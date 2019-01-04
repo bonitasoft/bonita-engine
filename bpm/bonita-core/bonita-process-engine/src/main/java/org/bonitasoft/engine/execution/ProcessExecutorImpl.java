@@ -93,8 +93,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
@@ -270,10 +268,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private SProcessInstance createProcessInstance(final SProcessDefinition sDefinition, final long starterId, final long starterSubstituteId,
                                                    final long callerId, final SFlowNodeType callerType, final long rootProcessInstanceId) throws SProcessInstanceCreationException {
-        final SProcessInstanceBuilder processInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class).createNewInstance(sDefinition)
-                .setStartedBy(starterId).setStartedBySubstitute(starterSubstituteId).setCallerId(callerId, callerType)
-                .setRootProcessInstanceId(rootProcessInstanceId);
-        final SProcessInstance sProcessInstance = processInstanceBuilder.done();
+
+        SProcessInstance sProcessInstance = SProcessInstance.builder().name(sDefinition.getName())
+                .processDefinitionId(sDefinition.getId()).description(sDefinition.getDescription())
+                .startedBy(starterId).startedBySubstitute(starterSubstituteId).callerId(callerId).callerType(callerType)
+                .rootProcessInstanceId(rootProcessInstanceId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
         return sProcessInstance;
     }

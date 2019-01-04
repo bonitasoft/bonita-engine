@@ -25,12 +25,12 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFo
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -58,7 +58,7 @@ public class ParentContainerResolverImplTest {
     @Test
     public void getContainerHierarchy_on_process_with_no_caller() throws Exception {
         //given
-        doReturn(new SProcessInstanceImpl()).when(processInstanceService).getProcessInstance(5L);
+        doReturn(SProcessInstance.builder().build()).when(processInstanceService).getProcessInstance(5L);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
                 .getContainerHierarchy(new DataContainer(5L, DataInstanceContainer.PROCESS_INSTANCE.name()));
@@ -109,7 +109,7 @@ public class ParentContainerResolverImplTest {
     }
 
     private void processWithCaller(long processInstanceId, long callerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
+        SProcessInstance processInstance = new SProcessInstance();
         processInstance.setCallerId(callerId);
         doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
     }

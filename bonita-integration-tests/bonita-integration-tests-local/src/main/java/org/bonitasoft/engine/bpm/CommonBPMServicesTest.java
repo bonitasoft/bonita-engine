@@ -48,7 +48,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilderFactory;
@@ -265,14 +264,13 @@ public class CommonBPMServicesTest {
 
     public List<SProcessInstance> getFirstProcessInstances(final int nb) throws SBonitaReadException {
         // we are already in a transaction context here:
-        final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, BuilderFactory.get(SProcessInstanceBuilderFactory.class)
-                .getLastUpdateKey(), OrderByType.DESC);
+        final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, SProcessInstance.LAST_UPDATE_KEY, OrderByType.DESC);
         final QueryOptions queryOptions = new QueryOptions(0, nb, Collections.singletonList(orderByOption), Collections.<FilterOption> emptyList(), null);
         return getTenantAccessor().getProcessInstanceService().searchProcessInstances(queryOptions);
     }
 
     protected SProcessInstance createSProcessInstance() throws SBonitaException {
-        final SProcessInstance processInstance = BuilderFactory.get(SProcessInstanceBuilderFactory.class).createNewInstance("process", 1).done();
+        final SProcessInstance processInstance = SProcessInstance.builder().name("process").processDefinitionId(1).build();
 
         openTx();
         getTenantAccessor().getProcessInstanceService().createProcessInstance(processInstance);

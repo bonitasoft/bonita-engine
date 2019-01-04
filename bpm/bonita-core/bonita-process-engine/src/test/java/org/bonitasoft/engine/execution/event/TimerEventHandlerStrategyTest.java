@@ -30,7 +30,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -71,7 +71,7 @@ public class TimerEventHandlerStrategyTest {
     private SProcessDefinitionImpl processDefinition;
     private SEventDefinitionImpl eventDefintion;
     private STimerEventTriggerDefinitionImpl eventTriggerDefinition;
-    private SProcessInstanceImpl processInstance;
+    private SProcessInstance processInstance;
     private SExpressionImpl timerExpression;
     @Captor
     private ArgumentCaptor<SJobDescriptor> jobDescriptorArgumentCaptor;
@@ -87,7 +87,7 @@ public class TimerEventHandlerStrategyTest {
         eventDefintion = new SStartEventDefinitionImpl(6543721L, "startevent");
         timerExpression = new SExpressionImpl("duration", "12342", "constant", "long", "", Collections.<SExpression> emptyList());
 
-        processInstance = new SProcessInstanceImpl("proceInst", PROCESS_DEFINITION_ID);
+        processInstance = new SProcessInstance("proceInst", PROCESS_DEFINITION_ID);
         processInstance.setId(PROCESS_INSTANCE_ID);
 
     }

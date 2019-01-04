@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl;
@@ -89,7 +88,7 @@ public class ProcessArchiverTest {
         ref2.setId(2L);
         final SProcessMultiRefBusinessDataInstanceImpl ref3 = new SProcessMultiRefBusinessDataInstanceImpl();
         List<SRefBusinessDataInstanceImpl> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
-        SProcessInstance processInstance = new SProcessInstanceImpl();
+        SProcessInstance processInstance = new SProcessInstance();
         processInstance.setId(451L);
 
         doReturn(mock(SAProcessInstance.class)).when(processArchiver).buildArchiveProcessInstance(processInstance);

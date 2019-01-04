@@ -15,19 +15,20 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.junit.Test;
 
 public class SProcessInstanceImplTest {
 
     @Test
     public void defaultInterruptingEventIdShouldBeMinusOne() {
-        assertThat(new SProcessInstanceImpl().getInterruptingEventId()).isEqualTo(-1L);
+        assertThat(SProcessInstance.builder().build().getInterruptingEventId()).isEqualTo(-1L);
     }
 
     @Test
     public void should_be_root_instance_when_callerId_is_less_than_zero() throws Exception {
         //given
-        SProcessInstanceImpl instance = new SProcessInstanceImpl();
+        SProcessInstance instance = new SProcessInstance();
         instance.setCallerId(-1);
 
         //then
@@ -37,7 +38,7 @@ public class SProcessInstanceImplTest {
     @Test
     public void should_not_be_root_instance_when_callerId_is_greater_than_zero() throws Exception {
         //given
-        SProcessInstanceImpl instance = new SProcessInstanceImpl();
+        SProcessInstance instance = new SProcessInstance();
         instance.setCallerId(1);
 
         //then

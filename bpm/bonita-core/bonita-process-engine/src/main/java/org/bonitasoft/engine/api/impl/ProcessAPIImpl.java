@@ -49,7 +49,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
 import org.bonitasoft.engine.api.impl.connector.ResetAllFailedConnectorStrategy;
 import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
-import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactManager;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -291,7 +290,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
@@ -3436,11 +3434,10 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
             final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaReadException {
-        final SProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
-        final FilterOption filterOption = new FilterOption(SProcessInstance.class, keyProvider.getProcessDefinitionIdKey(), processDefinitionId);
-        final OrderByOption order2 = new OrderByOption(SProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SProcessInstance.class, SProcessInstance.PROCESSDEF_ID_KEY, processDefinitionId);
+        final OrderByOption order2 = new OrderByOption(SProcessInstance.class, SProcessInstance.ID_KEY, OrderByType.ASC);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
-        final OrderByOption order = new OrderByOption(SProcessInstance.class, keyProvider.getCallerIdKey(), OrderByType.ASC);
+        final OrderByOption order = new OrderByOption(SProcessInstance.class, SProcessInstance.CALLER_ID, OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Arrays.asList(order, order2), Collections.singletonList(filterOption), null);
         return processInstanceService.searchProcessInstances(queryOptions);
     }

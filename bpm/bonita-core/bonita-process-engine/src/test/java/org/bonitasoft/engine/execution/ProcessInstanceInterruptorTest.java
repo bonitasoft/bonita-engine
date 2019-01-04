@@ -26,9 +26,9 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -149,7 +149,7 @@ public class ProcessInstanceInterruptorTest {
     @Test
     public void should_set_process_instance_to_ABORTING() throws Exception {
         //given
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl("proc", PROCESS_INSTANCE_ID);
+        SProcessInstance processInstance = new SProcessInstance("proc", PROCESS_INSTANCE_ID);
         doReturn(processInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
@@ -160,7 +160,7 @@ public class ProcessInstanceInterruptorTest {
     @Test
     public void should_set_process_instance_to_CANCELLING() throws Exception {
         //given
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl("proc", PROCESS_INSTANCE_ID);
+        SProcessInstance processInstance = new SProcessInstance("proc", PROCESS_INSTANCE_ID);
         doReturn(processInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, CANCELLING);

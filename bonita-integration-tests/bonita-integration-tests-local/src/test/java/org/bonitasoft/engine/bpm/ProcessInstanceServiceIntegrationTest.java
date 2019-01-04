@@ -31,11 +31,9 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
@@ -103,9 +101,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void getNumberOfProcessInstances() throws STransactionCreationException, STransactionCommitException, SProcessInstanceCreationException,
             STransactionRollbackException, SBonitaReadException {
         transactionService.begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
-        SProcessInstance sProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
+        SProcessInstance sProcessInstance = SProcessInstance.builder()
+                .name("an instance name")
+                .processDefinitionId(processDefinitionId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(queryOptions);
@@ -118,7 +117,9 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
         // second test with 100 processes:
         for (int i = 0; i < 100; i++) {
-            sProcessInstance = sProcessInstanceBuilder.createNewInstance("process instance " + i, processDefinitionId).done();
+            sProcessInstance = SProcessInstance.builder()
+                    .name("process instance " + i)
+                    .processDefinitionId(processDefinitionId).build();
             processInstanceService.createProcessInstance(sProcessInstance);
         }
         final long numberOfProcessInstances = processInstanceService.getNumberOfProcessInstances(queryOptions);
@@ -133,11 +134,16 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void getCorrectProcessInstancesOrder() throws Exception {
         // Creation of the process instances we want to retrieve:
         transactionService.begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
-        final SProcessInstance sProcessInstance0 = sProcessInstanceBuilder.createNewInstance("instance name 0", processDefinitionId).done();
-        final SProcessInstance sProcessInstance1 = sProcessInstanceBuilder.createNewInstance("instance name 1", processDefinitionId).done();
-        final SProcessInstance sProcessInstance2 = sProcessInstanceBuilder.createNewInstance("instance name 2", processDefinitionId).done();
+        final SProcessInstance sProcessInstance0 = SProcessInstance.builder()
+                .name("instance name 0")
+                .processDefinitionId(processDefinitionId).build();
+        final SProcessInstance sProcessInstance1 = SProcessInstance.builder()
+                .name("instance name 1")
+                .processDefinitionId(processDefinitionId).build();
+        final SProcessInstance sProcessInstance2 = SProcessInstance.builder()
+                .name("instance name 2")
+                .processDefinitionId(processDefinitionId).build();
         processInstanceService.createProcessInstance(sProcessInstance0);
         processInstanceService.setState(sProcessInstance0, ProcessInstanceState.STARTED);
         // to ensure the date is not exactly the same as the previous one:
@@ -175,9 +181,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testDeleteProcessInstance() throws SBonitaException {
         // Creation of a process instance:
         transactionService.begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
-        final SProcessInstance sProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
+        final SProcessInstance sProcessInstance = SProcessInstance.builder()
+                .name("an instance name")
+                .processDefinitionId(processDefinitionId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
         transactionService.complete();
 
@@ -198,10 +205,11 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testGetChildInstanceIdsOfProcessInstance() throws Exception {
         // first create parent process instance
         transactionService.begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final SCallActivityInstanceBuilderFactory sCallActivityInstanceBuilder = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
-        final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
+        final SProcessInstance parentProcessInstance = SProcessInstance.builder()
+                .name("an instance name")
+                .processDefinitionId(processDefinitionId).build();
         processInstanceService.createProcessInstance(parentProcessInstance);
         transactionService.complete();
 
@@ -215,14 +223,16 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         final List<Long> childInstanceIds = new ArrayList<Long>();
         SProcessInstance childProcessInstance;
         for (int i = 0; i < 10; i++) {
-            childProcessInstance = sProcessInstanceBuilder.createNewInstance("child process instance " + i, processDefinitionId)
-                    .setContainerId(parentProcessInstance.getId()).setCallerId(activityInstance.getId(), SFlowNodeType.CALL_ACTIVITY).done();
+            childProcessInstance = SProcessInstance.builder()
+                    .name("child process instance " + i)
+                    .processDefinitionId(processDefinitionId)
+                    .containerId(parentProcessInstance.getId()).callerId(activityInstance.getId()).callerType(SFlowNodeType.CALL_ACTIVITY).build();
             processInstanceService.createProcessInstance(childProcessInstance);
             childInstanceIds.add(childProcessInstance.getId());
         }
         transactionService.complete();
         // test get child by paging, order by name ASC
-        final String nameField = BuilderFactory.get(SProcessInstanceBuilderFactory.class).getNameKey();
+        final String nameField = SProcessInstance.NAME_KEY;
         transactionService.begin();
         final List<Long> childInstanceIdList1 = processInstanceService.getChildInstanceIdsOfProcessInstance(parentProcessInstance.getId(), 0, 4, nameField,
                 OrderByType.ASC);
@@ -269,10 +279,11 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testGetNumberOfChildInstancesOfProcessInstance() throws Exception {
         // first create parent process instance and test
         transactionService.begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final SCallActivityInstanceBuilderFactory sCallActivityInstanceBuilder = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
-        final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
+        final SProcessInstance parentProcessInstance = SProcessInstance.builder()
+                .name("an instance name")
+                .processDefinitionId(processDefinitionId).build();
         processInstanceService.createProcessInstance(parentProcessInstance);
         long numberOfChild = processInstanceService.getNumberOfChildInstancesOfProcessInstance(parentProcessInstance.getId());
         transactionService.complete();
@@ -288,8 +299,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
                 parentProcessInstance.getId()).done();
         activityInstanceService.createActivityInstance(activityInstance);
         for (int i = 0; i < 10; i++) {
-            childProcessInstance = sProcessInstanceBuilder.createNewInstance("child process instance " + i, processDefinitionId)
-                    .setContainerId(parentProcessInstance.getId()).setCallerId(activityInstance.getId(), SFlowNodeType.CALL_ACTIVITY).done();
+            childProcessInstance = SProcessInstance.builder()
+                    .name("child process instance " + i)
+                    .processDefinitionId(processDefinitionId)
+                    .containerId(parentProcessInstance.getId()).callerId(activityInstance.getId()).callerType(SFlowNodeType.CALL_ACTIVITY).build();
             processInstanceService.createProcessInstance(childProcessInstance);
             childInstanceIds.add(childProcessInstance.getId());
         }
@@ -351,10 +364,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     private SProcessInstance createProcessInstanceInTransaction(final long process_definition_id, final String processName)
             throws STransactionCreationException, SProcessInstanceCreationException, STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
-
         // Creation of a process instance:
-        final SProcessInstance processInstance = sProcessInstanceBuilder.createNewInstance(processName, process_definition_id).done();
+        final SProcessInstance processInstance = SProcessInstance.builder()
+                .name(processName)
+                .processDefinitionId(process_definition_id).build();
         processInstanceService.createProcessInstance(processInstance);
         getTransactionService().complete();
         return processInstance;
