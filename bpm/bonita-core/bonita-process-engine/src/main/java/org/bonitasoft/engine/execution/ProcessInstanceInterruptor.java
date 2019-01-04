@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 
@@ -35,21 +35,32 @@ public class ProcessInstanceInterruptor {
     private ProcessInstanceService processInstanceService;
     private FlowNodeInstanceService flowNodeInstanceService;
     private ContainerRegistry containerRegistry;
-    private final TechnicalLoggerService logger;
+    private final TechnicalLogger logger;
 
     public ProcessInstanceInterruptor(ProcessInstanceService processInstanceService, FlowNodeInstanceService flowNodeInstanceService,
                                       ContainerRegistry containerRegistry, final TechnicalLoggerService technicalLoggerService) {
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.containerRegistry = containerRegistry;
-        logger = technicalLoggerService;
+        logger = technicalLoggerService.asLogger(ProcessInstanceInterruptor.class);
     }
 
+    /**
+     * Interrupt the given process instant AND its children
+     *
+     * @param processInstanceId the process instance
+     * @param stateCategory     the state category
+     */
     public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory)
             throws SBonitaException {
         processInstanceService.setStateCategory(processInstanceService.getProcessInstance(processInstanceId), stateCategory);
-        final List<SFlowNodeInstance> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, -1);
+        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
+        interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+    }
+
+    private void executeChildren(SStateCategory stateCategory, List<SFlowNodeInstance> stableChildrenIds) throws SWorkRegisterException {
         for (final SFlowNodeInstance child : stableChildrenIds) {
+            logger.debug("Resume child in stateCategory; {} id = {}", stateCategory, child.getStateId());
             executeFlowNode(child);
         }
     }
@@ -58,51 +69,69 @@ public class ProcessInstanceInterruptor {
         containerRegistry.executeFlowNode(child.getProcessDefinitionId(), child.getParentProcessInstanceId(), child.getId());
     }
 
+    /**
+     * Interrupt the given process instant AND its children, excluding the exceptionChildId
+     *
+     * @param processInstanceId the process instance
+     * @param stateCategory     the state category
+     * @param exceptionChildId  the element to exclude
+     */
     public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long exceptionChildId)
             throws SBonitaException {
         processInstanceService.setStateCategory(processInstanceService.getProcessInstance(processInstanceId), stateCategory);
-        final List<SFlowNodeInstance> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
-        if (stableChildrenIds != null) {
-            for (final SFlowNodeInstance child : stableChildrenIds) {
-                executeFlowNode(child);
-            }
-        }
+        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
+        flowNodeInstances = excludeFlowNode(exceptionChildId, flowNodeInstances);
+        interruptFlowNodeInstances(flowNodeInstances, stateCategory);
     }
 
-    public void interruptChildrenOnly(final long processInstanceId, final SStateCategory stateCategory, final long interruptorChildId)
-            throws SBonitaException {
-        List<SFlowNodeInstance> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, interruptorChildId);
-        for (final SFlowNodeInstance child : stableChildrenIds) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Resume child in stateCategory " + stateCategory + " id = " + child.getId());
-            }
-            executeFlowNode(child);
-        }
-    }
-
-    private List<SFlowNodeInstance> interruptChildrenFlowNodeInstances(long processInstanceId, SStateCategory stateCategory,
-                                                                       long exceptionChildId) throws SBonitaException {
-        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstances(processInstanceId, 0, Integer.MAX_VALUE)
+    private List<SFlowNodeInstance> excludeFlowNode(long exceptionChildId, List<SFlowNodeInstance> flowNodeInstances) {
+        return flowNodeInstances
                 .stream()
                 .filter(f -> f.getId() != exceptionChildId)
                 .collect(Collectors.toList());
-        return interruptFlowNodeInstances(flowNodeInstances, stateCategory);
     }
 
-    private List<SFlowNodeInstance> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory)
+    /**
+     * Interrupt children of given process instance excluding interruptorChildId
+     *
+     * @param processInstanceId  the process instance
+     * @param stateCategory      the state category in which children must be set
+     * @param interruptorChildId the element to exclude
+     */
+    public void interruptChildrenOfProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long interruptorChildId)
+            throws SBonitaException {
+        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
+        flowNodeInstances = excludeFlowNode(interruptorChildId, flowNodeInstances);
+        interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+    }
+
+
+    /**
+     * Interrupt children of given flow node instance
+     *
+     * @param flowNodeInstance the flow node instance
+     * @param stateCategory      the state category in which children must be set
+     */
+    public void interruptChildrenOfFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SStateCategory stateCategory)
+            throws SBonitaException {
+        if (flowNodeInstance.getTokenCount() == 0) {
+            return;
+        }
+        List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfActivity(flowNodeInstance.getId(), 0, Integer.MAX_VALUE);
+        interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+    }
+
+    private void interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory)
             throws SBonitaException {
         final List<SFlowNodeInstance> childrenToResume = new ArrayList<>();
         for (final SFlowNodeInstance child : children) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                        "Put element in " + stateCategory + ", id= " + child.getId() + " name = " + child.getName() + " state = " + child.getStateName());
-            }
+            logger.debug("Put element in {}, id= {} name = {} state = {}", stateCategory, child.getId(), child.getName(), child.getStateName());
             flowNodeInstanceService.setStateCategory(child, stateCategory);
             if (child.mustExecuteOnAbortOrCancelProcess()) {
                 childrenToResume.add(child);
             }
         }
-        return childrenToResume;
+        executeChildren(stateCategory, childrenToResume);
     }
 
 }

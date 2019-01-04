@@ -72,14 +72,29 @@ public interface FlowNodeInstanceService {
     SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
-     * @param parentContainerId
+     *
+     * get the flow node instances directly contained in the given process instance
+     *
+     * @param processInstanceId the parent process isntance
      * @param fromIndex
      * @param maxResults
      * @return
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    List<SFlowNodeInstance> getFlowNodeInstances(long parentContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
+    List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(long processInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
+    /**
+     *
+     * get the flow node instances directly contained in the given activity instance
+     *
+     * @param parentActivityInstanceId the parent process instance
+     * @param fromIndex
+     * @param maxResults
+     * @return
+     * @throws SFlowNodeReadException
+     * @since 7.8
+     */
+    List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
 
     /**
      * @param flowNodeInstance

@@ -15,26 +15,21 @@
 package org.bonitasoft.engine.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -64,7 +59,7 @@ public class FlowNodeExecutorImplTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
-    private EventInstanceService eventInstanceService;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
     @Mock
     private ArchiveService archiveService;
     @Mock
@@ -76,9 +71,9 @@ public class FlowNodeExecutorImplTest {
 
     @Before
     public void before() throws Exception {
-        flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService, null, archiveService,
+        flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService, archiveService,
                 null, containerRegistry, processDefinitionService, null, null, null, null, workService, workFactory,
-                null,eventInstanceService);
+                null,processInstanceInterruptor);
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
         doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();
@@ -88,19 +83,10 @@ public class FlowNodeExecutorImplTest {
     public void should_abort_children_when_setting_activity_to_a_terminal_state() throws Exception {
         SUserTaskInstanceImpl flowNodeInstance = aTask(1L, true);
         flowNodeInstance.setTokenCount(2);
-        SUserTaskInstanceImpl task1 = aTask(2L, true);
-        SUserTaskInstanceImpl task2 = aTask(3L, true);
-        doReturn(Arrays.asList(task1, task2)).when(activityInstanceService).searchActivityInstances(eq(SActivityInstance.class), nullable(QueryOptions.class));
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 
-        verify(activityInstanceService).setStateCategory(task1, ABORTING);
-        verify(activityInstanceService).setStateCategory(task2, ABORTING);
-        verify(workService, times(2)).registerWork(workDescriptorArgumentCaptor.capture());
-        assertThat(workDescriptorArgumentCaptor.getAllValues().stream()
-                .map(work -> tuple(work.getType(), work.getLong("flowNodeInstanceId")))
-                .collect(Collectors.toList())).containsOnly(tuple("EXECUTE_FLOWNODE", 2L),
-                tuple("EXECUTE_FLOWNODE", 3L));
+        verify(processInstanceInterruptor).interruptChildrenOfFlowNodeInstance(flowNodeInstance, ABORTING);
     }
 
     @Test

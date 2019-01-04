@@ -39,7 +39,7 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         if (flowNodeInstance.getTokenCount() > 0) {
             try {
-                stateBehaviors.interruptSubActivities(flowNodeInstance.getId(), getStateCategory());
+                stateBehaviors.interruptSubActivities(flowNodeInstance, getStateCategory());
             } catch (final SBonitaException e) {
                 throw new SActivityExecutionException(e);
             }

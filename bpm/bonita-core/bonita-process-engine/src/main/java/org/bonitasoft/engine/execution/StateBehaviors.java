@@ -159,6 +159,7 @@ public class StateBehaviors {
     private final RefBusinessDataService refBusinessDataService;
     private ProcessExecutor processExecutor;
     private final BPMWorkFactory workFactory;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
                           final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
@@ -167,7 +168,8 @@ public class StateBehaviors {
                           final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
                           final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
                           final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
-                          final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory) {
+                          final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory,
+                          ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -189,6 +191,7 @@ public class StateBehaviors {
         this.refBusinessDataService = refBusinessDataService;
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.workFactory = workFactory;
+        this.processInstanceInterruptor = processInstanceInterruptor;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -606,22 +609,8 @@ public class StateBehaviors {
         }
     }
 
-    public void interruptSubActivities(final long parentActivityInstanceId, final SStateCategory stateCategory) throws SBonitaException {
-        QueryOptions queryOptions = activityInstanceService.buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(parentActivityInstanceId,
-                MAX_NUMBER_OF_RESULTS);
-        List<SActivityInstance> childrenToEnd;
-        do {
-            childrenToEnd = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
-            for (final SActivityInstance child : childrenToEnd) {
-                activityInstanceService.setStateCategory(child, stateCategory);
-                if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(),
-                            child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
-                            child.getId());
-                }
-            }
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (!childrenToEnd.isEmpty());
+    public void interruptSubActivities(SFlowNodeInstance flowNodeInstance, final SStateCategory stateCategory) throws SBonitaException {
+        processInstanceInterruptor.interruptChildrenOfFlowNodeInstance(flowNodeInstance, stateCategory);
     }
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,

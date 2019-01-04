@@ -115,7 +115,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
         updateInterruptorErrorEvent(eventInstance);
-        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
+        processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
     }
 
     private void updateInterruptorErrorEvent(final SThrowEventInstance eventInstance) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,

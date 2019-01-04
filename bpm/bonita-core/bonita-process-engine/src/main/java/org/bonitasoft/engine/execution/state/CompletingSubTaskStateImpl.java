@@ -79,7 +79,7 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
         final boolean hasTokens = sHumanTaskInstance.getTokenCount() > 0;
         if (hasTokens) {
             try {
-                stateBehaviors.interruptSubActivities(flowNodeInstance.getId(), SStateCategory.ABORTING);
+                stateBehaviors.interruptSubActivities(flowNodeInstance, SStateCategory.ABORTING);
             } catch (final SBonitaException e) {
                 throw new SActivityExecutionException(e);
             }

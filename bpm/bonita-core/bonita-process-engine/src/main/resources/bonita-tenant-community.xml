@@ -38,7 +38,6 @@
     <bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
         <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
         <constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
-        <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
@@ -50,7 +49,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="workFactory" ref="workFactory" />
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
     </bean>
 
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">

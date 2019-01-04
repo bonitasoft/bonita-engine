@@ -850,19 +850,4 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
              throws SBonitaReadException {
          return getPersistenceService().searchEntity(SHumanTaskInstance.class, ASSIGNED_AND_PENDING, queryOptions, Collections.emptyMap());
      }
-
-    @Override
-    public QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(final long parentActivityInstanceId, final int numberOfResults) {
-        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-
-        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-
-        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
-
-        return new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
-    }
-
 }
