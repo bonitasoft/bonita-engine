@@ -159,7 +159,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar,
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
+            //refresh classloader now, it is used to update the schema
+            dependencyService.refreshClassLoader(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException e) {

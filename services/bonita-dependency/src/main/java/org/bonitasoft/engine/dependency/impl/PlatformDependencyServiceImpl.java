@@ -43,10 +43,12 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -60,8 +62,9 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     private final ClassLoaderService classLoaderService;
 
     public PlatformDependencyServiceImpl(final PersistenceService platformPersistenceService, final ClassLoaderService classLoaderService,
-            BroadcastService broadcastService, UserTransactionService userTransactionService) {
-        super(broadcastService, userTransactionService, platformPersistenceService);
+                                         BroadcastService broadcastService, UserTransactionService userTransactionService,
+                                         BonitaTaskExecutor bonitaTaskExecutor, SessionAccessor sessionAccessor) {
+        super(broadcastService, userTransactionService, platformPersistenceService, bonitaTaskExecutor, sessionAccessor);
         this.platformPersistenceService = platformPersistenceService;
         this.classLoaderService = classLoaderService;
     }

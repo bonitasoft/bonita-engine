@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.bonitasoft.engine.CallableWithException;
+import org.bonitasoft.engine.RunnableWithException;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -85,28 +87,46 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         platformDependencyService = getPlatformAccessor().getDependencyService();
     }
 
-    private void initializeClassLoaderService() throws Exception {
+    private <T> T inTx(CallableWithException<T> runnable) throws Exception {
         getTransactionService().begin();
-        createPlatformDependency("globalResource", "globalResource.jar", IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
-        createDependency(ID1, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-        createDependency(ID2, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-        createDependency(ID1, TYPE1, "LocalResource2", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
-        getTransactionService().complete();
+        try {
+            return runnable.call();
+        } finally {
+            getTransactionService().complete();
+        }
+    }
+
+    private void inTx(RunnableWithException runnable) throws Exception {
+        getTransactionService().begin();
+        try {
+            runnable.run();
+        } finally {
+            getTransactionService().complete();
+        }
+    }
+
+    private void initializeClassLoaderService() throws Exception {
+        inTx(() -> {
+            createPlatformDependency("globalResource", "globalResource.jar", IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
+            createDependency(ID1, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
+            createDependency(ID2, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
+            createDependency(ID1, TYPE1, "LocalResource2", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
+        });
     }
 
     private void addNotInPathDependencies() throws Exception {
-        getTransactionService().begin();
-        createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar",
-                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar")));
-        createPlatformDependency("NotInPathShared", "NotInPathShared.jar",
-                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathShared.jar")));
-        createDependency(ID1, TYPE1, "NotInPathLocal", "NotInPathLocal.jar",
-                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar")));
-        getTransactionService().complete();
+        inTx(() -> {
+            createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar",
+                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar")));
+            createPlatformDependency("NotInPathShared", "NotInPathShared.jar",
+                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathShared.jar")));
+            createDependency(ID1, TYPE1, "NotInPathLocal", "NotInPathLocal.jar",
+                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar")));
+        });
     }
 
     private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
-            final byte[] value) throws SDependencyException {
+                                  final byte[] value) throws SDependencyException {
         long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
         dependencyService.refreshClassLoaderAfterUpdate(artifactType, artifactId);
         return id;
@@ -279,7 +299,6 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
     @Test
     public void testRemoveLocalClassLoader() throws Exception {
         initializeClassLoaderService();
-        // getTransactionService().begin();
         final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
 
@@ -290,70 +309,79 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         classLoaderService.removeLocalClassLoader(TYPE1.name(), ID2);
 
         assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
-        // getTransactionService().complete();
     }
 
     @Test
     public void testAddResourcesToGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
-        getTransactionService().begin();
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
         Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
 
-        createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        inTx(() -> {
+            createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        });
         Thread.sleep(10); // to be sure classloader refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader2);
 
         assertSameClassloader(globalClassLoader, classLoader2);
-        getTransactionService().complete();
     }
 
     @Test
     public void testAddResourcesToLocalClassLoader() throws Exception {
         initializeClassLoaderService();
-        getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        checkGlobalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
-        final long dependencyId = createDependency(ID1, TYPE1, "newlib", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
+        ClassLoader localClassLoader = inTx(() -> {
+            final ClassLoader cl = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+            checkGlobalClassLoader(cl.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
-        // check the refresh has been done using the service
-        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        checkLocalClassLoader(localClassLoader2.loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
-                .getClassLoader());
+            createDependency(ID1, TYPE1, "newlib", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
+            return cl;
+        });
 
-        // check the refresh has been done using the old reference
-        checkLocalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
+        inTx(() -> {
+            // check the refresh has been done using the service
+            final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+            checkLocalClassLoader(localClassLoader2.loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
+                    .getClassLoader());
 
-        assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
-        getTransactionService().complete();
+            // check the refresh has been done using the old reference
+            checkLocalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
+
+            assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
+        });
     }
 
     @Test
     public void testResetGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
 
-        getTransactionService().begin();
-        createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
 
-        ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
-        Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
-        final ClassLoader classLoader = clazz.getClassLoader();
-        checkGlobalClassLoader(classLoader);
-        assertSameClassloader(globalClassLoader, classLoader);
+        inTx(() -> {
+            createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        });
 
-        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
-                ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
-                classLoaderService.getGlobalClassLoaderId());
+        inTx(() -> {
+            ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+            Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
+            final ClassLoader classLoader = clazz.getClassLoader();
+            checkGlobalClassLoader(classLoader);
+            assertSameClassloader(globalClassLoader, classLoader);
+            platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
+                    ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+            platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                    classLoaderService.getGlobalClassLoaderId());
 
-        globalClassLoader = classLoaderService.getGlobalClassLoader();
-        clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
-        assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
-        getTransactionService().complete();
+        });
+        inTx(() -> {
+            ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
+            Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
+            // dependency is not in the bonita classloader anymore but only in the Test classloader
+            assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
+        });
+
     }
 
     @Test
