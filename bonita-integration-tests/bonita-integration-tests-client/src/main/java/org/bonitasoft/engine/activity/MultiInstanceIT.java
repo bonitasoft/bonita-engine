@@ -16,6 +16,8 @@ package org.bonitasoft.engine.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID;
 import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.STATE_NAME;
+import static org.bonitasoft.engine.expression.ExpressionConstants.*;
+import static org.bonitasoft.engine.operation.OperatorType.ASSIGNMENT;
 import static org.bonitasoft.engine.test.TestStates.ABORTED;
 import static org.junit.Assert.*;
 
@@ -67,7 +69,6 @@ import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -235,7 +236,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         userTask.addData("dataOutputItem_", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(0));
         userTask.addOperation(
                 new LeftOperandBuilder().createNewInstance("dataOutputItem_").done(),
-                OperatorType.ASSIGNMENT,
+                ASSIGNMENT,
                 "=",
                 null,
                 new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithLoopDataInputAndOutput3", "dataInputItem_ + 1",
@@ -377,8 +378,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3))
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceParallelWithCompletionCondition",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 2 ", Boolean.class.getName(),
-                                new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
+                                NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 2 ",
+                                Boolean.class.getName(),
+                                new ExpressionBuilder().createEngineConstant(NUMBER_OF_COMPLETED_INSTANCES)));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -396,8 +398,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax))
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("remainingInstancesAreAbortedAfterCompletionCondition",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
-                                new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
+                                NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ",
+                                Boolean.class.getName(),
+                                new ExpressionBuilder().createEngineConstant(NUMBER_OF_COMPLETED_INSTANCES)));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -420,8 +423,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
                 .addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceSequentialWithCompletionCondition",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 15 ", Boolean.class.getName(),
-                                new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
+                                NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 15 ",
+                                Boolean.class.getName(),
+                                new ExpressionBuilder().createEngineConstant(NUMBER_OF_COMPLETED_INSTANCES)));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -516,7 +520,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final int loopMax = 3;
         final int numberOfExecutedActivities = loopMax - 1;
 
-        withMultiInstanceAttribute(condition, ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES, numberOfExecutedActivities);
+        withMultiInstanceAttribute(condition, NUMBER_OF_COMPLETED_INSTANCES, numberOfExecutedActivities);
     }
 
     /**
@@ -577,7 +581,8 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final int numberOfExecutedActivities = loopMax;
         final int numberOfTaskToComplete = 2;
 
-        withParallelMultiInstanceAttribute(condition, ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES, numberOfExecutedActivities, numberOfTaskToComplete);
+        withParallelMultiInstanceAttribute(condition, NUMBER_OF_COMPLETED_INSTANCES, numberOfExecutedActivities,
+                numberOfTaskToComplete);
     }
 
     /**
@@ -775,8 +780,39 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeMultiInstanceWithActors", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("Survey");
-        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+        builder.addIntegerData("numberOfAlreadyFinishedTaskInstances",
+                new ExpressionBuilder().createConstantIntegerExpression(120));
+        builder.addIntegerData("totalNumberOfTaskInstances",
+                new ExpressionBuilder().createConstantIntegerExpression(120));
+        builder.addIntegerData("numberOfActiveInstances",
+                new ExpressionBuilder().createConstantIntegerExpression(120));
+        builder.addIntegerData("numberOfTerminatedInstances",
+                new ExpressionBuilder().createConstantIntegerExpression(120));
+        UserTaskDefinitionBuilder step1 = builder.addUserTask("step1", ACTOR_NAME);
+        step1.addOperation(new LeftOperandBuilder().createDataLeftOperand("numberOfAlreadyFinishedTaskInstances"), ASSIGNMENT,
+                "=",
+                new ExpressionBuilder().createGroovyScriptExpression("CompletedInstancesCountScript", "numberOfCompletedInstances",
+                        "java.lang.Integer",
+                        new ExpressionBuilder().createEngineConstant(NUMBER_OF_COMPLETED_INSTANCES)));
+        step1.addOperation(new LeftOperandBuilder().createDataLeftOperand("totalNumberOfTaskInstances"), ASSIGNMENT,
+                "=",
+                new ExpressionBuilder().createGroovyScriptExpression("TotalInstancesCountScript", "numberOfInstances",
+                        "java.lang.Integer",
+                        new ExpressionBuilder().createEngineConstant(NUMBER_OF_INSTANCES)));
+        step1.addOperation(new LeftOperandBuilder().createDataLeftOperand("numberOfActiveInstances"), ASSIGNMENT,
+                "=",
+                new ExpressionBuilder().createGroovyScriptExpression("numberOfActiveInstancesScript", "numberOfActiveInstances",
+                        "java.lang.Integer",
+                        new ExpressionBuilder().createEngineConstant(NUMBER_OF_ACTIVE_INSTANCES)));
+        step1.addOperation(new LeftOperandBuilder().createDataLeftOperand("numberOfTerminatedInstances"), ASSIGNMENT,
+                "=",
+                new ExpressionBuilder().createGroovyScriptExpression("numberOfTerminatedInstancesScript", "numberOfTerminatedInstances",
+                        "java.lang.Integer",
+                        new ExpressionBuilder().createEngineConstant(NUMBER_OF_TERMINATED_INSTANCES)));
+
+        step1.addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
+
 
         final List<User> listUsers = new ArrayList<>();
         final List<String> listActors = new ArrayList<>();
@@ -786,7 +822,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         listActors.add(ACTOR_NAME);
         listUsers.add(jenny);
         listActors.add(ACTOR_NAME);
-
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), listActors, listUsers);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -801,14 +836,30 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final List<HumanTaskInstance> pendingTasks2 = getProcessAPI().getPendingHumanTaskInstances(jack.getId(), 0, 10, null);
         final HumanTaskInstance pendingTask2 = pendingTasks2.get(0);
         assignAndExecuteStep(pendingTask2, jack.getId());
+        waitForActivityInCompletedState(processInstance,pendingTask2.getName(),true);
+        int numberOfFinishedTaskInstances = (int) getProcessAPI().getProcessDataInstance("numberOfAlreadyFinishedTaskInstances", processInstance.getId())
+                .getValue();
+        assertThat(numberOfFinishedTaskInstances).isEqualTo(1);
 
         // Execute task of multi-instance for Jenny
         checkNbPendingTaskOf(1, jenny);
         final List<HumanTaskInstance> pendingTasks3 = getProcessAPI().getPendingHumanTaskInstances(jenny.getId(), 0, 10, null);
         final HumanTaskInstance pendingTask3 = pendingTasks3.get(0);
         assignAndExecuteStep(pendingTask3, jenny.getId());
-
         waitForProcessToFinish(processInstance);
+
+        numberOfFinishedTaskInstances = (int) getProcessAPI().getArchivedProcessDataInstance("numberOfAlreadyFinishedTaskInstances", processInstance.getId())
+                .getValue();
+        int totalNumberOfTaskInstances = (int) getProcessAPI().getArchivedProcessDataInstance("totalNumberOfTaskInstances", processInstance.getId())
+                .getValue();
+        int numberOfActiveInstances = (int) getProcessAPI().getArchivedProcessDataInstance("numberOfActiveInstances", processInstance.getId())
+                .getValue();
+        int numberOfTerminatedInstances = (int) getProcessAPI().getArchivedProcessDataInstance("numberOfTerminatedInstances", processInstance.getId())
+                .getValue();
+        assertThat(numberOfFinishedTaskInstances).isEqualTo(2);
+        assertThat(totalNumberOfTaskInstances).isEqualTo(3);
+        assertThat(numberOfActiveInstances).isEqualTo(1);
+        assertThat(numberOfTerminatedInstances).isEqualTo(0);
         disableAndDeleteProcess(processDefinition);
     }
 

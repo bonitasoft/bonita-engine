@@ -37,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -108,6 +109,11 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                     return getLoggedUserFromSession(context, containerState);
                 case LOOP_COUNTER:
                     return getLoopCounter(context);
+                case NUMBER_OF_COMPLETED_INSTANCES:
+                case NUMBER_OF_INSTANCES:
+                case NUMBER_OF_ACTIVE_INSTANCES:
+                case NUMBER_OF_TERMINATED_INSTANCES:
+                    return getInstanceNumberForTheEngineConstant(context, expressionConstant);
                 default:
                     final Object object = context.get(expressionConstant.getEngineConstantName());
                     if (object == null) {
@@ -130,6 +136,48 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         } catch (final SBonitaException e) {
             throw new SExpressionEvaluationException(e, expressionName);
         }
+    }
+
+    private Serializable getInstanceNumberForTheEngineConstant(Map<String, Object> context, ExpressionConstants expressionConstants)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException, SExpressionEvaluationException {
+        final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
+        final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
+        String engineConstantName = expressionConstants.getEngineConstantName();
+        if (DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)) {
+            SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
+            if (flowNodeInstance instanceof SMultiInstanceActivityInstance) {
+                switch (expressionConstants) {
+                    case NUMBER_OF_TERMINATED_INSTANCES:
+                        return ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfTerminatedInstances();
+                    case NUMBER_OF_ACTIVE_INSTANCES:
+                        return ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
+                    case NUMBER_OF_INSTANCES:
+                        return ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfInstances();
+                    case NUMBER_OF_COMPLETED_INSTANCES:
+                        return ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfCompletedInstances();
+                    default:
+                        throw new SExpressionEvaluationException(engineConstantName + " is not available in this context",
+                engineConstantName);
+                }
+            }
+            SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) activityInstanceService
+                    .getFlowNodeInstance(flowNodeInstance.getParentActivityInstanceId());
+            switch (expressionConstants) {
+                case NUMBER_OF_TERMINATED_INSTANCES:
+                    return multiInstanceActivityInstance.getNumberOfTerminatedInstances();
+                case NUMBER_OF_ACTIVE_INSTANCES:
+                    return multiInstanceActivityInstance.getNumberOfActiveInstances();
+                case NUMBER_OF_INSTANCES:
+                    return multiInstanceActivityInstance.getNumberOfInstances();
+                case NUMBER_OF_COMPLETED_INSTANCES:
+                    return multiInstanceActivityInstance.getNumberOfCompletedInstances();
+                default:
+                    throw new SExpressionEvaluationException(engineConstantName + " is not available in this context",
+                engineConstantName);
+            }
+        }
+        throw new SExpressionEvaluationException(engineConstantName + " is not available in this context",
+                engineConstantName);
     }
 
     private Serializable getLoopCounter(Map<String, Object> context) throws SExpressionEvaluationException, SFlowNodeReadException, SFlowNodeNotFoundException {
