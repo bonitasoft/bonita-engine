@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.connector;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
@@ -178,9 +179,9 @@ public interface ConnectorService {
      * @return the result of the connector execution
      * @throws SConnectorException
      */
-    ConnectorResult executeConnector(long processDefinitionId, SConnectorInstance sConnectorInstance,
-            SConnectorImplementationDescriptor connectorImplementationDescriptor, ClassLoader classLoader, Map<String, Object> inputParameters)
-                    throws SConnectorException;
+    CompletableFuture<ConnectorResult> executeConnector(long processDefinitionId, SConnectorInstance sConnectorInstance,
+                                     SConnectorImplementationDescriptor connectorImplementationDescriptor, ClassLoader classLoader, Map<String, Object> inputParameters)
+            throws SConnectorException;
 
     /**
      * @param result

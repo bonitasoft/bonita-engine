@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.cache.CacheService;
@@ -216,6 +217,7 @@ public class ConnectorServiceImplTest {
         SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
                 "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
         SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
+        when(connectorExecutor.execute(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(Collections.emptyMap()));
 
         //when
         Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");

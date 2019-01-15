@@ -13,6 +13,7 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.cache.CacheService;
@@ -81,6 +82,7 @@ public class UserFilterServiceImplTest {
 
     @Test
     public void executeFilter_should_work_for_existing_descriptor() throws Exception {
+        doReturn(CompletableFuture.completedFuture(Collections.emptyMap())).when(connectorExecutor).execute(any(), anyMap(), any());
         doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
 
         userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.emptyMap(),
