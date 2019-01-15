@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -85,12 +87,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
      *        the number of threads to keep in the pool, even
      *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
      * @param loggerService
-     * @param timeout
-     *        if the execution of the connector is above this time in milliseconds the execution will fail
      * @param maximumPoolSize
      *        the maximum number of threads to allow in the
      *        pool
-     * @param keepAliveTime
+     * @param keepAliveTimeSeconds
      *        when the number of threads is greater than
      *        the core, this is the maximum time that excess idle threads
      *        will wait for new tasks before terminating. (in seconds)
@@ -109,9 +109,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     }
 
     @Override
-    public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters, final ClassLoader classLoader)
-            throws SConnectorException {
-        final long startTime = System.currentTimeMillis();
+    public CompletableFuture<Map<String, Object>> execute(final SConnector sConnector, final Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException {
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
@@ -122,24 +120,24 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         } catch (final STenantIdNotSetException tenantIdNotSetException) {
             throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
         }
-        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
-        final Future<Map<String, Object>> submit = executorService.submit(wrapForStats(callable));
-        try {
-            return getValue(submit);
-        } catch (final InterruptedException | ExecutionException e) {
-            disconnectSilently(sConnector);
-            throw new SConnectorException(e);
-        } catch (final TimeoutException e) {
-            submit.cancel(true);
-            disconnectSilently(sConnector);
-            throw new SConnectorException("The connector timed out " + sConnector, e);
-        } finally {
-            track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, startTime, sConnector, inputParameters);
-        }
+
+        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
+        return execute(sConnector, task);
+    }
+
+    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector, ExecuteConnectorCallable task) {
+        pendingWorks.incrementAndGet();
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return wrapForStats(task).call();
+            } catch (Throwable e) {
+                disconnectSilently(sConnector);
+                throw new SBonitaRuntimeException(e);
+            }
+        }, executorService);
     }
 
     private Callable<Map<String, Object>> wrapForStats(final Callable<Map<String, Object>> task) {
-        pendingWorks.incrementAndGet();
         return () -> {
             pendingWorks.decrementAndGet();
             runningWorks.incrementAndGet();
@@ -164,10 +162,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             desc.append(inputParameters);
             timeTracker.track(recordName, desc.toString(), endTime - startTime);
         }
-    }
-
-    protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
-        return submit.get();
     }
 
     void disconnectSilently(final SConnector sConnector) {
@@ -209,7 +203,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     /**
      * @author Baptiste Mesta
      */
-    final class ExecuteConnectorCallable implements Callable<Map<String, Object>> {
+    public final class ExecuteConnectorCallable implements Callable<Map<String, Object>> {
 
         private final Map<String, Object> inputParameters;
 
@@ -218,6 +212,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         private final long tenantId;
 
         private final ClassLoader loader;
+        private Thread thread;
+        private boolean interrupted;
 
         private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId,
                 final ClassLoader loader) {
@@ -229,6 +225,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
 
         @Override
         public Map<String, Object> call() throws Exception {
+            if (interrupted) {
+                throw new InterruptedException();
+            }
+            thread = Thread.currentThread();
             final long startTime = System.currentTimeMillis();
 
             //Fix Classloading issue with ThreadLocal implementation of SessionAccessor
@@ -253,6 +253,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             }
         }
 
+        public void interrupt() {
+            interrupted = true;
+            if (thread != null) {
+                thread.interrupt();
+            }
+        }
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -294,10 +300,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     // For unit tests
     ExecutorService getExecutorService() {
         return executorService;
-    }
-
-    public void setExecutorService(final ExecutorService executorService) {
-        this.executorService = executorService;
     }
 
     @Override

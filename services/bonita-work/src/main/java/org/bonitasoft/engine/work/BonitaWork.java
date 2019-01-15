@@ -81,6 +81,14 @@ public abstract class BonitaWork {
         return parentWork;
     }
 
+    protected BonitaWork getRootWork() {
+        BonitaWork rootWork = this;
+        while (rootWork.getParent() != null) {
+            rootWork = rootWork.getParent();
+        }
+        return rootWork;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

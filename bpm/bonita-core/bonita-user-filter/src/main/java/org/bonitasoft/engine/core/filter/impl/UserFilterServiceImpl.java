@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
@@ -191,7 +194,7 @@ public class UserFilterServiceImpl implements UserFilterService {
     protected FilterResult executeFilterInClassloader(final String implementationClassName, final Map<String, SExpression> parameters,
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException, SExpressionTypeUnknownException, SExpressionEvaluationException,
-            SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException {
+            SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException, InterruptedException, ExecutionException, TimeoutException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
@@ -208,7 +211,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                     inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
                 }
             }
-            connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader);
+            connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader).get();
             return new FilterResultImpl(sConnectorAdapter.getUserIds(), sConnectorAdapter.shouldAutoAssignTaskIfSingleResult());
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

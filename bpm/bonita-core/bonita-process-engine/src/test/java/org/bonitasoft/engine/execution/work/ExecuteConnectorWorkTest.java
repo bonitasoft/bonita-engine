@@ -14,12 +14,16 @@
 
 package org.bonitasoft.engine.execution.work;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -40,6 +44,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -122,14 +127,16 @@ public class ExecuteConnectorWorkTest {
     @Test
     public void should_execute_do_operations_in_a_lock() throws Exception {
         //given
+        CompletableFuture<ConnectorResult> toBeReturned = completedFuture(new ConnectorResult(null, Collections.emptyMap()));
+        when(connectorService.executeConnector(anyLong(), any(), any(), any(), any())).thenReturn(toBeReturned);
+
         //when
         executeConnectorWork.work(workContext);
 
         //then
-        InOrder inOrder = inOrder(lockService, userTransactionService, connectorService);
-        inOrder.verify(connectorService).executeConnector(anyLong(), nullable(SConnectorInstance.class), nullable(SConnectorImplementationDescriptor.class), any(ClassLoader.class), nullable(Map.class));
+        InOrder inOrder = inOrder(lockService, userTransactionService);
         inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()), eq(TENANT_ID));
-        inOrder.verify(userTransactionService).executeInTransaction(isA(ExecuteConnectorWork.EvaluateConnectorOutputsTxContent.class));
+        inOrder.verify(userTransactionService).executeInTransaction(any());
         inOrder.verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
     }
 }
