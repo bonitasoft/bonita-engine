@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -149,18 +150,16 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             final SConnectorInstance connectorInstance = callable.getConnectorInstance();
             SConnectorImplementationDescriptor connectorImplementationDescriptor = callable
                     .getConnectorImplementationDescriptor();
-            final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance,
+            return connectorService.executeConnector(processDefinitionId, connectorInstance,
                     connectorImplementationDescriptor, processClassloader,
-                    callable.getInputParameters());
-            // evaluate output and trigger the execution of the flow node
-            BonitaLock lock = tenantAccessor.getLockService().lock(processInstanceId,
-                    SFlowElementsContainerType.PROCESS.name(), getTenantId());
-            try {
-                userTransactionService.executeInTransaction(
-                        new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
-            } finally {
-                tenantAccessor.getLockService().unlock(lock, getTenantId());
-            }
+                    callable.getInputParameters()).thenAccept(r -> {
+                try {
+                    executeOutputOperationsAndContinue(context, tenantAccessor, userTransactionService, sConnectorDefinition, r);
+                } catch (Exception e) {
+                    throw new CompletionException(e);
+                }
+            });
+
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK)) {
                 final long endTime = System.currentTimeMillis();
@@ -177,7 +176,21 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             }
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return CompletableFuture.completedFuture(null);
+    }
+
+    private void executeOutputOperationsAndContinue(Map<String, Object> context, TenantServiceAccessor tenantAccessor, UserTransactionService userTransactionService, SConnectorDefinition sConnectorDefinition, ConnectorResult r) throws Exception {
+        // evaluate output and trigger the execution of the flow node
+        BonitaLock lock = tenantAccessor.getLockService().lock(processInstanceId,
+                SFlowElementsContainerType.PROCESS.name(), getTenantId());
+        try {
+            userTransactionService.executeInTransaction(() -> {
+                evaluateOutput(context, r, sConnectorDefinition);
+                continueFlow(context);
+                return null;
+            });
+        } finally {
+            tenantAccessor.getLockService().unlock(lock, getTenantId());
+        }
     }
 
     @Override

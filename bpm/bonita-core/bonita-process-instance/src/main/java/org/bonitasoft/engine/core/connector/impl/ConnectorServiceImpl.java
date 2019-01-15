@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -151,11 +153,11 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeConnector(final long processDefinitionId, final SConnectorInstance sConnectorInstance,
-            SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
-            final Map<String, Object> inputParameters) throws SConnectorException {
+    public CompletableFuture<ConnectorResult> executeConnector(final long processDefinitionId, final SConnectorInstance sConnectorInstance,
+                                                               SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
+                                                               final Map<String, Object> inputParameters) throws SConnectorException {
         final String implementationClassName = connectorImplementationDescriptor.getImplementationClassName();
-        final ConnectorResult connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
+        final CompletableFuture<ConnectorResult> connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             final String message = "Executed connector " + buildConnectorContextMessage(sConnectorInstance)
                     + buildConnectorInputMessage(inputParameters);
@@ -260,7 +262,12 @@ public class ConnectorServiceImpl implements ConnectorService {
         } catch (final SBonitaException e) {
             throw new SConnectorException(e);
         }
-        final ConnectorResult connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
+        final ConnectorResult connectorResult;
+        try {
+            connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SConnectorException(e);
+        }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed connector <" + implementationClassName
                     + "> with definition id <" + connectorDefinitionId + ">, version <" + connectorDefinitionVersion
@@ -269,14 +276,15 @@ public class ConnectorServiceImpl implements ConnectorService {
         return connectorResult;
     }
 
-    private ConnectorResult executeConnectorInClassloader(final String implementationClassName, final ClassLoader classLoader,
-            final Map<String, Object> inputParameters) throws SConnectorException {
+    private CompletableFuture<ConnectorResult> executeConnectorInClassloader(final String implementationClassName, final ClassLoader classLoader,
+                                                          final Map<String, Object> inputParameters) throws SConnectorException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
-            return new ConnectorResult(connector, connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader));
+            return connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader)
+                    .thenApply(result -> new ConnectorResult(connector, result));
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {

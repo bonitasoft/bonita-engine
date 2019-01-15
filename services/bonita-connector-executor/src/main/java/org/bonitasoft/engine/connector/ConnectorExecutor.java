@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.connector;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -34,12 +35,11 @@ public interface ConnectorExecutor extends TenantLifecycleService {
      *        The input parameters of connector
      * @param classLoader
      *        The classLoader within the connector will be executed
-     * @return
-     *         The output after connector executing
+     * @return a completable future with the result
      * @throws SConnectorException
      *         Error thrown when error occurs in connector executing
      */
-    Map<String, Object> execute(SConnector sConnector, Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException;
+    CompletableFuture<Map<String, Object>> execute(SConnector sConnector, Map<String, Object> inputParameters, ClassLoader classLoader) throws SConnectorException;
 
     /**
      * call disconnect method of the connector
@@ -48,5 +48,4 @@ public interface ConnectorExecutor extends TenantLifecycleService {
      * @throws SConnectorException
      */
     void disconnect(SConnector sConnector) throws SConnectorException;
-
 }
