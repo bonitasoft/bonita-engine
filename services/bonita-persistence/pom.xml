@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>7.9.0-SNAPSHOT</version>
+		<version>7.9.0.W03</version>
 	</parent>
 
     <dependencies>
