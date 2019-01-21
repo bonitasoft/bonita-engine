@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
+import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -32,5 +33,10 @@ public class DependencyRepository extends TestRepository {
         namedQuery.setParameter("artifactType", artifactType);
         namedQuery.setParameter("fileName", fileName);
         return (Long) namedQuery.uniqueResult();
+    }
+
+    public DependencyContent getDependencyContentOnly(long id) {
+        return (DependencyContent) getNamedQuery("getDependencyContentOnly")
+                .setParameter("id", id).uniqueResult();
     }
 }

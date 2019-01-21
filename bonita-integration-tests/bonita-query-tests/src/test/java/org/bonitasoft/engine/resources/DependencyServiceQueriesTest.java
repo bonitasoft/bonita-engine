@@ -14,11 +14,12 @@
 package org.bonitasoft.engine.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Random;
-
 import javax.inject.Inject;
 
+import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
@@ -106,5 +107,24 @@ public class DependencyServiceQueriesTest {
 
         //then
         assertThat(dependencyId).as("dependency id").isNull();
+    }
+
+    @Test
+    public void should_retrieve_dependency_content_only_using_disconnected_objects() throws Exception {
+        // given:
+        SDependencyImpl aDependency = (SDependencyImpl) repository.add(createDependency("aFileName.zip", 1L));
+
+        // when:
+        DependencyContent dependencyContentOnly = repository.getDependencyContentOnly(aDependency.getId());
+
+        //then:
+        assertThat(dependencyContentOnly.getContent()).isEqualTo("toutou".getBytes());
+        assertThat(dependencyContentOnly.getFileName()).isEqualTo("aFileName.zip");
+        assertThat(repository.getSession().getIdentifier(aDependency)).isNotNull();
+        try {
+            repository.getSession().getIdentifier(dependencyContentOnly);
+            fail("should fail because the object should not be in the hibernate session");
+        } catch (Exception ignored) {
+        }
     }
 }

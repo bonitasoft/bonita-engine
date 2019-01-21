@@ -17,6 +17,13 @@
         ORDER BY dependency.id ASC
     </query>
 
+    <!-- get only the content of the dependency using a 'new' to avoid having a connected object-->
+    <query name="getDependencyContentOnly">
+        SELECT new org.bonitasoft.engine.dependency.model.DependencyContent(dependency.fileName, dependency.value_)
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
+        WHERE dependency.id = :id
+    </query>
+
     <query name="getDependencies" read-only="true">
         SELECT dependency
         FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
