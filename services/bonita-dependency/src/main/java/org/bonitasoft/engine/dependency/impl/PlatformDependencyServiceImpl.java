@@ -30,6 +30,7 @@ import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
@@ -116,6 +117,15 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
             throw new SDependencyNotFoundException(bre);
         }
     }
+
+    @Override
+    public DependencyContent getDependencyContentOnly(final long id) throws SDependencyNotFoundException, SBonitaReadException {
+        NullCheckingUtil.checkArgsNotNull(id);
+        SelectOneDescriptor<DependencyContent> desc = new SelectOneDescriptor<>("getPlatformDependencyContentOnly",
+                Collections.singletonMap("id", id), SPlatformDependency.class, DependencyContent.class);
+        return Optional.ofNullable(platformPersistenceService.selectOne(desc)).orElseThrow(() -> new SDependencyNotFoundException("Can't get content of dependency with id: " + id));
+    }
+
 
     @Override
     protected SDependency getDependency(final String name) throws SDependencyNotFoundException {

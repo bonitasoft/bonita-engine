@@ -30,6 +30,7 @@ import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -240,6 +241,15 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         } catch (final SBonitaReadException e) {
             throw new SDependencyNotFoundException("Can't get dependency with id: " + id, e);
         }
+    }
+
+
+    @Override
+    public DependencyContent getDependencyContentOnly(final long id) throws SDependencyNotFoundException, SBonitaReadException {
+        NullCheckingUtil.checkArgsNotNull(id);
+        SelectOneDescriptor<DependencyContent> desc =
+                new SelectOneDescriptor<>("getDependencyContentOnly", Collections.singletonMap("id", id), SDependency.class, DependencyContent.class);
+        return Optional.ofNullable(persistenceService.selectOne(desc)).orElseThrow(() -> new SDependencyNotFoundException("Can't get content of dependency with id: " + id));
     }
 
     private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
