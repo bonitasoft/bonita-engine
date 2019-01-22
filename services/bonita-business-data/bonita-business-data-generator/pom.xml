@@ -161,6 +161,42 @@
                                        <exclude>**</exclude>
                                    </excludes>
                                </filter>
+				<filter>
+            			   <artifact>javax.xml.bind:jaxb-api</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
+			      <filter>
+            			   <artifact>com.sun.xml.fastinfoset:FastInfoset</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
+				<filter>
+            			   <artifact>javax.xml.bind:jsr173_api</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
+			      <filter>
+            			   <artifact>com.sun.xml.bind:jaxb-impl</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
+				<filter>
+            			   <artifact>com.sun.xml.bind:jaxb-core</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
+				<filter>
+            			   <artifact>com.sun.istack:istack-commons-runtime</artifact>
+                                   <excludes>
+                                       <exclude>**</exclude>
+                                   </excludes>
+                               </filter>
                                <!-- exclude bonita-common because studio already have it in classpath -->
                                <filter>
                                    <artifact>org.bonitasoft.engine:bonita-common</artifact>
