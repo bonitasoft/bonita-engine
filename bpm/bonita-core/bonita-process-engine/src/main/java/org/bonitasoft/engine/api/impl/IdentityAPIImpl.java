@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -77,6 +78,7 @@ import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.identity.ImportPolicy;
+import org.bonitasoft.engine.identity.InvalidOrganizationFileFormatException;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
@@ -1474,8 +1476,9 @@ public class IdentityAPIImpl implements IdentityAPI {
             final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(),
                     updaterFactor);
             ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI);
-            importedOrganization.execute();
-            return importedOrganization.getResult();
+            return importedOrganization.execute();
+        } catch (JAXBException e) {
+            throw new InvalidOrganizationFileFormatException(e);
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
         }
