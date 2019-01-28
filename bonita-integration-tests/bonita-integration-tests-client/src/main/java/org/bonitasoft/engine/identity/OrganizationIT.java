@@ -451,7 +451,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Test(expected = OrganizationImportException.class)
+    @Test(expected = InvalidOrganizationFileFormatException.class)
     public void importOrganizationWithOrganizationImportException() throws Exception {
         final String xmlOrganization = "";
         final User createUser = getIdentityAPI().createUser("john", "bpm");

@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -43,7 +43,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Matthieu Chaffotte
  */
-public class ImportOrganization implements TransactionContentWithResult<List<String>> {
+public class ImportOrganization {
 
     private static final String LEGACY_NS = "xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema\"";
 
@@ -106,13 +106,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         return content;
     }
 
-    @Override
-    public List<String> getResult() {
-        return warnings;
-    }
-
-    @Override
-    public void execute() throws SBonitaException {
+    public List<String> execute() throws SBonitaException, JAXBException {
         try {
             final Organization organization = new OrganizationParser().convert(organizationContent);
             final List<ExportedUser> users = organization.getUsers();
@@ -133,7 +127,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final Map<String, Long> groupPathToIdMap = importGroups(groups);
             // UserMemberships
             importMemberships(memberships, userNameToSUsers, roleNameToIdMap, groupPathToIdMap);
-        } catch (final SBonitaException e) {
+            return warnings;
+        } catch (final SBonitaException | JAXBException e) {
             throw e;
         } catch (final Exception e) {
             throw new SImportOrganizationException(e);

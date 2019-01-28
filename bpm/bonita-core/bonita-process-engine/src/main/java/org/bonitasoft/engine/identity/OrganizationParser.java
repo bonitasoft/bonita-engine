@@ -49,12 +49,16 @@ public class OrganizationParser {
     }
 
     public Organization convert(String organizationContent) throws JAXBException {
+
         if (!organizationContent.contains("http://documentation.bonitasoft.com/organization-xml-schema/1.1")) {
-            organizationContent = organizationContent.replace("http://documentation.bonitasoft.com/organization-xml-schema", "http://documentation.bonitasoft.com/organization-xml-schema/1.1");
+            organizationContent = organizationContent.replace(
+                    "http://documentation.bonitasoft.com/organization-xml-schema",
+                    "http://documentation.bonitasoft.com/organization-xml-schema/1.1");
         }
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(schema);
         return (Organization) unmarshaller.unmarshal(new StringReader(organizationContent));
+
     }
 
     private Marshaller getMarshaller() throws JAXBException {
