@@ -75,11 +75,13 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Required by Java 11 -->
+        <!-- Used explicitly in Java code of class IdentityServiceImpl:
+            not mandatory in Java 8.
+            Required by Java 11 at compile-time. -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
