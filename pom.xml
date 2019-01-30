@@ -535,6 +535,9 @@
                             <version>${junit.vintage.version}</version>
                         </dependency>
                     </dependencies>
+                    <configuration>
+                        <argLine>-showversion</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
