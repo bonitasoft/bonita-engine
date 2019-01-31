@@ -81,7 +81,7 @@ public class TestRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    protected Session getSession() {
+    public Session getSession() {
         return sessionFactory.getCurrentSession();
     }
 

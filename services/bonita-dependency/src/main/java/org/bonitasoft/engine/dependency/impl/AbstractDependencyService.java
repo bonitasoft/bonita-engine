@@ -112,12 +112,13 @@ public abstract class AbstractDependencyService implements DependencyService {
         return dependencyIds.stream()
                 .map(dependencyId -> {
                     try {
-                        return getDependency(dependencyId);
-                    } catch (SDependencyNotFoundException e) {
+                        // get only the content of the dependency to avoid having connected objects
+                        return getDependencyContentOnly(dependencyId);
+                    } catch (SDependencyNotFoundException | SBonitaReadException e) {
                         throw new SBonitaRuntimeException(e);
                     }
                 })
-                .map(dependency -> resource(dependency.getFileName(), dependency.getValue()));
+                .map(dependency -> resource(dependency.getFileName(), dependency.getContent()));
     }
 
     protected abstract Long getTenantId() throws STenantIdNotSetException;
