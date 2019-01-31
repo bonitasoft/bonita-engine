@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.commons;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +31,7 @@ public class JavaMethodInvoker {
     protected static Map<String, Class<?>> primitiveTypes;
 
     private static Map<String, Class<?>> autoboxableTypes;
+
     static {
         primitiveTypes = new HashMap<String, Class<?>>(8);
         primitiveTypes.put("char", char.class);
@@ -65,10 +66,13 @@ public class JavaMethodInvoker {
             IllegalArgumentException, InvocationTargetException {
         final Class<?> expressionResultType = getClassOrPrimitiveClass(typeOfValueToSet);
         final Class<?> dataType = Thread.currentThread().getContextClassLoader().loadClass(objectToInvokeJavaMethodOn.getClass().getName());
-        final Method method = MethodUtils.getMatchingAccessibleMethod(dataType, operator, new Class[] { getClassOrPrimitiveClass(operatorParameterClassName) });
-        final Object o = dataType.cast(objectToInvokeJavaMethodOn);
-        method.invoke(o, expressionResultType.cast(valueToSetObjectWith));
-        return o;
+        final Method method = MethodUtils.getMatchingAccessibleMethod(dataType, operator, new Class[]{getClassOrPrimitiveClass(operatorParameterClassName)});
+        if (method != null) {
+            final Object o = dataType.cast(objectToInvokeJavaMethodOn);
+            method.invoke(o, expressionResultType.cast(valueToSetObjectWith));
+            return o;
+        } else {
+            throw new NoSuchMethodException(dataType.toGenericString() + "." + operator + "(" + operatorParameterClassName + ").");
+        }
     }
-
 }

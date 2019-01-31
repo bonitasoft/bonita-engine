@@ -15,10 +15,10 @@ package org.bonitasoft.engine.dependency;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -68,6 +68,19 @@ public interface DependencyService {
      *         Error thrown if no dependency have an id corresponding to the parameter.
      */
     SDependency getDependency(long id) throws SDependencyNotFoundException;
+
+
+    /**
+     * Get only the content and file name of a dependency.
+     *
+     * This object will not be connected to the hibernate session and therefore will avoid
+     * issues related to dirty checking mechanism, see https://bonitasoft.atlassian.net/browse/BS-19262
+     *
+     * @param id of the dependency
+     * @return an object containing the file content and name
+     * @throws SDependencyNotFoundException
+     */
+    DependencyContent getDependencyContentOnly(long id) throws SDependencyNotFoundException, SBonitaReadException;
 
     /**
      * Get dependencies for the specified ids
