@@ -21,6 +21,11 @@
 		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
 	</query>
 
+	<query name="getPlatformDependencyContentOnly">
+		SELECT new org.bonitasoft.engine.dependency.model.DependencyContent(pdependency.fileName, pdependency.value_)
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
+		WHERE pdependency.id = :id
+	</query>
 	<query name="getPlatformDependencyMappings">
 		SELECT pdependencymapping
 		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl AS pdependencymapping

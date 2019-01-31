@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +87,21 @@ class JavaMethodInvokerTest {
                 "int");
 
         assertThat(object.getThing()).isEqualTo(83);
+    }
+
+    @Test
+    void invokeJavaMethod_should_throw_nosuchmethodexception() throws Exception {
+
+        assertThatThrownBy(
+                () -> {
+                    final MyClass myData = new MyClass();
+
+                    final JavaMethodInvoker invoker = new JavaMethodInvoker();
+
+                    final MyClass object = (MyClass) invoker.invokeJavaMethod(String.class.getName(), "A STRING", myData, "setDoesNotExistMethod",
+                            "java.lang.String");
+                })
+                .isInstanceOf(NoSuchMethodException.class);
     }
 
 }
