@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -36,7 +37,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
 
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
-    private final TechnicalLoggerService logger;
+    private final TechnicalLogger log;
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
 
@@ -54,7 +55,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
-        this.logger = logger;
+        this.log = logger.asLogger(BonitaThreadPoolExecutor.class);
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
     }
@@ -76,8 +77,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     @Override
     public void shutdownAndEmptyQueue() {
         super.shutdown();
-        logger.log(getClass(), TechnicalLogSeverity.INFO,
-                "Clearing queue of work, had " + workQueue.size() + " elements");
+        log.info("Clearing queue of work, had {} elements", workQueue.size());
         workQueue.clear();
     }
 

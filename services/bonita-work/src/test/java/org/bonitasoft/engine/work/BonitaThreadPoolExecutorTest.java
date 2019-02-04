@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Bonitasoft S.A.
+ * Copyright (C) 2017-2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,12 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.work;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.time.Instant;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,6 +56,7 @@ public class BonitaThreadPoolExecutorTest {
 
     @Before
     public void before() throws Exception {
+        doReturn(mock(TechnicalLogger.class)).when(technicalLoggerService).asLogger(any());
         bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3 //
                 , 1_000, TimeUnit.SECONDS //
                 , new ArrayBlockingQueue<>(1_000) //
