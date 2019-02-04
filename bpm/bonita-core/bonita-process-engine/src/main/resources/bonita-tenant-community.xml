@@ -923,7 +923,6 @@
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workExecutorService" ref="workExecutorService" />
-        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
     <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">

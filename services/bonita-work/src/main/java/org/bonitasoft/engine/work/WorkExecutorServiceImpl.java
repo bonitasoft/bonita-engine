@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.work;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -143,25 +144,17 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     @Override
     public long getPendings() {
-        if (executor == null) {
-            return 0;
-        }
-        return executor.getPendings();
+        return ofNullable(executor).map(ObservableExecutor::getPendings).orElse(0L);
     }
 
     @Override
     public long getRunnings() {
-        if (executor == null) {
-            return 0;
-        }
-        return executor.getRunnings();
+        return ofNullable(executor).map(ObservableExecutor::getRunnings).orElse(0L);
     }
 
     @Override
     public long getExecuted() {
-        if (executor == null) {
-            return 0;
-        }
-        return executor.getExecuted();
+        return ofNullable(executor).map(ObservableExecutor::getExecuted).orElse(0L);
     }
+
 }
