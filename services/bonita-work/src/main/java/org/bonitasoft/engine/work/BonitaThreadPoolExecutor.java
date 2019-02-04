@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 /**
  * @author Julien Reboul
@@ -40,6 +40,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final TechnicalLogger log;
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
+    private WorkExecutionAuditor workExecutionAuditor;
 
     private final AtomicLong runningWorks = new AtomicLong();
     private final AtomicLong executedWorks = new AtomicLong();
@@ -51,13 +52,14 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             final BlockingQueue<Runnable> workQueue,
             final ThreadFactory threadFactory,
             final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-            EngineClock engineClock, WorkExecutionCallback workExecutionCallback) {
+            EngineClock engineClock, WorkExecutionCallback workExecutionCallback, WorkExecutionAuditor workExecutionAuditor) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
         this.log = logger.asLogger(BonitaThreadPoolExecutor.class);
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
+        this.workExecutionAuditor = workExecutionAuditor;
     }
 
     @Override
@@ -84,12 +86,15 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     @Override
     public void submit(WorkDescriptor work) {
         submit(() -> {
-            if (work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now())) {
+            if (isRequiringDelayedExecution(work)) {
                 // Future implementation should use a real delay e.g. using a ScheduledThreadPoolExecutor
                 // Will be executed later
                 submit(work);
                 return;
             }
+            work.incrementExecutionCount();
+            workExecutionAuditor.detectAbnormalExecutionAndNotify(work);
+
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
             CompletableFuture<Void> asyncResult;
@@ -117,6 +122,10 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
                 return null;
             });
         });
+    }
+
+    private boolean isRequiringDelayedExecution(WorkDescriptor work) {
+        return work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now());
     }
 
     @Override

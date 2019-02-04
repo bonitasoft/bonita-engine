@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.time.Instant;
 import java.util.Map;
@@ -32,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,6 +49,10 @@ public class BonitaThreadPoolExecutorTest {
 
     @Mock
     private TechnicalLoggerService technicalLoggerService;
+    @Mock
+    private TechnicalLogger log;
+    @Mock
+    private WorkExecutionAuditor workExecutionAuditor;
     private MyWorkExecutionCallback workExecutionCallback = new MyWorkExecutionCallback();
     private BonitaThreadPoolExecutor bonitaThreadPoolExecutor;
     private FixedEngineClock engineClock = new FixedEngineClock(Instant.now());
@@ -56,14 +60,14 @@ public class BonitaThreadPoolExecutorTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(mock(TechnicalLogger.class)).when(technicalLoggerService).asLogger(any());
+        doReturn(log).when(technicalLoggerService).asLogger(any());
         bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3 //
                 , 1_000, TimeUnit.SECONDS //
                 , new ArrayBlockingQueue<>(1_000) //
                 , new WorkerThreadFactory("test-worker", 1, 3) //
                 , (r, executor) -> {
                 } //
-                , workFactory, technicalLoggerService, engineClock, workExecutionCallback);
+                , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor);
     }
 
     @Test
@@ -185,7 +189,7 @@ public class BonitaThreadPoolExecutorTest {
                 , (r, executor) -> {
                 } //
                 , workFactory //
-                , technicalLoggerService, engineClock, workExecutionCallback);
+                , technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor);
 
         //when:
         bonitaThreadPoolExecutor.submit(WorkDescriptor.create("SLEEP"));
@@ -197,6 +201,10 @@ public class BonitaThreadPoolExecutorTest {
         assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(1);
         assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(1);
     }
+
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
 
     private static class MyWorkExecutionCallback implements WorkExecutionCallback {
 

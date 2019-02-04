@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.work;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.bonitasoft.engine.commons.time.DefaultEngineClock;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,8 +36,9 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     @Test
     public void ThreadNameInExecutorServiceShouldContainsTenantId() {
         long tenantId = 999;
-        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, workFactory, tenantId, 1,
-                20, 15, 10, new DefaultEngineClock());
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
+                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class));
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
         Runnable r = () -> {

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ObservableExecutor;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 /**
  * @author Baptiste Mesta
@@ -32,12 +33,16 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private BonitaExecutorService executor;
     private long workTerminationTimeout;
+    private final WorkExecutionAuditor workExecutionAuditor;
     private final TechnicalLogger logger;
 
-    public WorkExecutorServiceImpl(BonitaExecutorServiceFactory bonitaExecutorServiceFactory, TechnicalLoggerService loggerService, long workTerminationTimeout) {
+    public WorkExecutorServiceImpl(BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
+            TechnicalLoggerService loggerService, long workTerminationTimeout,
+            WorkExecutionAuditor workExecutionAuditor) {
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
         logger = loggerService.asLogger(WorkExecutorServiceImpl.class);
         this.workTerminationTimeout = workTerminationTimeout;
+        this.workExecutionAuditor = workExecutionAuditor;
     }
 
     @Override
@@ -52,6 +57,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     public void onSuccess(WorkDescriptor work) {
         logger.debug("Completed work {}", work);
+        workExecutionAuditor.notifySuccess(work);
     }
 
     public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Throwable thrown) {
@@ -67,13 +73,13 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             return;
         }
         if (thrown instanceof SWorkPreconditionException) {
-            logger.info("Work was not executed because preconditions where not met, {} : {}", work, thrown.getMessage());
+            logger.info("Work was not executed because preconditions were not met, {} : {}", work, thrown.getMessage());
             return;
         }
         try {
             bonitaWork.handleFailure(thrown, context);
         } catch (Exception e) {
-            logger.warn("Work failed with error " + work, e);
+            logger.warn("Work failed with error {}", work, e);
         }
     }
 
