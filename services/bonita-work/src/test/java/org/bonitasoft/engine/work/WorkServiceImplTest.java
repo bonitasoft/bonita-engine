@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -27,14 +27,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkServiceImplTest {
 
-    @InjectMocks
     private WorkServiceImpl workService;
     @Mock
     private UserTransactionService transactionService;
@@ -49,7 +47,9 @@ public class WorkServiceImplTest {
 
     @Before
     public void before() throws Exception {
+        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         doReturn(1L).when(sessionAccessor).getTenantId();
+        workService = new WorkServiceImpl(transactionService, loggerService, sessionAccessor, workExecutorService);
     }
 
     @Test
