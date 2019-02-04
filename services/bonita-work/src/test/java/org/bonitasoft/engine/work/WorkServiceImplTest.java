@@ -16,7 +16,11 @@ package org.bonitasoft.engine.work;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -44,44 +48,49 @@ public class WorkServiceImplTest {
     private WorkExecutorService workExecutorService;
     @Captor
     private ArgumentCaptor<WorkSynchronization> synchronizationArgumentCaptor;
+    @Mock
+    private EngineClock engineClock;
 
     @Before
     public void before() throws Exception {
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
         doReturn(1L).when(sessionAccessor).getTenantId();
-        workService = new WorkServiceImpl(transactionService, loggerService, sessionAccessor, workExecutorService);
+        workService = new WorkServiceImpl(transactionService, loggerService, sessionAccessor, workExecutorService,
+                engineClock);
     }
 
     @Test
-    public void should_register_work_on_the_transaction_synchronization() throws SBonitaException {
+    public void should_register_work_on_the_transaction_synchronization_and_set_the_work_registration_instant() throws SBonitaException {
+        Instant registrationInstant = Instant.now().minus(25, ChronoUnit.HOURS);
+        doReturn(registrationInstant).when(engineClock).now();
         // given
-        WorkDescriptor bonitaWork = WorkDescriptor.create("MY_WORK");
+        WorkDescriptor workDescriptor = WorkDescriptor.create("MY_WORK");
 
         // when
-        workService.registerWork(bonitaWork);
+        workService.registerWork(workDescriptor);
 
         // then
-        assertThat(getWorkSynchronization().getWorks()).containsExactly(bonitaWork);
+        assertThat(workDescriptor.getRegistrationDate()).isEqualTo(registrationInstant);
+        assertThat(getWorkSynchronization().getWorks()).containsExactly(workDescriptor);
     }
 
     @Test
     public void should_register_multiple_work_on_the_same_transaction_synchronization() throws SBonitaException {
         // given
-        WorkDescriptor bonitaWork1 = WorkDescriptor.create("MY_WORK1");
-        WorkDescriptor bonitaWork2 = WorkDescriptor.create("MY_WORK2");
+        WorkDescriptor workDescriptor1 = WorkDescriptor.create("MY_WORK1");
+        WorkDescriptor workDescriptor2 = WorkDescriptor.create("MY_WORK2");
 
         // when
-        workService.registerWork(bonitaWork1);
-        workService.registerWork(bonitaWork2);
+        workService.registerWork(workDescriptor1);
+        workService.registerWork(workDescriptor2);
 
         // then
-        assertThat(getWorkSynchronization().getWorks()).containsOnly(bonitaWork1, bonitaWork2);
+        assertThat(getWorkSynchronization().getWorks()).containsOnly(workDescriptor1, workDescriptor2);
     }
 
     private WorkSynchronization getWorkSynchronization() throws STransactionNotFoundException {
         verify(transactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
         return synchronizationArgumentCaptor.getValue();
     }
-
 
 }

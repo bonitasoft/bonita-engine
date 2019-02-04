@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
+import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -40,13 +41,16 @@ public class WorkServiceImpl implements WorkService {
 
     private final WorkExecutorService workExecutorService;
 
+    private final EngineClock engineClock;
+
     public WorkServiceImpl(final UserTransactionService transactionService,
-                           final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
-                           WorkExecutorService workExecutorService) {
+            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
+            WorkExecutorService workExecutorService, final EngineClock engineClock) {
         this.transactionService = transactionService;
         this.log = loggerService.asLogger(WorkServiceImpl.class);
         this.sessionAccessor = sessionAccessor;
         this.workExecutorService = workExecutorService;
+        this.engineClock = engineClock;
     }
 
     @Override
@@ -55,6 +59,7 @@ public class WorkServiceImpl implements WorkService {
             log.warn("Tried to register work {}, but the work service is stopped.", workDescriptor);
             return;
         }
+        workDescriptor.setRegistrationDate(engineClock.now());
         log.debug("Registering work {}", workDescriptor);
         getContinuationSynchronization().addWork(workDescriptor);
         log.debug("Work registered");

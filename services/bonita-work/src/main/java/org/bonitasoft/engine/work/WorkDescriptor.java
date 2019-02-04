@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Bonitasoft S.A.
+ * Copyright (C) 2017-2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -36,6 +36,9 @@ public class WorkDescriptor implements Serializable {
     private Map<String, Serializable> parameters;
     private int retryCount = 0;
     private Instant executionThreshold;
+    private int executionCount = 0;
+    private Instant registrationDate;
+    private boolean abnormalExecutionDetected = false;
 
     public WorkDescriptor(String type) {
         this.type = type;
@@ -88,10 +91,6 @@ public class WorkDescriptor implements Serializable {
         return executionThreshold;
     }
 
-    public void setExecutionThreshold(Instant executionThreshold) {
-        this.executionThreshold = executionThreshold;
-    }
-
     public WorkDescriptor mustBeExecutedAfter(Instant mustBeExecutedAfter) {
         this.executionThreshold = mustBeExecutedAfter;
         return this;
@@ -103,6 +102,29 @@ public class WorkDescriptor implements Serializable {
 
     public void incrementRetryCount() {
         retryCount++;
+    }
+
+    public int getExecutionCount() {
+        return executionCount;
+    }
+
+    public void incrementExecutionCount() {
+        executionCount++;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public Instant getRegistrationDate() { return registrationDate; }
+
+    public WorkDescriptor abnormalExecutionDetected() {
+        this.abnormalExecutionDetected = true;
+        return this;
+    }
+
+    public boolean isAbnormalExecutionDetected() {
+        return abnormalExecutionDetected;
     }
 
     public String getDescription() {
@@ -125,6 +147,8 @@ public class WorkDescriptor implements Serializable {
                 .append(tenantId, that.tenantId)
                 .append(parameters, that.parameters)
                 .append(executionThreshold, that.executionThreshold)
+                .append(executionCount, that.executionCount)
+                .append(registrationDate, that.registrationDate)
                 .isEquals();
     }
 
@@ -137,6 +161,8 @@ public class WorkDescriptor implements Serializable {
                 .append(parameters)
                 .append(retryCount)
                 .append(executionThreshold)
+                .append(executionCount)
+                .append(registrationDate)
                 .toHashCode();
     }
 
@@ -149,6 +175,9 @@ public class WorkDescriptor implements Serializable {
                 .append("parameters", parameters)
                 .append("retryCount", retryCount)
                 .append("executionThreshold", executionThreshold)
+                .append("executionCount", executionCount)
+                .append("registrationDate", registrationDate)
                 .toString();
     }
+
 }
