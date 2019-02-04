@@ -923,12 +923,14 @@
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workExecutorService" ref="workExecutorService" />
+        <constructor-arg name="engineClock" ref="engineClock" />
     </bean>
 
     <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
         <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
+        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
     </bean>
 
     <bean id="operationsAnalyzer" class="org.bonitasoft.engine.core.operation.impl.OperationsAnalyzer" />
@@ -1064,6 +1066,30 @@
         <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
         <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
         <constructor-arg name="engineClock" ref="engineClock" />
+        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
+    </bean>
+
+    <bean id="workExecutionAuditor" class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor">
+        <property name="activated" value="${bonita.tenant.work.audit.activated:false}" />
+        <constructor-arg name="engineClock" ref="engineClock"/>
+        <constructor-arg name="executionCountCheckConfig">
+            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$ExecutionCountCheckConfig">
+                <constructor-arg name="executionCountThreshold"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count:10}"/>
+                <constructor-arg name="durationThresholdAmount"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_amount:10}"/>
+                <constructor-arg name="durationThresholdUnit"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_unit:MINUTES}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="registrationDurationElapsedCheckConfig">
+            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$RegistrationDurationElapsedCheckConfig">
+                <constructor-arg name="amount"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_amount:30}"/>
+                <constructor-arg name="unit"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_unit:MINUTES}"/>
+            </bean>
+        </constructor-arg>
     </bean>
 
     <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
