@@ -20,9 +20,10 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.LockException;
 import org.bonitasoft.engine.work.LockTimeoutException;
 
 /**
@@ -47,49 +48,28 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TechnicalLoggerService loggerService = getTenantAccessor(context).getTechnicalLoggerService();
+        final TechnicalLogger logger = getTenantAccessor(context).getTechnicalLoggerService().asLogger(LockProcessInstanceWork.class);
         final LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
         BonitaLock lock = null;
         try {
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " trying to get lock for instance "
-                        + processInstanceId + ": " + getWorkStack());
-            }
+            logger.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
             lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit, getTenantId());
             if (lock == null) {
-                // lock has not been obtained
-                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance "
-                            + processInstanceId + ": " + getWorkStack());
-                }
-                throw new LockTimeoutException("Unable to lock process instance "+processInstanceId);
+                throw new LockTimeoutException("Unable to lock process instance " + processInstanceId + ": " + getDescription());
             }
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId
-                        + ": " + getWorkStack());
-            }
+            logger.debug("{} obtained lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
             return getWrappedWork().work(context);
+        } catch (SLockException e) {
+            throw new LockException("Unexpected exception happened while trying to lock process instance " + processInstanceId + ": " + getDescription(), e);
         } finally {
             if (lock != null) {
                 lockService.unlock(lock, getTenantId());
-                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " has unlocked lock for instance "
-                            + processInstanceId + ": " + getWorkStack());
-                }
+                logger.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
             }
         }
 
-    }
-
-    private String getWorkStack() {
-        if (this.getWrappedWork() instanceof TxBonitaWork) {
-            final TxBonitaWork txBonitaWork = (TxBonitaWork) this.getWrappedWork();
-            final BonitaWork doingWork = txBonitaWork.getWrappedWork();
-            return doingWork.getDescription();
-        }
-        return "nothing";
     }
 
 }
