@@ -19,7 +19,7 @@ import static java.lang.String.format;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ObservableExecutor;
 
@@ -30,45 +30,49 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private BonitaExecutorService executor;
-    private TechnicalLoggerService loggerService;
     private long workTerminationTimeout;
+    private final TechnicalLogger logger;
 
     public WorkExecutorServiceImpl(BonitaExecutorServiceFactory bonitaExecutorServiceFactory, TechnicalLoggerService loggerService, long workTerminationTimeout) {
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
-        this.loggerService = loggerService;
+        logger = loggerService.asLogger(WorkExecutorServiceImpl.class);
         this.workTerminationTimeout = workTerminationTimeout;
     }
 
     @Override
     public void execute(WorkDescriptor work) {
         if (!isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Submitted work %s", work));
+            logger.debug("Submitted work {}", work);
             executor.submit(work);
         } else {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG,
-                    format("Ignored work submission (service stopped) %s", work));
+            logger.debug("Ignored work submission (service stopped) {}", work);
         }
     }
 
     public void onSuccess(WorkDescriptor work) {
-        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Completed work %s", work));
+        logger.debug("Completed work {}", work);
     }
 
     public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Throwable thrown) {
-        if (thrown instanceof LockTimeoutException) {
-            //retry the work
+        if (thrown instanceof LockException) {
+            if (thrown instanceof LockTimeoutException) {
+                //Can happen frequently, only log in debug
+                logger.debug("Tried to execute the work, but it was unable to acquire a lock {}", work);
+            } else {
+                //Caused
+                logger.warn("Tried to execute the work, but it was unable to acquire a lock " + work, thrown);
+            }
             execute(work);
             return;
         }
         if (thrown instanceof SWorkPreconditionException) {
-            loggerService.log(getClass(), TechnicalLogSeverity.INFO, format("Work was not executed because preconditions where not met, %s : %s", work, thrown.getMessage()));
+            logger.info("Work was not executed because preconditions where not met, {} : {}", work, thrown.getMessage());
             return;
         }
         try {
             bonitaWork.handleFailure(thrown, context);
         } catch (Exception e) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, format("Work failed with error %s", work),
-                    thrown);
+            logger.warn("Work failed with error " + work, e);
         }
     }
 
@@ -83,9 +87,9 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             awaitTermination();
         } catch (final SWorkException e) {
             if (e.getCause() != null) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage(), e.getCause());
+                logger.warn(e.getMessage(),e.getCause());
             } else {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+                logger.warn(e.getMessage());
             }
         }
     }
@@ -126,7 +130,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     private void shutdownExecutor() {
         executor.shutdownAndEmptyQueue();
-        loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Stopped executor service");
+        logger.info("Stopped executor service");
     }
 
     public boolean isStopped() {

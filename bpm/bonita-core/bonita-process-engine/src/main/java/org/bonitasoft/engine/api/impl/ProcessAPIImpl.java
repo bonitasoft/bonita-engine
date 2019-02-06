@@ -345,6 +345,7 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -526,17 +527,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 logError(tenantAccessor, e);
             }
         }
-    }
-
-    private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
-            final List<Long> processInstanceIds, final long tenantId) throws SLockException {
-        final ArrayList<BonitaLock> locks = new ArrayList<>(processInstanceIds.size());
-        for (final Long processInstanceId : processInstanceIds) {
-            final BonitaLock lock = lockService.lock(processInstanceId, objectType, tenantId);
-            locks.add(lock);
-            lockedProcesses.add(processInstanceId);
-        }
-        return locks;
     }
 
     @Override
@@ -3482,7 +3472,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType,
             final Map<SProcessInstance, List<Long>> sProcessInstances,
-            final long tenantId) throws SLockException {
+            final long tenantId) throws SLockException, SLockTimeoutException {
         final List<BonitaLock> locks = new ArrayList<>();
         final HashSet<Long> uniqIds = new HashSet<>();
         for (final Entry<SProcessInstance, List<Long>> sProcessInstancewithChildrenIds : sProcessInstances.entrySet()) {

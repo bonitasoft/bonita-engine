@@ -37,10 +37,11 @@ public interface LockService {
      * @param objectType
      * @param tenantId
      *        TODO
-     * @return
-     * @throws SLockException
+     * @return the lock
+     * @throws SLockException when we were unable to lock due to an unexpected error
+     * @throws SLockTimeoutException when we were unable to lock due to a timeout
      */
-    BonitaLock lock(long objectToLockId, String objectType, long tenantId) throws SLockException;
+    BonitaLock lock(long objectToLockId, String objectType, long tenantId) throws SLockException, SLockTimeoutException;
 
     /**
      * Acquire the lock for the object having type and id in parameters waiting maximum timeout<br>
@@ -51,8 +52,8 @@ public interface LockService {
      * @param timeout
      * @param timeUnit
      * @param tenantId
-     *        TODO
      * @return the obtained lock if it has been acquired before the timeout expires or null if the timeout has expired.
+     * @throws SLockException when we were unable to lock (not because of the timeout)
      */
-    BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId);
+    BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) throws SLockException;
 }
