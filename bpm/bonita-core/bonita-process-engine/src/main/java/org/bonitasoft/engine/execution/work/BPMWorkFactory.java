@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
@@ -147,11 +148,10 @@ public class BPMWorkFactory implements WorkFactory {
                 activationEvent);
     }
 
-    public WorkDescriptor createExecuteFlowNodeWorkDescriptor(final long processDefinitionId,
-            final long processInstanceId, final long flowNodeInstanceId) {
-        return WorkDescriptor.create(EXECUTE_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, processDefinitionId)
-                .withParameter(PROCESS_INSTANCE_ID, processInstanceId)
-                .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstanceId).withParameter(READY_HUMAN_TASK, false);
+    public WorkDescriptor createExecuteFlowNodeWorkDescriptor(SFlowNodeInstance flowNodeInstance) {
+        return WorkDescriptor.create(EXECUTE_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, flowNodeInstance.getProcessDefinitionId())
+                .withParameter(PROCESS_INSTANCE_ID, flowNodeInstance.getParentProcessInstanceId())
+                .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstance.getId()).withParameter(READY_HUMAN_TASK, false);
     }
 
     private BonitaWork createExecuteFlowNodeWork(WorkDescriptor workDescriptor) {
@@ -169,8 +169,8 @@ public class BPMWorkFactory implements WorkFactory {
         return withSession(wrappedWork);
     }
 
-    public WorkDescriptor createExecuteReadyHumanTaskWorkDescriptor(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) {
-        return createExecuteFlowNodeWorkDescriptor(processDefinitionId, processInstanceId, flowNodeInstanceId).withParameter(READY_HUMAN_TASK, true);
+    public WorkDescriptor createExecuteReadyHumanTaskWorkDescriptor(SFlowNodeInstance flowNodeInstance) {
+        return createExecuteFlowNodeWorkDescriptor(flowNodeInstance).withParameter(READY_HUMAN_TASK, true);
     }
 
     public WorkDescriptor createExecuteMessageCoupleWorkDescriptor(final SMessageInstance messageInstance,
@@ -224,13 +224,11 @@ public class BPMWorkFactory implements WorkFactory {
         return withSession(wrappedWork);
     }
 
-    public WorkDescriptor createNotifyChildFinishedWorkDescriptor(final long processDefinitionId,
-            final long processInstanceId, final long flowNodeInstanceId,
-            final long parentId, final String parentType) {
-        return WorkDescriptor.create(FINISH_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, processDefinitionId)
-                .withParameter(PROCESS_INSTANCE_ID, processInstanceId)
-                .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstanceId)
-                .withParameter(PARENT_ID, parentId).withParameter(PARENT_TYPE, parentType);
+    public WorkDescriptor createNotifyChildFinishedWorkDescriptor(SFlowNodeInstance sFlowNodeInstance) {
+        return WorkDescriptor.create(FINISH_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, sFlowNodeInstance.getProcessDefinitionId())
+                .withParameter(PROCESS_INSTANCE_ID, sFlowNodeInstance.getParentProcessInstanceId())
+                .withParameter(FLOW_NODE_INSTANCE_ID, sFlowNodeInstance.getId())
+                .withParameter(PARENT_ID, sFlowNodeInstance.getParentContainerId()).withParameter(PARENT_TYPE, sFlowNodeInstance.getParentContainerType().name());
     }
 
     private BonitaWork withLock(long processInstanceId, BonitaWork work) {

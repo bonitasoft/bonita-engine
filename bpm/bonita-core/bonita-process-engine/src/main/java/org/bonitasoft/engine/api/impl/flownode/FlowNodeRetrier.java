@@ -57,8 +57,7 @@ public class FlowNodeRetrier {
             flowNodeExecutor.setStateByStateId(flowNodeInstanceId, flowNodeInstance.getPreviousStateId());
 
             if (!previousState.isTerminal()) {
-                containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(), flowNodeInstanceId
-                );
+                containerRegistry.executeFlowNode(flowNodeInstance);
             }
         } catch (final SFlowNodeNotFoundException e) {
             throw new ActivityInstanceNotFoundException(e);
