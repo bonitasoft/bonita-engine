@@ -783,7 +783,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = :userId
@@ -829,7 +829,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = :userId
@@ -890,7 +890,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = user.id
@@ -951,7 +951,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = user.id

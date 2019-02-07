@@ -13,13 +13,21 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SConnectorInstanceWithFailureInfo extends SConnectorInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SConnectorInstanceWithFailureInfo extends SConnectorInstance {
 
-    String getStackTrace();
-
-    String getExceptionMessage();
+    public static final String EXCEPTION_MESSAGE = "exceptionMessage";
+    public static final String STACK_TRACE = "stackTrace";
+    private String stackTrace;
+    private String exceptionMessage;
 
 }

@@ -94,7 +94,6 @@ import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
@@ -303,8 +302,7 @@ public class StateBehaviors {
     private void mapUsingActors(final SFlowNodeInstance flowNodeInstance, final String actorName, final long processDefinitionId)
             throws SActorNotFoundException, SActivityCreationException {
         final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
-        final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
-                .createNewInstanceForActor(flowNodeInstance.getId(), actor.getId()).done();
+        final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(flowNodeInstance.getId()).actorId(actor.getId()).build();
         activityInstanceService.addPendingActivityMappings(mapping);
     }
 
@@ -323,8 +321,7 @@ public class StateBehaviors {
                     + humanTaskDefinition.getName());
         }
         for (final Long userId : new TreeSet<>(userIds)) {
-            final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
-                    .createNewInstanceForUser(flowNodeInstance.getId(), userId).done();
+            final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(flowNodeInstance.getId()).userId(userId).build();
             activityInstanceService.addPendingActivityMappings(mapping);
         }
         if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {

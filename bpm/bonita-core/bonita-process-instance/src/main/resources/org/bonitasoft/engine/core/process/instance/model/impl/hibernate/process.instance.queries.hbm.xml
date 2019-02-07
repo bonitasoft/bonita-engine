@@ -136,7 +136,7 @@
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (:actorIds))
@@ -145,7 +145,7 @@
 
 	<query name="getPendingMappingsOfTask">
 		SELECT mapping
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 		WHERE mapping.activityId=:activityId
 	</query>
 
@@ -158,7 +158,7 @@
 		AND a.assigneeId = 0
 		AND EXISTS (
 			SELECT mapping.id 
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping 
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping 
 			WHERE mapping.activityId=a.id
 			AND mapping.userId = :userId
 		)
@@ -192,13 +192,13 @@
 
 	<query name="getEventTriggerInstances">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 		WHERE t.eventInstanceId = :eventInstanceId
 	</query>
 
 	<query name="getEventTriggerInstanceById">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 		WHERE t.id = :id
 	</query>
 
@@ -229,7 +229,7 @@
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
@@ -261,7 +261,7 @@
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND EXISTS (SELECT mapping.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
@@ -297,7 +297,7 @@
 			) OR (
 				a.assigneeId = 0
 				AND EXISTS (SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId=a.id
 					AND ( mapping.userId = :userId
 						OR mapping.actorId in (SELECT actor
@@ -335,7 +335,7 @@
 			) OR (
 				a.assigneeId = 0
 				AND EXISTS (SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId=a.id
 					AND ( mapping.userId = :userId
 						OR mapping.actorId in (SELECT actor
@@ -390,7 +390,7 @@
 
 	<query name="getConnectorInstancesWithState">
 		SELECT c
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 		AND c.activationEvent = :activationEvent
@@ -399,7 +399,7 @@
 
     <query name="getConnectorInstancesWithFailureInfoInState">
         SELECT cfi
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl AS cfi
+        FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo AS cfi
         WHERE cfi.containerId = :containerId
         AND cfi.containerType = :containerType
         AND cfi.state = :state
@@ -408,17 +408,17 @@
 	
 	<query name="getNumberOfSConnectorInstance">
 		SELECT COUNT(c)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 	</query>
 	
 	<query name="searchSConnectorInstance">
 		SELECT c
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 	</query>
 	
 	<query name="getNextExecutableConnectorInstance">
 		SELECT c
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 		AND c.activationEvent = :activationEvent
@@ -427,32 +427,32 @@
 	</query>
 	<query name="getConnectorInstances">
 		SELECT c
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 	</query>
     <query name="getConnectorInstancesOrderedById">
         SELECT c
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+        FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
         WHERE c.containerId = :containerId
         AND c.containerType = :containerType
         ORDER BY  c.id
     </query>
 	<query name="getNumberOfConnectorInstances">
 		SELECT count(c)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 	</query>
 	<query name="getConnectorInstance">
 		SELECT c
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstance AS c
 		WHERE c.containerId = :id
 	</query>
 	
 	<query name="getConnectorInstanceWithFailureInfo">
 		SELECT cfi
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl AS cfi
+		FROM org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo AS cfi
 		WHERE cfi.containerId = :id
 	</query>
 
@@ -576,17 +576,17 @@
 	
 	<query name="getNumberOfSEventTriggerInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>
 	
 	<query name="searchSEventTriggerInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstanceByProcessInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,
 		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
@@ -594,7 +594,7 @@
 	
 	<query name="searchSTimerEventTriggerInstanceByProcessInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,
 		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
@@ -602,7 +602,7 @@
 	
 	<query name="getNumberOfSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,
 		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
@@ -610,7 +610,7 @@
 	
 	<query name="searchSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,
 		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
@@ -618,12 +618,12 @@
 	
 	<query name="getNumberOfSTimerEventTriggerInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>
 	
 	<query name="searchSTimerEventTriggerInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>	
 
 	<!-- External Service Queries -->
@@ -1051,7 +1051,7 @@
 		AND a.terminal = FALSE
 		AND exists (
     		SELECT mapping.activityId
-        		FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping  
+        		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping  
         		WHERE mapping.activityId=a.id
         		AND
            		( mapping.userId IN (
@@ -1093,7 +1093,7 @@
 		AND a.terminal = FALSE
 		AND exists (
     		SELECT mapping.activityId
-       		FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+       		FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
        		WHERE mapping.activityId=a.id
        		AND
           		( mapping.userId IN (
@@ -1146,7 +1146,7 @@
 		AND a.assigneeId = 0
 		AND a.expectedEndDate &lt; :currentTime
 		AND EXISTS (SELECT mapping.id 
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping 
+			FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping 
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
@@ -1699,7 +1699,7 @@
 
 	<query name="isTaskPendingForUser">
 		SELECT COUNT(DISTINCT mapping.id)
-		FROM  org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+		FROM  org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 		WHERE
 			mapping.activityId = :humanTaskInstanceId
 		AND (
@@ -1732,13 +1732,13 @@
         WHERE
           user.id IN (
               SELECT mapping.userId
-              FROM  org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+              FROM  org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
               WHERE mapping.activityId = :humanTaskInstanceId
           )
           OR user.id IN (
               SELECT actormember.userId
               FROM    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+                      org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping,
                       org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
               WHERE 
                   mapping.activityId = :humanTaskInstanceId
@@ -1748,7 +1748,7 @@
          OR user.id IN (
               SELECT user_membership.userId
               FROM    org.bonitasoft.engine.identity.model.SUserMembership AS user_membership,
-                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+                      org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping,
                       org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
                       org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
               WHERE
@@ -1768,7 +1768,7 @@
 	<query name="getNumberOfSUserWhoCanStartPendingTask">
 	   SELECT count(DISTINCT user)
 	   FROM org.bonitasoft.engine.identity.model.SUser AS user,
-	        org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+	        org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 	   WHERE mapping.activityId = :humanTaskInstanceId
 	   AND (
 	       user.id = mapping.userId
@@ -1798,7 +1798,7 @@
 	<query name="searchSUserWhoCanStartPendingTask">
 	   SELECT DISTINCT user
 	   FROM org.bonitasoft.engine.identity.model.SUser AS user,
-	        org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+	        org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 	   WHERE mapping.activityId = :humanTaskInstanceId
 	   AND (
 	       user.id = mapping.userId
@@ -1841,7 +1841,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
 						mapping.userId = :userId
@@ -1886,7 +1886,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
 						mapping.userId = :userId
@@ -1932,7 +1932,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
 						mapping.userId = user.id
@@ -1978,7 +1978,7 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
 						mapping.userId = user.id

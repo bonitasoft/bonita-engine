@@ -38,7 +38,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInst
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -323,7 +322,7 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaException{
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType);
-        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getIdKey(),
+        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, SConnectorInstance.ID_KEY,
                 OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
         List<SAConnectorInstance> connectorInstances;
@@ -345,8 +344,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
     private List<FilterOption> buildFiltersForConnectors(final long containerId, final String containerType) {
         final List<FilterOption> filters = new ArrayList<>(2);
-        filters.add(new FilterOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerIdKey(), containerId));
-        filters.add(new FilterOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerTypeKey(), containerType));
+        filters.add(new FilterOption(SAConnectorInstance.class, SConnectorInstance.CONTAINER_ID_KEY, containerId));
+        filters.add(new FilterOption(SAConnectorInstance.class, SConnectorInstance.CONTAINER_TYPE_KEY, containerType));
         return filters;
     }
 

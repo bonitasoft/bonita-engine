@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 
 /**
  * @author Julien Reboul
  */
-public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnectorInstanceImpl, ConnectorInstanceBuilder> {
+public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnectorInstance, ConnectorInstanceBuilder> {
 
     private boolean withFailureInfo = false;
 
@@ -57,15 +57,15 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnector
 
 
     @Override
-    SConnectorInstanceImpl _build() {
-        SConnectorInstanceImpl connectorInstance;
+    SConnectorInstance _build() {
+        SConnectorInstance connectorInstance;
         if (withFailureInfo) {
-            connectorInstance = new SConnectorInstanceWithFailureInfoImpl();
-            ((SConnectorInstanceWithFailureInfoImpl) connectorInstance).setExceptionMessage(exceptionMessage);
-            ((SConnectorInstanceWithFailureInfoImpl) connectorInstance).setStackTrace(stackTrace);
+            connectorInstance = new SConnectorInstanceWithFailureInfo();
+            ((SConnectorInstanceWithFailureInfo) connectorInstance).setExceptionMessage(exceptionMessage);
+            ((SConnectorInstanceWithFailureInfo) connectorInstance).setStackTrace(stackTrace);
         }
         else {
-            connectorInstance = new SConnectorInstanceImpl();
+            connectorInstance = new SConnectorInstance();
         }
         connectorInstance.setState(state);
         connectorInstance.setConnectorId(connectorId);

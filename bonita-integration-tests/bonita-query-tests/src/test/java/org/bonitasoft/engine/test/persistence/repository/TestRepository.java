@@ -35,10 +35,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -113,13 +111,13 @@ public class TestRepository {
         return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
     }
 
-    public SConnectorInstance add(final SConnectorInstanceImpl sConnectorInstance) {
+    public SConnectorInstance add(final SConnectorInstance sConnectorInstance) {
         getSession().save(sConnectorInstance);
         return (SConnectorInstance) getSession().get(sConnectorInstance.getClass(),
                 new PersistentObjectId(sConnectorInstance.getId(), sConnectorInstance.getTenantId()));
     }
 
-    public SPendingActivityMapping add(final SPendingActivityMappingImpl pendingActivityMapping) {
+    public SPendingActivityMapping add(final SPendingActivityMapping pendingActivityMapping) {
         getSession().save(pendingActivityMapping);
         return (SPendingActivityMapping) getSession().get(pendingActivityMapping.getClass(),
                 new PersistentObjectId(pendingActivityMapping.getId(), pendingActivityMapping.getTenantId()));
@@ -184,10 +182,10 @@ public class TestRepository {
         return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
     }
 
-    public STimerEventTriggerInstanceImpl add(final STimerEventTriggerInstanceImpl sTimerEventTriggerInstanceImpl) {
-        getSession().save(sTimerEventTriggerInstanceImpl);
-        return (STimerEventTriggerInstanceImpl) getSession().get(sTimerEventTriggerInstanceImpl.getClass(),
-                new PersistentObjectId(sTimerEventTriggerInstanceImpl.getId(), sTimerEventTriggerInstanceImpl.getTenantId()));
+    public STimerEventTriggerInstance add(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
+        getSession().save(sTimerEventTriggerInstance);
+        return (STimerEventTriggerInstance) getSession().get(sTimerEventTriggerInstance.getClass(),
+                new PersistentObjectId(sTimerEventTriggerInstance.getId(), sTimerEventTriggerInstance.getTenantId()));
     }
 
     public SCustomUserInfoDefinition add(final SCustomUserInfoDefinition infoDef) {

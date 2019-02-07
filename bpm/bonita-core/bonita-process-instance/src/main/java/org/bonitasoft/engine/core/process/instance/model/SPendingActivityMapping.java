@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -26,20 +30,30 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * 
  * @author Baptiste Mesta
  */
-public interface SPendingActivityMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SPendingActivityMapping implements PersistentObject {
 
+    public static final String ACTOR_ID = "actorId";
+    public static final String ACTIVITY_ID = "activityId";
+    public static final String USER_ID = "userId";
+    private long id;
+    private long tenantId;
     /**
      * the id of the activity
      */
-    long getActivityId();
-
+    private long activityId;
     /**
      * the id of the actor or -1 if the mapping is on user
      */
-    long getActorId();
-
+    @Builder.Default
+    private long actorId = -1;
     /**
      * the id of the user or -1 if the mapping is on actor
      */
-    long getUserId();
+    @Builder.Default
+    private long userId = -1;
+
 }

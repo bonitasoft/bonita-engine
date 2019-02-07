@@ -16,12 +16,10 @@ package org.bonitasoft.engine.core.process.instance.model;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
@@ -113,13 +111,13 @@ public class EventTriggerInstanceQueriesTest {
         assertEquals(98L, sTimerEventTriggerInstances.get(0).getId());
     }
 
-    private STimerEventTriggerInstanceImpl buildSTimerEventTriggerInstance(final long id, final long eventInstanceId, final String eventInstanceName,
-            final String jobTriggerName) {
-        final STimerEventTriggerInstanceImpl sTimerEventTriggerInstanceImpl = new STimerEventTriggerInstanceImpl(eventInstanceId, eventInstanceName, 96L,
+    private STimerEventTriggerInstance buildSTimerEventTriggerInstance(final long id, final long eventInstanceId, final String eventInstanceName,
+                                                                       final String jobTriggerName) {
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(eventInstanceId, eventInstanceName, 96L,
                 jobTriggerName);
-        sTimerEventTriggerInstanceImpl.setId(id);
-        sTimerEventTriggerInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sTimerEventTriggerInstanceImpl;
+        sTimerEventTriggerInstance.setId(id);
+        sTimerEventTriggerInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        return sTimerEventTriggerInstance;
     }
 
     private SIntermediateCatchEventInstanceImpl buildSIntermediateCatchEventInstanceImpl(final long id, final String name, final long processInstanceId) {

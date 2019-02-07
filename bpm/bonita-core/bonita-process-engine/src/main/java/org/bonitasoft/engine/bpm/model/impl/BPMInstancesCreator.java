@@ -23,6 +23,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
+import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -76,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskI
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
@@ -548,12 +548,15 @@ public class BPMInstancesCreator {
 
     SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition,
             int executionOrder) {
-        return BuilderFactory
-                .get(SConnectorInstanceBuilderFactory.class)
-                .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
-                        sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
-                        executionOrder)
-                .done();
+        return SConnectorInstance.builder().name(sConnectorDefinition.getName())
+                .containerId(container.getId())
+                .containerType(containerType)
+                .connectorId(sConnectorDefinition.getConnectorId())
+                .version(sConnectorDefinition.getVersion())
+                .activationEvent(sConnectorDefinition.getActivationEvent())
+                .state(ConnectorState.TO_BE_EXECUTED.name())
+                .executionOrder(executionOrder)
+                .build();
     }
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
