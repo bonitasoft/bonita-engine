@@ -34,9 +34,7 @@ public class ProfileBuilder extends PersistentObjectBuilder<SProfile, ProfileBui
 
     @Override
     SProfile _build() {
-        SProfile profile = new SProfile();
-        profile.setName(name);
-        return profile;
+        return SProfile.builder().name(name).build();
     }
 
     public ProfileBuilder withName(String name) {

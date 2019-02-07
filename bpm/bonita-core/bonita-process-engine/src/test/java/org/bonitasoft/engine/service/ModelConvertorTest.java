@@ -17,8 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -62,7 +70,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTask
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
@@ -79,7 +86,6 @@ import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.resources.STenantResourceLight;
@@ -233,7 +239,7 @@ public class ModelConvertorTest {
     @Test
     public void toEventTriggerInstance_can_convert_TIMER_Type() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
 
         // Then
         final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);
@@ -249,7 +255,7 @@ public class ModelConvertorTest {
     @Test
     public void toTimerEventTriggerInstance_can_convert() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
         sTimerEventTriggerInstance.setId(9);
 
         // Then

@@ -19,10 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

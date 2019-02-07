@@ -37,8 +37,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -89,7 +87,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     @Override
     public void setState(final SConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getStateKey(), state);
+        entityUpdateDescriptor.addField(SConnectorInstance.STATE_KEY, state);
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(sConnectorInstance, entityUpdateDescriptor), CONNECTOR_INSTANCE_STATE);
         } catch (final SRecorderException e) {
@@ -101,10 +99,10 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
             throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(BuilderFactory.get(SConnectorInstanceWithFailureInfoBuilderFactory.class).getExceptionMessageKey(),
+        entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.EXCEPTION_MESSAGE,
                 getExceptionMessage(throwable));
         try {
-            entityUpdateDescriptor.addField(BuilderFactory.get(SConnectorInstanceWithFailureInfoBuilderFactory.class).getStackTraceKey(),
+            entityUpdateDescriptor.addField(SConnectorInstanceWithFailureInfo.STACK_TRACE,
                     getStringStackTrace(throwable));
         } catch (final IOException e) {
             throw new SConnectorInstanceModificationException(e);

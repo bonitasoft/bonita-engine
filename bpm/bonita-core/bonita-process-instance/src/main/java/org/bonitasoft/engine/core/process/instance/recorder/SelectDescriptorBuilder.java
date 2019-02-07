@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -249,11 +248,6 @@ public class SelectDescriptorBuilder {
         parameters.put("userId", userId);
         parameters.put("currentTime", System.currentTimeMillis());
         return new SelectOneDescriptor<>("getNumberOfPendingOverdueTasksForUser", parameters, SHumanTaskInstance.class, Long.class);
-    }
-    public static SelectListDescriptor<SToken> getToken(final long processInstanceId) {
-        final Map<String, Object> singletonMap = new HashMap<>(1);
-        singletonMap.put("processInstanceId", processInstanceId);
-        return new SelectListDescriptor<>("getToken", singletonMap, SToken.class, new QueryOptions(0, 1));
     }
 
 }

@@ -38,7 +38,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -97,7 +96,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         Trigger trigger = scheduleJob(timerEventTriggerDefinition, jobDescriptor, jobParameters, timerCondition);
         if (timerEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
             final STimerEventTriggerInstance sEventTriggerInstance
-                    = new STimerEventTriggerInstanceImpl(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName());
+                    = new STimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName());
             eventInstanceService.createTimerEventTriggerInstance(sEventTriggerInstance);
         }
     }

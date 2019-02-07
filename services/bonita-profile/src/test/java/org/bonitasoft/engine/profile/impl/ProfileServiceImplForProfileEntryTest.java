@@ -93,15 +93,12 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     private SProfileEntry createProfileEntry(final long id) {
-        final SProfileEntry entry = new SProfileEntry();
-        entry.setId(id);
-        return entry;
+        return SProfileEntry.builder().id(id).build();
     }
     private SProfile profile(String name) {
-        final SProfile profile = new SProfile();
-        profile.setId(UUID.randomUUID().getLeastSignificantBits());
-        profile.setName(name);
-        return profile;
+        return SProfile.builder()
+                .id(UUID.randomUUID().getLeastSignificantBits())
+                .name(name).build();
     }
 
     @Test(expected = IllegalArgumentException.class)
