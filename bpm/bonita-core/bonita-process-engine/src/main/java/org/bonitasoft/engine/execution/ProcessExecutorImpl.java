@@ -938,8 +938,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
-                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
-                        sFlowNodeInstance.getId()));
+                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
             } catch (final SWorkRegisterException e) {
                 setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
                 throw new SFlowNodeExecutionException("Unable to trigger execution of the flow node.", e);
@@ -966,7 +965,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId()));
+                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
         }
     }
 

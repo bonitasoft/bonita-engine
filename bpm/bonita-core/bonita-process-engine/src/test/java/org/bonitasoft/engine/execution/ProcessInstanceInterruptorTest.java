@@ -104,7 +104,7 @@ public class ProcessInstanceInterruptorTest {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING, flownode3_stable.getId());
         //then
-        verify(containerRegistry, never()).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode3_stable.getId());
+        verify(containerRegistry, never()).executeFlowNode(flownode3_stable);
     }
 
     @Test
@@ -112,9 +112,9 @@ public class ProcessInstanceInterruptorTest {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
-        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode1_stable.getId());
-        verify(containerRegistry, never()).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode2_unstable.getId());
-        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode3_stable.getId());
+        verify(containerRegistry).executeFlowNode(flownode1_stable);
+        verify(containerRegistry, never()).executeFlowNode(flownode2_unstable);
+        verify(containerRegistry).executeFlowNode(flownode3_stable);
     }
 
     @Test
@@ -125,8 +125,8 @@ public class ProcessInstanceInterruptorTest {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
-        verify(containerRegistry, never()).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode1_stable.getId());
-        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode3_stable.getId());
+        verify(containerRegistry, never()).executeFlowNode(flownode1_stable);
+        verify(containerRegistry).executeFlowNode(flownode3_stable);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ProcessInstanceInterruptorTest {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
-        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, sGatewayInstance.getId());
+        verify(containerRegistry).executeFlowNode(sGatewayInstance);
     }
 
     @Test
@@ -179,8 +179,8 @@ public class ProcessInstanceInterruptorTest {
 
         verify(flowNodeInstanceService).setStateCategory(flownode1_stable, ABORTING);
         verify(flowNodeInstanceService).setStateCategory(flownode2_unstable, ABORTING);
-        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode1_stable.getId());
-        verify(containerRegistry, never()).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode2_unstable.getId());
+        verify(containerRegistry).executeFlowNode(flownode1_stable);
+        verify(containerRegistry, never()).executeFlowNode(flownode2_unstable);
     }
 
     @Test
