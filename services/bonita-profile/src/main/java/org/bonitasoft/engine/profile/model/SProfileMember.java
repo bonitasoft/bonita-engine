@@ -19,9 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Elias Ricken de Medeiros
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,15 +37,13 @@ public class SProfileMember implements PersistentObject {
     private long id;
     private long tenantId;
     private long profileId;
+    @Builder.Default
     private long userId = -1;
+    @Builder.Default
     private long groupId = -1;
+    @Builder.Default
     private long roleId = -1;
     private transient String displayNamePart1;
     private transient String displayNamePart2;
     private transient String displayNamePart3;
-
-    public SProfileMember(final long profileId) {
-        super();
-        this.profileId = profileId;
-    }
 }

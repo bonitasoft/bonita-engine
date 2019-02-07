@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -155,8 +154,7 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         long userId = 4411l;
         //given
         getTransactionService().begin();
-        final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
-                .createNewInstanceForUser(step1.getId(), userId).done();
+        final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(step1.getId()).userId(userId).build();
         activityInstanceService.addPendingActivityMappings(mapping);
         getTransactionService().complete();
         //

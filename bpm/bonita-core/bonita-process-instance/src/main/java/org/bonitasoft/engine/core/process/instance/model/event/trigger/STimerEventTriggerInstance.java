@@ -13,33 +13,46 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface STimerEventTriggerInstance extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class STimerEventTriggerInstance implements PersistentObject {
 
-    String EXECUTION_DATE = "executionDate";
+    public static final String EXECUTION_DATE = "executionDate";
 
-    long getEventInstanceId();
+    private long id;
+    private long tenantId;
+    private long eventInstanceId;
 
     /**
      * @return The date of the execution of the trigger
      * @since 6.4.0
      */
-    long getExecutionDate();
+    private long executionDate;
 
     /**
      * @return The name of the trigger of the job
-     * @see org.quartz.Trigger
      * @since 6.4.0
      */
-    String getJobTriggerName();
+    private String jobTriggerName;
 
     /**
      * @return The name of the {@link org.bonitasoft.engine.core.process.instance.model.event.SEventInstance}
      * @since 6.4.0
      */
-    String getEventInstanceName();
+    private String eventInstanceName;
+
+
+    public STimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName, final long executionDate, final String jobTriggerName) {
+        this.eventInstanceId = eventInstanceId;
+        this.eventInstanceName = eventInstanceName;
+        this.executionDate = executionDate;
+        this.jobTriggerName = jobTriggerName;
+    }
 }

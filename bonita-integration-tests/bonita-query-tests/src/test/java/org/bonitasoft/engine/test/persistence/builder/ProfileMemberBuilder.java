@@ -40,12 +40,11 @@ public class ProfileMemberBuilder extends PersistentObjectBuilder<SProfileMember
 
     @Override
     SProfileMember _build() {
-        SProfileMember profileMember = new SProfileMember();
-        profileMember.setProfileId(profileId);
-        profileMember.setGroupId(groupId);
-        profileMember.setRoleId(roleId);
-        profileMember.setUserId(userId);
-        return profileMember;
+        return SProfileMember.builder()
+                .profileId(profileId)
+                .groupId(groupId)
+                .roleId(roleId)
+                .userId(userId).build();
     }
 
     public ProfileMemberBuilder withProfileId(long profileId) {

@@ -277,11 +277,10 @@ public class ProfileServiceImpl implements ProfileService {
 
     private SProfileMember buildProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
                                               final String displayNamePart3) {
-        final SProfileMember profileMember = new SProfileMember(profileId);
-        profileMember.setDisplayNamePart1(displayNamePart1);
-        profileMember.setDisplayNamePart2(displayNamePart2);
-        profileMember.setDisplayNamePart1(displayNamePart3);
-        return profileMember;
+        return SProfileMember.builder().profileId(profileId)
+                .displayNamePart1(displayNamePart1)
+                .displayNamePart2(displayNamePart2)
+                .displayNamePart1(displayNamePart3).build();
     }
 
     @Override

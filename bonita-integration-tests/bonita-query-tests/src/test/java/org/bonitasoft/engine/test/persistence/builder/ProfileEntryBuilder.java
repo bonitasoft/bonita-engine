@@ -34,7 +34,7 @@ public class ProfileEntryBuilder extends PersistentObjectBuilder<SProfileEntry, 
 
     @Override
     SProfileEntry _build() {
-        SProfileEntry profileEntry = new SProfileEntry();
+        SProfileEntry profileEntry = SProfileEntry.builder().build();
         profileEntry.setProfileId(profileId);
         return profileEntry;
     }

@@ -24,7 +24,6 @@ import org.assertj.core.api.Condition;
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
-import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceRepository;
 import org.junit.Before;
@@ -44,20 +43,20 @@ public class ConnectorInstanceQueriesTest {
 
     @Inject
     private ConnectorInstanceRepository repository;
-    private SConnectorInstanceImpl expectedConnector1;
-    private SConnectorInstanceImpl expectedConnector2;
+    private SConnectorInstance expectedConnector1;
+    private SConnectorInstance expectedConnector2;
     private String containerType;
     private long containerId;
 
-    private SConnectorInstanceImpl expectedConnector3;
+    private SConnectorInstance expectedConnector3;
 
-    private SConnectorInstanceImpl expectedConnector4;
+    private SConnectorInstance expectedConnector4;
 
-    private SConnectorInstanceImpl expectedConnector5;
+    private SConnectorInstance expectedConnector5;
 
     private SConnectorInstance connectorInstanceOfDifferentContainer;
 
-    private SConnectorInstanceImpl expectedConnector6;
+    private SConnectorInstance expectedConnector6;
 
     /**
      * 
@@ -101,7 +100,7 @@ public class ConnectorInstanceQueriesTest {
         connectorInstanceOfDifferentContainer = repository.add(aConnectorInstance().setContainerId(differentContainerId).setContainerType(containerType)
                 .setActivationEvent(ConnectorEvent.ON_ENTER)
                 .withFailureInfo(false).build());// unexpected connector on different container
-        SConnectorInstanceImpl differentTenantConnector = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+        SConnectorInstance differentTenantConnector = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ConnectorEvent.ON_FINISH)
                 .withFailureInfo(false).build();
         differentTenantConnector.setTenantId(tenantId);

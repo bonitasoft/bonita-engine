@@ -52,9 +52,9 @@ public class ProfilesExporterTest {
     @Test
     public void should_convert_profiles_to_exported_version() throws Exception {
         //given
-        SProfile profile1 = new SProfile();
+        SProfile profile1 = SProfile.builder().build();
         profile1.setName("MyProfile1");
-        SProfile profile2 = new SProfile();
+        SProfile profile2 = SProfile.builder().build();
         profile2.setName("MyProfile2");
         //when
         ProfilesNode exportedProfiles = profilesExporter.toProfiles(Arrays.asList(profile1, profile2));
@@ -65,12 +65,12 @@ public class ProfilesExporterTest {
     @Test
     public void should_convert_profile_having_profile_entry_to_exported_version() throws Exception {
         //given
-        SProfile profile1 = new SProfile();
+        SProfile profile1 = SProfile.builder().build();
         profile1.setName("MyProfile1");
         profile1.setId(12L);
-        SProfileEntry sProfileEntry1 = new SProfileEntry();
+        SProfileEntry sProfileEntry1 = SProfileEntry.builder().build();
         sProfileEntry1.setName("p1");
-        SProfileEntry sProfileEntry2 = new SProfileEntry();
+        SProfileEntry sProfileEntry2 = SProfileEntry.builder().build();
         sProfileEntry2.setName("p2");
         doReturn(Arrays.asList(sProfileEntry1, sProfileEntry2)).doReturn(Collections.emptyList()).when(profileService)
                 .searchProfileEntries(any(QueryOptions.class));

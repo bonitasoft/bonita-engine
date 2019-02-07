@@ -45,9 +45,9 @@ import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConnectorDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -286,7 +286,7 @@ public class StateBehaviorsTest {
         //given
         List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
-        SConnectorInstanceImpl sConnectorInstance = new SConnectorInstanceImpl("connector1", 12, null, null, null, null);
+        SConnectorInstance sConnectorInstance = new SConnectorInstance("connector1", 12, null, null, null, null);
         sConnectorInstance.setState(TO_BE_EXECUTED.name());
         //when
         boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);
@@ -299,7 +299,7 @@ public class StateBehaviorsTest {
         //given
         List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
-        SConnectorInstanceImpl sConnectorInstance = new SConnectorInstanceImpl("connector1", 12, null, null, null, null);
+        SConnectorInstance sConnectorInstance = new SConnectorInstance("connector1", 12, null, null, null, null);
         sConnectorInstance.setState(TO_RE_EXECUTE.name());
         //when
         boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);
@@ -312,7 +312,7 @@ public class StateBehaviorsTest {
         //given
         List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
-        SConnectorInstanceImpl sConnectorInstance = new SConnectorInstanceImpl("connector2", 12, null, null, null, null);
+        SConnectorInstance sConnectorInstance = new SConnectorInstance("connector2", 12, null, null, null, null);
         sConnectorInstance.setState(TO_BE_EXECUTED.name());
         //when
         boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);

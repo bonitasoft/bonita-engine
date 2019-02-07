@@ -42,7 +42,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_update_if_default() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfile sProfile = new SProfile();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",true), sProfile);
 
@@ -51,7 +51,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_update_if_default2() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfile sProfile = new SProfile();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(true);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 
@@ -60,7 +60,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_not_update_if_custom() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfile sProfile = new SProfile();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 

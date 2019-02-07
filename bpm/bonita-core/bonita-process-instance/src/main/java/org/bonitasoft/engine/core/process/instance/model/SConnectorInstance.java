@@ -13,30 +13,53 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SConnectorInstance extends SNamedElement {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SConnectorInstance implements SNamedElement {
 
-    String FLOWNODE_TYPE = "flowNode";
+    public static final String ID_KEY = "id";
+    public static final String NAME_KEY = "name";
+    public static final String CONTAINER_ID_KEY = "containerId";
+    public static final String CONTAINER_TYPE_KEY = "containerType";
+    public static final String CONNECTOR_ID_KEY = "connectorId";
+    public static final String VERSION_KEY = "version";
+    public static final String ACTIVATION_EVENT_KEY = "activationEvent";
+    public static final String STATE_KEY = "state";
+    public static final String EXECUTION_ORDER = "executionOrder";
+    public static final String FLOWNODE_TYPE = "flowNode";
+    public static final String PROCESS_TYPE = "process";
 
-    String PROCESS_TYPE = "process";
+    private long id;
+    private long tenantId;
+    private String name;
+    private long containerId;
+    private String connectorId;
+    private String version;
+    private ConnectorEvent activationEvent;
+    private String state;
+    private String containerType;
+    private int executionOrder;
 
-    long getContainerId();
-
-    String getContainerType();
-
-    String getConnectorId();
-
-    String getVersion();
-
-    ConnectorEvent getActivationEvent();
-
-    String getState();
-
-    int getExecutionOrder();
+    public SConnectorInstance(final String name, final long containerId, final String containerType, final String connectorId, final String version,
+                                  final ConnectorEvent activationEvent) {
+        this.name = name;
+        this.containerId = containerId;
+        this.containerType = containerType;
+        this.connectorId = connectorId;
+        this.version = version;
+        this.activationEvent = activationEvent;
+    }
 
 }

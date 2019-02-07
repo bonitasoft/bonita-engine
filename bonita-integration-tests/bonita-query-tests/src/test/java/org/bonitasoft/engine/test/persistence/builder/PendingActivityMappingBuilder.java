@@ -15,9 +15,9 @@ package org.bonitasoft.engine.test.persistence.builder;
 
 import java.util.Random;
 
-import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 
-public class PendingActivityMappingBuilder extends PersistentObjectBuilder<SPendingActivityMappingImpl, PendingActivityMappingBuilder> {
+public class PendingActivityMappingBuilder extends PersistentObjectBuilder<SPendingActivityMapping, PendingActivityMappingBuilder> {
 
     private long activityId = new Random().nextLong();
 
@@ -35,11 +35,10 @@ public class PendingActivityMappingBuilder extends PersistentObjectBuilder<SPend
     }
 
     @Override
-    SPendingActivityMappingImpl _build() {
-        SPendingActivityMappingImpl mapping = new SPendingActivityMappingImpl(activityId);
-        mapping.setUserId(userId);
-        mapping.setActorId(actorId);
-        return mapping;
+    SPendingActivityMapping _build() {
+        return SPendingActivityMapping.builder().activityId(activityId)
+                .userId(userId)
+                .actorId(actorId).build();
     }
 
     public PendingActivityMappingBuilder withUserId(final long userId) {

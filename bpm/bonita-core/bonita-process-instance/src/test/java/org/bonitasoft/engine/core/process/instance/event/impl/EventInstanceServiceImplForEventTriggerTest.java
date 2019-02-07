@@ -27,7 +27,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -85,7 +84,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test
     public final void createEventTriggerInstance_should_create_event_trigger_instance() throws Exception {
         // Given
-        final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
         final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
 
         // When
@@ -98,7 +97,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test(expected = SEventTriggerInstanceCreationException.class)
     public final void createEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
@@ -113,7 +112,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test
     public final void deleteEventTriggerInstance_should_delete_event_trigger_instance() throws Exception {
         // Given
-        final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
         final DeleteRecord insertRecord = new DeleteRecord(eventTriggerInstance);
 
         // When
@@ -126,7 +125,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test(expected = SEventTriggerInstanceDeletionException.class)
     public final void deleteEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
@@ -137,7 +136,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstance_should_return_event_trigger_instance() throws Exception {
         // Given
         final long eventTriggerInstanceId = 63L;
-        final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
         final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(STimerEventTriggerInstance.class,
                 STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(eventTriggerInstance).when(persistenceService).selectById(selectByIdDescriptor);
@@ -168,7 +167,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void searchEventTriggerInstances_should_return_the_list() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
+        final List<STimerEventTriggerInstance> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstance());
         doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(STimerEventTriggerInstance.class, queryOptions, null);
 
         // When
@@ -221,7 +220,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
+        final List<STimerEventTriggerInstance> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstance());
         doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
                any());
 
@@ -252,12 +251,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test
     public final void updateEventTriggerInstance_should_update_timer_event_trigger_instance() throws Exception {
         // Given
-        final STimerEventTriggerInstanceImpl sTimerEventTriggerInstanceImpl = new STimerEventTriggerInstanceImpl();
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTimerEventTriggerInstanceImpl, descriptor);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTimerEventTriggerInstance, descriptor);
 
         // When
-        eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstanceImpl, descriptor);
+        eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
