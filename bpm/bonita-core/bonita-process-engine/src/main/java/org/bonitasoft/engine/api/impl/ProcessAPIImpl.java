@@ -5730,12 +5730,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             WorkDescriptor work;
             if (shouldBeReadyTask) {
-                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance.getProcessDefinitionId(),
-                        flowNodeInstance.getParentProcessInstanceId(),
-                        flowNodeInstanceId);
+                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance);
             } else {
-                work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
-                        flowNodeInstanceId);
+                work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
             }
             workService.registerWork(work);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {

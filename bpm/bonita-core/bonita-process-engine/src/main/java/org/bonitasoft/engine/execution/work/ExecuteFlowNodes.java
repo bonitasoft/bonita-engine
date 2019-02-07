@@ -101,8 +101,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         logInfo(logger, "Restarting flow node (Execute ...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
                 + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
-                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId()));
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
     }
 
     void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
@@ -110,9 +109,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         logInfo(logger, "Restarting flow node (Notify finished...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
                 + " in state = <" + sFlowNodeInstance.getStateName() + ">");
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
-        workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
-                .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
-                .name()));
+        workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance));
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {

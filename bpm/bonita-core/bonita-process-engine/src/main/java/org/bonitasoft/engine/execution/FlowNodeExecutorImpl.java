@@ -195,8 +195,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     private void registerExecuteFlowNodeWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
-        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
-                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId()));
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
     }
 
     private void setExecutedBySubstitute(final Long executerSubstituteId, final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeModificationException {
@@ -244,9 +243,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private void registerNotifyFinishWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
         workService.registerWork(
-                workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
-                        sFlowNodeInstance.getParentProcessInstanceId(),
-                        sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
+                workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance));
     }
 
     @Override
@@ -290,9 +287,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private void executeFlowNodeIfHasActionsToExecute(final boolean hasActionsToExecute, final SActivityInstance callActivityInstance)
             throws SWorkRegisterException {
         if (!hasActionsToExecute) {
-            containerRegistry.executeFlowNode(callActivityInstance.getProcessDefinitionId(),
-                    callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
-                    callActivityInstance.getId());
+            containerRegistry.executeFlowNode(callActivityInstance);
         }
     }
 

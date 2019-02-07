@@ -66,7 +66,7 @@ public class ProcessInstanceInterruptor {
     }
 
     private void executeFlowNode(SFlowNodeInstance child) throws SWorkRegisterException {
-        containerRegistry.executeFlowNode(child.getProcessDefinitionId(), child.getParentProcessInstanceId(), child.getId());
+        containerRegistry.executeFlowNode(child);
     }
 
     /**

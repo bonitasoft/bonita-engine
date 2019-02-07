@@ -61,8 +61,8 @@ public class ContainerRegistry {
         return executors.get(containerType);
     }
 
-    public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) throws SWorkRegisterException {
-        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinitionId, processInstanceId, flowNodeInstanceId));
+    public void executeFlowNode(SFlowNodeInstance flowNodeInstance) throws SWorkRegisterException {
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId,

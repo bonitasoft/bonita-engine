@@ -411,8 +411,7 @@ public class StateBehaviors {
                     activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
                 } else {
                     //the called process is finished, next step is stable so we trigger execution of this flownode
-                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
-                            flowNodeInstance.getId()));
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
                 }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
@@ -595,9 +594,7 @@ public class StateBehaviors {
             do {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
-                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(),
-                            sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
-                            sActivityInstance.getId());
+                    containerRegistry.executeFlowNode(sActivityInstance);
                 }
                 i += BATCH_SIZE;
             } while (childrenOfAnActivity.size() == BATCH_SIZE);
@@ -702,8 +699,7 @@ public class StateBehaviors {
                     waitingEventsInterrupter.interruptWaitingEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
                     if (stable) {
-                        containerRegistry.executeFlowNode(processDefinition.getId(),
-                                boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()), boundaryEventInstance.getId());
+                        containerRegistry.executeFlowNode(boundaryEventInstance);
                     }
                 }
             }

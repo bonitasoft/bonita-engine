@@ -66,10 +66,6 @@ public class FlowNodeRetrierTest {
 
     private static long FLOW_NODE_INSTANCE_ID = 10;
 
-    private static long PROCESS_INSTANCE_ID = 1;
-
-    private static long PROCESS_DEFINITION_ID = 20;
-
     private static int STATE_ID = 29;
 
     private static int PREVIOUS_STATE_ID = 30;
@@ -83,8 +79,6 @@ public class FlowNodeRetrierTest {
         given(flowNodeInstance.getId()).willReturn(FLOW_NODE_INSTANCE_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
         given(flowNodeInstance.getPreviousStateId()).willReturn(PREVIOUS_STATE_ID);
-        given(flowNodeInstance.getProcessDefinitionId()).willReturn(PROCESS_DEFINITION_ID);
-        given(flowNodeInstance.getParentProcessInstanceId()).willReturn(PROCESS_INSTANCE_ID);
         given(flowNodeInstance.getName()).willReturn(FLOW_NODE_NAME);
 
     }
@@ -104,7 +98,7 @@ public class FlowNodeRetrierTest {
         //then
         verify(strategy).resetConnectorsOf(FLOW_NODE_INSTANCE_ID);
         verify(flowNodeExecutor).setStateByStateId(FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
-        verify(registry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, FLOW_NODE_INSTANCE_ID);
+        verify(registry).executeFlowNode(flowNodeInstance);
     }
 
     @Test
@@ -119,7 +113,7 @@ public class FlowNodeRetrierTest {
         retrier.retry(FLOW_NODE_INSTANCE_ID);
 
         //then
-        verify(registry, never()).executeFlowNode(anyLong(), anyLong(), anyLong());
+        verify(registry, never()).executeFlowNode(any());
         verify(flowNodeExecutor).setStateByStateId(FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
     }
 

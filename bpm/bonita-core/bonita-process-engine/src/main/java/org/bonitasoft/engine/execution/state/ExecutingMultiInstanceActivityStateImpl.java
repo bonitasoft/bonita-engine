@@ -141,8 +141,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 if (stateBehaviors.shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
                     createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(), activityDefinition, miActivity, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
-                        containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId()
-                        );
+                        containerRegistry.executeFlowNode(sFlowNodeInstance);
                     }
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);

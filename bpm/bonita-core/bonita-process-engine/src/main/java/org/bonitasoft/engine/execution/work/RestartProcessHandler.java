@@ -207,8 +207,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
             if (callerId > 0) {
                 final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
                 if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
-                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance.getProcessDefinitionId(),
-                            callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId()));
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
                     logInfo(logger, "Restarting notification of finished process '" + processInstance.getName() + "' with id " + processInstance.getId()
                             + " in state " + getState(processInstance.getStateId()));
                 }

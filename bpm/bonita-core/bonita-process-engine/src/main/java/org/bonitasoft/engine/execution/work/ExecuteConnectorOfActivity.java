@@ -84,9 +84,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
         final WorkDescriptor executeFlowNodeWork = tenantAccessor.getBPMWorkFactory()
-                .createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
-                        parentProcessInstanceId,
-                        flowNodeInstanceId);
+                .createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance);
         workService.registerWork(executeFlowNodeWork);
     }
 
