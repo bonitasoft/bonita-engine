@@ -17,13 +17,20 @@ package org.bonitasoft.engine.work;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +51,8 @@ public class WorkExecutorServiceImplTest {
     private BonitaExecutorService bonitaExecutorService;
     @Mock
     private TechnicalLoggerService loggerService;
+    @Mock
+    private TechnicalLogger logger;
     private WorkDescriptor workDescriptor = WorkDescriptor.create("myWork");
     @Mock
     private BonitaWork bonitaWork;
@@ -52,6 +61,7 @@ public class WorkExecutorServiceImplTest {
     @Before
     public void before() throws Exception {
         doReturn(bonitaExecutorService).when(bonitaExecutorServiceFactory).createExecutorService(any());
+        doReturn(logger).when(loggerService).asLogger(any());
         workExecutorService = new WorkExecutorServiceImpl(bonitaExecutorServiceFactory, loggerService, WORK_TERMINATION_TIMEOUT);
         workExecutorService.start();
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -167,7 +177,7 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.stop();
 
         // then: will only be started one time
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), contains("Waited"));
+        verify(logger).warn(contains("Waited"));
     }
 
     @Test(expected = SWorkException.class)
@@ -192,7 +202,8 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.stop();
 
         // then: will only be started one time
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), contains("Interrupted"), any(InterruptedException.class));
+
+        verify(logger).warn(contains("Interrupted"),any(InterruptedException.class));
     }
     @Test
     public void checkStartStatus() {
@@ -217,7 +228,7 @@ public class WorkExecutorServiceImplTest {
     }
 
     @Test
-    public void should_reexecute_work_when_it_fails_because_of_lock() throws Exception {
+    public void should_reexecute_work_when_it_fails_because_of_lock_timeout() throws Exception {
         workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
                 new LockTimeoutException("lock timeout"));
 
@@ -225,10 +236,19 @@ public class WorkExecutorServiceImplTest {
     }
 
     @Test
+    public void should_warn_and_reexecute_work_when_it_fails_because_of_lock_exception() throws Exception {
+        workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
+                new LockException("lock timeout", new Exception()));
+
+        verify(bonitaExecutorService).submit(eq(workDescriptor));
+        verify(logger).warn(any(), any(Exception.class));
+    }
+
+    @Test
     public void should_log_on_success() throws Exception {
         workExecutorService.onSuccess(workDescriptor);
 
-        verify(loggerService).log(any(), eq(TechnicalLogSeverity.DEBUG),contains("Completed work"));
+        verify(logger).debug(eq("Completed work {}"), any(Object.class));
     }
 
 

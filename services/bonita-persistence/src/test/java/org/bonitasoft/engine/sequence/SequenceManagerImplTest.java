@@ -31,6 +31,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.lock.SLockTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +75,7 @@ public class SequenceManagerImplTest {
     private static final long TENANTID = 1;
 
     @Before
-    public void before() throws SQLException, SLockException {
+    public void before() throws SQLException, SLockException, SLockTimeoutException {
         lockService = mock(LockService.class);
         datasource = mock(DataSource.class);
         lock = mock(BonitaLock.class);

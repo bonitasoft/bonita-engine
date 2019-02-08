@@ -26,6 +26,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.lock.SLockTimeoutException;
 
 /**
  * @author Charles Souillard
@@ -171,7 +172,7 @@ public class TenantSequenceManagerImpl {
             } finally {
                 lockService.unlock(lock, tenantId);
             }
-        } catch (SLockException e1) {
+        } catch (SLockException | SLockTimeoutException e1) {
             throw new SObjectNotFoundException(
                     "Unable to get a sequence id for " + sequenceId, e1);
         }

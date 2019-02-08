@@ -14,12 +14,13 @@
 
 package org.bonitasoft.engine.work;
 
-/**
- * @author Baptiste Mesta.
- */
-public class LockTimeoutException extends LockException {
+public class LockException extends Exception {
 
-    public LockTimeoutException(String message) {
+    public LockException(String message, Exception e) {
+        super(message, e);
+    }
+
+    public LockException(String message) {
         super(message);
     }
 }
