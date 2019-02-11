@@ -583,13 +583,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+
+        //this also delete the event (unless its the event that interrupted the process)
         final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
                 + sFlowNodeInstanceChild.getId() + "> of process instance <" + processInstanceId + "> finished");
         if (isEnd) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
-                ///the event is deleted by latter...
+                //it it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in executePostThrowEventHandlers
                 numberOfFlowNode -= 1;
             }
             if (numberOfFlowNode > 0) {
@@ -607,6 +609,19 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
                     + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
             boolean hasActionsToExecute = false;
+            // in case of interruption by error event:
+            // * the first time the last element (except the error event itself)  goes here, it put the process in aborting
+            // * the error event in thrown
+            //     * the catching flow node is executed IN THE SAME THREAD (I don't know why...)
+            //     * OR the catching event sub process is executed IN THE SAME THREAD and the process having this event sub process is interrupted (not locked!)
+            // * the throw error event is deleted
+            // * the waiting error event is deleted
+            // * the process is put in:
+            //     * ABORTING: if the process was in state category ABORTING (I don't know why...)
+            //         I'm not sure this case really happens because this would require that a last flow node trigger this method again and it's never the case
+            //     * COMPLETED: in 'normal' case
+            //         In that case if the process is called by a call activity, the calling activity have its token count decremented but is not executed (hasActionsToExecute==true)
+            //
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
                 // the process instance has maybe changed
@@ -720,6 +735,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
+                //FIXME should be done in a work?
                 executeFlowNode(gatewayToExecute.getId(), null, null);
             }
 
@@ -753,6 +769,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
         //FIXME we archive the flow node instance here because it was not archived before because the flow node was interrupting the parent.. we should change that because it's not very easy to see how it works
+        // * the flow node is archived only if its not the error event that triggered the interruption (unless if its in a sub process????)
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
