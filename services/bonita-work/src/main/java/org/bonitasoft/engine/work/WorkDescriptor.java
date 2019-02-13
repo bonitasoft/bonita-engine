@@ -149,6 +149,7 @@ public class WorkDescriptor implements Serializable {
                 .append(executionThreshold, that.executionThreshold)
                 .append(executionCount, that.executionCount)
                 .append(registrationDate, that.registrationDate)
+                .append(abnormalExecutionDetected, that.abnormalExecutionDetected)
                 .isEquals();
     }
 
@@ -163,6 +164,7 @@ public class WorkDescriptor implements Serializable {
                 .append(executionThreshold)
                 .append(executionCount)
                 .append(registrationDate)
+                .append(abnormalExecutionDetected)
                 .toHashCode();
     }
 
@@ -177,6 +179,7 @@ public class WorkDescriptor implements Serializable {
                 .append("executionThreshold", executionThreshold)
                 .append("executionCount", executionCount)
                 .append("registrationDate", registrationDate)
+                .append("abnormalExecutionDetected", abnormalExecutionDetected)
                 .toString();
     }
 
