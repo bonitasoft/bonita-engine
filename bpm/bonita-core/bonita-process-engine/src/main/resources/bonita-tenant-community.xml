@@ -1396,6 +1396,10 @@
                     <constructor-arg name="zipName" value="page-tenant-status.zip" />
                     <constructor-arg name="hidden" value="true" />
                 </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="page-import-export-organization.zip" />
+                    <constructor-arg name="hidden" value="false" />
+                </bean>
             </list>
         </property>
     </bean>
