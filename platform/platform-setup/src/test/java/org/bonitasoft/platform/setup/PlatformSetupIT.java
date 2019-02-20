@@ -504,6 +504,10 @@ public class PlatformSetupIT {
 
     @Test
     public void should_not_fail_when_pulling_twice_in_the_same_jvm() throws Exception {
+        final Path setupFolder = temporaryFolder.newFolder().toPath();
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
+        configurationFolderUtil.buildInitialFolder(setupFolder);
+        configurationFolderUtil.buildSqlFolder(setupFolder, dbVendor);
         platformSetup.init();
         platformSetup.pull();
         platformSetup.pull();
