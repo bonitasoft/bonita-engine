@@ -38,10 +38,10 @@
 						<type>link</type>
 						<page>AllRoles</page>
 					</profileEntry>
-					<profileEntry name="Import / Export" isCustom="false">
+					<profileEntry name="Install / Export" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>6</index>
-						<description>Import / Export an final organization</description>
+						<description>Install / Export a complete organization</description>
 						<type>link</type>
 						<page>ImportExportFinalOrganization</page>
 					</profileEntry>
