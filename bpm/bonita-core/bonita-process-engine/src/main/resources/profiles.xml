@@ -86,12 +86,12 @@
 						<type>link</type>
 						<page>rolelistingadmin</page>
 					</profileEntry>
-					<profileEntry name="Install / Export" isCustom="false">
+					<profileEntry name="Import / Export" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>6</index>
-						<description>Install / Export a complete organization</description>
+						<description>Import / Export an final organization</description>
 						<type>link</type>
-						<page>custompage_importExportOrganizationBonita</page>
+						<page>importexportorganization</page>
 					</profileEntry>
 					<profileEntry name="Profiles" isCustom="false">
 						<parentName>Organization</parentName>
