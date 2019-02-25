@@ -218,7 +218,7 @@ public class BPMWorkFactory implements WorkFactory {
         final long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
         final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
         final long flowNodeInstanceId = workDescriptor.getLong(FLOW_NODE_INSTANCE_ID);
-        BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, workDescriptor.getLong("parentId"), workDescriptor.getString("parentType"));
+        BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId);
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);

@@ -44,6 +44,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -81,14 +82,14 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final ProcessInstanceInterruptor processInstanceInterruptor;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-                                final ArchiveService archiveService,
-                                final DataInstanceService dataInstanceService,
-                                final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
-                                final SCommentService commentService,
-                                final ProcessInstanceService processInstanceService,
-                                final ConnectorInstanceService connectorInstanceService,
-                                final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
-                                final ContractDataService contractDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
+             final ArchiveService archiveService,
+            final DataInstanceService dataInstanceService,
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+            final SCommentService commentService,
+            final ProcessInstanceService processInstanceService,
+            final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
+            final ContractDataService contractDataService, ProcessInstanceInterruptor processInstanceInterruptor){
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
         this.archiveService = archiveService;
@@ -131,27 +132,24 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public FlowNodeState stepForward(final long flowNodeInstanceId,
-            final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        // retrieve the activity and execute its state
+    public FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-            final long processDefinitionId = sFlowNodeInstance.getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
+            final long processDefinitionId = flowNodeInstance.getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
                     .getProcessDefinitionIndex());
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
 
-            if (!sFlowNodeInstance.isStateExecuting()) {
-                archiveFlowNodeInstance(sFlowNodeInstance, false, processDefinitionId);
-                setExecutedBy(executerId, sFlowNodeInstance);
-                setExecutedBySubstitute(executerSubstituteId, sFlowNodeInstance);
+            if (!flowNodeInstance.isStateExecuting()) {
+                archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
+                setExecutedBy(executerId, flowNodeInstance);
+                setExecutedBySubstitute(executerSubstituteId, flowNodeInstance);
             }
 
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            final FlowNodeState state = updateState(sFlowNodeInstance, processDefinition);
-            if (!sFlowNodeInstance.isStateExecuting() && state != null) {
-                registerWork(state, sFlowNodeInstance);
+            final FlowNodeState state = updateState(flowNodeInstance, processDefinition);
+            if (!flowNodeInstance.isStateExecuting() && state != null) {
+                registerWork(state, flowNodeInstance);
             }
             return state;
         } catch (final SFlowNodeExecutionException e) {
@@ -247,22 +245,22 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance sFlowNodeInstanceChild) throws SFlowNodeNotFoundException,
+    public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance flowNodeInstance) throws SFlowNodeNotFoundException,
             SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException, SFlowNodeModificationException,
-            SFlowNodeExecutionException, SContractDataDeletionException, SWorkRegisterException {
+            SFlowNodeExecutionException, SWorkRegisterException {
         // TODO check deletion here
-        archiveFlowNodeInstance(sFlowNodeInstanceChild, true, processDefinitionId);
+        archiveFlowNodeInstance(flowNodeInstance, true, processDefinitionId);
 
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService.getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final boolean hit = flowNodeStateManager.getState(activityInstanceParent.getStateId()).hit(sProcessDefinition, activityInstanceParent,
-                sFlowNodeInstanceChild);
+                flowNodeInstance);
         if (hit) {// we continue parent if hit of the parent return true
             if (activityInstanceParent.isTerminal()) {
                 registerNotifyFinishWork(activityInstanceParent);
             } else {
-                stepForward(parentId, null, null);
+                stepForward(activityInstanceParent, null, null);
             }
         }
     }
@@ -302,9 +300,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
-            final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return stepForward(flowNodeInstanceId, executerId, executerSubstituteId);
+    public FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return stepForward(flowNodeInstance, executerId, executerSubstituteId);
     }
 
     @Override
