@@ -16,8 +16,9 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -64,8 +65,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        SFlowNodeInstance flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         if (isReadyHumanTask) {
-            SHumanTaskInstance humanTaskInstance = tenantAccessor.getActivityInstanceService().getHumanTaskInstance(flowNodeInstanceId);
             /*
              * the stateExecuting flag must be set to true by the API
              * however this do not completely avoid concurrency issue:
@@ -75,16 +76,20 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
              * and the second will find it in the next state (so it is ok) unless there is an on-finish connector.
              * In this last case it will try to execute that and may execute twice the same connector (not verified)
              */
-            if (humanTaskInstance.getStateId() != 4 || !humanTaskInstance.isStateExecuting()) {
+            if (!isHumanTask(flowNodeInstance) || flowNodeInstance.getStateId() != 4 || !flowNodeInstance.isStateExecuting()) {
                 throw new SFlowNodeExecutionException(
-                        "Unable to execute flow node " + humanTaskInstance.getId()
+                        "Unable to execute human task " + flowNodeInstance.getId()
                                 + " because it is in an incompatible state ("
-                                + (humanTaskInstance.isStateExecuting() ? "transitioning from state " : "on state ")
-                                + humanTaskInstance.getStateName() + "). Someone probably already called execute on it.");
+                                + (flowNodeInstance.isStateExecuting() ? "transitioning from state " : "on state ")
+                                + flowNodeInstance.getStateName() + "). Someone probably already called execute on it.");
             }
         }
-        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, null, null);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstance, null, null);
         return CompletableFuture.completedFuture(null);
+    }
+
+    private boolean isHumanTask(SFlowNodeInstance flowNodeInstance) {
+        return flowNodeInstance.getType() == SFlowNodeType.USER_TASK || flowNodeInstance.getType() == SFlowNodeType.MANUAL_TASK;
     }
 
     @Override

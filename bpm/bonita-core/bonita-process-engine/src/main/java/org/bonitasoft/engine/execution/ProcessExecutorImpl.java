@@ -211,11 +211,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         containerRegistry.addContainerExecutor(this);
     }
-
     @Override
-    public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
-                                         final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return flowNodeExecutor.stepForward(flowNodeInstanceId, executerId, executerSubstituteId);
+    public FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return flowNodeExecutor.stepForward(flowNodeInstance, executerId, executerSubstituteId);
     }
 
     private SConnectorInstance getNextConnectorInstance(final SProcessInstance processInstance, final ConnectorEvent event)
@@ -322,7 +320,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), null, null);
+                executeFlowNode(gatewayToExecute, null, null);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -736,7 +734,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
                 //FIXME should be done in a work?
-                executeFlowNode(gatewayToExecute.getId(), null, null);
+                executeFlowNode(gatewayToExecute, null, null);
             }
 
         }

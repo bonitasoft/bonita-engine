@@ -46,6 +46,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
@@ -110,6 +111,8 @@ public class EventsHandler {
     private ProcessExecutor processExecutor;
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
+    private FlowNodeInstanceService flowNodeInstanceService;
+
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
                          final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
                          final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
@@ -125,6 +128,7 @@ public class EventsHandler {
         this.processInstanceService = processInstanceService;
         this.logger = logger;
         this.operationService = operationService;
+        this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceInterruptor = processInstanceInterruptor;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
@@ -393,7 +397,7 @@ public class EventsHandler {
     }
 
     private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations)
-            throws SFlowNodeReadException, SFlowNodeExecutionException {
+            throws SFlowNodeReadException, SFlowNodeExecutionException, SFlowNodeNotFoundException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
         if (operations.getOperations() != null && !operations.getOperations().isEmpty()) {
@@ -404,7 +408,7 @@ public class EventsHandler {
                 throw new SFlowNodeExecutionException("Unable to execute operation before executing flow node " + flowNodeInstanceId, e);
             }
         }
-        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId,
+        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceService.getFlowNodeInstance(flowNodeInstanceId),
                 operations.getContainerType());
     }
 

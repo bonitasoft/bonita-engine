@@ -29,8 +29,6 @@ public class NotifyChildFinishedWorkTest {
 
     private static final int PROCESS_DEFINITION_ID = 123;
     private static final int FLOW_NODE_INSTANCE_ID = 345;
-    private static final int PARENT_ID = 456;
-    private static final String PARENT_TYPE = "parentType";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
@@ -51,7 +49,7 @@ public class NotifyChildFinishedWorkTest {
     public void before() throws SClassLoaderException {
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, PARENT_ID, PARENT_TYPE);
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID);
 
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
         doReturn(flowNodeInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -71,6 +69,7 @@ public class NotifyChildFinishedWorkTest {
     public void should_throw_precondition_exception_when_flownode_is_completed() throws Exception {
         SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
         flowNodeInstance.setTerminal(false);
+        flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
 
@@ -85,11 +84,12 @@ public class NotifyChildFinishedWorkTest {
         doReturn(containerRegistry).when(tenantServiceAccessor).getContainerRegistry();
         SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
         flowNodeInstance.setTerminal(true);
+        flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
         notifyChildFinishedWork.work(context);
 
-        verify(containerRegistry).nodeReachedState(PROCESS_DEFINITION_ID, flowNodeInstance, PARENT_ID, PARENT_TYPE);
+        verify(containerRegistry).nodeReachedState(flowNodeInstance);
     }
 
 }

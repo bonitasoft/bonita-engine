@@ -660,7 +660,7 @@ public class StateBehaviors {
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId());
 
         // no need to handle failed state, creation is in the same tx
-        containerRegistry.executeFlowNodeInSameThread( boundaryEventInstance.getId(), containerType.name());
+        containerRegistry.executeFlowNodeInSameThread(boundaryEventInstance, containerType.name());
     }
 
     private SFlowElementsContainerType getContainerType(final SActivityInstance activityInstance,
