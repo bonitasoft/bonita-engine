@@ -15,7 +15,7 @@ package org.bonitasoft.engine.work.audit;
 
 public enum ExecutionStatus {
 
-    OK(true), TOO_MUCH_EXECUTIONS(false), TOO_MUCH_TIME_ELAPSED_SINCE_REGISTRATION(false);
+    OK(true), TOO_MANY_EXECUTIONS(false), TOO_MUCH_TIME_ELAPSED_SINCE_REGISTRATION(false);
 
     private final boolean isNormalExecution;
 
