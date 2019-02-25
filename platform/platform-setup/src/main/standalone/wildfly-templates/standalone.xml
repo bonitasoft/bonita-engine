@@ -187,6 +187,10 @@
             <logger category="org.bonitasoft.engine.scheduler">
                 <level name="FINE" />
             </logger> -->
+            <!-- Specific logger for auditing work execution -->
+            <logger category="BONITA_WORK_AUDIT.EXECUTION">
+                <level name="INFO" />
+            </logger>
 
             <!-- If you want to deactivate warnings on wrong handling of transient data -->
             <!-- <logger category="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">

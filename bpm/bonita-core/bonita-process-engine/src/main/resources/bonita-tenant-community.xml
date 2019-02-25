@@ -1070,7 +1070,7 @@
     </bean>
 
     <bean id="workExecutionAuditor" class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor">
-        <property name="activated" value="${bonita.tenant.work.audit.activated:false}" />
+        <property name="activated" value="${bonita.tenant.work.audit.activated:true}" />
         <constructor-arg name="engineClock" ref="engineClock"/>
         <constructor-arg name="executionCountCheckConfig">
             <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$ExecutionCountCheckConfig">

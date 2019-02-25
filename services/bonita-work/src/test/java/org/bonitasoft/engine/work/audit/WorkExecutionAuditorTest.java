@@ -62,7 +62,7 @@ public class WorkExecutionAuditorTest {
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now().minus(12, MINUTES), 200));
 
         // then:
-        assertThat(executionStatus).isEqualTo(TOO_MUCH_EXECUTIONS);
+        assertThat(executionStatus).isEqualTo(TOO_MANY_EXECUTIONS);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class WorkExecutionAuditorTest {
         //then:
         final InOrder inOrder = inOrder(auditListener);
         inOrder.verify(auditListener).detectionStarted(work);
-        inOrder.verify(auditListener).abnormalExecutionStatusDetected(work, TOO_MUCH_EXECUTIONS);
+        inOrder.verify(auditListener).abnormalExecutionStatusDetected(work, TOO_MANY_EXECUTIONS);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -130,7 +130,7 @@ public class WorkExecutionAuditorTest {
         //then:
         final InOrder inOrder1stRun = inOrder(auditListener);
         inOrder1stRun.verify(auditListener).detectionStarted(work);
-        inOrder1stRun.verify(auditListener).abnormalExecutionStatusDetected(work, TOO_MUCH_EXECUTIONS);
+        inOrder1stRun.verify(auditListener).abnormalExecutionStatusDetected(work, TOO_MANY_EXECUTIONS);
         inOrder1stRun.verifyNoMoreInteractions();
 
         //when:
