@@ -98,7 +98,7 @@ public class WorkExecutionAuditor {
     ExecutionStatus executionStatus(WorkDescriptor work) {
         Duration durationSinceWorkRegistration = Duration.between(work.getRegistrationDate(), engineClock.now());
         if (durationSinceWorkRegistration.compareTo(executionCountDurationThreshold) >= 0 && work.getExecutionCount() >= executionCountThreshold) {
-            return TOO_MUCH_EXECUTIONS;
+            return TOO_MANY_EXECUTIONS;
         }
         if (durationSinceWorkRegistration.compareTo(registrationDurationElapsedThreshold) >= 0) {
             return TOO_MUCH_TIME_ELAPSED_SINCE_REGISTRATION;
