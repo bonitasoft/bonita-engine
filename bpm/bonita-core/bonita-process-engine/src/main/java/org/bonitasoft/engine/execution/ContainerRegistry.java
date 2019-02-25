@@ -47,13 +47,18 @@ public class ContainerRegistry {
         executors.put(containerExecutor.getHandledType(), containerExecutor);
     }
 
-    public void nodeReachedState(final long processDefinitionId, final SFlowNodeInstance flowNodeInstance, final long parentId, final String parentType)
+    public void notifyChildFinished(SFlowNodeInstance flowNodeInstance) throws SWorkRegisterException {
+        workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(flowNodeInstance));
+    }
+
+    public void nodeReachedState(SFlowNodeInstance flowNodeInstance)
             throws SBonitaException {
-        final ContainerExecutor containerExecutor = executors.get(parentType);
+        final ContainerExecutor containerExecutor = executors.get(flowNodeInstance.getParentContainerType().name());
         if (containerExecutor != null) {
-            containerExecutor.childFinished(processDefinitionId, parentId, flowNodeInstance);
+            containerExecutor.childFinished(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentContainerId(), flowNodeInstance);
         } else {
-            throw new SActivityExecutionException("There is no container executor for the container " + parentId + " having the type " + parentType);
+            throw new SActivityExecutionException("There is no container executor for the container " + flowNodeInstance.getParentContainerId()
+                    + " having the type " + flowNodeInstance.getParentContainerType());
         }
     }
 
@@ -65,10 +70,9 @@ public class ContainerRegistry {
         workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
     }
 
-    public void executeFlowNodeInSameThread(final long flowNodeInstanceId,
+    public void executeFlowNodeInSameThread(final SFlowNodeInstance flowNodeInstance,
                                             final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        containerExecutor.executeFlowNode(flowNodeInstanceId, null, null);
+        containerExecutor.executeFlowNode(flowNodeInstance, null, null);
     }
-
 }

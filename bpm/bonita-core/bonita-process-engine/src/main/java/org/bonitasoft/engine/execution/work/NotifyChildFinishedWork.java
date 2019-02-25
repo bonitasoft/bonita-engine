@@ -41,15 +41,9 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final long flowNodeInstanceId;
 
-    private final String parentType;
-
-    private final long parentId;
-
-    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType) {
+    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
-        this.parentId = parentId;
-        this.parentType = parentType;
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -65,7 +59,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
             TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
             SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(tenantAccessor);
             final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstance, parentId, parentType);
+            containerRegistry.nodeReachedState(flowNodeInstance);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -87,7 +81,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
+        return getClass().getSimpleName() + " flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
     @Override

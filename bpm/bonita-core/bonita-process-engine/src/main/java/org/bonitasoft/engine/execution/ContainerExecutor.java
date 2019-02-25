@@ -40,8 +40,8 @@ public interface ContainerExecutor {
     /**
      * Execute a flow node in the context of this container executor
      * 
-     * @param flowNodeInstanceId
-     *            The identifier of the flow node instance
+     * @param flowNodeInstance
+     *            The flow node instance
      * @param executerId
      *            The identifier of the user which execute the flow node
      * @param executerSubstituteId
@@ -51,7 +51,7 @@ public interface ContainerExecutor {
      * @throws SFlowNodeExecutionException
      *             Throw if there is an error when execute the flow node
      */
-    FlowNodeState executeFlowNode(long flowNodeInstanceId,
+    FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance,
                                   final Long executerId, final Long executerSubstituteId) throws SFlowNodeReadException, SFlowNodeExecutionException;
 
     /**

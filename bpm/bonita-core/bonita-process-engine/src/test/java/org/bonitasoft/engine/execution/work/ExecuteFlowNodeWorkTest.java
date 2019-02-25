@@ -60,7 +60,7 @@ public class ExecuteFlowNodeWorkTest {
         doReturn(flowNodeExecutor).when(tenantServiceAccessor).getFlowNodeExecutor();
         sHumanTaskInstance = new SUserTaskInstanceImpl();
         sHumanTaskInstance.setId(FLOW_NODE_INSTANCE_ID);
-        doReturn(sHumanTaskInstance).when(activityInstanceService).getHumanTaskInstance(FLOW_NODE_INSTANCE_ID);
+        doReturn(sHumanTaskInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ExecuteFlowNodeWorkTest {
         sHumanTaskInstance.setStateId(2);
         //when
         expectedException.expect(SFlowNodeExecutionException.class);
-        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
+        expectedException.expectMessage("Unable to execute human task " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
         executeFlowNodeWork.work(context);
         //then exception
     }
@@ -85,7 +85,7 @@ public class ExecuteFlowNodeWorkTest {
         sHumanTaskInstance.setStateExecuting(false);
         //when
         expectedException.expect(SFlowNodeExecutionException.class);
-        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
+        expectedException.expectMessage("Unable to execute human task " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
         executeFlowNodeWork.work(context);
         //then exception
     }
@@ -100,7 +100,7 @@ public class ExecuteFlowNodeWorkTest {
         //when
         executeFlowNodeWork.work(context);
         //then
-        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, null, null);
+        verify(flowNodeExecutor).executeFlowNode(sHumanTaskInstance, null, null);
     }
 
     @Test
@@ -112,6 +112,6 @@ public class ExecuteFlowNodeWorkTest {
         //when
         executeFlowNodeWork.work(context);
         //then
-        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, null, null);
+        verify(flowNodeExecutor).executeFlowNode(sHumanTaskInstance, null, null);
     }
 }
