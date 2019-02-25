@@ -233,10 +233,10 @@ public class TransientDataServiceImpl implements TransientDataService {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SActivityDefinition flowNode = (SActivityDefinition) processDefinition.getProcessContainer()
                 .getFlowNode(flowNodeDefinitionId);
-        return flowNode.getSDataDefinitions()
+        return flowNode != null ? flowNode.getSDataDefinitions()
                 .stream()
                 .filter(SDataDefinition::isTransientData)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : Collections.emptyList();
     }
 
     private void createDataInstance(SDataDefinition dataDefinition, final long containerId,
