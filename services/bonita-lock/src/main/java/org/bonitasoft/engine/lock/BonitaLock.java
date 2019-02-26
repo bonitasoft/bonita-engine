@@ -14,28 +14,16 @@
 package org.bonitasoft.engine.lock;
 
 import java.util.Objects;
-import java.util.concurrent.locks.Lock;
 
-/**
- * @author Baptiste Mesta
- */
 public class BonitaLock {
 
-    private final Lock lock;
-
     private final String objectType;
-
     private final long objectToLockId;
 
-    public BonitaLock(final Lock lock, final String objectType, final long objectToLockId) {
+    public BonitaLock(final String objectType, final long objectToLockId) {
         super();
-        this.lock = lock;
         this.objectType = objectType;
         this.objectToLockId = objectToLockId;
-    }
-
-    public Lock getLock() {
-        return lock;
     }
 
     public String getObjectType() {
@@ -54,18 +42,17 @@ public class BonitaLock {
             return false;
         BonitaLock that = (BonitaLock) o;
         return objectToLockId == that.objectToLockId &&
-                Objects.equals(lock, that.lock) &&
                 Objects.equals(objectType, that.objectType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lock, objectType, objectToLockId);
+        return Objects.hash(objectType, objectToLockId);
     }
 
     @Override
     public String toString() {
-        return "BonitaLock[" + objectType + ":" + objectToLockId + ", lock=" + (lock == null ? null : lock.hashCode()) + "]";
+        return "BonitaLock[" + objectType + ":" + objectToLockId + "]";
     }
 
 }
