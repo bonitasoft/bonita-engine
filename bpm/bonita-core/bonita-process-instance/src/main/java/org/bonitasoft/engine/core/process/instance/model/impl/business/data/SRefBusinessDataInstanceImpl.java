@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.core.process.instance.model.impl.business.data;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObjectImpl;
 
 
 
@@ -26,9 +24,10 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObject
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl implements SRefBusinessDataInstance {
+public abstract class SRefBusinessDataInstanceImpl implements SRefBusinessDataInstance {
 
+    private long id;
+    private long tenantId;
     private String name;
     private String dataClassName;
 

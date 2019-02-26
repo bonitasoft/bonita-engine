@@ -33,8 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNode
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
@@ -138,12 +136,12 @@ public class TestRepository {
         return (SUserMembership) getSession().get(membership.getClass(), new PersistentObjectId(membership.getId(), membership.getTenantId()));
     }
 
-    public SMessageInstance add(final SMessageInstanceImpl message) {
+    public SMessageInstance add(final SMessageInstance message) {
         getSession().save(message);
         return (SMessageInstance) getSession().get(message.getClass(), new PersistentObjectId(message.getId(), message.getTenantId()));
     }
 
-    public SWaitingMessageEvent add(final SWaitingMessageEventImpl waitingEvent) {
+    public SWaitingMessageEvent add(final SWaitingMessageEvent waitingEvent) {
         getSession().save(waitingEvent);
         return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(), new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
     }

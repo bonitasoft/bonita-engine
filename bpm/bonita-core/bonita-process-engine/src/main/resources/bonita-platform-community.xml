@@ -501,16 +501,16 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="classNames">
             <set>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent</value>
             </set>
         </constructor-arg>
         <constructor-arg name="sequenceId" value="10016" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10016:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" />
         <constructor-arg name="sequenceId" value="10017" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10017:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -1199,11 +1199,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 
                 <!--business data-->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" />

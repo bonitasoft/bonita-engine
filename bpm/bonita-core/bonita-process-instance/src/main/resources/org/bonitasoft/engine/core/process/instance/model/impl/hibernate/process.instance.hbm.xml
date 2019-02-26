@@ -225,7 +225,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" table="message_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" table="message_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -245,7 +245,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" abstract="true" table="waiting_event">
+    <class name="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" abstract="true" table="waiting_event">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -270,8 +270,8 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" discriminator-value="message"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" discriminator-value="message"
+              extends="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent">
         <property name="messageName" column="messageName" />
         <property name="locked" column="locked" />
         <property name="progress" column="progress" />
@@ -282,11 +282,11 @@
         <property name="correlation5" column="correlation5" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" discriminator-value="signal" extends="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" discriminator-value="signal" extends="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent">
         <property name="signalName" column="signalName" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" discriminator-value="error" extends="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" discriminator-value="error" extends="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent">
         <property name="errorCode" column="errorCode" />
         <property name="relatedActivityInstanceId" column="relatedActivityInstanceId" />
     </subclass>

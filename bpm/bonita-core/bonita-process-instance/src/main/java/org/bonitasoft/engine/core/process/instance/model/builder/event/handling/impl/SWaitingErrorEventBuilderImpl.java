@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.handling
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,9 +22,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
  */
 public class SWaitingErrorEventBuilderImpl implements SWaitingErrorEventBuilder {
 
-    private final SWaitingErrorEventImpl entity;
+    private final SWaitingErrorEvent entity;
 
-    public SWaitingErrorEventBuilderImpl(final SWaitingErrorEventImpl entity) {
+    public SWaitingErrorEventBuilderImpl(final SWaitingErrorEvent entity) {
         super();
         this.entity = entity;
     }

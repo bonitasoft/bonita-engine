@@ -13,11 +13,31 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+
 /**
  * @author Matthieu Chaffotte
  */
-public interface SWaitingSignalEvent extends SWaitingEvent {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SWaitingSignalEvent extends SWaitingEvent {
 
-    String getSignalName();
+
+    private String signalName;
+
+    public SWaitingSignalEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+                                   final String flowNodeName, final String signalName) {
+        super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
+        this.signalName = signalName;
+    }
+
+    @Override
+    public SEventTriggerType getEventTriggerType() {
+        return SEventTriggerType.SIGNAL;
+    }
 
 }

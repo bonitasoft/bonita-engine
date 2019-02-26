@@ -13,18 +13,41 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface SMessageEventCouple extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SMessageEventCouple implements PersistentObject {
 
-    long getWaitingMessageId();
+    private long waitingMessageId;
+    private SBPMEventType waitingMessageEventType;
+    private long messageInstanceId;
 
-    long getMessageInstanceId();
+    public SMessageEventCouple(final long waitingMessageId, final SBPMEventType waitingMessageEventType, final long messageInstanceId) {
+        this.waitingMessageId = waitingMessageId;
+        this.waitingMessageEventType = waitingMessageEventType;
+        this.messageInstanceId = messageInstanceId;
+    }
 
-	SBPMEventType getWaitingMessageEventType();
+    @Override
+    public long getId() {
+        return -1;
+    }
+
+    @Override
+    public void setId(final long id) {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public void setTenantId(final long id) {
+        throw new IllegalArgumentException();
+    }
 
 }

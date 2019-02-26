@@ -458,22 +458,22 @@
 
 	<query name="getCaughtErrorByRelatedActivityAndAnyErrorCode">
 		SELECT s
-		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl AS s
+		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent AS s
 		WHERE s.relatedActivityInstanceId = :relatedActivityInstanceId
 		AND s.errorCode IS NULL
 	</query>
 
 	<query name="getCaughtErrorByRelatedActivityAndErrorCode">
 		SELECT s
-		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl AS s
+		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent AS s
 		WHERE s.relatedActivityInstanceId = :relatedActivityInstanceId
 		AND s.errorCode = :errorCode
 	</query>
 
 	<query name="getMessageEventCouples">
-		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, m.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s,
-			 org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
+		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple(s.id, s.eventType, m.id)
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent AS s,
+			 org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance AS m
 		WHERE m.messageName = s.messageName
 		AND m.targetProcess = s.processName
 		AND (m.targetFlowNode = null OR m.targetFlowNode = s.flowNodeName)
@@ -491,87 +491,87 @@
 
 	<query name="getListeningSignals">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent AS s
 		WHERE s.signalName = :signalName
         ORDER BY s.id ASC
 	</query>
 
 	<query name="getStartWaitingEvents">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
 		WHERE s.processDefinitionId = :processDefinitionId
 		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
 	</query>
 
 	<query name="getWaitingEventsOfFlowNode">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
 		WHERE s.flowNodeInstanceId = :flowNodeInstanceId
 	</query>
 
 
 	<query name="resetProgressMessageInstances">
-		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
+		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance AS m
 		SET m.handled = false
 		WHERE m.handled = true
 	</query>
 	
 	<query name="getInProgressMessageInstances">
 		SELECT m
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance AS m
 		WHERE m.handled = true
 	</query>
 	
 	<query name="resetInProgressWaitingEvents">
-		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
+		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent AS s
 		SET s.progress = 0
 		WHERE s.progress = 1
 	</query>
 
 	<query name="getInProgressWaitingEvents">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent AS s
 		WHERE s.progress = 1
 	</query>
 
 	<query name="getNumberOfSWaitingEvent">
 		SELECT COUNT(s)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
 	</query>
 	
 	<query name="searchSWaitingEvent">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent AS s
 	</query>	
 
 	<query name="getNumberOfSWaitingSignalEvent">
 		SELECT COUNT(s)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent AS s
 	</query>
 	
 	<query name="searchSWaitingSignalEvent">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent AS s
 	</query>	
 
 	<query name="getNumberOfSWaitingMessageEvent">
 		SELECT COUNT(s)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent AS s
 	</query>
 	
 	<query name="searchSWaitingMessageEvent">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent AS s
 	</query>	
 
 	<query name="getNumberOfSWaitingErrorEvent">
 		SELECT COUNT(s)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent AS s
 	</query>
 	
 	<query name="searchSWaitingErrorEvent">
 		SELECT s
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl AS s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent AS s
 	</query>	
 	
 	<query name="getNumberOfSEventTriggerInstance">

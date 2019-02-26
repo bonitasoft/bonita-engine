@@ -29,8 +29,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -85,11 +83,11 @@ public class EventInstanceServiceImplForMessageTest {
     @Test
     public final void createMessageInstance_should_create_message_instance() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
-        final InsertRecord insertRecord = new InsertRecord(sMessageInstanceImpl);
+        final SMessageInstance sMessageInstance = new SMessageInstance();
+        final InsertRecord insertRecord = new InsertRecord(sMessageInstance);
 
         // When
-        eventInstanceServiceImpl.createMessageInstance(sMessageInstanceImpl);
+        eventInstanceServiceImpl.createMessageInstance(sMessageInstance);
 
         // Then
         verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
@@ -98,11 +96,11 @@ public class EventInstanceServiceImplForMessageTest {
     @Test(expected = SMessageInstanceCreationException.class)
     public final void createMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
+        final SMessageInstance sMessageInstance = new SMessageInstance();
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.createMessageInstance(sMessageInstanceImpl);
+        eventInstanceServiceImpl.createMessageInstance(sMessageInstance);
     }
 
     /**
@@ -113,11 +111,11 @@ public class EventInstanceServiceImplForMessageTest {
     @Test
     public final void deleteMessageInstance_should_delete_message_instance() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
-        final DeleteRecord insertRecord = new DeleteRecord(sMessageInstanceImpl);
+        final SMessageInstance sMessageInstance = new SMessageInstance();
+        final DeleteRecord insertRecord = new DeleteRecord(sMessageInstance);
 
         // When
-        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstanceImpl);
+        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstance);
 
         // Then
         verify(recorder).recordDelete(eq(insertRecord), nullable(String.class));
@@ -126,11 +124,11 @@ public class EventInstanceServiceImplForMessageTest {
     @Test(expected = SMessageModificationException.class)
     public final void deleteMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
+        final SMessageInstance sMessageInstance = new SMessageInstance();
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstanceImpl);
+        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstance);
     }
 
     /**
@@ -163,7 +161,7 @@ public class EventInstanceServiceImplForMessageTest {
     @Test
     public final void getMessageEventCouples_should_return_message_event_couples() throws Exception {
         // Given
-        final List<SMessageEventCoupleImpl> sMessageEventCoupleImpls = Arrays.asList(new SMessageEventCoupleImpl());
+        final List<SMessageEventCouple> sMessageEventCoupleImpls = Arrays.asList(new SMessageEventCouple());
         final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples(0, 100);
         doReturn(sMessageEventCoupleImpls).when(persistenceService).selectList(selectDescriptor);
 
@@ -204,16 +202,16 @@ public class EventInstanceServiceImplForMessageTest {
     public final void getMessageInstance_should_return_message_instance() throws Exception {
         // Given
         final long messageInstanceId = 63L;
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
+        final SMessageInstance sMessageInstance = new SMessageInstance();
         final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SMessageInstance.class,
                 "MessageInstance", messageInstanceId);
-        doReturn(sMessageInstanceImpl).when(persistenceService).selectById(selectByIdDescriptor);
+        doReturn(sMessageInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
         final SMessageInstance result = eventInstanceServiceImpl.getMessageInstance(messageInstanceId);
 
         // Then
-        assertEquals("Should return the result of the mock.", sMessageInstanceImpl, result);
+        assertEquals("Should return the result of the mock.", sMessageInstance, result);
     }
 
     @Test
@@ -251,12 +249,12 @@ public class EventInstanceServiceImplForMessageTest {
     @Test
     public final void updateMessageInstance_should_update_message_instance() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
+        final SMessageInstance sMessageInstance = new SMessageInstance();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sMessageInstanceImpl, descriptor);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sMessageInstance, descriptor);
 
         // When
-        eventInstanceServiceImpl.updateMessageInstance(sMessageInstanceImpl, descriptor);
+        eventInstanceServiceImpl.updateMessageInstance(sMessageInstance, descriptor);
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
@@ -265,12 +263,12 @@ public class EventInstanceServiceImplForMessageTest {
     @Test(expected = SMessageModificationException.class)
     public final void updateMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
+        final SMessageInstance sMessageInstance = new SMessageInstance();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.updateMessageInstance(sMessageInstanceImpl, descriptor);
+        eventInstanceServiceImpl.updateMessageInstance(sMessageInstance, descriptor);
     }
 
 }
