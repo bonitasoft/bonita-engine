@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -67,7 +66,7 @@ public class LockProcessInstanceWorkTest {
 
     @Test
     public void testWork() throws Exception {
-        BonitaLock bonitaLock = new BonitaLock(new ReentrantLock(), PROCESS, processInstanceId);
+        BonitaLock bonitaLock = new BonitaLock( PROCESS, processInstanceId);
         when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(
                 bonitaLock);
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
