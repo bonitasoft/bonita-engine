@@ -13,35 +13,39 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SMessageInstance extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SMessageInstance implements PersistentObject {
 
-    String getMessageName();
+    private long id;
+    private long tenantId;
+    private String messageName;
+    private String targetProcess;
+    private String targetFlowNode;
+    private long processDefinitionId;
+    private boolean locked = false;
+    private boolean handled = false;
+    private String flowNodeName;
+    private String correlation1;
+    private String correlation2;
+    private String correlation3;
+    private String correlation4;
+    private String correlation5;
 
-    String getTargetProcess();
-
-    String getTargetFlowNode();
-
-    String getCorrelation1();
-
-    String getCorrelation2();
-
-    String getCorrelation3();
-
-    String getCorrelation4();
-
-    String getCorrelation5();
-
-    boolean isLocked();
-
-    boolean isHandled();
-
-    long getProcessDefinitionId();
-
-    String getFlowNodeName(); // FIXME : -> never used ??
+    public SMessageInstance(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
+                                final String flowNodeName) {
+        this.messageName = messageName;
+        this.targetProcess = targetProcess;
+        this.targetFlowNode = targetFlowNode;
+        this.processDefinitionId = processDefinitionId;
+        this.flowNodeName = flowNodeName;
+    }
 
 }

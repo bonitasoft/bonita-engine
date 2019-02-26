@@ -15,7 +15,10 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
@@ -50,7 +53,7 @@ public class TriggerSignalWorkTest {
     private EventsHandler eventsHandler;
     @Mock
     private EventInstanceService eventInstanceService;
-    private SWaitingSignalEventImpl waitingSignalEvent;
+    private SWaitingSignalEvent waitingSignalEvent;
 
     @Before
     public void before() throws Exception {
@@ -58,7 +61,7 @@ public class TriggerSignalWorkTest {
         context.put("tenantAccessor", tenantServiceAccessor);
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
         doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        waitingSignalEvent = new SWaitingSignalEventImpl(SBPMEventType.EVENT_SUB_PROCESS, 654223L, "proc", 54362L, "flownode", SIGNAL_NAME);
+        waitingSignalEvent = new SWaitingSignalEvent(SBPMEventType.EVENT_SUB_PROCESS, 654223L, "proc", 54362L, "flownode", SIGNAL_NAME);
         doThrow(SEventTriggerInstanceNotFoundException.class).when(eventInstanceService).getWaitingSignalEvent(anyLong());
         doReturn(waitingSignalEvent).when(eventInstanceService).getWaitingSignalEvent(SIGNAL_ID);
     }

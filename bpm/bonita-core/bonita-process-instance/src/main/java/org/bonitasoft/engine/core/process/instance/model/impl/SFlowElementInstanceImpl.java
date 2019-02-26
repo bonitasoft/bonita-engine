@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -26,9 +25,11 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class SFlowElementInstanceImpl extends SNamedElementImpl implements SFlowElementInstance {
+public abstract class SFlowElementInstanceImpl implements SFlowElementInstance {
 
+    private long id;
+    private long tenantId;
+    private String name;
     private long rootContainerId;
     private long parentContainerId;
     private SStateCategory stateCategory = SStateCategory.NORMAL;
@@ -44,13 +45,9 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
     private boolean terminal;
     private boolean stable;
 
-    public SFlowElementInstanceImpl(final String name) {
-        super(name);
-    }
-
     public SFlowElementInstanceImpl(final String name, final long rootContainerId, final long parentContainerId, final long logicalGroup1,
             final long logicalGroup2) {
-        super(name);
+        this.name = name;
         this.rootContainerId = rootContainerId;
         this.parentContainerId = parentContainerId;
         this.logicalGroup1 = logicalGroup1;

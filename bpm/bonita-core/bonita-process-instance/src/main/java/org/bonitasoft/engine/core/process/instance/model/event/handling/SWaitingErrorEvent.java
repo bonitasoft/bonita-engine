@@ -13,18 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SWaitingErrorEvent extends SWaitingEvent {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SWaitingErrorEvent extends SWaitingEvent {
 
-    String getErrorCode();
-
+    private String errorCode;
     /**
-     * Get the id of activity where the boundary event is attached to.
-     * 
-     * @return the id of activity where the boundary event is attached to or zero if it's not a boundary event
+     * the id of activity where the boundary event is attached to.
      */
-    long getRelatedActivityInstanceId();
+    private long relatedActivityInstanceId;
+
+    public SWaitingErrorEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+                                  final String flowNodeName, final String errorCode) {
+        super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
+        this.errorCode = errorCode;
+    }
+
+    @Override
+    public SEventTriggerType getEventTriggerType() {
+        return SEventTriggerType.ERROR;
+    }
 
 }
