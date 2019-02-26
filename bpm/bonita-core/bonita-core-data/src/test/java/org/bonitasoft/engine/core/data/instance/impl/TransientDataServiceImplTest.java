@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -180,6 +181,20 @@ public class TransientDataServiceImplTest {
 
         assertThat(dataInstances.size()).isEqualTo(3);
         assertThat(dataInstances).contains(data,data1,data2);
+    }
+
+    @Test
+    public void should_return_empty_data_list_for_flownodes_not_in_definition() throws Exception {
+        //happens when flow node is e.g. a manual task
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("p","1");
+        SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
+        when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDefinition);
+        when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
+        when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList("name:42:ctype","name:44:ctype","name:48:ctype"));
+
+        List<SDataInstance> dataInstances = transientDataServiceImpl.getDataInstances(42, "ctype", 0, 10);
+
+        assertThat(dataInstances).isEmpty();
     }
     
     private SDataDefinition dataWithName(String dataName, SExpression defaultValueExpression) {
