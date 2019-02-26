@@ -180,10 +180,9 @@
 
     <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
 
-    <bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService" scope="singleton">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="lockTimeout" value="${bonita.platform.lock.memory.timeout}" />
-        <constructor-arg name="lockPoolSize" value="${bonita.platform.lock.memory.poolsize}" />
+    <bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService">
+        <constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="lockTimeoutSeconds" value="${bonita.platform.lock.memory.timeout}" />
     </bean>
 
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
