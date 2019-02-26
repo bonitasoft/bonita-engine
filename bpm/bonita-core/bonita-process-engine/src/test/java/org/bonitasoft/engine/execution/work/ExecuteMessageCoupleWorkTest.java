@@ -1,11 +1,21 @@
 package org.bonitasoft.engine.execution.work;
 
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -20,17 +30,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class ExecuteMessageCoupleWorkTest {
 
@@ -55,8 +54,8 @@ public class ExecuteMessageCoupleWorkTest {
     private Map<String, Object> context = new HashMap<>();
 
     private ExecuteMessageCoupleWork executeMessageCoupleWork = new ExecuteMessageCoupleWork(MESSAGE_INSTANCE_ID, WAITING_MESSAGE_ID);
-    private SWaitingMessageEventImpl waitingMessageEvent = new SWaitingMessageEventImpl(SBPMEventType.BOUNDARY_EVENT, 4243252L, "Process", 5435312, "flownode", "message");
-    private SMessageInstance messageInstance = new SMessageInstanceImpl("message", "Process", "flowNode", 4243252L, "flownode");
+    private SWaitingMessageEvent waitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, 4243252L, "Process", 5435312, "flownode", "message");
+    private SMessageInstance messageInstance = new SMessageInstance("message", "Process", "flowNode", 4243252L, "flownode");
 
     @Before
     public void before() {

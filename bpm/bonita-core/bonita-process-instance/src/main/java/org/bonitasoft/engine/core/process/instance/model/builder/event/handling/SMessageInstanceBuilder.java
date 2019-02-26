@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.event.handling;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -22,13 +21,13 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMe
 public class SMessageInstanceBuilder implements SCorrelationContainerBuilder {
 
     public static final String HANDLED = "handled";
-    protected final SMessageInstanceImpl entity;
+    protected final SMessageInstance entity;
 
     public static SMessageInstanceBuilder create(String messageName, String targetProcess, String targetFlowNode, Long processDefinitionId, String flowNodeName) {
-        return new SMessageInstanceBuilder(new SMessageInstanceImpl(messageName, targetProcess, targetFlowNode, processDefinitionId, flowNodeName));
+        return new SMessageInstanceBuilder(new SMessageInstance(messageName, targetProcess, targetFlowNode, processDefinitionId, flowNodeName));
     }
 
-    private SMessageInstanceBuilder(SMessageInstanceImpl entity) {
+    private SMessageInstanceBuilder(SMessageInstance entity) {
         this.entity = entity;
     }
 
