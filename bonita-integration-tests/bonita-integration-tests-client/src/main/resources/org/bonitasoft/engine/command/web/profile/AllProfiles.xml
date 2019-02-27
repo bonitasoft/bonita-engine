@@ -43,7 +43,7 @@
 						<index>6</index>
 						<description>Install / Export a complete organization</description>
 						<type>link</type>
-						<page>ImportExportFinalOrganization</page>
+						<page>InstallExportFinalOrganization</page>
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
