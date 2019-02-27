@@ -75,7 +75,7 @@ public class ProfilesParserTest {
         final String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">"
                 + "<profile isDefault=\"false\" name=\"ProfileWithNull\"> "
-                + "<description>ImportExportProfileDescription</description>"
+                + "<description>InstallExportProfileDescription</description>"
                 + "<profileEntries>"
                 + "<parentProfileEntry isCustom=\"true\" name=\"menu3\">"
                 + "<parentName>NULL</parentName>"
