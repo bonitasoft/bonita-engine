@@ -13,26 +13,26 @@
  **/
 package org.bonitasoft.engine.connector.impl;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.session.SessionService;
@@ -121,11 +121,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
         }
 
-        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
+        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader, loggerService.asLogger(ConnectorExecutorImpl.class));
         return execute(sConnector, task);
     }
 
-    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector, ExecuteConnectorCallable task) {
+    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector, InterruptibleCallable<Map<String, Object>> task) {
         pendingWorks.incrementAndGet();
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -203,7 +203,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     /**
      * @author Baptiste Mesta
      */
-    public final class ExecuteConnectorCallable implements Callable<Map<String, Object>> {
+    public final class ExecuteConnectorCallable implements InterruptibleCallable<Map<String, Object>> {
 
         private final Map<String, Object> inputParameters;
 
@@ -212,23 +212,25 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         private final long tenantId;
 
         private final ClassLoader loader;
+        private TechnicalLogger technicalLogger;
         private Thread thread;
         private boolean interrupted;
 
         private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId,
-                final ClassLoader loader) {
+                                         final ClassLoader loader, TechnicalLogger technicalLogger) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
             this.tenantId = tenantId;
             this.loader = loader;
+            this.technicalLogger = technicalLogger;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
+            technicalLogger.debug("Start execution of connector {}", sConnector.getClass());
             if (interrupted) {
                 throw new InterruptedException();
             }
-            thread = Thread.currentThread();
             final long startTime = System.currentTimeMillis();
 
             //Fix Classloading issue with ThreadLocal implementation of SessionAccessor
@@ -237,10 +239,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
 
             sConnector.setInputParameters(inputParameters);
             try {
+                thread = Thread.currentThread();
                 sConnector.validate();
                 sConnector.connect();
                 return sConnector.execute();
             } finally {
+                thread = null;
+                technicalLogger.debug("Finish execution of connector {}", sConnector.getClass());
                 // in case a session has been created: see ConnectorAPIAccessorImpl
                 try {
                     final long sessionId = sessionAccessor.getSessionId();
@@ -253,9 +258,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             }
         }
 
+        @Override
         public void interrupt() {
             interrupted = true;
             if (thread != null) {
+                StackTraceElement[] stackTrace = thread.getStackTrace();
+                String stack = Arrays.stream(stackTrace).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
+                technicalLogger.debug("Interrupt thread of connector {}, thread is {}, {}, stack is:\n {}", sConnector.getClass(), thread.getName(), thread.getId(), stack);
                 thread.interrupt();
             }
         }

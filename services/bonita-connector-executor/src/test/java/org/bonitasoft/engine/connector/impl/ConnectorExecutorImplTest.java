@@ -21,15 +21,14 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -95,7 +94,7 @@ public class ConnectorExecutorImplTest {
 
             }
         };
-
+        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         final Map<String, Object> result = connectorExecutorImpl.execute(connector,
                 Collections.singletonMap("key", "value"), Thread.currentThread().getContextClassLoader()).get(100,TimeUnit.MILLISECONDS);
 
@@ -187,6 +186,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_update_connectors_counters_when_adding_a_connector_with_immediate_execution() throws Exception {
         //when:
+        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         connectorExecutorImpl.execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader()).get();
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
@@ -199,6 +199,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_update_connectors_counters_when_enqueuing_connectors_with_long_processing_time()
             throws Exception {
+        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(), Thread.currentThread().getContextClassLoader());
         connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(), Thread.currentThread().getContextClassLoader());
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
