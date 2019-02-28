@@ -43,7 +43,6 @@
 
     <modules>
         <module>bonita-integration-http-api</module>
-        <module>bonita-integration-ejb-api</module>
     </modules>
 
 </project>
