@@ -23,7 +23,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractFlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEvent;
-import org.bonitasoft.engine.tracking.FlushEventListener;
 import org.bonitasoft.engine.tracking.Record;
 
 public class CSVFlushEventListener extends AbstractFlushEventListener {
@@ -36,7 +35,8 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
 
     public static final String FILE_SUFFIX = ".csv";
 
-    public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
+    public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger,
+            final String outputFolder, final String csvSeparator) {
         super(activateAtStart, logger);
         this.outputFolder = outputFolder;
         this.csvSeparator = csvSeparator;
@@ -60,26 +60,24 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
             csvContent.add(row);
         }
 
-        final File outputFile = getDayFile(flushTime, outputFolder, FILE_PREFIX, FILE_SUFFIX);
+        final File outputFile = getDayFile(flushTime, this.outputFolder, FILE_PREFIX, FILE_SUFFIX);
 
         if (!outputFile.exists()) {
             log(TechnicalLogSeverity.INFO, "Generating new csv file to: " + outputFile);
-            CSVUtil.writeCSVRow(outputFile, getHeaderRow(), csvSeparator);
+            CSVUtil.writeCSVRow(outputFile, getHeaderRow(), this.csvSeparator);
         } else {
             log(TechnicalLogSeverity.INFO, "Reusing csv file: " + outputFile);
         }
-        CSVUtil.writeCSVRows(outputFile, csvContent, csvSeparator);
+        CSVUtil.writeCSVRows(outputFile, csvContent, this.csvSeparator);
         return new CSVFlushEventListenerResult(flushEvent, outputFile);
     }
-
 
     @Override
     public String getStatus() {
         String status = super.getStatus() + "\n";
-        status += "outputFolder: " + outputFolder + "\n";
+        status += "outputFolder: " + this.outputFolder + "\n";
         return status;
     }
-
 
     @Override
     public void notifyStopTracking() {
@@ -90,7 +88,6 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
     public void notifyStartTracking() {
         //nothing to do
     }
-
 
     private List<String> getRow(final Record record) {
         final long timestamp = record.getTimestamp();
@@ -142,7 +139,7 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
         return Integer.toString(i);
     }
 
-    private File getDayFile(long time, String folder, String filePrefix, String fileSuffix) {
+    private File getDayFile(final long time, final String folder, final String filePrefix, final String fileSuffix) {
         final StringBuilder sb = new StringBuilder();
         final GregorianCalendar c = new GregorianCalendar();
         c.setTimeInMillis(time);

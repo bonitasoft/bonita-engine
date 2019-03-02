@@ -23,7 +23,7 @@ public class FlushEventListenerResult {
     }
 
     public FlushEvent getFlushEvent() {
-        return flushEvent;
+        return this.flushEvent;
     }
 
 }

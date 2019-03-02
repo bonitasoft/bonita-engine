@@ -43,9 +43,9 @@ public abstract class AbstractFlushEventListener implements FlushEventListener {
         notifyStopTracking();
     }
 
-    protected void log(TechnicalLogSeverity severity, String message) {
-        if (logger.isLoggable(getClass(), severity)) {
-            logger.log(getClass(), severity, message);
+    protected void log(final TechnicalLogSeverity severity, final String message) {
+        if (this.logger.isLoggable(getClass(), severity)) {
+            this.logger.log(getClass(), severity, message);
         }
     }
 }
