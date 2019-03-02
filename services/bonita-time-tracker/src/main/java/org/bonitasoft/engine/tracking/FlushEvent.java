@@ -32,18 +32,18 @@ public final class FlushEvent {
     }
 
     public List<Record> getRecords() {
-        return records;
+        return this.records;
     }
 
     public long getFlushTime() {
-        return flushTime;
+        return this.flushTime;
     }
 
     @Override
     public String toString() {
         return "FlushEvent{" +
-                "records.size=" + records.size() +
-                ", flushTime=" + flushTime +
+                "records.size=" + this.records.size() +
+                ", flushTime=" + this.flushTime +
                 '}';
     }
 }

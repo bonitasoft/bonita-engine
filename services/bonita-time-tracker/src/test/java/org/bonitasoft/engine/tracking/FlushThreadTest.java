@@ -15,7 +15,10 @@ package org.bonitasoft.engine.tracking;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
@@ -36,7 +39,8 @@ public class FlushThreadTest {
         when(timeTracker.getLogger()).thenReturn(logger);
         when(timeTracker.getFlushIntervalInMS()).thenReturn(0L);
         when(timeTracker.flush()).thenReturn(flushResult);
-        when(clock.sleep(anyLong())).thenReturn(true).thenReturn(true).thenReturn(true).thenThrow(InterruptedException.class);
+        when(clock.sleep(anyLong())).thenReturn(true).thenReturn(true).thenReturn(true)
+                .thenThrow(InterruptedException.class);
 
         final FlushThread flushThread = new FlushThread(timeTracker);
         flushThread.start();
