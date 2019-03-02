@@ -23,7 +23,7 @@ public class Record {
 
     private final long duration;
 
-    public Record(long timestamp, TimeTrackerRecords name, String description, long duration) {
+    public Record(final long timestamp, final TimeTrackerRecords name, final String description, final long duration) {
         super();
         this.timestamp = timestamp;
         this.name = name;
@@ -32,19 +32,19 @@ public class Record {
     }
 
     public long getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
     public TimeTrackerRecords getName() {
-        return name;
+        return this.name;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public long getDuration() {
-        return duration;
+        return this.duration;
     }
 
 }

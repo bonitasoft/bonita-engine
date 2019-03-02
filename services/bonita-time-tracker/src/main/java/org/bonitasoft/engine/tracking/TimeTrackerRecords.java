@@ -16,23 +16,27 @@ package org.bonitasoft.engine.tracking;
 public enum TimeTrackerRecords {
 
     /**
-     * this key is used to track the connector execution (execute method only, not in/out parameters processing) including the pool submission (that may have
+     * this key is used to track the connector execution (execute method only, not in/out parameters
+     * processing) including the pool submission (that may have
      * additional impact if the pool is full).
      */
     EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT,
 
     /**
-     * this key is used to track the connector execution (execute method only, not in/out parameters processing), without potential pool submission impact
+     * this key is used to track the connector execution (execute method only, not in/out parameters
+     * processing), without potential pool submission impact
      */
     EXECUTE_CONNECTOR_CALLABLE,
 
     /**
-     * this key is used to track connector output parameters processing only (not pooling, not input, not execute)
+     * this key is used to track connector output parameters processing only (not pooling, not input,
+     * not execute)
      */
     EXECUTE_CONNECTOR_OUTPUT_OPERATIONS,
 
     /**
-     * this key is used to track connector input parameters processing only (not pooling, not execute, not output)
+     * this key is used to track connector input parameters processing only (not pooling, not execute,
+     * not output)
      */
     EXECUTE_CONNECTOR_INPUT_EXPRESSIONS,
 
@@ -42,22 +46,26 @@ public enum TimeTrackerRecords {
     EXECUTE_CONNECTOR_DISCONNECT,
 
     /**
-     * this key is used to track the whole connector execution including pooling, input, execute, output and disconnect
+     * this key is used to track the whole connector execution including pooling, input, execute,
+     * output and disconnect
      */
     EXECUTE_CONNECTOR_WORK,
 
     /**
-     * this key is used to track the whole expression evaluation including its context. See ExpressionResolver.
+     * this key is used to track the whole expression evaluation including its context. See
+     * ExpressionResolver.
      */
     EVALUATE_EXPRESSION_INCLUDING_CONTEXT,
 
     /**
-     * this key is used to track the expression evaluation "only", assuming the context is already evaluated if necessary. See ExpressionService.
+     * this key is used to track the expression evaluation "only", assuming the context is already
+     * evaluated if necessary. See ExpressionService.
      */
     EVALUATE_EXPRESSION,
 
     /**
-     * this key is used to track the expression evaluation "only", assuming the context is already evaluated if necessary. Evaluates a set of expression in one
+     * this key is used to track the expression evaluation "only", assuming the context is already
+     * evaluated if necessary. Evaluates a set of expression in one
      * measure. See ExpressionService.
      */
     EVALUATE_EXPRESSIONS,

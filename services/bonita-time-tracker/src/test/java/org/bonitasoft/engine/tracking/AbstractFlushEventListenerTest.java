@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.tracking;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +29,7 @@ public class AbstractFlushEventListenerTest extends AbstractTimeTrackerTest {
         final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true, null) {
 
             @Override
-            public FlushEventListenerResult flush(FlushEvent flushEvent) throws Exception {
+            public FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
                 return null;
             }
 
@@ -50,7 +52,7 @@ public class AbstractFlushEventListenerTest extends AbstractTimeTrackerTest {
         final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true, null) {
 
             @Override
-            public FlushEventListenerResult flush(FlushEvent flushEvent) throws Exception {
+            public FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
                 return null;
             }
 

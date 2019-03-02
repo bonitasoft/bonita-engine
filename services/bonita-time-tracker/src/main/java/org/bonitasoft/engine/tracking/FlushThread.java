@@ -30,7 +30,7 @@ public class FlushThread extends Thread {
 
     @Override
     public void run() {
-        log(TechnicalLogSeverity.INFO, "Starting " + this.getName() + "...");
+        log(TechnicalLogSeverity.INFO, "Starting " + getName() + "...");
         long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
             final long now = System.currentTimeMillis();
@@ -38,14 +38,14 @@ public class FlushThread extends Thread {
                 final long sleepTime = getSleepTime(now, lastFlushTimestamp);
                 log(TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
                 this.timeTracker.getClock().sleep(sleepTime);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // Make sure to propagate the interruption to cleanly stop the current thread.
                 Thread.currentThread().interrupt();
                 break;
             }
             lastFlushTimestamp = flush(now);
         }
-        log(TechnicalLogSeverity.INFO, this.getName() + " stopped.");
+        log(TechnicalLogSeverity.INFO, getName() + " stopped.");
     }
 
     long getSleepTime(final long now, final long lastFlushTimestamp) throws InterruptedException {
@@ -57,21 +57,21 @@ public class FlushThread extends Thread {
         try {
             final FlushResult flushResult = this.timeTracker.flush();
             return flushResult.getFlushTime();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log(TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
         }
         return now;
     }
 
-    void log(TechnicalLogSeverity severity, String message) {
-        if (logger.isLoggable(getClass(), severity)) {
-            logger.log(getClass(), severity, message);
+    void log(final TechnicalLogSeverity severity, final String message) {
+        if (this.logger.isLoggable(getClass(), severity)) {
+            this.logger.log(getClass(), severity, message);
         }
     }
 
-    void log(TechnicalLogSeverity severity, String message, Exception e) {
-        if (logger.isLoggable(getClass(), severity)) {
-            logger.log(getClass(), severity, message, e);
+    void log(final TechnicalLogSeverity severity, final String message, final Exception e) {
+        if (this.logger.isLoggable(getClass(), severity)) {
+            this.logger.log(getClass(), severity, message, e);
         }
     }
 

@@ -11,17 +11,16 @@ public class FlushResult {
 
     private final List<FlushEventListenerResult> flushEventListenerResults;
 
-
-    public FlushResult(long flushTime, List<FlushEventListenerResult> flushEventListenerResults) {
+    public FlushResult(final long flushTime, final List<FlushEventListenerResult> flushEventListenerResults) {
         this.flushTime = flushTime;
         this.flushEventListenerResults = flushEventListenerResults;
     }
 
     public List<FlushEventListenerResult> getFlushEventListenerResults() {
-        return flushEventListenerResults;
+        return this.flushEventListenerResults;
     }
 
     public long getFlushTime() {
-        return flushTime;
+        return this.flushTime;
     }
 }
