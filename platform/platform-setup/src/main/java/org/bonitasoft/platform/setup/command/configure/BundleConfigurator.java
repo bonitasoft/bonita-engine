@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * For Tomcat bundle:
  * <ul>
  * <li>sets db vendor + bdm db vendor in file setenv.sh / .bat</li>
- * <li>sets all database configuration in file conf/bitronix-resources.properties</li>
  * <li>sets all database configuration in file conf/Catalina/localhost/bonita.xml</li>
  * <li>copies the required drivers from setup/lib to lib/bonita</li>
  * </ul>
@@ -121,12 +120,14 @@ abstract class BundleConfigurator {
         }
     }
 
-    boolean copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
+    boolean copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor)
+            throws PlatformException {
         if (srcDriverFile == null || targetDriverFile == null) {
             return false;
         }
         if (Files.exists(targetDriverFile)) {
-            LOGGER.info("Your " + dbVendor + " driver file '" + getRelativePath(targetDriverFile) + "' already exists. Skipping the copy.");
+            LOGGER.info("Your " + dbVendor + " driver file '" + getRelativePath(targetDriverFile)
+                    + "' already exists. Skipping the copy.");
             return false;
         }
         copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
@@ -142,11 +143,13 @@ abstract class BundleConfigurator {
             final Path targetDriverFolder = targetDriverFile.getParent();
             targetDriverFolder.toFile().mkdirs();
             Files.copy(srcDriverFile, targetDriverFile);
-            LOGGER.info("Copying your " + dbVendor + " driver file '" + getRelativePath(srcDriverFile) + "' to tomcat lib folder '"
+            LOGGER.info("Copying your " + dbVendor + " driver file '" + getRelativePath(srcDriverFile)
+                    + "' to tomcat lib folder '"
                     + getRelativePath(targetDriverFolder) + "'");
         } catch (IOException e) {
             throw new PlatformException(
-                    "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to " + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(), e);
+                    "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to "
+                            + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(), e);
         }
     }
 
@@ -175,7 +178,8 @@ abstract class BundleConfigurator {
         try {
             return new String(Files.readAllBytes(bonitaXmlFile), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new PlatformException("Cannot read content of text file " + bonitaXmlFile.toAbsolutePath().toString(), e);
+            throw new PlatformException(
+                    "Cannot read content of text file " + bonitaXmlFile.toAbsolutePath().toString(), e);
         }
     }
 
@@ -197,7 +201,8 @@ abstract class BundleConfigurator {
         final Path originalFileName = originalFile.getFileName();
         final Path backup = getBackupFile(originalFile);
         LOGGER.info(
-                "Creating a backup of configuration file '" + getRelativePath(originalFile).normalize() + "' to '" + getRelativePath(backup).normalize() + "'");
+                "Creating a backup of configuration file '" + getRelativePath(originalFile).normalize() + "' to '"
+                        + getRelativePath(backup).normalize() + "'");
         try {
             Files.copy(originalFile, backup);
             return backup;
@@ -220,7 +225,8 @@ abstract class BundleConfigurator {
             throw new PlatformException("Drivers folder not found: " + driverFolder.toString()
                     + ". Make sure it exists and put a jar or zip file containing drivers there.");
         }
-        final Collection<File> driversFiles = FileUtils.listFiles(driverFolder.toFile(), getDriverFilter(dbVendor), null);
+        final Collection<File> driversFiles = FileUtils.listFiles(driverFolder.toFile(), getDriverFilter(dbVendor),
+                null);
         if (driversFiles.size() == 0) {
             throw new PlatformException("No " + dbVendor + " drivers found in folder " + driverFolder.toString()
                     + ". Make sure to put a jar or zip file containing drivers there.");

@@ -115,25 +115,11 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
                 "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash\"");
+        checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
+                "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
+                "serverName=\"localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"");
 
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
-    }
-
-    @Test
-    public void configureApplicationServer_should_update_bitronix_resources_file() throws Exception {
-        // when:
-        configurator.configureApplicationServer();
-
-        // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
-        checkFileContains(bitronixFile, "resource.ds1.className=org.postgresql.xa.PGXADataSource", "resource.ds1.driverProperties.user=bonita",
-                "resource.ds1.driverProperties.password=bpm", "resource.ds1.driverProperties.serverName=localhost",
-                "resource.ds1.driverProperties.portNumber=5432", "resource.ds1.driverProperties.databaseName=bonita", "resource.ds1.testQuery=SELECT 1");
-        checkFileContains(bitronixFile, "resource.ds2.className=oracle.jdbc.xa.client.OracleXADataSource",
-                "resource.ds2.driverProperties.user=bizUser", "resource.ds2.driverProperties.password=bizPwd",
-                "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL", "resource.ds2.testQuery=SELECT 1 FROM DUAL");
-
-        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
     }
 
     @Test
@@ -148,16 +134,7 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
         final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
-
-        checkFileContains(bitronixFile, "resource.ds1.className=org.h2.jdbcx.JdbcDataSource", "resource.ds1.driverProperties.user=myUser",
-                "resource.ds1.driverProperties.password=myPwd", "resource.ds1.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
-                        + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
-                "resource.ds1.testQuery=SELECT 1");
-        checkFileContains(bitronixFile, "resource.ds2.className=oracle.jdbc.xa.client.OracleXADataSource",
-                "resource.ds2.driverProperties.user=bizUser", "resource.ds2.driverProperties.password=bizPwd",
-                "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL", "resource.ds2.testQuery=SELECT 1 FROM DUAL");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
@@ -177,17 +154,7 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
         final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
-
-        checkFileContains(bitronixFile, "resource.ds1.className=org.postgresql.xa.PGXADataSource", "resource.ds1.driverProperties.user=bonita",
-                "resource.ds1.driverProperties.password=bpm", "resource.ds1.driverProperties.serverName=localhost",
-                "resource.ds1.driverProperties.portNumber=5432", "resource.ds1.driverProperties.databaseName=bonita", "resource.ds1.testQuery=SELECT 1");
-
-        checkFileContains(bitronixFile, "resource.ds2.className=org.h2.jdbcx.JdbcDataSource", "resource.ds2.driverProperties.user=sa",
-                "resource.ds2.driverProperties.password=", "resource.ds2.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
-                        + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
-                "resource.ds2.testQuery=SELECT 1");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
@@ -210,19 +177,7 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
         final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
-
-        checkFileContains(bitronixFile, "resource.ds1.driverProperties.user=_bonita_with$dollar\\andBackSlash",
-                "resource.ds1.driverProperties.password=bpm_With$dollar\\andBackSlash",
-                "resource.ds1.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
-                        + "/bonita_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
-
-        checkFileContains(bitronixFile, "resource.ds2.driverProperties.user=_bdmWith$dollar\\andBackSlash",
-                "resource.ds2.driverProperties.password=bdm_bpm_With$dollar\\andBackSlash",
-                "resource.ds2.driverProperties.password=",
-                "resource.ds2.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
-                        + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\""
                 , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
@@ -246,43 +201,11 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
         final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
-
-        checkFileContains(bitronixFile, "resource.ds1.driverProperties.user=_bonita_with$dollar\\andBackSlash",
-                "resource.ds1.driverProperties.password=bpm_With$dollar\\andBackSlash",
-                "resource.ds1.driverProperties.URL=jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
-
-        checkFileContains(bitronixFile, "resource.ds2.driverProperties.user=_bdmWith$dollar\\andBackSlash",
-                "resource.ds2.driverProperties.password=bdm_bpm_With$dollar\\andBackSlash",
-                "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"_bonita_with$dollar\\andBackSlash\""
                 , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"oracle.jdbc.OracleDriver\""
                 , "url=\"jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
-    }
-
-    @Test
-    public void configureApplicationServer_should_support_special_characters_for_postgre_specific_properties() throws Exception {
-        // given:
-        System.setProperty("db.vendor", "postgres");
-        System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
-        System.setProperty("db.user", "user");
-        System.setProperty("db.password", "password");
-
-        System.setProperty("bdm.db.vendor", "postgres");
-        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX.db");
-        System.setProperty("bdm.db.user", "bdm_user");
-        System.setProperty("bdm.db.password", "bdm_password");
-
-        // when:
-        configurator.configureApplicationServer();
-
-        // then:
-        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
-
-        checkFileContains(bitronixFile, "resource.ds1.driverProperties.databaseName=bonita_with$dollarXXX.db",
-                "resource.ds2.driverProperties.databaseName=bonita_bdm_with$dollarXXX.db");
     }
 
     @Test
@@ -309,12 +232,12 @@ public class TomcatBundleConfiguratorTest {
 
     @Test
     public void should_fail_if_tomcat_mandatory_file_not_present() throws Exception {
-        final Path confFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path confFile = tomcatFolder.resolve("bin").resolve("setenv.sh");
         FileUtils.deleteQuietly(confFile.toFile());
 
         // then:
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("File bitronix-resources.properties is mandatory but is not found");
+        expectedException.expectMessage("File setenv.sh is mandatory but is not found");
 
         // when:
         configurator.configureApplicationServer();
@@ -345,7 +268,7 @@ public class TomcatBundleConfiguratorTest {
             fail("Should have thrown exception");
         } catch (PlatformException e) {
             // then:
-            verify(spy).restorePreviousConfiguration(any(Path.class), any(Path.class), any(Path.class), any(Path.class));
+            verify(spy).restorePreviousConfiguration(any(Path.class), any(Path.class), any(Path.class));
         }
     }
 
@@ -355,7 +278,6 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
-        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
 
@@ -364,7 +286,6 @@ public class TomcatBundleConfiguratorTest {
 
         // then:
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
-        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
     }
@@ -375,7 +296,6 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
-        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
 
@@ -392,7 +312,6 @@ public class TomcatBundleConfiguratorTest {
 
         // then:
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(2);
-        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(2);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(2);
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(2);
     }

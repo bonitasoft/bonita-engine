@@ -34,7 +34,7 @@ public class TestConnectorWithAPICall extends AbstractConnector {
         final String name = (String) getInputParameter("processName");
         final String version = (String) getInputParameter("processVersion");
         final String propValue = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
-        final String userTransactionJNDIName = System.getProperty("sysprop.bonita.transaction.manager", "java:comp/UserTransaction");
+        final String userTransactionJNDIName = System.getProperty("sysprop.bonita.transaction.manager", "java:comp/env/UserTransaction");
         long processId = -1;
         try {
             final InitialContext ctx = new InitialContext();

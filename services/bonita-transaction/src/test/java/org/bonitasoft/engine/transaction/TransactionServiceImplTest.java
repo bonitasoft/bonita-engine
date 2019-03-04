@@ -13,22 +13,16 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 public class TransactionServiceImplTest extends TransactionServiceTest {
 
-    static BitronixTransactionTestDelegate delegate;
+    private static NarayanaTransactionTestDelegate delegate;
 
     @BeforeClass
-    public static void setUpBitronixTransactionManager() {
-        delegate = new BitronixTransactionTestDelegate();
-        delegate.setUpBitronixTransactionManager();
-    }
-
-    @AfterClass
-    public static void stopBitronixTransactionManager() {
-        delegate.stopBitronixTransactionManager();
+    public static void setupTransactionManager() {
+        delegate = new NarayanaTransactionTestDelegate();
+        delegate.setupTransactionManager();
     }
 
     @Override

@@ -69,12 +69,14 @@
         <dom4j.version>1.6.1</dom4j.version>
         <jaxen.version>1.1.4</jaxen.version>
         <logback.version>1.2.3</logback.version>
+        <narayana.version>5.9.0.Final</narayana.version>
 
         <!-- Tests -->
         <system-rules.version>1.16.0</system-rules.version>
         <junit.jupiter.version>5.1.1</junit.jupiter.version>
         <junit.vintage.version>5.1.1</junit.vintage.version>
         <junit.platform.version>1.1.1</junit.platform.version>
+        <commons-dbcp.version>2.5.0</commons-dbcp.version>
 
         <!-- use -Dkey=value or activate profile in settings.xml to override -->
         <docker-postgres-image>postgres:11.1</docker-postgres-image>
@@ -319,21 +321,23 @@
                 <artifactId>jta</artifactId>
                 <version>1.1</version>
             </dependency>
+
             <!-- Required by Java 11 -->
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1.1</version>
             </dependency>
+
             <dependency>
-                <groupId>org.codehaus.btm</groupId>
-                <artifactId>btm</artifactId>
-                <version>2.1.4</version>
+                <groupId>org.jboss.narayana.jta</groupId>
+                <artifactId>narayana-jta</artifactId>
+                <version>${narayana.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.btm</groupId>
-                <artifactId>btm-tomcat55-lifecycle</artifactId>
-                <version>2.1.4</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-dbcp2</artifactId>
+                <version>${commons-dbcp.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>

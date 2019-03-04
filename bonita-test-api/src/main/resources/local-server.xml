@@ -8,15 +8,14 @@
         <property name="location" value="local-server.properties" />
     </bean>
 
-    <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
-        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
-        <property name="uniqueName" value="${local.journal.xads.uniqueName}" />
-        <property name="minPoolSize" value="${local.journal.xads.minPoolSize}" />
-        <property name="maxPoolSize" value="${local.journal.xads.maxPoolSize}" />
-        <property name="acquireIncrement" value="${local.journal.xads.acquireIncrement}" />
-        <property name="allowLocalTransactions" value="${local.journal.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
-        <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
-        </property>
+    <bean id="bonitaDataSource" class="org.apache.commons.dbcp2.managed.BasicManagedDataSource">
+        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+        <property name="initialSize" value="${local.journal.xads.minPoolSize}" />
+        <property name="maxTotal" value="${local.journal.xads.maxPoolSize}" />
+        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
+        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
+        <property name="transactionManager" ref="arjunaTransactionManager" />
     </bean>
 
     <bean id="bonitaSequenceManagerDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
@@ -26,21 +25,19 @@
                 <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
                 <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
                 <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-                <property name="idleTimeout" value="1800000" />
                 <property name="maxLifetime" value="2000000" />
             </bean>
         </constructor-arg>
     </bean>
 
-    <bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
-        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
-        <property name="uniqueName" value="${local.bdm.xads.uniqueName}" />
-        <property name="minPoolSize" value="${local.bdm.xads.minPoolSize}" />
-        <property name="maxPoolSize" value="${local.bdm.xads.maxPoolSize}" />
-        <property name="acquireIncrement" value="${local.bdm.xads.acquireIncrement}" />
-        <property name="allowLocalTransactions" value="${local.bdm.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
-        <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
-        </property>
+    <bean id="businessDataDataSource" class="org.apache.commons.dbcp2.managed.BasicManagedDataSource">
+        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+        <property name="initialSize" value="${local.bdm.xads.minPoolSize}" />
+        <property name="maxTotal" value="${local.bdm.xads.maxPoolSize}" />
+        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
+        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
+        <property name="transactionManager" ref="arjunaTransactionManager" />
     </bean>
 
     <bean id="notManagedBizDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
@@ -50,98 +47,31 @@
                 <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
                 <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
                 <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-                <property name="idleTimeout" value="1800000" />
                 <property name="maxLifetime" value="2000000" />
             </bean>
         </constructor-arg>
     </bean>
 
-    <!-- H2 -->
-    <bean id="h2.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="user">${h2.db.user}</prop>
-                <prop key="password">${h2.db.password}</prop>
-                <prop key="URL">${h2.db.url}</prop>
-            </props>
-        </property>
-    </bean>
+    <!-- create Arjuna transaction manager -->
+    <bean id="arjunaTransactionManager" class="com.arjuna.ats.jta.TransactionManager" factory-method="transactionManager" />
 
-    <!-- MySQL -->
-    <bean id="mysql.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="user">${mysql.db.user}</prop>
-                <prop key="password">${mysql.db.password}</prop>
-                <prop key="URL">${mysql.db.url}</prop>
-            </props>
-        </property>
-    </bean>
-
-
-    <!-- Postgres -->
-    <bean id="postgres.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="user">${postgres.db.user}</prop>
-                <prop key="password">${postgres.db.password}</prop>
-                <prop key="serverName">${postgres.db.server.name}</prop>
-                <prop key="portNumber">${postgres.db.server.port}</prop>
-                <prop key="databaseName">${postgres.db.database.name}</prop>
-            </props>
-        </property>
-    </bean>
-
-
-    <!-- Oracle -->
-    <bean id="oracle.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="user">${oracle.db.user}</prop>
-                <prop key="password">${oracle.db.password}</prop>
-                <prop key="URL">${oracle.db.url}</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!-- SqlServer -->
-    <bean id="sqlserver.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="user">${sqlserver.db.user}</prop>
-                <prop key="password">${sqlserver.db.password}</prop>
-                <prop key="URL">${sqlserver.db.url}</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!--  Bitronix Transaction Manager embedded configuration -->
-    <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
-        <property name="serverId" value="btm-bonita" />
-        <property name="logPart1Filename" value="${btm.logPart1Filename}" />
-        <property name="logPart2Filename" value="${btm.logPart2Filename}" />
-        <property name="debugZeroResourceTransaction" value="${btm.debugZeroResourceTransaction}" />
-        <property name="warnAboutZeroResourceTransaction" value="${btm.warnAboutZeroResourceTransaction}" />
-        <property name="defaultTransactionTimeout" value="${btm.defaultTransactionTimeout}" />
-    </bean>
-
-    <!-- create BTM transaction manager -->
-    <bean id="BitronixTransactionManager" factory-method="getTransactionManager" class="bitronix.tm.TransactionManagerServices" depends-on="btmConfig" destroy-method="shutdown" />
+    <bean id="userTransaction" class="com.arjuna.ats.jta.UserTransaction" factory-method="userTransaction" />
 
     <!-- Set up the mapping jndiName -> Datasource -->
     <util:map id="jndiMapping">
-        <entry key="java:comp/env/bonitaDS" value-ref="bonitaDataSource" />
+        <entry key="${local.journal.xads.uniqueName}" value-ref="bonitaDataSource" />
         <entry key="java:comp/env/bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
-        <entry key="java:comp/env/BusinessDataDS" value-ref="businessDataDataSource" />
+        <entry key="${local.bdm.xads.uniqueName}" value-ref="businessDataDataSource" />
         <entry key="java:comp/env/NotManagedBizDataDS" value-ref="notManagedBizDataSource" />
-        <entry key="java:comp/UserTransaction" value-ref="BitronixTransactionManager" />
+        <entry key="${transactionManager.jndi.name}" value-ref="arjunaTransactionManager" />
+        <entry key="${userTransaction.jndi.name}" value-ref="userTransaction" />
     </util:map>
 
     <!-- This is the base class that will allow to lookup the JNDI tree -->
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate" />
 
-    <!-- Bind the mapping into Carol -->
-    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.test.env.MemoryJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
+    <!-- Bind the mapping -->
+    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.test.env.MemoryJNDISetup" init-method="init" destroy-method="clean">
         <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
         <constructor-arg name="jndiMapping" ref="jndiMapping" />
     </bean>
