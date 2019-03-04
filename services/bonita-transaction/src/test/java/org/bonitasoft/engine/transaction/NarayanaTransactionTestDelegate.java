@@ -13,21 +13,31 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+import static org.mockito.Mockito.mock;
+
 import javax.transaction.TransactionManager;
 
-public class Atomikos3TransactionManagerFactory {
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
-    private static TransactionManager transactionManager;
+public class NarayanaTransactionTestDelegate {
 
-    public Atomikos3TransactionManagerFactory() throws Exception {
-        final Class<?> userTransactionManagerClass = Class.forName("com.atomikos.icatch.jta.UserTransactionManager");
-        transactionManager = (TransactionManager) userTransactionManagerClass.newInstance();
+    private TransactionManager transactionManager;
+    private TechnicalLoggerService techLoggerService;
 
-        // System.err.println("Configured transactionManager:" + transactionManager);
+    public void setupTransactionManager() {
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        techLoggerService = mock(TechnicalLoggerService.class);
     }
 
-    public TransactionManager getTransactionManager() {
+    protected TransactionService getTxService() {
+        return new JTATransactionServiceImpl(getLoggerService(), getTransactionManager());
+    }
+
+    private TransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    private TechnicalLoggerService getLoggerService() {
+        return techLoggerService;
+    }
 }

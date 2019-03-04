@@ -165,7 +165,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 if (isTraceLoggable) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                            "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
+                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
                 }
                 txManager.rollback();
             } else {

@@ -29,13 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Resource;
-import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
-import bitronix.tm.TransactionManagerServices;
-import com.company.pojo.Employee;
-import com.company.pojo.Person;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -45,9 +41,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +49,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -85,17 +82,6 @@ public class JPABusinessDataRepositoryImplITest {
 
     private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
 
-    @BeforeClass
-    public static void initializeBitronix() {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
-        TransactionManagerServices.getConfiguration().setJournal(null);
-    }
-
-    @AfterClass
-    public static void shutdownTransactionManager() {
-        TransactionManagerServices.getTransactionManager().shutdown();
-    }
-
     @Before
     public void setUp() throws Exception {
         initMocks(this);
@@ -114,7 +100,7 @@ public class JPABusinessDataRepositoryImplITest {
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
-        ut = TransactionManagerServices.getTransactionManager();
+        ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();
 
         final Set<String> classNames = new HashSet<>();
