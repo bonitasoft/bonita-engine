@@ -89,9 +89,6 @@ cp -rf src/test/resources/tomcat_conf/* ${E2E_DIR}/..
 ${E2E_DIR}/setup.sh configure
 testReturnCode $? "setup.sh configure"
 
-cat target/server/conf/bitronix-resources.properties | grep "^resource.ds1.className=org.postgresql.xa.PGXADataSource" > /dev/null
-testReturnCode $? "Configuring bitronix-resources file with Postgres"
-
 cat target/server/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
 testReturnCode $? "Configuring bonita.xml file with Postgres"
 

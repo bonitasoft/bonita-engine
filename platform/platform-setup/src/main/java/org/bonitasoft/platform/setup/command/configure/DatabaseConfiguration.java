@@ -28,6 +28,7 @@ public class DatabaseConfiguration {
     private String dbVendor;
     private String nonXaDriverClassName;
     private String xaDriverClassName;
+    private String xaDataSourceFactory;
     private String databaseUser;
     private String databasePassword;
     private String databaseName;
@@ -43,13 +44,15 @@ public class DatabaseConfiguration {
 
         nonXaDriverClassName = getMandatoryProperty(dbVendor + ".nonXaDriver");
         xaDriverClassName = getMandatoryProperty(dbVendor + ".xaDriver");
+        xaDataSourceFactory = getMandatoryProperty(dbVendor + ".xaDSFactory");
         databaseName = getMandatoryProperty(prefix + "db.database.name");
         url = getMandatoryProperty(dbVendor + "." + prefix + "url");
         // Configuration for H2 is a little different from other DB vendors:
         if (H2_DB_VENDOR.equals(dbVendor)) {
             final String h2DatabaseDir = getMandatoryProperty("h2.database.dir");
             // generate absolute path:
-            url = url.replace("${h2.database.dir}", rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString());
+            url = url.replace("${h2.database.dir}", rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath()
+                    .normalize().toString());
         } else {
             serverName = getMandatoryProperty(prefix + "db.server.name");
             url = url.replace("${" + prefix + "db.server.name}", serverName);
@@ -74,6 +77,10 @@ public class DatabaseConfiguration {
         return xaDriverClassName;
     }
 
+    public String getXaDataSourceFactory() {
+        return xaDataSourceFactory;
+    }
+
     String getDatabaseUser() {
         return databaseUser;
     }
@@ -87,11 +94,11 @@ public class DatabaseConfiguration {
     }
 
     String getServerName() {
-        return serverName;
+        return serverName != null ? serverName : "";
     }
 
     String getServerPort() {
-        return serverPort;
+        return serverPort != null ? serverPort : "";
     }
 
     String getUrl() {

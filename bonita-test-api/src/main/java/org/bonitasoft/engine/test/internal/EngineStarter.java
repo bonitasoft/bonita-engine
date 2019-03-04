@@ -60,6 +60,8 @@ public class EngineStarter {
         LOGGER.info("============  Starting Bonita Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
+        System.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir",
+                System.getProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir", "target/tx-object-store"));
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
@@ -113,7 +115,8 @@ public class EngineStarter {
         logoutOnPlatform(session);
     }
 
-    protected PlatformAPI getPlatformAPI(PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    protected PlatformAPI getPlatformAPI(PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformAPI(session);
     }
 
@@ -158,7 +161,8 @@ public class EngineStarter {
         }
         if (fail) {
             throw new IllegalStateException(
-                    "Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads + "\nOther threads:" + unexpectedThreads);
+                    "Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads
+                            + "\nOther threads:" + unexpectedThreads);
         }
         LOGGER.info("All engine threads are stopped properly");
     }
@@ -181,11 +185,11 @@ public class EngineStarter {
         if (threadGroup != null && threadGroup.getName().equals("system")) {
             return true;
         }
-        final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "bitronix" , "main", "Reference Handler",
-                "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer", "process reaper", "ReaderThread",
+        final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */,
+                "Transaction Reaper Worker 0", "Transaction Reaper", "main", "Reference Handler", "Signal Dispatcher",
+                "Finalizer", "com.google.common.base.internal.Finalizer", "process reaper", "ReaderThread",
                 "Abandoned connection cleanup thread", "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown",
-                "surefire-forkedjvm",
-                "Restlet");
+                "surefire-forkedjvm", "Restlet");
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return true;
@@ -313,7 +317,8 @@ public class EngineStarter {
             File tempFolder = iterator.next();
             //folder of licenses not deleted because the shutdown hook that delete temp files
             //is executed as the same time as the shutdown hook that stops the engine
-            if (tempFolder.getName().contains("bonita_engine") && tempFolder.getName().contains(ManagementFactory.getRuntimeMXBean().getName())) {
+            if (tempFolder.getName().contains("bonita_engine")
+                    && tempFolder.getName().contains(ManagementFactory.getRuntimeMXBean().getName())) {
                 Path licenses = tempFolder.toPath().resolve("licenses");
                 if (Files.exists(licenses)) {
                     FileUtils.deleteDirectory(licenses.toFile());

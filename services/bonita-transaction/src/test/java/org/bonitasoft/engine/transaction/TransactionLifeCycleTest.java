@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public abstract class TransactionLifeCycleTest {
 
-    TransactionService txService;
+    private TransactionService txService;
 
     protected abstract TransactionService getTxService() throws Exception;
 

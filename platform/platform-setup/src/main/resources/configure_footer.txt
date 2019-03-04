@@ -4,7 +4,6 @@ If it is so:
 
 For Tomcat, it:
    - sets db vendor + bdm db vendor in file server/bin/setenv (.sh|.bat)
-   - sets all database configuration in file server/conf/bitronix-resources.properties
    - sets all database configuration in file server/conf/Catalina/localhost/bonita.xml
    - copies the required drivers from setup/lib/ to server/lib/bonita/
 
@@ -19,7 +18,6 @@ If you need to edit the server configuration, do not directly edit Tomcat files 
 Therefore, if you need to finely tune the server configuration, modify the following templates:
 
 For Tomcat:
-    - setup/tomcat-templates/bitronix-resources.properties
     - setup/tomcat-templates/bonita.xml
     - setup/tomcat-templates/setenv.sh
     - setup/tomcat-templates/setenv.bat

@@ -15,8 +15,6 @@ package org.bonitasoft.engine.business.data.impl;
 
 import javax.transaction.UserTransaction;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.company.pojo.Employee;
 
 public class AddNewEmployeeThread extends Thread {
@@ -32,7 +30,7 @@ public class AddNewEmployeeThread extends Thread {
 
     @Override
     public void run() {
-        final UserTransaction transaction = TransactionManagerServices.getTransactionManager();
+        UserTransaction transaction = com.arjuna.ats.jta.UserTransaction.userTransaction();
         try {
             transaction.begin();
 

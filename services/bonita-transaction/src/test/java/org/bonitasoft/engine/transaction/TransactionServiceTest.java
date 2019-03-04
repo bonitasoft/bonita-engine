@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public abstract class TransactionServiceTest {
 
-    TransactionService txService;
+    private TransactionService txService;
 
     protected abstract TransactionService getTxService() throws Exception;
 
@@ -120,7 +120,7 @@ public abstract class TransactionServiceTest {
 
         private final CountDownLatch startSignal;
 
-        public TransactionWorker(final CountDownLatch lock, final TransactionService transactionService, final CountDownLatch startSignal) {
+        TransactionWorker(final CountDownLatch lock, final TransactionService transactionService, final CountDownLatch startSignal) {
             this.lock = lock;
             this.transactionService = transactionService;
             this.startSignal = startSignal;
