@@ -41,7 +41,6 @@ public final class DeactivateTenant implements TransactionContent {
         platformService.deactiveTenant(tenantId);
         if (schedulerService.isStarted()) {
             schedulerService.pauseJobs(tenantId);
-            schedulerService.delete(ActivateTenant.CLEAN_INVALID_SESSIONS);
         }
     }
 

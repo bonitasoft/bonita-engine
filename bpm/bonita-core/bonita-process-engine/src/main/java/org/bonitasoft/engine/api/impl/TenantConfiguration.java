@@ -28,8 +28,6 @@ import org.bonitasoft.engine.scheduler.JobRegister;
  */
 public class TenantConfiguration {
 
-    private String cleanInvalidSessionsJobCron = "0 0 */2 * * ?";
-
     private List<JobRegister> jobsToRegister;
 
     private List<TenantLifecycleService> lifecycleServices;
@@ -49,18 +47,6 @@ public class TenantConfiguration {
         return CollectionUtil.emptyOrUnmodifiable(jobsToRegister);
     }
 
-    /**
-     * Specify how often invalid sessions will be cleaned
-     * 
-     * @return a String representing a Unix Cron
-     */
-    public String getCleanInvalidSessionsJobCron() {
-        return cleanInvalidSessionsJobCron;
-    }
-
-    public void setCleanInvalidSessionsJobCron(final String cleanInvalidSessionsJobCron) {
-        this.cleanInvalidSessionsJobCron = cleanInvalidSessionsJobCron;
-    }
 
     public List<TenantLifecycleService> getLifecycleServices() {
         return lifecycleServices;
