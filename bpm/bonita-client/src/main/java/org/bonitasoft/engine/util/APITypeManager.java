@@ -52,7 +52,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * </ul>
  * </p>
  * </li>
- * <li>EJB3
+ * <li>EJB3 <b>DEPRECATED</b>
  * <p>
  * connect to the server using EJB3. You must also specify<br/> For Wildfly 10 :
  * <ul>
@@ -83,7 +83,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  *
  * </li>
  * <li>
- * EJB3 access:
+ * EJB3 access: <b>DEPRECATED</b>
  * 
  * <pre>
  * <code>HashMap<String,String> parameters= new HashMap<>();
@@ -116,6 +116,7 @@ public class APITypeManager {
             if (LOCAL.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = LOCAL;
             } else if (EJB3.name().equalsIgnoreCase(apiType)) {
+                warnEJB3IsDeprecated();
                 apiAccessType = EJB3;
             } else if (HTTP.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = HTTP;
@@ -126,6 +127,10 @@ public class APITypeManager {
             }
         }
         return apiAccessType;
+    }
+
+    private static void warnEJB3IsDeprecated() {
+        LOGGER.warning("EJB communication protocol is Deprecated and will be removed in 7.10");
     }
 
     private static String getAPITypeFromProperties() throws IOException {
@@ -152,6 +157,9 @@ public class APITypeManager {
 
     public static void setAPITypeAndParams(final ApiAccessType type, final Map<String, String> parameters) {
         warnIfUsingRemoteConnectionWithLocalEngine(type);
+        if (EJB3 == type) {
+            warnEJB3IsDeprecated();
+        }
         apiAccessType = type;
         apiTypeParameters = new HashMap<>();
         if (parameters != null) {
