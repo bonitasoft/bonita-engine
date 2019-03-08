@@ -5,4 +5,6 @@ import java.util.concurrent.Callable;
 public interface InterruptibleCallable<T> extends Callable<T> {
 
     void interrupt();
+
+    boolean isCompleted();
 }
