@@ -15,18 +15,14 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.UUID;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
-import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -38,8 +34,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
-import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -47,8 +41,6 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Elias Ricken de Medeiros
  */
 public final class ActivateTenant implements TransactionContent {
-
-    public static final String CLEAN_INVALID_SESSIONS = "CleanInvalidSessions";
 
     private final long tenantId;
 
@@ -64,11 +56,8 @@ public final class ActivateTenant implements TransactionContent {
 
     private final TenantConfiguration tenantConfiguration;
 
-    private final NodeConfiguration nodeConfiguration;
-
     public ActivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService,
                           final TechnicalLoggerService logger, final WorkService workService, final ConnectorExecutor connectorExecutor,
-                          final NodeConfiguration plaformConfiguration,
                           final TenantConfiguration tenantConfiguration) {
         this.tenantId = tenantId;
         this.platformService = platformService;
@@ -76,7 +65,6 @@ public final class ActivateTenant implements TransactionContent {
         this.logger = logger;
         this.workService = workService;
         this.connectorExecutor = connectorExecutor;
-        nodeConfiguration = plaformConfiguration;
         this.tenantConfiguration = tenantConfiguration;
     }
 
@@ -87,7 +75,6 @@ public final class ActivateTenant implements TransactionContent {
         if (tenantWasActivated) {
             workService.start();
             connectorExecutor.start();
-            startCleanInvalidSessionsJob();
             final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
             for (final JobRegister jobRegister : jobsToRegister) {
                 registerJob(jobRegister);
@@ -119,29 +106,6 @@ public final class ActivateTenant implements TransactionContent {
                     "Unable to register job " + jobRegister.getJobDescription() + " because " + e.getMessage());
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
-        }
-    }
-
-    private void startCleanInvalidSessionsJob() throws SSchedulerException {
-        final String jobClassName = CleanInvalidSessionsJob.class.getName();
-        if (schedulerService.isStarted()) {
-            final String cron = tenantConfiguration.getCleanInvalidSessionsJobCron();
-            if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                        .createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
-                        .done();
-                final ArrayList<SJobParameter> jobParameters = new ArrayList<>();
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
-                        MisfireRestartPolicy.NONE);
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency : " + cron);
-                }
-                schedulerService.schedule(jobDescriptor, jobParameters, trigger);
-            }
-        } else {
-            if (logger.isLoggable(ActivateTenant.class, TechnicalLogSeverity.WARNING)) {
-                logger.log(ActivateTenant.class, TechnicalLogSeverity.WARNING, "The scheduler is not started: impossible to schedule job " + jobClassName);
             }
         }
     }

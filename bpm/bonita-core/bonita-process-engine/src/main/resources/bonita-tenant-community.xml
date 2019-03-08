@@ -3,10 +3,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:util="http://www.springframework.org/schema/util"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:task="http://www.springframework.org/schema/task"
         xsi:schemaLocation="
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
 
     <context:annotation-config />
 
@@ -1182,9 +1184,13 @@
         <constructor-arg name="themeRetriever" ref="themeRetriever" />
     </bean>
 
+    <task:scheduled-tasks scheduler="internalTasksScheduler">
+        <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="internalTasksScheduler"/>
 
     <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
-        <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
         <property name="jobListeners">
             <list>
                 <ref bean="timerEventTriggerJobListener" />

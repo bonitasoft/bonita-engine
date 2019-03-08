@@ -41,9 +41,6 @@ public class ActivateTenantTest {
     private TechnicalLoggerService logger;
 
     @Mock
-    private NodeConfiguration plaformConfiguration;
-
-    @Mock
     private PlatformService platformService;
 
     @Mock
@@ -62,7 +59,7 @@ public class ActivateTenantTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, logger, workService, connectorExecutor, plaformConfiguration,
+        activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, logger, workService, connectorExecutor,
                 tenantConfiguration);
     }
 
