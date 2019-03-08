@@ -31,6 +31,7 @@ import org.bonitasoft.engine.exception.StackTraceTransformer;
  * @author Matthieu Chaffotte
  * @author Aurélien Pupier
  */
+@Deprecated
 public class ServerAPIBean implements SessionBean, ServerAPI {
 
     private static final long serialVersionUID = 7410412298676783045L;
