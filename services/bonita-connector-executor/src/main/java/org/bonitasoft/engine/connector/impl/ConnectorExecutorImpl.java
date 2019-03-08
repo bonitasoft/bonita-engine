@@ -215,6 +215,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         private TechnicalLogger technicalLogger;
         private Thread thread;
         private boolean interrupted;
+        private boolean completed;
 
         private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId,
                                          final ClassLoader loader, TechnicalLogger technicalLogger) {
@@ -245,6 +246,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
                 return sConnector.execute();
             } finally {
                 thread = null;
+                completed = true;
                 technicalLogger.debug("Finish execution of connector {}", sConnector.getClass());
                 // in case a session has been created: see ConnectorAPIAccessorImpl
                 try {
@@ -267,6 +269,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
                 technicalLogger.debug("Interrupt thread of connector {}, thread is {}, {}, stack is:\n {}", sConnector.getClass(), thread.getName(), thread.getId(), stack);
                 thread.interrupt();
             }
+        }
+
+        @Override
+        public boolean isCompleted() {
+            return completed;
         }
     }
 
