@@ -684,7 +684,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-            final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
@@ -699,7 +698,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, platformAccessor.getTechnicalLoggerService(),
-                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(), platformConfiguration,
+                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(),
                     tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);

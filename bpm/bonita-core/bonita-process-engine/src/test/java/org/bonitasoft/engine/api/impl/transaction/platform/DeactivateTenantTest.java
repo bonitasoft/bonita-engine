@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,8 +37,6 @@ public class DeactivateTenantTest {
     private PlatformService platformService;
     @Mock
     private SchedulerService schedulerService;
-    @Mock
-    private WorkService workService;
 
     private DeactivateTenant deactivateTenant;
 
@@ -55,15 +52,5 @@ public class DeactivateTenantTest {
         deactivateTenant.execute();
 
         verify(schedulerService).pauseJobs(tenantId);
-    }
-
-    @Test
-    public void should_not_delete_jobs_other_than_default_jobs() throws Exception {
-        doReturn(true).when(schedulerService).isStarted();
-
-        deactivateTenant.execute();
-
-        verify(schedulerService).delete(anyString());
-        verify(schedulerService).delete(ActivateTenant.CLEAN_INVALID_SESSIONS);
     }
 }
