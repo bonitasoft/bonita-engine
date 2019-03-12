@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import static java.util.Collections.synchronizedMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,7 +31,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class MemoryLockService implements LockService {
 
     private final TechnicalLogger logger;
-    private ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+    // need to have a synchronized map to synchronize the get with map modifications
+    private Map<String, ReentrantLock> locks = synchronizedMap(new HashMap<>());
     private int lockTimeoutSeconds;
 
     public MemoryLockService(TechnicalLoggerService loggerService, int lockTimeoutSeconds) {
@@ -86,6 +89,7 @@ public class MemoryLockService implements LockService {
         ReentrantLock lock = createLock(objectToLockId, objectType, tenantId);
         try {
             if (lock.tryLock(timeout, timeUnit)) {
+                //this get need to be synchronized with the unlock that can change the map
                 ReentrantLock currentLockInTheMap = locks.get(key);
                 if (!lock.equals(currentLockInTheMap)) {
                     //lock was taken but someone replace it in the map, get it next time
