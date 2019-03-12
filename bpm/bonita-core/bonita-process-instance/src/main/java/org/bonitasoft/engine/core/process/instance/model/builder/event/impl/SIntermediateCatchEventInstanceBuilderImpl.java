@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediat
  */
 public class SIntermediateCatchEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SIntermediateCatchEventInstanceBuilder {
 
-    public SIntermediateCatchEventInstanceBuilderImpl(final SIntermediateCatchEventInstanceImpl entity) {
+    public SIntermediateCatchEventInstanceBuilderImpl(final SIntermediateCatchEventInstance entity) {
         super(entity);
     }
 

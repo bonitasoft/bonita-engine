@@ -26,7 +26,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -62,9 +62,9 @@ public class TaskInvolvementDelegateTest {
     public ProcessAPIImpl processAPI;
 
     @Mock
-    private SUserTaskInstanceImpl humanTaskInstance;
+    private SUserTaskInstance humanTaskInstance;
 
-    private SUserTaskInstanceImpl assignedHumanTaskInstance;
+    private SUserTaskInstance assignedHumanTaskInstance;
 
     @InjectMocks
     @Spy
@@ -75,11 +75,11 @@ public class TaskInvolvementDelegateTest {
         doReturn(tenantServiceAccessor).when(taskInvolvementDelegate).getTenantServiceAccessor();
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
 
-        humanTaskInstance = new SUserTaskInstanceImpl();
+        humanTaskInstance = new SUserTaskInstance();
         humanTaskInstance.setId(EXISTING_TASK);
         humanTaskInstance.setLogicalGroup(1, PROCESS_DEFINITION_ID);
 
-        assignedHumanTaskInstance = new SUserTaskInstanceImpl();
+        assignedHumanTaskInstance = new SUserTaskInstance();
         assignedHumanTaskInstance.setId(ASSIGNED_TASK);
         assignedHumanTaskInstance.setLogicalGroup(1, PROCESS_DEFINITION_ID);
         assignedHumanTaskInstance.setAssigneeId(ASSIGNED_USER);

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,7 +28,7 @@ public class SIntermediateThrowEventInstanceBuilderFactoryImpl extends SEventIns
     public SIntermediateThrowEventInstanceBuilder createNewIntermediateThrowEventInstance(final String name, final long flowNodeDefinitionId,
             final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SIntermediateThrowEventInstanceImpl entity = new SIntermediateThrowEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SIntermediateThrowEventInstance entity = new SIntermediateThrowEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SIntermediateThrowEventInstanceBuilderImpl(entity);

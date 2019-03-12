@@ -15,16 +15,17 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SMultiInstanceActivityInstanceImplTest {
 
-    private SMultiInstanceActivityInstanceImpl multi;
+    private SMultiInstanceActivityInstance multi;
 
     @Before
     public void setUp() {
-        multi = new SMultiInstanceActivityInstanceImpl();
+        multi = new SMultiInstanceActivityInstance();
     }
 
     @Test

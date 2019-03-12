@@ -13,29 +13,48 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SMultiInstanceActivityInstance extends SActivityInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SMultiInstanceActivityInstance extends SActivityInstance {
 
-    boolean isSequential();
+    private boolean sequential;
+    private String loopDataInputRef;
+    private String loopDataOutputRef;
+    private String dataInputItemRef;
+    private String dataOutputItemRef;
+    private int numberOfActiveInstances;
+    private int numberOfCompletedInstances;
+    private int numberOfTerminatedInstances;
+    private int loopCardinality;
 
-    String getLoopDataInputRef();
+    public SMultiInstanceActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
+                                              final long processDefinitionId, final long rootProcessInstanceId, final boolean isSequential) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
+        sequential = isSequential;
+    }
 
-    String getLoopDataOutputRef();
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.MULTI_INSTANCE_ACTIVITY;
+    }
 
-    String getDataInputItemRef();
+    public int getNumberOfInstances() {
+        return numberOfActiveInstances + numberOfCompletedInstances + numberOfTerminatedInstances;
+    }
 
-    String getDataOutputItemRef();
-
-    int getLoopCardinality();
-
-    int getNumberOfInstances();
-
-    int getNumberOfActiveInstances();
-
-    int getNumberOfCompletedInstances();
-
-    int getNumberOfTerminatedInstances();
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        // it's not necessary to execute it because this will be done when the last child reaches the aborted state
+        return false;
+    }
 
 }

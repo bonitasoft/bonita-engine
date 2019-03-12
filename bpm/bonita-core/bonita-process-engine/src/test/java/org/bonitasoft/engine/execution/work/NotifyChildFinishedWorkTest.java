@@ -13,7 +13,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
@@ -67,7 +67,7 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_throw_precondition_exception_when_flownode_is_completed() throws Exception {
-        SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(false);
         flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
@@ -82,7 +82,7 @@ public class NotifyChildFinishedWorkTest {
     @Test
     public void should_notify_child_finished_if_flow_node_is_completed() throws Exception {
         doReturn(containerRegistry).when(tenantServiceAccessor).getContainerRegistry();
-        SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(true);
         flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);

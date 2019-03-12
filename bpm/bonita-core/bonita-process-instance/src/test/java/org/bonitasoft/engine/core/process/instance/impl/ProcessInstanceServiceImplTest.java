@@ -61,21 +61,20 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -513,14 +512,14 @@ public class ProcessInstanceServiceImplTest {
 
     @Test
     public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_sub_process() throws Exception {
-        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstance();
 
         deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
     }
 
     @Test
     public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_call_activity() throws Exception {
-        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstance();
 
         deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
     }
@@ -546,7 +545,7 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_log_exception_when_getChildOfActivity_failed_and_log_is_active() throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -564,7 +563,7 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_do_nothing_when_getChildOfActivity_failed_and_no_log() throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -584,7 +583,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_INTERMEDIATE_CATCH_EVENT()
             throws Exception {
         // Given
-        final SFlowNodeInstanceImpl flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SIntermediateCatchEventInstance();
         flowNodeInstance.setFlowNodeDefinitionId(42);
         SIntermediateThrowEventDefinitionImpl definition = new SIntermediateThrowEventDefinitionImpl(42, "inter");
         definition.addMessageEventTriggerDefinition(new SThrowMessageEventTriggerDefinitionImpl());
@@ -600,7 +599,7 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_RECEIVE_TASK() throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SReceiveTaskInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SReceiveTaskInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -616,7 +615,7 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_not_call_deleteWaitingEvents_when_flownode_is_type_START_EVENT_with_no_trigger() throws Exception {
         // Given
-        final SFlowNodeInstanceImpl flowNodeInstance = new SStartEventInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SStartEventInstance();
         flowNodeInstance.setFlowNodeDefinitionId(42);
         final SProcessDefinition processDefinition = aProcess().with(new SStartEventDefinitionImpl(42, "start")).done();
 
@@ -631,7 +630,7 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_START_EVENT() throws Exception {
         // Given
-        final SFlowNodeInstanceImpl flowNodeInstance = new SStartEventInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SStartEventInstance();
         flowNodeInstance.setFlowNodeDefinitionId(42);
         SStartEventDefinitionImpl start = new SStartEventDefinitionImpl(42, "start");
         start.addSignalEventTrigger(new SCatchSignalEventTriggerDefinitionImpl("signal"));
@@ -648,7 +647,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_BOUNDARY_EVENT()
             throws Exception {
         // Given
-        final SFlowNodeInstanceImpl flowNodeInstance = new SBoundaryEventInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SBoundaryEventInstance();
         flowNodeInstance.setFlowNodeDefinitionId(42);
         SBoundaryEventDefinitionImpl boundary = new SBoundaryEventDefinitionImpl(42, "boundary");
         boundary.addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(null, null));
@@ -665,7 +664,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deletePendingMappings_when_flownode_is_type_USER_TASK()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SUserTaskInstanceImpl("name", 3L, 6L, 9L, 12L, STaskPriority.ABOVE_NORMAL, 7L, 8L);
+        final SFlowNodeInstance flowNodeInstance = new SUserTaskInstance("name", 3L, 6L, 9L, 12L, STaskPriority.ABOVE_NORMAL, 7L, 8L);
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -682,7 +681,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deletePendingMappings_when_flownode_is_type_MANUAL_TASK()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SManualTaskInstanceImpl("name", 1L, 2L, 3L, 4L, STaskPriority.ABOVE_NORMAL, 5L, 6L);
+        final SFlowNodeInstance flowNodeInstance = new SManualTaskInstance("name", 1L, 2L, 3L, 4L, STaskPriority.ABOVE_NORMAL, 5L, 6L);
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -699,7 +698,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_just_deleteDataInstancesIfNecessary_and_deleteConnectorInstancesIfNecessary_when_flownode_is_loop()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SLoopActivityInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SLoopActivityInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
@@ -717,7 +716,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_do_nothing_when_flownode_is_gateway()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SGatewayInstanceImpl();
+        final SFlowNodeInstance flowNodeInstance = new SGatewayInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
 

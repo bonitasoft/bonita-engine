@@ -13,10 +13,27 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SManualTaskInstance extends SHumanTaskInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SManualTaskInstance extends SHumanTaskInstance {
+    public SManualTaskInstance
+            (final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
+                                   final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parenteContainerId, actorId, priority, logicalGroup1, logicalGroup2);
+    }
 
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.MANUAL_TASK;
+    }
 }

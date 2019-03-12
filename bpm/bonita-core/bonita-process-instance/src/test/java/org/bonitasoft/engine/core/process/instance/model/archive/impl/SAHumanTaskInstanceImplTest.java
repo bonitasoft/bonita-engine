@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.junit.Test;
 
 /**
@@ -26,7 +26,7 @@ public class SAHumanTaskInstanceImplTest {
 
     @Test
     public void creatingArchiveShouldCopyAllRelevantAttibute() {
-        final SUserTaskInstanceImpl taskInstance = new SUserTaskInstanceImpl("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
+        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
         final long claimedDate = System.currentTimeMillis();
         taskInstance.setClaimedDate(claimedDate);
         taskInstance.setStateId(3);
@@ -68,7 +68,7 @@ public class SAHumanTaskInstanceImplTest {
     @Test
     public void should_allow_null_expected_date() {
         //given
-        final SUserTaskInstanceImpl taskInstance = new SUserTaskInstanceImpl("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
+        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
 
         //when
         taskInstance.setExpectedEndDate(null);

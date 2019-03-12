@@ -13,17 +13,53 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 
 /**
  * @author Feng Hui
  */
-public interface SGatewayInstance extends SFlowNodeInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SGatewayInstance extends SFlowNodeInstance {
 
-    SGatewayType getGatewayType();
+    private SGatewayType gatewayType;
+    private String hitBys = "";
 
-    String getHitBys();
+    public SGatewayInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
+                                final SGatewayType gatewayType, final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+        this.gatewayType = gatewayType;
+    }
 
-    boolean isFinished();
+    public SGatewayInstance(SGatewayInstance gatewayInstance) {
+        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(), gatewayInstance.getRootContainerId(),
+                gatewayInstance.getParentContainerId(),
+                gatewayInstance.getLogicalGroup(0), gatewayInstance.getLogicalGroup(1));
+        setLogicalGroup(2, gatewayInstance.getLogicalGroup(2));
+        setLogicalGroup(3, gatewayInstance.getLogicalGroup(3));
+        this.gatewayType = gatewayInstance.getGatewayType();
+        setStateId(gatewayInstance.getStateId());
+    }
+
+    public boolean isFinished() {
+        return hitBys != null && hitBys.startsWith(GatewayInstanceService.FINISH);
+    }
+
+    public SFlowNodeType getType() {
+        return SFlowNodeType.GATEWAY;
+    }
+
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        //always call execute when abort the gateway because the gateway that merge wait for the flow node in an unstable state
+        // this fact is a little strange but a full cleanup of the flownode execution mechanism should be done in order to change that
+        return true;
+    }
 
 }

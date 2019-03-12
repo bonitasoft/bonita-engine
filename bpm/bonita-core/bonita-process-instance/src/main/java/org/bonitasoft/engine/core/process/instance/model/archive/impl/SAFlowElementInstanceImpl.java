@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 
 /**
@@ -37,7 +37,7 @@ public abstract class SAFlowElementInstanceImpl extends SANamedElementImpl imple
     private long logicalGroup3;
     private long logicalGroup4;
 
-    public SAFlowElementInstanceImpl(final SFlowElementInstance flowElementInstance) {
+    public SAFlowElementInstanceImpl(final SFlowNodeInstance flowElementInstance) {
         super(flowElementInstance.getName(), flowElementInstance.getId());
         rootContainerId = flowElementInstance.getRootContainerId();
         parentContainerId = flowElementInstance.getParentContainerId();

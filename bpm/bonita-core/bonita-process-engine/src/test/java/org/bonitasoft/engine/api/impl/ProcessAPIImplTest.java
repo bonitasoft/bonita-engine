@@ -121,11 +121,11 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -283,7 +283,7 @@ public class ProcessAPIImplTest {
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
-    private SUserTaskInstanceImpl sUserTaskInstance;
+    private SUserTaskInstance sUserTaskInstance;
     private TestUserTransactionService userTransactionService;
 
     @Before
@@ -315,7 +315,7 @@ public class ProcessAPIImplTest {
         userTransactionService = new TestUserTransactionService();
         when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
 
-        sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
+        sUserTaskInstance = new SUserTaskInstance("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
                 ACTOR_ID, STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
         sUserTaskInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         sUserTaskInstance.setId(FLOW_NODE_INSTANCE_ID);

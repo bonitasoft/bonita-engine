@@ -39,8 +39,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
@@ -429,7 +427,7 @@ public class ProcessInstanceQueriesTest {
     public void searchSingleChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
@@ -446,7 +444,7 @@ public class ProcessInstanceQueriesTest {
     public void searchOnlyChildrenSProcessInstanceOfProcessInstance_return_processInstancesIdsFromCallActivity() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
@@ -469,14 +467,14 @@ public class ProcessInstanceQueriesTest {
     public void searchChildProcessInstanceOfProcessInstance_return_processInstancesIdsNotGrandChildren() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(childPI.getId())
                 .withName("call Activity")
                 .build());
@@ -493,14 +491,14 @@ public class ProcessInstanceQueriesTest {
     public void searchGrandChildProcessInstanceOfChildProcessInstance_return_processInstancesIdsNotChild() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(childPI.getId())
                 .withName("call Activity")
                 .build());
@@ -517,7 +515,7 @@ public class ProcessInstanceQueriesTest {
     public void searchChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
@@ -546,7 +544,7 @@ public class ProcessInstanceQueriesTest {
                 .withStateId(ProcessInstanceState.COMPLETED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Cancelled")
                 .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
@@ -766,15 +764,13 @@ public class ProcessInstanceQueriesTest {
 
     }
 
-    private SGatewayInstanceImpl buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {
-        final SGatewayInstanceImpl sGatewayInstanceImpl = new SGatewayInstanceImpl();
-        sGatewayInstanceImpl.setId(gatewayId);
-        sGatewayInstanceImpl.setHitBys("");
-        sGatewayInstanceImpl.setStateCategory(SStateCategory.NORMAL);
-        sGatewayInstanceImpl.setStateId(3);
-        sGatewayInstanceImpl.setLogicalGroup(3, parentProcessInstanceId);
-        sGatewayInstanceImpl.setTenantId(DEFAULT_TENANT_ID);
-        return sGatewayInstanceImpl;
+    private SGatewayInstance buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {
+        final SGatewayInstance sGatewayInstance = new SGatewayInstance();
+        sGatewayInstance.setId(gatewayId);
+        sGatewayInstance.setStateId(3);
+        sGatewayInstance.setLogicalGroup(3, parentProcessInstanceId);
+        sGatewayInstance.setTenantId(DEFAULT_TENANT_ID);
+        return sGatewayInstance;
     }
 
     private SProcessInstance buildFailedProcessInstance(final long processInstanceId) {

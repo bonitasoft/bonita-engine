@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.junit.Test;
 
 public class SGatewayInstanceImplTest {
@@ -23,7 +24,7 @@ public class SGatewayInstanceImplTest {
     @Test
     public void isFinished_should_return_true_when_hitbys_starts_with_FINISH() throws Exception {
         //given
-        SGatewayInstanceImpl gatewayInstance = buildGateWithHitBys("FINISH:1");
+        SGatewayInstance gatewayInstance = buildGateWithHitBys("FINISH:1");
 
         //when
         gatewayInstance.isFinished();
@@ -35,7 +36,7 @@ public class SGatewayInstanceImplTest {
     @Test
     public void isFinished_should_return_false_when_hitbys_doesnt_start_with_FINISH() throws Exception {
         //given
-        SGatewayInstanceImpl gatewayInstance = buildGateWithHitBys("1,2");
+        SGatewayInstance gatewayInstance = buildGateWithHitBys("1,2");
 
         //when
         gatewayInstance.isFinished();
@@ -47,7 +48,7 @@ public class SGatewayInstanceImplTest {
     @Test
     public void isFinished_should_return_false_when_hitbys_is_null() throws Exception {
         //given
-        SGatewayInstanceImpl gatewayInstance = buildGateWithHitBys(null);
+        SGatewayInstance gatewayInstance = buildGateWithHitBys(null);
 
         //when
         gatewayInstance.isFinished();
@@ -57,8 +58,8 @@ public class SGatewayInstanceImplTest {
     }
 
 
-    private SGatewayInstanceImpl buildGateWithHitBys(final String hitBys) {
-        SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
+    private SGatewayInstance buildGateWithHitBys(final String hitBys) {
+        SGatewayInstance gatewayInstance = new SGatewayInstance();
         gatewayInstance.setHitBys(hitBys);
         return gatewayInstance;
     }

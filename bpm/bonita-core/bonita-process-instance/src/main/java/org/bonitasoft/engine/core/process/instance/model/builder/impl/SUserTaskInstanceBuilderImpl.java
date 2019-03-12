@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -24,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceI
  */
 public class SUserTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl implements SUserTaskInstanceBuilder {
 
-    public SUserTaskInstanceBuilderImpl(final SUserTaskInstanceImpl activityInst) {
+    public SUserTaskInstanceBuilderImpl(final SUserTaskInstance activityInst) {
         super(activityInst);
     }
 

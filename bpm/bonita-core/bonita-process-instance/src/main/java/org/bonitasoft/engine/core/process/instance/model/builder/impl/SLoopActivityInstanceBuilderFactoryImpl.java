@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -26,7 +26,7 @@ public class SLoopActivityInstanceBuilderFactoryImpl extends SActivityInstanceBu
     @Override
     public SLoopActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
             final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SLoopActivityInstanceImpl activityInstanceImpl = new SLoopActivityInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SLoopActivityInstance activityInstanceImpl = new SLoopActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SLoopActivityInstanceBuilderImpl(activityInstanceImpl);

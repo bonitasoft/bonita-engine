@@ -13,9 +13,26 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SStartEventInstance extends SCatchEventInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SStartEventInstance extends SCatchEventInstance {
+    public SStartEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
+                               final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.START_EVENT;
+    }
 
 }

@@ -111,7 +111,7 @@
 		AND ( comment.userId = :userId
 		OR comment.processInstanceId IN (
 			SELECT usertask.logicalGroup2
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
+			FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS usertask
 			WHERE usertask.assigneeId = :userId
 		)
 		OR comment.processInstanceId IN (
@@ -145,7 +145,7 @@
 		AND (comment.userId = :userId
 		OR comment.processInstanceId IN (
 			SELECT usertask.logicalGroup2
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
+			FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS usertask
 			WHERE usertask.assigneeId = :userId
 		)
 		OR comment.processInstanceId IN (
@@ -179,7 +179,7 @@
 		AND (comment.userId = u.id
 			OR comment.processInstanceId IN (
 				SELECT usertask.logicalGroup2
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
+				FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS usertask
 				WHERE usertask.assigneeId = u.id
 			)
 			OR comment.processInstanceId IN (
@@ -210,7 +210,7 @@
 		AND (comment.userId = u.id
 			OR comment.processInstanceId IN (
 				SELECT usertask.logicalGroup2
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
+				FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS usertask
 				WHERE usertask.assigneeId = u.id
 			)
 			OR comment.processInstanceId IN (
