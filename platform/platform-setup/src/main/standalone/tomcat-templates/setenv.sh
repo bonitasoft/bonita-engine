@@ -14,9 +14,7 @@ DB_OPTS="-Dsysprop.bonita.db.vendor=h2"
 BDM_DB_OPTS="-Dsysprop.bonita.bdm.db.vendor=h2"
 
 # Arjuna (JTA service added to Tomcat and required by Bonita Engine for transaction management)
-ARJUNA_OPTS="\
--Dcom.arjuna.ats.arjuna.objectstore.objectStoreDir=${CATALINA_HOME}/temp/tx-object-store \
--Dcom.arjuna.ats.arjuna.coordinator.defaultTimeout=180"
+ARJUNA_OPTS="-Dcom.arjuna.ats.arjuna.common.propertiesFile=${CATALINA_HOME}/conf/jbossts-properties.xml"
 
 # Optional JAAS configuration. Usually used when delegating authentication to LDAP / Active Directory server
 #SECURITY_OPTS="-Djava.security.auth.login.config=${CATALINA_HOME}/conf/jaas-standard.cfg"
