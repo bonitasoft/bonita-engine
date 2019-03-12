@@ -19,19 +19,20 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -40,7 +41,6 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -144,7 +144,6 @@ public class PlatformAPIImplTest {
         doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
         doNothing().when(platformAPI).restartHandlersOfPlatform(platformServiceAccessor);
         doNothing().when(platformAPI).afterServicesStartOfRestartHandlersOfTenant(eq(platformServiceAccessor), anyMap());
-        doNothing().when(platformAPI).registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
 
         // When
         platformAPI.startNode();
@@ -160,76 +159,12 @@ public class PlatformAPIImplTest {
         doNothing().when(platformAPI).startPlatformServices(platformServiceAccessor);
         doReturn(true).when(platformAPI).isNodeStarted();
         doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
-        doNothing().when(platformAPI).registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
 
         // When
         platformAPI.startNode();
 
         // Then
         verify(platformAPI, never()).startScheduler(platformServiceAccessor, tenants);
-    }
-
-    @Test
-    public void startNode_should_call_registerMissingTenantsDefaultJobs() throws Exception {
-        // Given
-        doNothing().when(platformAPI).checkPlatformVersion(platformServiceAccessor);
-        doNothing().when(platformAPI).startPlatformServices(platformServiceAccessor);
-        doReturn(true).when(platformAPI).isNodeStarted();
-        doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
-        doNothing().when(platformAPI).registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
-
-        // When
-        platformAPI.startNode();
-
-        // Then
-        verify(platformAPI).registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
-    }
-
-    @Test
-    public void registerMissingTenantsDefaultJobs_should_call_registerJob_when_job_is_missing() throws BonitaHomeNotSetException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
-            SBonitaException, IOException, ClassNotFoundException {
-        // Given
-        final TransactionService transactionService = mock(TransactionService.class);
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doNothing().when(transactionService).begin();
-        doNothing().when(transactionService).complete();
-        final JobRegister jobRegister = mock(JobRegister.class);
-        doReturn("newJob").when(jobRegister).getJobName();
-        final List<JobRegister> defaultJobs = Collections.singletonList(jobRegister);
-        doReturn(defaultJobs).when(tenantConfiguration).getJobsToRegister();
-        final List<String> scheduledJobNames = Collections.singletonList("someOtherJob");
-        doReturn(scheduledJobNames).when(schedulerService).getJobs();
-        doNothing().when(platformAPI).registerJob(schedulerService, jobRegister);
-
-        // When
-        platformAPI.registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
-
-        // Then
-        verify(platformAPI).registerJob(schedulerService, jobRegister);
-    }
-
-    @Test
-    public void registerMissingTenantsDefaultJobs_should_not_call_registerJob_when_job_is_scheduled() throws BonitaHomeNotSetException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
-            SBonitaException, IOException, ClassNotFoundException {
-        // Given
-        final TransactionService transactionService = mock(TransactionService.class);
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doNothing().when(transactionService).begin();
-        doNothing().when(transactionService).complete();
-        final JobRegister jobRegister = mock(JobRegister.class);
-        doReturn("existingJob").when(jobRegister).getJobName();
-        final List<JobRegister> defaultJobs = Collections.singletonList(jobRegister);
-        doReturn(defaultJobs).when(tenantConfiguration).getJobsToRegister();
-        final List<String> scheduledJobNames = Collections.singletonList("existingJob");
-        doReturn(scheduledJobNames).when(schedulerService).getJobs();
-
-        // When
-        platformAPI.registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
-
-        // Then
-        verify(platformAPI, never()).registerJob(schedulerService, jobRegister);
     }
 
     @Test

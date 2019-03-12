@@ -38,16 +38,10 @@ public class ActivateTenantTest {
     private ConnectorExecutor connectorExecutor;
 
     @Mock
-    private TechnicalLoggerService logger;
-
-    @Mock
     private PlatformService platformService;
 
     @Mock
     private SchedulerService schedulerService;
-
-    @Mock
-    private TenantConfiguration tenantConfiguration;
 
     private final long tenantId = 17L;
 
@@ -59,8 +53,7 @@ public class ActivateTenantTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, logger, workService, connectorExecutor,
-                tenantConfiguration);
+        activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, workService, connectorExecutor);
     }
 
     @Test

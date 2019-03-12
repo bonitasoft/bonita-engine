@@ -15,10 +15,8 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
  * Bean that returns configuration
@@ -28,24 +26,9 @@ import org.bonitasoft.engine.scheduler.JobRegister;
  */
 public class TenantConfiguration {
 
-    private List<JobRegister> jobsToRegister;
-
     private List<TenantLifecycleService> lifecycleServices;
 
     private List<AbstractBonitaTenantJobListener> jobListeners;
-
-    public void setJobsToRegister(final List<JobRegister> jobsToRegister) {
-        this.jobsToRegister = jobsToRegister;
-    }
-
-    /**
-     * Give a list of job to register when the tenant is activated
-     * 
-     * @return
-     */
-    public List<JobRegister> getJobsToRegister() {
-        return CollectionUtil.emptyOrUnmodifiable(jobsToRegister);
-    }
 
 
     public List<TenantLifecycleService> getLifecycleServices() {
