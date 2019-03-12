@@ -20,7 +20,6 @@ import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronizationResult;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public abstract class TransactionSynchronizationTest {
@@ -123,19 +122,6 @@ public abstract class TransactionSynchronizationTest {
         assertEquals(expected, StaticSynchronizationResult.COMMENT);
     }
 
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnCommit() throws Exception {
-        testRegisteredSynchronizationsOrder(false, new StaticSynchronization(1), new StaticSynchronization(2),
-                new StaticSynchronization(3));
-    }
-
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnRollback() throws Exception {
-        testRegisteredSynchronizationsOrder(true, new StaticSynchronization(1), new StaticSynchronization(2),
-                new StaticSynchronization(3));
-    }
 
     private void testRegisteredSynchronizationsOrderOnFailure(final boolean rollback, final boolean failOnBefore,
             final boolean failOnAfter) throws Exception {
@@ -162,33 +148,9 @@ public abstract class TransactionSynchronizationTest {
         testRegisteredSynchronizationsOrderOnFailure(false, true, false);
     }
 
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnFailureDuringBeforeCompletionOnRollback() throws Exception {
-        testRegisteredSynchronizationsOrderOnFailure(true, true, false);
-    }
-
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnFailureDuringAfterCompletionOnCommit() throws Exception {
-        testRegisteredSynchronizationsOrderOnFailure(false, false, true);
-    }
-
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnFailureDuringAfterCompletionOnRollback() throws Exception {
-        testRegisteredSynchronizationsOrderOnFailure(true, false, true);
-    }
-
     @Test(expected = STransactionCommitException.class)
     public void testRegisteredSynchronizationsOrderOnFailureDuringBeforeAndAfterCompletionOnCommit() throws Exception {
         testRegisteredSynchronizationsOrderOnFailure(false, true, true);
-    }
-
-    @Test
-    @Ignore("Narayana synchronization execution order is reverse than Bitronix...")
-    public void testRegisteredSynchronizationsOrderOnFailureDuringBeforeAndAfterCompletionOnRollback() throws Exception {
-        testRegisteredSynchronizationsOrderOnFailure(true, true, true);
     }
 
 }

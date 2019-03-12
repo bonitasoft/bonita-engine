@@ -67,6 +67,13 @@
     <!-- Which Xid types to recover -->
     <entry key="JTAEnvironmentBean.xaRecoveryNodes">1</entry>
 
+
+    <!-- All of the 3 ways below to configure "userTransaction JNDI name" work: -->
+    <entry key="JTAEnvironmentBean.userTransactionJNDIContext">java:comp/UserTransaction</entry>
+    <!--<entry key="com.arjuna.ats.jta.utils.UTJNDIContext">java:comp/UserTransaction</entry>-->
+    <!--<entry key="com.arjuna.ats.jta.common.JTAEnvironmentBean.userTransactionJNDIContext">java:comp/UserTransaction</entry>-->
+
+
     <entry key="JTAEnvironmentBean.xaResourceOrphanFilterClassNames">
         com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter
         com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter
