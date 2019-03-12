@@ -60,8 +60,7 @@ public class EngineStarter {
         LOGGER.info("============  Starting Bonita Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
-        System.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir",
-                System.getProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir", "target/tx-object-store"));
+        System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
