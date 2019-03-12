@@ -24,8 +24,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.impl.SEndEventD
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class ExecuteConnectorOfActivityTest {
     public void createThrowErrorEventInstance_should_return_a_well_formed_instance() throws Exception {
         final ExecuteConnectorOfActivity work = new ExecuteConnectorOfActivity(4L, 123L, 45L, 687L, 5357L, "myConnector");
         final SEndEventDefinition eventDefinition = new SEndEventDefinitionImpl(8687L, "end");
-        final SUserTaskInstanceImpl instanceImpl = new SUserTaskInstanceImpl("userTask1", 1L, 2L, 3L, 4L, STaskPriority.NORMAL, 5L, 6L);
+        final SUserTaskInstance instanceImpl = new SUserTaskInstance("userTask1", 1L, 2L, 3L, 4L, STaskPriority.NORMAL, 5L, 6L);
         instanceImpl.setLogicalGroup(3, 4L);
         when(activityInstanceService.getFlowNodeInstance(687L)).thenReturn(instanceImpl);
 

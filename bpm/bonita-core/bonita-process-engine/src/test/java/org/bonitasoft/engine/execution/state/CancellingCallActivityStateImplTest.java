@@ -35,8 +35,8 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -60,7 +60,7 @@ public class CancellingCallActivityStateImplTest {
     private CancellingCallActivityStateImpl cancellingCallActivityState;
     private SProcessDefinition processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
     private SProcessInstance processInstance = new SProcessInstance("myProcess", PROCESS_DEFINITION_ID);
-    private SCallActivityInstanceImpl callActivity = new SCallActivityInstanceImpl("callACtivity", 5342985348L, 4323264L, 65222L, 87686L, 2342L);
+    private SCallActivityInstance callActivity = new SCallActivityInstance("callACtivity", 5342985348L, 4323264L, 65222L, 87686L, 2342L);
     @Mock
     private ProcessInstanceService processInstanceService;
     @Mock

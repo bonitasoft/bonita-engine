@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadEx
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -399,7 +398,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
      *         the new gateway
      */
     private SGatewayInstance createGatewayWithRemainingTokens(SGatewayInstance gatewayInstance, List<String> remaining) throws SGatewayCreationException {
-        SGatewayInstanceImpl sGatewayInstance = new SGatewayInstanceImpl(gatewayInstance);
+        SGatewayInstance sGatewayInstance = new SGatewayInstance(gatewayInstance);
         String remainingTokenAsString = "";
         for (String token : remaining) {
             remainingTokenAsString += token + ",";

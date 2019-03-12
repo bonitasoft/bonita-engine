@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance;
 
 /**
  * @author Matthieu Chaffotte
@@ -24,7 +24,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediat
  */
 public class SIntermediateThrowEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SIntermediateThrowEventInstanceBuilder {
 
-    public SIntermediateThrowEventInstanceBuilderImpl(final SIntermediateThrowEventInstanceImpl entity) {
+    public SIntermediateThrowEventInstanceBuilderImpl(final SIntermediateThrowEventInstance entity) {
         super(entity);
     }
 

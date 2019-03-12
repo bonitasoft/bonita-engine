@@ -23,11 +23,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SStartEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
 import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
@@ -97,7 +97,7 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createExecuteFlowNode() {
-        SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl("task", 5432L, 631L, 52311, 33L, 441L);
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance("task", 5432L, 631L, 52311, 33L, 441L);
         flowNodeInstance.setLogicalGroup4(3452L);
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
@@ -148,7 +148,7 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createNotifyChildFinishedWork() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createNotifyChildFinishedWorkDescriptor(new SAutomaticTaskInstanceImpl()));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createNotifyChildFinishedWorkDescriptor(new SAutomaticTaskInstance()));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));

@@ -33,10 +33,10 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -151,14 +151,14 @@ public class EventInstanceServiceImplForWaitingTest {
     @Test
     public final void deleteWaitingEvents_should_delete_waiting_events() throws Exception {
         // Given
-        final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
+        final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         final SWaitingMessageEvent waitingMessageEventImpl = new SWaitingMessageEvent();
         doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList()).when(persistenceService)
                 .selectList(any(SelectListDescriptor.class));
         doNothing().when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
 
         // When
-        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
+        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstance);
 
         // Then
         verify(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
@@ -167,23 +167,23 @@ public class EventInstanceServiceImplForWaitingTest {
     @Test(expected = SWaitingEventModificationException.class)
     public final void deleteWaitingEvents_should_throw_exception_when_cant_delete_waiting_event() throws Exception {
         // Given
-        final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
+        final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         final SWaitingSignalEvent waitingMessageEventImpl = new SWaitingSignalEvent();
         doReturn(Collections.singletonList(waitingMessageEventImpl)).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doThrow(new SWaitingEventModificationException(new Exception(""))).when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
 
         // When
-        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
+        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstance);
     }
 
     @Test(expected = SBonitaReadException.class)
     public final void deleteWaitingEvents_should_throw_exception_when_cant_search_waiting_event() throws Exception {
         // Given
-        final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
+        final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         doThrow(new SBonitaReadException(new Exception(""))).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         // When
-        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
+        eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstance);
     }
 
     /**

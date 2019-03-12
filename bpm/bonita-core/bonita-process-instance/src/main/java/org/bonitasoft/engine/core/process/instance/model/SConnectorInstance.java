@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -27,7 +28,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SConnectorInstance implements SNamedElement {
+public class SConnectorInstance implements PersistentObject {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";

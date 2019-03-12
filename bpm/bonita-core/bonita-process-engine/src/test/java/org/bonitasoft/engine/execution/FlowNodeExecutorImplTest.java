@@ -16,20 +16,21 @@ package org.bonitasoft.engine.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -81,7 +82,7 @@ public class FlowNodeExecutorImplTest {
 
     @Test
     public void should_abort_children_when_setting_activity_to_a_terminal_state() throws Exception {
-        SUserTaskInstanceImpl flowNodeInstance = aTask(1L, true);
+        SUserTaskInstance flowNodeInstance = aTask(1L, true);
         flowNodeInstance.setTokenCount(2);
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
@@ -91,7 +92,7 @@ public class FlowNodeExecutorImplTest {
 
     @Test
     public void should_interrupt_boundary_when_setting_activity_to_a_terminal_state() throws Exception {
-        SUserTaskInstanceImpl sUserTaskInstance = aTask(1L, true);
+        SUserTaskInstance sUserTaskInstance = aTask(1L, true);
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 
@@ -111,15 +112,15 @@ public class FlowNodeExecutorImplTest {
 
     @Test
     public void should_set_the_state_on_the_activity() throws Exception {
-        SUserTaskInstanceImpl aTask = aTask(1L, true);
+        SUserTaskInstance aTask = aTask(1L, true);
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 
         verify(activityInstanceService).setState(aTask, skippedFlowNodeState);
     }
 
-    private SUserTaskInstanceImpl aTask(long id, boolean stable) throws SFlowNodeReadException, SFlowNodeNotFoundException {
-        SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl();
+    private SUserTaskInstance aTask(long id, boolean stable) throws SFlowNodeReadException, SFlowNodeNotFoundException {
+        SUserTaskInstance sUserTaskInstance = new SUserTaskInstance();
         sUserTaskInstance.setId(id);
         sUserTaskInstance.setParentContainerId(PROCESS_INSTANCE_ID);
         sUserTaskInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);

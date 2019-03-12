@@ -13,15 +13,24 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface SActivityInstance extends SFlowNodeInstance, SFlowElementsContainer {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SActivityInstance extends SFlowNodeInstance {
 
-    long getAbortedByBoundary();
+    private long abortedByBoundary = 0;
 
-    int getTokenCount();
-
+    public SActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
+                                 final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+    }
 }

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,7 +27,7 @@ public class SIntermediateCatchEventInstanceBuilderFactoryImpl extends SEventIns
     public SIntermediateCatchEventInstanceBuilder createNewIntermediateCatchEventInstance(final String name, final long flowNodeDefinitionId,
             final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SIntermediateCatchEventInstanceImpl entity = new SIntermediateCatchEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SIntermediateCatchEventInstance entity = new SIntermediateCatchEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SIntermediateCatchEventInstanceBuilderImpl(entity);

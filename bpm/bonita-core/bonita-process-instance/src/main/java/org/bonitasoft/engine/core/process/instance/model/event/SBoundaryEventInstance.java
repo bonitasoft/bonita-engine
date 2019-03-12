@@ -13,11 +13,35 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SBoundaryEventInstance extends SCatchEventInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SBoundaryEventInstance extends SCatchEventInstance {
+    private long activityInstanceId;
 
-    long getActivityInstanceId();
+    public SBoundaryEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
+                                      final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.BOUNDARY_EVENT;
+    }
+
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        //a boundary event never must be executed when the process instance is aborted because it will be aborted by the attached activity
+        return false;
+    }
+
 
 }

@@ -443,23 +443,23 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="classNames">
             <set>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.SGatewayInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance</value>
             </set>
         </constructor-arg>
         <constructor-arg name="sequenceId" value="10011" />
@@ -1177,26 +1177,6 @@
                 <!-- bpm -->
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
 
                 <!--business data-->

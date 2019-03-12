@@ -15,18 +15,18 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public abstract class SFlowNodeInstanceBuilderImpl implements SFlowNodeInstanceBuilder {
 
-    protected final SFlowNodeInstanceImpl entity;
+    protected final SFlowNodeInstance entity;
 
-    public SFlowNodeInstanceBuilderImpl(final SFlowNodeInstanceImpl entity) {
+    public SFlowNodeInstanceBuilderImpl(final SFlowNodeInstance entity) {
         super();
         this.entity = entity;
     }

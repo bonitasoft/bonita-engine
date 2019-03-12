@@ -18,7 +18,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,9 +30,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventIn
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -81,7 +82,7 @@ public class EventInstanceServiceImplForEventTest {
     @Test
     public final void createEventInstance_should_create_event_instance() throws Exception {
         // Given
-        final SIntermediateCatchEventInstanceImpl eventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
+        final SIntermediateCatchEventInstance eventInstanceImpl = new SIntermediateCatchEventInstance();
         final InsertRecord insertRecord = new InsertRecord(eventInstanceImpl);
 
         // When
@@ -94,7 +95,7 @@ public class EventInstanceServiceImplForEventTest {
     @Test(expected = SEventInstanceCreationException.class)
     public final void createEventInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final SStartEventInstanceImpl eventInstanceImpl = new SStartEventInstanceImpl();
+        final SStartEventInstance eventInstanceImpl = new SStartEventInstance();
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
@@ -111,7 +112,7 @@ public class EventInstanceServiceImplForEventTest {
         final long activityInstanceId = 56L;
         final int fromIndex = 1;
         final int maxResults = 6;
-        final List<SBoundaryEventInstanceImpl> triggerInstanceImpls = Arrays.asList(new SBoundaryEventInstanceImpl());
+        final List<SBoundaryEventInstance> triggerInstanceImpls = Arrays.asList(new SBoundaryEventInstance());
         final SelectListDescriptor<SBoundaryEventInstance> selectDescriptor = SelectDescriptorBuilder.getActivityBoundaryEvents(activityInstanceId, fromIndex,
                 maxResults);
         doReturn(triggerInstanceImpls).when(persistenceService).selectList(selectDescriptor);
@@ -169,7 +170,7 @@ public class EventInstanceServiceImplForEventTest {
         final OrderByType orderByType = OrderByType.ASC;
         final SelectListDescriptor<SEventInstance> selectDescriptor = SelectDescriptorBuilder.getEventsFromRootContainer(rootContainerId, fromIndex,
                 maxResults, fieldName, orderByType);
-        final List<SIntermediateCatchEventInstanceImpl> eventInstanceImpls = Arrays.asList(new SIntermediateCatchEventInstanceImpl());
+        final List<SIntermediateCatchEventInstance> eventInstanceImpls = Arrays.asList(new SIntermediateCatchEventInstance());
         doReturn(eventInstanceImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When

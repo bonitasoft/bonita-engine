@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -24,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanc
  */
 public class SManualTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl implements SManualTaskInstanceBuilder {
 
-    public SManualTaskInstanceBuilderImpl(final SManualTaskInstanceImpl activityInst) {
+    public SManualTaskInstanceBuilderImpl(final SManualTaskInstance activityInst) {
         super(activityInst);
     }
 
