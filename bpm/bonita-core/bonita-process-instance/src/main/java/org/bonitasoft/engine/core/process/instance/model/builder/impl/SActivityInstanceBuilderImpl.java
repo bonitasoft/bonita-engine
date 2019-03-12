@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceI
  */
 public abstract class SActivityInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SActivityInstanceBuilder {
 
-    protected SActivityInstanceBuilderImpl(final SActivityInstanceImpl entity) {
+    protected SActivityInstanceBuilderImpl(final SActivityInstance entity) {
         super(entity);
     }
     

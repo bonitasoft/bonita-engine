@@ -17,7 +17,10 @@ package org.bonitasoft.engine.execution.state;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristicsImpl;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -27,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SMultiInstanceLoopCharacteristicsImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +50,7 @@ public class InitializingMultiInstanceActivityStateImplTest {
     private SProcessDefinition processDefinition;
     @Mock
     private SActivityDefinition activityDefinition;
-    private SMultiInstanceActivityInstanceImpl flowNodeInstance = new SMultiInstanceActivityInstanceImpl();
+    private SMultiInstanceActivityInstance flowNodeInstance = new SMultiInstanceActivityInstance();
     @Mock
     ExpressionResolverService expressionResolverService;
     @Mock

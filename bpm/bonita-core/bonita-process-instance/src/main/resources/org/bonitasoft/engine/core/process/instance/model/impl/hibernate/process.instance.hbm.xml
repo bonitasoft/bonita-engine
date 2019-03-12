@@ -46,7 +46,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SFlowNodeInstanceImpl" abstract="true" table="flownode_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" abstract="true" table="flownode_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -85,11 +85,11 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="SActivityInstanceImpl" extends="SFlowNodeInstanceImpl" abstract="true">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" extends="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" abstract="true">
         <property name="abortedByBoundary" column="abortedByBoundary" type="long" />
     </subclass>
 
-    <subclass name="SHumanTaskInstanceImpl" extends="SActivityInstanceImpl" abstract="true">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" abstract="true">
         <property name="actorId" column="actorId" type="long" />
         <property name="assigneeId" column="assigneeId" type="long" />
         <property name="expectedEndDate" column="expectedEndDate" type="long" />
@@ -101,27 +101,27 @@
         </property>
     </subclass>
 
-    <subclass name="SUserTaskInstanceImpl" discriminator-value="user" extends="SHumanTaskInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" discriminator-value="user" extends="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" />
 
-    <subclass name="SManualTaskInstanceImpl" discriminator-value="manual" extends="SHumanTaskInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" discriminator-value="manual" extends="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" />
 
-    <subclass name="SAutomaticTaskInstanceImpl" discriminator-value="auto" extends="SActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" discriminator-value="auto" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" />
 
-    <subclass name="SReceiveTaskInstanceImpl" discriminator-value="receive" extends="SActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" discriminator-value="receive" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" />
 
-    <subclass name="SSendTaskInstanceImpl" discriminator-value="send" extends="SActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" discriminator-value="send" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" />
 
-    <subclass name="SCallActivityInstanceImpl" discriminator-value="call" extends="SActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" discriminator-value="call" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" />
 
-    <subclass name="SSubProcessActivityInstanceImpl" discriminator-value="subProc" extends="SActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" discriminator-value="subProc" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance">
         <property name="triggeredByEvent" column="triggeredByEvent" />
     </subclass>
 
-    <subclass name="SLoopActivityInstanceImpl" discriminator-value="loop" extends="SActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" discriminator-value="loop" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance">
         <property name="loopMax" column="loop_max" />
     </subclass>
 
-    <subclass name="SMultiInstanceActivityInstanceImpl" discriminator-value="multi" extends="SActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" discriminator-value="multi" extends="org.bonitasoft.engine.core.process.instance.model.SActivityInstance">
         <property name="sequential" column="sequential" />
         <property name="loopDataInputRef" column="loopDataInputRef" />
         <property name="loopDataOutputRef" column="loopDataOutputRef" />
@@ -133,7 +133,7 @@
         <property name="numberOfTerminatedInstances" column="nbTerminatedInst" />
     </subclass>
 
-    <subclass name="SGatewayInstanceImpl" discriminator-value="gate" extends="SFlowNodeInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" discriminator-value="gate" extends="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance">
         <property name="gatewayType" column="gatewayType">
             <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
                 <param name="enumClass">
@@ -190,27 +190,27 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" abstract="true" extends="SFlowNodeInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance">
         <property name="interrupting" column="interrupting" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" discriminator-value="intermediateCatchEvent"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" discriminator-value="intermediateCatchEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance">
         <property name="activityInstanceId" column="activityInstanceId" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SThrowEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" discriminator-value="intermediateThrowEvent"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" discriminator-value="intermediateThrowEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance" />
 
     <class name="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" table="event_trigger_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">

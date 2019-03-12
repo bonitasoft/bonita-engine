@@ -25,13 +25,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFo
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -93,7 +93,7 @@ public class ParentContainerResolverImplTest {
 
     private void activityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId, final long parentActivityInstanceId,
             final long parentContainerId, final long rootContainerId) throws SFlowNodeReadException, SFlowNodeNotFoundException {
-        SActivityInstanceImpl activity = new SUserTaskInstanceImpl() {
+        SActivityInstance activity = new SUserTaskInstance() {
 
             @Override
             public SFlowNodeType getType() {

@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 
 /**
  * @author Julien Reboul
  */
-public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskInstanceImpl, UserTaskInstanceBuilder> {
+public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskInstance, UserTaskInstanceBuilder> {
 
     public static UserTaskInstanceBuilder aUserTask() {
         return new UserTaskInstanceBuilder();
@@ -34,13 +34,9 @@ public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskIn
         return this;
     }
 
-    public static UserTaskInstanceBuilder aCallActivityInstanceBuilder() {
-        return new UserTaskInstanceBuilder();
-    }
-
     @Override
-    SUserTaskInstanceImpl _build() {
-        final SUserTaskInstanceImpl userTaskInstanceImpl = new SUserTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
+    SUserTaskInstance _build() {
+        final SUserTaskInstance userTaskInstanceImpl = new SUserTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
                 STaskPriority.NORMAL, logicalGroup1, logicalGroup2);
         userTaskInstanceImpl.setAssigneeId(assigneeId);
         return userTaskInstanceImpl;

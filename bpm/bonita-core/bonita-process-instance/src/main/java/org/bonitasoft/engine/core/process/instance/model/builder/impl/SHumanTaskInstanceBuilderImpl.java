@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHumanTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -23,26 +23,26 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstance
  */
 public abstract class SHumanTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SHumanTaskInstanceBuilder {
 
-    protected SHumanTaskInstanceBuilderImpl(final SHumanTaskInstanceImpl entity) {
+    protected SHumanTaskInstanceBuilderImpl(final SHumanTaskInstance entity) {
         super(entity);
     }
 
     @Override
     public SHumanTaskInstanceBuilder setAssigneeId(final long assigneeId) {
-        ((SHumanTaskInstanceImpl) this.entity).setAssigneeId(assigneeId);
-        ((SHumanTaskInstanceImpl) this.entity).setClaimedDate(System.currentTimeMillis());
+        ((SHumanTaskInstance) this.entity).setAssigneeId(assigneeId);
+        ((SHumanTaskInstance) this.entity).setClaimedDate(System.currentTimeMillis());
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setPriority(final STaskPriority priority) {
-        ((SHumanTaskInstanceImpl) this.entity).setPriority(priority);
+        ((SHumanTaskInstance) this.entity).setPriority(priority);
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setExpectedEndDate(final Long expectedEndDate) {
-        ((SHumanTaskInstanceImpl) this.entity).setExpectedEndDate(expectedEndDate);
+        ((SHumanTaskInstance) this.entity).setExpectedEndDate(expectedEndDate);
         return this;
     }
 

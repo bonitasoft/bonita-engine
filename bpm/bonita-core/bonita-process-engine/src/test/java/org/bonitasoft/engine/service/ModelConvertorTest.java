@@ -61,7 +61,9 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinit
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl;
@@ -70,8 +72,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTask
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -543,7 +543,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
     }
@@ -565,10 +565,10 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
-        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstanceImpl(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
+        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstance(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
     }
 
     @Test
@@ -577,11 +577,11 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl urgentSTask = new SUserTaskInstanceImpl();
+        final SUserTaskInstance urgentSTask = new SUserTaskInstance();
         urgentSTask.setExpectedEndDate(15L);
         urgentSTask.setPriority(STaskPriority.UNDER_NORMAL);
 
-        final SUserTaskInstanceImpl takeYourTimeSTask = new SUserTaskInstanceImpl();
+        final SUserTaskInstance takeYourTimeSTask = new SUserTaskInstance();
         takeYourTimeSTask.setPriority(STaskPriority.UNDER_NORMAL);
 
         //when

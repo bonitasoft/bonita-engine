@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class ExecuteFlowNodeWorkTest {
     private ActivityInstanceService activityInstanceService;
     @Mock
     private FlowNodeExecutor flowNodeExecutor;
-    private SUserTaskInstanceImpl sHumanTaskInstance;
+    private SUserTaskInstance sHumanTaskInstance;
     private Map<String, Object> context;
 
     @Rule
@@ -58,7 +58,7 @@ public class ExecuteFlowNodeWorkTest {
         context = Collections.<String, Object> singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
         doReturn(flowNodeExecutor).when(tenantServiceAccessor).getFlowNodeExecutor();
-        sHumanTaskInstance = new SUserTaskInstanceImpl();
+        sHumanTaskInstance = new SUserTaskInstance();
         sHumanTaskInstance.setId(FLOW_NODE_INSTANCE_ID);
         doReturn(sHumanTaskInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
     }

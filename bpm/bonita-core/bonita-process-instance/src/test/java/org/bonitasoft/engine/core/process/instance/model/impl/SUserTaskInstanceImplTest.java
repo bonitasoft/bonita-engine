@@ -16,16 +16,17 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SUserTaskInstanceImplTest {
 
-    private SUserTaskInstanceImpl task;
+    private SUserTaskInstance task;
 
     @Before
     public void setUp() {
-        task = new SUserTaskInstanceImpl();
+        task = new SUserTaskInstance();
     }
 
     @Test

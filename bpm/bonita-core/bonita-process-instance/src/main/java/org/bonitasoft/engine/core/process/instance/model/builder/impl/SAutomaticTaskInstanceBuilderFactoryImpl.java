@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -27,7 +27,7 @@ public class SAutomaticTaskInstanceBuilderFactoryImpl extends SActivityInstanceB
     @Override
     public SAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
             final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SAutomaticTaskInstanceImpl activityInstanceImpl = new SAutomaticTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SAutomaticTaskInstance activityInstanceImpl = new SAutomaticTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SAutomaticTaskInstanceBuilderImpl(activityInstanceImpl);

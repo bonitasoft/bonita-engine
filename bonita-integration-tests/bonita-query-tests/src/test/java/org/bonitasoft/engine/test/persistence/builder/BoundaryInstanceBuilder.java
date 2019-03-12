@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 
 /**
  * @author Baptiste Mesta
  */
-public class BoundaryInstanceBuilder extends FlowNodeInstanceBuilder<SBoundaryEventInstanceImpl, BoundaryInstanceBuilder> {
+public class BoundaryInstanceBuilder extends FlowNodeInstanceBuilder<SBoundaryEventInstance, BoundaryInstanceBuilder> {
 
     private long activityInstanceId;
 
@@ -32,8 +32,8 @@ public class BoundaryInstanceBuilder extends FlowNodeInstanceBuilder<SBoundaryEv
     }
 
     @Override
-    SBoundaryEventInstanceImpl _build() {
-        final SBoundaryEventInstanceImpl boundaryEventInstance = new SBoundaryEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId,
+    SBoundaryEventInstance _build() {
+        final SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId,
                 logicalGroup1, logicalGroup2);
         boundaryEventInstance.setActivityInstanceId(activityInstanceId);
         return boundaryEventInstance;

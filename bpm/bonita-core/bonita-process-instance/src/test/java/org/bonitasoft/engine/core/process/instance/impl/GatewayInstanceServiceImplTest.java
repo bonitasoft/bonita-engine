@@ -19,7 +19,10 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +42,7 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -183,7 +185,7 @@ public class GatewayInstanceServiceImplTest {
         filters.add(new FilterOption(SFlowNodeInstance.class, "name", name));
         filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
         QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
-        SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl();
+        SUserTaskInstance sUserTaskInstance = new SUserTaskInstance();
         sUserTaskInstance.setName(name);
         sUserTaskInstance.setTerminal(terminal);
         doReturn(Arrays.asList(sUserTaskInstance)).when(flowNodeInstanceService).searchFlowNodeInstances(
@@ -341,7 +343,7 @@ public class GatewayInstanceServiceImplTest {
     public void should_checkMergingCondition_on_inclusive() throws Exception {
         doReturn(true).when(gatewayInstanceService).isInclusiveGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.INCLUSIVE);
 
         boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
@@ -354,7 +356,7 @@ public class GatewayInstanceServiceImplTest {
     public void should_checkMergingCondition_on_parallel() throws Exception {
         doReturn(true).when(gatewayInstanceService).isParallelGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.PARALLEL);
 
         boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
@@ -366,7 +368,7 @@ public class GatewayInstanceServiceImplTest {
     @Test
     public void should_checkMergingCondition_on_exclusive() throws Exception {
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.EXCLUSIVE);
 
         boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
@@ -376,7 +378,7 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_getMergedTokens_on_exclusive_return_the_first_token() throws Exception {
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.EXCLUSIVE);
 
         List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2"));
@@ -386,7 +388,7 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_getMergedTokens_on_parallel() throws Exception {
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.PARALLEL);
 
         List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2", "3", "2"));
@@ -396,7 +398,7 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_getMergedTokens_on_inclusive() throws Exception {
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.INCLUSIVE);
 
         List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2", "3", "2"));
@@ -419,7 +421,7 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         processDefinition.setProcessContainer(processContainer);
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setName("gate");
         gate.setHitBys("1,2,3,2");
         gate.setFlowNodeDefinitionId(666);
@@ -441,7 +443,7 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         processDefinition.setProcessContainer(processContainer);
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setName("gate");
         gate.setHitBys("2,3,2");
         gate.setFlowNodeDefinitionId(666);
@@ -464,7 +466,7 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         processDefinition.setProcessContainer(processContainer);
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setName("gate");
         gate.setHitBys("1,2,3,2");
         gate.setFlowNodeDefinitionId(666);
@@ -490,7 +492,7 @@ public class GatewayInstanceServiceImplTest {
     public void should_isInclusiveGatewayActivated_return_false_when_finished() throws SBonitaReadException {
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         processDefinition.setProcessContainer(processContainer);
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         gate.setName("gate");
         gate.setHitBys("FINISH:1");
         gate.setFlowNodeDefinitionId(50L);
@@ -504,7 +506,7 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_setState_change_lastUpdate_and_reachStateDate() throws SGatewayModificationException, SRecorderException {
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
 
         gatewayInstanceService.setState(gate, 12);
 
@@ -515,7 +517,7 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_getActiveGatewayOfProcess_return_the_gateway() throws Exception {
-        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        SGatewayInstance gate = new SGatewayInstance();
         doReturn(gate).when(persistenceRead).selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
 
         final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID, "myGate");

@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -33,7 +34,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SProcessInstance implements SFlowElementsContainer {
+public class SProcessInstance implements PersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
     public static final String STRING_INDEX_1_KEY = "stringIndex1";

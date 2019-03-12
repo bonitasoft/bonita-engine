@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventIns
  */
 public class SEndEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SEndEventInstanceBuilder {
 
-    public SEndEventInstanceBuilderImpl(final SEndEventInstanceImpl entity) {
+    public SEndEventInstanceBuilderImpl(final SEndEventInstance entity) {
         super(entity);
     }
 

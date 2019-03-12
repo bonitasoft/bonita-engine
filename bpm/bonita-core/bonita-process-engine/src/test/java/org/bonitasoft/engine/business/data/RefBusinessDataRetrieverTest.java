@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
@@ -35,8 +36,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNode
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.BusinessDataContext;
 import org.junit.Before;
@@ -62,15 +61,15 @@ public class RefBusinessDataRetrieverTest {
     private static long FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS = 213215L;
     private static long FLOW_NODE_INSTANCE_ID = 100L;
     private SAFlowNodeInstanceImpl archivedFlowNodeInstance;
-    private SFlowNodeInstanceImpl flowNodeInstance;
+    private SFlowNodeInstance flowNodeInstance;
     private SProcessInstance processInstance;
     private SAProcessInstanceImpl archivedProcessInstance;
     private SProcessInstance eventSubProcessInstance;
-    private SFlowNodeInstanceImpl eventSubProcessFlowNode;
+    private SFlowNodeInstance eventSubProcessFlowNode;
 
     @Before
     public void before() throws Exception {
-        flowNodeInstance = new SAutomaticTaskInstanceImpl("auto1", 312490L, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, 0L, 0L);
+        flowNodeInstance = new SAutomaticTaskInstance("auto1", 312490L, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, 0L, 0L);
         flowNodeInstance.setLogicalGroup(1, PROCESS_INSTANCE_ID);
         flowNodeInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         archivedFlowNodeInstance = new SAAutomaticTaskInstanceImpl((SAutomaticTaskInstance) flowNodeInstance);
@@ -81,7 +80,7 @@ public class RefBusinessDataRetrieverTest {
         eventSubProcessInstance.setId(EVENT_SUBPROCESS_ID);
         eventSubProcessInstance.setCallerType(SFlowNodeType.SUB_PROCESS);
         eventSubProcessInstance.setCallerId(FLOW_NODE_INSTANCE_ID);
-        eventSubProcessFlowNode = new SAutomaticTaskInstanceImpl("flownodeInEventSubProcess", 352523L, PROCESS_INSTANCE_ID, EVENT_SUBPROCESS_ID,
+        eventSubProcessFlowNode = new SAutomaticTaskInstance("flownodeInEventSubProcess", 352523L, PROCESS_INSTANCE_ID, EVENT_SUBPROCESS_ID,
                 0L, PROCESS_INSTANCE_ID);
         eventSubProcessFlowNode.setLogicalGroup(1, PROCESS_INSTANCE_ID);
         eventSubProcessFlowNode.setLogicalGroup(3, EVENT_SUBPROCESS_ID);

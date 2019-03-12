@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessI
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -170,7 +169,7 @@ public class TestRepository {
                 new PersistentObjectId(saProcessInstance.getId(), saProcessInstance.getTenantId()));
     }
 
-    public SFlowNodeInstance add(final SFlowNodeInstanceImpl sFlowNode) {
+    public SFlowNodeInstance add(final SFlowNodeInstance sFlowNode) {
         getSession().save(sFlowNode);
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }

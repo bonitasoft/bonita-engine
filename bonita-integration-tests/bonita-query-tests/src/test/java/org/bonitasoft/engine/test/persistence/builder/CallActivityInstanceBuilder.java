@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 
 
 /**
  * @author Julien Reboul
  *
  */
-public class CallActivityInstanceBuilder extends ActivityInstanceBuilder<SCallActivityInstanceImpl, CallActivityInstanceBuilder> {
+public class CallActivityInstanceBuilder extends ActivityInstanceBuilder<SCallActivityInstance, CallActivityInstanceBuilder> {
 
     @Override
     CallActivityInstanceBuilder getThisBuilder() {
@@ -32,9 +32,8 @@ public class CallActivityInstanceBuilder extends ActivityInstanceBuilder<SCallAc
     }
 
     @Override
-    SCallActivityInstanceImpl _build() {
-        SCallActivityInstanceImpl callActivityInstanceImpl = new SCallActivityInstanceImpl();
-        return callActivityInstanceImpl;
+    SCallActivityInstance _build() {
+        return new SCallActivityInstance();
     }
 
 }

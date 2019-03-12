@@ -771,7 +771,7 @@
         SELECT COUNT(DISTINCT process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -817,7 +817,7 @@
         SELECT DISTINCT(process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -864,7 +864,7 @@
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
         	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
@@ -925,7 +925,7 @@
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
         	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
@@ -984,7 +984,7 @@
  	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT COUNT(DISTINCT process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE process_definition.processId = a.logicalGroup1
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
@@ -995,7 +995,7 @@
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT DISTINCT(process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = a.logicalGroup1
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
