@@ -32,7 +32,12 @@
                 <prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
                 <prop key="org.quartz.plugin.shutdownhook.class">org.quartz.plugins.management.ShutdownHookPlugin</prop>
                 <prop key="org.quartz.plugin.shutdownhook.cleanShutdown">false</prop>
-                <prop key="org.quartz.jobStore.txIsolationLevelReadCommitted">${org.quartz.jobStore.txIsolationLevelReadCommitted:false}</prop>
+                <prop key="org.quartz.jobStore.txIsolationLevelReadCommitted">${org.quartz.jobStore.txIsolationLevelReadCommitted}</prop>
+                <prop key="org.quartz.jobStore.misfireThreshold">${org.quartz.jobStore.misfireThreshold}</prop>
+                <prop key="org.quartz.jobStore.maxMisfiresToHandleAtATime">${org.quartz.jobStore.maxMisfiresToHandleAtATime}</prop>
+                <prop key="org.quartz.jobStore.acquireTriggersWithinLock">${org.quartz.jobStore.acquireTriggersWithinLock}</prop>
+                <prop key="org.quartz.scheduler.batchTriggerAcquisitionMaxCount">${org.quartz.scheduler.batchTriggerAcquisitionMaxCount}</prop>
+                <prop key="org.quartz.scheduler.batchTriggerAcquisitionFireAheadTimeWindow">${org.quartz.scheduler.batchTriggerAcquisitionFireAheadTimeWindow}</prop>
             </props>
         </property>
     </bean>
