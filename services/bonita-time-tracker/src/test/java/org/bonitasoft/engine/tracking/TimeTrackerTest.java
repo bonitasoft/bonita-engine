@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -505,5 +506,38 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
         //There should be no more threads than the ones existing prior to tracker startup
         assertThat(afterTimeTrackerStoppedThreadSet).isEqualTo(Collections.emptySet());
+    }
+
+    @Test
+    public void should_add_remove_listeners() {
+        // create a tracker
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1);
+
+        // no active listener
+        assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
+
+        // add a new listener
+        final FlushEventListener flushEvent = new MemoryFlushEventListener(true, this.logger, 10);
+
+        this.tracker.addFlushEventListener(flushEvent);
+        assertThat(this.tracker.getActiveFlushEventListeners()).containsOnly(flushEvent);
+
+        // remove the same listener
+        this.tracker.removeFlushEventListener(flushEvent.getName());
+        assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
+    }
+
+    @Test
+    public void should_have_one_listener_based_on_listener_name() {
+        // create a tracker
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1);
+        // add a new listener
+        final FlushEventListener flushEvent1 = new MemoryFlushEventListener(true, this.logger, 10);
+        final FlushEventListener flushEvent2 = new MemoryFlushEventListener(true, this.logger, 10);
+
+        this.tracker.addFlushEventListener(flushEvent1);
+        this.tracker.addFlushEventListener(flushEvent2);
+        // must have only one time
+        assertThat(this.tracker.getActiveFlushEventListeners()).containsOnlyOnce(flushEvent2);
     }
 }
