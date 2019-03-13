@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
@@ -70,7 +70,7 @@ public class TimeTracker implements TenantLifecycleService {
         this.records = new CircularFifoQueue<>(maxSize);
         this.serviceStarted = false;
         this.logger = logger;
-        this.flushEventListeners = new HashMap<>();
+        this.flushEventListeners = new ConcurrentHashMap<>();
         if (flushEventListeners != null) {
             for (final FlushEventListener flushEventListener : flushEventListeners) {
                 final String name = flushEventListener.getName();
@@ -100,6 +100,23 @@ public class TimeTracker implements TenantLifecycleService {
             }
         }
         return active;
+    }
+
+    /**
+     * reference a new flushEventListener. The key of the reference is the flushEventListener.name().
+     * If a listener exist with this name, it will be replaced.
+     *
+     */
+    public void addFlushEventListener(final FlushEventListener flushEventListener) {
+        this.flushEventListeners.put(flushEventListener.getName(), flushEventListener);
+    }
+
+    /**
+     * remove a flush event listener
+     *
+     */
+    public void removeFlushEventListener(final String flushEventListenerName) {
+        this.flushEventListeners.remove(flushEventListenerName);
     }
 
     public boolean activateFlushEventListener(final String flushEventListenerName) {
