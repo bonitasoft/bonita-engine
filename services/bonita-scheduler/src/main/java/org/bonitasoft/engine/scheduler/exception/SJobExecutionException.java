@@ -24,7 +24,7 @@ public class SJobExecutionException extends SSchedulerException {
         super(message);
     }
 
-    public SJobExecutionException(final Exception e) {
+    public SJobExecutionException(final Throwable e) {
         super(e);
     }
 
