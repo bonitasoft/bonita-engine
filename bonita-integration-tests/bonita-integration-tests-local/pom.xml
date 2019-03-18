@@ -102,7 +102,6 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
@@ -134,7 +133,6 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <phase>integration-test</phase>
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
@@ -173,9 +171,6 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -210,9 +205,6 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -255,9 +247,6 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -292,9 +281,6 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
