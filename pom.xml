@@ -590,6 +590,10 @@
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>0.18.1</version>
+                    <configuration>
+                        <keepContainer>false</keepContainer>
+                        <removeVolumes>true</removeVolumes>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -656,7 +660,6 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
@@ -863,7 +866,6 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <phase>integration-test</phase>
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
