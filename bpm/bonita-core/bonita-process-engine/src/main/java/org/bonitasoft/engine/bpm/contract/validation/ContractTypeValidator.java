@@ -36,8 +36,8 @@ public class ContractTypeValidator {
             }
         } else {
             if (!isValidForSimpleType(definition, object)) {
-                errorReporter.addError(object 
-                        + " cannot be assigned to " 
+                errorReporter.addError(object
+                        + " cannot be assigned to "
                         + (definition.isMultiple() ? "multiple " : "")
                         + definition.getType());
                 return false;
@@ -68,7 +68,8 @@ public class ContractTypeValidator {
         return true;
     }
 
-    private boolean isValidForComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
+    private boolean isValidForComplexType(final SInputDefinition definition, final Object object,
+            ErrorReporter errorReporter) {
         if (definition.isMultiple()) {
             return isValidForMultipleComplexType(definition, object, errorReporter);
         } else {
@@ -77,7 +78,8 @@ public class ContractTypeValidator {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean isValidForMultipleComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
+    private boolean isValidForMultipleComplexType(final SInputDefinition definition, final Object object,
+            ErrorReporter errorReporter) {
         if (!(object instanceof List<?>)) {
             return false;
         }
@@ -88,13 +90,16 @@ public class ContractTypeValidator {
         return true;
     }
 
-    private boolean isValidForSimpleComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
+    private boolean isValidForSimpleComplexType(final SInputDefinition definition, final Object object,
+            ErrorReporter errorReporter) {
         try {
             @SuppressWarnings("unchecked")
             final Map<String, Object> map = (Map<String, Object>) object;
             for (final SInputDefinition sInputDefinition : definition.getInputDefinitions()) {
                 Object value = (map == null) ? null : map.get(sInputDefinition.getName());
-                validate(sInputDefinition, value, errorReporter);
+                if (value != null) {
+                    validate(sInputDefinition, value, errorReporter);
+                }
             }
             return !errorReporter.hasError();
         } catch (final ClassCastException e) {
