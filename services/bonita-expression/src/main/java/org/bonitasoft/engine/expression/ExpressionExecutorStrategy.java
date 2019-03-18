@@ -50,6 +50,8 @@ public interface ExpressionExecutorStrategy {
     String TYPE_INPUT = "TYPE_INPUT";
 
     String TYPE_READ_ONLY_SCRIPT = "TYPE_READ_ONLY_SCRIPT";
+    
+    String TYPE_READ_ONLY_CONDITION_SCRIPT = "TYPE_READ_ONLY__CONDITION_SCRIPT";
 
     String TYPE_VARIABLE = "TYPE_VARIABLE";
 
@@ -84,6 +86,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
 
     ExpressionKind KIND_READ_ONLY_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_SCRIPT, INTERPRETER_GROOVY);
+    
+    ExpressionKind KIND_READ_ONLY_CONDITION_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_CONDITION_SCRIPT, INTERPRETER_GROOVY);
 
     ExpressionKind KIND_INPUT = new ExpressionKind(TYPE_INPUT);
 

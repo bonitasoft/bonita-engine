@@ -85,7 +85,7 @@ public class ContractConstraintsValidator {
 
     private SExpression createGroovyExpression(SConstraintDefinition constraint) throws SInvalidExpressionException {
         return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(constraint.getName()).setContent(constraint.getExpression())
-                .setExpressionType(ExpressionExecutorStrategy.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionExecutorStrategy.INTERPRETER_GROOVY)
+                .setExpressionType(ExpressionExecutorStrategy.TYPE_READ_ONLY_CONDITION_SCRIPT).setInterpreter(ExpressionExecutorStrategy.INTERPRETER_GROOVY)
                 .setReturnType(Boolean.class.getName()).done();
     }
 
