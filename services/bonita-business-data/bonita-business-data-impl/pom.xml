@@ -168,6 +168,26 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -186,7 +206,7 @@
                         <executions>
                             <execution>
                                 <id>start</id>
-                                <phase>process-test-classes</phase>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                     <goal>start</goal>
@@ -194,19 +214,16 @@
                             </execution>
                             <execution>
                                 <id>stop</id>
-                                <phase>prepare-package</phase>
+                                <phase>post-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor>
@@ -218,6 +235,14 @@
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -238,7 +263,7 @@
                         <executions>
                             <execution>
                                 <id>start</id>
-                                <phase>process-test-classes</phase>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                     <goal>start</goal>
@@ -246,19 +271,16 @@
                             </execution>
                             <execution>
                                 <id>stop</id>
-                                <phase>prepare-package</phase>
+                                <phase>post-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
@@ -270,6 +292,14 @@
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -298,7 +328,7 @@
                         <executions>
                             <execution>
                                 <id>start</id>
-                                <phase>process-test-classes</phase>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                     <goal>start</goal>
@@ -306,19 +336,16 @@
                             </execution>
                             <execution>
                                 <id>stop</id>
-                                <phase>prepare-package</phase>
+                                <phase>post-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>oracle</sysprop.bonita.db.vendor>
@@ -331,6 +358,14 @@
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -351,7 +386,7 @@
                         <executions>
                             <execution>
                                 <id>start</id>
-                                <phase>process-test-classes</phase>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                     <goal>start</goal>
@@ -359,19 +394,16 @@
                             </execution>
                             <execution>
                                 <id>stop</id>
-                                <phase>prepare-package</phase>
+                                <phase>post-integration-test</phase>
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
-                                <configuration>
-                                    <keepContainer>true</keepContainer>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>sqlserver</sysprop.bonita.db.vendor>
@@ -384,6 +416,14 @@
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
