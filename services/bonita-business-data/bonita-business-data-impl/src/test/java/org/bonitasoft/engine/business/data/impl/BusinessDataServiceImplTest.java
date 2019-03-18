@@ -283,7 +283,7 @@ public class BusinessDataServiceImplTest {
         verify(businessDataRepository, never()).findByIds(EntityPojo.class, keys);
     }
 
-    @Test(expected = SBusinessDataNotFoundException.class)
+    @Test
     public void callJavaOperationShouldThrowExceptionWhenPersistenceIdIsNull() throws Exception {
         //given
         final Long persistenceId1 = 1562L;
@@ -291,12 +291,14 @@ public class BusinessDataServiceImplTest {
         final EntityPojo entity1 = new EntityPojo(persistenceId1);
         final EntityPojo entity2 = new EntityPojo(null);
         final List<EntityPojo> entities = Arrays.asList(entity1, entity2);
+        doReturn(EntityPojo.class).when(businessDataReloader).getEntityRealClass(entity2);
 
+        // expect
+        expectedException.expect(SBusinessDataNotFoundException.class);
+        expectedException.expectMessage("Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. It is only possible to reference persisted instances in an aggregation relation.");
+        
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
-
-        assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEqualTo(entities);
+        businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
     }
 
     @Test
