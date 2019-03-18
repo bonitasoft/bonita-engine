@@ -177,7 +177,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
-                throw new SBusinessDataNotFoundException("persistenceId of business data is null");
+                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.", 
+                        businessDataReloader.getEntityRealClass(entity).getName()));
             }
             primaryKeys.add(entity.getPersistenceId());
         }
@@ -197,7 +198,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataReloader.reloadEntity(entity);
+            try {
+                return businessDataReloader.reloadEntity(entity);
+            }catch (SBusinessDataNotFoundException e) {
+                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.", 
+                        businessDataReloader.getEntityRealClass(entity).getName()),e);
+            }
         } else {
             return entity;
         }
