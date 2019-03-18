@@ -368,7 +368,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void logJobError(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+    public void logJobError(final Throwable jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
             SJobLogCreationException, SJobDescriptorReadException {
         final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId, 0, 1);
         if (!jobLogs.isEmpty()) {
@@ -386,7 +386,7 @@ public class JobServiceImpl implements JobService {
     }
 
 
-    public void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
+    public void createJobLog(final Throwable jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
         SJobDescriptor jobDescriptor = getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null) {
             final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
@@ -402,7 +402,7 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private String getStackTrace(final Exception jobException) {
+    private String getStackTrace(final Throwable jobException) {
         final StringWriter exceptionWriter = new StringWriter();
         jobException.printStackTrace(new PrintWriter(exceptionWriter));
         return exceptionWriter.toString();

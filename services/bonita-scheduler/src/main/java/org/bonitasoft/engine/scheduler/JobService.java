@@ -311,6 +311,6 @@ public interface JobService {
      * @throws SJobDescriptorReadException
      * @since 7.2.0
      */
-    void logJobError(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+    void logJobError(final Throwable jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
             SJobLogCreationException, SJobDescriptorReadException;
 }

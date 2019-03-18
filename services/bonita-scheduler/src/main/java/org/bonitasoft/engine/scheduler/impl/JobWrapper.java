@@ -113,7 +113,7 @@ public class JobWrapper implements StatelessJob {
         } catch (final SFireEventException | SJobExecutionException e) {
             handleFailure(e);
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             handleFailure(e);
             throw new SJobExecutionException(e);
         } finally {
@@ -124,7 +124,7 @@ public class JobWrapper implements StatelessJob {
         }
     }
 
-    void handleFailure(Exception e) {
+    void handleFailure(Throwable e) {
         logFailedJob(e);
         try {
             registerFailInAnOtherThread(e, jobIdentifier);
@@ -134,7 +134,7 @@ public class JobWrapper implements StatelessJob {
         }
     }
 
-    private void registerFailInAnOtherThread(final Exception jobException, final JobIdentifier jobIdentifier) throws STransactionNotFoundException {
+    private void registerFailInAnOtherThread(final Throwable jobException, final JobIdentifier jobIdentifier) throws STransactionNotFoundException {
         transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
             @Override
             public void beforeCommit() {
@@ -173,7 +173,7 @@ public class JobWrapper implements StatelessJob {
         });
     }
 
-    private void logFailedJob(final Exception e) {
+    private void logFailedJob(final Throwable e) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + jobIdentifier + " : " + e.getMessage(), e);
         }
