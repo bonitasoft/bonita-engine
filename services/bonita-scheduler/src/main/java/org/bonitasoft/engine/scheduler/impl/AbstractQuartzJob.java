@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,7 +34,7 @@ public abstract class AbstractQuartzJob implements org.quartz.Job {
             if (bosJob != null) {
                 bosJob.execute();
             }
-        } catch (final SBonitaException e) {
+        } catch (final Throwable e) {
             JobExecutionException jobExecutionException = new JobExecutionException(e);
             jobExecutionException.setUnscheduleFiringTrigger(true);//job log will be registered
             throw jobExecutionException;

@@ -13,56 +13,72 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.ERROR;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.JOBEXCEPTION;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.NO_EXCEPTION;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.TYPE;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTriggerForTest;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
+public class SchedulerServiceIT extends CommonBPMServicesTest {
 
-    private final SchedulerService schedulerService;
-
+    private SchedulerService schedulerService;
+    private JobService jobService;
+    private UserTransactionService userTransactionService;
     private final VariableStorage storage = VariableStorage.getInstance();
-
-    public QuartzSchedulerExecutorITest() {
-        schedulerService = getTenantAccessor().getSchedulerService();
-    }
 
     @Before
     public void before() throws Exception {
+        schedulerService = getTenantAccessor().getSchedulerService();
+        userTransactionService = getTenantAccessor().getUserTransactionService();
+        jobService = getTenantAccessor().getJobService();
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         if (!schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
             schedulerService.start();
         }
+        getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
     }
 
     @After
-    public void after() throws Exception {
+    public void after() {
         storage.clear();
     }
 
@@ -148,6 +164,97 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
         ReleaseWaitersJob.waitForJobToExecuteOnce();
+    }
+
+    @Test
+    public void should_be_able_to_list_job_that_failed_because_of_an_Error() throws Exception {
+        // schedule a job that throws an Error
+        schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
+                new OneShotTrigger("triggerJob", new Date(System.currentTimeMillis() + 100)),
+                singletonMap(TYPE, ERROR));
+
+        //we have failed job
+        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
+        assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
+                assertThat(f.getLastMessage()).contains("an Error"));
+    }
+
+    @Test
+    public void should_be_able_to_restart_a_job_that_failed_because_of_a_SJobExecutionException() throws Exception {
+        // schedule a job that throws a SJobExecutionException
+        schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
+                new OneShotTrigger("triggerJob", new Date(System.currentTimeMillis() + 100)),
+                singletonMap(TYPE, JOBEXCEPTION));
+        SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
+
+        //we have failed job
+        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
+        assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
+                assertThat(f.getLastMessage()).contains("a Job exception"));
+
+        //reschedule the job: no more exception
+        inTx(() -> {
+            schedulerService.executeAgain(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            return null;
+        });
+        await().until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
+    }
+
+    @Test
+    public void should_be_able_to_restart_a_cron_job_that_failed_because_of_a_SJobExecutionException() throws Exception {
+        // schedule a job that throws a SJobExecutionException
+        schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
+                new UnixCronTrigger("triggerJob", new Date(System.currentTimeMillis() + 100), "* * * * * ?"),
+                singletonMap(TYPE, JOBEXCEPTION));
+        SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
+
+        //we have failed job
+        List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
+        assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
+                assertThat(f.getLastMessage()).contains("a Job exception"));
+        assertThat(storage.getVariableValue("nbJobException")).isEqualTo(1);
+        //ensure there is no more execution of that
+        Thread.sleep(2000);
+        assertThat(storage.getVariableValue("nbJobException")).isEqualTo(1);
+
+        //reschedule the job: no more exception
+        inTx(() -> {
+            schedulerService.executeAgain(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            return null;
+        });
+        //FIXME the job should still be executed even if an instance failed, right now it is executed once after a failure
+        // we loose the cron
+        await().until(() -> storage.getVariableValue("nbSuccess", 0), equalTo(1));
+    }
+
+    private SJobDescriptor getFirstPersistedJob() throws Exception {
+        return inTx(() -> jobService.searchJobDescriptors(new QueryOptions(0, 1))).get(0);
+    }
+
+    private <T> T inTx(Callable<T> callable) throws Exception {
+
+        return userTransactionService.executeInTransaction(() -> {
+            getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
+            return callable.call();
+        });
+    }
+
+
+    private SJobDescriptor jobDescriptor(Class<?> jobClass, String jobName) {
+        return BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(jobClass.getName(), jobName).done();
+    }
+
+    private void schedule(SJobDescriptor jobDescriptor, Trigger trigger, Map<String, Serializable> parameters) throws Exception {
+        List<SJobParameter> parametersList = toJobParameterList(parameters);
+        inTx(() -> {
+            schedulerService.schedule(jobDescriptor, parametersList, trigger);
+            return null;
+        });
+    }
+
+    private List<SJobParameter> toJobParameterList(Map<String, Serializable> parameters) {
+        return parameters.entrySet().stream().map(e -> BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(e.getKey(), e.getValue()).done()).collect(Collectors.toList());
     }
 
 }
