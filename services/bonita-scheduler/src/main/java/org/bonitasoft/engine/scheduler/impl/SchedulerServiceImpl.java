@@ -115,38 +115,10 @@ public class SchedulerServiceImpl implements SchedulerService {
         schedulerExecutor.setBOSSchedulerService(this);
     }
 
-    private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
-        }
-    }
-
-    private void logAfterMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogAfterMethod(this.getClass(), methodName));
-        }
-    }
-
-    private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName, final Exception e) {
-        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
-        }
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
     @Override
     public void schedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "schedule");
         final SJobDescriptor createdJobDescriptor = createJobDescriptor(jobDescriptor, Collections.<SJobParameter> emptyList());
         internalSchedule(createdJobDescriptor, trigger);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "schedule");
     }
 
     @Override
@@ -172,28 +144,20 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "createJobDescriptor");
         final long tenantId = getTenantId();
         try {
             final SJobDescriptor createdJobDescriptor = jobService.createJobDescriptor(sJobDescriptor, tenantId);
             jobService.createJobParameters(parameters, tenantId, createdJobDescriptor.getId());
-            logAfterMethod(TechnicalLogSeverity.TRACE, "createJobDescriptor");
             return createdJobDescriptor;
         } catch (final SBonitaException sbe) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createJobDescriptor", sbe);
             throw new SSchedulerException(sbe);
         }
     }
 
     private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "internalSchedule");
         final String tenantId = getTenantIdAsString();
         try {
-            if (trigger == null) {
-                schedulerExecutor.executeNow(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
-            } else {
-                schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, jobDescriptor.disallowConcurrentExecution());
-            }
+            schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, jobDescriptor.disallowConcurrentExecution());
         } catch (final Throwable e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             try {
@@ -203,8 +167,6 @@ public class SchedulerServiceImpl implements SchedulerService {
             }
             throw new SSchedulerException(e);
         }
-
-        logAfterMethod(TechnicalLogSeverity.TRACE, "internalSchedule");
     }
 
     private long getTenantId() throws SSchedulerException {
@@ -212,7 +174,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         try {
             tenantId = sessionAccessor.getTenantId();
         } catch (final STenantIdNotSetException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getTenantId", e);
             throw new SSchedulerException(e);
         }
         return tenantId;
@@ -223,42 +184,26 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void executeNow(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {
-        final SJobDescriptor createdJobDescriptor = createJobDescriptor(jobDescriptor, parameters);
-        internalSchedule(createdJobDescriptor, null);
-    }
-
-    @Override
     public boolean isStarted() throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "isStarted");
-        final boolean isStarted = schedulerExecutor.isStarted();
-        logAfterMethod(TechnicalLogSeverity.TRACE, "isStarted");
-        return isStarted;
+        return schedulerExecutor.isStarted();
     }
 
     @Override
     public boolean isStopped() throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "isShutdown");
-        final boolean isShutdown = schedulerExecutor.isShutdown();
-        logAfterMethod(TechnicalLogSeverity.TRACE, "isShutdown");
-        return isShutdown;
+        return schedulerExecutor.isShutdown();
     }
 
     @Override
     public void start() throws SSchedulerException, SFireEventException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "start");
     }
 
     @Override
     public void stop() throws SSchedulerException, SFireEventException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "shutdown");
         schedulerExecutor.shutdown();
         eventService.fireEvent(schedulStopped);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "shutdown");
     }
 
     @Override
@@ -273,35 +218,25 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public boolean delete(final String jobName) throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
         final boolean delete = schedulerExecutor.delete(jobName, String.valueOf(getTenantId()));
         jobService.deleteJobDescriptorByJobName(jobName);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "delete");
         return delete;
     }
 
     @Override
     public void deleteJobs() throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "deleteJobs");
         schedulerExecutor.deleteJobs(String.valueOf(getTenantId()));
         jobService.deleteAllJobDescriptors();
-        logAfterMethod(TechnicalLogSeverity.TRACE, "deleteJobs");
     }
 
     @Override
     public List<String> getJobs() throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getJobs");
-        final List<String> list = schedulerExecutor.getJobs(String.valueOf(getTenantId()));
-        logAfterMethod(TechnicalLogSeverity.TRACE, "getJobs");
-        return list;
+        return schedulerExecutor.getJobs(String.valueOf(getTenantId()));
     }
 
     @Override
     public List<String> getAllJobs() throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getAllJobs");
-        final List<String> list = schedulerExecutor.getAllJobs();
-        logAfterMethod(TechnicalLogSeverity.TRACE, "getAllJobs");
-        return list;
+        return schedulerExecutor.getAllJobs();
     }
 
     /**
@@ -312,10 +247,8 @@ public class SchedulerServiceImpl implements SchedulerService {
      * @throws SSchedulerException
      */
     public StatelessJob getPersistedJob(final JobIdentifier jobIdentifier) throws SSchedulerException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
         try {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
             return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
         } catch (final Exception e) {
             throw new SSchedulerException("The job class couldn't be instantiated", e);

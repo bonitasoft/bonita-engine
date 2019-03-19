@@ -15,11 +15,19 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupStartsWith;
@@ -36,7 +44,6 @@ import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
-import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
@@ -123,85 +130,6 @@ public class QuartzSchedulerExecutorTest {
         final HashSet<JobKey> set = new HashSet<JobKey>();
         set.addAll(asList(jobKeys));
         return set;
-    }
-
-    private class TestRepeatTrigger implements RepeatTrigger {
-
-        private final MisfireRestartPolicy misfireRestartPolicy;
-
-        private final String triggerName;
-
-        private final int interval;
-
-        private final int count;
-
-        public TestRepeatTrigger(final String triggerName, final int interval, final int count, final MisfireRestartPolicy misfireRestartPolicy) {
-            this.triggerName = triggerName;
-            this.interval = interval;
-            this.count = count;
-            this.misfireRestartPolicy = misfireRestartPolicy;
-        }
-
-        public TestRepeatTrigger(final String triggerName, final int interval, final int count) {
-            this.triggerName = triggerName;
-            this.interval = interval;
-            this.count = count;
-            misfireRestartPolicy = MisfireRestartPolicy.ONE;
-        }
-
-        @Override
-        public Date getStartDate() {
-            return new Date();
-        }
-
-        @Override
-        public int getPriority() {
-            return -1;
-        }
-
-        @Override
-        public String getName() {
-            return triggerName;
-        }
-
-        @Override
-        public MisfireRestartPolicy getMisfireHandlingPolicy() {
-            return misfireRestartPolicy;
-        }
-
-        @Override
-        public long getInterval() {
-            return interval;
-        }
-
-        @Override
-        public int getCount() {
-            return count;
-        }
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void schedule_should_check_RepeatTrigger_with_bad_interval_param() throws Exception {
-        final int badInterval = -1;
-        final RepeatTrigger trigger = new TestRepeatTrigger("triggerName", badInterval, 1);
-
-        quartzSchedulerExecutor.schedule(1l, "2", JOB_NAME, trigger, true);
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void schedule_should_check_RepeatTrigger_with_bad_name_param() throws Exception {
-        final String badTriggerName = null;
-        final RepeatTrigger trigger = new TestRepeatTrigger(badTriggerName, 1, 1);
-
-        quartzSchedulerExecutor.schedule(1l, "2", JOB_NAME, trigger, true);
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void schedule_should_check_RepeatTrigger_with_bad_count_param() throws Exception {
-        final int badCount = -2;
-        final RepeatTrigger trigger = new TestRepeatTrigger("triggerName", 1, badCount);
-
-        quartzSchedulerExecutor.schedule(1l, "2", JOB_NAME, trigger, true);
     }
 
     @Test
@@ -407,25 +335,9 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void executeNow_should_schedule_job() throws Exception {
-        quartzSchedulerExecutor.executeNow(1L, "2", JOB_NAME, false);
-
-        verify(scheduler, times(1)).addJob(any(JobDetail.class), anyBoolean());
-        verify(scheduler, times(1)).triggerJob(any(JobKey.class));
-
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void executeNow_with_exception() throws Exception {
-        doThrow(SchedulerException.class).when(scheduler).triggerJob(any(JobKey.class));
-
-        quartzSchedulerExecutor.executeNow(1l, "2", JOB_NAME, false);
-    }
-
-    @Test
     public void schedule_should_use_tenant_id_as_group_in_job_details() throws Exception {
         final String tenantId = "3";
-        final Trigger trigger = new TestRepeatTrigger("trigger", 1, 1, MisfireRestartPolicy.NONE);
+        final Trigger trigger = new OneShotTrigger("trigger", new Date(), 1, MisfireRestartPolicy.NONE);
 
         quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
 
@@ -438,7 +350,7 @@ public class QuartzSchedulerExecutorTest {
     @Test
     public void schedule_should_store_tenant_id_in_jobDataMap() throws Exception {
         final String tenantId = "3";
-        final Trigger trigger = new TestRepeatTrigger("trigger", 1, 1, MisfireRestartPolicy.NONE);
+        final Trigger trigger = new OneShotTrigger("trigger", new Date(), 1, MisfireRestartPolicy.NONE);
 
         quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
 
@@ -446,32 +358,6 @@ public class QuartzSchedulerExecutorTest {
         verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(org.quartz.Trigger.class));
         final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
         assertThat(dataMap.get("tenantId")).isEqualTo(tenantId);
-    }
-
-    @Test
-    public void executeNow_should_store_tenant_id_in_jobDataMap() throws Exception {
-        final String tenantId = "3";
-
-        quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
-
-        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
-        verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
-        final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
-        assertThat(dataMap.get("tenantId")).isEqualTo(tenantId);
-        verify(scheduler, times(1)).triggerJob(any(JobKey.class));
-    }
-
-    @Test
-    public void executeNow_should_use_tenant_id_as_group_in_job_details() throws Exception {
-        final String tenantId = "3";
-
-        quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
-
-        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
-        verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
-        final String group = jobDetailCaptor.getValue().getKey().getGroup();
-        assertThat(group).isEqualTo(String.valueOf(tenantId));
-        verify(scheduler, times(1)).triggerJob(any(JobKey.class));
     }
 
     @Test(expected = SSchedulerException.class)
