@@ -24,8 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
+import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
@@ -68,13 +67,21 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private QuartzScheduler quartzScheduler;
 
+    private List<BonitaJobListener> jobListeners = new ArrayList<>();
+
+
     public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final TransactionService transactionService,
-            final SessionAccessor sessionAccessor, final TechnicalLoggerService logger, final boolean useOptimization) {
+                                   final SessionAccessor sessionAccessor, final TechnicalLoggerService logger, final boolean useOptimization) {
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
         this.logger = logger;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
+    }
+
+    // autowired
+    public void setJobListeners(List<BonitaJobListener> jobListeners) {
+        this.jobListeners = jobListeners;
     }
 
     @Override
@@ -214,14 +221,13 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 if (isStarted()) {
                     throw new SSchedulerException("The scheduler is already started.");
                 }
-                // shutdown();
             }
-            if(scheduler.isShutdown()){
+            if (scheduler.isShutdown()) {
                 initializeScheduler();
             }
 
             scheduler.start();
-
+            addListeners();
             try {
                 if (useOptimization) {
                     final Field quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
@@ -248,7 +254,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    protected void checkSchedulerState() throws SSchedulerException {
+    private void checkSchedulerState() throws SSchedulerException {
         if (scheduler == null) {
             throw new SSchedulerException("The scheduler is not started");
         }
@@ -388,21 +394,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    @Override
-    public void addJobListener(final List<AbstractBonitaTenantJobListener> jobListeners, final String groupName) throws SSchedulerException {
-        try {
-            scheduler.getListenerManager().addJobListener(new TenantQuartzJobListener(jobListeners, groupName, sessionAccessor, transactionService, logger),
-                    GroupMatcher.<JobKey> groupEquals(groupName));
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void addJobListener(final List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException {
+    private void addListeners() throws SSchedulerException {
         try {
             final ListenerManager listenerManager = scheduler.getListenerManager();
-            listenerManager.addJobListener(new PlatformQuartzJobListener(jobListeners));
+            listenerManager.addJobListener(new QuartzJobListener(jobListeners, sessionAccessor, logger));
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

@@ -42,7 +42,7 @@
         </property>
     </bean>
 
-    <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
+    <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor" autowire="byType">
         <constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -157,20 +157,16 @@
                 <ref bean="bonitaTaskExecutor" />
             </list>
         </property>
-        <property name="jobListeners">
-            <list>
-                <ref bean="loggerJobListener" />
-                <ref bean="jdbcJobListener" />
-            </list>
-        </property>
     </bean>
 
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
         <constructor-arg name="schedulerService" ref="scheduler" />
         <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
         <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="timerEventTriggerJobListener" class="org.bonitasoft.engine.jobs.TimerEventTriggerJobListener">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 

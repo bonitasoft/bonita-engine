@@ -21,40 +21,27 @@ import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
+import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 
 /**
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class TechnicalLoggerJobListener extends AbstractBonitaPlatformJobListener {
-
-    private static final long serialVersionUID = 2830540082890033377L;
+public class TechnicalLoggerJobListener implements BonitaJobListener {
 
     private static final String jobToBeFiredMessage = "Job FIRED : group=''{1}'', name=''{0}'', class=''{5}'', data=''{6}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
-
     private static final String jobSuccessMessage = "Job COMPLETED : group=''{1}'', name=''{0}'', class=''{4}'', data=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
-
     private static final String jobFailedMessage = "Job FAILED : group=''{1}'', name=''{0}'', class=''{4}'', data=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
-
     private static final String jobWasVetoedMessage = "Job VETOED : group=''{1}'', name=''{0}'', class=''{5}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
-
     private final TechnicalLoggerService logger;
-
     private final boolean trace;
-
     private final boolean warning;
 
     public TechnicalLoggerJobListener(final TechnicalLoggerService logger) {
         this.logger = logger;
         trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         warning = logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING);
-    }
-
-    @Override
-    public String getName() {
-        return "TechnicalLoggerJobListener";
     }
 
     @Override

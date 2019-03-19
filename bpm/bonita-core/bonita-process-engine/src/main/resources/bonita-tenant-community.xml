@@ -1198,17 +1198,6 @@
     <task:scheduler id="internalTasksScheduler"/>
 
     <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
-        <property name="jobListeners">
-            <list>
-                <ref bean="timerEventTriggerJobListener" />
-            </list>
-        </property>
-    </bean>
-
-    <bean id="timerEventTriggerJobListener" class="org.bonitasoft.engine.jobs.TimerEventTriggerJobListener">
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 

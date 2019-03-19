@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.jobs;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -31,7 +34,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEve
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
+import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.search.SSearchException;
 import org.junit.Before;
@@ -61,17 +64,22 @@ public class TimerEventTriggerJobListenerTest {
 
     private TimerEventTriggerJobListener timerEventTriggerJobListener;
 
-    private final Map<String, Serializable> context = new HashMap<String, Serializable>();
+    private final Map<String, Serializable> context = new HashMap<>();
 
     @Before
     public void setUp() {
-        timerEventTriggerJobListener = new TimerEventTriggerJobListener(eventInstanceService, TENANT_ID, logger);
+        timerEventTriggerJobListener = new TimerEventTriggerJobListener(logger){
+            @Override
+            protected EventInstanceService getEventInstanceService(Long tenantId) {
+                return eventInstanceService;
+            }
+        };
         MockitoAnnotations.initMocks(timerEventTriggerJobListener);
 
-        context.put(AbstractBonitaJobListener.TRIGGER_NAME, TRIGGER_NAME);
-        context.put(AbstractBonitaJobListener.TENANT_ID, TENANT_ID);
-        context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
-        context.put(AbstractBonitaJobListener.JOB_TYPE, TriggerTimerEventJob.class.getName());
+        context.put(BonitaJobListener.TRIGGER_NAME, TRIGGER_NAME);
+        context.put(BonitaJobListener.TENANT_ID, TENANT_ID);
+        context.put(BonitaJobListener.BOS_JOB, mock(StatelessJob.class));
+        context.put(BonitaJobListener.JOB_TYPE, TriggerTimerEventJob.class.getName());
     }
 
     @Test
@@ -91,7 +99,7 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public final void jobWasExecuted_should_not_search_for_event_triggers_when_executed_job_was_not_TimerEventJob() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.JOB_TYPE, "AnotherJob");
+        context.put(BonitaJobListener.JOB_TYPE, "AnotherJob");
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -115,7 +123,7 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public final void jobWasExecuted_should_not_delete_timer_event_trigger_if_no_engine_job() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.BOS_JOB, null);
+        context.put(BonitaJobListener.BOS_JOB, null);
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -127,7 +135,7 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public void jobWasExecuted_should_do_nothing_when_no_tenant_id() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.TENANT_ID, null);
+        context.put(BonitaJobListener.TENANT_ID, null);
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -140,7 +148,7 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public void jobWasExecuted_should_do_nothing_when_tenant_id_equals_0() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.TENANT_ID, 0L);
+        context.put(BonitaJobListener.TENANT_ID, 0L);
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -154,7 +162,7 @@ public class TimerEventTriggerJobListenerTest {
     public final void jobWasExecuted_should_do_nothing_when_deleteTimerEventTriggerIfJobNotScheduledAnyMore_throws_exception() throws Exception {
         // Given
         final TimerEventTriggerJobListener spiedTimerEventTriggerJobListener = spy(timerEventTriggerJobListener);
-        doThrow(new SSearchException(new Exception())).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(TRIGGER_NAME);
+        doThrow(new SSearchException(new Exception())).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(eventInstanceService, TRIGGER_NAME);
 
         // When
         spiedTimerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -169,7 +177,7 @@ public class TimerEventTriggerJobListenerTest {
         doReturn(true).when(logger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING));
         final TimerEventTriggerJobListener spiedTimerEventTriggerJobListener = spy(timerEventTriggerJobListener);
         final SSearchException e = new SSearchException(new Exception());
-        doThrow(e).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(TRIGGER_NAME);
+        doThrow(e).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(eventInstanceService, TRIGGER_NAME);
 
         // When
         spiedTimerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -178,19 +186,6 @@ public class TimerEventTriggerJobListenerTest {
         verify(eventInstanceService, never()).deleteEventTriggerInstance(any(STimerEventTriggerInstance.class));
         verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
                 eq("An exception occurs during the deleting of the timer event trigger '" + TRIGGER_NAME + "'."), eq(e));
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.jobs.TimerEventTriggerJobListener#getName()
-     * .
-     */
-    @Test
-    public final void getName() {
-        // When
-        final String name = timerEventTriggerJobListener.getName();
-
-        // then
-        assertEquals("TimerEventTriggerJobListener_" + TENANT_ID, name);
     }
 
     /**

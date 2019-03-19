@@ -16,8 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -39,8 +37,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -63,8 +59,6 @@ public class PlatformAPIImplTest {
 
     public static final long TENANT_ID = 56423L;
     private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
-    private final List<AbstractBonitaTenantJobListener> tenantJobListeners = Collections.singletonList(mock(AbstractBonitaTenantJobListener.class));
-    private final List<AbstractBonitaPlatformJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
     @Mock
@@ -96,17 +90,8 @@ public class PlatformAPIImplTest {
         doReturn(platformConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
-        doReturn(platformJobListeners).when(platformConfiguration).getJobListeners();
-
-        doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
-        doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
-        doReturn(tenantConfiguration).when(tenantServiceAccessor).getTenantConfiguration();
-        doReturn(tenantJobListeners).when(tenantConfiguration).getJobListeners();
-
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
         doReturn(sessionAccessor).when(platformAPI).createSessionAccessor();
-        doReturn(-1L).when(platformAPI).createSession(anyLong(), any(SessionService.class));
         doReturn(tenants).when(platformAPI).getTenants(platformServiceAccessor);
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServerInstance();
         PlatformAPIImpl.isNodeStarted = false;
@@ -149,7 +134,7 @@ public class PlatformAPIImplTest {
         platformAPI.startNode();
 
         // Then
-        verify(platformAPI).startScheduler(platformServiceAccessor, tenants);
+        verify(platformAPI).startScheduler(platformServiceAccessor);
     }
 
     @Test
@@ -164,72 +149,7 @@ public class PlatformAPIImplTest {
         platformAPI.startNode();
 
         // Then
-        verify(platformAPI, never()).startScheduler(platformServiceAccessor, tenants);
-    }
-
-    @Test
-    public void startScheduler_should_register_PlatformJobListeners_and_TenantJobListeners_when_scheduler_starts() throws Exception {
-        // Given
-        doReturn(true).when(platformConfiguration).shouldStartScheduler();
-        doReturn(false).when(schedulerService).isStarted();
-
-        // When
-        platformAPI.startScheduler(platformServiceAccessor, tenants);
-
-        // Then
-        verify(schedulerService).initializeScheduler();
-        verify(schedulerService).addJobListener(anyList());
-        verify(schedulerService).addJobListener(anyList(), anyString());
-        verify(schedulerService).start();
-    }
-
-    @Test
-    public void startScheduler_should_not_register_PlatformJobListeners_and_TenantJobListeners_when_scheduler_is_started() throws Exception {
-        // Given
-        doReturn(true).when(platformConfiguration).shouldStartScheduler();
-        doReturn(true).when(schedulerService).isStarted();
-
-        // When
-        platformAPI.startScheduler(platformServiceAccessor, tenants);
-
-        // Then
-        verify(schedulerService, never()).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyList());
-        verify(schedulerService, never()).addJobListener(anyList(), anyString());
-        verify(schedulerService, never()).start();
-    }
-
-    @Test
-    public void startScheduler_should_not_register_PlatformJobListeners_and_TenantJobListeners_when_scheduler_should_not_be_started() throws Exception {
-        // Given
-        doReturn(false).when(platformConfiguration).shouldStartScheduler();
-
-        // When
-        platformAPI.startScheduler(platformServiceAccessor, tenants);
-
-        // Then
-        verify(schedulerService, never()).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyList());
-        verify(schedulerService, never()).addJobListener(anyList(), anyString());
-        verify(schedulerService, never()).start();
-    }
-
-    @Test
-    public void startScheduler_should_not_register_JobListeners_when_none_are_configured() throws Exception {
-        // Given
-        doReturn(true).when(platformConfiguration).shouldStartScheduler();
-        doReturn(false).when(schedulerService).isStarted();
-        doReturn(Collections.EMPTY_LIST).when(platformConfiguration).getJobListeners();
-        doReturn(Collections.EMPTY_LIST).when(tenantConfiguration).getJobListeners();
-
-        // When
-        platformAPI.startScheduler(platformServiceAccessor, tenants);
-
-        // Then
-        verify(schedulerService).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyList());
-        verify(schedulerService, never()).addJobListener(anyList(), anyString());
-        verify(schedulerService).start();
+        verify(platformAPI, never()).startScheduler(platformServiceAccessor);
     }
 
     @Test
