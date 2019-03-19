@@ -69,10 +69,4 @@ public class NodeConfigurationTest {
         assertEquals(true, restartElements);
     }
 
-    @Test
-    public void getShouldStartEventHandlingJob() {
-        boolean startEvent = ((NodeConfigurationImpl) nodeConfiguration).shouldStartEventHandlingJob();
-        assertEquals(true, startEvent);
-    }
-
 }

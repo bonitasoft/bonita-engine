@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 
 /**
  * @author Baptiste Mesta
@@ -35,13 +34,9 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private List<RestartHandler> restartHandlers;
 
-    private boolean shouldStartEventHandlingJob = true;
-
     private List<TenantRestartHandler> tenantRestartHandlers;
 
     private List<PlatformLifecycleService> lifecycleServices;
-
-    private List<AbstractBonitaPlatformJobListener> jobListeners;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -71,21 +66,12 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         this.tenantRestartHandlers = tenantRestartHandlers;
     }
 
-    @Override
-    public boolean shouldStartEventHandlingJob() {
-        return shouldStartEventHandlingJob;
-    }
-
     public void setShouldStartScheduler(final boolean shouldStartScheduler) {
         this.shouldStartScheduler = shouldStartScheduler;
     }
 
     public void setShouldRestartElements(final boolean shouldRestartElements) {
         this.shouldRestartElements = shouldRestartElements;
-    }
-
-    public void setShouldStartEventHandlingJob(final boolean shouldStartEventHandlingJob) {
-        this.shouldStartEventHandlingJob = shouldStartEventHandlingJob;
     }
 
     @Override
@@ -100,15 +86,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     public void setLifecycleServices(final List<PlatformLifecycleService> lifecycleServices) {
         this.lifecycleServices = lifecycleServices;
-    }
-
-    @Override
-    public List<AbstractBonitaPlatformJobListener> getJobListeners() {
-        return jobListeners;
-    }
-
-    public void setJobListeners(final List<AbstractBonitaPlatformJobListener> jobListeners) {
-        this.jobListeners = jobListeners;
     }
 
 }

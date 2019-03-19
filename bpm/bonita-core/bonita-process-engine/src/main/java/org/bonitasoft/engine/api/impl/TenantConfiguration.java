@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 
 /**
  * Bean that returns configuration
@@ -28,8 +27,6 @@ public class TenantConfiguration {
 
     private List<TenantLifecycleService> lifecycleServices;
 
-    private List<AbstractBonitaTenantJobListener> jobListeners;
-
 
     public List<TenantLifecycleService> getLifecycleServices() {
         return lifecycleServices;
@@ -37,22 +34,6 @@ public class TenantConfiguration {
 
     public void setLifecycleServices(final List<TenantLifecycleService> lifecycleServices) {
         this.lifecycleServices = lifecycleServices;
-    }
-
-    /**
-     * @return The job listeners to add at the scheduler
-     * @since 6.4.0
-     */
-    public List<AbstractBonitaTenantJobListener> getJobListeners() {
-        return jobListeners;
-    }
-
-    /**
-     * @param jobListeners
-     * @since 6.4.0
-     */
-    public void setJobListeners(List<AbstractBonitaTenantJobListener> jobListeners) {
-        this.jobListeners = jobListeners;
     }
 
 }

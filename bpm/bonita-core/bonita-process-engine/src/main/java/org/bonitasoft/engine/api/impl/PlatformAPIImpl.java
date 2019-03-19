@@ -23,8 +23,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.impl.scheduler.PlatformJobListenerManager;
-import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
@@ -70,9 +68,7 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -182,7 +178,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
                 startServicesOfTenants(platformAccessor, sessionAccessor, tenants);
                 if (mustRestartElements) {
-                    startScheduler(platformAccessor, tenants);
+                    startScheduler(platformAccessor);
                     restartHandlersOfPlatform(platformAccessor);
                 }
                 isNodeStarted = true;
@@ -280,41 +276,13 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
-            BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException, ClassNotFoundException {
+    void startScheduler(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
-            addPlatformJobListeners(platformAccessor, schedulerService);
-            addTenantJobListeners(platformAccessor, tenants, schedulerService);
             schedulerService.start();
         }
-    }
-
-    private void addTenantJobListeners(PlatformServiceAccessor platformAccessor, final List<STenant> tenants, final SchedulerService schedulerService)
-            throws SBonitaException,
-            BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException, ClassNotFoundException {
-        for (STenant tenant : tenants) {
-            addTenantJobListener(platformAccessor, schedulerService, tenant.getId());
-        }
-    }
-
-    private void addTenantJobListener(PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService, final long tenantId)
-            throws SBonitaException, BonitaHomeNotSetException,
-            IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException {
-        final List<AbstractBonitaTenantJobListener> jobListeners = platformAccessor.getTenantServiceAccessor(tenantId).getTenantConfiguration()
-                .getJobListeners();
-        TenantJobListenerManager tenantJobListenerManager = new TenantJobListenerManager(schedulerService);
-        tenantJobListenerManager.registerListeners(jobListeners, tenantId);
-    }
-
-    private void addPlatformJobListeners(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws SSchedulerException {
-        PlatformJobListenerManager platformJobListenerManager = new PlatformJobListenerManager(schedulerService);
-        platformJobListenerManager.registerListener(platformAccessor.getPlatformConfiguration().getJobListeners());
     }
 
     void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
@@ -628,7 +596,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
-            startScheduler(platformAccessor, Collections.singletonList(defaultTenant));
+            startScheduler(platformAccessor);
             // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
             // startNode() method to start the scheduler, not ActivateTenant)
             // schedulerStarted = true;
