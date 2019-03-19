@@ -18,11 +18,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -34,8 +35,6 @@ import java.util.Random;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -51,7 +50,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -246,31 +244,6 @@ public class SchedulerServiceImplTest {
 
         // Then
         verify(schedulerExecutor).rescheduleJob(triggerName, groupName, triggerStartTime);
-    }
-
-    @Test
-    public void addJobListener_for_TenantJobListener_should_call_addJobListener_for_TenantJobListener() throws SSchedulerException {
-        // Given
-        final String groupName = "groupName";
-        final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
-
-        // When
-        schedulerService.addJobListener(jobListeners, groupName);
-
-        // Then
-        verify(schedulerExecutor).addJobListener(jobListeners, groupName);
-    }
-
-    @Test
-    public void addJobListener_for_PlatormJobListener_should_call_addJobListener_for_PlatormJobListener() throws SSchedulerException {
-        // Given
-        final List<AbstractBonitaPlatformJobListener> jobListeners = Collections.emptyList();
-
-        // When
-        schedulerService.addJobListener(jobListeners);
-
-        // Then
-        verify(schedulerExecutor).addJobListener(jobListeners);
     }
 
     @Test
