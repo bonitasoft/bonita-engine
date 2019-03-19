@@ -60,8 +60,6 @@ public interface SchedulerExecutor {
 
     List<String> getAllJobs() throws SSchedulerException;
 
-    void executeNow(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
-
     void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
     boolean isStillScheduled(String groupName, String jobName) throws SSchedulerException;

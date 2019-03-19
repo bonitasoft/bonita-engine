@@ -227,23 +227,6 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void executeNow_should_use_tenantId_on_jobDescriptor_jobParameters_and_call_executor_executeNow()
-            throws Exception {
-        // given
-        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
-        given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
-        final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
-
-        // when
-        schedulerService.executeNow(jobDescriptor, parameters);
-
-        // then
-        verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
-        verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), nullable(String.class), anyBoolean());
-    }
-
-    @Test
     public void should_delete_all_jobs_for_a_given_tenant() throws Exception {
         schedulerService.deleteJobs();
 

@@ -29,7 +29,6 @@ import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
-import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -42,7 +41,6 @@ import org.quartz.JobKey;
 import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -143,19 +141,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void executeNow(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution)
-            throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final JobDetail jobDetail = getJobDetail(jobId, groupName, jobName, disallowConcurrentExecution);
-            scheduler.addJob(jobDetail, true);
-            scheduler.triggerJob(jobDetail.getKey());
-        } catch (final Exception e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
     public void executeAgain(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution)
             throws SSchedulerException {
         try {
@@ -198,24 +183,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                     throw new IllegalStateException();
             }
             triggerBuilder = base.withSchedule(cronScheduleBuilder).endAt(cronTrigger.getEndDate());
-        } else if (trigger instanceof RepeatTrigger) {
-            final RepeatTrigger repeatTrigger = (RepeatTrigger) trigger;
-            final SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(repeatTrigger.getInterval())
-                    .withRepeatCount(repeatTrigger.getCount()).withMisfireHandlingInstructionIgnoreMisfires();
-            triggerBuilder = base.withSchedule(scheduleBuilder).startAt(repeatTrigger.getStartDate());
-            switch (repeatTrigger.getMisfireHandlingPolicy()) {
-                case NONE:
-                    scheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
-                    break;
-                case ALL:
-                    scheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
-                    break;
-                case ONE:
-                    scheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
-                    break;
-                default:
-                    throw new IllegalStateException();
-            }
         } else {
             triggerBuilder = base.startAt(trigger.getStartDate());
         }
