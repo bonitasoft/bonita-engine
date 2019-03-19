@@ -98,16 +98,6 @@ public interface SchedulerService extends PlatformLifecycleService {
     void executeAgain(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
-     * execute a job.
-     *
-     * @param jobDescriptor
-     * @param jobParameters
-     * @throws SSchedulerException
-     *         if an exception occurs.
-     */
-    void executeNow(SJobDescriptor jobDescriptor, List<SJobParameter> parameters) throws SSchedulerException;
-
-    /**
      * Deletes a job according to its name.
      *
      * @param jobName
