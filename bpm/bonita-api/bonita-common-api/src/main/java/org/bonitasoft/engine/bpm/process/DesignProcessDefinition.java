@@ -118,7 +118,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the label for the ProcessDefinition given search index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
@@ -133,7 +133,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the label list for the ProcessDefinition given search index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
@@ -146,7 +146,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the Expression for the ProcessDefinition given search index.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
@@ -160,7 +160,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the Expression list of the ProcessDefinition search index values.
      * <p>
-     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/bonita/current/define-a-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
