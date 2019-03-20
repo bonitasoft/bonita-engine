@@ -13,9 +13,16 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -239,7 +246,7 @@ public class DocumentHelperTest {
 
         DocumentValue docValue1 = new DocumentValue("url1");
         DocumentValue docValue2 = new DocumentValue("url2");
-        documentHelperSpy.setDocumentList(Arrays.asList(docValue1, docValue2), "theList", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelperSpy.setDocumentList(asList(docValue1, docValue2), "theList", PROCESS_INSTANCE_ID, AUTHOR_ID);
 
         verify(documentHelperSpy).processDocumentOnIndex(docValue1, "theList", PROCESS_INSTANCE_ID, existingList, 0, AUTHOR_ID);
         verify(documentHelperSpy).processDocumentOnIndex(docValue2, "theList", PROCESS_INSTANCE_ID, existingList, 1, AUTHOR_ID);
@@ -451,7 +458,7 @@ public class DocumentHelperTest {
     public void should_toCheckedList_check_not_all_doc() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        documentHelper.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
+        documentHelper.toCheckedList(asList(new DocumentValue("theUrl"), new Object()));
     }
 
     @Test
@@ -461,6 +468,33 @@ public class DocumentHelperTest {
         assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
         assertThat(result.get(0).getMimeType()).isEqualTo("contentType");
+    }
+
+    @Test
+    public void should_convert_FileInputValue_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes());
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        assertThat(result).isEqualToComparingFieldByField(new DocumentValue("The report content".getBytes(), "contentType", "report.pdf"));
+    }
+    @Test
+    public void should_convert_FileInputValue_having_id_and_updated_content_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes(), "55");
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        DocumentValue expected = new DocumentValue(55L, "The report content".getBytes(), "contentType", "report.pdf");
+        assertThat(result).isEqualToComparingFieldByField(expected);
+    }
+    @Test
+    public void should_convert_FileInputValue_having_id_and_unchanged_content_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", null, "55");
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        DocumentValue expected = new DocumentValue(55L);
+        assertThat(result).isEqualToComparingFieldByField(expected);
     }
 
     @Test
