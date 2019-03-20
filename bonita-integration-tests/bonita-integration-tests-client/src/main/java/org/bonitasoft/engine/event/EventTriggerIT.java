@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -89,6 +90,8 @@ public class EventTriggerIT extends AbstractEventIT {
             assertTrue(newDate.equals(date) || newDate.after(date));
 
             waitForUserTask(processInstance2, EXCEPTION_STEP);
+
+            Assertions.assertThat(getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult()).isEmpty();
         } finally {
             disableAndDeleteProcess(process2, process1);
         }
