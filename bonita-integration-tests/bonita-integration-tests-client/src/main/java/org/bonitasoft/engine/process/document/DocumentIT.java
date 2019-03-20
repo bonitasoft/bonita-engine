@@ -13,9 +13,17 @@
  **/
 package org.bonitasoft.engine.process.document;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -103,7 +111,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         try {
             //given
-            final Document attachment = getProcessAPI().attachDocument(pi.getId(), "Name", "FileName", "MimeType", new byte[] { 1, 2, 3 });
+            final Document attachment = getProcessAPI().attachDocument(pi.getId(), "Name", "FileName", "MimeType", new byte[]{1, 2, 3});
 
             //when
             final Document document = getProcessAPI().removeDocument(attachment.getId());
@@ -120,7 +128,7 @@ public class DocumentIT extends TestWithUser {
                     new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.SOURCEOBJECT_ID, document.getId()).done());
             assertThat(archivedDocumentSearchResult.getResult()).hasSize(1);
             assertThat(archivedDocumentSearchResult.getResult().get(0).getContentStorageId()).isEqualTo(document.getContentStorageId());
-            assertThat(getProcessAPI().getDocumentContent(document.getContentStorageId())).isEqualTo(new byte[] { 1, 2, 3 });
+            assertThat(getProcessAPI().getDocumentContent(document.getContentStorageId())).isEqualTo(new byte[]{1, 2, 3});
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
         }
@@ -160,7 +168,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     private void assertIsSameDocument(final Document attachedDoc, final long processInstanceId, final String name, final long author, final boolean hasContent,
-            final String fileName, final String mimeType, final String url, final String description) {
+                                      final String fileName, final String mimeType, final String url, final String description) {
         assertEquals("Process instances IDs are not the same!", processInstanceId, attachedDoc.getProcessInstanceId());
         assertEquals("Names are not the same!", name, attachedDoc.getName());
         assertEquals("Authors are not the same!", author, attachedDoc.getAuthor());
@@ -320,7 +328,7 @@ public class DocumentIT extends TestWithUser {
         builder.addActor(ACTOR_NAME);
         builder.addDocumentDefinition("myDoc").addContentFileName("myPdfModifiedName.pdf").addDescription("a cool pdf document").addMimeType("application/pdf")
                 .addFile("myPdf.pdf").addDescription("my description");
-        final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
+        final byte[] pdfContent = new byte[]{5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5};
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.getProcess())
                 .addDocumentResource(new BarResource("myPdf.pdf", pdfContent)).done();
         final ProcessInstance processInstance = deployAndEnableProcessWithActorAndStartIt(businessArchive, user);
@@ -356,7 +364,7 @@ public class DocumentIT extends TestWithUser {
         builder.addDocumentDefinition("myDoc").addContentFileName("myPdfModifiedName.pdf").addDescription("a cool pdf document").addMimeType("application/pdf")
                 .addFile("myPdf.pdf");
         builder.addTransition("setDataTask", "step1");
-        final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
+        final byte[] pdfContent = new byte[]{5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5};
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.getProcess())
                 .addDocumentResource(new BarResource("myPdf.pdf", pdfContent)).done();
         final ProcessInstance pi = deployAndEnableProcessWithActorAndStartIt(businessArchive, user);
@@ -386,8 +394,8 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(deployAndEnableProcess(archive.done()).getId());
         waitForProcessToFinish(processInstance.getId());
 
-        final Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>> singletonMap(
-                new ExpressionBuilder().createDocumentReferenceExpression("document"), Collections.<String, Serializable> emptyMap());
+        final Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>>singletonMap(
+                new ExpressionBuilder().createDocumentReferenceExpression("document"), Collections.<String, Serializable>emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
 
@@ -537,7 +545,7 @@ public class DocumentIT extends TestWithUser {
 
         // Finalize the process
         getProcessAPI().assignUserTask(step1, user.getId());
-        getProcessAPI().executeUserTask(user.getId(), step1, Collections.<String, Serializable> emptyMap());
+        getProcessAPI().executeUserTask(user.getId(), step1, Collections.<String, Serializable>emptyMap());
         waitForProcessToFinish(processInstance);
 
         //search archive document order by archive date
@@ -977,7 +985,7 @@ public class DocumentIT extends TestWithUser {
         expressionContext.put("documentValue", new DocumentValue("Binary content of the document".getBytes(), "plain/text", documentFileName));
         expressionContext.put("documentReference", new DocumentValue(docUrl));
         final ProcessInstance myCase = getProcessAPI()
-                .startProcess(processDefinition.getId(), Arrays.asList(docContentOperation, docRefOperation), expressionContext);
+                .startProcess(processDefinition.getId(), asList(docContentOperation, docRefOperation), expressionContext);
         waitForUserTask(myCase, "step1");
 
         SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(
@@ -1210,7 +1218,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     private void check(final ProcessInstance processInstance, final int one, final int two, final int three, final int four, final int five,
-            final DocumentCriterion documentCriterion) throws ProcessInstanceNotFoundException, DocumentException {
+                       final DocumentCriterion documentCriterion) throws ProcessInstanceNotFoundException, DocumentException {
         final List<Document> lastVersionOfDocuments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 10, documentCriterion);
         Assertions.assertThat(lastVersionOfDocuments).as("the order was not respected for " + documentCriterion)
                 .extracting("name").containsExactly("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five);
@@ -1263,7 +1271,7 @@ public class DocumentIT extends TestWithUser {
         urls.add(documents.get(1).getUrl());
         urls.add(documents.get(2).getUrl());
 
-        assertEquals(Arrays.asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
+        assertEquals(asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
 
         disableAndDeleteProcess(miDefinition);
         disableAndDeleteProcess(docDefinition);
@@ -1277,7 +1285,7 @@ public class DocumentIT extends TestWithUser {
         spBuilder.addActor(ACTOR_NAME);
         spBuilder.addUserTask("step1", ACTOR_NAME);
         spBuilder.addDocumentDefinition("document1").addMimeType("application/octet-stream").addContentFileName("file").addFile("file");
-        final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
+        final byte[] pdfContent = new byte[]{5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5};
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(spBuilder.getProcess())
                 .addDocumentResource(new BarResource("file", pdfContent)).done();
         final ProcessDefinition docDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
@@ -1310,7 +1318,7 @@ public class DocumentIT extends TestWithUser {
 
     public BusinessArchive getNormalBar() throws InvalidProcessDefinitionException, InvalidBusinessArchiveFormatException {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process",
-                String.valueOf(processVersion++), Arrays.asList("step1", "step2"), Arrays.asList(true, true), ACTOR_NAME, false);
+                String.valueOf(processVersion++), asList("step1", "step2"), asList(true, true), ACTOR_NAME, false);
         return new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
     }
 
@@ -1458,9 +1466,9 @@ public class DocumentIT extends TestWithUser {
 
         //update empty list to have 3 version archived
         getProcessAPI().setDocumentList(processInstance.getId(), "emptyList",
-                Arrays.asList(new DocumentValue(emptyListDoc.getId(), "anUrl1"), new DocumentValue("anUrl2")));
+                asList(new DocumentValue(emptyListDoc.getId(), "anUrl1"), new DocumentValue("anUrl2")));
         getProcessAPI().setDocumentList(processInstance.getId(), "emptyList",
-                Arrays.asList(new DocumentValue("anUrl3"), new DocumentValue("anUrl4")));
+                asList(new DocumentValue("anUrl3"), new DocumentValue("anUrl4")));
 
         final SearchResult<ArchivedDocument> searchAllVersions = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100)
                 .filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
@@ -1621,7 +1629,7 @@ public class DocumentIT extends TestWithUser {
         assertThat(updated.getUrl()).isEqualTo("The new value");
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
-        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable> emptyMap());
+        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable>emptyMap());
         final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions)
                 .get("list1");
         assertThat(initialList1).hasSize(4);
@@ -1638,6 +1646,121 @@ public class DocumentIT extends TestWithUser {
         assertThat(finalList1).hasSize(7);
 
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
+    }
+
+    @Test
+    public void should_create_and_update_document_list_using_contract() throws Exception {
+
+        User user = getIdentityAPI().createUser("james", "bpm");
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocFromContract", "1.0");
+        builder.addContract().addFileInput("fileInputValues", "create my list of document", true);
+        builder.addDocumentListDefinition("myDocumentList")
+                .addInitialValue(new ExpressionBuilder().createContractInputExpression("fileInputValues", List.class.getName()));
+        builder.addActor("actor");
+        UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("updateList", "actor");
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDocumentList("myDocumentList", new ExpressionBuilder().createContractInputExpression("fileInputValues", List.class.getName())));
+        userTaskBuilder.addContract().addFileInput("fileInputValues", "update my list of document", true);
+        builder.addUserTask("checkListIsUpdated", "actor");
+        builder.addTransition("updateList", "checkListIsUpdated");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", user);
+
+        ArrayList<Serializable> createList = new ArrayList<>(asList(
+                new FileInputValue("file1", "text/plain", "the content".getBytes()),
+                new FileInputValue("file2", "text/plain", "the content".getBytes()),
+                new FileInputValue("file3", "text/plain", "the content".getBytes())
+        ));
+        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), singletonMap("fileInputValues", createList));
+        long updateListTask = waitForUserTask("updateList");
+
+        //verify list is created
+        List<Document> myDocumentList = getProcessAPI().getDocumentList(processInstance.getId(), "myDocumentList", 0, 100);
+
+        assertThat(myDocumentList).hasSize(3);
+        assertThat(myDocumentList).extracting("fileName").containsExactly("file1", "file2", "file3");
+
+
+        getProcessAPI().assignUserTask(updateListTask, user.getId());
+        ArrayList<Serializable> updateList = new ArrayList<>(asList(
+                new FileInputValue("file4", "text/plain", "the content".getBytes()),
+                new FileInputValue("file3", "text/plain", null, String.valueOf(myDocumentList.get(2).getId())),
+                new FileInputValue("file2", "text/plain", "updated content of file 2".getBytes(), String.valueOf(myDocumentList.get(1).getId())),
+                new FileInputValue("updated file name", "updated content type", "updated content of file 1".getBytes(), String.valueOf(myDocumentList.get(0).getId()))
+        ));
+        getProcessAPI().executeUserTask(user.getId(), updateListTask, singletonMap("fileInputValues", updateList));
+        waitForUserTask("checkListIsUpdated");
+
+        //verify list is update
+        List<Document> myUpdatedDocumentList = getProcessAPI().getDocumentList(processInstance.getId(), "myDocumentList", 0, 100);
+        assertThat(myUpdatedDocumentList).hasSize(4);
+
+        //added document
+        assertThat(myUpdatedDocumentList.get(0)).matches(d ->
+                d.getContentFileName().equals("file4")
+        );
+        //moved document
+        assertThat(myUpdatedDocumentList.get(1)).matches(d ->
+                d.getContentFileName().equals("file3") &&
+                        d.getContentStorageId().equals(myDocumentList.get(2).getContentStorageId()) &&
+                        d.getId() == myDocumentList.get(2).getId()
+        );
+        //document with content updated
+        assertThat(myUpdatedDocumentList.get(2)).matches(d ->
+                d.getContentFileName().equals("file2") &&
+                        !d.getContentStorageId().equals(myDocumentList.get(1).getContentStorageId()) &&
+                        d.getId() == myDocumentList.get(1).getId()
+        );
+        //document with content updated and file name
+        assertThat(myUpdatedDocumentList.get(3)).matches(d ->
+                d.getContentFileName().equals("updated file name") &&
+                        d.getContentMimeType().equals("updated content type") &&
+                        !d.getContentStorageId().equals(myDocumentList.get(0).getContentStorageId()) &&
+                        d.getId() == myDocumentList.get(0).getId()
+        );
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Test
+    public void should_create_and_update_document_using_contract() throws Exception {
+
+        User user = getIdentityAPI().createUser("james", "bpm");
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocFromContract", "1.0");
+        builder.addContract().addFileInput("fileInputValue", "create my document");
+        builder.addDocumentDefinition("myDocument")
+                .addInitialValue(new ExpressionBuilder().createContractInputExpression("fileInputValue", FileInputValue.class.getName()));
+        builder.addActor("actor");
+        UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("update", "actor");
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDocument("myDocument", new ExpressionBuilder().createContractInputExpression("fileInputValue", FileInputValue.class.getName())));
+        userTaskBuilder.addContract().addFileInput("fileInputValue", "update my document");
+        builder.addUserTask("checkIsUpdated", "actor");
+        builder.addTransition("update", "checkIsUpdated");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", user);
+
+        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), singletonMap("fileInputValue", new FileInputValue("file1", "text/plain", "the content".getBytes())));
+        long checkListIsCreated = waitForUserTask("update");
+
+        //verify list is created
+        Document myDocument = getProcessAPI().getLastDocument(processInstance.getId(), "myDocument");
+
+        assertThat(myDocument.getContentFileName()).isEqualTo("file1");
+
+
+        getProcessAPI().assignUserTask(checkListIsCreated, user.getId());
+
+        getProcessAPI().executeUserTask(user.getId(), checkListIsCreated, singletonMap("fileInputValue",
+                new FileInputValue("file1", "text/plain", "the content".getBytes(), String.valueOf(myDocument.getId()))));
+        waitForUserTask("checkIsUpdated");
+
+        //verify list is update
+
+        Document myUpdatedDocument = getProcessAPI().getLastDocument(processInstance.getId(), "myDocument");
+
+        //document with content updated
+        assertThat(myUpdatedDocument.getId()).isEqualTo(myDocument.getId());
+        assertThat(myUpdatedDocument.getContentStorageId()).isNotEqualTo(myDocument.getContentStorageId());
+
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test

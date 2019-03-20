@@ -247,7 +247,13 @@ public class DocumentHelper {
     }
 
     public DocumentValue toDocumentValue(FileInputValue fileInput) {
-        return new DocumentValue(fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        if (fileInput.getId() == null) {
+            return new DocumentValue(fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        } else if (fileInput.getContent() != null) {
+            return new DocumentValue(Long.valueOf(fileInput.getId()), fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        }else {
+            return new DocumentValue(Long.valueOf(fileInput.getId()));
+        }
     }
 
     public DocumentValue toDocumentValue(Document document) throws SOperationExecutionException {
