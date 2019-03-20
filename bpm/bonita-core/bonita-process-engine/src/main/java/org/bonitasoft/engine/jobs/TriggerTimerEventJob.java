@@ -13,14 +13,26 @@
  **/
 package org.bonitasoft.engine.jobs;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
@@ -62,6 +74,7 @@ public class TriggerTimerEventJob extends InternalJob {
     private transient JobService jobService;
     private transient SchedulerService schedulerService;
     private transient TechnicalLoggerService loggerService;
+    private transient EventInstanceService eventInstanceService;
     private Long jobDescriptorId;
 
     @Override
@@ -98,6 +111,14 @@ public class TriggerTimerEventJob extends InternalJob {
                 eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, targetSFlowNodeDefinitionId, containerType, subProcessId,
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
+            if (flowNodeInstanceId != null) {
+                List<STimerEventTriggerInstance> triggerInstances = eventInstanceService.searchTimerEventTriggerInstances(new QueryOptions(0, 1, emptyList(), singletonList(new FilterOption(STimerEventTriggerInstance.class, "eventInstanceId", flowNodeInstanceId)), null));
+                if (!triggerInstances.isEmpty()) {
+                    eventInstanceService.deleteEventTriggerInstance(triggerInstances.get(0));
+                }
+
+            }
+
         } catch (final SBonitaException e) {
             throw new SJobExecutionException(e);
         }
@@ -120,6 +141,7 @@ public class TriggerTimerEventJob extends InternalJob {
         jobService = tenantServiceAccessor.getJobService();
         schedulerService = tenantServiceAccessor.getSchedulerService();
         loggerService = tenantServiceAccessor.getTechnicalLoggerService();
+        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
 }

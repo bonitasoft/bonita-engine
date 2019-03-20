@@ -70,7 +70,7 @@ public class QuartzJobListener implements JobListener {
 
     @Override
     public String getName() {
-        return "TenantQuartzJobListener";
+        return "QuartzJobListener";
     }
 
     List<BonitaJobListener> getBonitaJobListeners() {
