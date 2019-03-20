@@ -313,7 +313,7 @@
                 <dependency>
                     <groupId>com.oracle</groupId>
                     <artifactId>ojdbc</artifactId>
-                    <version>6</version>
+                    <version>8.12.2.0.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -353,7 +353,7 @@
                                 <db.vendor>oracle</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
-                                <db.database.name>xe</db.database.name>
+                                <db.database.name>ORCLPDB1.localdomain</db.database.name>
                                 <db.server.name>${docker.host.address}</db.server.name>
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>

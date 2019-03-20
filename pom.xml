@@ -81,7 +81,7 @@
         <!-- use -Dkey=value or activate profile in settings.xml to override -->
         <docker-postgres-image>postgres:11.1</docker-postgres-image>
         <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
-        <docker-oracle-image>oracle:11g</docker-oracle-image>
+        <docker-oracle-image>oracle:12c-ee</docker-oracle-image>
         <docker-sqlserver-image>ms-sqlserver:2019</docker-sqlserver-image>
 
         <!-- ************************ -->
@@ -589,7 +589,7 @@
                 <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.18.1</version>
+                    <version>0.28.0</version>
                     <configuration>
                         <keepContainer>false</keepContainer>
                         <removeVolumes>true</removeVolumes>
@@ -947,7 +947,7 @@
                 <dependency>
                     <groupId>com.oracle</groupId>
                     <artifactId>ojdbc</artifactId>
-                    <version>6</version>
+                    <version>8.12.2.0.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1083,7 +1083,7 @@
                 <dependency>
                     <groupId>com.oracle</groupId>
                     <artifactId>ojdbc</artifactId>
-                    <version>6</version>
+                    <version>8.12.2.0.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1110,7 +1110,7 @@
                                         </env>
                                         <wait>
                                             <time>${docker-timeout}</time>
-                                            <log>end of customization</log>
+                                            <healthy>true</healthy>
                                         </wait>
                                     </run>
                                 </image>
@@ -1128,7 +1128,7 @@
                                 <db.vendor>oracle</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
-                                <db.database.name>xe</db.database.name>
+                                <db.database.name>ORCLPDB1.localdomain</db.database.name>
                                 <!--suppress UnresolvedMavenProperty -->
                                 <db.server.name>${docker.host.address}</db.server.name>
                                 <!--suppress UnresolvedMavenProperty -->
@@ -1210,12 +1210,12 @@
             <properties>
                 <docker-postgres-image>registry.rd.lan/bonitasoft/postgres-11:0.0.1</docker-postgres-image>
                 <docker-mysql-image>registry.rd.lan/bonitasoft/mysql-5.5.61:1.1.2</docker-mysql-image>
-                <docker-oracle-image>registry.rd.lan/bonitasoft/oracle-11g:1.3.0</docker-oracle-image>
+                <docker-oracle-image>registry.rd.lan/bonitasoft/oracle-12c-ee:0.1.1</docker-oracle-image>
                 <docker-sqlserver-image>registry.rd.lan/bonitasoft/sqlserver-2019:1.1.4</docker-sqlserver-image>
                 <!-- turns on/off logs from docker image-->
                 <docker.showLogs>true</docker.showLogs>
                 <!-- global timeout in millis allowed for docker image to start -->
-                <docker-timeout>180000</docker-timeout>
+                <docker-timeout>360000</docker-timeout>
             </properties>
         </profile>
     </profiles>

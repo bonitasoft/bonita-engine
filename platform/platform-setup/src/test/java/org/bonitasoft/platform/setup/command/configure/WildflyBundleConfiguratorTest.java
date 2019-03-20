@@ -134,8 +134,8 @@ public class WildflyBundleConfiguratorTest {
 
         checkFileContains(configFile,
                 "<driver>oracle</driver>", "<user-name>bizUser</user-name>", "<password>bizPwd</password>",
-                "<xa-datasource-property name=\"URL\">jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash</xa-datasource-property>",
-                "<connection-url>jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash</connection-url>",
+                "<xa-datasource-property name=\"URL\">jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora1.rd.lan)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCL_with\\backslash)))</xa-datasource-property>",
+                "<connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora1.rd.lan)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCL_with\\backslash)))</connection-url>",
                 "<check-valid-connection-sql>SELECT 1 FROM DUAL</check-valid-connection-sql>");
         checkFileDoesNotContain(configFile, "<xa-datasource-property name=\"ServerName\">ora1.rd.lan</xa-datasource-property>",
                 "<xa-datasource-property name=\"portNumber\">1521</xa-datasource-property>",
@@ -370,14 +370,14 @@ public class WildflyBundleConfiguratorTest {
 
         // then:
         final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
-        final String bonitaJdbcUrl = "jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good";
+        final String bonitaJdbcUrl = "jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=5432))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good)))";
         checkFileContains(configFile,
                 "<connection-url>" + bonitaJdbcUrl + "</connection-url>",
                 "<user-name>_bonita_with$dollar\\andBackSlash</user-name>",
                 "<password>bpm_With$dollar\\andBackSlash</password>",
                 "<xa-datasource-property name=\"URL\">" + bonitaJdbcUrl + "</xa-datasource-property>");
 
-        final String bdmJdbcUrl = "jdbc:oracle:thin:@ora1.rd.lan:1521:bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good";
+        final String bdmJdbcUrl = "jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora1.rd.lan)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good)))";
         checkFileContains(configFile, "<connection-url>" + bdmJdbcUrl + "</connection-url>",
                 "<user-name>_bdmWith$dollar\\andBackSlash</user-name>",
                 "<password>bdm_bpm_With$dollar\\andBackSlash</password>",
