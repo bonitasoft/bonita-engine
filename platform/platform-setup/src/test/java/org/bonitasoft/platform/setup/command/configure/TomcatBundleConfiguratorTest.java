@@ -114,7 +114,7 @@ public class TomcatBundleConfiguratorTest {
                 "url=\"jdbc:postgresql://localhost:5432/bonita\"");
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash\"");
+                "url=\"jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora1.rd.lan)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCL_with\\backslash)))\"");
         checkFileContains(bonita_xml, "type=\"org.postgresql.xa.PGXADataSource\"",
                 "class=\"org.postgresql.xa.PGXADataSource\"", "factory=\"org.postgresql.xa.PGXADataSourceFactory\"",
                 "serverName=\"localhost\"", "portNumber=\"5432\"", "port=\"5432\"", "databaseName=\"bonita\"");
@@ -139,7 +139,7 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
-                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash\"");
+                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora1.rd.lan)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCL_with\\backslash)))\"");
     }
 
     @Test
@@ -205,7 +205,7 @@ public class TomcatBundleConfiguratorTest {
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"_bonita_with$dollar\\andBackSlash\""
                 , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"oracle.jdbc.OracleDriver\""
-                , "url=\"jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
+                , "url=\"jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=5432))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good)))\"");
     }
 
     @Test
@@ -220,8 +220,7 @@ public class TomcatBundleConfiguratorTest {
 
     @Test
     public void should_not_copy_drivers_again_if_same_dbVendor_for_bdm() throws Exception {
-        final String bdmDbVendor = "postgres";
-        System.setProperty("bdm.db.vendor", bdmDbVendor);
+        System.setProperty("bdm.db.vendor", "postgres");
 
         // when:
         spy.configureApplicationServer();
