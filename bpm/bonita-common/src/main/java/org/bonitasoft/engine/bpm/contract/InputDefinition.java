@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  */
 public interface InputDefinition extends DescriptionElement, InputContainerDefinition {
 
+    String FILE_INPUT_ID = "id";
     String FILE_INPUT_FILENAME = "filename";
     String FILE_INPUT_CONTENT = "content";
 
