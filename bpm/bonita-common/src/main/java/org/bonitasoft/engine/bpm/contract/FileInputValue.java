@@ -23,15 +23,21 @@ import java.util.Objects;
  */
 public class FileInputValue implements Serializable {
 
+    private String id;
     private String fileName;
     private byte[] content;
     private String contentType;
 
     public FileInputValue(String fileName, byte[] content) {
-        this(fileName, null, content);
+        this(fileName, null, content, null);
     }
-
+    
     public FileInputValue(String fileName, String contentType, byte[] content) {
+        this(fileName, contentType, content, null);
+    }
+    
+    public FileInputValue(String fileName, String contentType, byte[] content, String id) {
+        this.id = id;
         this.fileName = fileName;
         this.contentType = contentType;
         this.content = content;
@@ -60,10 +66,19 @@ public class FileInputValue implements Serializable {
     public void setContent(byte[] content) {
         this.content = content;
     }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getId() {
+        return id;
+    }
 
     @Override
     public String toString() {
         return "FileInputValue{" +
+                "id='" + id + '\'' +
                 "fileName='" + fileName + '\'' +
                 '}';
     }
@@ -73,12 +88,12 @@ public class FileInputValue implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final FileInputValue that = (FileInputValue) o;
-        return Objects.equals(fileName, that.fileName) &&
+        return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) &&
                 Arrays.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileName, content);
+        return Objects.hash(id, fileName, content);
     }
 }
