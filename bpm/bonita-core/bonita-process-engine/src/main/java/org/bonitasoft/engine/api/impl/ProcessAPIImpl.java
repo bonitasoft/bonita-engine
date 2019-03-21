@@ -5328,10 +5328,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
         try {
             if (parameters == null || parameters.isEmpty()) {
-                schedulerService.executeAgain(jobDescriptorId);
+                schedulerService.retryJobThatFailed(jobDescriptorId);
             } else {
                 final List<SJobParameter> jobParameters = getJobParameters(parameters);
-                schedulerService.executeAgain(jobDescriptorId, jobParameters);
+                schedulerService.retryJobThatFailed(jobDescriptorId, jobParameters);
             }
         } catch (final SSchedulerException sse) {
             throw new ExecutionException(sse);

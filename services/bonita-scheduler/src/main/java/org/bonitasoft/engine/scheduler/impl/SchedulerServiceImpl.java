@@ -31,6 +31,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobParameter;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
@@ -129,10 +131,26 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void executeAgain(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
+    public void retryJobThatFailed(long jobDescriptorId) throws SSchedulerException {
+        final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+        deleteFailedJobs(jobDescriptorId);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+    }
+
+    @Override
+    public void retryJobThatFailed(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
+        deleteFailedJobs(jobDescriptorId);
         schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+    }
+
+    private void deleteFailedJobs(long jobDescriptorId) throws SSchedulerException {
+        try {
+            jobService.deleteJobLogs(jobDescriptorId);
+        } catch (SJobLogDeletionException | SBonitaReadException e) {
+            throw new SSchedulerException("Unable to delete failed jobs logs", e);
+        }
     }
 
     private SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {

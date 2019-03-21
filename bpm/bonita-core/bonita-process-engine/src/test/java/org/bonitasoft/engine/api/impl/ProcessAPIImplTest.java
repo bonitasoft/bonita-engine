@@ -107,8 +107,6 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinit
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
@@ -138,7 +136,6 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -508,7 +505,7 @@ public class ProcessAPIImplTest {
         processAPI.replayFailedJob(jobDescriptorId, null);
         processAPI.replayFailedJob(jobDescriptorId, Collections.EMPTY_MAP);
 
-        verify(schedulerService, times(2)).executeAgain(jobDescriptorId);
+        verify(schedulerService, times(2)).retryJobThatFailed(jobDescriptorId);
     }
 
     @Test
@@ -516,12 +513,12 @@ public class ProcessAPIImplTest {
     public void replayingAFailedJobShouldExecuteAgainSchedulerServiceWithSomeParameters() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", Boolean.FALSE);
         final long jobDescriptorId = 544L;
-        doNothing().when(schedulerService).executeAgain(anyLong(), anyList());
+        doNothing().when(schedulerService).retryJobThatFailed(anyLong(), anyList());
         doReturn(new ArrayList()).when(processAPI).getJobParameters(parameters);
 
         processAPI.replayFailedJob(jobDescriptorId, parameters);
 
-        verify(schedulerService).executeAgain(eq(jobDescriptorId), anyList());
+        verify(schedulerService).retryJobThatFailed(eq(jobDescriptorId), anyList());
     }
 
     @Test
@@ -919,9 +916,6 @@ public class ProcessAPIImplTest {
     public void deleteArchivedProcessInstances_by_ids_should_return_0_when_no_archived_process_instance_for_ids() throws Exception {
         // Given
         final long archivedProcessInstanceId = 42l;
-        final List<Long> archivedProcessInstanceIds = Arrays.asList(archivedProcessInstanceId);
-        doReturn(new ArrayList<SAProcessInstance>()).when(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
-
         // When
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 
@@ -946,7 +940,6 @@ public class ProcessAPIImplTest {
     public void deleteArchivedProcessInstance_by_id_should_delete_archived_process_instance_when_exist() throws Exception {
         // Given
         final long processInstanceId = 42l;
-        doReturn(Arrays.asList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(anyList());
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(processInstanceId);

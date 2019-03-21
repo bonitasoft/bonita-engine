@@ -100,7 +100,6 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(logger).warn(eq("An exception occurs during the job execution."), eq(exeption1));
-        verify(jobService, never()).deleteJobLogs(anyLong());
         verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
     }
 
@@ -114,22 +113,7 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(logger).warn(eq("An exception occurs during the job execution."), eq(exeption1));
-        verify(jobService, never()).deleteJobLogs(anyLong());
         verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
-    }
-
-    @Test
-    public void jobWasExecuted_should_deleteJobLogs_when_no_job_exception() throws Exception {
-        // Given
-        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
-        doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
-        doReturn(true).when(schedulerService).isStillScheduled(jobDesc);
-
-        // When
-        jdbcJobListener.jobWasExecuted(context, null);
-
-        // Then
-        verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
     @Test
@@ -207,7 +191,6 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
-        verify(jobService, never()).deleteJobLogs(anyLong());
         verify(schedulerService, never()).delete(anyString());
         verify(jobService, never()).updateJobLog(any(SJobLog.class), any(EntityUpdateDescriptor.class));
         verify(jobService, never()).createJobLog(any(SJobLog.class));
