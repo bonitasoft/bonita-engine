@@ -103,7 +103,6 @@ public class JDBCJobListener implements BonitaJobListener {
     private void performPostExecutionActions(final Exception jobException, final Long jobDescriptorId) {
         try {
             if (jobException == null) {
-                jobService.deleteJobLogs(jobDescriptorId);
                 deleteJobIfNotScheduledAnyMore(jobDescriptorId);
             }
         } catch (final Exception e) {

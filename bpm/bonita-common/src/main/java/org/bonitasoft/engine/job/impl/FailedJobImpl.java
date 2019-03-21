@@ -35,6 +35,7 @@ public class FailedJobImpl implements FailedJob {
     private Date lastUpdateDate;
 
     private String lastMessage;
+    private int numberOfFailures;
 
     public FailedJobImpl(final long jobDescriptorId, final String jobName) {
         this.jobDescriptorId = jobDescriptorId;
@@ -56,8 +57,8 @@ public class FailedJobImpl implements FailedJob {
 
     }
 
-    public void setRetryNumber(final long retryNumber) {
-        this.retryNumber = retryNumber;
+    public void setNumberOfFailures(int numberOfFailures) {
+        this.numberOfFailures = numberOfFailures;
     }
 
     @Override
@@ -83,6 +84,11 @@ public class FailedJobImpl implements FailedJob {
     @Override
     public long getRetryNumber() {
         return retryNumber;
+    }
+
+    @Override
+    public int getNumberOfFailures() {
+        return numberOfFailures;
     }
 
     @Override

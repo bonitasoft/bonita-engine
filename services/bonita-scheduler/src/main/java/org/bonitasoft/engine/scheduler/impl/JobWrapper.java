@@ -110,11 +110,9 @@ public class JobWrapper implements StatelessJob {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Finished execution of " + statelessJob.getName());
             }
 
-        } catch (final SFireEventException | SJobExecutionException e) {
+        } catch (final Throwable e) {
             handleFailure(e);
-            throw e;
-        } catch (Throwable e) {
-            handleFailure(e);
+            //throw an exception: if it's a "one shot" timer it should delete the timer trigger only if job succeeded (see TimerEventTriggerJobListener)
             throw new SJobExecutionException(e);
         } finally {
             if (eventService.hasHandlers(JOB_COMPLETED, null)) {

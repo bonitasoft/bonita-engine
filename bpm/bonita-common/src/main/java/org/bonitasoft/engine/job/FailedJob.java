@@ -17,7 +17,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author Matthieu Chaffotte
+ *
+ * Represent failure(s) that happened to a certain job (e.g. Timer execution)
+ *
  */
 public interface FailedJob extends Serializable {
 
@@ -27,10 +29,25 @@ public interface FailedJob extends Serializable {
 
     String getDescription();
 
+    /**
+     * @return the exception thrown by the last failing execution
+     */
     String getLastMessage();
 
+    /**
+     * @deprecated since 7.9, use {@link #getNumberOfFailures()} instead
+     */
+    @Deprecated
     long getRetryNumber();
 
+    /**
+     * @return the number of times a job failed before replaying it manually
+     */
+    int getNumberOfFailures();
+
+    /**
+     * @return the Date of the last failure
+     */
     Date getLastUpdateDate();
 
 }

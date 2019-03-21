@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.scheduler.model.impl;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 
 /**
@@ -27,18 +25,23 @@ public class SFailedJobImpl implements SFailedJob {
     private final long jobDescriptorId;
     private final String jobName;
     private final String description;
-    private final long retryNumber;
+    private final int retryNumber;
     private final long lastUpdateDate;
     private final String lastMessage;
 
-    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, final long retryNumber, final long lastUpdateDate,
-            final String lastMessage) {
+    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, long retryNumber, final long lastUpdateDate,
+                          final String lastMessage) {
         this.jobDescriptorId = jobDescriptorId;
         this.jobName = jobName;
         this.description = description;
-        this.retryNumber = retryNumber;
+        this.retryNumber = (int) retryNumber;
         this.lastUpdateDate = lastUpdateDate;
         this.lastMessage = lastMessage;
     }
 
+    @Override
+    public int getNumberOfFailures() {
+        // we want the number of failures, not the number of retry
+        return retryNumber + 1;
+    }
 }
