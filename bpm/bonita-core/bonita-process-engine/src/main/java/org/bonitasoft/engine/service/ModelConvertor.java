@@ -2076,7 +2076,7 @@ public class ModelConvertor {
         final FailedJobImpl failedJob = new FailedJobImpl(sFailedJob.getJobDescriptorId(), sFailedJob.getJobName());
         failedJob.setDescription(sFailedJob.getDescription());
         failedJob.setLastMessage(sFailedJob.getLastMessage());
-        failedJob.setRetryNumber(sFailedJob.getRetryNumber());
+        failedJob.setNumberOfFailures(sFailedJob.getNumberOfFailures());
         failedJob.setLastUpdateDate(new Date(sFailedJob.getLastUpdateDate()));
         return failedJob;
     }

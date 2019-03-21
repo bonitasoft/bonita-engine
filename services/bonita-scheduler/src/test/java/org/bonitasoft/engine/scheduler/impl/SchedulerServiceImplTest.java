@@ -13,13 +13,17 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +46,8 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
+import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -57,6 +64,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SchedulerServiceImplTest {
 
     private static final long TENANT_ID = 1L;
+    private static final long JOB_DESCRIPTOR_ID = 32187L;
 
     private SchedulerServiceImpl schedulerService;
     @Mock
@@ -253,5 +261,47 @@ public class SchedulerServiceImplTest {
 
         // Then
         verify(schedulerExecutor).initializeScheduler();
+    }
+
+    @Test
+    public void should_execute_again_an_existing_job() throws Exception {SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
+        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+
+        schedulerService.executeAgain(JOB_DESCRIPTOR_ID);
+
+        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(jobService, never()).deleteJobLogs(JOB_DESCRIPTOR_ID);
+    }
+
+    @Test
+    public void should_retry_a_job_that_failed() throws Exception {
+        SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
+        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+
+        schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID);
+
+        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
+    }
+
+    @Test
+    public void should_retry_a_job_that_failed_while_changing_parameters() throws Exception {
+        SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
+        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        List<SJobParameter> parameters = asList(new SJobParameterImpl("a", 1), new SJobParameterImpl("b", 2));
+
+        schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID, parameters);
+
+        verify(jobService).setJobParameters(TENANT_ID, JOB_DESCRIPTOR_ID, parameters);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 }

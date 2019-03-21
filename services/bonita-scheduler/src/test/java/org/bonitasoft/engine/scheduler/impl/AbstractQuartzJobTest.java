@@ -36,7 +36,9 @@ public class AbstractQuartzJobTest {
     private AbstractQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
 
     @Test
-    public void should_execute_set_exception_to_unschedule_in_case_of_exception() throws Exception {
+    public void should_not_unschedule_job_on_exception() throws Exception {
+        // job should never throw an exception and be handled by the JobWrapper
+        // we do not unschedule the job in that case. we don't want to loose the job
         //given
         abstractQuartzJob.setBosJob(new StatelessJob() {
             @Override
@@ -65,8 +67,8 @@ public class AbstractQuartzJobTest {
 
             abstractQuartzJob.execute(null);
             fail("should throw exception");
-        }catch (JobExecutionException e ){
-            assertThat(e.unscheduleFiringTrigger()).isTrue();
+        } catch (JobExecutionException e ){
+            assertThat(e.unscheduleFiringTrigger()).isFalse();
         }
 
 

@@ -35,9 +35,7 @@ public abstract class AbstractQuartzJob implements org.quartz.Job {
                 bosJob.execute();
             }
         } catch (final Throwable e) {
-            JobExecutionException jobExecutionException = new JobExecutionException(e);
-            jobExecutionException.setUnscheduleFiringTrigger(true);//job log will be registered
-            throw jobExecutionException;
+            throw new JobExecutionException(e);
         }
     }
 

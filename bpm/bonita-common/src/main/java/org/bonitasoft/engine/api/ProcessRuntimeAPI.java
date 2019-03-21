@@ -2300,32 +2300,37 @@ public interface ProcessRuntimeAPI {
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
 
     /**
-     * Replays the failed job in order to unlock it. The replay will use the stored parameters of the job.
+     *
+     * Replay a job that failed.
+     *
+     * Job that failed can be found using {@link #getFailedJobs(int, int)}
+     *
+     * This will remove the traces of Failed Jobs and restart the job once.
+     * If you wish to re-execute multiple times the job that failed in case a recurrent job failed multiple times,
+     * call this method several times.
      *
      * @param jobDescriptorId
      *        The identifier of the job descriptor.
-     * @throws ExecutionException
-     *         Occurs when an exception is thrown during the job replay
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
 
     /**
-     * Replays the failed job in order to unlock it. The specified parameters replace the stored parameters. If the job is launched from CRON, all job
-     * executions use the specified parameters.
+     *
+     * Update parameters of a job and replay it.
+     *
+     * The specified parameters replace the stored parameters. i.e. If the job is recurrent, all
+     * future executions of this job will use the newly specified parameters.
+     *
      *
      * @param jobDescriptorId
      *        The identifier of the job descriptor.
      * @param parameters
      *        The job parameters.
-     * @throws ExecutionException
-     *         Occurs when an exception is thrown during the job replay
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
+     * @deprecated since 7.9, use {@link #replayFailedJob(long)} instead, parameters should not be modified.
      */
+    @Deprecated
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
 
     /**
