@@ -243,18 +243,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
 
-        //Client DAO impl dependencies
-        InputStream resourceAsStream = null;
-        try {
-            resourceAsStream = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/javassist-3.18.1-GA.jar.res");
-            resources.put("javassist-3.18.1-GA.jar", IOUtil.getAllContentFrom(resourceAsStream));
-        } finally {
-            if (resourceAsStream != null) {
-                resourceAsStream.close();
-            }
-        }
+        putResourceFromClassPath(resources, "example-pom.xml");
+        putResourceFromClassPath(resources, "README.md");
 
         return IOUtil.generateZip(resources);
+    }
+
+    private void putResourceFromClassPath(Map<String, byte[]> resources, String name) throws IOException {
+        try (InputStream resource = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/" + name)) {
+            resources.put(name, IOUtil.getAllContentFrom(resource));
+        }
     }
 
     @Override
