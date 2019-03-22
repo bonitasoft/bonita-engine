@@ -16,8 +16,11 @@ package org.bonitasoft.engine.business.data;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -481,7 +485,20 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void should_deploy_generate_client_bdm_zip() throws Exception {
-        assertThat(getTenantAdministrationAPI().getClientBDMZip()).isNotEmpty();
+        ArrayList<String> entries = listEntries(getTenantAdministrationAPI().getClientBDMZip());
+
+        assertThat(entries).containsOnly("README.md", "example-pom.xml", "bdm-dao.jar", "bdm-model.jar", "bom.zip");
+    }
+
+    private ArrayList<String> listEntries(byte[] clientBDMZip) throws IOException {
+        ArrayList<String> entries = new ArrayList<>();
+        ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(clientBDMZip));
+        ZipEntry nextEntry;
+        while ((nextEntry = zipInputStream.getNextEntry()) != null) {
+            entries.add(nextEntry.getName());
+        }
+        zipInputStream.close();
+        return entries;
     }
 
     @Test
