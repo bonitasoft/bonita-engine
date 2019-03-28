@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl.jackson.utils;
 
+import java.util.Objects;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -44,4 +46,19 @@ public class Link {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Link))
+            return false;
+        Link link = (Link) o;
+        return Objects.equals(rel, link.rel) &&
+                Objects.equals(href, link.href);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rel, href);
+    }
 }

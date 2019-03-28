@@ -14,7 +14,7 @@
 
 package org.bonitasoft.engine.business.data.impl.jackson.writer;
 
-import java.util.List;
+import java.util.LinkedHashSet;
 
 import org.bonitasoft.engine.business.data.impl.jackson.utils.Link;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
@@ -46,7 +46,8 @@ public class LinkPropertyWriter extends VirtualBeanPropertyWriter {
     @Override
     protected Object value(Object bean, JsonGenerator jgen, SerializerProvider prov) {
         LOG.trace("Post processing links for {}", bean);
-        List<Link> links = LinkUtils.getLinksFromContext(bean, prov);
+        // valid cast we only apply this writer to Entity bean
+        LinkedHashSet<Link> links = LinkUtils.getLinksFromContext(bean, prov);
         LOG.trace("Retrieved links: {}", links);
         return links;
     }

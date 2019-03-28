@@ -14,8 +14,7 @@
 
 package org.bonitasoft.engine.business.data.impl.jackson.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,20 +29,21 @@ public class LinkUtils {
     private static final String ATTRIBUTE_KEY_LINK_BASE_NAME = "IgnoredToLinkSerializer$$ATTRIBUTE_KEY_LINK";
     private static final String ATTRIBUTE_KEY_URI_PATTERN = "IgnoredToLinkSerializer$$PATTERN_URI";
 
-    public static List<Link> getLinksFromContext(Object value, SerializerProvider prov) {
+    public static LinkedHashSet<Link> getLinksFromContext(Object value, SerializerProvider prov) {
         LOG.trace("Retrieving links from context");
-        List<Link> links = (List<Link>) prov.getAttribute(getAttributeKeyLink(value));
+        String attributeKeyLink = getAttributeKeyLink(value);
+        LinkedHashSet<Link> links = (LinkedHashSet<Link>) prov.getAttribute(attributeKeyLink);
         if (links == null) {
             LOG.trace("No found links, initialize them in the context");
-            links = new ArrayList<>();
-            prov.setAttribute(getAttributeKeyLink(value), links);
+            links = new LinkedHashSet<>();
+            prov.setAttribute(attributeKeyLink, links);
         }
         LOG.trace("Links: {}", links);
         return links;
     }
 
     public static void addLinkToContext(Object value, Link link, SerializerProvider prov) {
-        List<Link> links = getLinksFromContext(value, prov);
+        LinkedHashSet<Link> links = getLinksFromContext(value, prov);
         links.add(link);
         LOG.trace("Added to context: {}", link);
     }
@@ -52,7 +52,6 @@ public class LinkUtils {
         return ATTRIBUTE_KEY_LINK_BASE_NAME + "$$" + value.getClass().getCanonicalName() + "@" + value.hashCode();
     }
 
-
     public static String getUriPatternFromContext(SerializerProvider prov) {
         return (String) prov.getAttribute(ATTRIBUTE_KEY_URI_PATTERN);
     }
@@ -60,5 +59,4 @@ public class LinkUtils {
     public static ObjectWriter putUriPatternIntoContext(ObjectWriter writer, String uriPattern) {
         return writer.withAttribute(ATTRIBUTE_KEY_URI_PATTERN, uriPattern);
     }
-
 }
