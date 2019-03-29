@@ -34,8 +34,6 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SSystemCommentBuilderFactory;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -242,7 +240,7 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteArchivedComments(List<Long> processInstanceIds) throws SBonitaException {
-        archiveService.deleteFromQuery("deleteArchiveCommentsOfProcessInstances", Collections.<String,Object>singletonMap("processInstanceIds", processInstanceIds));
+        archiveService.deleteFromQuery("deleteArchiveCommentsOfProcessInstances", Collections.singletonMap("processInstanceIds", processInstanceIds));
     }
 
     @Override

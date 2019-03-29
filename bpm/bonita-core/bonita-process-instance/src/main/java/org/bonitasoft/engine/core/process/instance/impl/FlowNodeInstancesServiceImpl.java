@@ -263,13 +263,13 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     @Override
     public Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds) throws SBonitaReadException {
-        return new HashSet<>(getPersistenceService().selectList(new SelectListDescriptor<Long>("getSourceObjectIdsOfArchivedFlowNodeInstances",
-                Collections.<String, Object>singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds), SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
+        return new HashSet<>(getPersistenceService().selectList(new SelectListDescriptor<>("getSourceObjectIdsOfArchivedFlowNodeInstances",
+                Collections.singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds), SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
     }
 
     @Override
     public void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException {
-        archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances", Collections.<String, Object>singletonMap("sourceObjectIds", sourceObjectIds));
+        archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances", Collections.singletonMap("sourceObjectIds", sourceObjectIds));
     }
 
     @Override
@@ -384,7 +384,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
-        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<SFlowNodeInstanceStateCounter>(
+        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<>(
                 "getNumberOfFlowNodesInAllStates", parameters, SFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
             return result;
@@ -396,7 +396,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
-        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<SFlowNodeInstanceStateCounter>(
+        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<>(
                 "getNumberOfArchivedFlowNodesInAllStates", parameters, SAFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
             return result;
@@ -458,7 +458,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SBonitaReadException {
         final List<Long> selectList = getPersistenceService().selectList(
-                new SelectListDescriptor<Long>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
+                new SelectListDescriptor<>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 
