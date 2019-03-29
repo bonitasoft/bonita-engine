@@ -14,21 +14,14 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl.IN_REQUEST_SIZE;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,8 +80,8 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -743,10 +736,31 @@ public class ProcessInstanceServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessInstances_should_throw_a_read_exception_if_getNumberOfEntities_does_it() throws Exception {
-        when(readPersistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenThrow(
+        when(readPersistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenThrow(
                 new SBonitaReadException("error"));
 
         processInstanceService.getNumberOfProcessInstances(45L);
+    }
+
+    @Test
+    public void getPartitionFromLargeList_should_never_return_more_than_IN_REQUEST_SIZE_results() {
+        // given:
+        final Long[] longs = new Long[1200];
+        Arrays.fill(longs, 1L);
+
+        // when:
+        final Iterable<List<Long>> smallerList = processInstanceService.getPartitionFromLargeList(Arrays.asList(longs));
+
+        // then:
+        for (List<Long> listOfLongs : smallerList) {
+            assertThat(listOfLongs.size()).isLessThanOrEqualTo(IN_REQUEST_SIZE);
+        }
+    }
+
+    @Test
+    public void _IN_REQUEST_SIZE_should_be_100_for_good_performance() {
+        // In any case, it should be <= 1000, as this is the limit of the most restrictive RDBMS we support: Oracle.
+        assertThat(IN_REQUEST_SIZE).isLessThanOrEqualTo(100);
     }
 
     private SProcessDefinitionBuilder aProcess() {
