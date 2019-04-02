@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Collections.singletonList;
+
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,7 +34,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
-import org.bonitasoft.engine.scheduler.JobParameter;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -60,16 +60,15 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final TechnicalLoggerService logger;
 
-    // this recorder must not use async logging else we have an infinite loop.
     private final SchedulerExecutor schedulerExecutor;
 
     private final JobService jobService;
 
     private final EventService eventService;
 
-    private final SEvent schedulStarted;
+    private final SEvent schedulerStarted;
 
-    private final SEvent schedulStopped;
+    private final SEvent schedulerStopped;
 
     private final SEvent jobFailed;
 
@@ -80,38 +79,29 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final ServicesResolver servicesResolver;
     private PersistenceService persistenceService;
 
-    private final int batchSize;
-
     /**
      * Create a new instance of scheduler service.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final ServicesResolver servicesResolver, PersistenceService persistenceService) {
-        this(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, persistenceService, 1000);
-    }
-
-    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
-            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final ServicesResolver servicesResolver, PersistenceService persistenceService, final int batchSize) {
+            final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
         this.servicesResolver = servicesResolver;
         this.persistenceService = persistenceService;
-        schedulStarted = new SEvent(SCHEDULER_STARTED);
-        schedulStopped = new SEvent(SCHEDULER_STOPPED);
+        schedulerStarted = new SEvent(SCHEDULER_STARTED);
+        schedulerStopped = new SEvent(SCHEDULER_STOPPED);
         jobFailed = new SEvent(JOB_FAILED);
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
-        this.batchSize = batchSize;
         schedulerExecutor.setBOSSchedulerService(this);
     }
 
     @Override
     public void schedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
-        final SJobDescriptor createdJobDescriptor = createJobDescriptor(jobDescriptor, Collections.<SJobParameter> emptyList());
+        final SJobDescriptor createdJobDescriptor = createJobDescriptor(jobDescriptor, Collections.emptyList());
         internalSchedule(createdJobDescriptor, trigger);
     }
 
@@ -207,13 +197,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void start() throws SSchedulerException, SFireEventException {
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Start scheduler");
         schedulerExecutor.start();
-        eventService.fireEvent(schedulStarted);
+        eventService.fireEvent(schedulerStarted);
     }
 
     @Override
     public void stop() throws SSchedulerException, SFireEventException {
         schedulerExecutor.shutdown();
-        eventService.fireEvent(schedulStopped);
+        eventService.fireEvent(schedulerStopped);
     }
 
     @Override
@@ -250,13 +240,12 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     /**
-     * get the persisted job from the database It opens a transaction!
+     * Get the persisted job from the database inside its own transaction.
      *
-     * @param jobIdentifier
-     * @return the job
-     * @throws SSchedulerException
+     * @return the newly created job
+     * @throws SSchedulerException if the job cannot be created successfully
      */
-    public StatelessJob getPersistedJob(final JobIdentifier jobIdentifier) throws SSchedulerException {
+    StatelessJob getPersistedJob(final JobIdentifier jobIdentifier) throws SSchedulerException {
         try {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
             return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
@@ -271,7 +260,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         private final JobIdentifier jobIdentifier;
 
-        public PersistedJobCallable(final JobIdentifier jobIdentifier) {
+        PersistedJobCallable(final JobIdentifier jobIdentifier) {
             this.jobIdentifier = jobIdentifier;
         }
 
@@ -287,16 +276,15 @@ public class SchedulerServiceImpl implements SchedulerService {
             final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
 
             final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
-            final List<OrderByOption> orderByoptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
-            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByoptions,
-                    Collections.singletonList(filterOption), null);
+            final List<OrderByOption> orderByOptions = singletonList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
+                    singletonList(filterOption), null);
             final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
-            final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
+            final HashMap<String, Serializable> parameterMap = new HashMap<>();
             for (final SJobParameter sJobParameterImpl : parameters) {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
             parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID, jobIdentifier.getId());
-            parameterMap.put(JobParameter.BATCH_SIZE.name(), batchSize);
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
                 servicesResolver.injectServices(jobIdentifier.getTenantId(), statelessJob);

@@ -66,7 +66,6 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
     </bean>
 
     <bean id="servicesResolver" class="org.bonitasoft.engine.service.ServicesResolver">
