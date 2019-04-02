@@ -402,6 +402,7 @@ CREATE TABLE waiting_event (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
+CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
 	tenantid BIGINT NOT NULL,
@@ -421,6 +422,7 @@ CREATE TABLE message_instance (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
+CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
 	tenantid BIGINT NOT NULL,

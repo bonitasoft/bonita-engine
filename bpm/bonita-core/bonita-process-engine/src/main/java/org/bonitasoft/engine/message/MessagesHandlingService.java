@@ -56,7 +56,7 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class MessagesHandlingService implements TenantLifecycleService, ObservableExecutor {
 
-    private static final int MAX_COUPLES = 1000;
+    private static final int MAX_COUPLES = 100;
     private static final String LOCK_TYPE = "EVENTS";
     private ThreadPoolExecutor threadPoolExecutor;
     private EventInstanceService eventInstanceService;
@@ -144,7 +144,8 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
             }
             if (potentialMessageCouples.size() == MAX_COUPLES) {
                 log(TechnicalLogSeverity.DEBUG,
-                        "There is more than " + MAX_COUPLES + " event to match. will retrigger the execution now.");
+                        "There are more than " + MAX_COUPLES + " event to match. " +
+                                "Will trigger the execution again now, to match more event couples.");
                 triggerMatchingOfMessages();
             }
             return null;
@@ -161,7 +162,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         }
     }
 
-    void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
+    private void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
             SMessageModificationException, SWaitingEventModificationException, SWorkRegisterException {
 
         // Mark messages that will be treated as "treatment in progress":
