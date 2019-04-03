@@ -656,7 +656,7 @@ CREATE TABLE command (
   name NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   IMPLEMENTATION NVARCHAR(100) NOT NULL,
-  system BIT,
+  isSystem BIT,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 )

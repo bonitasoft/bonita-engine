@@ -26,5 +26,5 @@ public interface SCommand extends PersistentObject {
 
     String getImplementation();
 
-    boolean getSystem();
+    boolean isSystem();
 }

@@ -32,8 +32,8 @@
                     <artifactId>postgresql</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>mysql-connector-java</artifactId>
                     <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.microsoft.sqlserver</groupId>
@@ -79,8 +79,8 @@
                     <artifactId>postgresql</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>mysql-connector-java</artifactId>
                     <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.microsoft.sqlserver</groupId>

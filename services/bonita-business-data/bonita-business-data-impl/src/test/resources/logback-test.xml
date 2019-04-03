@@ -9,7 +9,8 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="WARN" />
-    <logger name="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory" level="ERROR" />
+    <!-- To remove hibernate annoying warnings: -->
+    <logger name="org.hibernate" level="ERROR" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

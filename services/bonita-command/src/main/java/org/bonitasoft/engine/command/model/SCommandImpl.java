@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.command.model;
 
+import org.bonitasoft.engine.command.api.impl.CommandDeployment;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.command.api.impl.CommandDeployment;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,7 +29,7 @@ public class SCommandImpl extends CommandDeployment implements SCommand {
 
     private long tenantId;
     private long id;
-    private boolean system;
+    private boolean isSystem;
 
     public SCommandImpl(final String name, final String description, final String implementation) {
         super(name, description, implementation);
@@ -37,12 +38,12 @@ public class SCommandImpl extends CommandDeployment implements SCommand {
     public SCommandImpl(final SCommand command) {
         super(command.getName(), command.getDescription(), command.getImplementation());
         this.id = command.getId();
-        this.system = command.getSystem();
+        this.isSystem = command.isSystem();
     }
 
     @Override
-    public boolean getSystem() {
-        return system;
+    public boolean isSystem() {
+        return isSystem;
     }
 
 }
