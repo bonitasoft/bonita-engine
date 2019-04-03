@@ -97,17 +97,17 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         List<SFormMapping> listAll = formMappingService.list(0, 10);
 
         transactionService.complete();
-        assertThat(list).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+        assertThat(list).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
                 FormMappingType.PROCESS_OVERVIEW.getId());
-        assertThat(list).extracting("task").containsExactly("step1", null, null);
-        assertThat(list).extracting("pageMapping.url").containsExactly(null, "http://bit.coin", null);
-        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER,
+        assertThat(list).extracting("task").containsExactlyInAnyOrder("step1", null, null);
+        assertThat(list).extracting("pageMapping.url").containsExactlyInAnyOrder(null, "http://bit.coin", null);
+        assertThat(list).extracting("pageMapping.urlAdapter").containsExactlyInAnyOrder(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER,
                 URLAdapterConstants.LEGACY_URL_ADAPTER);
-        assertThat(list).extracting("pageMapping.pageId").containsExactly(page.getId(), null, null);
-        //        assertThat(list).extracting("pageMapping.key").containsExactly();
-        assertThat(listAll).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+        assertThat(list).extracting("pageMapping.pageId").containsExactlyInAnyOrder(page.getId(), null, null);
+        //        assertThat(list).extracting("pageMapping.key").containsExactlyInAnyOrder();
+        assertThat(listAll).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
                 FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingType.PROCESS_OVERVIEW.getId());
-        assertThat(listAll).extracting("processDefinitionId").containsExactly(p1.getId(), p1.getId(), p1.getId(), p2.getId());
+        assertThat(listAll).extracting("processDefinitionId").containsExactlyInAnyOrder(p1.getId(), p1.getId(), p1.getId(), p2.getId());
     }
 
     @Test
