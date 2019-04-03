@@ -402,6 +402,6 @@ public class CommandServiceImplTest {
 
     private QueryOptions getQueryOptions(final int fromIndex, int maxResults) {
         return new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, "id", OrderByType.ASC)),
-                Collections.singletonList(new FilterOption(SCommand.class, "system", true)), null);
+                Collections.singletonList(new FilterOption(SCommand.class, "isSystem", true)), null);
     }
 }

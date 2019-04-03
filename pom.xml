@@ -389,7 +389,7 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.26</version>
+                <version>8.0.14</version>
             </dependency>
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
@@ -1215,7 +1215,7 @@
             <id>bonita-internal</id>
             <properties>
                 <docker-postgres-image>registry.rd.lan/bonitasoft/postgres-11:0.0.2</docker-postgres-image>
-                <docker-mysql-image>registry.rd.lan/bonitasoft/mysql-5.5.61:1.1.2</docker-mysql-image>
+                <docker-mysql-image>registry.rd.lan/bonitasoft/mysql-8.0.14:1.0.2-UTF8MB3</docker-mysql-image>
                 <docker-oracle-image>registry.rd.lan/bonitasoft/oracle-12c-ee:0.1.1</docker-oracle-image>
                 <docker-sqlserver-image>registry.rd.lan/bonitasoft/sqlserver-2019:1.1.5</docker-sqlserver-image>
                 <!-- turns on/off logs from docker image-->

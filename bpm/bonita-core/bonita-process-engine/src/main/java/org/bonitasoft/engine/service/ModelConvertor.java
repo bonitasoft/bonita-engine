@@ -1134,7 +1134,7 @@ public class ModelConvertor {
     public static CommandDescriptor toCommandDescriptor(final SCommand command) {
         final CommandDescriptorImpl commandDescriptor = new CommandDescriptorImpl(command.getName(), command.getDescription(), command.getImplementation());
         commandDescriptor.setId(command.getId());
-        commandDescriptor.setSystem(command.getSystem());
+        commandDescriptor.setSystem(command.isSystem());
         return commandDescriptor;
     }
 

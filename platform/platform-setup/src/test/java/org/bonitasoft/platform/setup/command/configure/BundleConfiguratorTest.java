@@ -58,7 +58,7 @@ public class BundleConfiguratorTest {
     public void xml_chars_in_URLs_should_be_escaped_before_replacing() {
         // given:
         String url = "jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}" +
-                "?dontTrackOpenResources=true&useUnicode=true&characterEncoding=UTF-8";
+                "?dontTrackOpenResources=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true";
 
         // when:
         final String escapedXmlCharacters = BundleConfigurator.escapeXmlCharacters(url);
@@ -66,7 +66,7 @@ public class BundleConfiguratorTest {
         // then:
         assertThat(escapedXmlCharacters)
                 .isEqualTo("jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}" +
-                        "?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8");
+                        "?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true");
     }
 
     @Test

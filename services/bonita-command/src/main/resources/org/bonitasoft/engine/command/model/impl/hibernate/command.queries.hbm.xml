@@ -17,7 +17,7 @@
 	<query name="getUserCommands">
 		SELECT command
 		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
-		WHERE command.system = :system
+		WHERE command.isSystem = :isSystem
 	</query>
 	
 	<query name="getNumberOfSCommand">

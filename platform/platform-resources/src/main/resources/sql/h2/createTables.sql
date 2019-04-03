@@ -574,7 +574,7 @@ CREATE TABLE command (
   name VARCHAR(50) NOT NULL,
   description LONGVARCHAR,
   IMPLEMENTATION VARCHAR(100) NOT NULL,
-  system BOOLEAN,
+  isSystem BOOLEAN,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
