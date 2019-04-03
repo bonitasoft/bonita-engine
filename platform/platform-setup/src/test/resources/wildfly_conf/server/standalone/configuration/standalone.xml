@@ -258,7 +258,7 @@
                     <!-- MySQL Example -->
                     <!--
                     <driver name="mysql" module="com.mysql">
-                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                        <xa-datasource-class>com.mysql.cj.jdbc.MysqlXADataSource</xa-datasource-class>
                     </driver>
                     -->
 
@@ -420,7 +420,7 @@
                 <!-- MySQL Example -->
                 <!-- <xa-datasource jndi-name="java:jboss/datasources/bonitaDS" pool-name="bonitaDS" enabled="true" use-ccm="false" use-java-context="false">
                         <driver>mysql</driver>
-                        <xa-datasource-property name="URL">jdbc:mysql://localhost:3306/bonita?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</xa-datasource-property>
+                        <xa-datasource-property name="URL">jdbc:mysql://localhost:3306/bonita?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</xa-datasource-property>
                         <xa-pool>
                             <min-pool-size>1</min-pool-size>
                             <max-pool-size>50</max-pool-size>
@@ -442,7 +442,7 @@
 
                     <datasource jta="false" jndi-name="java:jboss/datasources/bonitaSequenceManagerDS" pool-name="bonitaSequenceManagerDS" enabled="true" use-ccm="false" use-java-context="false">
                         <driver>mysql</driver>
-                        <connection-url>jdbc:mysql://localhost:3306/bonita?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
+                        <connection-url>jdbc:mysql://localhost:3306/bonita?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</connection-url>
                         <security>
                             <user-name>bonita</user-name>
                             <password>bpm</password>
@@ -676,7 +676,7 @@
 
                     <datasource jta="false" jndi-name="java:jboss/datasources/NotManagedBizDataDS" pool-name="NotManagedBizDataDS" enabled="true" use-ccm="false" use-java-context="false">
                         <driver>mysql</driver>
-                        <connection-url>jdbc:mysql://localhost:3306/business_data?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
+                        <connection-url>jdbc:mysql://localhost:3306/business_data?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</connection-url>
                         <security>
                             <user-name>bonita</user-name>
                             <password>bpm</password>

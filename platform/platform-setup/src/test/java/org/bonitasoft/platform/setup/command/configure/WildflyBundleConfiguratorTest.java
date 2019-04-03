@@ -108,8 +108,8 @@ public class WildflyBundleConfiguratorTest {
         // then:
         final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
         checkFileContains(configFile,
-                "<connection-url>jdbc:mysql://mysql_servidor:9876/mysql_database?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>",
-                "<connection-url>jdbc:mysql://mysql_servidor_bdm:4321/mysql_database_bdm?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>");
+                "<connection-url>jdbc:mysql://mysql_servidor:9876/mysql_database?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</connection-url>",
+                "<connection-url>jdbc:mysql://mysql_servidor_bdm:4321/mysql_database_bdm?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</connection-url>");
     }
 
     @Test

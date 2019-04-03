@@ -25,8 +25,8 @@ public class SCommandBuilderFactoryImpl implements SCommandBuilderFactory {
     static final String DESCRIPTION = "description";
 
     static final String IMPLEMENTATION = "implementation";
-    
-    static final String SYSTEM = "system";
+
+    static final String SYSTEM = "isSystem";
 
     @Override
     public SCommandBuilder createNewInstance(final SCommand originalCommand) {
