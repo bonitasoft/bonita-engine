@@ -1937,6 +1937,25 @@ public class ProcessAPIImpl implements ProcessAPI {
                     + " to user (id: " + userId + ") | " + sbe.getMessage(), sbe);
         }
     }
+    
+    @CustomTransactions
+    @Override
+    public void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs)
+            throws UpdateException, UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException {
+        try {
+            inTx(() -> {
+                assignUserTask(userTaskInstanceId, userId);
+                executeFlowNode(userId, userTaskInstanceId, inputs, true);
+                return null;
+            });
+        } catch (final ContractViolationException e) {
+            throw e;
+        } catch (final SFlowNodeNotFoundException e) {
+            throw new UserTaskNotFoundException(String.format("User task %s is not found, it might already be executed", userTaskInstanceId));
+        } catch (final Exception e) {
+            verifyIfTheActivityWasInTheCorrectStateAndThrowException(userTaskInstanceId, e);
+        }
+    }
 
     @Override
     public void updateActorsOfUserTask(final long userTaskId) throws UpdateException {
@@ -5989,4 +6008,5 @@ public class ProcessAPIImpl implements ProcessAPI {
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         return processConfigurationAPI.getFormMapping(formMappingId);
     }
+    
 }

@@ -318,8 +318,18 @@ public class ContractIT extends CommonAPIIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
-        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
+        try {
+            getProcessAPI().assignAndExecuteUserTask(matti.getId(),userTask.getId(), new HashMap<String, Serializable>());
+            fail("The contract is not enforced");
+        } catch (final ContractViolationException e) {
+            final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
+            assertThat(state).isEqualTo("ready");
+            assertThat(e.getExplanations()).containsExactly("Expected input [numberOfDays] is missing");
+            assertThat(userTask.getAssigneeId()).isNotEqualTo(matti.getId());
+        }
+        
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         try {
             getProcessAPI().executeFlowNode(userTask.getId());
             fail("The contract is not enforced");
@@ -327,14 +337,7 @@ public class ContractIT extends CommonAPIIT {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
         }
-        try {
-            getProcessAPI().executeUserTask(userTask.getId(), new HashMap<String, Serializable>());
-            fail("The contract is not enforced");
-        } catch (final ContractViolationException e) {
-            final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
-            assertThat(state).isEqualTo("ready");
-            assertThat(e.getExplanations()).containsExactly("Expected input [numberOfDays] is missing");
-        }
+       
         disableAndDeleteProcess(processDefinition);
     }
 
