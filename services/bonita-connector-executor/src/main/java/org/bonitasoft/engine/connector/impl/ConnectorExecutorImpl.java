@@ -266,6 +266,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             if (thread != null) {
                 StackTraceElement[] stackTrace = thread.getStackTrace();
                 String stack = Arrays.stream(stackTrace).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
+                technicalLogger.warn("Interrupt thread of connector {}, thread is {}, {}, connectors was doing :\n {}, activate debug logs to have the full execution stacktrace.", sConnector.getClass(), thread.getName(), thread.getId(), stackTrace[0].toString());
                 technicalLogger.debug("Interrupt thread of connector {}, thread is {}, {}, stack is:\n {}", sConnector.getClass(), thread.getName(), thread.getId(), stack);
                 thread.interrupt();
             }
