@@ -16,7 +16,9 @@ package org.bonitasoft.engine.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.flownode.EventCriterion.NAME_DESC;
 import static org.bonitasoft.engine.bpm.flownode.TimerType.DURATION;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -48,7 +49,6 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.Test;
 
@@ -491,11 +491,9 @@ public class HumanTasksIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance userTask = waitForUserTaskAndAssignIt(processInstance, "userTask", user);
-        getProcessAPI().executeUserTask(userTask.getId(), null);
+        final HumanTaskInstance userTask = waitForUserTaskAssignAndExecuteIt(processInstance, "userTask", user, null);
 
-        final HumanTaskInstance userTaskNullDueDate = waitForUserTaskAndAssignIt(processInstance, "userTaskNullExpression", user);
-        getProcessAPI().executeUserTask(userTaskNullDueDate.getId(), null);
+        final HumanTaskInstance userTaskNullDueDate = waitForUserTaskAssignAndExecuteIt(processInstance, "userTaskNullExpression", user, null);
 
         final HumanTaskInstance manualTask = waitForUserTaskAndAssignIt(processInstance, "manualTask", user);
         getProcessAPI().executeUserTask(manualTask.getId(), null);

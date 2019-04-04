@@ -2587,6 +2587,31 @@ public interface ProcessRuntimeAPI {
      */
     void executeUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs) throws UserTaskNotFoundException, ContractViolationException,
             FlowNodeExecutionException;
+    
+    /**
+     * Assign a task to a user with given user identifier and executes a user task that is in a stable state on behalf of a given user
+     * Will make the task go in the next stable state and then continue the execution of the process
+     * If userId equals 0, the logged-in user is declared as the executer of the task.
+     * The user, who executed the task on behalf of a given user, is declared as a executer delegate.
+     *
+     * @param userId
+     *        The identifier of the user for which you want to assign and execute the flow node
+     * @param userTaskInstanceId
+     *        The identifier of the user task to execute
+     * @param inputs
+     *        the input used for user task execution
+     * @throws UpdateException
+     *         If an assignment exception occurs
+     * @throws UserTaskNotFoundException
+     *         If user task to execute is not found
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
+     * @throws FlowNodeExecutionException
+     *         If an execution exception occurs
+     * @since 7.9
+     */
+    void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs) throws UpdateException, UserTaskNotFoundException, ContractViolationException,
+            FlowNodeExecutionException;
 
     /**
      * Gets the value of the variable of the user task contract.
