@@ -15,7 +15,10 @@ package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder.aBusinessArchive;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -769,6 +772,13 @@ public class APITestUtil extends PlatformTestUtil {
     public HumanTaskInstance waitForUserTaskAndAssignIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
+        return humanTaskInstance;
+    }
+    
+
+    public HumanTaskInstance waitForUserTaskAssignAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user, Map<String, Serializable> inputs) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
+        getProcessAPI().assignAndExecuteUserTask(user.getId(), humanTaskInstance.getId(), inputs);
         return humanTaskInstance;
     }
 
