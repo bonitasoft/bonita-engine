@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.util.FunctionalMatcher;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -50,6 +52,8 @@ import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTriggerForTest;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -207,8 +211,26 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
         //ensure there is more than one failure: i.e. cron is still triggering new jobs
         await().until(() -> storage.getVariableValue("nbJobException", 0), isGreaterThan(1));
+        //wait a little because the failure is registered later...
+        Callable<List<SFailedJob>> getFailedJobs = () -> {
+            try {
+                return inTx(() -> jobService.getFailedJobs(0, 100));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+        List<SFailedJob> sFailedJobs = await().until(getFailedJobs, new BaseMatcher<List<SFailedJob>>() {
+            @Override
+            public boolean matches(Object item) {
+                List<SFailedJob> list = (List<SFailedJob>) item;
+                return list.size() == 1 && list.get(0).getNumberOfFailures() > 1;
+            }
 
-        List<SFailedJob> sFailedJobs = inTx(() -> jobService.getFailedJobs(0, 100));
+            @Override
+            public void describeTo(Description description) {
+
+            }
+        });
 
         assertThat(sFailedJobs).hasSize(1);
         //ensure we trace the number of failure
