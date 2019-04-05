@@ -42,6 +42,7 @@ integrationTest.doFirst {
         rename 'bonita-client-invalid.properties', 'bonita-client-community.properties'
     }
 }
+group = 'org.bonitasoft.engine.test'
 publishing {
     publications {
         mavenJava(MavenPublication) {
