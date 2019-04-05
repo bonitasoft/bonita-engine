@@ -104,6 +104,7 @@
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
 

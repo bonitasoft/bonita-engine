@@ -23,7 +23,7 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * A work that wrap an other work in a transaction
- * 
+ *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  * @author Charles Souillard

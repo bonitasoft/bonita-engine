@@ -105,24 +105,24 @@ public class ProcessInstanceInterruptorTest {
     }
 
     @Test
-    public void should_call_execute_on_stable_elements_only() throws Exception {
+    public void should_call_execute_on_all_elements_only() throws Exception {
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
         verify(containerRegistry).executeFlowNode(flownode1_stable);
-        verify(containerRegistry, never()).executeFlowNode(flownode2_unstable);
+        verify(containerRegistry).executeFlowNode(flownode2_unstable);
         verify(containerRegistry).executeFlowNode(flownode3_stable);
     }
 
     @Test
-    public void should_not_call_execute_on_terminal_state() throws Exception {
+    public void should_call_execute_on_terminal_state() throws Exception {
         //given
         flownode1_stable.setTerminal(true);
         flownode3_stable.setTerminal(false);
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
-        verify(containerRegistry, never()).executeFlowNode(flownode1_stable);
+        verify(containerRegistry).notifyChildFinished(flownode1_stable);
         verify(containerRegistry).executeFlowNode(flownode3_stable);
     }
 
@@ -177,7 +177,7 @@ public class ProcessInstanceInterruptorTest {
         verify(flowNodeInstanceService).setStateCategory(flownode1_stable, ABORTING);
         verify(flowNodeInstanceService).setStateCategory(flownode2_unstable, ABORTING);
         verify(containerRegistry).executeFlowNode(flownode1_stable);
-        verify(containerRegistry, never()).executeFlowNode(flownode2_unstable);
+        verify(containerRegistry).executeFlowNode(flownode2_unstable);
     }
 
     @Test

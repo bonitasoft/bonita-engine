@@ -60,10 +60,13 @@ public class BPMWorkFactory implements WorkFactory {
     private static final String CONNECTOR_INSTANCE_ID = "connectorInstanceId";
     private static final String CONNECTOR_DEFINITION_NAME = "connectorDefinitionName";
     private static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+    public static final String STATE_ID = "stateId";
+    private static final String STATE_EXECUTING = "stateExecuting";
+    private static final String STATE_ABORTING = "stateAborting";
+    private static final String STATE_CANCELING = "stateCanceling";
     private static final String ACTIVATION_EVENT = "activationEvent";
     private static final String SUB_PROCESS_DEFINITION_ID = "subProcessDefinitionId";
     private static final String FLOW_NODE_DEFINITIONS_FILTER = "flowNodeDefinitionsFilter";
-    private static final String READY_HUMAN_TASK = "readyHumanTask";
     private static final String MESSAGE_INSTANCE_ID = "messageInstanceId";
     private static final String MESSAGE_INSTANCE_NAME = "messageInstanceName";
     private static final String MESSAGE_INSTANCE_TARGET_PROCESS = "messageInstanceTargetProcess";
@@ -151,7 +154,11 @@ public class BPMWorkFactory implements WorkFactory {
     public WorkDescriptor createExecuteFlowNodeWorkDescriptor(SFlowNodeInstance flowNodeInstance) {
         return WorkDescriptor.create(EXECUTE_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, flowNodeInstance.getProcessDefinitionId())
                 .withParameter(PROCESS_INSTANCE_ID, flowNodeInstance.getParentProcessInstanceId())
-                .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstance.getId()).withParameter(READY_HUMAN_TASK, false);
+                .withParameter(FLOW_NODE_INSTANCE_ID, flowNodeInstance.getId())
+                .withParameter(STATE_ID, flowNodeInstance.getStateId())
+                .withParameter(STATE_EXECUTING, flowNodeInstance.isStateExecuting())
+                .withParameter(STATE_ABORTING, flowNodeInstance.isAborting())
+                .withParameter(STATE_CANCELING, flowNodeInstance.isCanceling());
     }
 
     private BonitaWork createExecuteFlowNodeWork(WorkDescriptor workDescriptor) {
@@ -160,19 +167,15 @@ public class BPMWorkFactory implements WorkFactory {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(flowNodeInstanceId);
-        Object readyHumanTask = workDescriptor.getParameter(READY_HUMAN_TASK);
-        executeFlowNodeWork.setReadyHumanTask(readyHumanTask != null ? ((Boolean) readyHumanTask) : false);
-        BonitaWork wrappedWork = executeFlowNodeWork;
+        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId,
+                workDescriptor.getInteger(STATE_ID),
+                workDescriptor.getBoolean(STATE_EXECUTING),
+                workDescriptor.getBoolean(STATE_ABORTING),
+                workDescriptor.getBoolean(STATE_CANCELING));
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(workDescriptor.getLong(PROCESS_DEFINITION_ID), processInstanceId, flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);
     }
-
-    public WorkDescriptor createExecuteReadyHumanTaskWorkDescriptor(SFlowNodeInstance flowNodeInstance) {
-        return createExecuteFlowNodeWorkDescriptor(flowNodeInstance).withParameter(READY_HUMAN_TASK, true);
-    }
-
     public WorkDescriptor createExecuteMessageCoupleWorkDescriptor(final SMessageInstance messageInstance,
             final SWaitingMessageEvent waitingMessage) {
         return WorkDescriptor.create(EXECUTE_MESSAGE)
@@ -218,17 +221,25 @@ public class BPMWorkFactory implements WorkFactory {
         final long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
         final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
         final long flowNodeInstanceId = workDescriptor.getLong(FLOW_NODE_INSTANCE_ID);
-        BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId);
+        BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId,
+                workDescriptor.getInteger(STATE_ID),
+                workDescriptor.getBoolean(STATE_EXECUTING),
+                workDescriptor.getBoolean(STATE_ABORTING),
+                workDescriptor.getBoolean(STATE_CANCELING));
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
         return withSession(wrappedWork);
     }
 
     public WorkDescriptor createNotifyChildFinishedWorkDescriptor(SFlowNodeInstance sFlowNodeInstance) {
-        return WorkDescriptor.create(FINISH_FLOWNODE).withParameter(PROCESS_DEFINITION_ID, sFlowNodeInstance.getProcessDefinitionId())
+        return WorkDescriptor.create(FINISH_FLOWNODE)
+                .withParameter(PROCESS_DEFINITION_ID, sFlowNodeInstance.getProcessDefinitionId())
                 .withParameter(PROCESS_INSTANCE_ID, sFlowNodeInstance.getParentProcessInstanceId())
                 .withParameter(FLOW_NODE_INSTANCE_ID, sFlowNodeInstance.getId())
-                .withParameter(PARENT_ID, sFlowNodeInstance.getParentContainerId()).withParameter(PARENT_TYPE, sFlowNodeInstance.getParentContainerType().name());
+                .withParameter(STATE_ID, sFlowNodeInstance.getStateId())
+                .withParameter(STATE_EXECUTING, sFlowNodeInstance.isStateExecuting())
+                .withParameter(STATE_ABORTING, sFlowNodeInstance.isAborting())
+                .withParameter(STATE_CANCELING, sFlowNodeInstance.isCanceling());
     }
 
     private BonitaWork withLock(long processInstanceId, BonitaWork work) {
