@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id.startsWith("io.spring.dependency-management")) {
+                useVersion("1.0.6.RELEASE")
+            }
+            if (requested.id.namespace == 'com.bonitasoft.gradle') {
+                //use same version for all bonita gradle plugins
+                useModule("${requested.id.id}:${requested.id.id}.gradle.plugin:${Deps.bonitaPluginsVersion}")
+            }
+        }
+    }
+}
+
+rootProject.name = 'bonita-engine'
+
+apply from: 'engine-settings.gradle'
+
+def fixPath
+fixPath = { project ->
+    String relativeProjectPath = project.projectDir.path.replace(settingsDir.path, "")
+    project.projectDir = new File(relativeProjectPath.replace("/engine/",''))
+    project.children.each fixPath
+}
+
+rootProject.children.each fixPath

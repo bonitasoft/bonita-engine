@@ -30,10 +30,12 @@ import org.bonitasoft.engine.bdm.model.BusinessObject;
 @XmlType
 public class RelationField extends Field {
 
+    @XmlType
     public enum Type {
         AGGREGATION, COMPOSITION;
     }
 
+    @XmlType
     public enum FetchType {
         EAGER, LAZY
     }

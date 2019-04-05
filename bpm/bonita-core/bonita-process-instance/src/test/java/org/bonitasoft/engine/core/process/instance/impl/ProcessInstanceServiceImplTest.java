@@ -594,7 +594,6 @@ public class ProcessInstanceServiceImplTest {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SReceiveTaskInstance();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doReturn(mock(SFlowElementContainerDefinition.class)).when(processDefinition).getProcessContainer();
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
         doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
 

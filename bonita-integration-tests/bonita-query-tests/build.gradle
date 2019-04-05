@@ -1,0 +1,17 @@
+
+
+dependencies {
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "com.h2database:h2:${Deps.h2Version}"
+    testCompile "org.springframework:spring-core:${Deps.springVersion}"
+    testCompile "org.springframework:spring-beans:${Deps.springVersion}"
+    testCompile "org.springframework:spring-tx:${Deps.springVersion}"
+    testCompile "org.springframework:spring-test:${Deps.springVersion}"
+    testCompile 'org.springframework:spring-orm:4.3.16.RELEASE'
+    testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
+    testCompile 'javax.inject:javax.inject:1'
+    testCompile project(':engine:bpm:bonita-server')
+    testCompile project(':engine:bpm:bonita-common')
+    testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
+}

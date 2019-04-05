@@ -1,0 +1,6 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-recorder')
+}

@@ -1,0 +1,24 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-log-technical')
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+}
+
+task testsJar(type: Jar) {
+    classifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+group = 'org.bonitasoft.engine.events'
+description = 'Bonita Event'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact testsJar
+        }
+    }
+}

@@ -1,0 +1,30 @@
+
+
+dependencies {
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile project(':engine:bpm:bonita-client')
+    compile project(':engine:platform:platform-setup')
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
+    compile "javax.transaction:jta:${Deps.javaxJtaVersion}"
+    compile "org.apache.commons:commons-dbcp2:${Deps.commonsDbcp2Version}"
+    compile "com.zaxxer:HikariCP:${Deps.hikariCPVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    compile "com.h2database:h2:${Deps.h2Version}"
+    compile "junit:junit:${Deps.junit4Version}"
+    testCompile project(':engine:bpm:bonita-server')
+    testCompile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    testCompile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    testCompile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+        }
+    }
+}

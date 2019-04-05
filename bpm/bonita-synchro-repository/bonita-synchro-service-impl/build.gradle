@@ -1,0 +1,7 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-cache')
+    compile project(':engine:bpm:bonita-synchro-repository:bonita-synchro-service')
+}

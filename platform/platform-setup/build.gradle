@@ -1,0 +1,142 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'distribution'
+
+
+configurations {
+    distributionZip
+    inDistrib
+}
+
+dependencies {
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
+        exclude(module: 'jul-to-slf4j')
+        exclude(module: 'log4j-to-slf4j')
+    }
+    compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
+    compile "org.springframework:spring-tx:${Deps.springVersion}"
+    compile "org.springframework:spring-jdbc:${Deps.springVersion}"
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
+    compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
+    compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+    compile "com.h2database:h2:${Deps.h2Version}"
+    compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile project(':engine:platform:platform-resources')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
+        exclude(module: 'json-path')
+    }
+    testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    testCompile project(':engine:platform:platform-setup-test')
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+    inDistrib project(path: ':engine:platform:platform-resources', configuration: 'distributionZip')
+}
+
+task testsJar(type: Jar) {
+    classifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+group = 'org.bonitasoft.platform'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact testsJar
+            artifact distZip
+        }
+    }
+}
+processResources {
+    from('src/main/resources') {
+        include '*'
+        filter(ReplaceTokens, tokens: [version: project.version])
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir project.file("build/generated/main/resources")
+        }
+    }
+}
+
+distTar.enabled = false
+distributions {
+    main {
+        baseName = "Bonita-platform-setup"
+        contents {
+            includeEmptyDirs = false
+            into('/') {
+                from('src/main/standalone')
+                include('*.sh')
+                include('*.bat')
+                fileMode = 0740 // the first 0 is important
+            }
+            into('/') {
+                from('src/main/standalone')
+                exclude('*.sh')
+                exclude('*.bat')
+            }
+            into('/lib') {
+                from jar
+                from project.configurations.runtime {
+                    exclude(module: 'jul-to-slf4j')
+                    exclude(module: 'log4j-over-slf4j')
+                    exclude(module: 'commons-logging')
+                    exclude(module: 'log4j-api')
+                    exclude(module: 'log4j-to-slf4j')
+                }
+            }
+            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
+                from(zipTree(it.file)) {
+                    include '**/sql/**'
+                    eachFile { fcp ->
+                        fcp.path = fcp.path.replaceAll(".*/sql/", "/platform_conf/sql/")
+                    }
+                }
+            }
+            configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
+                from(zipTree(it.file)) {
+                    exclude '**/sql/**'
+                    eachFile { fcp ->
+                        fcp.path = fcp.path.replaceAll(".*${version}/", "/platform_conf/initial/")
+                    }
+                }
+            }
+            fileMode = 0640
+        }
+    }
+}
+
+
+tasks.distZip.dependsOn configurations.inDistrib
+
+artifacts { distributionZip distZip }
+
+test {
+    include '**/*Test.class'
+}
+
+
+def iT = tasks.getByName("integrationTest")
+iT.configure {
+    def testDir = new File(buildDir, "integrationTest")
+    doFirst {
+        testDir.mkdirs()
+        systemProperty "bonita.distribution.path", distZip.outputs.files.first()
+    }
+    workingDir testDir
+}
+tasks.integrationTest.dependsOn distZip

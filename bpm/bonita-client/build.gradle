@@ -1,0 +1,34 @@
+
+
+dependencies {
+    compile project(':engine:bpm:bonita-common')
+    compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
+    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    compile "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
+    compile "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
+    runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+    runtime "com.sun.xml.bind:jaxb-impl:${Deps.jaxbVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
+}
+
+task testsJar(type: Jar) {
+    classifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+description = 'Bonita Client'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact testsJar
+        }
+    }
+}

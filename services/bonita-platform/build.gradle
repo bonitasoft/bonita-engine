@@ -1,0 +1,36 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:services:bonita-cache')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:services:bonita-persistence')
+    compile project(':engine:services:bonita-commons')
+    testCompile project(':engine:services:bonita-events')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}
+
+group = 'org.bonitasoft.engine.platform'
+def generatePlatformProperties = task("generatePlatformProperties") {
+  doFirst{
+    project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl").mkdirs()
+    project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties").text =
+            "version $project.version"
+  }
+  inputs.property "version", project.version
+  outputs.file project.file("build/generated/main/resources/org/bonitasoft/engine/platform/model/impl/platform.properties")
+}
+tasks.processResources.dependsOn generatePlatformProperties
+sourceSets {
+  main {
+    resources {
+      srcDir project.file("build/generated/main/resources")
+    }
+  }
+}
