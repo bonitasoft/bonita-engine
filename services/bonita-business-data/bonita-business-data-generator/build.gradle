@@ -21,6 +21,16 @@ dependencies {
 }
 
 group = 'org.bonitasoft.engine.data'
+
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources", "../bonita-business-data-client-resources/src/main/java"
+        }
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -28,3 +38,4 @@ publishing {
         }
     }
 }
+
