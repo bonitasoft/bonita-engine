@@ -92,7 +92,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
@@ -109,6 +108,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -123,6 +123,9 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -134,8 +137,6 @@ import org.bonitasoft.engine.work.WorkService;
 public class StateBehaviors {
 
     private static final int BATCH_SIZE = 20;
-
-    private static final int MAX_NUMBER_OF_RESULTS = 100;
     protected final ParentContainerResolver parentContainerResolver;
     private final BPMInstancesCreator bpmInstancesCreator;
     private final EventsHandler eventsHandler;
@@ -159,6 +160,7 @@ public class StateBehaviors {
     private ProcessExecutor processExecutor;
     private final BPMWorkFactory workFactory;
     private ProcessInstanceInterruptor processInstanceInterruptor;
+    private final UserTransactionService userTransactionService;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
                           final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
@@ -168,7 +170,7 @@ public class StateBehaviors {
                           final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
                           final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
                           final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory,
-                          ProcessInstanceInterruptor processInstanceInterruptor) {
+                          UserTransactionService userTransactionService, ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -191,6 +193,7 @@ public class StateBehaviors {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.workFactory = workFactory;
         this.processInstanceInterruptor = processInstanceInterruptor;
+        this.userTransactionService = userTransactionService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -389,7 +392,7 @@ public class StateBehaviors {
                 if (callActivity == null) {
                     final StringBuilder stb = new StringBuilder("unable to find call activity definition with name '");
                     stb.append(flowNodeInstance.getName());
-                    stb.append("' in procecess definition '");
+                    stb.append("' in process definition '");
                     stb.append(processDefinition.getId());
                     stb.append("'");
                     throw new SActivityStateExecutionException(stb.toString());
@@ -410,8 +413,24 @@ public class StateBehaviors {
                 if (sProcessInstance.getStateId() != ProcessInstanceState.COMPLETED.getId()) {
                     activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
                 } else {
-                    //the called process is finished, next step is stable so we trigger execution of this flownode
-                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
+                    // This need to be done "later" we register a work to execute this call activity because it is in fact finish
+                    // we can't do it right now because its state is not yet changed and the work would fail.
+                    userTransactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
+                        @Override
+                        public void beforeCommit() {
+                            //the called process is finished, next step is stable so we trigger execution of this flownode
+                            try {
+                                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
+                            } catch (SWorkRegisterException e) {
+                                throw new BonitaRuntimeException(e);
+                            }
+                        }
+
+                        @Override
+                        public void afterCompletion(TransactionState txState) {
+
+                        }
+                    });
                 }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
@@ -687,20 +706,16 @@ public class StateBehaviors {
 
     public void interruptAttachedBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,
             final SStateCategory categoryState) throws SActivityStateExecutionException {
-        final SBoundaryEventInstanceBuilderFactory keyProvider = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class);
         try {
             final List<SBoundaryEventInstance> boundaryEventInstances = eventInstanceService.getActivityBoundaryEventInstances(activityInstance.getId(), 0,
                     QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
             for (final SBoundaryEventInstance boundaryEventInstance : boundaryEventInstances) {
                 // don't abort boundary event that put this activity in aborting state
                 if (activityInstance.getAbortedByBoundary() != boundaryEventInstance.getId()) {
-                    final boolean stable = boundaryEventInstance.isStable();
                     final SCatchEventDefinition catchEventDef = processDefinition.getProcessContainer().getBoundaryEvent(boundaryEventInstance.getName());
                     waitingEventsInterrupter.interruptWaitingEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
-                    if (stable) {
-                        containerRegistry.executeFlowNode(boundaryEventInstance);
-                    }
+                    containerRegistry.executeFlowNode(boundaryEventInstance);
                 }
             }
         } catch (final SBonitaException e) {

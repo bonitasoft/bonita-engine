@@ -24,7 +24,10 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.work.SWorkPreconditionException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +46,7 @@ public class ExecuteFlowNodeWorkTest {
     public static final long PROCESS_INSTANCE_ID = 34552L;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
+    private TechnicalLoggerService technicalLoggerService = new TechnicalLoggerSLF4JImpl();
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock
@@ -55,7 +59,7 @@ public class ExecuteFlowNodeWorkTest {
 
     @Before
     public void before() throws Exception {
-        context = Collections.<String, Object> singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
+        context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
         doReturn(flowNodeExecutor).when(tenantServiceAccessor).getFlowNodeExecutor();
         sHumanTaskInstance = new SUserTaskInstance();
@@ -66,26 +70,25 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_throw_exception_if_executing_human_task_not_ready_when_isReadyHumanTask_flag_is_true() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
-        executeFlowNodeWork.setReadyHumanTask(true);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, false, false, false);
         sHumanTaskInstance.setStateId(2);
         //when
-        expectedException.expect(SFlowNodeExecutionException.class);
-        expectedException.expectMessage("Unable to execute human task " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
+        expectedException.expect(SWorkPreconditionException.class);
+        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID + " because it is not in the expected state " +
+                "( expected state: 4, transitioning: false, aborting: false, canceling: false, " +
+                "but got  state: 2, transitioning: false, aborting: false, canceling: false). Someone probably already called execute on it.");
         executeFlowNodeWork.work(context);
         //then exception
     }
 
     @Test
-    public void should_throw_exception_if_executing_human_task_ready_but_not_executing_when_isReadyHumanTask_flag_is_true() throws Exception {
+    public void should_throw_exception_if_executing_flow_node_not_in_expected_state() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
-        executeFlowNodeWork.setReadyHumanTask(true);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, false, false, true);
         sHumanTaskInstance.setStateId(4);
         sHumanTaskInstance.setStateExecuting(false);
         //when
-        expectedException.expect(SFlowNodeExecutionException.class);
-        expectedException.expectMessage("Unable to execute human task " + FLOW_NODE_INSTANCE_ID + " because it is in an incompatible state");
+        expectedException.expect(SWorkPreconditionException.class);
         executeFlowNodeWork.work(context);
         //then exception
     }
@@ -93,8 +96,7 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_execute_human_task_in_ready_and_executing_if_isReadyHumanTask_flag_is_true() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
-        executeFlowNodeWork.setReadyHumanTask(true);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 4, true, false, false);
         sHumanTaskInstance.setStateId(4);
         sHumanTaskInstance.setStateExecuting(true);
         //when
@@ -106,7 +108,7 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_execute_flow_node_in_any_state_if_isReadyHumanTask_flag_is_false() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, 2, true, false, false);
         sHumanTaskInstance.setStateId(2);
         sHumanTaskInstance.setStateExecuting(true);
         //when

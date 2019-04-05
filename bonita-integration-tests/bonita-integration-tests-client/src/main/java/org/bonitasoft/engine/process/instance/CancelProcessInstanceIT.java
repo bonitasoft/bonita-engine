@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
@@ -31,6 +36,8 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
@@ -170,4 +177,35 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         getProcessAPI().cancelProcessInstance(45);
     }
 
+
+    @Test
+    public void should_cancel_process_instance_with_running_tasks() throws Exception {
+        //given
+        ProcessDefinition processDefinition = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processWithATaskThatCallCancel", "1.0")
+                        .addStartEvent("start")
+                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
+                                new ExpressionBuilder().createConstantStringExpression("1.0"))
+                        .addTransition("start", "call")
+                        .getProcess());
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        ActivityInstance activityInstance = waitForTaskToFail(processInstance);
+        assertThat(activityInstance.getName()).isEqualTo("call");
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+
+        //then
+        try {
+            getProcessAPI().getProcessInstance(processInstance.getId());
+            fail("process should not exist anymore");
+        } catch (ProcessInstanceNotFoundException ignored) {
+        }
+        //verify the call activity was archived in cancelled state:
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
+        assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
+        assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
+        disableAndDeleteProcess(processDefinition);
+    }
 }

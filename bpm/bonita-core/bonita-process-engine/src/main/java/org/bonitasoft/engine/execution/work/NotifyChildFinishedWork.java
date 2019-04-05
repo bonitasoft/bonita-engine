@@ -38,12 +38,19 @@ import org.bonitasoft.engine.work.SWorkPreconditionException;
 public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final long processDefinitionId;
-
     private final long flowNodeInstanceId;
+    private final Integer stateId;
+    private final Boolean executing;
+    private final Boolean aborting;
+    private final Boolean canceling;
 
-    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId) {
+    NotifyChildFinishedWork(long processDefinitionId, long flowNodeInstanceId, Integer stateId, Boolean executing, Boolean aborting, Boolean canceling) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
+        this.stateId = stateId;
+        this.executing = executing;
+        this.aborting = aborting;
+        this.canceling = canceling;
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -72,6 +79,17 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
             flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         } catch (SFlowNodeNotFoundException e) {
             throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is already completed ( not found )");
+        }
+        if (stateId != flowNodeInstance.getStateId()
+                || executing != flowNodeInstance.isStateExecuting()
+                || aborting != flowNodeInstance.isAborting()
+                || canceling != flowNodeInstance.isCanceling()) {
+            throw new SWorkPreconditionException(
+                    String.format("Unable to execute flow node %d because it is not in the expected state " +
+                                    "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)." +
+                                    " Someone probably already called execute on it.",
+                            flowNodeInstanceId, stateId, executing, aborting, canceling, flowNodeInstance.getStateId(),
+                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(), flowNodeInstance.isCanceling()));
         }
         if (!flowNodeInstance.isTerminal()) {
             throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is not yet completed");

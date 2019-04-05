@@ -74,12 +74,11 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
             try {
                 final SActivityInstance relatedActivityInst = activityInstanceService
                         .getActivityInstance(boundaryEventInstance.getActivityInstanceId());
+
                 activityInstanceService.setStateCategory(relatedActivityInst, SStateCategory.ABORTING);
                 activityInstanceService.setAbortedByBoundaryEvent(relatedActivityInst, boundaryEventInstance.getId());
-                if (relatedActivityInst.isStable() && !relatedActivityInst.isStateExecuting()) {
-                    containerRegistry
-                            .executeFlowNode(relatedActivityInst);
-                }
+                containerRegistry
+                        .executeFlowNode(relatedActivityInst);
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
             }

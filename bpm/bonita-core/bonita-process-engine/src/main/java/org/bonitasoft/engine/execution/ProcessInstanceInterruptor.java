@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -56,17 +56,30 @@ public class ProcessInstanceInterruptor {
         processInstanceService.setStateCategory(processInstanceService.getProcessInstance(processInstanceId), stateCategory);
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+        logger.info("Process instance {} and its children were {}", processInstanceId, getInterruptionType(stateCategory));
+    }
+
+    private String getInterruptionType(SStateCategory stateCategory) {
+        return stateCategory.equals(SStateCategory.ABORTING) ? "aborted" : "cancelled";
     }
 
     private void executeChildren(SStateCategory stateCategory, List<SFlowNodeInstance> stableChildrenIds) throws SWorkRegisterException {
         for (final SFlowNodeInstance child : stableChildrenIds) {
-            logger.debug("Resume child in stateCategory; {} id = {}", stateCategory, child.getStateId());
+            logger.debug("Resume child in stateCategory {}: {}, {}, {}", stateCategory, child.getId(), child.getStateName(), child.getStateCategory());
             executeFlowNode(child);
         }
     }
 
     private void executeFlowNode(SFlowNodeInstance child) throws SWorkRegisterException {
-        containerRegistry.executeFlowNode(child);
+        if (child.isTerminal()) {
+            containerRegistry.notifyChildFinished(child);
+        }else{
+
+            //should not try to execute these because its the children that should be aborted
+            if (child.getType() != SFlowNodeType.MULTI_INSTANCE_ACTIVITY || child.getType() != SFlowNodeType.LOOP_ACTIVITY) {
+                containerRegistry.executeFlowNode(child);
+            }
+        }
     }
 
     /**
@@ -103,6 +116,7 @@ public class ProcessInstanceInterruptor {
         List<SFlowNodeInstance> flowNodeInstances = flowNodeInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, Integer.MAX_VALUE);
         flowNodeInstances = excludeFlowNode(interruptorChildId, flowNodeInstances);
         interruptFlowNodeInstances(flowNodeInstances, stateCategory);
+        logger.info("Process instance {} and its children were {} by flownode {}", processInstanceId, getInterruptionType(stateCategory), interruptorChildId);
     }
 
 
@@ -123,15 +137,11 @@ public class ProcessInstanceInterruptor {
 
     private void interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory)
             throws SBonitaException {
-        final List<SFlowNodeInstance> childrenToResume = new ArrayList<>();
         for (final SFlowNodeInstance child : children) {
-            logger.debug("Put element in {}, id= {} name = {} state = {}", stateCategory, child.getId(), child.getName(), child.getStateName());
+            logger.debug("Put element in {}, element:  {}, {}, {}", stateCategory, child.getId(), child.getStateName(), child.getType());
             flowNodeInstanceService.setStateCategory(child, stateCategory);
-            if (child.mustExecuteOnAbortOrCancelProcess()) {
-                childrenToResume.add(child);
-            }
         }
-        executeChildren(stateCategory, childrenToResume);
+        executeChildren(stateCategory, children);
     }
 
 }
