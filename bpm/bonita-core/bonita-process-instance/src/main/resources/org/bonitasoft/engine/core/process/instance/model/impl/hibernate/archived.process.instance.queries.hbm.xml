@@ -659,7 +659,7 @@
 	<query name="deleteArchiveProcessInstanceBySourceObjectId">
 		DELETE FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl
 		WHERE sourceObjectId IN (:sourceProcessInstanceIds)
-		AND rootProcessInstanceId in (:sourceProcessInstanceIds)
+		AND rootProcessInstanceId IN (:sourceProcessInstanceIds)
 	</query>
 
 	<query name="getSourceObjectIdsOfArchivedFlowNodeInstances">
