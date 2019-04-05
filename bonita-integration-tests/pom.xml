@@ -30,6 +30,9 @@
 
         <profile>
             <id>as-tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <modules>
                 <module>bonita-integration-tests-client</module>
                 <module>bonita-integration-tests-local</module>

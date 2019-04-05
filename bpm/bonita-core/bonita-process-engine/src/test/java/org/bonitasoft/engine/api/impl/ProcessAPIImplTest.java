@@ -916,6 +916,7 @@ public class ProcessAPIImplTest {
     public void deleteArchivedProcessInstances_by_ids_should_return_0_when_no_archived_process_instance_for_ids() throws Exception {
         // Given
         final long archivedProcessInstanceId = 42l;
+
         // When
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 

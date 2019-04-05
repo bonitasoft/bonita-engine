@@ -1,0 +1,19 @@
+
+
+dependencies {
+    compile project(':engine:platform:platform-setup')
+    compile project(':engine:bpm:bonita-core:bonita-process-engine')
+    compile project(':engine:services:bonita-platform-session')
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:bpm:bonita-common')
+    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    compile 'commons-fileupload:commons-fileupload:1.2.2'
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "org.springframework:spring-test:${Deps.springVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.springframework:spring-webmvc:${Deps.springVersion}"
+    compileOnly 'javax.servlet:javax.servlet-api:3.0.1'
+    testCompile 'javax.servlet:javax.servlet-api:3.0.1'
+}

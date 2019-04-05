@@ -1,0 +1,18 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-expression')
+    compile project(':engine:bpm:bonita-common')
+    compile project(':engine:bpm:bonita-core:bonita-process-definition')
+    compile project(':engine:services:bonita-cache')
+    compile project(':engine:services:bonita-resources')
+    compile project(':engine:services:bonita-connector-executor')
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:bpm:bonita-core:bonita-process-instance')
+    compile project(':engine:bpm:bonita-core:bonita-home-server')
+    compile project(':engine:services:bonita-commons')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}

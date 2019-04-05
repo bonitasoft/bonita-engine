@@ -10,7 +10,7 @@ Requirements
 -------------
 >     Java JDK 1.8 or higher
 
-This project bundles the [Maven Wrapper](https://github.com/takari/maven-wrapper), so the `mvnw` script is available at
+This project bundles the [Gradle Wrapper](https://github.com/takari/maven-wrapper), so the `mvnw` script is available at
 the project root.
 
 
@@ -18,7 +18,7 @@ Building the Engine
 -----------------
 Just run the following Maven command:
 ```
-./mvnw install
+./gradlew build
 ```
 
 To be able to successfully build the Bonita components that use the Engine, run:

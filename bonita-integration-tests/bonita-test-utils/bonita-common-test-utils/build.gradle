@@ -1,0 +1,14 @@
+
+
+dependencies {
+    compile "junit:junit:${Deps.junit4Version}"
+}
+
+group = 'org.bonitasoft.engine.test'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+        }
+    }
+}

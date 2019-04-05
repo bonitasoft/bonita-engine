@@ -1,0 +1,16 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-cache')
+    compile project(':engine:services:bonita-time-tracker')
+    compile project(':engine:services:bonita-classloader')
+    compile project(':engine:services:bonita-log-technical')
+    compile "org.codehaus.groovy:groovy-all:${Deps.groovyAllVersion}"
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}

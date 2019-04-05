@@ -81,7 +81,7 @@
 
         <!-- use -Dkey=value or activate profile in settings.xml to override -->
         <docker-postgres-image>postgres:11.1</docker-postgres-image>
-        <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
+        <docker-mysql-image>mysql:8.0.14</docker-mysql-image>
         <docker-oracle-image>oracle:12c-ee</docker-oracle-image>
         <docker-sqlserver-image>ms-sqlserver:2019</docker-sqlserver-image>
 
@@ -808,6 +808,9 @@
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <modules>
                 <module>platform</module>
                 <module>services</module>

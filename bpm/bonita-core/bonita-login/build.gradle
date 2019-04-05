@@ -1,0 +1,13 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-identity')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:bpm:bonita-core:bonita-home-server')
+    compile project(':engine:services:bonita-authentication')
+    compile project(':engine:services:bonita-profile')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+}

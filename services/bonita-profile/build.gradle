@@ -1,0 +1,18 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:services:bonita-persistence')
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-events')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:services:bonita-identity')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

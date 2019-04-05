@@ -1,0 +1,44 @@
+import org.apache.tools.ant.filters.PrefixLines
+
+apply plugin: 'distribution'
+
+group = 'org.bonitasoft.platform'
+description = ''
+
+processResources {
+    from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-platform-community.properties") {
+        filter(PrefixLines, prefix: "#")
+        rename 'bonita-platform-community.properties', 'platform_engine/bonita-platform-community-custom.properties'
+    }
+    from("${projectDir}/../../bpm/bonita-core/bonita-process-engine/src/main/resources/bonita-tenant-community.properties") {
+        filter(PrefixLines, prefix: "#")
+        rename 'bonita-tenant-community.properties', 'tenant_template_engine/bonita-tenant-community-custom.properties'
+    }
+}
+
+configurations {
+    distributionZip
+}
+
+distributions {
+    main{
+        main {
+            contents {
+                from { 'src/main/resources' }
+            }
+        }
+    }
+}
+
+artifacts {
+    distributionZip distZip
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact distZip
+        }
+    }
+}
