@@ -424,10 +424,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDataInstanceException(e);
         }
     }
-            @Override
-    public void deleteLocalArchivedDataInstances(List<Long> containerIds,final String containerType) throws SDataInstanceException {
-                HashMap<String, Object> map = new HashMap<>();
-            map.put("containerIds", containerIds);
+
+    @Override
+    public void deleteLocalArchivedDataInstances(List<Long> containerIds, final String containerType)
+            throws SDataInstanceException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("containerIds", containerIds);
         map.put("containerType", containerType);
         try {
             archiveService.deleteFromQuery("deleteLocalSADataInstancesOfContainers", map);
@@ -435,7 +437,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDataInstanceException(e);
         }
     }
-
 
     @Override
     public void deleteLocalDataInstances(final long containerId, final String dataInstanceContainerType, final boolean dataPresent)
