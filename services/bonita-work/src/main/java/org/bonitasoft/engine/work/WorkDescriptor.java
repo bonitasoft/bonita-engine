@@ -73,6 +73,12 @@ public class WorkDescriptor implements Serializable {
     public Long getLong(String key) {
         return (Long) getParameter(key);
     }
+    public Integer getInteger(String key) {
+        return (Integer) getParameter(key);
+    }
+    public Boolean getBoolean(String key) {
+        return (Boolean) getParameter(key);
+    }
 
     public String getString(String key) {
         return (String) getParameter(key);
