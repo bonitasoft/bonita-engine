@@ -82,6 +82,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 
+import com.google.common.collect.Iterables;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -106,6 +108,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private static final String MANAGED_BY = "ManagedBy";
 
     private static final int BATCH_SIZE = 100;
+
+    static final int IN_REQUEST_SIZE = 100;
 
     private final Recorder recorder;
 
@@ -228,6 +232,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
+    protected Iterable<List<Long>> getPartitionFromLargeList(Iterable<Long> allSourceObjectIds) {
+        return Iterables.partition(allSourceObjectIds, IN_REQUEST_SIZE);
+    }
 
     @Override
     public int deleteArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
@@ -239,10 +246,19 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         Set<Long> allSourceObjectIds = new HashSet<>();
         allSourceObjectIds.addAll(sourceProcessInstanceIds);
         allSourceObjectIds.addAll(archivedChildrenProcessInstances);
-        //delete all elements
-        deleteElementsOfArchivedProcessInstances(new ArrayList<>(allSourceObjectIds));
-        //delete all archive processes
-        return archiveService.deleteFromQuery("deleteArchiveProcessInstanceBySourceObjectId", Collections.<String,Object>singletonMap("sourceProcessInstanceIds", allSourceObjectIds));
+        int numberOfDeletedInstances = 0;
+        // Verify that the resulting IN statement in the request has a reasonable size, if not split in smaller requests
+        // See BS-19316
+        Iterable<List<Long>> sourceObjectIdsPartitions = getPartitionFromLargeList(allSourceObjectIds);
+        for (List<Long> sourceObjectIds2k : sourceObjectIdsPartitions) {
+            //delete all elements
+            deleteElementsOfArchivedProcessInstances(new ArrayList<>(sourceObjectIds2k));
+            //delete all archived processes
+            numberOfDeletedInstances = numberOfDeletedInstances
+                    + archiveService.deleteFromQuery("deleteArchiveProcessInstanceBySourceObjectId",
+                            Collections.singletonMap("sourceProcessInstanceIds", sourceObjectIds2k));
+        }
+        return numberOfDeletedInstances;
     }
 
     private void deleteElementsOfArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
@@ -255,14 +271,21 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedFlowNodeInstancesAndElements(List<Long> sourceProcessInstanceIds) throws SBonitaException {
-        List<Long> flowNodesSourceObjectIds = new ArrayList<>(activityService.getSourceObjectIdsOfArchivedFlowNodeInstances(sourceProcessInstanceIds));
-        if (flowNodesSourceObjectIds.isEmpty()) {
-            return;
+        List<Long> flowNodesSourceObjectIds = new ArrayList<>(
+                activityService.getSourceObjectIdsOfArchivedFlowNodeInstances(sourceProcessInstanceIds));
+        if (!flowNodesSourceObjectIds.isEmpty()) {
+            // Verify that the resulting IN statement in the request has a reasonable size, if not split it in smaller requests
+            // See BS-19316
+            Iterable<List<Long>> flowNodesSourceObjectIdsPartitions = getPartitionFromLargeList(flowNodesSourceObjectIds);
+            for (List<Long> flowNodesSourceObjectIds2k : flowNodesSourceObjectIdsPartitions) {
+                connectorInstanceService.deleteArchivedConnectorInstances(flowNodesSourceObjectIds2k,
+                        SConnectorInstance.FLOWNODE_TYPE);
+                dataInstanceService.deleteLocalArchivedDataInstances(flowNodesSourceObjectIds2k,
+                        DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                contractDataService.deleteArchivedUserTaskData(flowNodesSourceObjectIds2k);
+                activityService.deleteArchivedFlowNodeInstances(flowNodesSourceObjectIds2k);
+            }
         }
-        connectorInstanceService.deleteArchivedConnectorInstances(flowNodesSourceObjectIds, SConnectorInstance.FLOWNODE_TYPE);
-        dataInstanceService.deleteLocalArchivedDataInstances(flowNodesSourceObjectIds, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        contractDataService.deleteArchivedUserTaskData(flowNodesSourceObjectIds);
-        activityService.deleteArchivedFlowNodeInstances(flowNodesSourceObjectIds);
     }
 
     private Set<Long> getArchivedChildrenProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {

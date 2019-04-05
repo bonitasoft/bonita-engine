@@ -31,14 +31,11 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl;
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -376,7 +373,10 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void deleteArchivedDocuments(List<Long> processInstanceIds) throws SBonitaReadException, SRecorderException {
-        List<SAMappedDocument> archivedMappedDocuments = persistenceService.selectList(new SelectListDescriptor<>("getArchiveMappingsOfProcessInstances", Collections.singletonMap("processInstanceIds", processInstanceIds), SAMappedDocument.class, QueryOptions.countQueryOptions()));
+        List<SAMappedDocument> archivedMappedDocuments = persistenceService
+                .selectList(new SelectListDescriptor<>("getArchiveMappingsOfProcessInstances",
+                        Collections.singletonMap("processInstanceIds", processInstanceIds), SAMappedDocument.class,
+                        QueryOptions.countQueryOptions()));
         if (archivedMappedDocuments.isEmpty()) {
             //no documents to delete
             return;

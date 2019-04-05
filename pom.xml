@@ -69,6 +69,7 @@
         <dom4j.version>1.6.1</dom4j.version>
         <jaxen.version>1.1.4</jaxen.version>
         <logback.version>1.2.3</logback.version>
+        <guava.version>19.0</guava.version>
 
         <!-- Tests -->
         <system-rules.version>1.16.0</system-rules.version>
@@ -376,6 +377,11 @@
                 <artifactId>lombok</artifactId>
                 <version>1.16.20</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
