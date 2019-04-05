@@ -1,0 +1,13 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-transaction')
+    compile project(':engine:services:bonita-log-technical')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}

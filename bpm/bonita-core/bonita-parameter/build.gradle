@@ -1,0 +1,17 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:bpm:bonita-core:bonita-home-server')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-cache')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:services:bonita-persistence')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

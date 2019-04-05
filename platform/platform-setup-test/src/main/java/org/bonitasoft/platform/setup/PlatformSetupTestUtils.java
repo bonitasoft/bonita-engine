@@ -88,17 +88,29 @@ public class PlatformSetupTestUtils {
     }
 
     public static void extractDistributionTo(File distFolder) throws IOException {
-        File target = new File("target");
-        Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
+        String distZipPath = System.getProperty("bonita.distribution.path");
         File dist = null;
-        for (File file : target.listFiles()) {
-            if (distribPattern.matcher(file.getName()).matches()) {
-                dist = file;
-                break;
+        if (distZipPath != null) {
+            dist = new File(distZipPath);
+        } else {
+
+            File target = new File("target");
+            if (!target.isDirectory()) {
+                throw new IllegalStateException("No bonita.distribution.path set and not target folder");
+            }
+            Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
+            for (File file : target.listFiles()) {
+                if (distribPattern.matcher(file.getName()).matches()) {
+                    dist = file;
+                    break;
+                }
             }
         }
         if (dist == null) {
             throw new IllegalStateException("Unable to locate the distribution");
+        }
+        if (!dist.isFile()) {
+            throw new IllegalStateException("Distribution is not a file: " + dist.getPath());
         }
 
         try (InputStream inputStream = new FileInputStream(dist)) {

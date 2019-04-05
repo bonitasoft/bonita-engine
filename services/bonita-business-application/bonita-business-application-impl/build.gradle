@@ -1,0 +1,15 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-business-application:bonita-business-application-api')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:services:bonita-events')
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-builder')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

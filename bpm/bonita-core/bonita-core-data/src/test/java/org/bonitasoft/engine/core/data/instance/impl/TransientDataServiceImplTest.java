@@ -190,7 +190,6 @@ public class TransientDataServiceImplTest {
         SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
         when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDefinition);
         when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
-        when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList("name:42:ctype","name:44:ctype","name:48:ctype"));
 
         List<SDataInstance> dataInstances = transientDataServiceImpl.getDataInstances(42, "ctype", 0, 10);
 

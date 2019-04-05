@@ -1,0 +1,12 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:bpm:bonita-common')
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile project(':engine:platform:platform-setup')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+}

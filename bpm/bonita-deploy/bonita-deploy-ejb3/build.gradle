@@ -1,0 +1,16 @@
+
+
+dependencies {
+    compileOnly project(':engine:bpm:bonita-common')
+    compileOnly project(':engine:bpm:bonita-server')
+    compileOnly 'javax:javaee-api:6.0'
+}
+
+description = 'Bonita Deploy: EJB3'
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from project.components.java
+    }
+  }
+}

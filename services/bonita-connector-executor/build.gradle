@@ -1,0 +1,11 @@
+
+
+dependencies {
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-time-tracker')
+    compile project(':engine:services:bonita-session')
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+}

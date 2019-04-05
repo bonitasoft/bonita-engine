@@ -63,7 +63,6 @@ public class RestartProcessHandlerTest {
     public void handleCompletionShouldExecuteParentCallActivityIfItIsNOTInFailedState() throws Exception {
         int callActivityStateId = 8;
         SActivityInstance callActivity = mock(SActivityInstance.class);
-        when(callActivity.getParentProcessInstanceId()).thenReturn(564654L);
         when(callActivity.getStateId()).thenReturn(callActivityStateId);
         when(flowNodeStateManager.getFailedState()).thenReturn(new FailedActivityStateImpl());
         doReturn(callActivity).when(activityInstanceService).getActivityInstance(anyLong());

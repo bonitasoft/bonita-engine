@@ -35,9 +35,9 @@ import org.junit.rules.TestRule;
  */
 public class BonitaClientXMLTest {
 
-    private static final String BONITA_HOME_CLIENT_INVALID_API_TYPE = "target/bonita_home_client_invalidAPIType";
+    private static final String BONITA_HOME_CLIENT_INVALID_API_TYPE = "build/bonita_home_client_invalidAPIType";
 
-    private static final String BONITA_HOME_CLIENT_EJB3 = "target/bonita_home_client_EJB3";
+    private static final String BONITA_HOME_CLIENT_EJB3 = "build/bonita_home_client_EJB3";
 
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
