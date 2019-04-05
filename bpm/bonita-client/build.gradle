@@ -23,12 +23,22 @@ task testsJar(type: Jar) {
     from(sourceSets.test.output)
 }
 
-description = 'Bonita Client'
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from project.components.java
-            artifact testsJar
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            artifact project.testsJar
         }
     }
 }
