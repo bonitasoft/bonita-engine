@@ -68,6 +68,7 @@ dependencyManagement {
         dependency "com.zaxxer:HikariCP:${Deps.hikariCPVersion}"
         dependency "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
         dependency "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
+        dependency "javax.activation:activation:${Deps.javaxActivationVersion}"
     }
 }
 
@@ -78,13 +79,13 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'bonita-tests'
 
-    repositories { 
+    repositories {
         mavenLocal()
         maven { url 'http://repositories.rd.lan/maven/all/' }
         mavenCentral()
         jcenter()
 
-       
+
 //        task sourcesJar(type: Jar) {
 //            classifier = 'sources'
 //            from(sourceSets.main.allJava)
