@@ -36,8 +36,6 @@ import org.bonitasoft.engine.session.SessionService;
  */
 public class DefaultProfilesUpdater {
 
-    private static final String DEFAULT_PROFILES_FILE = "profiles.xml";
-
     protected PlatformServiceAccessor platformServiceAccessor;
     protected TenantServiceAccessor tenantServiceAccessor;
 
@@ -48,7 +46,7 @@ public class DefaultProfilesUpdater {
 
     /**
      * Executes a default profile update
-     * 
+     *
      * @return whether the default profiles where updated
      * @throws Exception if execution fails
      */
@@ -115,10 +113,19 @@ public class DefaultProfilesUpdater {
 
     /**
      * @return content of the XML file that contains default profiles
-     * @throws IOException
+     * @throws IOException in case of problem reading profiles file
      */
     String getDefaultProfilesXml() throws IOException {
-        return IOUtil.readResource(DEFAULT_PROFILES_FILE);
+        String profiles = IOUtil.readResource("profiles-sp.xml");
+        if (profiles != null) {
+            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                    "Loading profiles from file profiles-sp.xml");
+        } else {
+            profiles = IOUtil.readResource("profiles.xml");
+            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                    "Loading profiles from file profiles.xml");
+        }
+        return profiles;
     }
 
     ProfilesNode getProfilesFromXML(final String defaultProfilesXml) throws IOException {
