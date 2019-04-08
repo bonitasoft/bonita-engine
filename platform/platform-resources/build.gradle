@@ -20,12 +20,11 @@ configurations {
     distributionZip
 }
 
+distTar.enabled = false
 distributions {
-    main{
-        main {
-            contents {
-                from { 'src/main/resources' }
-            }
+    main {
+        contents {
+            from sourceSets.main.output
         }
     }
 }
