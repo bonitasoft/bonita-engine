@@ -32,7 +32,10 @@ public class ExportDefaultProfilesCommand extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         try {
-            final InputStream xmlStream = ExportDefaultProfilesCommand.class.getResourceAsStream("/profiles.xml");
+            InputStream xmlStream = ExportDefaultProfilesCommand.class.getResourceAsStream("/profiles-sp.xml");
+            if (xmlStream == null) {
+                xmlStream = ExportDefaultProfilesCommand.class.getResourceAsStream("/profiles.xml");
+            }
             final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
             xmlStream.close();
             return xmlContent;
