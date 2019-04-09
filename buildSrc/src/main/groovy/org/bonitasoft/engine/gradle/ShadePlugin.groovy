@@ -53,15 +53,26 @@ class ShadePlugin implements Plugin<Project> {
             }
 
             project.javadoc {
-                source {getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect { it.sourceSets.main.allJava }}
-                classpath = project.files({getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect { it.sourceSets.main.compileClasspath }})
+                source {
+                    getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect {
+                        it.sourceSets.main.allJava
+                    }
+                }
+                classpath = project.files({
+                    getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect {
+                        it.sourceSets.main.compileClasspath
+                    }
+                })
                 options.addStringOption('Xdoclint:none', '-quiet')
-                options.addBooleanOption("author", true) // FIXME update studio test org.bonitasoft.studio.tests.engine.TestJavaDoc.testHasJavaDoc
+                options.addBooleanOption("author", true)
+                // FIXME update studio test org.bonitasoft.studio.tests.engine.TestJavaDoc.testHasJavaDoc
             }
             project.tasks.create("sourcesJar", Jar) {
-                from {getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect {
-                    it.sourceSets.main.allJava
-                }}
+                from {
+                    getShadedProjects(project, extension, getProjectsAlreadyShaded(project, extension)).collect {
+                        it.sourceSets.main.allJava
+                    }
+                }
                 classifier = 'sources'
             }
             project.tasks.create("javadocJar", Jar) {
@@ -210,7 +221,9 @@ class ShadePlugin implements Plugin<Project> {
 
     private Set<ResolvedDependency> getPomDependencies(Project project, ShadeExtension extension, Set<Project> allProjectsAlreadyShaded, boolean isRootProject) {
         Set allDependencies = []
-        project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.forEach {
+        // We include compile + runtime dependencies (like hazelcast-aws), to be complete:
+        def allScopes = project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies + project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies
+        allScopes.forEach {
             Project projectDependency = getAssociatedProjectFromDependency(project, it)
             if (projectDependency) {
                 if (allProjectsAlreadyShaded.contains(projectDependency)) {
@@ -247,7 +260,7 @@ class ShadePlugin implements Plugin<Project> {
         def res = [] as Set
         project.logger.debug(" Shade POM generation: adding ${indent}${current.name}")
         // if the external dependency is shaded, do not add it in the pom, but add its dependencies
-        if(!extension.includes.contains(new ShadeDependency(group: current.moduleGroup, name: current.moduleName))){
+        if (!extension.includes.contains(new ShadeDependency(group: current.moduleGroup, name: current.moduleName))) {
             res.add(current)
         }
         def thirdPartyExclusion = extension.libExclusions.get(current.moduleName)
