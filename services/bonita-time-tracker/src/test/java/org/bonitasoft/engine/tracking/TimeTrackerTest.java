@@ -14,15 +14,8 @@
 package org.bonitasoft.engine.tracking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -182,7 +175,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
             for (final Record record : records) {
                 final TimeTrackerRecords name = record.getName();
                 if (!result.containsKey(name)) {
-                    result.put(name, new ArrayList<Record>());
+                    result.put(name, new ArrayList<>());
                 }
                 result.get(name).add(record);
             }
@@ -423,7 +416,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_pause_resume_without_error() {
 
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
 
         //when
         this.tracker.start();
@@ -448,7 +441,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_start_method_be_reentrant() {
 
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         final Set<Thread> initialThreadSet = Thread.getAllStackTraces().keySet();
         this.tracker.start();
         //expect
@@ -464,9 +457,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void isTracking_should_be_false_if_tracking_not_started() throws Exception {
+    public void isTracking_should_be_false_if_tracking_not_started() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         //when
         final boolean trackingStatus = this.tracker.isTracking();
         //then
@@ -474,9 +467,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void isTracking_should_be_true_if_tracking_is_started() throws Exception {
+    public void isTracking_should_be_true_if_tracking_is_started() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         try {
             this.tracker.start();
 
@@ -491,9 +484,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_not_leave_unused_threads_when_stopped() throws Exception {
+    public void should_not_leave_unused_threads_when_stopped() {
         //given
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         final Set<Thread> beforeTimeTrackerStartedThreadSet = Thread.getAllStackTraces().keySet();
         this.tracker.start();
 
@@ -511,7 +504,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void should_add_remove_listeners() {
         // create a tracker
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
 
         // no active listener
         assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
@@ -530,7 +523,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void should_have_one_listener_based_on_listener_name() {
         // create a tracker
-        this.tracker = new TimeTracker(this.logger, true, new LinkedList<FlushEventListener>(), 500, 1);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
         // add a new listener
         final FlushEventListener flushEvent1 = new MemoryFlushEventListener(true, this.logger, 10);
         final FlushEventListener flushEvent2 = new MemoryFlushEventListener(true, this.logger, 10);
