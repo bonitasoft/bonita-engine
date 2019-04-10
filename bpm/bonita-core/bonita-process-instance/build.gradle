@@ -3,34 +3,34 @@ plugins {
 }
 
 dependencies {
-  compile project(':engine:bpm:bonita-common')
-  compile project(':engine:services:bonita-recorder')
-  compile project(':engine:bpm:bonita-core:bonita-process-definition')
-  compile project(':engine:services:bonita-identity')
-  compile project(':engine:services:bonita-persistence')
-  compile project(':engine:services:bonita-commons')
-  compile project(':engine:services:bonita-log')
-  compile project(':engine:services:bonita-events')
-  compile project(':engine:services:bonita-log-technical')
-  compile project(':engine:services:bonita-archive')
-  compile project(':engine:services:bonita-data-instance')
-  compile project(':engine:services:bonita-classloader')
-  compile project(':engine:bpm:bonita-core:bonita-process-comment')
-  compile project(':engine:services:bonita-builder')
-  compile project(':engine:bpm:bonita-core:bonita-home-server')
-  compile project(':engine:services:bonita-session')
-  compile project(':engine:services:bonita-dependency')
-  compile project(':engine:services:bonita-connector-executor')
-  compile project(':engine:services:bonita-resources')
-  compile project(':engine:services:bonita-time-tracker')
-  compile project(':engine:services:bonita-expression')
+    compile project(':engine:bpm:bonita-common')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:bpm:bonita-core:bonita-process-definition')
+    compile project(':engine:services:bonita-identity')
+    compile project(':engine:services:bonita-persistence')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-events')
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-archive')
+    compile project(':engine:services:bonita-data-instance')
+    compile project(':engine:services:bonita-classloader')
+    compile project(':engine:bpm:bonita-core:bonita-process-comment')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:bpm:bonita-core:bonita-home-server')
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:services:bonita-dependency')
+    compile project(':engine:services:bonita-connector-executor')
+    compile project(':engine:services:bonita-resources')
+    compile project(':engine:services:bonita-time-tracker')
+    compile project(':engine:services:bonita-expression')
     compile project(':engine:services:bonita-cache')
     compile project(':engine:bpm:bonita-core:bonita-contract-data')
     compile group: 'com.google.guava', name: "guava", version: Deps.guavaVersion
-    testCompile group: 'junit', name: 'junit', version:'4.12'
-    testCompile group: 'org.assertj', name: 'assertj-core', version:'3.7.0'
-    testCompile group: 'org.mockito', name: 'mockito-core', version:'2.17.0'
-
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 }
