@@ -50,28 +50,37 @@ public class EngineStarter {
     private static final String DATABASE_DIR = "org.bonitasoft.h2.database.dir";
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
+    private static boolean hasFailed = false;
 
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
     private ClassPathXmlApplicationContext applicationContext;
 
     public void start() throws Exception {
-        LOGGER.info("=====================================================");
-        LOGGER.info("============  Starting Bonita Engine  ===========");
-        LOGGER.info("=====================================================");
-        final long startTime = System.currentTimeMillis();
-        System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
-        if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
-            //force it to local if not specified
-            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+        if (hasFailed) {
+            throw new IllegalStateException("Engine has previously failed to start");
         }
-        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
-            prepareEnvironment();
-            setupPlatform();
-            initPlatformAndTenant();
+        try {
+            LOGGER.info("=====================================================");
+            LOGGER.info("============  Starting Bonita Engine  ===========");
+            LOGGER.info("=====================================================");
+            final long startTime = System.currentTimeMillis();
+            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
+            if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
+                //force it to local if not specified
+                APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
+            }
+            if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
+                prepareEnvironment();
+                setupPlatform();
+                initPlatformAndTenant();
+            }
+            deployCommandsOnDefaultTenant();
+            LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+        } catch (Exception e) {
+            hasFailed = true;
+            throw e;
         }
-        deployCommandsOnDefaultTenant();
-        LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
     protected void setupPlatform() throws NamingException, PlatformException {
