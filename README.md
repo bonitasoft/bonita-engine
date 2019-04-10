@@ -8,9 +8,9 @@ This project builds Bonita Execution Engine (Community Edition)
 
 Requirements
 -------------
->     Java JDK 1.8 or higher
+>     Java JDK 1.8 (to compile), and JVM 8 or 11 (to run)
 
-This project bundles the [Gradle Wrapper](https://github.com/takari/maven-wrapper), so the `mvnw` script is available at
+This project bundles the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html), so the `gradlew` script is available at
 the project root.
 
 
@@ -23,24 +23,25 @@ Just run the following Maven command:
 
 To be able to successfully build the Bonita components that use the Engine, run:
 ```
- ./mvnw install -Ppackage,javadoc
+ ./gradlew publishToMavenLocal
 ```
 
-The command above runs all unit tests. To skip them, add the `-DskipTests`
+The command above runs all unit tests. To skip them, add the `-x test`
 option.
 
 To run all **unit + integration tests** (on the default embedded H2
 database), run the following command:
 ```
-./mvnw verify -Ptests
+./gradlew test integrationTest
 ```
 
-To run all **unit + integration tests** on mysql, postgres or oracle using
+To run all **unit + integration tests** on mysql, oracle, sqlserver or postgres using
 a _Docker_ container, run one of the following commands:
 ```
-./mvnw verify -Ptests,mysql
-./mvnw verify -Ptests,oracle
-./mvnw verify -Ptests,postgres
+./gradlew mysqlDatabaseTest
+./gradlew oracleDatabaseTest
+./gradlew sqlserverDatabaseTest
+./gradlew postgresDatabaseTest
 ```
 
 How to contribute
