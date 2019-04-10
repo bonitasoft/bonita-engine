@@ -15,7 +15,6 @@ dependencies {
     compile "com.bmuschko:gradle-docker-plugin:4.6.2"
 }
 
-
 gradlePlugin {
     plugins {
         bonitaShade {

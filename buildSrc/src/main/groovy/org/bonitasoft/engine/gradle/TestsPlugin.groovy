@@ -4,8 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 
-class TestsPlugin implements Plugin<Project>{
-
+class TestsPlugin implements Plugin<Project> {
 
     public static final String TEST_JVM = "test.jvm"
 
@@ -15,7 +14,6 @@ class TestsPlugin implements Plugin<Project>{
         def tests = project.extensions.create("tests", TestsExtension)
 
         Test integrationTest = project.tasks.create("integrationTest", Test)
-
 
         project.afterEvaluate {
 
@@ -36,17 +34,16 @@ class TestsPlugin implements Plugin<Project>{
                 slowTest.systemProperty("bonita.version", project.version)
             }
 
-
             Test testTask = project.tasks.getByName("test") as Test
             if (testTask) {
+                setTestJVM(project, testTask)
                 setJvmArgs(project, testTask)
                 testTask.include(tests.testPattern)
             }
-
         }
     }
 
-    private void setJvmArgs(Project project, Test task) {
+    private static void setJvmArgs(Project project, Test task) {
         def property = project.property('org.gradle.jvmargs')
         if (property) {
             task.jvmArgs property.toString().split(" ")
@@ -57,7 +54,7 @@ class TestsPlugin implements Plugin<Project>{
         }
     }
 
-    private void setTestJVM(Project project, Test task) {
+    private static void setTestJVM(Project project, Test task) {
         if (project.hasProperty(TEST_JVM)) {
             def alternateJvm = project.property(TEST_JVM)
             project.logger.info("Parameter '$TEST_JVM' detected. ${project.name} will use alternate JVM '$alternateJvm' to run $task")
