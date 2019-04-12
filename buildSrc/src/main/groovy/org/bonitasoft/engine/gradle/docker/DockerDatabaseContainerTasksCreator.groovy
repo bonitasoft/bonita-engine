@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ */
 package org.bonitasoft.engine.gradle.docker
 
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
@@ -11,48 +24,34 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.testing.Test
 
 /**
- * Gradle plugin to start docker database containers and performed tests with them
+ * Gradle plugin to start docker database containers and perform tests against them
  */
 class DockerDatabaseContainerTasksCreator {
 
     def static vendors = [
-            [name           : 'oracle',
-             repository     : 'registry.rd.lan/bonitasoft/oracle-12c-ee',
-             tag            : '0.1.1',
-             portBinding    : 1521,
-             uriTemplate    : 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1.localdomain',
-             driverClassName: 'oracle.jdbc.OracleDriver',
-             rootUser       : 'sys as sysdba',
-             rootPassword   : 'Oradoc_db1'
+            [name       : 'oracle',
+             repository : 'registry.rd.lan/bonitasoft/oracle-12c-ee',
+             tag        : '0.1.1',
+             portBinding: 1521,
+             uriTemplate: 'jdbc:oracle:thin:@//%s:%s/ORCLPDB1.localdomain',
             ],
-            [name           : 'postgres',
-             repository     : 'registry.rd.lan/bonitasoft/postgres-11',
-             tag            : '0.0.2',
-             portBinding    : 5432,
-             uriTemplate    : 'jdbc:postgresql://%s:%s/bonita',
-             driverClassName: 'org.postgresql.Driver',
-             rootUser       : 'postgres',
-             rootPassword   : 'postgres',
-             databaseName   : 'bonita'
+            [name       : 'postgres',
+             repository : 'registry.rd.lan/bonitasoft/postgres-11',
+             tag        : '0.0.2',
+             portBinding: 5432,
+             uriTemplate: 'jdbc:postgresql://%s:%s/bonita',
             ],
-            [name           : 'mysql',
-             repository     : 'registry.rd.lan/bonitasoft/mysql-8.0.14',
-             tag            : '1.0.2-UTF8MB3',
-             portBinding    : 3306,
-             uriTemplate    : 'jdbc:mysql://%s:%s/bonita?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
-             driverClassName: 'com.mysql.jdbc.Driver',
-             rootUser       : 'root',
-             rootPassword   : 'root'
+            [name       : 'mysql',
+             repository : 'registry.rd.lan/bonitasoft/mysql-8.0.14',
+             tag        : '1.0.2-UTF8MB3',
+             portBinding: 3306,
+             uriTemplate: 'jdbc:mysql://%s:%s/bonita?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8',
             ],
-            [name           : 'sqlserver',
-             repository     : 'registry.rd.lan/bonitasoft/sqlserver-2019',
-             tag            : '1.1.5',
-             portBinding    : 1433,
-             uriTemplate    : 'jdbc:sqlserver://%s:%s;database=bonita',
-             driverClassName: 'com.microsoft.sqlserver.jdbc.SQLServerDriver',
-             rootUser       : 'sa',
-             rootPassword   : 'DeLorean1985',
-             databaseName   : 'bonita'
+            [name       : 'sqlserver',
+             repository : 'registry.rd.lan/bonitasoft/sqlserver-2019',
+             tag        : '1.1.5',
+             portBinding: 1433,
+             uriTemplate: 'jdbc:sqlserver://%s:%s;database=bonita',
             ]
     ]
 
@@ -67,7 +66,6 @@ class DockerDatabaseContainerTasksCreator {
     private static final String SYS_PROP_DB_URL = 'db.url'
     private static final String SYS_PROP_DB_USER = 'db.user'
     private static final String SYS_PROP_DB_PASSWORD = 'db.password'
-//    private static final String SYS_PROP_DB_NAME = 'db.database.name'
 
     def static createTasks(Project project, DatabasePluginExtension extension) {
         // required to have the environment correctly setup: see https://github.com/bmuschko/gradle-docker-plugin/issues/575#issuecomment-383704012
@@ -152,7 +150,7 @@ class DockerDatabaseContainerTasksCreator {
                 targetContainerId createContainer.getContainerId()
             }
 
-            Test databaseTestTask = project.tasks.create("${vendor.name}DatabaseTest", Test.class) {
+            Task databaseTestTask = project.tasks.create("${vendor.name}DatabaseTest", Test) {
                 group "Verification"
                 description "Run integration test suite on database $vendor.name"
                 systemProperty "bonita.version", project.version
