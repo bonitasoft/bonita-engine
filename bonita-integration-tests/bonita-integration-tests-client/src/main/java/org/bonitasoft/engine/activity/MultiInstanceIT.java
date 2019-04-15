@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID;
 import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.STATE_NAME;
 import static org.bonitasoft.engine.expression.ExpressionConstants.*;
@@ -70,6 +71,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
@@ -165,16 +167,16 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         // No need to verify anything, if no exception, query exists
         getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
-                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,john.getId()).done());
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, john.getId()).done());
 
         getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,john.getId()).done());
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID, john.getId()).done());
 
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY).done());
-        assertThat(searchActivities.getResult().get(0).getType()).isEqualByComparingTo( FlowNodeType.MULTI_INSTANCE_ACTIVITY);
+        assertThat(searchActivities.getResult().get(0).getType()).isEqualByComparingTo(FlowNodeType.MULTI_INSTANCE_ACTIVITY);
         final MultiInstanceActivityInstance activityInstance = (MultiInstanceActivityInstance) searchActivities.getResult().get(0);
         assertEquals(1, activityInstance.getNumberOfActiveInstances());
 
@@ -770,9 +772,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
     /**
      * Test of sequential multi-instance with several users.
-     *
-     * @throws Exception
-     * @since 6.0
      */
     @Test
     public void multiInstanceSequentialWithSeveralUsers() throws Exception {
@@ -826,17 +825,23 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Execute task of multi-instance for John
-        checkNbPendingTaskOf(1, john);
-        final List<HumanTaskInstance> pendingTasks1 = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> pendingTasks1 = checkNbPendingTaskOf(1, john).getPendingHumanTaskInstances();
         final HumanTaskInstance pendingTask1 = pendingTasks1.get(0);
         assignAndExecuteStep(pendingTask1, john.getId());
 
         // Execute task of multi-instance for Jack
-        checkNbPendingTaskOf(1, jack);
-        final List<HumanTaskInstance> pendingTasks2 = getProcessAPI().getPendingHumanTaskInstances(jack.getId(), 0, 10, null);
+        final List<HumanTaskInstance> pendingTasks2 = checkNbPendingTaskOf(1, jack).getPendingHumanTaskInstances();
         final HumanTaskInstance pendingTask2 = pendingTasks2.get(0);
         assignAndExecuteStep(pendingTask2, jack.getId());
-        waitForActivityInCompletedState(processInstance,pendingTask2.getName(),true);
+
+        final SearchOptionsBuilder sob = new SearchOptionsBuilder(0, 0);
+        sob.filter(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, processInstance.getId());
+        sob.filter(ArchivedHumanTaskInstanceSearchDescriptor.NAME, pendingTask2.getName());
+        sob.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, "completed");
+        final SearchOptions searchOptions = sob.done();
+
+        await().until(() -> getProcessAPI().searchArchivedHumanTasks(searchOptions).getCount() == 2 );
+
         int numberOfFinishedTaskInstances = (int) getProcessAPI().getProcessDataInstance("numberOfAlreadyFinishedTaskInstances", processInstance.getId())
                 .getValue();
         assertThat(numberOfFinishedTaskInstances).isEqualTo(1);
