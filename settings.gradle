@@ -21,8 +21,12 @@ apply from: 'engine-settings.gradle'
 
 def fixPath
 fixPath = { project ->
-    String relativeProjectPath = project.projectDir.path.replace(settingsDir.path, "")
-    project.projectDir = new File(relativeProjectPath.replace("/engine/",''))
+    java.nio.file.Path enginePath = settingsDir.toPath().resolve("engine")
+    java.nio.file.Path rootPath = settingsDir.toPath()
+    java.nio.file.Path projectPath = project.projectDir.toPath()
+    def relativeProjectPath = enginePath.relativize(projectPath)
+    project.projectDir = rootPath.resolve(relativeProjectPath).toFile()
+    logger.debug("Path of project ${project.path} set to ${project.projectDir}")
     project.children.each fixPath
 }
 
