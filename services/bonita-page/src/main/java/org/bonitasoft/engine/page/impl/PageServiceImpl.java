@@ -112,6 +112,8 @@ public class PageServiceImpl implements PageService {
 
     private static final String CLASS_FILENAME = "classFileName";
 
+    private static final String THEME_CSS = "resources/theme.css";
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -297,7 +299,10 @@ public class PageServiceImpl implements PageService {
     void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingIndexException {
         final Set<String> entrySet = zipContent.keySet();
         for (final String entry : entrySet) {
-            if (INDEX_GROOVY.equals(entry) || INDEX_HTML.equalsIgnoreCase(entry) || RESOURCES_INDEX_HTML.equalsIgnoreCase(entry)) {
+            if (INDEX_GROOVY.equals(entry) 
+                    || INDEX_HTML.equalsIgnoreCase(entry) 
+                    || RESOURCES_INDEX_HTML.equalsIgnoreCase(entry)
+                    || THEME_CSS.equalsIgnoreCase(entry)) {
                 return;
             }
         }
