@@ -89,6 +89,8 @@ public class PageServiceImplTest {
     private static final String INDEX_HTML = "index.html";
 
     private static final String INDEX_GROOVY = "Index.groovy";
+    
+    private static final String THEME_CSS = "resources/theme.css";
 
     private static final String CONTENT_NAME = "content.zip";
 
@@ -108,6 +110,7 @@ public class PageServiceImplTest {
     public static final String BONITA_DEFAULT_LAYOUT_ZIP_NAME = "bonita-default-layout.zip";
     public static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
     public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
+
 
     @Mock
     private Recorder recorder;
@@ -892,6 +895,18 @@ public class PageServiceImplTest {
         // given
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair(INDEX_HTML, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
+
+        // when then
+        pageServiceImpl.readPageZip(content, false);
+
+    }
+    
+    @Test
+    public void zipTest_valid_Theme() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(THEME_CSS, "h1 { font-size:14pt; }".getBytes()),
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
 
         // when then
