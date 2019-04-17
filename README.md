@@ -16,7 +16,7 @@ the project root.
 
 Building the Engine
 -----------------
-Just run the following Maven command:
+Just run the following Gradle command:
 ```
 ./gradlew build
 ```
