@@ -119,15 +119,45 @@ public class NodeToApplicationConverterTest {
         assertThat(importStatus.getErrors()).isEmpty();
 
     }
+    @Test
+    public void toSApplication_should_use_layout_defined_in_ApplicationNode() throws Exception {
+        //given
+        String layoutName = "custompage_mainLayout";
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setLayout(layoutName);
+
+        long layoutId = 15L;
+        SPage layout = buildMockPage(layoutId);
+        given(pageService.getPageByName(layoutName)).willReturn(layout);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getLayoutId()).isEqualTo(layoutId);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    private SPage buildMockPage(final long layoutId) {
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(layoutId);
+        return layout;
+    }
 
     @Test
-    public void toSApplication_should_always_use_default_layout() throws Exception {
+    public void toSApplication_should_use_default_layout_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setToken("app");
-        node.setLayout("dummyLayout"); // will not be used, the layout will be always the default one
-
-        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
 
         //when
         long createdBy = 1L;
@@ -143,19 +173,64 @@ public class NodeToApplicationConverterTest {
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_throw_importException_when_neither_specified_layout_neither_default_layout_is_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        String notAvailableLayout = "notAvailableLayout";
+        node.setLayout(notAvailableLayout);
+        String token = "app";
+        node.setToken(token);
+
+        given(pageService.getPageByName(notAvailableLayout)).willReturn(null);
+
+        //then
+        expectedException.expect(ImportException.class);
+        expectedException.expectMessage(String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
+                token, notAvailableLayout));
+
+
+        //when
+        converter.toSApplication(node, 1L);
 
     }
 
     @Test
-    public void toSApplication_should_always_use_default_theme() throws Exception {
+    public void toSApplication_should_use_theme_defined_in_ApplicationNode() throws Exception {
+        //given
+        String themeName = "custompage_mainTheme";
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setTheme(themeName);
+
+        long themeId = 15L;
+        SPage theme = buildMockPage(themeId);
+        given(pageService.getPageByName(themeName)).willReturn(theme);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getThemeId()).isEqualTo(themeId);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_use_default_theme_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setToken("app");
-        node.setTheme("dummyTheme"); // will not be used, the theme will be always the default one
 
-        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
-
-        //when
         long createdBy = 1L;
         final ImportResult importResult = converter.toSApplication(node, createdBy);
 
@@ -169,6 +244,24 @@ public class NodeToApplicationConverterTest {
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_throw_ImportException_when_neither_specified_theme_neither_default_theme_is_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setTheme("notAvailable");
+        node.setToken("app");
+
+        given(pageService.getPageByName("notAvailable")).willReturn(null);
+
+        //then
+        expectedException.expect(ImportException.class);
+        expectedException.expectMessage(String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
+                "app", "notAvailable", ApplicationService.DEFAULT_THEME_NAME));
+
+        //when
+        converter.toSApplication(node, 1L);
 
     }
 

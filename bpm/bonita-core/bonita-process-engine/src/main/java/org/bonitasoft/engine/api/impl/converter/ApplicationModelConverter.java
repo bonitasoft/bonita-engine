@@ -64,13 +64,21 @@ public class ApplicationModelConverter {
         builder.setProfileId(profileId);
         return builder.done();
     }
-
-    protected Long getLayoutId(ApplicationCreator creator) throws CreationException {
-        return getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_LAYOUT_NAME);
+    
+    protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {
+        Long layoutId = (Long) creator.getFields().get(ApplicationField.LAYOUT_ID);
+        if (layoutId == null) {
+            layoutId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_LAYOUT_NAME);
+        }
+        return layoutId;
     }
 
-    protected Long getThemeId(ApplicationCreator creator) throws CreationException {
-        return getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_THEME_NAME);
+    protected Long getThemeId(final ApplicationCreator creator) throws CreationException {
+        Long themeId = (Long) creator.getFields().get(ApplicationField.THEME_ID);
+        if (themeId == null) {
+            themeId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_THEME_NAME);
+        }
+        return themeId;
     }
 
     private Long getPageId(final String applicationToken, final String pageName) throws CreationException {

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -322,10 +321,10 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).containsExactly("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page1", "custompage_page2", "custompage_page3");
-        assertThat(getApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactly("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page1", "custompage_page2", "custompage_page3");
-        assertThat(allPagesForProfile2).containsExactly("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page4");
-        assertThat(getApplicationAPI().getAllPagesForProfile(profile2.getName())).containsExactly("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page4");
+        assertThat(allPagesForProfile1).containsExactly("custompage_layoutBonita", "custompage_page1", "custompage_page2", "custompage_page3", "custompage_themeBonita");
+        assertThat(getApplicationAPI().getAllPagesForProfile(profile1.getName())).containsExactly("custompage_layoutBonita", "custompage_page1", "custompage_page2", "custompage_page3", "custompage_themeBonita");
+        assertThat(allPagesForProfile2).containsExactly("custompage_layoutBonita", "custompage_page4", "custompage_themeBonita");
+        assertThat(getApplicationAPI().getAllPagesForProfile(profile2.getName())).containsExactly("custompage_layoutBonita", "custompage_page4", "custompage_themeBonita");
 
         //clean
         getApplicationAPI().deleteApplication(app1.getId());
