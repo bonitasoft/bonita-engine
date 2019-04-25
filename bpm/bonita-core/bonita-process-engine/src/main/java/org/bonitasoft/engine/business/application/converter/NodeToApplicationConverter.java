@@ -94,11 +94,11 @@ public class NodeToApplicationConverter {
     }
 
     protected String getLayoutName(final ApplicationNode applicationNode) {
-        return ApplicationService.DEFAULT_LAYOUT_NAME;
+        return applicationNode.getLayout() != null ? applicationNode.getLayout() : ApplicationService.DEFAULT_LAYOUT_NAME;
     }
 
     protected String getThemeName(final ApplicationNode applicationNode) {
-        return ApplicationService.DEFAULT_THEME_NAME;
+        return applicationNode.getTheme() != null ? applicationNode.getTheme() : ApplicationService.DEFAULT_THEME_NAME;
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {
