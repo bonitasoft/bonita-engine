@@ -26,7 +26,7 @@ public enum Vendor {
     ORACLE, SQLSERVER, POSTGRES, MYSQL, OTHER;
 
     /**
-     * Get database vendor from databases metadatas
+     * Get database vendor from databases metadata
      */
     public static Vendor fromDatabaseMetadata(DatabaseMetaData metadata) throws SQLException {
         if (metadata != null) {

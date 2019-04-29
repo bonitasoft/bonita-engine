@@ -211,7 +211,7 @@
 	<query name="getNumberOfSAProcessInstancewithSUserTaskInstance">
 		select COUNT(DISTINCT ap)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
@@ -227,7 +227,7 @@
   	<query name="searchSAProcessInstancewithSUserTaskInstance">
 		select DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
+		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
@@ -421,7 +421,7 @@
 	</query>
 
   	<query name="getNumberOfSAProcessInstanceWithoutSubProcess">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT COUNT(ap.sourceObjectId)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
 		WHERE ap.callerId = -1
 		AND ap.stateId IN (6,7,3,4)
@@ -435,7 +435,7 @@
   	</query>
 
 	<query name="getNumberOfSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT COUNT(ap.sourceObjectId)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 		WHERE ap.callerId = -1
@@ -444,7 +444,7 @@
 	</query>
 
 	<query name="searchSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 		WHERE ap.callerId = -1
@@ -454,7 +454,7 @@
 
 
 	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorWithoutSubProcess">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT COUNT(ap.sourceObjectId)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE ap.callerId = -1
@@ -472,7 +472,7 @@
 	</query>
 
 	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorSUserTaskInstanceWithoutSubProcess">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT COUNT(ap.sourceObjectId)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 		     org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
 		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
@@ -511,7 +511,7 @@
 	</query>
 
   	<query name="getNumberOfSAProcessInstanceInvolvingUser">
-		SELECT COUNT(DISTINCT ap.id)
+		SELECT COUNT(ap.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
 		WHERE (
 				ap.stateId IN (6,7,3,4) AND
