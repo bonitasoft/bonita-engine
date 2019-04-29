@@ -31,5 +31,5 @@ public enum ScopeType {
     /**
      * For the platform dependency.
      */
-    GLOBAL;
+    GLOBAL
 }
