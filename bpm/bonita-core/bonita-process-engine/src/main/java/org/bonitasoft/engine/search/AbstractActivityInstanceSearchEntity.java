@@ -59,7 +59,7 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
         return ModelConvertor.toActivityInstances(serverObjects, flowNodeStateManager);
     }
 
-    protected Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) throws SBonitaReadException {
+    private Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) throws SBonitaReadException {
         Class<? extends PersistentObject> entityClass = SActivityInstance.class;
         final SearchFilter searchFilter = getSearchFilter(searchOptions, ActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
         if (searchFilter != null) {

@@ -35,11 +35,12 @@ public class SearchOptionsBuilder {
 
     /**
      * Builds a new {@link SearchOptions} with results limited to {@code startIndex} and {@code maxResults}. If you are interested only in the number of
-     * elements matching with the given criteria without knowing the elements details, it's possible to use zero as {@code maxResults}:
+     * elements matching with the given criteria without knowing the elements details, it's possible to use 0 (zero) as {@code maxResults}:
      * {@link SearchResult#getResult()} will send an empty list and {@link SearchResult#getCount()} will return the number of matching elements.
      *
      * @param startIndex the first result to return
      * @param maxResults the maximum results to return. The actual number can be smaller, if the end of the list has been reached.
+     *        If 0 (zero) or a negative number is provided, only the result count will be pertinent, and the result list itself will be empty.
      * @see SearchOptions
      * @see SearchResult#getResult()
      * @see SearchResult#getCount()

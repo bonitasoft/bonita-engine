@@ -1172,22 +1172,22 @@
 	</query>
 	
 	<query name="getNumberOfSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SActivityInstance AS a
 	</query>
 	
 	<query name="searchSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSCallActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a
 	</query>
 
 	<query name="searchSCallActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a
 	</query>
 
@@ -1249,162 +1249,162 @@
 	</query>
 
 	<query name="getNumberOfSSendTaskInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a
 	</query>
 
 	<query name="searchSSendTaskInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a
 	</query>
 
 	<query name="getNumberOfSLoopActivity">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a
 	</query>
 
 	<query name="searchSLoopActivity">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSMultiInstanceActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a
 	</query>
 
 	<query name="searchSMultiInstanceActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSSubProcessActivityInstanceImpl">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a
 	</query>
 
 	<query name="searchSSubProcessActivityInstanceImpl">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSAutomaticTaskInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a
 	</query>
 	
 	<query name="searchSAutomaticTaskInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a
 	</query>
 	
 	<query name="getNumberOfSReceiveTaskInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a
 	</query>
 	
 	<query name="searchSReceiveTaskInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a
 	</query>
 	
 	<query name="getNumberOfSUserTaskInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 	</query>
 	
 	<query name="searchSUserTaskInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 	</query>	
 		
 	<query name="getNumberOfSManualTaskInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a
 	</query>
 	
 	<query name="searchSManualTaskInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a
 	</query>
 	
 	<query name="getNumberOfSAutomaticTaskInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a
 	</query>
 	
 	<query name="searchSAutomaticTaskInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a
 	</query>
 	
 	<query name="getNumberOfSReceiveTaskInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a
 	</query>
 	
 	<query name="searchSReceiveTaskInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a
 	</query>
 	
 	<query name="getNumberOfSUserTaskInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 	</query>
 	
 	<query name="searchSUserTaskInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
 	</query>	
 		
 	<query name="getNumberOfSManualTaskInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a
 	</query>
 	
 	<query name="searchSManualTaskInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a
 	</query>
 
 	<query name="getNumberOfSSendTaskInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a
 	</query>
 
 	<query name="searchSSendTaskInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a
 	</query>
 
 	<query name="getNumberOfSMultiInstanceActivityInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a
 	</query>
 
 	<query name="searchSMultiInstanceActivityInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSSubProcessActivityInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a
 	</query>
 
 	<query name="searchSSubProcessActivityInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a
 	</query>
 
 	<query name="getNumberOfSLoopActivityInstancewithSActivityInstance">
-		SELECT COUNT(DISTINCT a)
+		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a
 	</query>
 
 	<query name="searchSLoopActivityInstancewithSActivityInstance">
-		SELECT DISTINCT a
+		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a
 	</query>
 
@@ -1430,12 +1430,12 @@
 
 	<!-- Process Instance  -->
 	<query name="getNumberOfSProcessInstance">
-		SELECT COUNT(DISTINCT p)
+		SELECT COUNT(p)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 	</query>
 	
 	<query name="searchSProcessInstance">
-		SELECT DISTINCT p
+		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 	</query>
 	
@@ -1456,14 +1456,14 @@
 	<query name="getNumberOfSProcessInstancewithSProcessSupervisor">
 		SELECT COUNT(DISTINCT p.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
 	<query name="searchSProcessInstancewithSProcessSupervisor">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
@@ -1486,7 +1486,7 @@
     </query>
 
 	<query name="getNumberOfSProcessInstanceFailed">
-		SELECT COUNT(DISTINCT p)
+		SELECT COUNT(p)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (
             p.stateId = 7 
@@ -1644,7 +1644,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessInstanceInvolvingUser">
-		select COUNT(DISTINCT p.id)
+		select COUNT(p.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
@@ -1656,7 +1656,7 @@
 	</query>
 
 	<query name="searchSProcessInstanceInvolvingUser">
-		select DISTINCT p
+		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
@@ -1698,7 +1698,7 @@
 
 
 	<query name="isTaskPendingForUser">
-		SELECT COUNT(DISTINCT mapping.id)
+		SELECT COUNT(mapping.id)
 		FROM  org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 		WHERE
 			mapping.activityId = :humanTaskInstanceId
@@ -2023,7 +2023,7 @@
 	</query>
     
     <query name="countProcessInstancesOfProcessDefinition">
-        SELECT COUNT(DISTINCT p)
+        SELECT COUNT(p)
         FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
         WHERE p.processDefinitionId = :processDefinitionId
     </query>
