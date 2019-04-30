@@ -4,6 +4,10 @@ testReturnCode() {
   COD_RET=$1
   if [ ${COD_RET} -ne 0 ]; then
     echo "ERROR $1 $2"
+    echo "############################ W A R N I N G ###########################"
+    echo "################# command '$2' should NOT have failed!! ##############"
+    echo "############################ W A R N I N G ###########################"
+    docker rm -vf bonita-postgres
     exit ${COD_RET}
   fi
 }
@@ -15,17 +19,29 @@ testValue() {
   fi
 }
 
-mvn clean install -DskipTests -f ../pom.xml
+echo "========================================================================"
+echo "Remove potential previously-started docker container. Ignore the errors."
+echo "========================================================================"
+docker rm -vf bonita-postgres 2> /dev/null
 
-export VERSION=`cat ../platform-setup/target/classes/PLATFORM_ENGINE_VERSION`
+echo "============================================="
+echo "Start the Postgres database docker container"
+echo "============================================="
+docker run --rm -p 5432:5432 --name bonita-postgres -d registry.rd.lan/bonitasoft/postgres-11:0.0.2
+
+cd ../../..
+./gradlew build -x test
+cd -
+
+export VERSION=`cat build/resources/main/PLATFORM_ENGINE_VERSION`
 
 echo "========================================"
-echo "version:${VERSION}"
+echo "version: ${VERSION}"
 echo "========================================"
-export E2E_DIR="target/e2e-postgres-bos"
+export E2E_DIR="build/e2e-postgres-bos"
 export ZIP=Bonita-platform-setup-${VERSION}.zip
 
-unzip -o -q -d ${E2E_DIR} target/${ZIP}
+unzip -o -q -d ${E2E_DIR} build/distributions/${ZIP}
 
 echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
 # Activate in debug development phase:
@@ -58,12 +74,6 @@ if [ $? -eq 0 ]; then
 fi
 
 echo "========================================"
-echo "clean all tables"
-echo "========================================"
-psql postgresql://bonita:bpm@localhost:5432/bonita -q -f ${E2E_DIR}/platform_conf/sql/postgres/dropTables.sql
-psql postgresql://bonita:bpm@localhost:5432/bonita -q -f ${E2E_DIR}/platform_conf/sql/postgres/dropQuartzTables.sql
-
-echo "========================================"
 echo "configure postgres"
 sed -i s/^db.vendor=h2/db.vendor=postgres/g ${E2E_DIR}/database.properties
 sed -i s/^db.user=.*/db.user=bonita/g ${E2E_DIR}/database.properties
@@ -89,10 +99,10 @@ cp -rf src/test/resources/tomcat_conf/* ${E2E_DIR}/..
 ${E2E_DIR}/setup.sh configure
 testReturnCode $? "setup.sh configure"
 
-cat target/server/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
+cat build/server/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
 testReturnCode $? "Configuring bonita.xml file with Postgres"
 
-cat target/server/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
+cat build/server/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
 testReturnCode $? "Configuring setenv.sh file with Postgres"
 
 echo "========================================"
@@ -105,10 +115,10 @@ cp -rf src/test/resources/wildfly_conf/* ${E2E_DIR}/..
 ${E2E_DIR}/setup.sh configure
 testReturnCode $? "setup.sh configure"
 
-cat target/server/standalone/configuration/standalone.xml | grep "<connection-url>jdbc:postgresql://localhost:5432/bonita</connection-url>" > /dev/null
+cat build/server/standalone/configuration/standalone.xml | grep "<connection-url>jdbc:postgresql://localhost:5432/bonita</connection-url>" > /dev/null
 testReturnCode $? "Configuring standalone.xml file with Postgres for non-XA datasource"
 
-cat target/server/standalone/configuration/standalone.xml | grep "<xa-datasource-property name=\"DatabaseName\">bonita</xa-datasource-property>" > /dev/null
+cat build/server/standalone/configuration/standalone.xml | grep "<xa-datasource-property name=\"DatabaseName\">bonita</xa-datasource-property>" > /dev/null
 testReturnCode $? "Configuring standalone.xml file with Postgres for XA datasource"
 
 echo "========================================"
@@ -121,20 +131,18 @@ testReturnCode $? "setup.sh init"
 echo "========================================"
 echo "check tables"
 echo "========================================"
-psql postgresql://bonita:bpm@localhost:5432/bonita <<EOF
+docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 select t.table_catalog, t.table_schema, t.table_name from information_schema.tables t
 where t.table_schema='public'
-order by t.table_name;
-EOF
-
+order by t.table_name;"
 
 echo "========================================"
 echo "check platform data"
 echo "========================================"
-psql postgresql://bonita:bpm@localhost:5432/bonita <<EOF
+docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 SELECT
     p.id,
-    p."version",
+    p.version,
     p.initialversion,
     p.createdby,
     TO_CHAR(
@@ -144,14 +152,14 @@ SELECT
         'DD/MM/YYYY HH24:MI:SS'
     ) as creation_date
 FROM
-    platform p
-EOF
+    platform p"
 
 
 echo "========================================"
 echo "check configuration"
 echo "========================================"
-psql postgresql://bonita:bpm@localhost:5432/bonita  <<EOF
+
+docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 SELECT
     c.tenant_id,
     c.content_type,
@@ -161,15 +169,13 @@ FROM
 ORDER BY
     c.tenant_id,
     c.content_type,
-    c.resource_name
-EOF
-
+    c.resource_name"
 
 
 echo "========================================"
 echo "simulation of engine start"
 echo "========================================"
-psql postgresql://bonita:bpm@localhost:5432/bonita  <<EOF
+docker exec bonita-postgres psql postgresql://bonita:bpm@localhost:5432/bonita -c "
 INSERT
     INTO
         configuration(
@@ -186,9 +192,7 @@ INSERT
             configuration c
         WHERE
             c.tenant_id = 0
-            AND c.content_type ='TENANT_TEMPLATE_SECURITY_SCRIPTS'
-EOF
-
+            AND c.content_type ='TENANT_TEMPLATE_SECURITY_SCRIPTS'"
 
 echo "================================================================================"
 echo "simulate a version upgrade (configuration files have changed in folder initial/)"
@@ -232,6 +236,17 @@ CUSTOM_FILE=${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts
 touch ${CUSTOM_FILE}
 
 ${E2E_DIR}/setup.sh push
+
+echo "============================================"
+echo "Backup folder should be created when pushing"
+echo "============================================"
+
+if [ "`ls ${E2E_DIR}/platform_conf/ | grep 'backup-'`" = "" ]; then
+    echo 'ERROR. Should have created backup folder';
+    exit -52
+else
+    echo 'OK. Backup folder present.'
+fi
 
 echo "========================================"
 echo "pull & check new value"
@@ -291,7 +306,12 @@ rm ${E2E_DIR}/lib/postgres*.jar
 ${E2E_DIR}/setup.sh push --debug
 
 echo "========================================"
-echo "end."
+echo "Docker database cleanup"
+echo "========================================"
+docker rm -vf bonita-postgres
+
+echo "========================================"
+echo "END"
 echo "========================================"
 
 

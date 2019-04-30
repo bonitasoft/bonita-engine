@@ -24,7 +24,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
@@ -79,7 +78,9 @@ public class PlatformSetup {
 
     private Path initialConfigurationFolder;
     private Path currentConfigurationFolder;
+    private Path backupConfigurationFolder;
     private Path licensesFolder;
+    private Path backupLicensesFolder;
 
     @Autowired
     PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
@@ -170,6 +171,8 @@ public class PlatformSetup {
         LOGGER.info("Configuration currently in database will be replaced by configuration from folder: "
                 + currentConfigurationFolder.toString());
         ensureNoCriticalFoldersAreDeleted(forcePush);
+        pull(backupConfigurationFolder, backupLicensesFolder);
+        LOGGER.info("Backup directory created: " + backupConfigurationFolder.toString());
         clean();
         pushFromFolder(currentConfigurationFolder);
         pushLicenses();
@@ -313,6 +316,11 @@ public class PlatformSetup {
     private void initializeFoldersPaths(Path platformConfFolder) {
         initialConfigurationFolder = platformConfFolder.resolve("initial");
         currentConfigurationFolder = platformConfFolder.resolve("current");
+
+        Path rootBackupFolder = platformConfFolder.resolve("backup-" + System.currentTimeMillis());
+        backupConfigurationFolder = rootBackupFolder.resolve("current");
+        backupLicensesFolder = rootBackupFolder.resolve("licenses");
+
         licensesFolder = getLicenseInitialFolder(platformConfFolder);
     }
 

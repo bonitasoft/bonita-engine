@@ -28,8 +28,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
@@ -304,7 +306,7 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void push_method_should_log_when_created() throws Exception {
+    public void push_method_should_log_when_created_and_create_backup() throws Exception {
         // given
         platformSetup.init();
         File setupFolder = temporaryFolder.newFolder("conf");
@@ -315,10 +317,13 @@ public class PlatformSetupIT {
         systemOutRule.clearLog();
         platformSetup.forcePush();
 
-        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        final String[] split = log.split("\n");
-
         // then
+        assertThat(setupFolder.listFiles()).hasSize(1);
+        List backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles()).filter(it -> it.getName().contains("backup")).collect(Collectors.toList());
+        assertThat(backupDirectory).hasSize(1);
+        final String log = systemOutRule.getLogWithNormalizedLineSeparator();
+        assertThat(log).contains("Backup directory created:");
+        final String[] split = log.split("\n");
         assertThat(split[split.length - 1]).as("should push new configuration and log message").contains("INFO")
                 .endsWith(
                         "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
