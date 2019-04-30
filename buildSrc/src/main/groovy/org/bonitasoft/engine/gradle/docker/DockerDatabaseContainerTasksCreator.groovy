@@ -152,7 +152,7 @@ class DockerDatabaseContainerTasksCreator {
 
             Task databaseTestTask = project.tasks.create("${vendor.name}DatabaseTest", Test) {
                 group "Verification"
-                description "Run integration test suite on database $vendor.name"
+                description "Runs slow integration test suite on $vendor.name database."
                 systemProperty "bonita.version", project.version
                 classpath += project.files(project.configurations.drivers)
 

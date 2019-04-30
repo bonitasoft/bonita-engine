@@ -13,7 +13,10 @@ class TestsPlugin implements Plugin<Project> {
 
         def tests = project.extensions.create("tests", TestsExtension)
 
-        Test integrationTest = project.tasks.create("integrationTest", Test)
+        Test integrationTest = project.tasks.create("integrationTest", Test) {
+            group "Verification"
+            description "Runs all integration tests (except tests from slow suite) on H2 database."
+        } as Test
 
         project.afterEvaluate {
 
