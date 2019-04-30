@@ -1,18 +1,20 @@
 #!/bin/sh
 
-mvn -f ../pom.xml clean install -DskipTests
+cd ../../../
+./gradlew build -x test
+cd -
 
-export VERSION=`cat ../platform-setup/target/classes/PLATFORM_ENGINE_VERSION`
+export VERSION=`cat ../platform-setup/build/resources/main/PLATFORM_ENGINE_VERSION`
 
 echo "========================================"
 echo "version:${VERSION}"
 echo "========================================"
 
-export E2E_DIR="target/e2e-distrib"
+export E2E_DIR="build/e2e-distrib"
 export ZIP=Bonita-platform-setup-${VERSION}.zip
 
 rm -rf ${E2E_DIR}
-unzip -q -d ${E2E_DIR} target/${ZIP}
+unzip -q -d ${E2E_DIR} build/distributions/${ZIP}
 unzip -q -d ${E2E_DIR}-jar-exploded ${E2E_DIR}/lib/platform-setup-${VERSION}.jar
 
 echo "========================================"
