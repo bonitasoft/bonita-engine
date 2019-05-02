@@ -242,6 +242,7 @@
         <property name="correlation3" column="correlation3" />
         <property name="correlation4" column="correlation4" />
         <property name="correlation5" column="correlation5" />
+        <property name="creationDate" column="creationDate" />
         <filter name="tenantFilter" />
     </class>
 

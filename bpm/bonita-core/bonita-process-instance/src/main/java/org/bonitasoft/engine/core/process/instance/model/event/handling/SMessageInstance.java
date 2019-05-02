@@ -38,6 +38,7 @@ public class SMessageInstance implements PersistentObject {
     private String correlation3;
     private String correlation4;
     private String correlation5;
+    private long creationDate;
 
     public SMessageInstance(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
                                 final String flowNodeName) {
@@ -46,6 +47,7 @@ public class SMessageInstance implements PersistentObject {
         this.targetFlowNode = targetFlowNode;
         this.processDefinitionId = processDefinitionId;
         this.flowNodeName = flowNodeName;
+        this.creationDate = System.currentTimeMillis();
     }
 
 }
