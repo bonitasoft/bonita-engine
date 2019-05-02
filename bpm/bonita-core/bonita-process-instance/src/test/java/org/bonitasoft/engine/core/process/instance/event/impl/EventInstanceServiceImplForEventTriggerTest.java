@@ -162,31 +162,6 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Then
         assertNull("Should return the result of the mock.", result);
     }
-
-    @Test
-    public final void searchEventTriggerInstances_should_return_the_list() throws Exception {
-        // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        final List<STimerEventTriggerInstance> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstance());
-        doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(STimerEventTriggerInstance.class, queryOptions, null);
-
-        // When
-        final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.searchTimerEventTriggerInstances(queryOptions);
-
-        // Then
-        assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
-    }
-
-    @Test(expected = SBonitaReadException.class)
-    public final void searchEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
-        // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(STimerEventTriggerInstance.class, queryOptions, null);
-
-        // When
-        eventInstanceServiceImpl.searchTimerEventTriggerInstances(queryOptions);
-    }
-
     @Test
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_return_the_number() throws Exception {
         // Given

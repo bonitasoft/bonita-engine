@@ -13,9 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import static java.util.Collections.singletonMap;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -52,6 +55,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -322,20 +326,24 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(QueryOptions searchOptions) throws SBonitaReadException {
-        return getPersistenceService().searchEntity(STimerEventTriggerInstance.class, searchOptions, null);
+    public Optional<STimerEventTriggerInstance> getTimerEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException {
+        return Optional.ofNullable(getPersistenceService().selectOne(new SelectOneDescriptor<>(
+                "getEventTriggerInstances",
+                singletonMap("eventInstanceId", flowNodeInstanceId),
+                STimerEventTriggerInstance.class
+        )));
     }
 
     @Override
     public long getNumberOfTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", processInstanceId);
+        final Map<String, Object> parameters = singletonMap("processInstanceId", processInstanceId);
         return getPersistenceService().getNumberOfEntities(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
     }
 
     @Override
     public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions)
             throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", processInstanceId);
+        final Map<String, Object> parameters = singletonMap("processInstanceId", processInstanceId);
         return getPersistenceService().searchEntity(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
     }
 
