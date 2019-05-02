@@ -466,6 +466,7 @@ CREATE TABLE message_instance (
   	correlation3 NVARCHAR(128),
   	correlation4 NVARCHAR(128),
   	correlation5 NVARCHAR(128),
+  	creationDate NUMERIC(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
 )
 GO

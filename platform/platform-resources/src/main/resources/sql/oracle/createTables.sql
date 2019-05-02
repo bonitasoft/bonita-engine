@@ -416,6 +416,7 @@ CREATE TABLE message_instance (
   	correlation3 VARCHAR2(128 CHAR),
   	correlation4 VARCHAR2(128 CHAR),
   	correlation5 VARCHAR2(128 CHAR),
+  	creationDate NUMBER(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
