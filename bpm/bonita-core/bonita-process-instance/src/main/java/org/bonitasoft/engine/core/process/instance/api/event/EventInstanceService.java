@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.api.event;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -132,7 +133,12 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(QueryOptions searchOptions) throws SBonitaReadException;
+    /**
+     *
+     * @param flowNodeInstanceId the flow node instance id
+     * @return the timer event trigger instance of this flow node if there is one
+     */
+    Optional<STimerEventTriggerInstance> getTimerEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException;
 
     SWaitingSignalEvent getWaitingSignalEvent(long id)
             throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException;
