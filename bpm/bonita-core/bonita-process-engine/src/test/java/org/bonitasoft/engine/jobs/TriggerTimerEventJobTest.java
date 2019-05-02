@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -147,8 +148,7 @@ public class TriggerTimerEventJobTest {
         setAttributes();
         STimerEventTriggerInstance timerEventTriggerInstance = new STimerEventTriggerInstance();
         timerEventTriggerInstance.setId(32143L);
-        doReturn(singletonList(timerEventTriggerInstance)).when(eventInstanceService)
-                .searchTimerEventTriggerInstances(new QueryOptions(0, 1, emptyList(), singletonList(new FilterOption(STimerEventTriggerInstance.class, "eventInstanceId", flowNodeInstanceId)), null));
+        doReturn(Optional.of(timerEventTriggerInstance)).when(eventInstanceService).getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
 
         triggerTimerEventJob.execute();
 

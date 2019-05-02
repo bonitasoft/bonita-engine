@@ -13,26 +13,17 @@
  **/
 package org.bonitasoft.engine.jobs;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
@@ -112,9 +103,9 @@ public class TriggerTimerEventJob extends InternalJob {
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
             if (flowNodeInstanceId != null) {
-                List<STimerEventTriggerInstance> triggerInstances = eventInstanceService.searchTimerEventTriggerInstances(new QueryOptions(0, 1, emptyList(), singletonList(new FilterOption(STimerEventTriggerInstance.class, "eventInstanceId", flowNodeInstanceId)), null));
-                if (!triggerInstances.isEmpty()) {
-                    eventInstanceService.deleteEventTriggerInstance(triggerInstances.get(0));
+                Optional<STimerEventTriggerInstance> triggerInstance = eventInstanceService.getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+                if (triggerInstance.isPresent()) {
+                    eventInstanceService.deleteEventTriggerInstance(triggerInstance.get());
                 }
 
             }

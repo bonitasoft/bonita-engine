@@ -579,11 +579,6 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
 	</query>
 	
-	<query name="searchSEventTriggerInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t
-	</query>	
-	
 	<query name="getNumberOfSTimerEventTriggerInstanceByProcessInstance">
 		SELECT COUNT(t)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance AS t,
