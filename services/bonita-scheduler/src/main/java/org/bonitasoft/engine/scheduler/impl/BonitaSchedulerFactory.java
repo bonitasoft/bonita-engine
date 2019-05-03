@@ -26,17 +26,15 @@ import org.quartz.impl.StdSchedulerFactory;
 public class BonitaSchedulerFactory extends StdSchedulerFactory {
 
     private SchedulerServiceImpl schedulerService;
-    private final TechnicalLoggerService logger;
 
-    public BonitaSchedulerFactory(final Properties props, final TechnicalLoggerService logger) throws SchedulerException {
+    public BonitaSchedulerFactory(final Properties props) throws SchedulerException {
         super(props);
-        this.logger = logger;
     }
 
     @Override
     public Scheduler getScheduler() throws SchedulerException {
         final Scheduler scheduler = super.getScheduler();
-        scheduler.setJobFactory(new TransactionalSimpleJobFactory(schedulerService, logger));
+        scheduler.setJobFactory(new TransactionalSimpleJobFactory(schedulerService));
         return scheduler;
     }
 
