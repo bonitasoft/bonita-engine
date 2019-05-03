@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -27,24 +30,52 @@ import org.quartz.JobExecutionException;
 public abstract class AbstractQuartzJob implements org.quartz.Job {
 
     private StatelessJob bosJob;
+    private SchedulerServiceImpl schedulerService;
+    private JobDetail jobDetail;
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
-            if (bosJob != null) {
-                bosJob.execute();
-            }
+            final JobIdentifier jobIdentifier = getJobIdentifier(jobDetail.getJobDataMap());
+            bosJob = retrieveJob(jobIdentifier);
+            bosJob.execute();
         } catch (final Throwable e) {
             throw new JobExecutionException(e);
         }
     }
 
-    public StatelessJob getBosJob() {
+    private StatelessJob retrieveJob(JobIdentifier jobIdentifier) throws JobExecutionException {
+        try {
+            return schedulerService.getPersistedJob(jobIdentifier);
+        } catch (final Throwable t) {
+            throw new JobExecutionException("unable to create the BOS job", t);
+        }
+    }
+
+    private JobIdentifier getJobIdentifier(JobDataMap jobDataMap) {
+        final long tenantId = Long.parseLong((String) jobDataMap.get("tenantId"));
+        final long jobId = Long.parseLong((String) jobDataMap.get("jobId"));
+        final String jobName = (String) jobDataMap.get("jobName");
+        return new JobIdentifier(jobId, tenantId, jobName);
+    }
+
+    StatelessJob getBosJob() {
         return bosJob;
     }
 
-    public void setBosJob(final StatelessJob bosJob) {
-        this.bosJob = bosJob;
+    void setSchedulerService(SchedulerServiceImpl schedulerService) {
+        this.schedulerService = schedulerService;
     }
 
+    void setJobDetails(JobDetail jobDetail) {
+        this.jobDetail = jobDetail;
+    }
+
+    JobDetail getJobDetail() {
+        return jobDetail;
+    }
+
+    SchedulerServiceImpl getSchedulerService() {
+        return schedulerService;
+    }
 }

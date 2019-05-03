@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Collections.singletonList;
+import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
+import static org.bonitasoft.engine.scheduler.impl.JobUtils.jobThatSucceed;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.verify;
 
@@ -24,6 +27,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
+import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -67,6 +71,8 @@ public class QuartzJobListenerTest {
     private BonitaJobListener bonitaJobListener;
 
     private JobExecutionContext context;
+    @Mock
+    private SchedulerServiceImpl schedulerService;
 
     @Before
     public void setUp() {
@@ -99,7 +105,7 @@ public class QuartzJobListenerTest {
     }
 
     @Test
-    public final void jobExecutionVetoed() {
+    public final void jobExecutionVetoed() throws Exception {
         // Given
         final Scheduler scheduler = new RemoteScheduler("schedId", "host", 1589);
         final JobDataMap jobDataMap = new JobDataMap();
@@ -111,34 +117,8 @@ public class QuartzJobListenerTest {
         final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true, new Date(), new Date(),
                 new Date(), new Date());
         final ConcurrentQuartzJob job = new ConcurrentQuartzJob();
-        job.setBosJob(new StatelessJob() {
-
-            private static final long serialVersionUID = -3387888226053088779L;
-
-            @Override
-            public String getName() {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public String getDescription() {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public void execute() {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void setAttributes(final Map<String, Serializable> attributes) {
-                // TODO Auto-generated method stub
-
-            }
-        });
+        job.setSchedulerService(schedulerService);
+        job.setJobDetails(createJobDetails(1,2));
         final JobExecutionContext context = new JobExecutionContextImpl(scheduler, firedBundle, job);
 
         // When
