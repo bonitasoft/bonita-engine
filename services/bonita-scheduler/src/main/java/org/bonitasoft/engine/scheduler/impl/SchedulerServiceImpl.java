@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import static java.util.Collections.singletonList;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
@@ -28,10 +28,6 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -83,8 +79,8 @@ public class SchedulerServiceImpl implements SchedulerService {
      * Create a new instance of scheduler service.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
-            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
+                                final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
+                                final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
@@ -267,25 +263,19 @@ public class SchedulerServiceImpl implements SchedulerService {
         @Override
         public JobWrapper call() throws Exception {
             final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
-            // FIXME do something here if the job does not exist
             if (sJobDescriptor == null) {
+                logger.log(SchedulerServiceImpl.class, TechnicalLogSeverity.WARNING, String.format("The job %s does not exist anymore. It might be already executed", jobIdentifier));
                 return null;
             }
             final String jobClassName = sJobDescriptor.getJobClassName();
             final Class<?> jobClass = Class.forName(jobClassName);
             final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
 
-            final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
-            final List<OrderByOption> orderByOptions = singletonList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
-            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
-                    singletonList(filterOption), null);
-            final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
-            final HashMap<String, Serializable> parameterMap = new HashMap<>();
-            for (final SJobParameter sJobParameterImpl : parameters) {
-                parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
-            }
-            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID, jobIdentifier.getId());
-            statelessJob.setAttributes(parameterMap);
+            Map<String, Serializable> parameters = jobService.getJobParameters(jobIdentifier.getId())
+                    .stream()
+                    .collect(Collectors.toMap(SJobParameter::getKey, SJobParameter::getValue));
+            parameters.put(StatelessJob.JOB_DESCRIPTOR_ID, jobIdentifier.getId());
+            statelessJob.setAttributes(parameters);
             if (servicesResolver != null) {
                 servicesResolver.injectServices(jobIdentifier.getTenantId(), statelessJob);
             }
