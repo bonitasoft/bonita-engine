@@ -17,7 +17,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -31,6 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -172,19 +175,9 @@ public class JobServiceImpl implements JobService {
 
     protected void deleteAllJobParameters(final long jobDescriptorId) throws SJobParameterCreationException {
         try {
-            final int limit = 100;
-            final List<FilterOption> filters = new ArrayList<FilterOption>(1);
-
-            filters.add(new FilterOption(SJobParameter.class, "jobDescriptorId", jobDescriptorId));
-            final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
-            final QueryOptions options = new QueryOptions(0, limit, orderByOptions, filters, null);
-            List<SJobParameter> jobParameters = null;
-            do {
-                jobParameters = searchJobParameters(options);
-                for (final SJobParameter jobParameter : jobParameters) {
-                    deleteJobParameter(jobParameter);
-                }
-            } while (jobParameters.size() == limit);
+            for (SJobParameter jobParameter : getJobParameters(jobDescriptorId)) {
+                deleteJobParameter(jobParameter);
+            }
         } catch (final SBonitaException sbe) {
             throw new SJobParameterCreationException(sbe);
         }
@@ -239,9 +232,11 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+
     @Override
-    public List<SJobParameter> searchJobParameters(final QueryOptions queryOptions) throws SBonitaReadException {
-        return readPersistenceService.searchEntity(SJobParameter.class, queryOptions, null);
+    public List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException {
+        Map<String, Object> parameters = Collections.<String, Object>singletonMap("jobDescriptorId", jobDescriptorId);
+        return readPersistenceService.selectList(new SelectListDescriptor<SJobParameter>("getJobParameters", parameters, SJobParameter.class, QueryOptions.countQueryOptions()));
     }
 
     @Override

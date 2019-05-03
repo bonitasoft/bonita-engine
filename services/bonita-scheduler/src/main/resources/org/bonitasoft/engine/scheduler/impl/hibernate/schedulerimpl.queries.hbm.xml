@@ -19,10 +19,10 @@
 		SELECT COUNT(jp)
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
 	</query>
-
-	<query name="searchSJobParameter">
+	<query name="getJobParameters">
 		SELECT jp
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
+		WHERE jp.jobDescriptorId = :jobDescriptorId
 	</query>
 
 	<!-- Job Log -->
