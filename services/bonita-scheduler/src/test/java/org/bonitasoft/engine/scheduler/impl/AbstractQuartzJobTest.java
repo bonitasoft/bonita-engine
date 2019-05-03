@@ -16,6 +16,10 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
+import static org.bonitasoft.engine.scheduler.impl.JobUtils.jobThatFails;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -24,7 +28,11 @@ import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.quartz.JobExecutionException;
 
 /**
@@ -32,6 +40,11 @@ import org.quartz.JobExecutionException;
  */
 public class AbstractQuartzJobTest {
 
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Mock
+    SchedulerServiceImpl schedulerService;
 
     private AbstractQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
 
@@ -40,40 +53,16 @@ public class AbstractQuartzJobTest {
         // job should never throw an exception and be handled by the JobWrapper
         // we do not unschedule the job in that case. we don't want to loose the job
         //given
-        abstractQuartzJob.setBosJob(new StatelessJob() {
-            @Override
-            public String getName() {
-                return null;
-            }
+        doReturn(jobThatFails()).when(schedulerService).getPersistedJob(any());
+        abstractQuartzJob.setSchedulerService(schedulerService);
+        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
 
-            @Override
-            public String getDescription() {
-                return null;
-            }
-
-            @Override
-            public void execute() throws SJobExecutionException, SFireEventException {
-                throw new SJobExecutionException("exception");
-            }
-
-            @Override
-            public void setAttributes(Map<String, Serializable> attributes) throws SJobConfigurationException {
-
-            }
-        });
-
-        //when
         try{
-
             abstractQuartzJob.execute(null);
             fail("should throw exception");
         } catch (JobExecutionException e ){
             assertThat(e.unscheduleFiringTrigger()).isFalse();
         }
-
-
-        //then
-
     }
 
 
