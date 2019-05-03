@@ -190,15 +190,11 @@ public interface JobService {
      */
     SJobParameter getJobParameter(long id) throws SJobParameterNotFoundException, SJobParameterReadException;
 
+
     /**
-     * Search all job parameters according to specific criteria
-     *
-     * @param queryOptions a map of specific parameters of a query
-     * @return A list of SJobParameter objects
-     * @throws SBonitaReadException
-     * @since 6.1
+     * get parameters of a job
      */
-    List<SJobParameter> searchJobParameters(QueryOptions queryOptions) throws SBonitaReadException;
+    List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException;
 
     /**
      * Create a new job log for a specific tenant

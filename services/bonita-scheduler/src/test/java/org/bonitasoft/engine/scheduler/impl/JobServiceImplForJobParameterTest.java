@@ -13,15 +13,27 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.entry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -36,6 +48,7 @@ import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDelet
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterReadException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -286,34 +299,16 @@ public class JobServiceImplForJobParameterTest {
         jobServiceImpl.getJobParameter(jobParameterId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#searchJobParameters(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
+
     @Test
-    public void searchJobParameters() throws Exception {
-        // Given
-        final QueryOptions options = new QueryOptions(0, 10);
-        final SJobParameter sJobParameter = mock(SJobParameter.class);
-        when(readPersistenceService.searchEntity(SJobParameter.class, options, null)).thenReturn(Collections.singletonList(sJobParameter));
+    public void should_list_parameters() throws Exception {
+        when(readPersistenceService.selectList(any())).thenReturn(Collections.singletonList(new SJobParameterImpl("key", "value")));
 
-        // When
-        final SJobParameter result = jobServiceImpl.searchJobParameters(options).get(0);
+        List<SJobParameter> result = jobServiceImpl.getJobParameters(123L);
 
-        // Then
-        assertEquals(sJobParameter, result);
-        verify(readPersistenceService).searchEntity(SJobParameter.class, options, null);
+        Assertions.assertThat(result.stream().collect(Collectors.toMap(SJobParameter::getKey, SJobParameter::getValue)))
+                .containsOnly(entry("key", "value"));
     }
-
-    @Test(expected = SBonitaReadException.class)
-    public void searchJobParameters_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SBonitaReadException {
-        // Given
-        final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobParameter.class, options, null);
-
-        // When
-        jobServiceImpl.searchJobParameters(options);
-    }
-
     /**
      * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#setJobParameters(long, long, java.util.List)}.
      */
@@ -325,8 +320,7 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         final List<SJobParameter> sJobParameters = Collections.singletonList(sJobParameter);
-        doReturn(sJobParameters).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
+        doReturn(sJobParameters).when(readPersistenceService).selectList(any());
 
         // When
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, sJobParameters);
@@ -344,9 +338,6 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
 
-        doReturn(Collections.EMPTY_LIST).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
-
         // When
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.<SJobParameter> emptyList());
 
@@ -360,9 +351,6 @@ public class JobServiceImplForJobParameterTest {
         // Given
         final long tenantId = 12;
         final long jobDescriptorId = 8;
-
-        doReturn(Collections.EMPTY_LIST).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
 
         // When
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, null);
@@ -380,8 +368,7 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
+        doThrow(new SBonitaReadException("")).when(readPersistenceService).selectList(any());
 
         // When
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
@@ -394,8 +381,7 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq(null));
+        doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).selectList(any());
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
@@ -409,9 +395,6 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
         doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
