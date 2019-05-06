@@ -1,0 +1,28 @@
+plugins {
+    id "java-library"
+}
+
+dependencies {
+    api(project(":engine:bpm:bonita-common"))
+    api(project(":engine:bpm:bonita-client"))
+
+    api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}")
+
+    implementation(project(":engine:bonita-test-api"))
+    implementation(project(":engine:bpm:bonita-server"))
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Deps.springBootVersion}")
+
+    testImplementation("org.springframework.boot:spring-boot-test:${Deps.springBootVersion}")
+    testImplementation("junit:junit:${Deps.junit4Version}")
+    testImplementation("org.assertj:assertj-core:${Deps.assertjVersion}")
+    testImplementation("org.awaitility:awaitility:${Deps.awaitilityVersion}")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+        }
+    }
+}
