@@ -107,11 +107,6 @@ public class TransientDataServiceImpl implements TransientDataService {
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
             final String dataInstanceKey = getKey(dataInstance);
-            if (checkDataAlreadyExists(dataInstanceKey)) {
-                throw new SCreateDataInstanceException(String.format(
-                        "Data already exists: name,  container type = %s, containerId = %s", dataInstance.getName(),
-                        dataInstance.getContainerType(), dataInstance.getContainerId()));
-            }
             setId(dataInstance);
             cacheService.store(TRANSIENT_DATA_CACHE_NAME, dataInstanceKey, dataInstance);
         } catch (final Exception e) {
@@ -124,11 +119,6 @@ public class TransientDataServiceImpl implements TransientDataService {
         // FIXME: probably the id will be be used, so not necessary to be set
         final long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         ClassReflector.invokeSetter(dataInstance, "setId", long.class, id);
-    }
-
-    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws SCacheException {
-        final List<?> keys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
-        return keys.contains(dataInstanceKey);
     }
 
     @Override
@@ -284,7 +274,7 @@ public class TransientDataServiceImpl implements TransientDataService {
                             return getDataInstance(data.getName(), containerId, containerType);
                         } catch (SDataInstanceException e) {
                             throw new BonitaRuntimeException(
-                                    String.format("Transient data '%s' not found for container %s wit type %s",
+                                    String.format("Transient data '%s' not found for container %s with type %s",
                                             data.getName(), containerId, containerType),
                                     e);
                         }
@@ -293,7 +283,7 @@ public class TransientDataServiceImpl implements TransientDataService {
         } catch (SProcessDefinitionNotFoundException | SFlowNodeNotFoundException | SFlowNodeReadException
                 | SBonitaReadException e) {
             throw new SDataInstanceException(
-                    String.format("An error occured while retrieving transient data for container %s wit type %s",
+                    String.format("An error occured while retrieving transient data for container %s with type %s",
                             containerId, containerType),
                     e);
         }
