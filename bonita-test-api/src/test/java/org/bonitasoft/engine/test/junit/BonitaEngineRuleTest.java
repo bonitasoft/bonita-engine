@@ -3,6 +3,7 @@ package org.bonitasoft.engine.test.junit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.annotation.Engine;
 import org.junit.Rule;
@@ -59,6 +60,16 @@ public class BonitaEngineRuleTest {
 
         @Override
         public void setDropOnStop(boolean dropOnStop) {
+
+        }
+
+        @Override
+        public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration database) {
+            
+        }
+
+        @Override
+        public void setBusinessDataDatabaseProperties(BonitaDatabaseConfiguration database) {
 
         }
     }

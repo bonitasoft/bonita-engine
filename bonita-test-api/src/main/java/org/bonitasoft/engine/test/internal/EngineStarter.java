@@ -32,6 +32,7 @@ import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
+import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
@@ -350,5 +351,24 @@ public class EngineStarter {
 
     public void setDropOnStop(boolean dropOnStop) {
         this.dropOnStop = dropOnStop;
+    }
+
+    public void setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration database) {
+        System.setProperty("sysprop.bonita.db.vendor", database.getDbVendor());
+        setSystemPropertyIfNotNull(database.getServer(), "db.server.name");
+        setSystemPropertyIfNotNull(database.getPort(), "db.server.port");
+        setSystemPropertyIfNotNull(database.getDatabaseName(), "db.database.name");
+        setSystemPropertyIfNotNull(database.getUser(), "db.user");
+        setSystemPropertyIfNotNull(database.getPassword(), "db.password");
+    }
+
+    private void setSystemPropertyIfNotNull(String property, String key) {
+        if (property != null) {
+            System.setProperty(key, property);
+        }
+    }
+
+    public void setBusinessDataDatabaseConfiguration(BonitaDatabaseConfiguration bonitaDatabaseConfiguration) {
+        //NYI
     }
 }
