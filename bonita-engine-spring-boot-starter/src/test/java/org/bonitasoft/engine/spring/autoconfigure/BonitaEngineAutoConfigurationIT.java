@@ -11,14 +11,21 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine;
+package org.bonitasoft.engine.spring.autoconfigure;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.bonitasoft.engine.api.APIClient;
+import org.bonitasoft.engine.platform.LoginException;
+import org.junit.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * @author Emmanuel Duchastenier
- */
-@SpringBootApplication
-public class ClientTestApplication {
+public class BonitaEngineAutoConfigurationIT {
+
+    @Test
+    public void should_start_engine_when_application_starts() throws LoginException {
+        final ConfigurableApplicationContext context = SpringApplication.run(ClientTestApplication.class);
+        context.getBean(APIClient.class).login("install", "install");
+        context.stop();
+    }
 
 }

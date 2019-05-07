@@ -9,6 +9,8 @@ import org.bonitasoft.engine.test.internal.EngineStarter;
 public class TestEngineImpl implements TestEngine {
 
     private static TestEngineImpl INSTANCE = createTestEngine();
+    private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
+    private BonitaDatabaseConfiguration businessDataDatabase;
 
     private static TestEngineImpl createTestEngine() {
         return new TestEngineImpl(new EngineStarter(), new EngineCommander());
@@ -46,6 +48,10 @@ public class TestEngineImpl implements TestEngine {
      */
     @Override
     public boolean start() throws Exception {
+        if (bonitaDatabaseConfiguration != null) {
+            engineStarter.setBonitaDatabaseConfiguration(bonitaDatabaseConfiguration);
+            engineStarter.setBusinessDataDatabaseConfiguration(businessDataDatabase);
+        }
         if (!started) {
             doStart();
             started = true;
@@ -84,5 +90,23 @@ public class TestEngineImpl implements TestEngine {
     @Override
     public void setDropOnStop(boolean dropOnStop) {
         engineStarter.setDropOnStop(dropOnStop);
+    }
+
+    @Override
+    public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration configuration) {
+        bonitaDatabaseConfiguration = configuration;
+    }
+
+    @Override
+    public void setBusinessDataDatabaseProperties(BonitaDatabaseConfiguration database) {
+        this.businessDataDatabase = database;
+    }
+
+    public BonitaDatabaseConfiguration getBonitaDatabaseConfiguration() {
+        return bonitaDatabaseConfiguration;
+    }
+
+    public BonitaDatabaseConfiguration getBusinessDataDatabase() {
+        return businessDataDatabase;
     }
 }
