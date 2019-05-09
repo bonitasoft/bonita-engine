@@ -25,10 +25,13 @@ To be able to successfully build the Bonita components that use the Engine, run:
 ```
  ./gradlew publishToMavenLocal
 ```
+Among other things, it also generates the javadoc used by Bonita Studio.
 
 The command above runs all unit tests. To skip them, add the `-x test`
 option.
 
+Running unit / integration tests
+-----------------
 To run all **unit + integration tests** (on the default embedded H2
 database), run the following command:
 ```
@@ -46,5 +49,4 @@ a _Docker_ container, run one of the following commands:
 
 How to contribute
 -----------------
-
 In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD).
