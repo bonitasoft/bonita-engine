@@ -955,6 +955,7 @@ CREATE TABLE job_param (
   value_ BLOB NOT NULL,
   PRIMARY KEY (tenantId, id)
 );
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
 
 CREATE TABLE job_log (
   tenantId NUMBER(19, 0) NOT NULL,
