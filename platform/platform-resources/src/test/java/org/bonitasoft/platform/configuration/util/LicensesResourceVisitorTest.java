@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,13 +13,12 @@
  **/
 package org.bonitasoft.platform.configuration.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,7 +50,7 @@ public class LicensesResourceVisitorTest {
         Files.walkFileTree(licenseFolder, resourceVisitor);
 
         //then
-        assertThat(bonitaConfigurations).containsOnly(expectedLicense1, expectedLicense2);
+        Assertions.assertThat(bonitaConfigurations).containsOnly(expectedLicense1, expectedLicense2);
 
     }
 }

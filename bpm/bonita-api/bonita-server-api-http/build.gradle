@@ -1,7 +1,7 @@
 
 
 dependencies {
-    compile project(':engine:platform:platform-setup')
+    compile project(':engine:platform:platform-resources')
     compile project(':engine:bpm:bonita-core:bonita-process-engine')
     compile project(':engine:services:bonita-platform-session')
     compile project(':engine:services:bonita-session')

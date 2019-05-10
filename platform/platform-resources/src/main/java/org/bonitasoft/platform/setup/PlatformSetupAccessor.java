@@ -28,7 +28,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * access platform setup outside of a spring context ( to be replace by a spring context...)
+ * access platform setup outside of a spring context (to be replaced by a spring context...)
  *
  * @author Baptiste Mesta
  */

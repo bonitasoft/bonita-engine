@@ -13,20 +13,18 @@
  */
 package org.bonitasoft.platform.version.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-
 import java.util.Arrays;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,13 +51,13 @@ public class VersionServiceImplTest {
     @Test
     public void should_return_platform_database_version() throws Exception {
         //given
-        doReturn(Arrays.asList("a.b.c")).when(jdbcTemplate).query(anyString(), any(PlatformRowMapper.class));
+        Mockito.doReturn(Arrays.asList("a.b.c")).when(jdbcTemplate).query(ArgumentMatchers.anyString(), ArgumentMatchers.any(PlatformRowMapper.class));
 
         //when
         final String platformVersion = versionService.getPlatformVersion();
 
         //then
-        assertThat(platformVersion).as("should return same version").isEqualTo("a.b.c");
+        Assertions.assertThat(platformVersion).as("should return same version").isEqualTo("a.b.c");
     }
 
 }

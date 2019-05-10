@@ -23,11 +23,6 @@
         <property name="transactionManager" ref="arjunaTransactionManager" />
     </bean>
 
-    <util:map id="jpa-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
-        <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
-        <entry key="hibernate.connection.datasource" value-ref="businessDataDataSource" />
-    </util:map>
-
     <bean id="notManagedBizDataSource"
           class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <constructor-arg name="configuration">
@@ -39,11 +34,21 @@
         </constructor-arg>
     </bean>
 
-    <util:map id="jpa-model-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
-        <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
-        <entry key="hibernate.show_sql" value="false" />
-        <entry key="hibernate.format_sql" value="true" />
-        <entry key="hibernate.connection.datasource" value-ref="notManagedBizDataSource" />
-    </util:map>
+    <bean id="jpa-test-configuration" class="org.bonitasoft.engine.business.data.JpaTestConfiguration">
+        <constructor-arg name="jpaConfiguration">
+            <util:map id="jpa-configuration">
+                <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value-ref="businessDataDataSource" />
+            </util:map>
+        </constructor-arg>
+        <constructor-arg name="jpaModelConfiguration">
+            <util:map id="jpa-model-configuration">
+                <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+                <entry key="hibernate.show_sql" value="false" />
+                <entry key="hibernate.format_sql" value="true" />
+                <entry key="hibernate.connection.datasource" value-ref="notManagedBizDataSource" />
+            </util:map>
+        </constructor-arg>
+    </bean>
 
 </beans>

@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2016-2018 Bonitasoft S.A.
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,13 +10,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 package org.bonitasoft.platform.configuration.impl;
 
 import static org.bonitasoft.platform.configuration.impl.ConfigurationFields.RESOURCE_CONTENT;
 import static org.bonitasoft.platform.configuration.impl.ConfigurationFields.RESOURCE_NAME;
 import static org.bonitasoft.platform.configuration.model.BonitaConfigurationAssert.assertThat;
-import static org.mockito.Mockito.doReturn;
 
 import java.sql.ResultSet;
 
@@ -25,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -38,8 +38,8 @@ public class BonitaConfigurationRowMapperTest {
 
     @Before
     public void setup() throws Exception {
-        doReturn("my resource").when(rs).getString(RESOURCE_NAME);
-        doReturn("my content".getBytes()).when(rs).getBytes(RESOURCE_CONTENT);
+        Mockito.doReturn("my resource").when(rs).getString(RESOURCE_NAME);
+        Mockito.doReturn("my content".getBytes()).when(rs).getBytes(RESOURCE_CONTENT);
     }
 
     @Test

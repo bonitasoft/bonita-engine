@@ -3,7 +3,7 @@
 dependencies {
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile project(':engine:bpm:bonita-client')
-    compile project(':engine:platform:platform-setup')
+    compile project(':engine:platform:platform-resources')
     compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"
     compile "javax.transaction:jta:${Deps.javaxJtaVersion}"
