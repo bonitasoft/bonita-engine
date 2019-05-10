@@ -1,12 +1,43 @@
-.project
-.settings
+### virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### OSX template
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Maven template
 target
-.classpath
-.metadata
-FILEPATH.*.db
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
 dependency-reduced-pom.xml
-Temporary*.java
+buildNumber.properties
+.mvn/timing.properties
+
+### Intellij
 *.iml
 .idea
+
+### Eclipse
+.project
+.settings
+.classpath
+
+### Temporary files
 *.orig
-engine-it.exec
+**/bin
+*.tmp
+*~
+
+### bonita template
+engine-sp-it.exec
+FILEPATH.*.db
+Temporary*.java
+generated
+
+### gradle
+build
+.gradle
