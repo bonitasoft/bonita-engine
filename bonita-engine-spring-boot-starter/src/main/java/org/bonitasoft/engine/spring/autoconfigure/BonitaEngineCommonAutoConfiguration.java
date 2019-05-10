@@ -13,36 +13,14 @@
  **/
 package org.bonitasoft.engine.spring.autoconfigure;
 
-import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.spring.autoconfigure.properties.BonitaEngineProperties;
-import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
-import org.bonitasoft.engine.test.TestEngine;
-import org.bonitasoft.engine.test.TestEngineImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan
-@ConditionalOnClass({ TestEngine.class })
 @EnableConfigurationProperties(BonitaEngineProperties.class)
-public class BonitaEngineAutoConfiguration {
-
-    @Bean
-    TestEngine testEngine(BonitaEngineProperties properties) {
-        TestEngine instance = TestEngineImpl.getInstance();
-        instance.setBonitaDatabaseProperties(properties.getDatabase().getBonita());
-        instance.setBusinessDataDatabaseProperties(properties.getDatabase().getBusinessData());
-        instance.setDropOnStart(false);
-        instance.setDropOnStop(false);
-        return instance;
-    }
-
-    @Bean
-    APIClient apiAccessor() {
-        return new APIClient();
-    }
+public class BonitaEngineCommonAutoConfiguration {
 
 }
