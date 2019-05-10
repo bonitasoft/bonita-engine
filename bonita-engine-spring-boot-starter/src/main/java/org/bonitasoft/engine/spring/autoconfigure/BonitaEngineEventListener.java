@@ -32,18 +32,15 @@ public class BonitaEngineEventListener implements ApplicationContextAware {
 
     private TestEngine bonitaEngine;
 
-    public BonitaEngineEventListener(TestEngine bonitaEngine) {
-        this.bonitaEngine = bonitaEngine;
-    }
-
     @EventListener
     public void handleApplicationReadyEvent(final ApplicationReadyEvent applicationReadyEvent) throws Exception {
+        bonitaEngine = applicationReadyEvent.getApplicationContext().getBean(TestEngine.class);
         bonitaEngine.start();
     }
 
     @EventListener
     public void handleContextStoppedEvent(final ContextClosedEvent contextClosedEvent) throws Exception {
-        if (context == contextClosedEvent.getApplicationContext()) {
+        if (bonitaEngine != null && context == contextClosedEvent.getApplicationContext()) {
             bonitaEngine.stop();
         }
     }

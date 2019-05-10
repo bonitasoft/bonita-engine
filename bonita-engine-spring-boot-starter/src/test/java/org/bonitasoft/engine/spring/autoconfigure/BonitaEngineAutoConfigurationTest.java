@@ -24,7 +24,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 public class BonitaEngineAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(BonitaEngineAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(BonitaEngineCommonAutoConfiguration.class,BonitaEngineServerAutoConfiguration.class));
 
     @Test
     public void should_configure_database_using_properties() {
