@@ -18,17 +18,15 @@ import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
@@ -62,11 +60,9 @@ public class ConcurrencyTest {
     @Qualifier("notManagedBizDataSource")
     private DataSource modelDatasource;
 
-    @Resource(name = "jpa-configuration")
-    private Map<String, Object> configuration;
-
-    @Resource(name = "jpa-model-configuration")
-    private Map<String, Object> modelConfiguration;
+    @Autowired
+    @Qualifier("jpa-test-configuration")
+    private JpaTestConfiguration configuration;
 
     private JdbcTemplate jdbcTemplate;
 
@@ -82,14 +78,14 @@ public class ConcurrencyTest {
 
         final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, loggerService);
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(
                 mock(DependencyService.class),
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService,
-                        configuration, classLoaderService, 1L));
+                        configuration.getJpaConfiguration(), classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
 
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();

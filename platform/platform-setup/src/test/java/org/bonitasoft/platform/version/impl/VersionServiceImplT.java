@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2016 Bonitasoft S.A.
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,13 +10,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 package org.bonitasoft.platform.version.impl;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.platform.setup.PlatformSetupApplication;
 import org.bonitasoft.platform.setup.ScriptExecutor;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
@@ -80,13 +79,13 @@ public class VersionServiceImplT {
         final String platformVersion = versionService.getPlatformVersion();
 
         //then
-        assertThat(platformVersion).as("should return same version").isEqualTo(versionService.getPlatformSetupVersion());
+        Assertions.assertThat(platformVersion).as("should return same version").isEqualTo(versionService.getPlatformSetupVersion());
     }
 
     @Test
     public void should_have_same_version() throws Exception {
         //then
-        assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isTrue();
+        Assertions.assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isTrue();
     }
 
     @Test
@@ -95,7 +94,7 @@ public class VersionServiceImplT {
         jdbcTemplate.execute("UPDATE platform set version='a.b.c' ");
 
         //then
-        assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isFalse();
+        Assertions.assertThat(versionService.isValidPlatformVersion()).as("should insert valid version").isFalse();
     }
 
 }

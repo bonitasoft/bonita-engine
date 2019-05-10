@@ -19,12 +19,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
@@ -40,11 +38,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SchemaManagerTest {
 
     @Autowired
-    @Qualifier("notManagedBizDataSource")
-    private DataSource modelDatasource;
-
-    @Resource(name = "jpa-model-configuration")
-    private Map<String, Object> modelConfiguration;
+    @Qualifier("jpa-test-configuration")
+    private JpaTestConfiguration configuration;
 
     private SchemaManagerUpdate schemaManager;
 
@@ -52,7 +47,7 @@ public class SchemaManagerTest {
     public void setUp() {
         final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
-        schemaManager = new SchemaManagerUpdate(modelConfiguration, loggerService);
+        schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
     }
 
     @Test
@@ -67,7 +62,7 @@ public class SchemaManagerTest {
         updateAndDropSchema(bom);
     }
 
-       protected void updateAndDropSchema(final BusinessObjectModel bom) {
+    private void updateAndDropSchema(final BusinessObjectModel bom) {
         final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
         if (!updateExceptions.isEmpty()) {
             fail("Updating schema fails due to: " + updateExceptions);

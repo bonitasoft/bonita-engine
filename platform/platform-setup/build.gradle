@@ -2,14 +2,12 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'distribution'
 
-
 configurations {
     distributionZip
     inDistrib
 }
 
 dependencies {
-    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: Deps.springBootVersion) {
@@ -17,16 +15,13 @@ dependencies {
         exclude(module: 'log4j-to-slf4j')
     }
     compile "org.springframework.boot:spring-boot-starter-jdbc:${Deps.springBootVersion}"
-    compile "org.springframework:spring-tx:${Deps.springVersion}"
-    compile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     compile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     compile "com.h2database:h2:${Deps.h2Version}"
     compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
+    compile(project(":engine:platform:platform-resources"))
     runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testCompile project(':engine:platform:platform-resources')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
@@ -37,38 +32,24 @@ dependencies {
     testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     testCompile project(':engine:platform:platform-setup-test')
 
-    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
-    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     inDistrib project(path: ':engine:platform:platform-resources', configuration: 'distributionZip')
 }
 
-task testsJar(type: Jar) {
-    classifier = 'tests'
-    from(sourceSets.test.output)
-}
-
 group = 'org.bonitasoft.platform'
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from project.components.java
-            artifact testsJar
             artifact distZip
         }
     }
 }
+
 processResources {
     from('src/main/resources') {
         include '*'
         filter(ReplaceTokens, tokens: [version: project.version])
-    }
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDir project.file("build/generated/main/resources")
-        }
     }
 }
 
@@ -110,6 +91,7 @@ distributions {
             configurations.inDistrib.resolvedConfiguration.resolvedArtifacts.each {
                 from(zipTree(it.file)) {
                     exclude '**/sql/**'
+                    exclude '**/org/**'
                     eachFile { fcp ->
                         fcp.path = fcp.path.replaceAll(".*${version}/", "/platform_conf/initial/")
                     }

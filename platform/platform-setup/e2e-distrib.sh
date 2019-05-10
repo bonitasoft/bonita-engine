@@ -4,7 +4,7 @@ cd ../../../
 ./gradlew build -x test
 cd -
 
-export VERSION=`cat ../platform-setup/build/resources/main/PLATFORM_ENGINE_VERSION`
+export VERSION=`cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION`
 
 echo "========================================"
 echo "version:${VERSION}"
@@ -15,19 +15,12 @@ export ZIP=Bonita-platform-setup-${VERSION}.zip
 
 rm -rf ${E2E_DIR}
 unzip -q -d ${E2E_DIR} build/distributions/${ZIP}
+rm -rf ${E2E_DIR}-jar-exploded
 unzip -q -d ${E2E_DIR}-jar-exploded ${E2E_DIR}/lib/platform-setup-${VERSION}.jar
 
 echo "========================================"
 echo "platform-setup-${VERSION}.jar exploded:"
 tree ${E2E_DIR}-jar-exploded
-echo "========================================"
-
-ls -l ${E2E_DIR}/../platform-setup-${VERSION}-tests.jar
-unzip -q -d ${E2E_DIR}-tests-jar-exploded target/platform-setup-${VERSION}-tests.jar
-
-echo "========================================"
-echo "platform-setup-${VERSION}-test.jar exploded:"
-tree ${E2E_DIR}-tests-jar-exploded
 echo "========================================"
 
 echo "========================================"

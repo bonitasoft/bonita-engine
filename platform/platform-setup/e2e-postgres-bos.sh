@@ -33,7 +33,7 @@ cd ../../..
 ./gradlew build -x test
 cd -
 
-export VERSION=`cat build/resources/main/PLATFORM_ENGINE_VERSION`
+export VERSION=`cat ../platform-resources/build/resources/main/PLATFORM_ENGINE_VERSION`
 
 echo "========================================"
 echo "version: ${VERSION}"

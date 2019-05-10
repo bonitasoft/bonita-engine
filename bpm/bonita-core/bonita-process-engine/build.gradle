@@ -55,7 +55,6 @@ dependencies {
     compile project(':engine:services:bonita-business-data:bonita-business-data-api')
     compile project(':engine:services:bonita-resources')
     compile "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
-    compile project(':engine:platform:platform-setup')
     compile project(':engine:platform:platform-resources')
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
