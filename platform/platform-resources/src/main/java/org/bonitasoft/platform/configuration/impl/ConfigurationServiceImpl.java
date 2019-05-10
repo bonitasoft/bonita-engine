@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -105,7 +105,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public List<BonitaConfiguration> getTenantTemplateSecurityScripts() {
-        return getNonTenantResource(ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS);
+        return getNonTenantResource(TENANT_TEMPLATE_SECURITY_SCRIPTS);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public void storeTenantTemplateSecurityScripts(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, NON_TENANT_RESOURCE);
+        storeConfiguration(bonitaConfigurations, TENANT_TEMPLATE_SECURITY_SCRIPTS, NON_TENANT_RESOURCE);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public void storeTenantSecurityScripts(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
-        storeConfiguration(bonitaConfigurations, ConfigurationType.TENANT_SECURITY_SCRIPTS, tenantId);
+        storeConfiguration(bonitaConfigurations, TENANT_SECURITY_SCRIPTS, tenantId);
     }
 
     public List<BonitaConfiguration> getAllTenantsPortalConf() {
@@ -181,12 +181,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public void storeTenantTemplatePortalConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, ConfigurationType.TENANT_TEMPLATE_PORTAL, NON_TENANT_RESOURCE);
+        storeConfiguration(bonitaConfigurations, TENANT_TEMPLATE_PORTAL, NON_TENANT_RESOURCE);
     }
 
     @Override
     public void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
-        storeConfiguration(bonitaConfigurations, ConfigurationType.TENANT_PORTAL, tenantId);
+        storeConfiguration(bonitaConfigurations, TENANT_PORTAL, tenantId);
     }
 
     @Override
@@ -194,32 +194,32 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         // update default configuration at TENANT_TEMPLATE_PORTAL level:
         transactionTemplate.execute(
                 new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
-                        ConfigurationType.TENANT_TEMPLATE_PORTAL));
+                        TENANT_TEMPLATE_PORTAL));
         // Also update default configuration at TENANT_PORTAL level for all existing tenants:
         transactionTemplate
                 .execute(new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
-                        ConfigurationType.TENANT_PORTAL));
+                        TENANT_PORTAL));
     }
 
     @Override
     public void storePlatformPortalConf(List<BonitaConfiguration> bonitaConfigurations) {
-        storeConfiguration(bonitaConfigurations, ConfigurationType.PLATFORM_PORTAL, NON_TENANT_RESOURCE);
+        storeConfiguration(bonitaConfigurations, PLATFORM_PORTAL, NON_TENANT_RESOURCE);
 
     }
 
     @Override
     public List<BonitaConfiguration> getTenantTemplatePortalConf() {
-        return getNonTenantResource(ConfigurationType.TENANT_TEMPLATE_PORTAL);
+        return getNonTenantResource(TENANT_TEMPLATE_PORTAL);
     }
 
     @Override
     public List<BonitaConfiguration> getTenantPortalConf(long tenantId) {
-        return getBonitaConfigurations(ConfigurationType.TENANT_PORTAL, tenantId);
+        return getBonitaConfigurations(TENANT_PORTAL, tenantId);
     }
 
     @Override
     public BonitaConfiguration getTenantPortalConfiguration(long tenantId, String file) {
-        return getBonitaConfiguration(ConfigurationType.TENANT_PORTAL, tenantId, file);
+        return getBonitaConfiguration(TENANT_PORTAL, tenantId, file);
     }
 
     @Override
@@ -278,7 +278,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public List<BonitaConfiguration> getTenantSecurityScripts(long tenantId) {
-        return getBonitaConfigurations(ConfigurationType.TENANT_SECURITY_SCRIPTS, tenantId);
+        return getBonitaConfigurations(TENANT_SECURITY_SCRIPTS, tenantId);
     }
 
     private BonitaConfiguration getBonitaConfiguration(ConfigurationType type, long tenantId, String resourceName) {

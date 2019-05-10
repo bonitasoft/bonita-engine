@@ -33,9 +33,9 @@ public class MemoryJNDISetup {
     public MemoryJNDISetup(final JndiTemplate jndiTemplate, final Map<String, Object> jndiMapping) {
         super();
         if (System.getProperty(Context.INITIAL_CONTEXT_FACTORY) == null) {
-            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.platform.setup.jndi.SimpleMemoryContextFactory");
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.env.SimpleMemoryContextFactory");
         }
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.platform.setup.jndi");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.env");
         this.jndiTemplate = jndiTemplate;
         this.jndiMapping = jndiMapping;
     }
