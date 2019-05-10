@@ -1099,6 +1099,9 @@ CREATE TABLE job_param (
   PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId)
+GO
+
 
 CREATE TABLE job_log (
   tenantid NUMERIC(19, 0) NOT NULL,

@@ -970,6 +970,7 @@ CREATE TABLE job_param (
 ) ENGINE = INNODB;
 CREATE INDEX fk_job_param_jobId_idx ON job_param(jobDescriptorId ASC, tenantid ASC);
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
 
 CREATE TABLE job_log (
   tenantid BIGINT NOT NULL,
