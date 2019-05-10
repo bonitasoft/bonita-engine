@@ -966,6 +966,7 @@ CREATE TABLE job_param (
   value_ BYTEA NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
 
 CREATE TABLE job_log (
   tenantid INT8 NOT NULL,
