@@ -29,5 +29,6 @@ fixPath = { project ->
     logger.debug("Path of project ${project.path} set to ${project.projectDir}")
     project.children.each fixPath
 }
-
+//change the path of the root ":", real root is ":engine"
+rootProject.projectDir = rootProject.projectDir.toPath().resolve("fakeRoot").toFile()
 rootProject.children.each fixPath

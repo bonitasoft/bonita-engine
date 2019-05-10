@@ -1,5 +1,5 @@
 
-
+include(':engine')
 include(':engine:platform:platform-resources')
 include(':engine:platform:platform-setup')
 include(':engine:platform:platform-setup-test')
