@@ -96,16 +96,13 @@ public class BonitaEngineRule implements MethodRule {
         private void startEngine() throws Exception {
             final boolean start = testEngine.start();
             if (start) {
-                Runtime.getRuntime().addShutdownHook(new Thread() {
-
-                    public void run() {
-                        try {
-                            testEngine.stop();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        testEngine.stop();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
+                }));
             }
         }
     }
