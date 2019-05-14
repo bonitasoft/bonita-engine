@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
-import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
@@ -84,7 +82,7 @@ public class EngineStarter {
         }
     }
 
-    protected void setupPlatform() throws NamingException, PlatformException {
+    protected void setupPlatform() throws Exception {
         PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();
@@ -99,7 +97,7 @@ public class EngineStarter {
         String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         //is h2 and not started outside
         if (Objects.equals("h2", dbVendor)) {
-            setSystemPropertyIfNotSet(DATABASE_DIR, "target/database");
+            setSystemPropertyIfNotSet(DATABASE_DIR, "build/database");
         }
         //init jndi
         applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
