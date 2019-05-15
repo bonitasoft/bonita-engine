@@ -71,7 +71,7 @@
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate" />
 
     <!-- Bind the mapping -->
-    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.test.env.MemoryJNDISetup" init-method="init" destroy-method="clean">
+    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.MemoryJNDISetup" init-method="init" destroy-method="clean">
         <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
         <constructor-arg name="jndiMapping" ref="jndiMapping" />
     </bean>

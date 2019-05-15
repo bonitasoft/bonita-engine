@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.spring.autoconfigure.properties;
 
-import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 public class BonitaDatabasesConfiguration {

@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.test;
+package org.bonitasoft.engine;
 
 public class BonitaDatabaseConfiguration {
 

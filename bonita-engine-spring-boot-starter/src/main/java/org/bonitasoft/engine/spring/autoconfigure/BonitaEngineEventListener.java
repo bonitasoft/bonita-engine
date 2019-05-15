@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.spring.autoconfigure;
 
-import org.bonitasoft.engine.test.TestEngine;
+import org.bonitasoft.engine.BonitaEngine;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
@@ -30,11 +30,11 @@ public class BonitaEngineEventListener implements ApplicationContextAware {
 
     private ApplicationContext context;
 
-    private TestEngine bonitaEngine;
+    private BonitaEngine bonitaEngine;
 
     @EventListener
     public void handleApplicationReadyEvent(final ApplicationReadyEvent applicationReadyEvent) throws Exception {
-        bonitaEngine = applicationReadyEvent.getApplicationContext().getBean(TestEngine.class);
+        bonitaEngine = applicationReadyEvent.getApplicationContext().getBean(BonitaEngine.class);
         bonitaEngine.start();
     }
 

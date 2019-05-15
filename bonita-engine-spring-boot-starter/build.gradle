@@ -8,7 +8,7 @@ dependencies {
 
     api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}")
 
-    implementation(project(":engine:bonita-test-api"))
+    implementation(project(":engine:bonita-engine-standalone"))
     implementation(project(":engine:bpm:bonita-server"))
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Deps.springBootVersion}")
@@ -25,4 +25,7 @@ publishing {
             from project.components.java
         }
     }
+}
+integrationTest.doFirst {
+    systemProperty("org.bonitasoft.h2.database.dir", "./build/h2databasedir")
 }

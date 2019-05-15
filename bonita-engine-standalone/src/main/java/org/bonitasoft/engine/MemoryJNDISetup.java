@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.env;
+package org.bonitasoft.engine;
 
 import java.util.Map;
 import javax.naming.Context;
@@ -33,9 +33,9 @@ public class MemoryJNDISetup {
     public MemoryJNDISetup(final JndiTemplate jndiTemplate, final Map<String, Object> jndiMapping) {
         super();
         if (System.getProperty(Context.INITIAL_CONTEXT_FACTORY) == null) {
-            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.env.SimpleMemoryContextFactory");
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.SimpleMemoryContextFactory");
         }
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.env");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine");
         this.jndiTemplate = jndiTemplate;
         this.jndiMapping = jndiMapping;
     }

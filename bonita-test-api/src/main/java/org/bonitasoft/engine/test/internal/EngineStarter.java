@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
+import org.bonitasoft.engine.BonitaEngine;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -31,7 +33,6 @@ import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
-import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
@@ -39,7 +40,6 @@ import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Baptiste Mesta
@@ -53,7 +53,19 @@ public class EngineStarter {
 
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
-    private ClassPathXmlApplicationContext applicationContext;
+    private BonitaEngine engine;
+
+    protected EngineStarter(BonitaEngine engine) {
+        this.engine = engine;
+    }
+
+    public static EngineStarter create() {
+        return new EngineStarter(new BonitaEngine());
+    }
+
+    public static EngineStarter create(BonitaEngine engine) {
+        return new EngineStarter(engine);
+    }
 
     public void start() throws Exception {
         if (hasFailed) {
@@ -72,7 +84,7 @@ public class EngineStarter {
             if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
                 prepareEnvironment();
                 setupPlatform();
-                initPlatformAndTenant();
+                engine.start();
             }
             deployCommandsOnDefaultTenant();
             LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
@@ -87,29 +99,26 @@ public class EngineStarter {
         if (isDropOnStart()) {
             platformSetup.destroy();
         }
-        platformSetup.init();
     }
 
     //--------------  engine life cycle methods
 
-    protected void prepareEnvironment() {
+    protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
         String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         //is h2 and not started outside
         if (Objects.equals("h2", dbVendor)) {
             setSystemPropertyIfNotSet(DATABASE_DIR, "build/database");
         }
-        //init jndi
-        applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
-        applicationContext.refresh();
+        engine.initializeEnvironment();
     }
 
-    protected void shutdown() throws BonitaException {
+    protected void shutdown() throws Exception {
         undeployCommands();
         deleteTenantAndPlatform();
     }
 
-    protected void deleteTenantAndPlatform() throws BonitaException {
+    protected void deleteTenantAndPlatform() throws Exception {
         LOGGER.info("=========  CLEAN PLATFORM =======");
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = getPlatformAPI(session);
@@ -120,6 +129,7 @@ public class EngineStarter {
             }
         }
         logoutOnPlatform(session);
+        engine.stop();
     }
 
     protected PlatformAPI getPlatformAPI(PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
@@ -206,25 +216,6 @@ public class EngineStarter {
         return thread.getId() == Thread.currentThread().getId();
     }
 
-    protected void initPlatformAndTenant() throws Exception {
-        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-
-        if (!platformAPI.isPlatformInitialized()) {
-            LOGGER.info("=========  INIT PLATFORM =======");
-            createPlatformAndTenant(platformAPI);
-        } else {
-            LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
-            platformAPI.startNode();
-        }
-        platformLoginAPI.logout(session);
-    }
-
-    protected void createPlatformAndTenant(PlatformAPI platformAPI) throws BonitaException {
-        initializeAndStartPlatformWithDefaultTenant(platformAPI);
-    }
-
     protected PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
     }
@@ -258,11 +249,6 @@ public class EngineStarter {
         platformLoginAPI.logout(session);
     }
 
-    protected void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI) throws BonitaException {
-        platformAPI.initializePlatform();
-        platformAPI.startNode();
-    }
-
     protected static String setSystemPropertyIfNotSet(final String property, final String value) {
         final String finalValue = System.getProperty(property, value);
         System.setProperty(property, finalValue);
@@ -283,9 +269,6 @@ public class EngineStarter {
 
         shutdown();
 
-        if (applicationContext != null) {
-            applicationContext.close();
-        }
 
         checkTempFoldersAreCleaned();
         checkThreadsAreStopped();
@@ -308,13 +291,7 @@ public class EngineStarter {
 
     private List<File> getTemporaryFolders() {
         File tempFolder = new File(IOUtil.TMP_DIRECTORY);
-        FilenameFilter filter = new FilenameFilter() {
-
-            @Override
-            public boolean accept(File file, String s) {
-                return s.startsWith("bonita_");
-            }
-        };
+        FilenameFilter filter = (file, s) -> s.startsWith("bonita_");
         return new ArrayList<>(Arrays.asList(tempFolder.listFiles(filter)));
     }
 
@@ -352,21 +329,11 @@ public class EngineStarter {
     }
 
     public void setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration database) {
-        System.setProperty("sysprop.bonita.db.vendor", database.getDbVendor());
-        setSystemPropertyIfNotNull(database.getServer(), "db.server.name");
-        setSystemPropertyIfNotNull(database.getPort(), "db.server.port");
-        setSystemPropertyIfNotNull(database.getDatabaseName(), "db.database.name");
-        setSystemPropertyIfNotNull(database.getUser(), "db.user");
-        setSystemPropertyIfNotNull(database.getPassword(), "db.password");
+        engine.setBonitaDatabaseConfiguration(database);
     }
 
-    private void setSystemPropertyIfNotNull(String property, String key) {
-        if (property != null) {
-            System.setProperty(key, property);
-        }
-    }
 
     public void setBusinessDataDatabaseConfiguration(BonitaDatabaseConfiguration bonitaDatabaseConfiguration) {
-        //NYI
+        engine.setBusinessDataDatabaseConfiguration(bonitaDatabaseConfiguration);
     }
 }

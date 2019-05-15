@@ -13,11 +13,9 @@
  **/
 package org.bonitasoft.engine.spring.autoconfigure;
 
+import org.bonitasoft.engine.BonitaEngine;
 import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.spring.autoconfigure.properties.BonitaEngineProperties;
-import org.bonitasoft.engine.test.TestEngine;
-import org.bonitasoft.engine.test.TestEngineImpl;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -29,12 +27,10 @@ public class BonitaEngineServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    TestEngine bonitaEngine(BonitaEngineProperties properties) {
-        TestEngine instance = TestEngineImpl.getInstance();
-        instance.setBonitaDatabaseProperties(properties.getDatabase().getBonita());
-        instance.setBusinessDataDatabaseProperties(properties.getDatabase().getBusinessData());
-        instance.setDropOnStart(false);
-        instance.setDropOnStop(false);
+    BonitaEngine bonitaEngine(BonitaEngineProperties properties) {
+        BonitaEngine instance = new BonitaEngine();
+        instance.setBonitaDatabaseConfiguration(properties.getDatabase().getBonita());
+        instance.setBusinessDataDatabaseConfiguration(properties.getDatabase().getBusinessData());
         return instance;
     }
 
