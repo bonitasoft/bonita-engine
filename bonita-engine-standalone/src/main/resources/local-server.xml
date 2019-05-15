@@ -52,22 +52,6 @@
     <bean id="userTransaction" class="com.arjuna.ats.jta.UserTransaction" factory-method="userTransaction" />
 
     <!-- Set up the mapping jndiName -> Datasource -->
-    <util:map id="jndiMapping">
-        <entry key="${local.journal.xads.uniqueName}" value-ref="bonitaDataSource" />
-        <entry key="java:comp/env/bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
-        <entry key="${local.bdm.xads.uniqueName}" value-ref="businessDataDataSource" />
-        <entry key="java:comp/env/NotManagedBizDataDS" value-ref="notManagedBizDataSource" />
-        <entry key="${transactionManager.jndi.name}" value-ref="arjunaTransactionManager" />
-        <entry key="${userTransaction.jndi.name}" value-ref="userTransaction" />
-    </util:map>
 
-    <!-- This is the base class that will allow to lookup the JNDI tree -->
-    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate" />
-
-    <!-- Bind the mapping -->
-    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.MemoryJNDISetup" init-method="init" destroy-method="clean">
-        <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
-        <constructor-arg name="jndiMapping" ref="jndiMapping" />
-    </bean>
 
 </beans>

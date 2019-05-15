@@ -1,6 +1,10 @@
 package org.bonitasoft.engine;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -16,21 +20,42 @@ import org.bonitasoft.engine.util.APITypeManager;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jndi.JndiTemplate;
 
 public class BonitaEngine {
 
     private ClassPathXmlApplicationContext applicationContext;
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
+    private MemoryJNDISetup memoryJNDISetup;
 
     public void initializeEnvironment() throws Exception {
         if (applicationContext == null) {
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.emptyMap());
             applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
+
+
+
+
             applicationContext.refresh();
+            initializeJNDI(applicationContext);
+
+
         }
     }
 
+    private void initializeJNDI(ClassPathXmlApplicationContext applicationContext) throws NamingException {
+        Map<String, Object> jndiMapping = new HashMap<>();
+        jndiMapping.put("java:comp/env/bonitaDS",applicationContext.getBean("bonitaDataSource"));
+        jndiMapping.put("java:comp/env/bonitaSequenceManagerDS",applicationContext.getBean("bonitaSequenceManagerDataSource"));
+        jndiMapping.put("java:comp/env/BusinessDataDS",applicationContext.getBean("businessDataDataSource"));
+        jndiMapping.put("java:comp/env/NotManagedBizDataDS",applicationContext.getBean("notManagedBizDataSource"));
+        jndiMapping.put("java:comp/env/TransactionManager",applicationContext.getBean("arjunaTransactionManager"));
+        jndiMapping.put("java:comp/UserTransaction",applicationContext.getBean("userTransaction"));
+        JndiTemplate jndiTemplate = new JndiTemplate();
+        memoryJNDISetup = new MemoryJNDISetup(jndiTemplate,jndiMapping);
+        memoryJNDISetup.init();
+    }
     public void start() throws Exception {
         initializeEnvironment();
         PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
@@ -63,6 +88,7 @@ public class BonitaEngine {
         }
         logoutFromPlatform(platformSession);
         applicationContext.close();
+        memoryJNDISetup.clean();
     }
 
     public void setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration database) {
