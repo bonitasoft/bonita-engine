@@ -31,7 +31,6 @@ dependencies {
     testCompile "org.springframework:spring-context:${Deps.springVersion}"
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testCompile "com.zaxxer:HikariCP:${Deps.hikariCPVersion}"
     testCompile project(':engine:bpm:bonita-util:bonita-common-util-test')
     compileOnly "javax.transaction:jta:${Deps.javaxJtaVersion}"
     testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
