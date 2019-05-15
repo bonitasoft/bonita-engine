@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
 
@@ -13,7 +14,7 @@ public class TestEngineImpl implements TestEngine {
     private BonitaDatabaseConfiguration businessDataDatabase;
 
     private static TestEngineImpl createTestEngine() {
-        return new TestEngineImpl(new EngineStarter(), new EngineCommander());
+        return new TestEngineImpl(EngineStarter.create(), new EngineCommander());
     }
 
     private final EngineStarter engineStarter;

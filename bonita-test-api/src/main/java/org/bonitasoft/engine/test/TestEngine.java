@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
+
 /**
  * @author Baptiste Mesta
  */

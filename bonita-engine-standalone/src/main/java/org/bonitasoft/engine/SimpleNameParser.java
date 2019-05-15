@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.env;
+package org.bonitasoft.engine;
 
 import javax.naming.CompositeName;
 import javax.naming.Name;
@@ -21,7 +21,6 @@ import javax.naming.NamingException;
 public class SimpleNameParser implements NameParser {
 
     public SimpleNameParser(final String name) {
-        // TODO Auto-generated constructor stub
     }
 
     @Override

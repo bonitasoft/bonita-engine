@@ -56,7 +56,7 @@
     <entry key="com.arjuna.ats.arjuna.coordinator.defaultTimeout">180</entry>
 
     <!-- default is under user.home - must be writable!) -->
-    <entry key="com.arjuna.ats.arjuna.objectstore.objectStoreDir">target/tx-object-store</entry>
+    <entry key="com.arjuna.ats.arjuna.objectstore.objectStoreDir">build/tx-object-store</entry>
 
     <!-- (default is ON) -->
     <entry key="ObjectStoreEnvironmentBean.transactionSync">ON</entry>
