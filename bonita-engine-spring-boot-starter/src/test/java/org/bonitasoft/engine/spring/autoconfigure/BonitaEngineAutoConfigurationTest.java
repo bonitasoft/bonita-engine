@@ -15,8 +15,8 @@ package org.bonitasoft.engine.spring.autoconfigure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.test.BonitaDatabaseConfiguration;
-import org.bonitasoft.engine.test.TestEngineImpl;
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
+import org.bonitasoft.engine.BonitaEngine;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -38,8 +38,8 @@ public class BonitaEngineAutoConfigurationTest {
                         "org.bonitasoft.engine.database.bonita.password=secret",
                         "org.bonitasoft.engine.database.business-data.db-vendor=mysql")
                 .run((context) -> {
-                    TestEngineImpl testEngine = context.getBean(TestEngineImpl.class);
-                    BonitaDatabaseConfiguration bonitaDatabaseConfiguration = testEngine.getBonitaDatabaseConfiguration();
+                    BonitaEngine engine = context.getBean(BonitaEngine.class);
+                    BonitaDatabaseConfiguration bonitaDatabaseConfiguration = engine.getBonitaDatabaseConfiguration();
                     assertThat(bonitaDatabaseConfiguration.getDbVendor()).isEqualTo("postgres");
                     assertThat(bonitaDatabaseConfiguration.getServer()).isEqualTo("myServer");
                     assertThat(bonitaDatabaseConfiguration.getPort()).isEqualTo("1289");
@@ -47,7 +47,7 @@ public class BonitaEngineAutoConfigurationTest {
                     assertThat(bonitaDatabaseConfiguration.getUser()).isEqualTo("myUser");
                     assertThat(bonitaDatabaseConfiguration.getPassword()).isEqualTo("secret");
                     assertThat(
-                            testEngine.getBusinessDataDatabase().getDbVendor())
+                            engine.getBusinessDataDatabaseConfiguration().getDbVendor())
                             .isEqualTo("mysql");
                 });
     }
