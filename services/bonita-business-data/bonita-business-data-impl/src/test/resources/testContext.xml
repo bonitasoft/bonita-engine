@@ -24,14 +24,12 @@
     </bean>
 
     <bean id="notManagedBizDataSource"
-          class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
-        <constructor-arg name="configuration">
-            <bean class="com.zaxxer.hikari.HikariConfig">
-                <property name="jdbcUrl" value="${db.url}" />
-                <property name="username" value="${db.user}" />
-                <property name="password" value="${db.password}" />
-            </bean>
-        </constructor-arg>
+          class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="initialSize" value="1" />
+        <property name="maxTotal" value="10" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.user}" />
+        <property name="password" value="${db.password}" />
     </bean>
 
     <bean id="jpa-test-configuration" class="org.bonitasoft.engine.business.data.JpaTestConfiguration">
