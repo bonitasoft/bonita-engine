@@ -1,6 +1,4 @@
-plugins {
-    id 'com.intershop.gradle.jaxb' version '2.0.0'
-}
+plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
 
 
 dependencies {
@@ -71,15 +69,15 @@ jaxb {
     schemaGen {
         forms {
             javaFiles = fileTree(dir: 'src/main/java', includes: [
-                    'org/bonitasoft/engine/bpm/bar/form/model/*.java',
-                    'org/bonitasoft/engine/form/*.java'])
+                'org/bonitasoft/engine/bpm/bar/form/model/*.java',
+                'org/bonitasoft/engine/form/*.java'
+            ])
             namespaceconfigs = ['http://www.bonitasoft.org/ns/form/6.0': 'form-mapping.xsd']
             outputDir = project.file("build/generated/jaxb/schemas")
         }
         application {
-            javaFiles = fileTree(dir: 'src/main/java', includes: [
-                    'org/bonitasoft/engine/business/application/xml/**/*.java'],
-                    excludes:['**/*Builder.java'])
+            javaFiles = fileTree(dir: 'src/main/java', includes: ['org/bonitasoft/engine/business/application/xml/**/*.java'],
+            excludes:['**/*Builder.java'])
             namespaceconfigs = ['http://documentation.bonitasoft.com/application-xml-schema/1.0': 'application.xsd']
             outputDir = project.file("build/generated/jaxb/schemas")
         }
@@ -96,9 +94,7 @@ jaxb {
     }
 }
 
-processResources {
-    from "$buildDir/generated/jaxb/schemas"
-}
+processResources { from "$buildDir/generated/jaxb/schemas" }
 
 //tasks.processResources.dependsOn tasks.jaxbSchemaGenProcessdefinition
 tasks.processResources.dependsOn tasks.jaxbSchemaGenApplication

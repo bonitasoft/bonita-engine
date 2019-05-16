@@ -1,6 +1,4 @@
-plugins {
-    id 'com.intershop.gradle.jaxb' version '2.0.0'
-}
+plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
 apply plugin: 'groovy'
 dependencies {
     compile project(':engine:bpm:bonita-core:bonita-home-server')
@@ -79,8 +77,6 @@ jaxb {
     }
 }
 
-processResources {
-    from "$buildDir/generated/jaxb/schemas"
-}
+processResources { from "$buildDir/generated/jaxb/schemas" }
 
 tasks.processResources.dependsOn tasks.jaxbSchemaGenOrganization

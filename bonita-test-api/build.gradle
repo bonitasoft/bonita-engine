@@ -16,8 +16,6 @@ dependencies {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from project.components.java
-        }
+        mavenJava(MavenPublication) { from project.components.java }
     }
 }

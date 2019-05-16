@@ -1,6 +1,4 @@
-plugins {
-    id 'com.intershop.gradle.jaxb' version '2.0.0'
-}
+plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
 
 dependencies {
     compile project(':engine:bpm:bonita-common')
@@ -30,7 +28,7 @@ dependencies {
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
-    
+
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 }
@@ -45,9 +43,6 @@ jaxb {
     }
 }
 
-processResources {
-    from "$buildDir/generated/jaxb/schema/connectors"
-}
+processResources { from "$buildDir/generated/jaxb/schema/connectors" }
 
 tasks.processResources.dependsOn tasks.jaxbSchemaGenConnectors
-

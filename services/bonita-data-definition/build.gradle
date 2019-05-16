@@ -1,5 +1,3 @@
 
 
-dependencies {
-    compile project(':engine:services:bonita-expression')
-}
+dependencies { compile project(':engine:services:bonita-expression') }
