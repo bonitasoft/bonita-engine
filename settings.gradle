@@ -1,7 +1,5 @@
 pluginManagement {
-    repositories {
-        gradlePluginPortal()
-    }
+    repositories { gradlePluginPortal() }
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id.startsWith("io.spring.dependency-management")) {

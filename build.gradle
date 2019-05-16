@@ -31,9 +31,7 @@ dependencyManagement {
         }
         dependency "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${Deps.hibernateJpaVersion}"
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
-        dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") {
-            exclude 'commons-collections:commons-collections'
-        }
+        dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
         dependency "commons-collections:commons-collections:${Deps.commonsCollectionsVersion}"
         dependency "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
         dependency "org.apache.commons:commons-collections4:${Deps.commonsCollections4Version}"
@@ -84,33 +82,15 @@ subprojects {
         mavenCentral()
         jcenter()
 
-
-//        task sourcesJar(type: Jar) {
-//            classifier = 'sources'
-//            from(sourceSets.main.allJava)
-//        }
-
         sourceCompatibility = '1.8'
 
         configurations.all {
         }
 
-//        publishing {
-//            publications {
-//                maven(MavenPublication) {
-//                    from(components.java)
-//                    artifact(sourcesJar)
-//                }
-//            }
-//        }
         afterEvaluate {
-            tasks.withType(AbstractCompile) {
-                options.encoding = 'UTF-8'
-            }
+            tasks.withType(AbstractCompile) { options.encoding = 'UTF-8' }
         }
-        tasks.withType(JavaCompile) {
-            options.encoding = 'UTF-8'
-        }
+        tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
         tasks.withType(Javadoc) {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.encoding = 'UTF-8'

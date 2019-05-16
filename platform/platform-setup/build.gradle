@@ -26,9 +26,7 @@ dependencies {
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
-        exclude(module: 'json-path')
-    }
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) { exclude(module: 'json-path') }
     testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     testCompile project(':engine:platform:platform-setup-test')
 
@@ -107,9 +105,7 @@ tasks.distZip.dependsOn configurations.inDistrib
 
 artifacts { distributionZip distZip }
 
-test {
-    include '**/*Test.class'
-}
+test { include '**/*Test.class' }
 
 
 def iT = tasks.getByName("integrationTest")
