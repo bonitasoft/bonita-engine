@@ -3,9 +3,7 @@
 dependencies {
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile project(':engine:services:bonita-log-technical')
-    compile(group: 'org.hibernate', name: 'hibernate-core', version:Deps.hibernateVersion) {
-        exclude(module: 'jboss-transaction-api_1.2_spec')
-    }
+    compile(group: 'org.hibernate', name: 'hibernate-core', version:Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compile project(':engine:services:bonita-session')
     compile project(':engine:services:bonita-commons')
     compile project(':engine:services:bonita-lock')

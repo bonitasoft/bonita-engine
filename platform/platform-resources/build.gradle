@@ -36,22 +36,16 @@ processResources {
     }
 }
 
-configurations {
-    distributionZip
-}
+configurations { distributionZip }
 
 distTar.enabled = false
 distributions {
     main {
-        contents {
-            from sourceSets.main.output
-        }
+        contents { from sourceSets.main.output }
     }
 }
 
-artifacts {
-    distributionZip distZip
-}
+artifacts { distributionZip distZip }
 
 publishing {
     publications {

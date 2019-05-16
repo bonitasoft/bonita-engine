@@ -12,9 +12,7 @@ dependencies {
 }
 group = 'org.bonitasoft.engine.test'
 publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      from project.components.java
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
     }
-  }
 }

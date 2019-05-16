@@ -9,12 +9,8 @@ dependencies {
     compile project(':engine:services:bonita-resources')
     compile project(':engine:services:bonita-transaction')
     compile project(':engine:services:bonita-commons')
-    compile(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) {
-        exclude(module: 'jboss-transaction-api_1.2_spec')
-    }
-    compile(group: 'org.hibernate', name: 'hibernate-entitymanager', version: Deps.hibernateVersion) {
-        exclude(module: 'jboss-transaction-api_1.2_spec')
-    }
+    compile(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
+    compile(group: 'org.hibernate', name: 'hibernate-entitymanager', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile project(':engine:services:bonita-classloader')
     testCompile "junit:junit:${Deps.junit4Version}"
@@ -43,6 +39,4 @@ dependencies {
 // ./gradlew oracleDatabaseTest
 // ./gradlew postgresDatabaseTest
 // to run tests on specific docker DB:
-databaseIntegrationTest {
-    includes '**/*Test.class'
-}
+databaseIntegrationTest { includes '**/*Test.class' }
