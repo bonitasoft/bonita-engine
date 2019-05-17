@@ -6,6 +6,10 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
+import com.arjuna.ats.jta.TransactionManager;
+import com.arjuna.ats.jta.UserTransaction;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -28,34 +32,83 @@ public class BonitaEngine {
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
     private MemoryJNDISetup memoryJNDISetup;
+    private BasicManagedDataSource bonitaDataSource;
+    private BasicManagedDataSource businessDataDataSource;
+    private BasicDataSource bonitaSequenceManagerDataSource;
+    private BasicDataSource notManagedBizDataSource;
+    private javax.transaction.UserTransaction userTransaction;
+    private javax.transaction.TransactionManager arjunaTransactionManager;
 
     public void initializeEnvironment() throws Exception {
         if (applicationContext == null) {
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.emptyMap());
             applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
-
-
-
-
             applicationContext.refresh();
-            initializeJNDI(applicationContext);
-
-
+            arjunaTransactionManager = TransactionManager.transactionManager();
+            userTransaction = UserTransaction.userTransaction();
+            initializeBonitaDataSource();
+            initializeBusinessDataSource();
+            initializeBonitaSequenceManagerDataSource();
+            initializeNotManagedBizDataSource();
+            initializeJNDI();
         }
     }
 
-    private void initializeJNDI(ClassPathXmlApplicationContext applicationContext) throws NamingException {
+    private void initializeBonitaDataSource() {
+        bonitaDataSource = new BasicManagedDataSource();
+        bonitaDataSource.setDriverClassName(resolveProperty("${sysprop.bonita.db.vendor}.db.driver.class"));
+        bonitaDataSource.setTransactionManager(arjunaTransactionManager);
+        bonitaDataSource.setInitialSize(1);
+        bonitaDataSource.setMaxTotal(7);
+        bonitaDataSource.setUrl(resolveProperty("${sysprop.bonita.db.vendor}.db.url"));
+        bonitaDataSource.setUsername(resolveProperty("${sysprop.bonita.db.vendor}.db.user"));
+        bonitaDataSource.setPassword(resolveProperty("${sysprop.bonita.db.vendor}.db.password"));
+    }
+
+    private void initializeBusinessDataSource(){
+        businessDataDataSource = new BasicManagedDataSource();
+        businessDataDataSource.setDriverClassName(resolveProperty("${sysprop.bonita.db.vendor}.db.driver.class"));
+        businessDataDataSource.setTransactionManager(arjunaTransactionManager);
+        businessDataDataSource.setInitialSize(1);
+        businessDataDataSource.setMaxTotal(3);
+        businessDataDataSource.setUrl(resolveProperty("${sysprop.bonita.db.vendor}.db.url"));
+        businessDataDataSource.setUsername(resolveProperty("${sysprop.bonita.db.vendor}.db.user"));
+        businessDataDataSource.setPassword(resolveProperty("${sysprop.bonita.db.vendor}.db.password"));
+    }
+
+    private void initializeBonitaSequenceManagerDataSource(){
+        bonitaSequenceManagerDataSource = new BasicDataSource();
+        bonitaSequenceManagerDataSource.setDriverClassName(resolveProperty("${sysprop.bonita.db.vendor}.db.driver.class"));
+        bonitaSequenceManagerDataSource.setInitialSize(1);
+        bonitaSequenceManagerDataSource.setMaxTotal(7);
+        bonitaSequenceManagerDataSource.setUrl(resolveProperty("${sysprop.bonita.db.vendor}.db.url"));
+        bonitaSequenceManagerDataSource.setUsername(resolveProperty("${sysprop.bonita.db.vendor}.db.user"));
+        bonitaSequenceManagerDataSource.setPassword(resolveProperty("${sysprop.bonita.db.vendor}.db.password"));
+    }
+
+    private void initializeNotManagedBizDataSource(){
+        notManagedBizDataSource = new BasicDataSource();
+        notManagedBizDataSource.setDriverClassName(resolveProperty("${sysprop.bonita.db.vendor}.db.driver.class"));
+        notManagedBizDataSource.setInitialSize(1);
+        notManagedBizDataSource.setMaxTotal(3);
+        notManagedBizDataSource.setUrl(resolveProperty("${sysprop.bonita.db.vendor}.db.url"));
+        notManagedBizDataSource.setUsername(resolveProperty("${sysprop.bonita.db.vendor}.db.user"));
+        notManagedBizDataSource.setPassword(resolveProperty("${sysprop.bonita.db.vendor}.db.password"));
+    }
+
+    private void initializeJNDI() throws NamingException {
         Map<String, Object> jndiMapping = new HashMap<>();
-        jndiMapping.put("java:comp/env/bonitaDS",applicationContext.getBean("bonitaDataSource"));
-        jndiMapping.put("java:comp/env/bonitaSequenceManagerDS",applicationContext.getBean("bonitaSequenceManagerDataSource"));
-        jndiMapping.put("java:comp/env/BusinessDataDS",applicationContext.getBean("businessDataDataSource"));
-        jndiMapping.put("java:comp/env/NotManagedBizDataDS",applicationContext.getBean("notManagedBizDataSource"));
-        jndiMapping.put("java:comp/env/TransactionManager",applicationContext.getBean("arjunaTransactionManager"));
-        jndiMapping.put("java:comp/UserTransaction",applicationContext.getBean("userTransaction"));
+        jndiMapping.put("java:comp/env/bonitaDS",bonitaDataSource);
+        jndiMapping.put("java:comp/env/bonitaSequenceManagerDS",bonitaSequenceManagerDataSource);
+        jndiMapping.put("java:comp/env/BusinessDataDS",businessDataDataSource);
+        jndiMapping.put("java:comp/env/NotManagedBizDataDS",notManagedBizDataSource);
+        jndiMapping.put("java:comp/env/TransactionManager",arjunaTransactionManager);
+        jndiMapping.put("java:comp/UserTransaction",userTransaction);
         JndiTemplate jndiTemplate = new JndiTemplate();
         memoryJNDISetup = new MemoryJNDISetup(jndiTemplate,jndiMapping);
         memoryJNDISetup.init();
     }
+
     public void start() throws Exception {
         initializeEnvironment();
         PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
@@ -119,5 +172,9 @@ public class BonitaEngine {
 
     public BonitaDatabaseConfiguration getBusinessDataDatabaseConfiguration() {
         return businessDataDatabaseConfiguration;
+    }
+
+    private String resolveProperty(String name) {
+        return applicationContext.getBeanFactory().resolveEmbeddedValue("${" + name + "}");
     }
 }

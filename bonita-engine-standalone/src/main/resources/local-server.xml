@@ -8,48 +8,11 @@
         <property name="location" value="local-server.properties" />
     </bean>
 
-    <bean id="bonitaDataSource" class="org.apache.commons.dbcp2.managed.BasicManagedDataSource">
-        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="initialSize" value="${local.journal.xads.minPoolSize}" />
-        <property name="maxTotal" value="${local.journal.xads.maxPoolSize}" />
-        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-        <property name="transactionManager" ref="arjunaTransactionManager" />
-    </bean>
 
-    <bean id="bonitaSequenceManagerDataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="initialSize" value="${local.journal.xads.minPoolSize}" />
-        <property name="maxTotal" value="${local.journal.xads.maxPoolSize}" />
-        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-    </bean>
 
-    <bean id="businessDataDataSource" class="org.apache.commons.dbcp2.managed.BasicManagedDataSource">
-        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="initialSize" value="${local.bdm.xads.minPoolSize}" />
-        <property name="maxTotal" value="${local.bdm.xads.maxPoolSize}" />
-        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-        <property name="transactionManager" ref="arjunaTransactionManager" />
-    </bean>
-
-    <bean id="notManagedBizDataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="initialSize" value="${local.bdm.xads.minPoolSize}" />
-        <property name="maxTotal" value="${local.bdm.xads.maxPoolSize}" />
-        <property name="url" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-    </bean>
 
     <!-- create Arjuna transaction manager -->
-    <bean id="arjunaTransactionManager" class="com.arjuna.ats.jta.TransactionManager" factory-method="transactionManager" />
 
-    <bean id="userTransaction" class="com.arjuna.ats.jta.UserTransaction" factory-method="userTransaction" />
 
     <!-- Set up the mapping jndiName -> Datasource -->
 
