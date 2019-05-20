@@ -83,6 +83,7 @@ class ShadePlugin implements Plugin<Project> {
             project.publishing.publications {
                 shadow(MavenPublication) { publication ->
                     project.shadow.component(publication)
+                    PomUtils.pomCommunityPublication(publication.getPom())
                     pom.withXml {
                         def allProjectsAlreadyShaded = getProjectsAlreadyShaded(project, extension)
                         Set<ResolvedDependency> inPom = getPomDependencies(project, extension, allProjectsAlreadyShaded, true)
@@ -91,12 +92,6 @@ class ShadePlugin implements Plugin<Project> {
                             project.logger.info(" - {}", it)
                         }
                         def rootNode = asNode()
-                        if (extension.parentName) {
-                            def parent = rootNode.appendNode("parent")
-                            parent.appendNode("artifactId", extension.parentName)
-                            parent.appendNode("groupId", extension.parentGroup)
-                            parent.appendNode("version", project.version)
-                        }
                         Node dependencies = rootNode.children().find { Node child -> child.name() == "dependencies" }
                         inPom.each { gradleDep ->
                             Node dependency =

@@ -62,12 +62,23 @@ dependencies {
     compile project(':engine:bpm:bonita-common')
 }
 
-description = 'Bonita Server'
 shade {
     exclude project(':engine:bpm:bonita-common')
     exclude project(':engine:platform:platform-resources')
 
     excludeLibs('hibernate-core', new ShadeDependency(group: 'org.jboss.spec.javax.transaction', name: 'jboss-transaction-api_1.2_spec'))
     excludeLibs('hibernate-entitymanager', new ShadeDependency(group: 'org.jboss.spec.javax.transaction', name: 'jboss-transaction-api_1.2_spec'))
+}
 
+afterEvaluate {
+    publishing {
+        publications {
+            shadow(MavenPublication) { publication ->
+                publication.getPom().with {
+                    name = "Bonita Server"
+                    description = "Bonita Server is the Server-side BPM Execution Engine"
+                }
+            }
+        }
+    }
 }

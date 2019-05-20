@@ -41,8 +41,6 @@ publishing {
         mavenJava(MavenPublication) {
             from project.components.java
             artifact distZip
-        }
-        maven(MavenPublication) {
             pom { pom ->
                 name = "Bonita Platform Setup"
                 description = "Bonita Platform Setup is the standalone tool to setup a new Bonita platform"
