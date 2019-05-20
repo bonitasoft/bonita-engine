@@ -1,4 +1,5 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.bonitasoft.engine.gradle.PomUtils
 
 apply plugin: 'distribution'
 
@@ -40,6 +41,13 @@ publishing {
         mavenJava(MavenPublication) {
             from project.components.java
             artifact distZip
+        }
+        maven(MavenPublication) {
+            pom { pom ->
+                name = "Bonita Platform Setup"
+                description = "Bonita Platform Setup is the standalone tool to setup a new Bonita platform"
+                PomUtils.pomCommunityPublication(pom)
+            }
         }
     }
 }
