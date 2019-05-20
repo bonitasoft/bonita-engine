@@ -7,14 +7,4 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="local-server.properties" />
     </bean>
-
-
-
-
-    <!-- create Arjuna transaction manager -->
-
-
-    <!-- Set up the mapping jndiName -> Datasource -->
-
-
 </beans>

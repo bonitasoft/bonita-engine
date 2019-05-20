@@ -31,9 +31,8 @@ public class BonitaEngineAutoConfigurationTest {
         this.contextRunner
                 .withPropertyValues(
                         "org.bonitasoft.engine.database.bonita.db-vendor=postgres",
-                        "org.bonitasoft.engine.database.bonita.server=myServer",
-                        "org.bonitasoft.engine.database.bonita.port=1289",
-                        "org.bonitasoft.engine.database.bonita.database-name=mySchema",
+                        "org.bonitasoft.engine.database.bonita.url=myServerUrl",
+                        "org.bonitasoft.engine.database.bonita.driver=my.Driver",
                         "org.bonitasoft.engine.database.bonita.user=myUser",
                         "org.bonitasoft.engine.database.bonita.password=secret",
                         "org.bonitasoft.engine.database.business-data.db-vendor=mysql")
@@ -41,10 +40,9 @@ public class BonitaEngineAutoConfigurationTest {
                     BonitaEngine engine = context.getBean(BonitaEngine.class);
                     BonitaDatabaseConfiguration bonitaDatabaseConfiguration = engine.getBonitaDatabaseConfiguration();
                     assertThat(bonitaDatabaseConfiguration.getDbVendor()).isEqualTo("postgres");
-                    assertThat(bonitaDatabaseConfiguration.getServer()).isEqualTo("myServer");
-                    assertThat(bonitaDatabaseConfiguration.getPort()).isEqualTo("1289");
-                    assertThat(bonitaDatabaseConfiguration.getDatabaseName()).isEqualTo("mySchema");
-                    assertThat(bonitaDatabaseConfiguration.getUser()).isEqualTo("myUser");
+                    assertThat(bonitaDatabaseConfiguration.getUrl()).isEqualTo("myServerUrl");
+                    assertThat(bonitaDatabaseConfiguration.getDriver()).isEqualTo("my.Driver");
+                    assertThat(bonitaDatabaseConfiguration.getUserName()).isEqualTo("myUser");
                     assertThat(bonitaDatabaseConfiguration.getPassword()).isEqualTo("secret");
                     assertThat(
                             engine.getBusinessDataDatabaseConfiguration().getDbVendor())
