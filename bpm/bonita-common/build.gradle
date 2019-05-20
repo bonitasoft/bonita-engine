@@ -61,8 +61,6 @@ publishing {
             artifact project.sourcesJar
             artifact project.javadocJar
             artifact project.testsJar
-        }
-        maven(MavenPublication) {
             pom { pom ->
                 name = "Bonita Common"
                 description = "Bonita Common is the useful layer common to bonita-client and bonita-server"

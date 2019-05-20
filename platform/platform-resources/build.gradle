@@ -53,8 +53,6 @@ publishing {
         mavenJava(MavenPublication) {
             from project.components.java
             artifact distZip
-        }
-        maven(MavenPublication) {
             pom { pom ->
                 name = "Bonita Platform Resources"
                 description = "Bonita Platform Resources serves to setup Bonita platform"

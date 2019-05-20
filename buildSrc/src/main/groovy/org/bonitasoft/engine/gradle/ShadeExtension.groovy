@@ -7,8 +7,6 @@ class ShadeExtension {
     List<ShadeDependency> includes = []
     List<Project> excludes = []
     Map<String, List<ShadeDependency>> libExclusions = [:] as Map
-    String parentGroup
-    String parentName
 
     def include(Map<String, String> artifact) {
         includes.add(new ShadeDependency(artifact))
