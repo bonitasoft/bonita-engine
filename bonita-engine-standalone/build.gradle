@@ -1,3 +1,5 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
 plugins {
     id "java-library"
 }
@@ -17,10 +19,29 @@ dependencies{
     implementation "com.h2database:h2:${Deps.h2Version}"
 
 }
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+        }
+        maven(MavenPublication) {
+            pom { pom ->
+                name = "Bonita Engine Standalone"
+                description = "Bonita Engine Standalone is the library to easily embed Bonita Engine is your applications"
+                PomUtils.pomCommunityPublication(pom)
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-
+import org.bonitasoft.engine.gradle.PomUtils
 
 dependencies {
     compile project(':engine:bpm:bonita-common')
@@ -39,6 +39,13 @@ publishing {
             artifact project.sourcesJar
             artifact project.javadocJar
             artifact project.testsJar
+        }
+        maven(MavenPublication) {
+            pom { pom ->
+                name = "Bonita Client"
+                description = "Bonita Client is the Jar used to interact with a running Bonita Engine"
+                PomUtils.pomCommunityPublication(pom)
+            }
         }
     }
 }
