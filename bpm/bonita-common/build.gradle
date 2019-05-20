@@ -1,3 +1,5 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
 plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
 
 
@@ -22,7 +24,7 @@ dependencies {
 }
 
 def generateInfoProperties = task("generateInfoProperties") {
-    doFirst{
+    doFirst {
         project.file("build/generated/main/resources").mkdirs()
         project.file("build/generated/main/resources/info.properties").text = "version $project.version"
     }
@@ -60,6 +62,13 @@ publishing {
             artifact project.javadocJar
             artifact project.testsJar
         }
+        maven(MavenPublication) {
+            pom { pom ->
+                name = "Bonita Common"
+                description = "Bonita Common is the useful layer common to bonita-client and bonita-server"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
     }
 }
 
@@ -77,7 +86,7 @@ jaxb {
         }
         application {
             javaFiles = fileTree(dir: 'src/main/java', includes: ['org/bonitasoft/engine/business/application/xml/**/*.java'],
-            excludes:['**/*Builder.java'])
+            excludes: ['**/*Builder.java'])
             namespaceconfigs = ['http://documentation.bonitasoft.com/application-xml-schema/1.0': 'application.xsd']
             outputDir = project.file("build/generated/jaxb/schemas")
         }
