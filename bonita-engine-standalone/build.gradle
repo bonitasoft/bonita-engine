@@ -40,8 +40,6 @@ publishing {
             from project.components.java
             artifact project.sourcesJar
             artifact project.javadocJar
-        }
-        maven(MavenPublication) {
             pom { pom ->
                 name = "Bonita Engine Standalone"
                 description = "Bonita Engine Standalone is the library to easily embed Bonita Engine is your applications"

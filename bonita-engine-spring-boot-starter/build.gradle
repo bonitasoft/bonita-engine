@@ -34,8 +34,6 @@ publishing {
             from project.components.java
             artifact project.sourcesJar
             artifact project.javadocJar
-        }
-        maven(MavenPublication) {
             pom { pom ->
                 name = "bonita-engine-spring-boot-starter"
                 description = "bonita-engine-spring-boot-starter"
