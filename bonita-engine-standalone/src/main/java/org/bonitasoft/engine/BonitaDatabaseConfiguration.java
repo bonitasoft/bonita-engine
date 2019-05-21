@@ -1,55 +1,36 @@
 package org.bonitasoft.engine;
 
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@ToString(exclude = "password")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BonitaDatabaseConfiguration {
 
-    private String driver = "org.h2.Driver";
-    private String url = "jdbc:h2:file:" +
-            System.getProperty("org.bonitasoft.h2.database.dir", "./h2databasedir") +
-            "/bonita;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;";
-    private String dbVendor = "h2";
+    private String driverClassName;
+    private String url;
+    private String dbVendor;
+    private String user;
+    private String password;
 
-    private String user = "sa";
-    private String password = "";
-    public String getDbVendor() {
-        return dbVendor;
+
+    public boolean isEmpty() {
+        return isNullOrEmpty(driverClassName) &&
+                isNullOrEmpty(url) &&
+                isNullOrEmpty(dbVendor) &&
+                isNullOrEmpty(user) &&
+                isNullOrEmpty(password);
     }
 
-    /**
-     * Specify on which database vendor
-     */
-    public void setDbVendor(String dbVendor) {
-        this.dbVendor = dbVendor;
+    private boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 
-    public String getUserName() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 }

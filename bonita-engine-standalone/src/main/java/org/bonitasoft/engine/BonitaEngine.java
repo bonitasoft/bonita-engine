@@ -27,6 +27,7 @@ import org.springframework.jndi.JndiTemplate;
 
 public class BonitaEngine {
 
+    private BonitaDataSourceInitializer bonitaDataSourceInitializer = new BonitaDataSourceInitializer();
     private ClassPathXmlApplicationContext applicationContext;
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
@@ -40,6 +41,7 @@ public class BonitaEngine {
     public static final String BONITA_BDM_DB_VENDOR = "sysprop.bonita.bdm.db.vendor";
     public static final String BONITA_DB_VENDOR = "sysprop.bonita.db.vendor";
 
+
     public void initializeEnvironment() throws Exception {
         if (applicationContext == null) {
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.emptyMap());
@@ -49,36 +51,36 @@ public class BonitaEngine {
             initializeBusinessDataDatabaseConfiguration();
             arjunaTransactionManager = TransactionManager.transactionManager();
             userTransaction = UserTransaction.userTransaction();
-            initializeBonitaDataSource();
-            initializeBusinessDataSource();
-            initializeBonitaSequenceManagerDataSource();
-            initializeNotManagedBizDataSource();
+            bonitaDataSource = bonitaDataSourceInitializer.createManagedDataSource(bonitaDatabaseConfiguration, arjunaTransactionManager);
+            businessDataDataSource = bonitaDataSourceInitializer.createManagedDataSource(businessDataDatabaseConfiguration, arjunaTransactionManager);
+            bonitaSequenceManagerDataSource = bonitaDataSourceInitializer.createDataSource(bonitaDatabaseConfiguration);
+            notManagedBizDataSource = bonitaDataSourceInitializer.createDataSource(businessDataDatabaseConfiguration);
             initializeJNDI();
         }
     }
 
     private void initializeBonitaDatabaseConfiguration() {
-        if (bonitaDatabaseConfiguration == null) {
+        if (bonitaDatabaseConfiguration == null || bonitaDatabaseConfiguration.isEmpty() ) {
             bonitaDatabaseConfiguration = createDefaultDBConfiguration(BONITA_DB_VENDOR);
         }
         setSystemPropertyIfNotSet(BONITA_DB_VENDOR, bonitaDatabaseConfiguration.getDbVendor());
     }
 
-    public void initializeBusinessDataDatabaseConfiguration() {
-        if (businessDataDatabaseConfiguration == null) {
+    private void initializeBusinessDataDatabaseConfiguration() {
+        if (businessDataDatabaseConfiguration == null || businessDataDatabaseConfiguration.isEmpty()) {
             businessDataDatabaseConfiguration = createDefaultDBConfiguration(BONITA_BDM_DB_VENDOR);
         }
         setSystemPropertyIfNotSet(BONITA_BDM_DB_VENDOR, businessDataDatabaseConfiguration.getDbVendor());
     }
 
-    public BonitaDatabaseConfiguration createDefaultDBConfiguration(String dbVendorSystemPropertyName) {
+    private BonitaDatabaseConfiguration createDefaultDBConfiguration(String dbVendorSystemPropertyName) {
         BonitaDatabaseConfiguration databaseConfiguration = new BonitaDatabaseConfiguration();
         String bonitaDBVendor = System.getProperty(dbVendorSystemPropertyName, "h2");
         databaseConfiguration.setUrl(resolveProperty(bonitaDBVendor + ".db.url"));
         databaseConfiguration.setDbVendor(bonitaDBVendor);
         databaseConfiguration.setUser(resolveProperty(bonitaDBVendor + ".db.user"));
         databaseConfiguration.setPassword(bonitaDBVendor + ".db.password");
-        databaseConfiguration.setDriver(resolveProperty(bonitaDBVendor + ".db.driver.class"));
+        databaseConfiguration.setDriverClassName(resolveProperty(bonitaDBVendor + ".db.driver.class"));
         return databaseConfiguration;
     }
 
@@ -89,48 +91,6 @@ public class BonitaEngine {
         }
         System.setProperty(systemPropertyName, defaultValue);
         return defaultValue;
-    }
-
-    private void initializeBonitaDataSource() {
-        bonitaDataSource = new BasicManagedDataSource();
-        bonitaDataSource.setInitialSize(1);
-        bonitaDataSource.setMaxTotal(7);
-        bonitaDataSource.setDriverClassName(bonitaDatabaseConfiguration.getDriver());
-        bonitaDataSource.setTransactionManager(arjunaTransactionManager);
-        bonitaDataSource.setUrl(bonitaDatabaseConfiguration.getUrl());
-        bonitaDataSource.setUsername(bonitaDatabaseConfiguration.getUserName());
-        bonitaDataSource.setPassword(bonitaDatabaseConfiguration.getPassword());
-    }
-
-    private void initializeBusinessDataSource() {
-        businessDataDataSource = new BasicManagedDataSource();
-        businessDataDataSource.setInitialSize(1);
-        businessDataDataSource.setMaxTotal(3);
-        businessDataDataSource.setDriverClassName(businessDataDatabaseConfiguration.getDriver());
-        businessDataDataSource.setTransactionManager(arjunaTransactionManager);
-        businessDataDataSource.setUrl(businessDataDatabaseConfiguration.getUrl());
-        businessDataDataSource.setUsername(businessDataDatabaseConfiguration.getUserName());
-        businessDataDataSource.setPassword(businessDataDatabaseConfiguration.getPassword());
-    }
-
-    private void initializeBonitaSequenceManagerDataSource() {
-        bonitaSequenceManagerDataSource = new BasicDataSource();
-        bonitaSequenceManagerDataSource.setInitialSize(1);
-        bonitaSequenceManagerDataSource.setMaxTotal(7);
-        bonitaSequenceManagerDataSource.setDriverClassName(bonitaDatabaseConfiguration.getDriver());
-        bonitaSequenceManagerDataSource.setUrl(bonitaDatabaseConfiguration.getUrl());
-        bonitaSequenceManagerDataSource.setUsername(bonitaDatabaseConfiguration.getUserName());
-        bonitaSequenceManagerDataSource.setPassword(bonitaDatabaseConfiguration.getPassword());
-    }
-
-    private void initializeNotManagedBizDataSource() {
-        notManagedBizDataSource = new BasicDataSource();
-        notManagedBizDataSource.setInitialSize(1);
-        notManagedBizDataSource.setMaxTotal(3);
-        notManagedBizDataSource.setDriverClassName(businessDataDatabaseConfiguration.getDriver());
-        notManagedBizDataSource.setUrl(businessDataDatabaseConfiguration.getUrl());
-        notManagedBizDataSource.setUsername(businessDataDatabaseConfiguration.getUserName());
-        notManagedBizDataSource.setPassword(businessDataDatabaseConfiguration.getPassword());
     }
 
     private void initializeJNDI() throws NamingException {

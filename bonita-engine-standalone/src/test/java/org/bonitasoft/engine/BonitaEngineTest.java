@@ -3,7 +3,6 @@ package org.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -18,9 +17,11 @@ public class BonitaEngineTest {
     @Test
     public void should_set_db_vendor_system_property_according_to_database_configuration() throws Exception {
         BonitaEngine bonitaEngine = newBonitaEngine();
-        BonitaDatabaseConfiguration database = new BonitaDatabaseConfiguration();
-        database.setDbVendor("postgres");
-        bonitaEngine.setBonitaDatabaseConfiguration(database);
+        bonitaEngine.setBonitaDatabaseConfiguration(BonitaDatabaseConfiguration.builder()
+                .dbVendor("postgres")
+                .url("url")
+                .user("user")
+                .build());
 
         bonitaEngine.initializeEnvironment();
 
@@ -45,21 +46,6 @@ public class BonitaEngineTest {
 
         assertThat(bonitaEngine.getBonitaDataSource().getUrl()).contains("h2");
         assertThat(bonitaEngine.getBonitaDataSource().getDriverClassName()).containsIgnoringCase("h2");
-
-    }
-
-    @Ignore("Should provide default values related to dbvendor")
-    @Test
-    public void should_configure_bonita_datasource_on_postgres() throws Exception {
-        BonitaEngine bonitaEngine = newBonitaEngine();
-        BonitaDatabaseConfiguration database = new BonitaDatabaseConfiguration();
-        database.setDbVendor("postgres");
-        bonitaEngine.setBonitaDatabaseConfiguration(database);
-
-        bonitaEngine.initializeEnvironment();
-
-        assertThat(bonitaEngine.getBonitaDataSource().getUrl()).contains("postgres");
-        assertThat(bonitaEngine.getBonitaDataSource().getDriverClassName()).containsIgnoringCase("postgres");
 
     }
 
