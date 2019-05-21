@@ -32,7 +32,7 @@ public class BonitaEngineAutoConfigurationTest {
                 .withPropertyValues(
                         "org.bonitasoft.engine.database.bonita.db-vendor=postgres",
                         "org.bonitasoft.engine.database.bonita.url=myServerUrl",
-                        "org.bonitasoft.engine.database.bonita.driver=my.Driver",
+                        "org.bonitasoft.engine.database.bonita.driver-class-name=my.Driver",
                         "org.bonitasoft.engine.database.bonita.user=myUser",
                         "org.bonitasoft.engine.database.bonita.password=secret",
                         "org.bonitasoft.engine.database.business-data.db-vendor=mysql")
@@ -41,8 +41,8 @@ public class BonitaEngineAutoConfigurationTest {
                     BonitaDatabaseConfiguration bonitaDatabaseConfiguration = engine.getBonitaDatabaseConfiguration();
                     assertThat(bonitaDatabaseConfiguration.getDbVendor()).isEqualTo("postgres");
                     assertThat(bonitaDatabaseConfiguration.getUrl()).isEqualTo("myServerUrl");
-                    assertThat(bonitaDatabaseConfiguration.getDriver()).isEqualTo("my.Driver");
-                    assertThat(bonitaDatabaseConfiguration.getUserName()).isEqualTo("myUser");
+                    assertThat(bonitaDatabaseConfiguration.getDriverClassName()).isEqualTo("my.Driver");
+                    assertThat(bonitaDatabaseConfiguration.getUser()).isEqualTo("myUser");
                     assertThat(bonitaDatabaseConfiguration.getPassword()).isEqualTo("secret");
                     assertThat(
                             engine.getBusinessDataDatabaseConfiguration().getDbVendor())
