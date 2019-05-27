@@ -1,6 +1,5 @@
 package org.bonitasoft.engine;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,7 @@ import lombok.ToString;
 @ToString(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class BonitaDatabaseConfiguration {
 
     private String driverClassName;

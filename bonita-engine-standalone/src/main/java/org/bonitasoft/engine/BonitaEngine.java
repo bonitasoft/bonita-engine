@@ -3,10 +3,9 @@ package org.bonitasoft.engine;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.naming.NamingException;
 
-import com.arjuna.ats.jta.TransactionManager;
-import com.arjuna.ats.jta.UserTransaction;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -22,13 +21,18 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jndi.JndiTemplate;
 
+import com.arjuna.ats.jta.TransactionManager;
+import com.arjuna.ats.jta.UserTransaction;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BonitaEngine {
 
     private BonitaDataSourceInitializer bonitaDataSourceInitializer = new BonitaDataSourceInitializer();
-    private ClassPathXmlApplicationContext applicationContext;
+    private boolean initialized;
     private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
     private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
     private MemoryJNDISetup memoryJNDISetup;
@@ -41,18 +45,18 @@ public class BonitaEngine {
     public static final String BONITA_BDM_DB_VENDOR = "sysprop.bonita.bdm.db.vendor";
     public static final String BONITA_DB_VENDOR = "sysprop.bonita.db.vendor";
 
-
     public void initializeEnvironment() throws Exception {
-        if (applicationContext == null) {
+        if (!initialized) {
+            initialized = true;
             APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.emptyMap());
-            applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
-            applicationContext.refresh();
             initializeBonitaDatabaseConfiguration();
             initializeBusinessDataDatabaseConfiguration();
             arjunaTransactionManager = TransactionManager.transactionManager();
             userTransaction = UserTransaction.userTransaction();
-            bonitaDataSource = bonitaDataSourceInitializer.createManagedDataSource(bonitaDatabaseConfiguration, arjunaTransactionManager);
-            businessDataDataSource = bonitaDataSourceInitializer.createManagedDataSource(businessDataDatabaseConfiguration, arjunaTransactionManager);
+            bonitaDataSource = bonitaDataSourceInitializer.createManagedDataSource(bonitaDatabaseConfiguration,
+                    arjunaTransactionManager);
+            businessDataDataSource = bonitaDataSourceInitializer
+                    .createManagedDataSource(businessDataDatabaseConfiguration, arjunaTransactionManager);
             bonitaSequenceManagerDataSource = bonitaDataSourceInitializer.createDataSource(bonitaDatabaseConfiguration);
             notManagedBizDataSource = bonitaDataSourceInitializer.createDataSource(businessDataDatabaseConfiguration);
             initializeJNDI();
@@ -60,10 +64,11 @@ public class BonitaEngine {
     }
 
     private void initializeBonitaDatabaseConfiguration() {
-        if (bonitaDatabaseConfiguration == null || bonitaDatabaseConfiguration.isEmpty() ) {
+        if (bonitaDatabaseConfiguration == null || bonitaDatabaseConfiguration.isEmpty()) {
             bonitaDatabaseConfiguration = createDefaultDBConfiguration(BONITA_DB_VENDOR);
         }
         setSystemPropertyIfNotSet(BONITA_DB_VENDOR, bonitaDatabaseConfiguration.getDbVendor());
+        log.info("Using database configuration for bonita {}", bonitaDatabaseConfiguration);
     }
 
     private void initializeBusinessDataDatabaseConfiguration() {
@@ -71,26 +76,20 @@ public class BonitaEngine {
             businessDataDatabaseConfiguration = createDefaultDBConfiguration(BONITA_BDM_DB_VENDOR);
         }
         setSystemPropertyIfNotSet(BONITA_BDM_DB_VENDOR, businessDataDatabaseConfiguration.getDbVendor());
+        log.info("Using database configuration for business data {}", bonitaDatabaseConfiguration);
     }
 
     private BonitaDatabaseConfiguration createDefaultDBConfiguration(String dbVendorSystemPropertyName) {
-        BonitaDatabaseConfiguration databaseConfiguration = new BonitaDatabaseConfiguration();
         String bonitaDBVendor = System.getProperty(dbVendorSystemPropertyName, "h2");
-        databaseConfiguration.setUrl(resolveProperty(bonitaDBVendor + ".db.url"));
-        databaseConfiguration.setDbVendor(bonitaDBVendor);
-        databaseConfiguration.setUser(resolveProperty(bonitaDBVendor + ".db.user"));
-        databaseConfiguration.setPassword(bonitaDBVendor + ".db.password");
-        databaseConfiguration.setDriverClassName(resolveProperty(bonitaDBVendor + ".db.driver.class"));
-        return databaseConfiguration;
+        return DefaultBonitaDatabaseConfigurations.defaultConfiguration(bonitaDBVendor);
     }
 
-    private String setSystemPropertyIfNotSet(String systemPropertyName, String defaultValue) {
+    private void setSystemPropertyIfNotSet(String systemPropertyName, String defaultValue) {
         String value = System.getProperty(systemPropertyName);
         if (value != null) {
-            return value;
+            return;
         }
         System.setProperty(systemPropertyName, defaultValue);
-        return defaultValue;
     }
 
     private void initializeJNDI() throws NamingException {
@@ -123,7 +122,8 @@ public class BonitaEngine {
     }
 
     private void logoutFromPlatform(PlatformSession platformSession)
-            throws PlatformLogoutException, SessionNotFoundException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+            throws PlatformLogoutException, SessionNotFoundException, BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
         PlatformAPIAccessor.getPlatformLoginAPI().logout(platformSession);
     }
 
@@ -138,10 +138,8 @@ public class BonitaEngine {
             platformAPI.stopNode();
         }
         logoutFromPlatform(platformSession);
-        applicationContext.close();
         memoryJNDISetup.clean();
     }
-
 
     public BonitaDatabaseConfiguration getBonitaDatabaseConfiguration() {
         return bonitaDatabaseConfiguration;
@@ -158,11 +156,6 @@ public class BonitaEngine {
     public void setBusinessDataDatabaseConfiguration(BonitaDatabaseConfiguration businessDataDatabaseConfiguration) {
         this.businessDataDatabaseConfiguration = businessDataDatabaseConfiguration;
     }
-
-    private String resolveProperty(String name) {
-        return applicationContext.getBeanFactory().resolveEmbeddedValue("${" + name + "}");
-    }
-
 
     BasicManagedDataSource getBonitaDataSource() {
         return bonitaDataSource;
