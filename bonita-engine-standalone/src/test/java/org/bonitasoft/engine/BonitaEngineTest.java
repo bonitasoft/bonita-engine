@@ -1,6 +1,5 @@
 package org.bonitasoft.engine;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Rule;
@@ -27,7 +26,6 @@ public class BonitaEngineTest {
 
         assertThat(System.getProperty(BonitaEngine.BONITA_DB_VENDOR)).isEqualTo("postgres");
     }
-
 
     @Test
     public void should_set_db_vendor_system_property_to_h2_by_default() throws Exception {
