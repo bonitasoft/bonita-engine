@@ -57,5 +57,4 @@ class ProfilePermissionRule  implements PermissionRule {
         }
         return false
     }
-
 }

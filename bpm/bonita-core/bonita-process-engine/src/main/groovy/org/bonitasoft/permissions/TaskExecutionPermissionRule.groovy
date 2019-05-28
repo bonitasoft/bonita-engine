@@ -25,7 +25,7 @@ import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance
 import org.bonitasoft.engine.bpm.flownode.ArchivedManualTaskInstance
-import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance
 import org.bonitasoft.engine.exception.NotFoundException
@@ -137,8 +137,8 @@ class TaskExecutionPermissionRule implements PermissionRule {
                     return true
                 }
             } else {
-                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
-                builder.filter(UserSearchDescriptor.USER_NAME, username);
+                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1)
+                builder.filter(UserSearchDescriptor.USER_NAME, username)
                 def searchResult = processAPI.searchUsersWhoCanExecutePendingHumanTask(flowNodeId, builder.done())
                 if (searchResult.getCount() == 1l) {
                     logger.debug("The task is pending for user")
@@ -146,7 +146,7 @@ class TaskExecutionPermissionRule implements PermissionRule {
                 }
             }
             //we can access the task if we can access the parent of the subtask
-        if (FlowNodeType.MANUAL_TASK.equals(instance.getType())) {
+            if (FlowNodeType.MANUAL_TASK.equals(instance.getType())) {
                 try {
 
                     def parentTask = processAPI.getHumanTaskInstance(instance.getParentContainerId())
@@ -155,8 +155,8 @@ class TaskExecutionPermissionRule implements PermissionRule {
                             return true
                         }
                     } else {
-                        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
-                        builder.filter(UserSearchDescriptor.USER_NAME, username);
+                        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1)
+                        builder.filter(UserSearchDescriptor.USER_NAME, username)
                         def searchResult = processAPI.searchUsersWhoCanExecutePendingHumanTask(parentTask.id, builder.done())
                         if (searchResult.getCount() == 1l) {
                             logger.debug("The parent task is pending for user")
@@ -172,7 +172,7 @@ class TaskExecutionPermissionRule implements PermissionRule {
         def processDefinitionId = instance.getProcessDefinitionId()
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
-    
+
     private long getTaskInstanceId(APICallContext apiCallContext) {
         def compoundResourceId = apiCallContext.getCompoundResourceId()
         if (compoundResourceId == null || compoundResourceId.isEmpty()) {

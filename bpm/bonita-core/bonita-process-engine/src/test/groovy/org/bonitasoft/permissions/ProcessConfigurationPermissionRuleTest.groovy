@@ -59,15 +59,15 @@ public class ProcessConfigurationPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "process_id": "1"
+                    "process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -76,27 +76,27 @@ public class ProcessConfigurationPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "process_id": "1"
+                    "process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_get_is_true_when_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(["1", "connectorName", "1.0"]).when(apiCallContext).getCompoundResourceId()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -104,36 +104,36 @@ public class ProcessConfigurationPermissionRuleTest {
     public void should_check_verify_get_is_false_when_not_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(["1", "connectorName", "1.0"]).when(apiCallContext).getCompoundResourceId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_put_when_not_process_owner() {
         doReturn(true).when(apiCallContext).isPUT()
         doReturn(["1", "connectorName", "1.0"]).when(apiCallContext).getCompoundResourceId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_put_when_process_owner() {
         doReturn(true).when(apiCallContext).isPUT()
         doReturn(["1", "connectorName", "1.0"]).when(apiCallContext).getCompoundResourceId()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -141,13 +141,13 @@ public class ProcessConfigurationPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "other": "sample"
+                    "other": "sample"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 }

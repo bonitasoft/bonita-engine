@@ -45,7 +45,7 @@ class ProcessPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         if (apiCallContext.isGET()) {
             return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
         }
@@ -62,11 +62,11 @@ class ProcessPermissionRule implements PermissionRule {
         def resourceIds = apiCallContext.getCompoundResourceId()
         if (!resourceIds.isEmpty()) {
             def processId = Long.parseLong(resourceIds.get(0))
-            def processDefinition = processAPI.getProcessDeploymentInfo(processId);
+            def processDefinition = processAPI.getProcessDeploymentInfo(processId)
             def deployedByUser = processDefinition.getDeployedBy() == currentUserId
             if(deployedByUser){
                 logger.debug("deployed by the current user")
-                return true;
+                return true
             }
             def canStart = processAPI.searchProcessDeploymentInfosCanBeStartedBy(currentUserId, new SearchOptionsBuilder(0, 1).filter(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID, processDefinition.getProcessId()).done())
             if(canStart.getCount()==1){
@@ -86,7 +86,7 @@ class ProcessPermissionRule implements PermissionRule {
                 return true
             }
         }
-        return false;
+        return false
     }
     private boolean checkPutMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
         def resourceIds = apiCallContext.getCompoundResourceId()

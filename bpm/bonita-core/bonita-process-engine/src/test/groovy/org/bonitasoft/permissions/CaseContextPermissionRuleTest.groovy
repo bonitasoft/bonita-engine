@@ -130,7 +130,7 @@ public class CaseContextPermissionRuleTest {
         //then
         Assertions.assertThat(isAuthorized).isTrue()
     }
-    
+
     @Test
     public void should_check_verify_resourceId_archived_isInvolved_as_manager_on_GET() {
         //given
@@ -149,7 +149,7 @@ public class CaseContextPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
