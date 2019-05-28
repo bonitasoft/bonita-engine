@@ -42,8 +42,8 @@ class UserPermissionRule implements PermissionRule {
 
     @Override
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        APISession session = apiSession;
-        long currentUserId = session.getUserId();
+        APISession session = apiSession
+        long currentUserId = session.getUserId()
         if (apiCallContext.getResourceId() != null) {
             def resourceId = Long.valueOf(apiCallContext.getResourceId())
             if (resourceId.equals(currentUserId)) {

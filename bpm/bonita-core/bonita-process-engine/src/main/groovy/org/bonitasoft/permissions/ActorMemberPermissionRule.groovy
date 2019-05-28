@@ -43,7 +43,7 @@ class ActorMemberPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         if (apiCallContext.isPOST()) {
             return checkPostMethod(apiCallContext, apiAccessor, currentUserId, logger)
         } else if (apiCallContext.isGET()) {
@@ -58,7 +58,7 @@ class ActorMemberPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
         def list = mapper.readValue(apiCallContext.getBody(), List.class)
 
         for (int i = 0; i < list.size(); i++) {

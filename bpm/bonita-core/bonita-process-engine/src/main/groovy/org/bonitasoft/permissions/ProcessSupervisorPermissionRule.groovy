@@ -41,7 +41,7 @@ class ProcessSupervisorPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         if (apiCallContext.isPOST()) {
             return checkPostMethod(apiCallContext, apiAccessor, currentUserId, logger)
         } else if (apiCallContext.isGET()) {
@@ -55,21 +55,21 @@ class ProcessSupervisorPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
         def map = mapper.readValue(apiCallContext.getBody(), Map.class)
 
         def processAPI = apiAccessor.getProcessAPI()
 
         def processIdString = map.get("process_id")
         if (processIdString == null || processIdString.toString().isEmpty()) {
-            return false;
+            return false
         }
         def processId = Long.valueOf(processIdString.toString())
         if (processId <= 0) {
-            return false;
+            return false
         }
 
-        return processAPI.isUserProcessSupervisor(processId, currentUserId);
+        return processAPI.isUserProcessSupervisor(processId, currentUserId)
     }
 
     private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {

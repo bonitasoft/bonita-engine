@@ -66,12 +66,12 @@ public class ProcessSupervisorPermissionRuleTest {
                 "other":"sample"
             }
         ''').when(apiCallContext).getBody()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -83,27 +83,27 @@ public class ProcessSupervisorPermissionRuleTest {
                 "other":"sample"
             }
         ''').when(apiCallContext).getBody()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_get_is_true_when_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn([
-                "process_id": "154",
-                "other"     : "sample"
+            "process_id": "154",
+            "other"     : "sample"
         ]).when(apiCallContext).getFilters()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -111,50 +111,40 @@ public class ProcessSupervisorPermissionRuleTest {
     public void should_check_verify_get_is_false_when_not_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn([
-                "process_id": "154",
-                "other"     : "sample"
+            "process_id": "154",
+            "other"     : "sample"
         ]).when(apiCallContext).getFilters()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_delete_return_false_when_not_process_owner() {
         doReturn(true).when(apiCallContext).isDELETE()
-        doReturn([
-                "154",
-                "1",
-                "2",
-                "3"
-        ]).when(apiCallContext).getCompoundResourceId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(["154", "1", "2", "3"]).when(apiCallContext).getCompoundResourceId()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
 
     }
 
     @Test
     public void should_check_verify_delete_return_true_when_process_owner() {
         doReturn(true).when(apiCallContext).isDELETE()
-        doReturn([
-                "154",
-                "1",
-                "2",
-                "3"
-        ]).when(apiCallContext).getCompoundResourceId()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(["154", "1", "2", "3"]).when(apiCallContext).getCompoundResourceId()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 }

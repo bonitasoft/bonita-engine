@@ -42,7 +42,7 @@ class CaseVariablePermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         def resourceId = apiCallContext.getResourceId()
         def processAPI = apiAccessor.getProcessAPI()
         try {
