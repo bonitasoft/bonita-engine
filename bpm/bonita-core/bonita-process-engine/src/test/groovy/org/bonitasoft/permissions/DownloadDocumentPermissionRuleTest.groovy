@@ -97,7 +97,7 @@ public class DownloadDocumentPermissionRuleTest {
         //then
         assertThat(isAuthorized).isTrue()
     }
-    
+
     @Test
     public void should_allow_on_GET_with_user_involved_and_supervisor() {
         //given

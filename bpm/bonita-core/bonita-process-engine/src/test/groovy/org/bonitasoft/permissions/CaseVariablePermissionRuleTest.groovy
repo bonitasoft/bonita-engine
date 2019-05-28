@@ -143,6 +143,4 @@ class CaseVariablePermissionRuleTest {
         assertThat(isAuthorized).isFalse()
 
     }
-
-
 }
