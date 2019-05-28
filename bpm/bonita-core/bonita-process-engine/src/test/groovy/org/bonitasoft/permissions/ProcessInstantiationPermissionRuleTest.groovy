@@ -69,29 +69,29 @@ public class ProcessInstantiationPermissionRuleTest {
         doReturn("process").when(apiCallContext).getResourceName()
         doReturn("45/instantiation").when(apiCallContext).getResourceId()
         doReturn(Arrays.asList("45", "instantiation")).when(apiCallContext).getCompoundResourceId()
-        doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l);
+        doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l)
     }
 
     @Test
     public void should_check_verify_can_start_is_true() {
         havingResourceId(true)
-        doReturn(new SearchResultImpl<User>(1, [user])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class));
+        doReturn(new SearchResultImpl<User>(1, [user])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
 
     }
 
     @Test
     public void should_check_verify_can_start_on_post_is_false() {
         havingResourceId(false)
-        doReturn(new SearchResultImpl<User>(0, [])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class));
+        doReturn(new SearchResultImpl<User>(0, [])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 }

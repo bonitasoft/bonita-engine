@@ -19,10 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
-import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.session.APISession
 
@@ -42,20 +42,20 @@ import org.bonitasoft.engine.session.APISession
  */
 class DownloadDocumentPermissionRule implements PermissionRule {
 
-    public static final String DOCUMENT_ID_PARAM = "document";
+    public static final String DOCUMENT_ID_PARAM = "document"
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
 
         if (apiCallContext.isGET()) {
-            def documentId = apiCallContext.getParameters().get(DOCUMENT_ID_PARAM);
+            def documentId = apiCallContext.getParameters().get(DOCUMENT_ID_PARAM)
             if (documentId != null) {
                 return checkMethodWithResourceId(documentId, apiAccessor, currentUserId)
             }
-            return true;
+            return true
         }
-        
+
         return false
     }
 
@@ -80,7 +80,7 @@ class DownloadDocumentPermissionRule implements PermissionRule {
             return true
         }
     }
-    
+
     private boolean isSupervisor(ProcessAPI processAPI, long currentUserId, long processInstanceId) {
         def processDefinitionId
         try {
@@ -94,5 +94,4 @@ class DownloadDocumentPermissionRule implements PermissionRule {
         }
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
-    
 }

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.identity.UserSearchDescriptor
@@ -48,7 +48,7 @@ class ProcessInstantiationPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         def processDefinitionId = getProcessDefinitionId(apiCallContext)
         if (processDefinitionId <= 0) {
             return true
@@ -56,11 +56,11 @@ class ProcessInstantiationPermissionRule implements PermissionRule {
         try {
             def processAPI = apiAccessor.getProcessAPI()
             def identityAPI = apiAccessor.getIdentityAPI()
-            User user = identityAPI.getUser(currentUserId);
-            SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 10);
-            searchOptionBuilder.filter(UserSearchDescriptor.USER_NAME, user.getUserName());
-            SearchResult<User> listUsers = processAPI.searchUsersWhoCanStartProcessDefinition(processDefinitionId, searchOptionBuilder.done());
-            logger.debug("RuleCase : nb Result [" + listUsers.getCount() + "] ?");
+            User user = identityAPI.getUser(currentUserId)
+            SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 10)
+            searchOptionBuilder.filter(UserSearchDescriptor.USER_NAME, user.getUserName())
+            SearchResult<User> listUsers = processAPI.searchUsersWhoCanStartProcessDefinition(processDefinitionId, searchOptionBuilder.done())
+            logger.debug("RuleCase : nb Result [" + listUsers.getCount() + "] ?")
             def canStart = listUsers.getCount() == 1
             logger.debug("RuleCase : User allowed to start? " + canStart)
             return canStart
@@ -69,7 +69,7 @@ class ProcessInstantiationPermissionRule implements PermissionRule {
             return true
         }
     }
-    
+
     private long getProcessDefinitionId(APICallContext apiCallContext) {
         def compoundResourceId = apiCallContext.getCompoundResourceId()
         if (compoundResourceId == null || compoundResourceId.isEmpty()) {

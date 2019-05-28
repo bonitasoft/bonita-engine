@@ -59,15 +59,15 @@ public class ProcessConnectorDependencyPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "connector_process_id": "1"
+                    "connector_process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -76,15 +76,15 @@ public class ProcessConnectorDependencyPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "connector_process_id": "1"
+                    "connector_process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -92,13 +92,13 @@ public class ProcessConnectorDependencyPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "other": "sample"
+                    "other": "sample"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 }
