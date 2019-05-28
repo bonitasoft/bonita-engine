@@ -42,7 +42,3 @@ publishing {
         }
     }
 }
-
-integrationTest.doFirst {
-    systemProperty("org.bonitasoft.h2.database.dir", "./build/h2databasedir")
-}

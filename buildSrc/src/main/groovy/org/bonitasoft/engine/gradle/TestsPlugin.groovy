@@ -47,6 +47,7 @@ class TestsPlugin implements Plugin<Project> {
     }
 
     private static void setJvmArgs(Project project, Test task) {
+        task.jvmArgs("-Dorg.bonitasoft.h2.database.dir=./build/h2databasedir")
         def property = project.property('org.gradle.jvmargs')
         if (property) {
             task.jvmArgs property.toString().split(" ")
