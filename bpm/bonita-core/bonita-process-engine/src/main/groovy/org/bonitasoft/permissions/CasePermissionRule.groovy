@@ -24,7 +24,7 @@ import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.identity.UserSearchDescriptor
@@ -51,7 +51,7 @@ class CasePermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         if (apiCallContext.isGET()) {
             return checkGetMethod(apiCallContext, apiAccessor, currentUserId, logger)
         } else if (apiCallContext.isPOST()) {
@@ -62,29 +62,29 @@ class CasePermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
         def map = mapper.readValue(apiCallContext.getBody(), Map.class)
 
         def string = map.get("processDefinitionId")
         if (string == null || string.toString().isEmpty()) {
-            return true;
+            return true
         }
         def processDefinitionId = Long.valueOf(string.toString())
         if (processDefinitionId <= 0) {
-            return true;
+            return true
         }
         def processAPI = apiAccessor.getProcessAPI()
         def identityAPI = apiAccessor.getIdentityAPI()
-        User user = identityAPI.getUser(currentUserId);
-        SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionBuilder.filter(UserSearchDescriptor.USER_NAME, user.getUserName());
-        SearchResult<User> listUsers = processAPI.searchUsersWhoCanStartProcessDefinition(processDefinitionId, searchOptionBuilder.done());
-        logger.debug("RuleCase : nb Result [" + listUsers.getCount() + "] ?");
+        User user = identityAPI.getUser(currentUserId)
+        SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 10)
+        searchOptionBuilder.filter(UserSearchDescriptor.USER_NAME, user.getUserName())
+        SearchResult<User> listUsers = processAPI.searchUsersWhoCanStartProcessDefinition(processDefinitionId, searchOptionBuilder.done())
+        logger.debug("RuleCase : nb Result [" + listUsers.getCount() + "] ?")
         def canStart = listUsers.getCount() == 1
         logger.debug("RuleCase : User allowed to start? " + canStart)
         return canStart
     }
-    
+
     private boolean isInvolved(ProcessAPI processAPI, long currentUserId, long processInstanceId) {
         return processAPI.isInvolvedInProcessInstance(currentUserId, processInstanceId) || processAPI.isManagerOfUserInvolvedInProcessInstance(currentUserId, processInstanceId)
     }
@@ -94,19 +94,19 @@ class CasePermissionRule implements PermissionRule {
         def filters = apiCallContext.getFilters()
         try {
             if (apiCallContext.getResourceId() != null) {
-                def processDefinitionId;
+                def processDefinitionId
                 if (apiCallContext.getResourceName().startsWith("archived")) {
                     def archivedProcessInstanceId = Long.valueOf(apiCallContext.getResourceId())
                     def archivedProcessInstance = processAPI.getArchivedProcessInstance(archivedProcessInstanceId)
                     def processInstanceId = archivedProcessInstance.getSourceObjectId()
                     if (isInvolved(processAPI, currentUserId, processInstanceId)) {
-                        return true;
+                        return true
                     }
                     processDefinitionId = archivedProcessInstance.getProcessDefinitionId()
                 } else {
                     def processInstanceId = Long.valueOf(apiCallContext.getResourceId())
                     if (isInvolved(processAPI, currentUserId, processInstanceId)) {
-                        return true;
+                        return true
                     }
                     processDefinitionId = processAPI.getProcessInstance(processInstanceId).getProcessDefinitionId()
                 }
@@ -123,8 +123,8 @@ class CasePermissionRule implements PermissionRule {
                 }
                 if ("archivedCase".equals(apiCallContext.getResourceName()) && filters.containsKey("sourceObjectId")) {
                     def sourceCase = Long.valueOf(filters.get("sourceObjectId"))
-                    final SearchOptionsBuilder opts = new SearchOptionsBuilder(0, 1);
-                    opts.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, sourceCase);
+                    final SearchOptionsBuilder opts = new SearchOptionsBuilder(0, 1)
+                    opts.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, sourceCase)
                     def result = processAPI.searchArchivedProcessInstancesInvolvingUser(currentUserId, opts.done())
                     def archivedProcessInstance = processAPI.getFinalArchivedProcessInstance(sourceCase)
                     return result.getCount() == 1 || processAPI.isUserProcessSupervisor(archivedProcessInstance.getProcessDefinitionId(), currentUserId)
@@ -134,6 +134,6 @@ class CasePermissionRule implements PermissionRule {
             //exception, allow user to have the 404 when the rest api will look for the resource:
             return true
         }
-        return false;
+        return false
     }
 }

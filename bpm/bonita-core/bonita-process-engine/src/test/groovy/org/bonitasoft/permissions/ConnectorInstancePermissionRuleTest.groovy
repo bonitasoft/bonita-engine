@@ -70,9 +70,9 @@ public class ConnectorInstancePermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "containerId": "2"
+                    "containerId": "2"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
         doReturn("connectorInstance").when(apiCallContext).getResourceName()
         doReturn(flownodeInstance).when(processAPI).getFlowNodeInstance(2l)
         doReturn(1l).when(flownodeInstance).getProcessDefinitionId()
@@ -81,7 +81,7 @@ public class ConnectorInstancePermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -89,9 +89,9 @@ public class ConnectorInstancePermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "containerId": "2"
+                    "containerId": "2"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
         doReturn("connectorInstance").when(apiCallContext).getResourceName()
         doReturn(flownodeInstance).when(processAPI).getFlowNodeInstance(2l)
         doReturn(1l).when(flownodeInstance).getProcessDefinitionId()
@@ -100,7 +100,7 @@ public class ConnectorInstancePermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -108,9 +108,9 @@ public class ConnectorInstancePermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "containerId": "2"
+                    "containerId": "2"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
         doReturn("archivedConnectorInstance").when(apiCallContext).getResourceName()
         doReturn(archivedFlowNodeInstanceSearchResult).when(processAPI).searchArchivedFlowNodeInstances(any(SearchOptions.class))
         doReturn([archivedFlowNodeInstance]).when(archivedFlowNodeInstanceSearchResult).getResult()
@@ -120,7 +120,7 @@ public class ConnectorInstancePermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -128,9 +128,9 @@ public class ConnectorInstancePermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "containerId": "2"
+                    "containerId": "2"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
         doReturn("archivedConnectorInstance").when(apiCallContext).getResourceName()
         doReturn(archivedFlowNodeInstanceSearchResult).when(processAPI).searchArchivedFlowNodeInstances(any(SearchOptions.class))
         doReturn([archivedFlowNodeInstance]).when(archivedFlowNodeInstanceSearchResult).getResult()
@@ -140,7 +140,7 @@ public class ConnectorInstancePermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -148,13 +148,13 @@ public class ConnectorInstancePermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "other": "sample"
+                    "other": "sample"
                 ]
-        ).when(apiCallContext).getFilters()
+                ).when(apiCallContext).getFilters()
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 }

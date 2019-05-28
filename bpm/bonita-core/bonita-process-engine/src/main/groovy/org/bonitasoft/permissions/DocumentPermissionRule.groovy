@@ -19,10 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.Logger
-import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.session.APISession
 
@@ -48,19 +48,19 @@ class DocumentPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
-        
+        long currentUserId = apiSession.getUserId()
+
         def resourceId = apiCallContext.getResourceId()
         if (resourceId != null) {
             return checkMethodWithResourceId(resourceId, apiAccessor, currentUserId)
         }
-        
+
         if (apiCallContext.isGET()) {
             return checkGetMethod(apiCallContext, apiAccessor, currentUserId)
         } else if (apiCallContext.isPOST()) {
             return checkPostMethod(apiCallContext, apiAccessor, currentUserId)
         }
-        
+
         return false
     }
 
@@ -76,19 +76,19 @@ class DocumentPermissionRule implements PermissionRule {
             return true
         }
     }
-    
+
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
         def map = mapper.readValue(apiCallContext.getBody(), Map.class)
 
         def processInstanceIdAsString = map.get(CASE_ID)
         if (processInstanceIdAsString == null || processInstanceIdAsString.toString().isEmpty()) {
-            return true;
+            return true
         }
         def processInstanceId = Long.valueOf(processInstanceIdAsString.toString())
         if (processInstanceId <= 0) {
-            return true;
+            return true
         }
         try {
             def processAPI = apiAccessor.getProcessAPI()
@@ -103,10 +103,10 @@ class DocumentPermissionRule implements PermissionRule {
     private boolean checkGetMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId) {
         def filters = apiCallContext.getFilters()
         def processAPI = apiAccessor.getProcessAPI()
-        
+
         long processInstanceId = -1
         long processDefinitionId = -1
-        
+
         def archivedCaseIdAsString = filters.get(ARCHIVED_CASE_ID)
         if (archivedCaseIdAsString != null) {
             def archivedCaseId = Long.valueOf(archivedCaseIdAsString)
@@ -120,13 +120,13 @@ class DocumentPermissionRule implements PermissionRule {
                 processDefinitionId = processAPI.getProcessInstance(processInstanceId).getProcessDefinitionId()
             }
         }
-        
+
         if (processInstanceId > 0 && processDefinitionId > 0) {
             return isInvolved(processAPI, currentUserId, processInstanceId) ||
                     processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
         }
-        
-        return false;
+
+        return false
     }
 
 
@@ -137,7 +137,7 @@ class DocumentPermissionRule implements PermissionRule {
             return true
         }
     }
-    
+
     private boolean isSupervisor(ProcessAPI processAPI, long currentUserId, long processInstanceId) {
         def processDefinitionId
         try {
@@ -151,5 +151,4 @@ class DocumentPermissionRule implements PermissionRule {
         }
         return processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)
     }
-    
 }

@@ -63,7 +63,7 @@ public class ProfileEntryPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ProfileEntryPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ProfileEntryPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -93,16 +93,12 @@ public class ProfileEntryPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn([profile_id: "110"]).when(apiCallContext).getFilters()
 
-        doReturn((1l..100l).collect {
-            profile(it)
-        }).when(profileAPI).getProfilesForUser(currentUserId, 0, 100, ProfileCriterion.ID_ASC)
-        doReturn((101l..110l).collect {
-            profile(it)
-        }).when(profileAPI).getProfilesForUser(currentUserId, 100, 100, ProfileCriterion.ID_ASC)
+        doReturn((1l..100l).collect { profile(it) }).when(profileAPI).getProfilesForUser(currentUserId, 0, 100, ProfileCriterion.ID_ASC)
+        doReturn((101l..110l).collect { profile(it) }).when(profileAPI).getProfilesForUser(currentUserId, 100, 100, ProfileCriterion.ID_ASC)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -113,7 +109,7 @@ public class ProfileEntryPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -125,7 +121,7 @@ public class ProfileEntryPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     private ProfileImpl profile(long id) {
@@ -133,6 +129,4 @@ public class ProfileEntryPermissionRuleTest {
         profile.setId(id)
         return profile
     }
-
-
 }
