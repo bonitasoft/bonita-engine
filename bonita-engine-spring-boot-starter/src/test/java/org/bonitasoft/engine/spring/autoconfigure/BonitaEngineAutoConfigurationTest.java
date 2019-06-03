@@ -35,6 +35,10 @@ public class BonitaEngineAutoConfigurationTest {
                         "org.bonitasoft.engine.database.bonita.driver-class-name=my.Driver",
                         "org.bonitasoft.engine.database.bonita.user=myUser",
                         "org.bonitasoft.engine.database.bonita.password=secret",
+                        "org.bonitasoft.engine.database.bonita.datasource.max-pool-size=3",
+                        "org.bonitasoft.engine.database.bonita.xa-datasource.max-pool-size=4",
+                        "org.bonitasoft.engine.database.business-data.datasource.max-pool-size=5",
+                        "org.bonitasoft.engine.database.business-data.xa-datasource.max-pool-size=6",
                         "org.bonitasoft.engine.database.business-data.db-vendor=mysql")
                 .run((context) -> {
                     BonitaEngine engine = context.getBean(BonitaEngine.class);
@@ -44,8 +48,13 @@ public class BonitaEngineAutoConfigurationTest {
                     assertThat(bonitaDatabaseConfiguration.getDriverClassName()).isEqualTo("my.Driver");
                     assertThat(bonitaDatabaseConfiguration.getUser()).isEqualTo("myUser");
                     assertThat(bonitaDatabaseConfiguration.getPassword()).isEqualTo("secret");
+                    assertThat(bonitaDatabaseConfiguration.getDatasource().getMaxPoolSize()).isEqualTo(3);
+                    assertThat(bonitaDatabaseConfiguration.getXaDatasource().getMaxPoolSize()).isEqualTo(4);
+                    BonitaDatabaseConfiguration businessDataDatabaseConfiguration = engine.getBusinessDataDatabaseConfiguration();
+                    assertThat(businessDataDatabaseConfiguration.getDatasource().getMaxPoolSize()).isEqualTo(5);
+                    assertThat(businessDataDatabaseConfiguration.getXaDatasource().getMaxPoolSize()).isEqualTo(6);
                     assertThat(
-                            engine.getBusinessDataDatabaseConfiguration().getDbVendor())
+                            businessDataDatabaseConfiguration.getDbVendor())
                             .isEqualTo("mysql");
                 });
     }
