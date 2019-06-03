@@ -19,6 +19,8 @@ public class BonitaDatabaseConfiguration {
     private String dbVendor;
     private String user;
     private String password;
+    private DatasourceConfiguration xaDatasource;
+    private DatasourceConfiguration datasource;
 
 
     public boolean isEmpty() {
