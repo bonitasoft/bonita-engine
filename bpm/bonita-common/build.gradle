@@ -80,30 +80,37 @@ jaxb {
                 'org/bonitasoft/engine/form/*.java'
             ])
             namespaceconfigs = ['http://www.bonitasoft.org/ns/form/6.0': 'form-mapping.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas")
+            outputDir = project.file("build/generated/jaxb/schemas/form-mapping")
         }
         application {
             javaFiles = fileTree(dir: 'src/main/java', includes: ['org/bonitasoft/engine/business/application/xml/**/*.java'],
             excludes: ['**/*Builder.java'])
             namespaceconfigs = ['http://documentation.bonitasoft.com/application-xml-schema/1.0': 'application.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas")
+            outputDir = project.file("build/generated/jaxb/schemas/application")
         }
         bom {
             javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/bdm/model/**/*.java')
             namespaceconfigs = ['': 'bom.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas")
+            outputDir = project.file("build/generated/jaxb/schemas/bom")
         }
         profile {
             javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/profile/xml/**/*.java')
             namespaceconfigs = ['http://www.bonitasoft.org/ns/profile/6.1': 'profiles.xsd']
-            outputDir = project.file("build/generated/jaxb/schemas")
+            outputDir = project.file("build/generated/jaxb/schemas/profiles")
         }
     }
 }
 
-processResources { from "$buildDir/generated/jaxb/schemas" }
+processResources { from "$buildDir/generated/jaxb/schemas/form-mapping"
+    from "$buildDir/generated/jaxb/schemas/application"
+    from "$buildDir/generated/jaxb/schemas/bom"
+    from "$buildDir/generated/jaxb/schemas/profiles" }
 
 //tasks.processResources.dependsOn tasks.jaxbSchemaGenProcessdefinition
+tasks.jaxbSchemaGenApplication.outputs.cacheIf { true }
+tasks.jaxbSchemaGenBom.outputs.cacheIf { true }
+tasks.jaxbSchemaGenProfile.outputs.cacheIf { true }
+tasks.jaxbSchemaGenForms.outputs.cacheIf { true }
 tasks.processResources.dependsOn tasks.jaxbSchemaGenApplication
 tasks.processResources.dependsOn tasks.jaxbSchemaGenBom
 tasks.processResources.dependsOn tasks.jaxbSchemaGenProfile
