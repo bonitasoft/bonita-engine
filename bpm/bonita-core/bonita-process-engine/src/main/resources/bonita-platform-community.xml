@@ -164,6 +164,8 @@
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
+    <bean id="monitoringJobListener" class="org.bonitasoft.engine.scheduler.impl.MonitoringJobListener"/>
+
     <bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
