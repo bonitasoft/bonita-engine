@@ -31,6 +31,7 @@ class BonitaDataSourceInitializer {
     BasicManagedDataSource createManagedDataSource(BonitaDatabaseConfiguration configuration, TransactionManager transactionManager) {
         validate(configuration);
         BasicManagedDataSource bonitaDataSource = new BasicManagedDataSource();
+        bonitaDataSource.setDefaultAutoCommit(false);
         bonitaDataSource.setTransactionManager(transactionManager);
         configureDatasource(configuration.getXaDatasource(), bonitaDataSource);
         setCommonDataSourceConfiguration(configuration, bonitaDataSource);
