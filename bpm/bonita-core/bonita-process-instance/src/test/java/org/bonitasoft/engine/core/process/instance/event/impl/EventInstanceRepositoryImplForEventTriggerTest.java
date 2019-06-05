@@ -13,16 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
@@ -48,6 +38,14 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Celine Souchet
@@ -55,7 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @since 6.4.0
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EventInstanceServiceImplForEventTriggerTest {
+public class EventInstanceRepositoryImplForEventTriggerTest {
 
     @Mock
     private ArchiveService archiveService;
@@ -74,11 +72,11 @@ public class EventInstanceServiceImplForEventTriggerTest {
 
     @Spy
     @InjectMocks
-    private EventInstanceServiceImpl eventInstanceServiceImpl;
+    private EventInstanceRepositoryImpl eventInstanceRepository;
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#createTimerEventTriggerInstance(STimerEventTriggerInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#createTimerEventTriggerInstance(STimerEventTriggerInstance)}
      * .
      */
     @Test
@@ -88,7 +86,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
 
         // When
-        eventInstanceServiceImpl.createTimerEventTriggerInstance(eventTriggerInstance);
+        eventInstanceRepository.createTimerEventTriggerInstance(eventTriggerInstance);
 
         // Then
         verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
@@ -101,12 +99,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.createTimerEventTriggerInstance(eventTriggerInstance);
+        eventInstanceRepository.createTimerEventTriggerInstance(eventTriggerInstance);
     }
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#deleteEventTriggerInstance(STimerEventTriggerInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#deleteEventTriggerInstance(STimerEventTriggerInstance)}
      * .
      */
     @Test
@@ -116,7 +114,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final DeleteRecord insertRecord = new DeleteRecord(eventTriggerInstance);
 
         // When
-        eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
+        eventInstanceRepository.deleteEventTriggerInstance(eventTriggerInstance);
 
         // Then
         verify(recorder).recordDelete(eq(insertRecord), nullable(String.class));
@@ -129,7 +127,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
+        eventInstanceRepository.deleteEventTriggerInstance(eventTriggerInstance);
     }
 
     @Test
@@ -142,7 +140,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         doReturn(eventTriggerInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final STimerEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceRepository.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertEquals("Should return the result of the mock.", eventTriggerInstance, result);
@@ -157,7 +155,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final STimerEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceRepository.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertNull("Should return the result of the mock.", result);
@@ -171,7 +169,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
                 Matchers.<Map<String, Object>> any());
 
         // When
-        final long result = eventInstanceServiceImpl.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
+        final long result = eventInstanceRepository.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", 3L, result);
@@ -187,7 +185,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
                 any());
 
         // When
-        eventInstanceServiceImpl.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
+        eventInstanceRepository.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
     @Test
@@ -200,7 +198,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
                any());
 
         // When
-        final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
+        final List<STimerEventTriggerInstance> result = eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
@@ -215,12 +213,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
                 eq(queryOptions), any());
 
         // When
-        eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
+        eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#updateEventTriggerInstance(STimerEventTriggerInstance, EntityUpdateDescriptor)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#updateEventTriggerInstance(STimerEventTriggerInstance, EntityUpdateDescriptor)}
      * .
      */
     @Test
@@ -231,7 +229,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTimerEventTriggerInstance, descriptor);
 
         // When
-        eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
+        eventInstanceRepository.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));

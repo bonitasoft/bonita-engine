@@ -13,16 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
@@ -48,6 +40,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Celine Souchet
@@ -55,7 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @since 6.4.0
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EventInstanceServiceImplForMessageTest {
+public class EventInstanceRepositoryImplForMessageTest {
 
     @Mock
     private ArchiveService archiveService;
@@ -73,11 +71,11 @@ public class EventInstanceServiceImplForMessageTest {
     private Recorder recorder;
 
     @InjectMocks
-    private EventInstanceServiceImpl eventInstanceServiceImpl;
+    private EventInstanceRepositoryImpl eventInstanceRepository;
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#createMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
+     * {@link EventInstanceRepository#createMessageInstance( org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
      * .
      */
     @Test
@@ -87,7 +85,7 @@ public class EventInstanceServiceImplForMessageTest {
         final InsertRecord insertRecord = new InsertRecord(sMessageInstance);
 
         // When
-        eventInstanceServiceImpl.createMessageInstance(sMessageInstance);
+        eventInstanceRepository.createMessageInstance(sMessageInstance);
 
         // Then
         verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
@@ -100,12 +98,12 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.createMessageInstance(sMessageInstance);
+        eventInstanceRepository.createMessageInstance(sMessageInstance);
     }
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#deleteMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#deleteMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
      * .
      */
     @Test
@@ -115,7 +113,7 @@ public class EventInstanceServiceImplForMessageTest {
         final DeleteRecord insertRecord = new DeleteRecord(sMessageInstance);
 
         // When
-        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstance);
+        eventInstanceRepository.deleteMessageInstance(sMessageInstance);
 
         // Then
         verify(recorder).recordDelete(eq(insertRecord), nullable(String.class));
@@ -128,11 +126,11 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.deleteMessageInstance(sMessageInstance);
+        eventInstanceRepository.deleteMessageInstance(sMessageInstance);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#resetProgressMessageInstances()}.
+     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#resetProgressMessageInstances()}.
      */
     @Test
     public final void resetProgressMessageInstances_should_update_message() throws Exception {
@@ -140,7 +138,7 @@ public class EventInstanceServiceImplForMessageTest {
         doReturn(3).when(persistenceService).update("resetProgressMessageInstances");
 
         // When
-        final int result = eventInstanceServiceImpl.resetProgressMessageInstances();
+        final int result = eventInstanceRepository.resetProgressMessageInstances();
 
         // Then
         assertEquals("Should return the result of the mock.", 3, result);
@@ -152,11 +150,11 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SPersistenceException("")).when(persistenceService).update("resetProgressMessageInstances");
 
         // When
-        eventInstanceServiceImpl.resetProgressMessageInstances();
+        eventInstanceRepository.resetProgressMessageInstances();
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getMessageEventCouples(int, int)}.
+     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageEventCouples(int, int)}.
      */
     @Test
     public final void getMessageEventCouples_should_return_message_event_couples() throws Exception {
@@ -166,7 +164,7 @@ public class EventInstanceServiceImplForMessageTest {
         doReturn(sMessageEventCoupleImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SMessageEventCouple> result = eventInstanceServiceImpl.getMessageEventCouples(0, 100);
+        final List<SMessageEventCouple> result = eventInstanceRepository.getMessageEventCouples(0, 100);
 
         // Then
         assertEquals("Should return the result of the mock.", sMessageEventCoupleImpls, result);
@@ -179,7 +177,7 @@ public class EventInstanceServiceImplForMessageTest {
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SMessageEventCouple> result = eventInstanceServiceImpl.getMessageEventCouples(0, 100);
+        final List<SMessageEventCouple> result = eventInstanceRepository.getMessageEventCouples(0, 100);
 
         // Then
         assertTrue("The result must be empty.", result.isEmpty());
@@ -192,11 +190,11 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        eventInstanceServiceImpl.getMessageEventCouples(0, 100);
+        eventInstanceRepository.getMessageEventCouples(0, 100);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getMessageInstance(long)}.
+     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getMessageInstance(long)}.
      */
     @Test
     public final void getMessageInstance_should_return_message_instance() throws Exception {
@@ -208,7 +206,7 @@ public class EventInstanceServiceImplForMessageTest {
         doReturn(sMessageInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SMessageInstance result = eventInstanceServiceImpl.getMessageInstance(messageInstanceId);
+        final SMessageInstance result = eventInstanceRepository.getMessageInstance(messageInstanceId);
 
         // Then
         assertEquals("Should return the result of the mock.", sMessageInstance, result);
@@ -223,7 +221,7 @@ public class EventInstanceServiceImplForMessageTest {
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SMessageInstance result = eventInstanceServiceImpl.getMessageInstance(messageInstanceId);
+        final SMessageInstance result = eventInstanceRepository.getMessageInstance(messageInstanceId);
 
         // Then
         assertNull("Should return the result of the mock.", result);
@@ -238,12 +236,12 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        eventInstanceServiceImpl.getMessageInstance(messageInstanceId);
+        eventInstanceRepository.getMessageInstance(messageInstanceId);
     }
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#updateMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#updateMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
      * .
      */
     @Test
@@ -254,7 +252,7 @@ public class EventInstanceServiceImplForMessageTest {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sMessageInstance, descriptor);
 
         // When
-        eventInstanceServiceImpl.updateMessageInstance(sMessageInstance, descriptor);
+        eventInstanceRepository.updateMessageInstance(sMessageInstance, descriptor);
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
@@ -268,7 +266,8 @@ public class EventInstanceServiceImplForMessageTest {
         doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.updateMessageInstance(sMessageInstance, descriptor);
+        eventInstanceRepository.updateMessageInstance(sMessageInstance, descriptor);
     }
+
 
 }

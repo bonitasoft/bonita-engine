@@ -1271,14 +1271,20 @@
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
     </bean>
 
-    <bean id="eventInstanceService"
-          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
+    <bean id="eventInstanceRepository"
+          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
+
+    <bean id="eventInstanceService"
+          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
+        <constructor-arg name="eventInstanceRepository" ref="eventInstanceRepository" />
+    </bean>
+
 
     <bean id="refBusinessDataService"
           class="org.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">

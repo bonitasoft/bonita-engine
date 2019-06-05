@@ -13,11 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.event;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -71,6 +66,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -217,7 +216,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             final SProcessInstance processInstance, final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
-        final SCallActivityInstance callActivityInstance = (SCallActivityInstance) getEventInstanceService().getFlowNodeInstance(processInstance.getCallerId());
+        final SCallActivityInstance callActivityInstance = (SCallActivityInstance) flowNodeInstanceService.getFlowNodeInstance(processInstance.getCallerId());
         final long processDefinitionId = callActivityInstance.getLogicalGroup(flowNodeKeyProvider.getProcessDefinitionIndex());
         final SProcessDefinition callActivityContainer = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) callActivityContainer.getProcessContainer().getFlowNode(
