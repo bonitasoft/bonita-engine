@@ -22,7 +22,6 @@ dependencies {
     compile project(':engine:services:bonita-connector-executor')
     compile project(':engine:services:bonita-data-definition')
     compile project(':engine:services:bonita-data-instance')
-    compile project(':engine:services:bonita-dependency')
     compile project(':engine:services:bonita-events')
     compile project(':engine:services:bonita-expression')
     compile project(':engine:services:bonita-external-identity-mapping')

@@ -45,7 +45,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;

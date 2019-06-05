@@ -17,7 +17,6 @@ dependencies {
     compile project(':engine:services:bonita-builder')
     compile project(':engine:bpm:bonita-core:bonita-home-server')
     compile project(':engine:services:bonita-session')
-    compile project(':engine:services:bonita-dependency')
     compile project(':engine:services:bonita-connector-executor')
     compile project(':engine:services:bonita-resources')
     compile project(':engine:services:bonita-time-tracker')

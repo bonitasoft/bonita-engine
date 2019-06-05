@@ -3,7 +3,6 @@
 dependencies {
     compile project(':engine:bpm:bonita-common')
     compile project(':engine:services:bonita-identity')
-    compile project(':engine:services:bonita-dependency')
     compile project(':engine:services:bonita-expression')
     compile project(':engine:services:bonita-data-definition')
     compile project(':engine:services:bonita-commons')
