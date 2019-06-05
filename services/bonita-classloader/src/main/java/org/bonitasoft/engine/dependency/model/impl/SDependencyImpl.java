@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.dependency.model.impl;
 
-import java.util.Arrays;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

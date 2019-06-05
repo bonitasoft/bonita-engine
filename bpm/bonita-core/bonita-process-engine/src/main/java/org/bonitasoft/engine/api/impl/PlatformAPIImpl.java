@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

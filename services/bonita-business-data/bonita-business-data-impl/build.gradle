@@ -3,7 +3,7 @@ apply plugin: 'bonita-docker-database'
 dependencies {
     compile project(':engine:bpm:bonita-common')
     compile project(':engine:services:bonita-business-data:bonita-business-data-generator')
-    compile project(':engine:services:bonita-dependency')
+    compile project(':engine:services:bonita-classloader')
     compile project(':engine:services:bonita-log-technical')
     compile project(':engine:services:bonita-business-data:bonita-business-data-api')
     compile project(':engine:services:bonita-resources')

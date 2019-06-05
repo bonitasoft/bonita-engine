@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-
 /**
  * @author Celine Souchet
  */

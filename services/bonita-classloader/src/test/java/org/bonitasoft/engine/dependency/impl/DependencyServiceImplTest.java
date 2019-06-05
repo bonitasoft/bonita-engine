@@ -51,6 +51,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -210,7 +211,7 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyNotFoundException.class)
     public void deleteDependencyWithReadExceptionShouldThrowSDependencyNotFoundException() throws Exception {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SDependency>> any());
+        Mockito.doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SDependency>> any());
         dependencyServiceImpl.deleteDependency("notFound");
     }
 
