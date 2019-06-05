@@ -13,18 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
@@ -47,6 +35,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Celine Souchet
@@ -54,7 +49,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @since 6.4.0
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EventInstanceServiceImplForEventTest {
+public class EventInstanceRepositoryImplForEventTest {
 
     @Mock
     private ArchiveService archiveService;
@@ -72,11 +67,11 @@ public class EventInstanceServiceImplForEventTest {
     private Recorder recorder;
 
     @InjectMocks
-    private EventInstanceServiceImpl eventInstanceServiceImpl;
+    private EventInstanceRepositoryImpl eventInstanceRepository;
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#createEventInstance(org.bonitasoft.engine.core.process.instance.model.event.SEventInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#createEventInstance(org.bonitasoft.engine.core.process.instance.model.event.SEventInstance)}
      * .
      */
     @Test
@@ -86,7 +81,7 @@ public class EventInstanceServiceImplForEventTest {
         final InsertRecord insertRecord = new InsertRecord(eventInstanceImpl);
 
         // When
-        eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);
+        eventInstanceRepository.createEventInstance(eventInstanceImpl);
 
         // Then
         verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
@@ -99,11 +94,11 @@ public class EventInstanceServiceImplForEventTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
-        eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);
+        eventInstanceRepository.createEventInstance(eventInstanceImpl);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getActivityBoundaryEventInstances(long, int, int)}
+     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getActivityBoundaryEventInstances(long, int, int)}
      * .
      */
     @Test
@@ -118,7 +113,7 @@ public class EventInstanceServiceImplForEventTest {
         doReturn(triggerInstanceImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SBoundaryEventInstance> result = eventInstanceServiceImpl.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
+        final List<SBoundaryEventInstance> result = eventInstanceRepository.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
 
         // Then
         assertEquals("Should return the result of the mock.", triggerInstanceImpls, result);
@@ -135,7 +130,7 @@ public class EventInstanceServiceImplForEventTest {
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SBoundaryEventInstance> result = eventInstanceServiceImpl.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
+        final List<SBoundaryEventInstance> result = eventInstanceRepository.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
 
         // Then
         assertTrue("The result must be empty.", result.isEmpty());
@@ -152,12 +147,12 @@ public class EventInstanceServiceImplForEventTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        eventInstanceServiceImpl.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
+        eventInstanceRepository.getActivityBoundaryEventInstances(activityInstanceId, fromIndex, maxResults);
     }
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getEventInstances(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getEventInstances(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
      * .
      */
     @Test
@@ -174,7 +169,7 @@ public class EventInstanceServiceImplForEventTest {
         doReturn(eventInstanceImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SEventInstance> result = eventInstanceServiceImpl.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
+        final List<SEventInstance> result = eventInstanceRepository.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
 
         // Then
         assertEquals("Should return the result of the mock.", eventInstanceImpls, result);
@@ -193,7 +188,7 @@ public class EventInstanceServiceImplForEventTest {
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SEventInstance> result = eventInstanceServiceImpl.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
+        final List<SEventInstance> result = eventInstanceRepository.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
 
         // Then
         assertTrue("The result must be empty.", result.isEmpty());
@@ -212,7 +207,7 @@ public class EventInstanceServiceImplForEventTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        eventInstanceServiceImpl.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
+        eventInstanceRepository.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
     }
 
 }
