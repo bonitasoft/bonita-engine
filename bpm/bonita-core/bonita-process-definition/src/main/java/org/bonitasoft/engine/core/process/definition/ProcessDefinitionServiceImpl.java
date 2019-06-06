@@ -96,19 +96,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
-    private final EventService eventService;
     private final SessionService sessionService;
     private final ReadSessionAccessor sessionAccessor;
     private final QueriableLoggerService queriableLoggerService;
     private final CacheService cacheService;
     protected ProcessDefinitionBARContribution processDefinitionBARContribution;
 
-    public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
-            final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService, CacheService cacheService) {
+    public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final SessionService sessionService,
+                                        final ReadSessionAccessor sessionAccessor, final QueriableLoggerService queriableLoggerService, CacheService cacheService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
-        this.eventService = eventService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.queriableLoggerService = queriableLoggerService;

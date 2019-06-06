@@ -91,10 +91,6 @@ public class ProcessDefinitionServiceImplTest {
     @Mock
     private CacheService cacheService;
     @Mock
-    private DependencyService dependencyService;
-    @Mock
-    private EventService eventService;
-    @Mock
     private ReadPersistenceService persistenceService;
     @Mock
     private QueriableLoggerService queriableLoggerService;
