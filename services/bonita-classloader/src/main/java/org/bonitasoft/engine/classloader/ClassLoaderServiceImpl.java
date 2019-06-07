@@ -73,11 +73,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private SessionAccessor sessionAccessor;
     private UserTransactionService userTransactionService;
     private BroadcastService broadcastService;
-    private BonitaTaskExecutor bonitaTaskExecutor;
+    private ClassLoaderUpdater classLoaderUpdater;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger,
                                   final EventService eventService, PlatformDependencyService platformDependencyService, SessionAccessor sessionAccessor,
-                                  UserTransactionService userTransactionService, BroadcastService broadcastService, BonitaTaskExecutor bonitaTaskExecutor) {
+                                  UserTransactionService userTransactionService, BroadcastService broadcastService, ClassLoaderUpdater classLoaderUpdater) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
@@ -86,7 +86,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
         this.broadcastService = broadcastService;
-        this.bonitaTaskExecutor = bonitaTaskExecutor;
+        this.classLoaderUpdater = classLoaderUpdater;
         globalListeners.add(new ClassReflectorClearer());
         globalListeners.add(new JacksonCacheClearer());
     }
@@ -351,7 +351,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
             if (refreshTaskSynchronization == null) {
                 RefreshClassLoaderTask callable = new RefreshClassLoaderTask(id, type);
-                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, bonitaTaskExecutor, userTransactionService, broadcastService, sessionAccessor, callable, getTenantId(type), type, id);
+                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, broadcastService, callable, classLoaderUpdater,  getTenantId(type), type, id);
                 userTransactionService.registerBonitaSynchronization(refreshTaskSynchronization);
                 currentRefreshTask.set(refreshTaskSynchronization);
             } else {

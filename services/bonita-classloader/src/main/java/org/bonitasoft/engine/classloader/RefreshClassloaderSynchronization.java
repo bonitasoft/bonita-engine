@@ -43,24 +43,20 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 public class RefreshClassloaderSynchronization implements BonitaTransactionSynchronization {
 
     private ClassLoaderService classLoaderService;
-    private BonitaTaskExecutor bonitaTaskExecutor;
-    private UserTransactionService userTransactionService;
+    private ClassLoaderUpdater classLoaderUpdater;
     private BroadcastService broadcastService;
-    private SessionAccessor sessionAccessor;
     private final RefreshClassLoaderTask callable;
     private final Set<Pair<ScopeType, Long>> ids = new HashSet<>();
     private final Long tenantId;
 
     public RefreshClassloaderSynchronization(ClassLoaderService classLoaderService,
-                                             BonitaTaskExecutor bonitaTaskExecutor, UserTransactionService userTransactionService,
                                              BroadcastService broadcastService,
-                                             SessionAccessor sessionAccessor, RefreshClassLoaderTask callable,
+                                             RefreshClassLoaderTask callable,
+                                             ClassLoaderUpdater classLoaderUpdater,
                                              Long tenantId, ScopeType scopeType, Long scopeId) {
         this.classLoaderService = classLoaderService;
-        this.bonitaTaskExecutor = bonitaTaskExecutor;
-        this.userTransactionService = userTransactionService;
-        this.broadcastService = broadcastService;
-        this.sessionAccessor = sessionAccessor;
+        this.classLoaderUpdater = classLoaderUpdater;
+                this.broadcastService = broadcastService;
         this.callable = callable;
         this.tenantId = tenantId;
         addClassloaderToRefresh(scopeType, scopeId);
@@ -74,7 +70,7 @@ public class RefreshClassloaderSynchronization implements BonitaTransactionSynch
     public void afterCompletion(TransactionState txState) {
         classLoaderService.removeRefreshClassLoaderSynchronization();
         if (txState == TransactionState.COMMITTED) {
-            refreshLocalClassLoader();
+            classLoaderUpdater.refreshClassloaders(classLoaderService, tenantId, ids);
             refreshClassLoaderOnOtherNodes();
         }
     }
@@ -92,38 +88,6 @@ public class RefreshClassloaderSynchronization implements BonitaTransactionSynch
         }
     }
 
-    private void refreshLocalClassLoader() {
-        Future<Void> execute = bonitaTaskExecutor.execute(
-                inSession(inTransaction(() -> {
-                    for (Pair<ScopeType, Long> id : ids) {
-                        classLoaderService.refreshClassLoader(id.getKey(), id.getValue());
-                    }
-                    return null;
-                })));
-        try {
-            execute.get(5, TimeUnit.MINUTES);//hard coded timeout, it should never happen
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new SBonitaRuntimeException("Unable to refresh the classloaders: "+ids, e);
-        }
-    }
-
-    private <T> Callable<T> inSession(Callable<T> callable) {
-        if (tenantId == null) {
-            return callable;
-        }
-        return () -> {
-            sessionAccessor.setTenantId(tenantId);
-            try {
-                return callable.call();
-            } finally {
-                sessionAccessor.deleteTenantId();
-            }
-        };
-    }
-
-    private <T> Callable<T> inTransaction(Callable<T> callable) {
-        return () -> userTransactionService.executeInTransaction(callable);
-    }
 
     //Testing purpose only
     Set<Pair<ScopeType, Long>> getIds() {

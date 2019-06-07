@@ -10,11 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.stream.Stream;
-
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
@@ -75,7 +72,7 @@ public class ClassLoaderServiceImplTest {
     @Mock
     private BroadcastService broadcastService;
     @Mock
-    private BonitaTaskExecutor bonitaTaskExecutor;
+    private ClassLoaderUpdater classLoaderUpdater;
 
     @Captor
     private ArgumentCaptor<RefreshClassloaderSynchronization> synchronizationArgumentCaptor;
@@ -93,7 +90,7 @@ public class ClassLoaderServiceImplTest {
     @Before
     public void before() throws Exception {
         classLoaderService = new ClassLoaderServiceImpl(parentClassLoaderResolver, logger, eventService,
-                platformDependencyService, sessionAccessor, userTransactionService, broadcastService, bonitaTaskExecutor);
+                platformDependencyService, sessionAccessor, userTransactionService, broadcastService, classLoaderUpdater);
         //tenant in theses tests is 0L
         classLoaderService.registerDependencyServiceOfTenant(0L, tenantDependencyService);
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
@@ -226,7 +223,7 @@ public class ClassLoaderServiceImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void should_create_throw_an_exception_if_bad_resolver() throws Exception {
         //given
-        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService, platformDependencyService, sessionAccessor, userTransactionService, broadcastService, bonitaTaskExecutor);
+        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService, platformDependencyService, sessionAccessor, userTransactionService, broadcastService, classLoaderUpdater);
         //when
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
 

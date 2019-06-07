@@ -209,7 +209,13 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="broadcastService" ref="broadcastService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
+        <constructor-arg name="classLoaderUpdater" ref="classLoaderUpdater" />
+    </bean>
+
+    <bean id="classLoaderUpdater" class="org.bonitasoft.engine.classloader.ClassLoaderUpdater">
+        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor"/>
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
+        <constructor-arg name="userTransactionService" ref="transactionService"/>
     </bean>
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
