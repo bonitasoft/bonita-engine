@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import java.util.stream.Stream;
-
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.home.BonitaResource;
 
 /**
  * @author Elias Ricken de Medeiros
