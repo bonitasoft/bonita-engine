@@ -46,7 +46,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros, Charles Souillard, Baptiste Mesta
  */
-public class ClassLoaderServiceTest extends CommonBPMServicesTest {
+public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
     private DependencyService dependencyService;
 
@@ -117,28 +117,28 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
     private void addNotInPathDependencies() throws Exception {
         inTx(() -> {
             createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar",
-                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar")));
+                    IOUtil.getAllContentFrom(ClassLoaderServiceIT.class.getResource("NotInPathGlobal.jar")));
             createPlatformDependency("NotInPathShared", "NotInPathShared.jar",
-                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathShared.jar")));
+                    IOUtil.getAllContentFrom(ClassLoaderServiceIT.class.getResource("NotInPathShared.jar")));
             createDependency(ID1, TYPE1, "NotInPathLocal", "NotInPathLocal.jar",
-                    IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar")));
+                    IOUtil.getAllContentFrom(ClassLoaderServiceIT.class.getResource("NotInPathLocal.jar")));
         });
     }
 
     private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
-                                  final byte[] value) throws SDependencyException {
+                                  final byte[] value) throws SDependencyException, SClassLoaderException {
         long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
-        dependencyService.refreshClassLoaderAfterUpdate(artifactType, artifactId);
+        classLoaderService.refreshClassLoader(artifactType, artifactId);
         return id;
     }
 
-    private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException {
+    private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException, SClassLoaderException {
         final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
                 .createNewInstance(name, fileName, value);
         final SDependency dependency = builder.done();
         platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(),
                 ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+        classLoaderService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                 classLoaderService.getGlobalClassLoaderId());
         return dependency.getId();
     }
@@ -371,7 +371,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
             assertSameClassloader(globalClassLoader, classLoader);
             platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
                     ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-            platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+            classLoaderService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                     classLoaderService.getGlobalClassLoaderId());
 
         });
@@ -473,7 +473,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
     public void loadResource() throws Exception {
         initializeClassLoaderService();
         getTransactionService().begin();
-        final URL resourceFile = ClassLoaderServiceTest.class.getResource("resource.txt");
+        final URL resourceFile = ClassLoaderServiceIT.class.getResource("resource.txt");
         final byte[] resourceFileContent = IOUtil.getAllContentFrom(resourceFile);
 
         createPlatformDependency("resource", "resource.txt", resourceFileContent);
@@ -553,10 +553,10 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         dependencyService.createMappedDependency("myResource.jar", jarContent, "myResource.jar", ID1, TYPE1);
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, Stream.of(resource("myResource.jar", jarContent)));
+        classLoaderService.refreshClassLoader(TYPE1, ID1);
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, Stream.of(resource("myResource.jar", jarContent)));
+        classLoaderService.refreshClassLoader(TYPE1, ID1);
         getTransactionService().complete();
 
         //when

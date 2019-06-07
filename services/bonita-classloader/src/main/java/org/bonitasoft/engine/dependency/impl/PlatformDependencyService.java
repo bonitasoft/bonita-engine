@@ -19,55 +19,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
+import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class PlatformDependencyServiceImpl extends AbstractDependencyService {
+public class PlatformDependencyService extends AbstractDependencyService {
 
     private final PersistenceService platformPersistenceService;
 
-    private final ClassLoaderService classLoaderService;
 
-    public PlatformDependencyServiceImpl(final PersistenceService platformPersistenceService, final ClassLoaderService classLoaderService,
-                                         BroadcastService broadcastService, UserTransactionService userTransactionService,
-                                         BonitaTaskExecutor bonitaTaskExecutor, SessionAccessor sessionAccessor) {
-        super(broadcastService, userTransactionService, platformPersistenceService, bonitaTaskExecutor, sessionAccessor);
+    public PlatformDependencyService(final PersistenceService platformPersistenceService) {
+        super(platformPersistenceService);
         this.platformPersistenceService = platformPersistenceService;
-        this.classLoaderService = classLoaderService;
     }
 
     @Override
@@ -224,28 +211,7 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     }
 
     @Override
-    protected AbstractRefreshClassLoaderTask getRefreshClassLoaderTask(final ScopeType type, final long id) {
-        return new RefreshPlatformClassLoaderTask(type, id);
-    }
-
-    @Override
-    protected Long getTenantId() throws STenantIdNotSetException {
-        return null;
-    }
-
-    @Override
-    public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
-        final Stream<BonitaResource> resources = getDependenciesResources(type, id);
-        try {
-            classLoaderService.refreshGlobalClassLoader(resources);
-        } catch (final SClassLoaderException e) {
-            throw new SDependencyException("can't refresh global classLoader", e);
-        }
-    }
-
-    @Override
-    public SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
-            throws SDependencyException {
+    public SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) {
         throw new UnsupportedOperationException("NYI");
     }
 }

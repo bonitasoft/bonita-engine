@@ -1484,16 +1484,16 @@
         <constructor-arg name="servletUrl" value="${document.servlet.url}" />
     </bean>
 
-    <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl">
+    <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.TenantDependencyService">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.dependency.impl.DependencyServiceRegistrator" init-method="registerDependencyService">
+        <constructor-arg name="tenantDependencyService" ref="dependencyService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
-        <constructor-arg name="broadcastService" ref="broadcastService" />
-        <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
@@ -1528,6 +1528,7 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
@@ -1702,6 +1703,7 @@
     <bean id="businessDataModelRepository"
           class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="schemaManager" ref="schemaManager" />
         <constructor-arg name="tenantResourcesService" ref="tenantResourcesService" />
         <constructor-arg name="tenantId" value="${tenantId}" />

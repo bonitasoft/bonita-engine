@@ -1,4 +1,14 @@
-package org.bonitasoft.engine.dependency.impl;
+package org.bonitasoft.engine.classloader;
+
+import static java.util.Collections.emptyMap;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
@@ -15,16 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import static java.util.Collections.emptyMap;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
-import java.util.concurrent.Callable;
-
 public class RefreshClassloaderSynchronizationTest {
 
     @Rule
@@ -34,8 +34,6 @@ public class RefreshClassloaderSynchronizationTest {
     private BroadcastService broadcastService;
     @Mock
     private UserTransactionService userTransactionService;
-    @Mock
-    private AbstractDependencyService abstractDependencyService;
     @Mock
     private BonitaTaskExecutor bonitaTaskExecutor;
     @Captor
@@ -47,12 +45,14 @@ public class RefreshClassloaderSynchronizationTest {
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
-    private AbstractRefreshClassLoaderTask refreshClassLoaderTask;
+    private RefreshClassLoaderTask refreshClassLoaderTask;
+    @Mock
+    private ClassLoaderService classLoaderService;
 
 
     @Before
     public void before() {
-        refreshClassloaderSynchronization = new RefreshClassloaderSynchronization(abstractDependencyService, bonitaTaskExecutor,
+        refreshClassloaderSynchronization = new RefreshClassloaderSynchronization(classLoaderService, bonitaTaskExecutor,
                 userTransactionService, broadcastService, sessionAccessor, refreshClassLoaderTask, 1L, ScopeType.PROCESS, 111L);
     }
 
@@ -61,7 +61,7 @@ public class RefreshClassloaderSynchronizationTest {
 
         refreshClassloaderSynchronization.afterCompletion(TransactionState.NO_TRANSACTION);
 
-        verify(abstractDependencyService).removeRefreshClassLoaderSynchronization();
+        verify(classLoaderService).removeRefreshClassLoaderSynchronization();
     }
 
     @Test
@@ -74,7 +74,7 @@ public class RefreshClassloaderSynchronizationTest {
         callableArgumentCaptor1.getValue().call();
         callableArgumentCaptor2.getValue().call();
 
-        verify(abstractDependencyService).refreshClassLoader(ScopeType.PROCESS, 111);
+        verify(classLoaderService).refreshClassLoader(ScopeType.PROCESS, 111);
     }
 
     @Test

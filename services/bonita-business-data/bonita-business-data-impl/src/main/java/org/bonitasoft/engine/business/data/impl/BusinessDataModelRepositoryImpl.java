@@ -40,6 +40,8 @@ import org.bonitasoft.engine.business.data.generator.filter.OnlyDAOImplementatio
 import org.bonitasoft.engine.business.data.generator.filter.WithoutDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.server.ServerBDMJarBuilder;
 import org.bonitasoft.engine.business.data.SchemaManager;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
@@ -71,14 +73,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private static final String BOM_NAME = "bom.zip";
 
     private final DependencyService dependencyService;
+    private final ClassLoaderService classLoaderService;
 
     private final SchemaManager schemaManager;
     private TenantResourcesService tenantResourcesService;
     private long tenantId;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
-            TenantResourcesService tenantResourcesService, long tenantId) {
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, ClassLoaderService classLoaderService, final SchemaManager schemaManager,
+                                           TenantResourcesService tenantResourcesService, long tenantId) {
         this.dependencyService = dependencyService;
+        this.classLoaderService = classLoaderService;
         this.schemaManager = schemaManager;
         this.tenantResourcesService = tenantResourcesService;
         this.tenantId = tenantId;
@@ -160,10 +164,10 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema
-            dependencyService.refreshClassLoader(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoader(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
-        } catch (final SDependencyException e) {
+        } catch (final SDependencyException | SClassLoaderException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
     }
@@ -259,11 +263,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
+            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
         } catch (final SDependencyNotFoundException sde) {
             // do nothing
-        } catch (final SDependencyException sde) {
-            throw new SBusinessDataRepositoryException(sde);
+        } catch (final SDependencyException | SClassLoaderException e) {
+            throw new SBusinessDataRepositoryException(e);
         }
         try {
             STenantResource clientBDMZip = tenantResourcesService.get(TenantResourceType.BDM, CLIENT_BDM_ZIP);

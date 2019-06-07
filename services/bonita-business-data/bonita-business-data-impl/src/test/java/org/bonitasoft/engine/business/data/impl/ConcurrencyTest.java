@@ -81,7 +81,7 @@ public class ConcurrencyTest {
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(
                 mock(DependencyService.class),
-                schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+                classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService,

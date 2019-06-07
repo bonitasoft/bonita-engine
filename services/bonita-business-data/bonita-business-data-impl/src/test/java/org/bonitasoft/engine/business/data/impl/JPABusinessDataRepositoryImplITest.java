@@ -96,7 +96,7 @@ public class JPABusinessDataRepositoryImplITest {
 
         final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+                classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration.getJpaConfiguration(), classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();

@@ -41,6 +41,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.connector.Connector;
@@ -95,6 +97,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final ExpressionResolverService expressionResolverService;
     private final OperationService operationService;
     private final DependencyService dependencyService;
+    private final ClassLoaderService classLoaderService;
     private final TechnicalLoggerService logger;
     private final TimeTracker timeTracker;
     private final ProcessResourcesService processResourcesService;
@@ -103,12 +106,13 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final Schema schema;
 
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor,
-            final ExpressionResolverService expressionResolverService, final OperationService operationService,
-            final DependencyService dependencyService, final TechnicalLoggerService logger, final TimeTracker timeTracker,
-            ProcessResourcesService processResourcesService) {
+                                final ExpressionResolverService expressionResolverService, final OperationService operationService,
+                                final DependencyService dependencyService, ClassLoaderService classLoaderService, final TechnicalLoggerService logger, final TimeTracker timeTracker,
+                                ProcessResourcesService processResourcesService) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
         this.expressionResolverService = expressionResolverService;
+        this.classLoaderService = classLoaderService;
         this.processResourcesService = processResourcesService;
         this.operationService = operationService;
         this.dependencyService = dependencyService;
@@ -388,8 +392,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             }
             updateJarDependencies(sDefinition, connectorArchive, connectorImplementationDescriptorToReplace);
             updateConnectorImplementationFile(sDefinition, connectorArchive, connectorImplementationFile);
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sDefinition.getId());
-        } catch (final SRecorderException | SDependencyException | SBonitaReadException e) {
+            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sDefinition.getId());
+        } catch (final SRecorderException | SDependencyException | SBonitaReadException | SClassLoaderException e) {
             throw new SConnectorException("Problem replacing connector implementation of connector " + connectorId + " of process " + sDefinition.getId(), e);
         }
     }
