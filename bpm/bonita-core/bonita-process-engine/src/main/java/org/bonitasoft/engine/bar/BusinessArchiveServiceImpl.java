@@ -77,7 +77,7 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
             if (isResolved) {
                 processDefinitionService.resolveProcess(sProcessDefinition.getId());
             }
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sProcessDefinition.getId());
+            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sProcessDefinition.getId());
         } catch (SV6FormsDeployException | SAlreadyExistsException e) {
             throw e;
         } catch (final SBonitaException e) {

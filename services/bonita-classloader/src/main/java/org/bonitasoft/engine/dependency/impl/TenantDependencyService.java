@@ -19,11 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
@@ -40,7 +37,6 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFacto
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
-import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -60,37 +56,24 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.service.BonitaTaskExecutor;
-import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class DependencyServiceImpl extends AbstractDependencyService {
+public class TenantDependencyService extends AbstractDependencyService {
 
     private final ReadPersistenceService persistenceService;
     private final Recorder recorder;
     private final QueriableLoggerService queriableLoggerService;
-    private final ClassLoaderService classLoaderService;
-    private ReadSessionAccessor readSessionAccessor;
 
-    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-                                 final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
-                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor,
-                                 UserTransactionService userTransactionService, BonitaTaskExecutor bonitaTaskExecutor,
-                                 SessionAccessor sessionAccessor) {
-        super(broadcastService, userTransactionService, persistenceService, bonitaTaskExecutor, sessionAccessor);
+    public TenantDependencyService(final ReadPersistenceService persistenceService, final Recorder recorder,
+                                   final QueriableLoggerService queriableLoggerService) {
+        super(persistenceService);
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.queriableLoggerService = queriableLoggerService;
-        this.classLoaderService = classLoaderService;
-        this.readSessionAccessor = readSessionAccessor;
     }
 
     private SDependencyLogBuilder getQueriableLog(final ActionType actionType, final String message) {
@@ -145,10 +128,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         return sDependency;
     }
 
-    @Override
-    protected AbstractRefreshClassLoaderTask getRefreshClassLoaderTask(ScopeType type, long id) {
-        return new RefreshClassLoaderTask(type, id);
-    }
 
     @Override
     protected List<SDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
@@ -192,7 +171,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         try {
             delete(dependencyMapping, DEPENDENCYMAPPING);
             log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependencyMapping");
-            refreshClassLoaderAfterUpdate(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SRecorderException e) {
             log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependencyMapping");
             throw new SDependencyException("Can't delete dependency mapping" + dependencyMapping, e);
@@ -262,21 +240,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
-    @Override
-    public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
-        final Stream<BonitaResource> resources = getDependenciesResources(type, id);
-        try {
-            classLoaderService.refreshLocalClassLoader(type.name(), id, resources);
-        } catch (final SClassLoaderException e) {
-            throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
-        }
-    }
-
-    @Override
-    protected Long getTenantId() throws STenantIdNotSetException {
-        return readSessionAccessor.getTenantId();
-    }
-
     public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
             throws SDependencyException {
         final SDependency sDependency = createDependency(name, jarContent, fileName, artifactId, scopeType);
@@ -330,7 +293,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         try {
             insert(dependencyMapping, DEPENDENCYMAPPING);
             log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder1, "createDependencyMapping");
-            refreshClassLoaderAfterUpdate(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SRecorderException e) {
             log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder1, "createDependencyMapping");
             throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);

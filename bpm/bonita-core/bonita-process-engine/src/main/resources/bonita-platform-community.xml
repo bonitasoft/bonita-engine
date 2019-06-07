@@ -193,13 +193,8 @@
         <property name="jndiName" value="${database.sequence.manager.datasource.name}" />
     </bean>
 
-    <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
+    <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyService">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
-        <constructor-arg name="broadcastService" ref="broadcastService" />
-        <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
@@ -210,6 +205,11 @@
         <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
+        <constructor-arg name="platformDependencyService" ref="platformDependencyService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="broadcastService" ref="broadcastService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
+        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
     </bean>
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">

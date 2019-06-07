@@ -59,7 +59,7 @@ public class SetServiceState implements Callable<Void>, Serializable {
 
             if (serviceStrategy.shouldRefreshClassLoaders()) {
                 // refresh the tenant classloader:
-                tenantServiceAccessor.getDependencyService().refreshClassLoader(ScopeType.TENANT, tenantId);
+                tenantServiceAccessor.getClassLoaderService().refreshClassLoader(ScopeType.TENANT, tenantId);
                 refreshClassloaderOfProcessDefinitions(tenantServiceAccessor);
             }
 
@@ -89,7 +89,7 @@ public class SetServiceState implements Callable<Void>, Serializable {
     }
 
     protected void refreshClassloaderOfProcessDefinitions(final TenantServiceAccessor tenantServiceAccessor) throws SBonitaException {
-        final DependencyService dependencyService = tenantServiceAccessor.getDependencyService();
+        ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
         final int maxResults = 100;
@@ -97,7 +97,7 @@ public class SetServiceState implements Callable<Void>, Serializable {
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(startIndex, maxResults);
             for (final Long id : processDefinitionIds) {
-                dependencyService.refreshClassLoader(ScopeType.PROCESS, id);
+                classLoaderService.refreshClassLoader(ScopeType.PROCESS, id);
             }
             startIndex += maxResults;
         } while (processDefinitionIds.size() == maxResults);

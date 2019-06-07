@@ -16,11 +16,13 @@ package org.bonitasoft.engine.dependency;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -102,17 +104,7 @@ public interface DependencyService {
      */
     List<SDependencyMapping> getDependencyMappings(QueryOptions queryOptions) throws SDependencyException;
 
-    /**
-     * Refresh classloader after a dependency update
-     * difference with #refreshClassLoader is that this one is done on all nodes and after transaction
-     *
-     * Multiple call to this method will have no effects, it will only register the refresh to be done after the transaction.
-     *
-     * @param type
-     * @param id
-     * @throws SDependencyException
-     */
-    void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SDependencyException;
+    Stream<BonitaResource> getDependenciesResources(ScopeType type, long id) throws SDependencyException;
 
     /**
      * Get all dependency ids for specific artifact
@@ -134,15 +126,6 @@ public interface DependencyService {
      * @throws SDependencyException
      */
     void deleteDependencies(long id, ScopeType type) throws SDependencyException;
-
-    /**
-     * refresh classloader on this node only
-     * 
-     * @param type
-     * @param id
-     * @throws SDependencyException
-     */
-    void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
 
     SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
 

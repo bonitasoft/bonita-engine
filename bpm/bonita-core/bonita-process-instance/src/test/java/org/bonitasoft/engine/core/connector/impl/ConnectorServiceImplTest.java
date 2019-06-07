@@ -33,6 +33,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -98,6 +99,8 @@ public class ConnectorServiceImplTest {
     private TimeTracker timeTracker;
     @Mock
     private TechnicalLoggerService technicalLoggerService;
+    @Mock
+    private ClassLoaderService classLoaderService;
     @Captor
     private ArgumentCaptor<SConnector> connectorArgumentCaptor;
     @Captor

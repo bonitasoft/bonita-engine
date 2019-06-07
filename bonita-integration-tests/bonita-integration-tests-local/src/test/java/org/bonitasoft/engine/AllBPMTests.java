@@ -29,7 +29,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstanceServiceIntegrationTe
 import org.bonitasoft.engine.bpm.event.EventInstanceServiceTest;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceServiceTest;
 import org.bonitasoft.engine.cache.CacheServiceTest;
-import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
+import org.bonitasoft.engine.classloader.ClassLoaderServiceIT;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
 import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
@@ -56,7 +56,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CacheServiceTest.class,
         PersistenceTest.class,
         ArchiveServiceTest.class,
-        ClassLoaderServiceTest.class,
+        ClassLoaderServiceIT.class,
         ExpressionServiceTest.class,
         IdentityServiceTest.class,
         AuthenticationServiceTest.class,

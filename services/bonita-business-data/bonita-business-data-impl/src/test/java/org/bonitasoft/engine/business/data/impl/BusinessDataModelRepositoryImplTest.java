@@ -23,6 +23,7 @@ import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -44,6 +45,8 @@ public class BusinessDataModelRepositoryImplTest {
 
     @Mock
     private DependencyService dependencyService;
+    @Mock
+    private ClassLoaderService classLoaderService;
 
     @Mock
     private TenantResourcesService tenantResourcesService;
@@ -53,7 +56,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() {
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService,
-                mock(SchemaManagerUpdate.class), tenantResourcesService, TENANT_ID));
+                classLoaderService, mock(SchemaManagerUpdate.class), tenantResourcesService, TENANT_ID));
     }
 
     @Test
