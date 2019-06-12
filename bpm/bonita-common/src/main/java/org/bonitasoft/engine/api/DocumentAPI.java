@@ -397,6 +397,18 @@ public interface DocumentAPI {
     /**
      * Search for archived documents that meet the search options. An archived document is a document that is not the latest version.
      *
+     * -- ex: Retrieve documents of a given archived case --
+     * <pre>
+     * {@code
+     *   public List<ArchivedDocument> retrieveDocuments(DocumentAPI documentAPI, ArchivedProcessInstance archivedProcessInstance) {
+     *       SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+     *               .filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, archivedProcessInstance.getSourceObjectId())
+     *               .done();
+     *       return documentAPI.searchArchivedDocuments(searchOptions).getResult();
+     *   }
+     * }
+     * </pre>  
+     *
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching archived document list and its total number

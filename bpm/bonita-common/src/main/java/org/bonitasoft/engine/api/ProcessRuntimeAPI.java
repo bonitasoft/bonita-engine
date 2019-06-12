@@ -2003,6 +2003,18 @@ public interface ProcessRuntimeAPI {
     /**
      * Search for archived comments.
      *
+     * -- ex: Retrieve comments of a given archived case --
+     * <pre>
+     * {@code
+     *  public List<ArchivedComment> retrieveComments(ProcessRuntimeAPI processRuntimeAPI, ArchivedProcessInstance archivedProcessInstance) {
+     *      SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+     *          .filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, archivedProcessInstance.getSourceObjectId())
+     *          .done();
+     *      return processRuntimeAPI.searchArchivedComments(searchOptions).getResult();
+     *  }
+     * }
+     * </pre>   
+     *
      * @param searchOptions
      *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor} for valid fields for
      *        searching and sorting.
