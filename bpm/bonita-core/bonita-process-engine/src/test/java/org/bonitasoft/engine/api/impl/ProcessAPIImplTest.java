@@ -1398,6 +1398,13 @@ public class ProcessAPIImplTest {
     }
 
     @Test
+    public void should_throw_Illegal_Arg_Exception_when_setState_with_unknown_state() throws UpdateException {
+
+        expectedException.expect(IllegalArgumentException.class);
+        processAPI.setActivityStateByName(25l,"garbage");
+    }
+
+    @Test
     public void executeMessageCouple_should_reset_couple() throws Exception {
         // given:
         final long messageInstanceId = 123L;
