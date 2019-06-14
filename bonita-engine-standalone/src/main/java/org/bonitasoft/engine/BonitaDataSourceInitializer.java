@@ -31,14 +31,15 @@ class BonitaDataSourceInitializer {
     BasicManagedDataSource createManagedDataSource(BonitaDatabaseConfiguration configuration, TransactionManager transactionManager) {
         validate(configuration);
         BasicManagedDataSource bonitaDataSource = new BasicManagedDataSource();
+        bonitaDataSource.setDefaultAutoCommit(false);
         bonitaDataSource.setTransactionManager(transactionManager);
+        configureDatasource(configuration.getXaDatasource(), bonitaDataSource);
         setCommonDataSourceConfiguration(configuration, bonitaDataSource);
         return bonitaDataSource;
     }
 
     private void setCommonDataSourceConfiguration(BonitaDatabaseConfiguration configuration, BasicDataSource bonitaDataSource) {
         bonitaDataSource.setInitialSize(1);
-        bonitaDataSource.setMaxTotal(7);
         bonitaDataSource.setDriverClassName(getDriverClassName(configuration, configuration.getDriverClassName()));
         bonitaDataSource.setUrl(configuration.getUrl());
         bonitaDataSource.setUsername(configuration.getUser());
@@ -73,7 +74,16 @@ class BonitaDataSourceInitializer {
     BasicDataSource createDataSource(BonitaDatabaseConfiguration configuration) {
         validate(configuration);
         BasicDataSource dataSource = new BasicDataSource();
+        configureDatasource(configuration.getDatasource(), dataSource);
         setCommonDataSourceConfiguration(configuration, dataSource);
         return dataSource;
+    }
+
+    private void configureDatasource(DatasourceConfiguration configuration, BasicDataSource dataSource) {
+        if (configuration != null && configuration.getMaxPoolSize() > 0) {
+            dataSource.setMaxTotal(configuration.getMaxPoolSize());
+        } else {
+            dataSource.setMaxTotal(7);
+        }
     }
 }

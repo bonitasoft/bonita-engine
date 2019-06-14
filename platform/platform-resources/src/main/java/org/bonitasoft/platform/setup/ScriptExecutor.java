@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.exception.PlatformException;
@@ -50,7 +48,7 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:/application.properties")
 public class ScriptExecutor {
 
-    public static final boolean CONTINUE_ON_ERROR = true;
+    private static final boolean CONTINUE_ON_ERROR = true;
 
     public static final boolean FAIL_ON_ERROR = false;
 
@@ -80,7 +78,7 @@ public class ScriptExecutor {
         try {
             executeSQLResources(asList("createTables.sql", "createQuartzTables.sql", "postCreateStructure.sql"),
                     FAIL_ON_ERROR);
-        } catch (final IOException | SQLException e) {
+        } catch (final IOException e) {
             throw new PlatformException(e);
         }
     }
@@ -95,7 +93,7 @@ public class ScriptExecutor {
         }
     }
 
-    protected void insertPlatform() throws PlatformException {
+    protected void insertPlatform() {
         String version = versionService.getPlatformSetupVersion();
         final String sql = "INSERT INTO platform (id, version, previousversion, initialversion, created, createdby) VALUES (1, '" + version + "', '', '"
                 + version + "', " + System.currentTimeMillis() + ", 'platformAdmin')";
@@ -113,9 +111,8 @@ public class ScriptExecutor {
     /**
      * @param sqlFiles the sql files to execute
      * @param shouldContinueOnError
-     * @throws SQLException
      */
-    protected void executeSQLResources(final List<String> sqlFiles, boolean shouldContinueOnError) throws IOException, SQLException {
+    protected void executeSQLResources(final List<String> sqlFiles, boolean shouldContinueOnError) throws IOException {
         for (final String sqlFile : sqlFiles) {
             executeSQLResource(sqlFile, shouldContinueOnError);
         }
@@ -164,7 +161,7 @@ public class ScriptExecutor {
      * @param shouldContinueOnError
      * @throws IOException
      */
-    protected void executeSQLResource(final String sqlFile, boolean shouldContinueOnError) throws IOException, SQLException {
+    protected void executeSQLResource(final String sqlFile, boolean shouldContinueOnError) throws IOException {
         final Resource sqlResource = getSQLResource(sqlFolder, sqlFile);
         ResourceDatabasePopulator populate = new ResourceDatabasePopulator();
         populate.setContinueOnError(shouldContinueOnError);
@@ -186,7 +183,7 @@ public class ScriptExecutor {
     public void initializePlatformStructure() throws PlatformException {
         try {
             executeSQLResources(Collections.singletonList("initTables.sql"), FAIL_ON_ERROR);
-        } catch (final IOException | SQLException e) {
+        } catch (final IOException e) {
             throw new PlatformException(e);
         }
     }
@@ -194,7 +191,7 @@ public class ScriptExecutor {
     public void deleteTables() throws PlatformException {
         try {
             executeSQLResources(asList("preDropStructure.sql", "dropQuartzTables.sql", "dropTables.sql"), CONTINUE_ON_ERROR);
-        } catch (final IOException | SQLException e) {
+        } catch (final IOException e) {
             throw new PlatformException(e);
         }
     }
