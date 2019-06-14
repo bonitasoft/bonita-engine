@@ -83,5 +83,22 @@ public class BonitaDataSourceInitializerTest {
         assertThat(dataSource.getDriverClassName()).isEqualTo("com.mysql.cj.jdbc.Driver");
     }
 
+    @Test
+    public void should_set_pool_size_according_to_configuration() {
+        BonitaDatabaseConfiguration configuration = BonitaDatabaseConfiguration.builder()
+                .dbVendor("mysql")
+                .url("jdbc::localhost")
+                .user("myUser")
+                .xaDatasource(DatasourceConfiguration.builder().maxPoolSize(10).build())
+                .datasource(DatasourceConfiguration.builder().maxPoolSize(5).build())
+                .build();
+
+        BasicDataSource dataSource = bonitaDataSourceInitializer.createDataSource(configuration);
+        BasicDataSource managedDataSource = bonitaDataSourceInitializer.createManagedDataSource(configuration, null);
+
+        assertThat(dataSource.getMaxTotal()).isEqualTo(5);
+        assertThat(managedDataSource.getMaxTotal()).isEqualTo(10);
+    }
+
 
 }

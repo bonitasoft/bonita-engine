@@ -21,10 +21,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -94,12 +96,12 @@ public class PlatformSetupTestUtils {
             dist = new File(distZipPath);
         } else {
 
-            File target = new File("target");
+            File target = Paths.get("build").resolve("distributions").toFile();
             if (!target.isDirectory()) {
-                throw new IllegalStateException("No bonita.distribution.path set and not target folder");
+                throw new IllegalStateException("No bonita.distribution.path set and no build folder exists");
             }
             Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
-            for (File file : target.listFiles()) {
+            for (File file : Objects.requireNonNull(target.listFiles())) {
                 if (distribPattern.matcher(file.getName()).matches()) {
                     dist = file;
                     break;
