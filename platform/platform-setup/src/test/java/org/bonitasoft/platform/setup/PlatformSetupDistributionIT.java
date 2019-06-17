@@ -140,7 +140,7 @@ public class PlatformSetupDistributionIT {
     public void setupSh_should_work_on_postgres_database() throws Exception {
         //given
         File dbFolder = temporaryFolder.newFolder();
-        Server pgServer = Server.createPgServer("-baseDir", dbFolder.getAbsolutePath());
+        Server pgServer = Server.createPgServer("-baseDir", dbFolder.getAbsolutePath(), "-ifNotExists");
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArguments("init");
         try {

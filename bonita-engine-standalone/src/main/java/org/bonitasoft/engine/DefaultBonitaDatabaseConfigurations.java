@@ -5,7 +5,7 @@ public class DefaultBonitaDatabaseConfigurations {
     private static BonitaDatabaseConfiguration defaultH2Configuration = BonitaDatabaseConfiguration.builder()
             .dbVendor("h2")
             .url("jdbc:h2:file:" + System.getProperty("org.bonitasoft.h2.database.dir", "./h2databasedir")
-                    + "/bonita;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE")
+                    + "/bonita;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE")
             .user("bonita")
             .password("bpm").build();
     private static BonitaDatabaseConfiguration defaultPostgresConfiguration = BonitaDatabaseConfiguration.builder()
@@ -28,8 +28,6 @@ public class DefaultBonitaDatabaseConfigurations {
             .url("jdbc:sqlserver://localhost:1433;database=bonita")
             .user("bonita")
             .password("bpm").build();
-
-
 
 
     public static BonitaDatabaseConfiguration defaultConfiguration(String dbVendor) {
