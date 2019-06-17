@@ -266,6 +266,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("name", getName())
                 .append("parentContainerId", parentContainerId)
                 .append("archiveDate", archiveDate)
                 .append("state", state)
