@@ -14,7 +14,7 @@ rem If you use different DB engines by tenants, please update directly bonita-te
 set BDM_DB_OPTS="-Dsysprop.bonita.bdm.db.vendor=h2"
 
 rem Arjuna (JTA service added to Tomcat and required by Bonita Engine for transaction management)
-set ARJUNA_OPTS="-Dcom.arjuna.ats.arjuna.common.propertiesFile=${CATALINA_HOME}/conf/jbossts-properties.xml"
+set ARJUNA_OPTS="-Dcom.arjuna.ats.arjuna.common.propertiesFile=%CATALINA_HOME%\conf\jbossts-properties.xml"
 
 rem Optional JAAS configuration. Usually used when delegating authentication to LDAP / Active Directory server
 rem set SECURITY_OPTS="-Djava.security.auth.login.config=%CATALINA_HOME%\conf\jaas-standard.cfg"

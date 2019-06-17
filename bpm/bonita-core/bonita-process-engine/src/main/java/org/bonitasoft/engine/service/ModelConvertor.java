@@ -1673,7 +1673,7 @@ public class ModelConvertor {
     }
 
     public static int getServerActivityStateId(final String state) {
-        int stateId = -1;
+        int stateId;
         if (state.equalsIgnoreCase(ActivityStates.READY_STATE)) {
             stateId = 4;
         } else if (state.equalsIgnoreCase(ActivityStates.COMPLETING_STATE)) {
@@ -1690,6 +1690,10 @@ public class ModelConvertor {
             stateId = 13;
         } else if (state.equalsIgnoreCase(ActivityStates.CANCELLED_STATE)) {
             stateId = 14;
+        } else if (state.equalsIgnoreCase(ActivityStates.FAILED_STATE)) {
+            stateId = 3;
+        } else {
+            throw new IllegalArgumentException("Unknown activity state "+ state);
         }
         return stateId;
     }

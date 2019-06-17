@@ -44,4 +44,5 @@ jaxb {
 
 processResources { from "$buildDir/generated/jaxb/schema/connectors" }
 
+tasks.jaxbSchemaGenConnectors.outputs.cacheIf { true }
 tasks.processResources.dependsOn tasks.jaxbSchemaGenConnectors

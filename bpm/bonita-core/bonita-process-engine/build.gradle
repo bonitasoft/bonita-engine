@@ -78,4 +78,5 @@ jaxb {
 
 processResources { from "$buildDir/generated/jaxb/schemas" }
 
+tasks.jaxbSchemaGenOrganization.outputs.cacheIf { true }
 tasks.processResources.dependsOn tasks.jaxbSchemaGenOrganization
