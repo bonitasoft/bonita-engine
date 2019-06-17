@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.process;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -267,9 +270,9 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition2 = deployAndEnableProcess(designProcessDefinition2);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
-        // one archive for each change in the activity state. For automatic tasks we have initializingAndexecuting, completed
-        checkNbOfArchivedActivityInstances(processInstance1, 2 * 2);
-        checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
+        // one archive for each change in the activity state. For automatic tasks we have initializingAndExecuting, completed
+        await().atMost(20, SECONDS).until(() -> getProcessAPI().getArchivedActivityInstances(processInstance1.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT), hasSize(2 * 2));
+        await().atMost(20, SECONDS).until(() -> getProcessAPI().getArchivedActivityInstances(processInstance2.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT), hasSize(3 * 2));
         waitForProcessToFinish(processInstance1);
         waitForProcessToFinish(processInstance2);
         disableAndDeleteProcess(processDefinition1, processDefinition2);
