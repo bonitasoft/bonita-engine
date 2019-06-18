@@ -112,7 +112,7 @@ public interface EventInstanceRepository {
 
     /**
      * @param processDefinitionId
-     * @param searchOptions
+     * @param queryOptions
      * @return
      * @throws SBonitaReadException
      * @since 6.3
@@ -126,6 +126,12 @@ public interface EventInstanceRepository {
     SWaitingMessageEvent getWaitingMessage(long waitingMessageId) throws SWaitingEventReadException;
 
     SMessageInstance getMessageInstance(long messageInstanceId) throws SMessageInstanceReadException;
+
+    int deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException;
+
+    List<Long> getMessageInstanceIdOlderThanCreationDate(final long creationDate,
+            QueryOptions queryOptions)
+            throws SEventTriggerInstanceReadException, SMessageInstanceReadException;
 
     void updateWaitingMessage(SWaitingMessageEvent waitingMessageEvent, EntityUpdateDescriptor descriptor)
             throws SWaitingEventModificationException;
@@ -214,5 +220,6 @@ public interface EventInstanceRepository {
             EntityUpdateDescriptor descriptor)
             throws SEventTriggerInstanceModificationException;
 
-    List<SWaitingEvent> getWaitingEventsForFlowNodeId(long flowNodeInstanceId) throws  SEventTriggerInstanceReadException;
+    List<SWaitingEvent> getWaitingEventsForFlowNodeId(long flowNodeInstanceId)
+            throws SEventTriggerInstanceReadException;
 }

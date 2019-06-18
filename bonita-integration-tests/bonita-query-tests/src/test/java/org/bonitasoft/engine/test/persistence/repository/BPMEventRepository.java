@@ -54,4 +54,21 @@ public class BPMEventRepository extends TestRepository {
         Query namedQuery = getNamedQuery(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
         return namedQuery.executeUpdate();
     }
+
+    @SuppressWarnings("unchecked")
+    public int deleteMessageInstanceByIds(List<Long> ids) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("deleteMessageInstanceByIds");
+
+        namedQuery.setParameterList("ids", ids);
+        return namedQuery.executeUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getMessageInstanceIdOlderThanCreationDate");
+        namedQuery.setParameter("creationDate", creationDate);
+        return namedQuery.list();
+    }
 }

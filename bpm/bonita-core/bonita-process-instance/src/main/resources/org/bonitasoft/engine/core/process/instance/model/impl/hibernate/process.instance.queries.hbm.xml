@@ -489,6 +489,18 @@
 		AND s.correlation5 = m.correlation5
 	</query>
 
+
+	<query name="getMessageInstanceIdOlderThanCreationDate">
+		SELECT m.id
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance AS m
+		WHERE m.creationDate &lt;= :creationDate
+	</query>
+
+	<query name="deleteMessageInstanceByIds">
+		DELETE FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance AS m
+		WHERE m.id IN (:ids)
+	</query>
+
 	<query name="getListeningSignals">
 		SELECT s
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent AS s

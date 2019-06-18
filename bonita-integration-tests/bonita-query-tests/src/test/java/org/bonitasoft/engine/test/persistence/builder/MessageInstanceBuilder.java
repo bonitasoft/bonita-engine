@@ -31,16 +31,23 @@ public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInst
     }
 
     private boolean handled;
+    private long creationDate;
 
     @Override
     SMessageInstance _build() {
         SMessageInstance messageInstance = new SMessageInstance();
         messageInstance.setHandled(handled);
+        messageInstance.setCreationDate(creationDate);
         return messageInstance;
     }
 
     public MessageInstanceBuilder handled(final boolean handled) {
         this.handled = handled;
+        return this;
+    }
+
+    public MessageInstanceBuilder creationDate(final long creationDate) {
+        this.creationDate = creationDate;
         return this;
     }
 }

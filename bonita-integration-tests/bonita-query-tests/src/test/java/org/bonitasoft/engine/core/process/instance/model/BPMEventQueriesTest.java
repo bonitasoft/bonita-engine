@@ -13,20 +13,21 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
-import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
+import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -132,6 +133,33 @@ public class BPMEventQueriesTest {
 
         // then:
         assertThat(resetMessageInstances).as("wrong result").isEqualTo(MORE_THAN_DEFAULT_PAGE_SIZE);
+    }
+
+    @Test
+    public void should_return_message_older_than_creationDate() {
+        SMessageInstance messageInstance = bPMEventRepository.add(aMessageInstance().creationDate(100).build());
+        SMessageInstance messageInstance1 = bPMEventRepository.add(aMessageInstance().creationDate(200).build());
+        bPMEventRepository.add(aMessageInstance().creationDate(300).build());
+
+        List<Long> messageInstanceIds = bPMEventRepository.getMessageInstanceIdOlderThanCreationDate(200);
+
+        // then:
+        assertThat(messageInstanceIds).containsOnly(messageInstance.getId(), messageInstance1.getId());
+    }
+
+    @Test
+    public void should_delete_message_with_given_ids() {
+        SMessageInstance messageInstance = bPMEventRepository.add(aMessageInstance().creationDate(100).build());
+        SMessageInstance messageInstance1 = bPMEventRepository.add(aMessageInstance().creationDate(200).build());
+        SMessageInstance messageInstance2 = bPMEventRepository.add(aMessageInstance().creationDate(300).build());
+
+        bPMEventRepository.deleteMessageInstanceByIds(Arrays.asList(messageInstance.getId(), messageInstance1.getId()));
+
+        List<Long> messageInstanceIds = bPMEventRepository
+                .getMessageInstanceIdOlderThanCreationDate(Instant.now().toEpochMilli());
+
+        // then:
+        assertThat(messageInstanceIds).containsExactly(messageInstance2.getId());
     }
 
 }

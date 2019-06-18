@@ -48,6 +48,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -234,6 +235,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public EventInstanceService getEventInstanceService() {
         return beanAccessor.getService(EventInstanceService.class);
+    }
+
+    @Override
+    public EventInstanceRepository getEventInstanceRepository() {
+        return beanAccessor.getService(EventInstanceRepository.class);
     }
 
     @Override
