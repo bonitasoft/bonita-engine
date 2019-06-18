@@ -24,6 +24,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -41,6 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -75,7 +78,7 @@ public class EventInstanceRepositoryImplForMessageTest {
 
     /**
      * Test method for
-     * {@link EventInstanceRepository#createMessageInstance( org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
+     * {@link EventInstanceRepository#createMessageInstance(org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance)}
      * .
      */
     @Test
@@ -95,7 +98,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     public final void createMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SMessageInstance sMessageInstance = new SMessageInstance();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.createMessageInstance(sMessageInstance);
@@ -123,7 +127,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     public final void deleteMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SMessageInstance sMessageInstance = new SMessageInstance();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.deleteMessageInstance(sMessageInstance);
@@ -160,7 +165,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     public final void getMessageEventCouples_should_return_message_event_couples() throws Exception {
         // Given
         final List<SMessageEventCouple> sMessageEventCoupleImpls = Arrays.asList(new SMessageEventCouple());
-        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples(0, 100);
+        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder
+                .getMessageEventCouples(0, 100);
         doReturn(sMessageEventCoupleImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -173,7 +179,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     @Test
     public final void getMessageEventCouples_should_return_empty_list_if_doesnt_exist() throws Exception {
         // Given
-        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples(0, 100);
+        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder
+                .getMessageEventCouples(0, 100);
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -186,7 +193,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     @Test(expected = SEventTriggerInstanceReadException.class)
     public final void getMessageEventCouples_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples(0, 100);
+        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder
+                .getMessageEventCouples(0, 100);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -201,7 +209,8 @@ public class EventInstanceRepositoryImplForMessageTest {
         // Given
         final long messageInstanceId = 63L;
         final SMessageInstance sMessageInstance = new SMessageInstance();
-        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SMessageInstance.class,
+        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SMessageInstance.class,
                 "MessageInstance", messageInstanceId);
         doReturn(sMessageInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -216,7 +225,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     public final void getMessageInstance_should_return_null_if_doesnt_exist() throws Exception {
         // Given
         final long messageInstanceId = 63L;
-        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SMessageInstance.class,
+        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SMessageInstance.class,
                 "MessageInstance", messageInstanceId);
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -231,7 +241,8 @@ public class EventInstanceRepositoryImplForMessageTest {
     public final void getMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final long messageInstanceId = 63L;
-        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SMessageInstance.class,
+        final SelectByIdDescriptor<SMessageInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SMessageInstance.class,
                 "MessageInstance", messageInstanceId);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -263,11 +274,35 @@ public class EventInstanceRepositoryImplForMessageTest {
         // Given
         final SMessageInstance sMessageInstance = new SMessageInstance();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.updateMessageInstance(sMessageInstance, descriptor);
     }
 
+    @Test(expected = SMessageModificationException.class)
+    public final void deleteMessageInstanceByIds_throw_exception_when_there_is_error() throws Exception {
+        // Given
+        doThrow(new SPersistenceException("")).when(persistenceService).update(anyString(), anyMap());
+        // When
+        eventInstanceRepository.deleteMessageInstanceByIds(Collections.singletonList(50L));
+    }
 
+    @Test(expected = SMessageInstanceReadException.class)
+    public final void getMessageInstanceIdOlderThanCreationDateInstanceByIds_throw_exception_when_there_is_error()
+            throws Exception {
+        // Given
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
+        // When
+        eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(14500L, new QueryOptions(0, 100));
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void should_throw_exception_when_query_option_have_bad_filters()
+            throws Exception {
+        eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(14500L, new QueryOptions(Collections.singletonList(new FilterOption(SMessageInstance.class, "toto", "testt")), null));
+
+    }
 }

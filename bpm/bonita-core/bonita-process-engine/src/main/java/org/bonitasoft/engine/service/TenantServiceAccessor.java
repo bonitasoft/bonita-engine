@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -149,6 +150,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DependencyService getDependencyService();
 
     EventInstanceService getEventInstanceService();
+
+    EventInstanceRepository getEventInstanceRepository();
 
     ConnectorService getConnectorService();
 

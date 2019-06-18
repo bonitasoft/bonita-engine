@@ -39,6 +39,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -48,11 +51,13 @@ import java.util.Optional;
 
 public class EventInstanceServiceImpl implements EventInstanceService {
 
-
+    private final DataInstanceService dataInstanceService;
     private EventInstanceRepository eventInstanceRepository;
 
-    public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository) {
+    public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
+            DataInstanceService dataInstanceService) {
         this.eventInstanceRepository = eventInstanceRepository;
+        this.dataInstanceService = dataInstanceService;
     }
 
     @Override
@@ -216,6 +221,34 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     public void updateWaitingMessage(SWaitingMessageEvent waitingMsg, EntityUpdateDescriptor descriptor)
             throws SWaitingEventModificationException {
         this.eventInstanceRepository.updateWaitingMessage(waitingMsg, descriptor);
+    }
+
+    @Override
+    public Integer deleteMessageAndDataInstanceOlderCreationDate(long creationDate,
+                                                                 QueryOptions queryOptions)
+            throws SMessageModificationException {
+
+        try {
+            List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository
+                    .getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
+            eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
+            for (Long messageId : messageInstanceIdOlderThanCreationDate) {
+                dataInstanceService.deleteLocalDataInstances(messageId,
+                        DataInstanceContainer.MESSAGE_INSTANCE.name(),
+                        true);
+                dataInstanceService.deleteLocalArchivedDataInstances(messageId,
+                        DataInstanceContainer.MESSAGE_INSTANCE.name());
+            }
+
+            return messageInstanceIdOlderThanCreationDate.size();
+        } catch (SDataInstanceException | SEventTriggerInstanceReadException | SMessageInstanceReadException e) {
+            throw new SMessageModificationException(e);
+        }
+    }
+
+    @Override
+    public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions) throws SEventTriggerInstanceReadException, SMessageInstanceReadException {
+        return this.eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
     }
 
     @Override

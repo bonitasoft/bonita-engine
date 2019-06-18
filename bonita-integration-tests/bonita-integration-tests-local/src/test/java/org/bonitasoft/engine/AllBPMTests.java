@@ -18,7 +18,7 @@ import org.bonitasoft.engine.authentication.AuthenticationServiceTest;
 import org.bonitasoft.engine.bpm.ActorMappingServiceTest;
 import org.bonitasoft.engine.bpm.CategoryServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.DocumentServiceTest;
-import org.bonitasoft.engine.bpm.EventInstanceServiceIT;
+import org.bonitasoft.engine.bpm.EventInstanceRepositoryIT;
 import org.bonitasoft.engine.bpm.GatewayInstanceServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.NodeConfigurationTest;
 import org.bonitasoft.engine.bpm.OperationServiceIntegrationTest;
@@ -90,7 +90,7 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformLoginServiceTest.class,
         FormMappingServiceIT.class,
         PageMappingServiceIT.class,
-        EventInstanceServiceIT.class
+        EventInstanceRepositoryIT.class
 })
 @RunWith(Suite.class)
 public class AllBPMTests {

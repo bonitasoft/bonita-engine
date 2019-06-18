@@ -13,24 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.recorder;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
@@ -41,6 +35,11 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -248,6 +247,23 @@ public class SelectDescriptorBuilder {
         parameters.put("userId", userId);
         parameters.put("currentTime", System.currentTimeMillis());
         return new SelectOneDescriptor<>("getNumberOfPendingOverdueTasksForUser", parameters, SHumanTaskInstance.class, Long.class);
+    }
+
+
+    public static SelectListDescriptor<Long> deleteMessageInstanceByIds(List<Long> ids,                                                                                       final int fromIndex, final int maxResults) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("ids", ids);
+
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        return new SelectListDescriptor<>("deleteMessageInstanceByIds", parameters,
+                SMessageEventCouple.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate,
+                                                                                       QueryOptions queryOptions) {
+        final Map<String, Object> parameters = Collections.singletonMap("creationDate", creationDate);
+        return new SelectListDescriptor<>("getMessageInstanceIdOlderThanCreationDate", parameters,
+                SMessageInstance.class, queryOptions);
     }
 
 }

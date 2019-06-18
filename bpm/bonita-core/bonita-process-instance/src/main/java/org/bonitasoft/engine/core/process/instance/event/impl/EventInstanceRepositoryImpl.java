@@ -41,12 +41,14 @@ import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuil
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -56,9 +58,11 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonMap;
 
@@ -281,6 +285,44 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
             throw new SMessageInstanceReadException(e);
         }
     }
+
+    @Override
+    public List<Long> getMessageInstanceIdOlderThanCreationDate(final long creationDate,
+            QueryOptions queryOptions) throws SMessageInstanceReadException {
+        try {
+            validateFiltersForGetMessage(queryOptions);
+            final SelectListDescriptor<Long> selectDescriptor = SelectDescriptorBuilder
+                    .getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
+            return persistenceService.selectList(selectDescriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SMessageInstanceReadException(e);
+        }
+    }
+
+    private void validateFiltersForGetMessage(QueryOptions queryOptions) {
+        List<FilterOption> notOkField = queryOptions.getFilters().stream().filter(filterOption -> filterOption.getFilterOperationType() != FilterOperationType.EQUALS
+                || !filterOption.getFieldName().equals("messageName")
+                || filterOption.getPersistentClass() != SMessageInstance.class).collect(Collectors.toList());
+        if(!notOkField.isEmpty()){
+            throw  new IllegalArgumentException("Unsupported filters  "+ notOkField  + ", can only filter on messageName");
+        }
+
+    }
+
+
+    @Override
+    public int deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("ids", ids);
+        try {
+            return persistenceService.update("deleteMessageInstanceByIds", parameters);
+        } catch (SPersistenceException e) {
+            throw new SMessageModificationException(e);
+        }
+    }
+
+
+
 
     @Override
     public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> entityClass,
