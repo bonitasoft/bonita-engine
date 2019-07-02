@@ -29,7 +29,7 @@ public class RefreshClassloaderSynchronizationTest {
     @Mock
     private RefreshClassLoaderTask refreshClassLoaderTask;
     @Mock
-    private ClassLoaderService classLoaderService;
+    private ClassLoaderServiceImpl classLoaderService;
     @Mock
     private ClassLoaderUpdater classLoaderUpdater;
     private RefreshClassloaderSynchronization refreshClassloaderSynchronization;

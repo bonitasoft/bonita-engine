@@ -17,9 +17,15 @@ package org.bonitasoft.engine.classloader;
 import java.io.Serializable;
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.bonitasoft.engine.dependency.model.ScopeType;
+
 /**
  * @author Baptiste Mesta
  */
+@Data
+@AllArgsConstructor
 public class ClassLoaderIdentifier implements Serializable {
 
     public static final String GLOBAL_TYPE = "GLOBAL";
@@ -29,33 +35,9 @@ public class ClassLoaderIdentifier implements Serializable {
     private String type;
     private long id;
 
-    public ClassLoaderIdentifier(String type, long id) {
-        this.type = type;
-        this.id = id;
-    }
 
-    public String getType() {
-        return type;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        ClassLoaderIdentifier that = (ClassLoaderIdentifier) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, id);
+    public ScopeType getScopeType() {
+        return ScopeType.valueOf(type);
     }
 
     @Override

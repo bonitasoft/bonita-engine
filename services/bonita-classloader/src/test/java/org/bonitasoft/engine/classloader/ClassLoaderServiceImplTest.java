@@ -4,17 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
 import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -107,7 +105,7 @@ public class ClassLoaderServiceImplTest {
     }
 
     @Test
-    public void should_addListener_add_on_specified_classloader_do_not_call_on_others() throws Exception {
+    public void should_addListener_add_on_specified_classloader_do_not_call_on_others() {
         //given
         classLoaderService.addListener(TENANT.name(), PARENT_ID, myClassLoaderListener);
         //when
@@ -117,7 +115,7 @@ public class ClassLoaderServiceImplTest {
     }
 
     @Test
-    public void should_addListener_add_on_specified_classloader_call_listener() throws Exception {
+    public void should_addListener_add_on_specified_classloader_call_listener() {
         //given
         classLoaderService.addListener(TENANT.name(), PARENT_ID, myClassLoaderListener);
         //when
@@ -127,7 +125,7 @@ public class ClassLoaderServiceImplTest {
     }
 
     @Test
-    public void should_removeListener_remove_the_listener() throws Exception {
+    public void should_removeListener_remove_the_listener() {
         //given
         classLoaderService.addListener(TENANT.name(), PARENT_ID, myClassLoaderListener);
         classLoaderService.removeListener(TENANT.name(), PARENT_ID, myClassLoaderListener);
@@ -143,7 +141,7 @@ public class ClassLoaderServiceImplTest {
         //given
         classLoaderService.addListener(PROCESS.name(), CHILD_ID, myClassLoaderListener);
         //when
-        classLoaderService.refreshClassLoader(PROCESS, CHILD_ID);
+        classLoaderService.refreshClassLoaderImmediately(PROCESS, CHILD_ID);
         //then
         assertThat(myClassLoaderListener.isOnUpdateCalled()).isTrue();
         assertThat(myClassLoaderListener.isOnDestroyCalled()).isFalse();
@@ -204,7 +202,7 @@ public class ClassLoaderServiceImplTest {
 
 
     @Test
-    public void should_getLocalClassLoader_create_expected_hierarchy() throws Exception {
+    public void should_getLocalClassLoader_create_expected_hierarchy() {
         //given
         VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
         //when
@@ -221,7 +219,7 @@ public class ClassLoaderServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_create_throw_an_exception_if_bad_resolver() throws Exception {
+    public void should_create_throw_an_exception_if_bad_resolver() {
         //given
         classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService, platformDependencyService, sessionAccessor, userTransactionService, broadcastService, classLoaderUpdater);
         //when
@@ -253,8 +251,8 @@ public class ClassLoaderServiceImplTest {
         ClassLoaderListener listener = mock(ClassLoaderListener.class);
         classLoaderService.addListener(listener);
         //when
-        classLoaderService.refreshClassLoader(PROCESS, CHILD_ID);
-        classLoaderService.refreshClassLoader(PROCESS, 17);
+        classLoaderService.refreshClassLoaderImmediately(PROCESS, CHILD_ID);
+        classLoaderService.refreshClassLoaderImmediately(PROCESS, 17);
 
         //then
         verify(listener, times(2)).onUpdate(any(VirtualClassLoader.class));
@@ -306,6 +304,47 @@ public class ClassLoaderServiceImplTest {
         classLoaderService.refreshClassLoaderAfterUpdate(PROCESS, 42);
 
         assertThat(synchronizationArgumentCaptor.getAllValues()).hasSize(2);
+    }
+
+    @Test
+    public void should_only_warn_when_refreshing_classloader_on_not_existing_tenant() throws Exception {
+        doReturn(55L).when(sessionAccessor).getTenantId();
+
+        classLoaderService.refreshClassLoaderImmediately(TENANT, 55L);
+        verify(logger).log(any(), eq(TechnicalLogSeverity.WARNING), contains("No dependency service is initialized"), eq(55L));
+    }
+
+
+    @Test
+    public void should_initialize_class_loader_when_getting_it() {
+        VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
+
+        verify(classLoaderUpdater).initializeClassLoader(classLoaderService, localClassLoader, new ClassLoaderIdentifier(TENANT.name(), 43L));
+    }
+
+    @Test
+    public void should_initialize_only_once_classloader() {
+        doAnswer(invocation -> {
+            VirtualClassLoader argument = invocation.getArgument(1);
+            argument.replaceClassLoader(mock(BonitaClassLoader.class));
+            return null;
+        }).when(classLoaderUpdater).initializeClassLoader(any(), any(), any());
+
+        VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
+        classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
+
+
+        verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, localClassLoader, new ClassLoaderIdentifier(TENANT.name(), 43L));
+    }
+
+    @Test
+    public void should_not_initialize_classloader_when_adding_and_removing_listener() {
+        ClassLoaderListener classLoaderListener = mock(ClassLoaderListener.class);
+
+        assertThat(classLoaderService.addListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
+        assertThat(classLoaderService.removeListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
+
+        verify(classLoaderUpdater, never()).initializeClassLoader(any(), any(), eq(new ClassLoaderIdentifier(TENANT.name(), 44L)));
     }
 
 }

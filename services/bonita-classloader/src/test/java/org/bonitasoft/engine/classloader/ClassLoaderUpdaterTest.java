@@ -42,7 +42,7 @@ public class ClassLoaderUpdaterTest {
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
-    private ClassLoaderService classLoaderService;
+    private ClassLoaderServiceImpl classLoaderService;
     @InjectMocks
     private ClassLoaderUpdater classLoaderUpdater;
 
@@ -60,8 +60,8 @@ public class ClassLoaderUpdaterTest {
         callableGivenToTheTaskExecutor.getValue().call();
         callableGivenToTheTransactionService.getValue().call();
 
-        verify(classLoaderService).refreshClassLoader(ScopeType.TENANT, 4L);
-        verify(classLoaderService).refreshClassLoader(PROCESS, 45L);
+        verify(classLoaderService).refreshClassLoaderImmediately(ScopeType.TENANT, 4L);
+        verify(classLoaderService).refreshClassLoaderImmediately(PROCESS, 45L);
     }
     @Test
     public void should_not_create_a_session_when_there_is_no_tenant_id() throws Exception {

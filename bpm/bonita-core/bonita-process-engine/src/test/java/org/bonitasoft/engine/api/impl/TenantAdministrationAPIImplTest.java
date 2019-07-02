@@ -14,8 +14,9 @@
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.PAUSE;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.RESUME;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -25,14 +26,10 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -138,11 +135,9 @@ public class TenantAdministrationAPIImplTest {
         tenantManagementAPI.pause();
 
         // Then tenant service with lifecycle should be pause
-        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
-                isA(PauseServiceStrategy.class));
+        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId,PAUSE);
         verify(schedulerService).pauseJobs(tenantId);
-        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
-                isA(ResumeServiceStrategy.class));
+        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, RESUME);
     }
 
     @Test
@@ -152,10 +147,8 @@ public class TenantAdministrationAPIImplTest {
         tenantManagementAPI.resume();
 
         // Then tenant service with lifecycle should be resumed
-        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
-                isA(ResumeServiceStrategy.class));
-        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
-                isA(PauseServiceStrategy.class));
+        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId,RESUME);
+        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, PAUSE);
     }
 
     private static Map<String, TaskResult<String>> okFuture() {

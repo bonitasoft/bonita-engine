@@ -35,7 +35,7 @@ public class RefreshClassLoaderTask implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
-        getClassLoaderService().refreshClassLoader(scopeType, id);
+        getClassLoaderService().refreshClassLoaderImmediately(scopeType, id);
         return null;
     }
 

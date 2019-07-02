@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.home.BonitaResource.resource;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
@@ -25,7 +24,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.bonitasoft.engine.CallableWithException;
 import org.bonitasoft.engine.RunnableWithException;
@@ -128,7 +126,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
                                   final byte[] value) throws SDependencyException, SClassLoaderException {
         long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
-        classLoaderService.refreshClassLoader(artifactType, artifactId);
+        classLoaderService.refreshClassLoaderImmediately(artifactType, artifactId);
         return id;
     }
 
@@ -138,7 +136,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         final SDependency dependency = builder.done();
         platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(),
                 ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        classLoaderService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+        classLoaderService.refreshClassLoaderImmediately(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                 classLoaderService.getGlobalClassLoaderId());
         return dependency.getId();
     }
@@ -371,7 +369,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
             assertSameClassloader(globalClassLoader, classLoader);
             platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
                     ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-            classLoaderService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+            classLoaderService.refreshClassLoaderImmediately(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                     classLoaderService.getGlobalClassLoaderId());
 
         });
@@ -553,10 +551,10 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         dependencyService.createMappedDependency("myResource.jar", jarContent, "myResource.jar", ID1, TYPE1);
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshClassLoader(TYPE1, ID1);
+        classLoaderService.refreshClassLoaderImmediately(TYPE1, ID1);
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshClassLoader(TYPE1, ID1);
+        classLoaderService.refreshClassLoaderImmediately(TYPE1, ID1);
         getTransactionService().complete();
 
         //when

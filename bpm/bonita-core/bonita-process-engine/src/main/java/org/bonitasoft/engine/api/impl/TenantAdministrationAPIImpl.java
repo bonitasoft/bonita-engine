@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.PAUSE;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.RESUME;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
-import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
-import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -150,7 +150,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             deleteSessionsOfTenantExceptTechnicalUser(platformServiceAccessor, tenantId);
 
             // on all nodes
-            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new PauseServiceStrategy());
+            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, PAUSE);
         } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
@@ -171,7 +171,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             resumeScheduler(platformServiceAccessor, tenantId);
 
             // on all nodes
-            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
+            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, RESUME);
 
             tenantRestarter
                     .executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
@@ -186,7 +186,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     // In package private for unit tests
     void setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(final PlatformServiceAccessor platformServiceAccessor, final long tenantId,
-            final ServiceStrategy serviceStrategy) throws UpdateException {
+            final SetServiceState.ServiceAction serviceStrategy) throws UpdateException {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);
         final Map<String, TaskResult<Void>> result;
