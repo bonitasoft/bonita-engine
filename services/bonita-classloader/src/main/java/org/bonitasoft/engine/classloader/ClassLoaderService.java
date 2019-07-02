@@ -104,7 +104,9 @@ public interface ClassLoaderService extends PlatformLifecycleService {
 
     void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SClassLoaderException;
 
-    void refreshClassLoader(ScopeType type, long id) throws SClassLoaderException;
+    void refreshClassLoaderOnOtherNodes(ScopeType type, long id) throws SClassLoaderException;
+
+    void refreshClassLoaderImmediately(ScopeType type, long id) throws SClassLoaderException;
 
     void removeRefreshClassLoaderSynchronization();
 }

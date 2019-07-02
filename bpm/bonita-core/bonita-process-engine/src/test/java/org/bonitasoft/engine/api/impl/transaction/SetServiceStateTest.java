@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction;
 
+import static java.util.Arrays.asList;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.PAUSE;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.RESUME;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.START;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -21,14 +27,21 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
+import org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -47,55 +60,76 @@ public class SetServiceStateTest {
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
+    private TenantConfiguration tenantConfiguration;
+    @Mock
+    private TenantLifecycleService tenantService1;
+    @Mock
+    private TenantLifecycleService tenantService2;
+    @Mock
     private ClassLoaderService classLoaderService;
-    @Mock
-    private ProcessDefinitionService processDefinitionService;
-    @Mock
-    private ServiceStrategy serviceStrategy;
-    private SetServiceState setServiceState;
     public static final long TENANT_ID = 635434L;
 
     @Before
     public void before() throws Exception {
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
 
-        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(mock(ClassLoaderService.class));
-        when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(mock(TenantConfiguration.class));
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
         when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
-        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        setServiceState = spy(new SetServiceState(TENANT_ID, serviceStrategy));
+        when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(tenantConfiguration);
+        when(tenantConfiguration.getLifecycleServices()).thenReturn(asList(tenantService1, tenantService2));
+        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
+    }
+
+    private SetServiceState createService(ServiceAction action) throws Exception {
+        SetServiceState setServiceState = spy(new SetServiceState(TENANT_ID, action));
         doReturn(platformServiceAccessor).when(setServiceState).getPlatformAccessor();
-        doReturn(true).when(serviceStrategy).shouldRefreshClassLoaders();
+        return setServiceState;
+    }
+
+
+    @Test
+    public void should_not_refresh_classloaders_on_start() throws Exception {
+        // when:
+        createService(START).call();
+
+        // then:
+        verify(classLoaderService).getLocalClassLoader(ScopeType.TENANT.name(), TENANT_ID);
+        verifyNoMoreInteractions(classLoaderService);
     }
 
     @Test
-    public void callShouldRefreshClassloaderOnCurrentTenant() throws Exception {
-        // given:
-        doNothing().when(setServiceState).refreshClassloaderOfProcessDefinitions(tenantServiceAccessor);
+    public void should_not_get_classloader_on_pause_and_stop() throws Exception {
+        createService(PAUSE).call();
+        createService(STOP).call();
 
-        // Usefull only for test / mock purposes:
-
-        // when:
-        setServiceState.call();
-
-        // then:
-        verify(classLoaderService).refreshClassLoader(ScopeType.TENANT, TENANT_ID);
+        verifyZeroInteractions(classLoaderService);
     }
 
     @Test
-    public void callShouldRefreshClassloaderOfProcesses() throws Exception {
-        // given:
-        InOrder order = inOrder(classLoaderService);
+    public void should_call_start_on_tenant_services() throws Exception {
+        createService(START).call();
 
-        // Usefull only for test / mock purposes:
-        doReturn(Arrays.asList(1L, 2L)).when(processDefinitionService).getProcessDefinitionIds(anyInt(), anyInt());
+        verify(tenantService1).start();
+        verify(tenantService2).start();
+    }
+    @Test
+    public void should_call_stop_on_tenant_services() throws Exception {
+        createService(STOP).call();
 
-        // when:
-        setServiceState.call();
+        verify(tenantService1).stop();
+        verify(tenantService2).stop();
+    }
+    @Test
+    public void should_call_resume_on_tenant_services() throws Exception {
+        createService(RESUME).call();
 
-        // then:
-        order.verify(classLoaderService).refreshClassLoader(ScopeType.PROCESS, 1L);
-        order.verify(classLoaderService).refreshClassLoader(ScopeType.PROCESS, 2L);
+        verify(tenantService1).resume();
+        verify(tenantService2).resume();
+    }
+    @Test
+    public void should_call_pause_on_tenant_services() throws Exception {
+        createService(PAUSE).call();
+
+        verify(tenantService1).pause();
+        verify(tenantService2).pause();
     }
 }

@@ -40,16 +40,16 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 /**
  * @author Baptiste Mesta
  */
-public class RefreshClassloaderSynchronization implements BonitaTransactionSynchronization {
+class RefreshClassloaderSynchronization implements BonitaTransactionSynchronization {
 
-    private ClassLoaderService classLoaderService;
+    private ClassLoaderServiceImpl classLoaderService;
     private ClassLoaderUpdater classLoaderUpdater;
     private BroadcastService broadcastService;
     private final RefreshClassLoaderTask callable;
     private final Set<Pair<ScopeType, Long>> ids = new HashSet<>();
     private final Long tenantId;
 
-    public RefreshClassloaderSynchronization(ClassLoaderService classLoaderService,
+    public RefreshClassloaderSynchronization(ClassLoaderServiceImpl classLoaderService,
                                              BroadcastService broadcastService,
                                              RefreshClassLoaderTask callable,
                                              ClassLoaderUpdater classLoaderUpdater,

@@ -184,4 +184,8 @@ public class VirtualClassLoader extends ClassLoader {
     public ClassLoaderIdentifier getIdentifier() {
         return identifier;
     }
+
+    public boolean isInitialized() {
+        return classloader != null;
+    }
 }

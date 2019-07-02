@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.START;
+import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +27,6 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
-import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
-import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
@@ -296,7 +297,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     platformSessionId = sessionAccessor.getSessionId();
                     sessionAccessor.deleteSessionId();
                     sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-                    final SetServiceState startService = new SetServiceState(tenantId, new StartServiceStrategy());
+                    final SetServiceState startService = new SetServiceState(tenantId, START);
                     platformAccessor.getTransactionService().executeInTransaction(startService);
                 } finally {
                     sessionService.deleteSession(sessionId);
@@ -378,7 +379,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     tenantServiceAccessor.getSessionService().deleteSessions();
                 }
                 // stop the tenant services:
-                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
+                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), STOP));
             }
             for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
@@ -560,7 +561,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
             // stop the tenant services:
-            final SetServiceState stopService = new SetServiceState(tenantId, new StopServiceStrategy());
+            final SetServiceState stopService = new SetServiceState(tenantId, STOP);
             platformAccessor.getTransactionService().executeInTransaction(stopService);
 
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
