@@ -1,27 +1,29 @@
-bonita-engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
-=============
+# Bonita Engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
 
-What it does?
--------------
-This project builds Bonita Execution Engine (Community Edition)
+Deploy, execute, manage applications made with Bonita Studio.
 
 
-Requirements
--------------
+## Using the Engine
+
+The engine is included as part of either [Bonita Studio][downloads] or [Bonita Web Platform][downloads], and executes the BPMN process logic.
+The engine can however be included as a standalone dependency in a custom Application, as explained [here][standalone]
+
+## Running the Project
+
+### Prerequisites
 >     Java JDK 1.8 (to compile), and JVM 8 or 11 (to run)
 
-This project bundles the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html), so the `gradlew` script is available at
+This project bundles the [Gradle Wrapper][wrapper], so the `gradlew` script is available at
 the project root.
 
+### Compiling
 
-Building the Engine
------------------
 Just run the following Gradle command:
 ```
 ./gradlew build
 ```
 
-To be able to successfully build the Bonita components that use the Engine, run:
+To be able to successfully build other Bonita components that use the Engine, run:
 ```
  ./gradlew publishToMavenLocal
 ```
@@ -30,23 +32,34 @@ Among other things, it also generates the javadoc used by Bonita Studio.
 The command above runs all unit tests. To skip them, add the `-x test`
 option.
 
-Running unit / integration tests
------------------
+### Running unit / integration tests
+
 To run all **unit + integration tests** (on the default embedded H2
 database), run the following command:
 ```
 ./gradlew test integrationTest
 ```
 
-To run all **unit + integration tests** on mysql, oracle, sqlserver or postgres using
-a _Docker_ container, run one of the following commands:
-```
-./gradlew mysqlDatabaseTest
-./gradlew oracleDatabaseTest
-./gradlew sqlserverDatabaseTest
-./gradlew postgresDatabaseTest
-```
+## Project Structure
+The project is composed of several modules. Unit tests are contained in the modules, integration tests are regrouped in bonita-integration-tests.
 
-How to contribute
------------------
-In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD).
+* `bonita-engine-spring-boot-starter` : Run the engine in standalone mode using Spring boot, see [documentation][standalone]
+* `bonita-engine-standalone` : Run the engine in standalone programmatically, see [documentation][standalone]
+* `bonita-test-api` : Junit Rule to include the engine in your tests
+* `bpm` : Services related to bpm process execution
+* `buildSrc` : Internal Gradle plugins used to build Bonita Engine
+* `platform` : Services that handle the platform creation/configuration
+* `services` : Generic services used by the engine
+ 
+## How to contribute
+In order to contribute to the project, read the [guide][guide].
+To report an issue use the official [bugtracker][bugtracker].
+
+
+
+
+[downloads]: https://www.bonitasoft.com/downloads
+[standalone]: https://documentation.bonitasoft.com/bonita/7.9/embed-engine
+[guide]: https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD
+[wrapper]: https://docs.gradle.org/current/userguide/gradle_wrapper.html
+[bugtracker]: https://bonita.atlassian.net/projects/BBPMC/issues
