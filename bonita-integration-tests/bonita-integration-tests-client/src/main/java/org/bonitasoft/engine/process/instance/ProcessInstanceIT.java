@@ -186,14 +186,16 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         // when
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
+        Thread.sleep(20);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
+        Thread.sleep(20);
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForProcessToFinish(pi0.getId());
         waitForProcessToFinish(pi1.getId());
         waitForProcessToFinish(pi2.getId());
 
-        // then 
+        // then
         final List<ArchivedProcessInstance> processInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_ASC);
         assertThat(processInstances).as("should find 3 archived processes").hasSize(3);
 
