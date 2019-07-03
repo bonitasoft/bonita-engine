@@ -111,6 +111,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -123,6 +124,7 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -157,6 +159,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -169,11 +172,15 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchFilterOperation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchMessageInstanceDescriptor;
+import org.bonitasoft.engine.search.impl.SearchFilter;
+import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.model.SSession;
@@ -241,6 +248,7 @@ public class ProcessAPIImplTest {
     private SchedulerService schedulerService;
     @Mock
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
+
     @Mock
     private EventInstanceService eventInstanceService;
     @Mock
@@ -277,6 +285,8 @@ public class ProcessAPIImplTest {
     private ArgumentCaptor<WorkDescriptor> workArgumentCaptor;
     @Captor
     private ArgumentCaptor<SPendingActivityMapping> pendingMappingArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<QueryOptions> deleteOldMessageArgumentCaptor;
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -509,7 +519,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void replayingAFailedJobShouldExecuteAgainSchedulerServiceWithSomeParameters() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", Boolean.FALSE);
         final long jobDescriptorId = 544L;
@@ -1401,7 +1411,7 @@ public class ProcessAPIImplTest {
     public void should_throw_Illegal_Arg_Exception_when_setState_with_unknown_state() throws UpdateException {
 
         expectedException.expect(IllegalArgumentException.class);
-        processAPI.setActivityStateByName(25l,"garbage");
+        processAPI.setActivityStateByName(25l, "garbage");
     }
 
     @Test
@@ -1508,10 +1518,55 @@ public class ProcessAPIImplTest {
     public void should_throw_RetrieveException_when_cant_read_database() throws Exception {
         doThrow(new SBonitaReadException(""))
                 .when(processResourcesService)
-                .get(anyLong(),any(),anyString());
+                .get(anyLong(), any(), anyString());
 
         expectedException.expect(RetrieveException.class);
 
         processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource2");
+    }
+
+
+    @Test
+    public void should_invoke_deleteMessageAndDataInstanceOlderCreationDate_with_good_fields() throws Exception {
+        long creationDate = System.currentTimeMillis();
+
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
+        searchOptionsBuilder.filter("messageName", "test");
+
+        when(searchEntitiesDescriptor.getSearchMessageInstanceDescriptor()).thenReturn(new SearchMessageInstanceDescriptor());
+
+        when(eventInstanceService.deleteMessageAndDataInstanceOlderThanCreationDate(anyLong(), any(QueryOptions.class))).thenReturn(2);
+        int numberMessageDeleted = processAPI.deleteMessageByCreationDate(creationDate, searchOptionsBuilder.done());
+
+        assertThat(numberMessageDeleted).isEqualTo(2);
+        verify(eventInstanceService).deleteMessageAndDataInstanceOlderThanCreationDate(eq(creationDate), deleteOldMessageArgumentCaptor.capture());
+        assertThat(deleteOldMessageArgumentCaptor.getValue().getFromIndex()).isEqualTo(0);
+        assertThat(deleteOldMessageArgumentCaptor.getValue().getNumberOfResults()).isEqualTo(1000);
+        assertThat(deleteOldMessageArgumentCaptor.getValue().getFilters()).containsExactly(new FilterOption(SMessageInstance.class, "messageName", "test"));
+    }
+
+
+    @Test
+    public void should_throw_ExecutionException_when_wrong_fields_used() throws Exception {
+
+        when(searchEntitiesDescriptor.getSearchMessageInstanceDescriptor()).thenReturn(new SearchMessageInstanceDescriptor());
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("the field 'test' is unknown for the entity searched using SearchMessageInstanceDescriptor");
+
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10000);
+        searchOptionsBuilder.filter("test", "test");
+
+        processAPI.deleteMessageByCreationDate(1000L, searchOptionsBuilder.done());
+    }
+
+    @Test
+    public void should_throw_ExecutionException_when_service_throw_an_exception() throws Exception {
+        doThrow(new SMessageModificationException(""))
+                .when(eventInstanceService)
+                .deleteMessageAndDataInstanceOlderThanCreationDate(anyLong(), any(QueryOptions.class));
+        when(searchEntitiesDescriptor.getSearchMessageInstanceDescriptor()).thenReturn(new SearchMessageInstanceDescriptor());
+        expectedException.expect(ExecutionException.class);
+
+        processAPI.deleteMessageByCreationDate(1000L, new SearchOptionsImpl(0, 1000));
     }
 }

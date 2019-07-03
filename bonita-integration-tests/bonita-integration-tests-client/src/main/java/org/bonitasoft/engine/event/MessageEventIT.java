@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bar.BEntry;
@@ -54,6 +55,11 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchFilterOperation;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.impl.SearchFilter;
+import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
@@ -837,5 +843,41 @@ public class MessageEventIT extends AbstractEventIT {
 
         //clean up
         disableAndDeleteProcess(receiveMsgProcess, sendMessageProcess);
+    }
+
+    @Test
+    public void can_delete_message_by_creationDate() throws Exception {
+
+        final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("p1");
+        final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("step1");
+
+        getProcessAPI().sendMessage("go", targetProcessExpression, targetFlowNodeExpression, null, null);
+        long untilDate = System.currentTimeMillis();
+
+        TimeUnit.MILLISECONDS.sleep(5);
+
+        getProcessAPI().sendMessage("go2", targetProcessExpression, targetFlowNodeExpression, null, null);
+
+        getProcessAPI().sendMessage("go3", targetProcessExpression, targetFlowNodeExpression, null, null);
+
+        int nbMessageDeleted = getProcessAPI().deleteMessageByCreationDate(untilDate, null);
+        Assertions.assertThat(nbMessageDeleted).isEqualTo(1);
+
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 2);
+        searchOptionsBuilder.filter("messageName",  "go2");
+
+        nbMessageDeleted = getProcessAPI().deleteMessageByCreationDate(System.currentTimeMillis(), searchOptionsBuilder.done());
+        Assertions.assertThat(nbMessageDeleted).isEqualTo(1);
+
+        //clean up
+        nbMessageDeleted = getProcessAPI().deleteMessageByCreationDate(System.currentTimeMillis(), null);
+        Assertions.assertThat(nbMessageDeleted).isEqualTo(1);
+
+
+        nbMessageDeleted = getProcessAPI().deleteMessageByCreationDate(System.currentTimeMillis(), null);
+        Assertions.assertThat(nbMessageDeleted).isEqualTo(0);
+
+
+
     }
 }

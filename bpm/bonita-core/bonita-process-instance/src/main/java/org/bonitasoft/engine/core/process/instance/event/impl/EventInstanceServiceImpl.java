@@ -55,7 +55,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     private EventInstanceRepository eventInstanceRepository;
 
     public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
-            DataInstanceService dataInstanceService) {
+                                    DataInstanceService dataInstanceService) {
         this.eventInstanceRepository = eventInstanceRepository;
         this.dataInstanceService = dataInstanceService;
     }
@@ -113,7 +113,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long id, int fromIndex,
-            int maxResults) throws SEventInstanceReadException {
+                                                                          int maxResults) throws SEventInstanceReadException {
         return this.eventInstanceRepository.getActivityBoundaryEventInstances(id, fromIndex, maxResults);
     }
 
@@ -125,14 +125,14 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName,
-            OrderByType orderByType) throws SEventInstanceReadException {
+                                                  OrderByType orderByType) throws SEventInstanceReadException {
         return this.eventInstanceRepository.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName,
                 orderByType);
     }
 
     @Override
     public <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass,
-            long eventTriggerInstanceId) throws SEventTriggerInstanceReadException {
+                                                                            long eventTriggerInstanceId) throws SEventTriggerInstanceReadException {
         return this.eventInstanceRepository.getEventTriggerInstance(entityClass, eventTriggerInstanceId);
     }
 
@@ -159,7 +159,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> sWaitingEventClass,
-            QueryOptions searchOptions) throws SBonitaReadException {
+                                         QueryOptions searchOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.getNumberOfWaitingEvents(sWaitingEventClass, searchOptions);
     }
 
@@ -200,14 +200,14 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
-            QueryOptions searchOptions) throws SBonitaReadException {
+                                                                             QueryOptions searchOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId,
                 QueryOptions.countQueryOptions());
     }
 
     @Override
     public <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> waitingEventClass,
-            QueryOptions queryOptions) throws SBonitaReadException {
+                                                                 QueryOptions queryOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.searchWaitingEvents(waitingEventClass, queryOptions);
     }
 
@@ -224,22 +224,23 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
-    public Integer deleteMessageAndDataInstanceOlderCreationDate(long creationDate,
-                                                                 QueryOptions queryOptions)
+    public Integer deleteMessageAndDataInstanceOlderThanCreationDate(long creationDate,
+                                                                     QueryOptions queryOptions)
             throws SMessageModificationException {
 
         try {
             List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository
                     .getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
-            eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
-            for (Long messageId : messageInstanceIdOlderThanCreationDate) {
-                dataInstanceService.deleteLocalDataInstances(messageId,
-                        DataInstanceContainer.MESSAGE_INSTANCE.name(),
-                        true);
-                dataInstanceService.deleteLocalArchivedDataInstances(messageId,
-                        DataInstanceContainer.MESSAGE_INSTANCE.name());
+            if (messageInstanceIdOlderThanCreationDate.size() > 0) {
+                eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
+                for (Long messageId : messageInstanceIdOlderThanCreationDate) {
+                    dataInstanceService.deleteLocalDataInstances(messageId,
+                            DataInstanceContainer.MESSAGE_INSTANCE.name(),
+                            true);
+                    dataInstanceService.deleteLocalArchivedDataInstances(messageId,
+                            DataInstanceContainer.MESSAGE_INSTANCE.name());
+                }
             }
-
             return messageInstanceIdOlderThanCreationDate.size();
         } catch (SDataInstanceException | SEventTriggerInstanceReadException | SMessageInstanceReadException e) {
             throw new SMessageModificationException(e);
@@ -253,7 +254,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance,
-            EntityUpdateDescriptor descriptor) throws SEventTriggerInstanceModificationException {
+                                           EntityUpdateDescriptor descriptor) throws SEventTriggerInstanceModificationException {
         this.eventInstanceRepository.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
     }
 }

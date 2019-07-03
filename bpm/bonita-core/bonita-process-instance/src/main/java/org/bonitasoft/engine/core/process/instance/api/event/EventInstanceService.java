@@ -194,8 +194,8 @@ public interface EventInstanceService  {
     List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
                                                                       QueryOptions searchOptions) throws SBonitaReadException;
 
-    Integer deleteMessageAndDataInstanceOlderCreationDate(long creationDate,
-                                                          QueryOptions queryOptions) throws  SMessageModificationException;
+    Integer deleteMessageAndDataInstanceOlderThanCreationDate(long creationDate,
+                                                              QueryOptions queryOptions) throws  SMessageModificationException;
 
 
     List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions) throws SEventTriggerInstanceReadException, SMessageInstanceReadException;
