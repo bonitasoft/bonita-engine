@@ -16,8 +16,8 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -46,7 +46,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -129,7 +129,7 @@ public class JobServiceImplForJobDescriptorTest {
         //Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
-        doReturn(sJobDescriptor).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobDescriptor>> any());
+        doReturn(sJobDescriptor).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any());
 
         // When
         jobServiceImpl.deleteJobDescriptor(3);
@@ -141,7 +141,7 @@ public class JobServiceImplForJobDescriptorTest {
     @Test
     public final void deleteJobDescriptor_by_id_should_do_nothing_when_job_descriptor_doesnt_exist() throws Exception {
         // Given
-        when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
         when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.TRACE))).thenReturn(true);
 
         // When
@@ -154,7 +154,7 @@ public class JobServiceImplForJobDescriptorTest {
     @Test
     public final void deleteJobDescriptor_by_id_should_do_nothing_when_job_descriptor_doesnt_exist_without_log() throws Exception {
         // Given
-        when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
 
         // When
         jobServiceImpl.deleteJobDescriptor(1);

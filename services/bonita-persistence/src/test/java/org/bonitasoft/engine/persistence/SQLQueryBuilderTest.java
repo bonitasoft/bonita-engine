@@ -15,7 +15,7 @@
 package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.singletonMap;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 

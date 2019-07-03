@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -54,7 +54,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -113,7 +113,7 @@ public class IdentityServiceImplForUserTest {
      */
     @Test
     public void getNumberOfUsers() throws Exception {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(1L);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(1L);
         Assert.assertEquals(1L, identityServiceImpl.getNumberOfUsers());
 
         verifyZeroInteractions(recorder);
@@ -121,7 +121,7 @@ public class IdentityServiceImplForUserTest {
 
     @Test(expected = SIdentityException.class)
     public void getNumberOfUsersThrowException() throws Exception {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SUser>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SUser>> any())).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers();
     }
 

@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.identity;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -122,6 +122,6 @@ public class UserImporterTest {
         importer.importUsers(Collections.singletonList(userToImport));
 
         // then
-        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(Matchers.<List<ExportedCustomUserInfoValue>>any(), anyLong());
+        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(ArgumentMatchers.<List<ExportedCustomUserInfoValue>>any(), anyLong());
     }
 }

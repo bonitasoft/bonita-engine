@@ -13,7 +13,7 @@
  */
 package org.bonitasoft.engine.execution.work;
 
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;

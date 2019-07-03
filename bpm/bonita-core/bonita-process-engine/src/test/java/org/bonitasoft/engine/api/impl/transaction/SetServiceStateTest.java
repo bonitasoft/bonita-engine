@@ -19,7 +19,7 @@ import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.Service
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.START;
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;

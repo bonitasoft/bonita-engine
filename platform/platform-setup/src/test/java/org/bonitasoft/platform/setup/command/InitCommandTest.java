@@ -15,8 +15,8 @@
 package org.bonitasoft.platform.setup.command;
 
 import static org.bonitasoft.platform.setup.command.CommandTestUtils.buildCommandLine;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.apache.commons.cli.Options;

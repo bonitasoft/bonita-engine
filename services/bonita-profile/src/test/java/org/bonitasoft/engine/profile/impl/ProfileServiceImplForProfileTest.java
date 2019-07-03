@@ -54,7 +54,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -133,21 +133,21 @@ public class ProfileServiceImplForProfileTest {
     public void getProfileById() throws Exception {
         final SProfile sProfile = mock(SProfile.class);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
 
         assertEquals(sProfile, profileServiceImpl.getProfile(1));
     }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getNoProfileById() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfile>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any())).thenReturn(null);
 
         profileServiceImpl.getProfile(1);
     }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getProfileByIdThrowException() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfile>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getProfile(1);
     }
@@ -160,14 +160,14 @@ public class ProfileServiceImplForProfileTest {
         final String profileName = "plop";
         final SProfile sProfile = mock(SProfile.class);
 
-        doReturn(sProfile).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProfile>> any());
 
         assertEquals(sProfile, profileServiceImpl.getProfileByName(profileName));
     }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getNoProfileByName() throws Exception {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SProfile>> any())).thenReturn(null);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SProfile>> any())).thenReturn(null);
 
         profileServiceImpl.getProfileByName("plop");
     }
@@ -196,7 +196,7 @@ public class ProfileServiceImplForProfileTest {
         sProfiles.add(sProfile);
         sProfiles.add(sProfile);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
 
         assertEquals(sProfiles, profileServiceImpl.getProfiles(profileIds));
     }
@@ -206,7 +206,7 @@ public class ProfileServiceImplForProfileTest {
         final List<Long> profileIds = new ArrayList<Long>();
         profileIds.add(1L);
 
-        doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(null).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
 
         profileServiceImpl.getProfiles(profileIds);
     }
@@ -229,7 +229,7 @@ public class ProfileServiceImplForProfileTest {
         final SProfile sProfile = mock(SProfile.class);
         sProfiles.add(sProfile);
 
-        doReturn(sProfiles).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+        doReturn(sProfiles).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProfile>> any());
 
         assertEquals(sProfiles, profileServiceImpl.searchProfilesOfUser(1, 0, 10, "name", OrderByType.ASC));
     }
@@ -238,14 +238,14 @@ public class ProfileServiceImplForProfileTest {
     public final void getNoProfilesOfUser() throws SBonitaReadException {
         final List<SProfile> sProfiles = new ArrayList<SProfile>();
 
-        doReturn(sProfiles).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+        doReturn(sProfiles).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProfile>> any());
 
         assertEquals(sProfiles, profileServiceImpl.searchProfilesOfUser(1, 0, 10, "name", OrderByType.ASC));
     }
 
     @Test(expected = SBonitaReadException.class)
     public final void getProfilesOfUserThrowException() throws SBonitaReadException {
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProfile>> any());
 
         profileServiceImpl.searchProfilesOfUser(1, 0, 10, "name", OrderByType.ASC);
     }
@@ -349,7 +349,7 @@ public class ProfileServiceImplForProfileTest {
         doReturn(4L).when(sProfileMember).getId();
         sProfileMembers.add(sProfileMember);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(sProfileEntries).doReturn(new ArrayList<SProfileEntry>()).when(persistenceService)
                 .selectList(any());
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
@@ -362,7 +362,7 @@ public class ProfileServiceImplForProfileTest {
     @Test(expected = SProfileNotFoundException.class)
     public final void deleteNoProfileById() throws SBonitaReadException, SProfileDeletionException, SProfileNotFoundException, SProfileEntryDeletionException,
             SProfileMemberDeletionException {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfile>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any())).thenReturn(null);
 
         profileServiceImpl.deleteProfile(1);
     }
@@ -395,7 +395,7 @@ public class ProfileServiceImplForProfileTest {
         doReturn(4L).when(sProfileMember).getId();
         sProfileMembers.add(sProfileMember);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(new ArrayList<SProfileEntry>()).when(persistenceService).selectList(any());
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
         doReturn(sProfileMembers).doReturn(new ArrayList<SProfileMember>()).when(persistenceService)
@@ -415,7 +415,7 @@ public class ProfileServiceImplForProfileTest {
         doReturn(6L).when(sProfileEntry).getId();
         sProfileEntries.add(sProfileEntry);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(sProfileEntries).doReturn(new ArrayList<SProfileEntry>()).when(persistenceService)
                 .selectList(any());
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);

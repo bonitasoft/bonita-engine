@@ -47,7 +47,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -127,14 +127,14 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void deleteProfileEntryById() throws SProfileEntryNotFoundException, SProfileEntryDeletionException, SBonitaReadException, SRecorderException {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
-        doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
+        doReturn(sProfileEntry).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
 
         profileServiceImpl.deleteProfileEntry(1);
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
     public final void deleteNoProfileEntryById() throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
 
         profileServiceImpl.deleteProfileEntry(1);
     }
@@ -239,21 +239,21 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void getProfileEntryById() throws SProfileEntryNotFoundException, SBonitaReadException {
         final SProfileEntry sProfileEntry = createProfileEntry(1);
 
-        doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
+        doReturn(sProfileEntry).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
 
         assertEquals(sProfileEntry, profileServiceImpl.getProfileEntry(1));
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
     public void getNoProfileEntryById() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
 
         profileServiceImpl.getProfileEntry(1);
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
     public void getProfileEntryByIdThrowException() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getProfileEntry(1);
     }

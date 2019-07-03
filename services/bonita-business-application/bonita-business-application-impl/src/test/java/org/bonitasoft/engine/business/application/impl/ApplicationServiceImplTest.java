@@ -16,9 +16,9 @@ package org.bonitasoft.engine.business.application.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -402,7 +402,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void getApplicationPage_by_name_and_appName_should_throw_SObjectNotFoundException_when_persitence_service_selectOne_returns_null() throws Exception {
         //given
-        given(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SApplicationPage>> any())).willReturn(null);
+        given(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SApplicationPage>> any())).willReturn(null);
 
         //when
         applicationServiceImpl.getApplicationPage("app", "firstPage");
@@ -908,7 +908,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void deleteApplicationMenu_should_throw_SObjectObjectNotFoundException_if_no_application_menu_is_found_with_the_given_id() throws Exception {
         //given
-        given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(null);
+        given(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(null);
 
         //when
         applicationServiceImpl.deleteApplicationMenu(5);
@@ -920,7 +920,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplicationMenu_should_throw_SObjectObjectModificationException_recorder_throws_exception() throws Exception {
         //given
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 1, 1, 12);
-        given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(applicationMenu);
+        given(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(applicationMenu);
 
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
                 SApplicationMenu.class);

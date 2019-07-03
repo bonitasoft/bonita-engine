@@ -15,7 +15,7 @@ package org.bonitasoft.engine.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -60,7 +60,7 @@ public class QueriableLogUpdaterTest {
         given(platformService.getSPlatformProperties()).willReturn(properties);
         given(properties.getPlatformVersion()).willReturn("platform.version");
 
-        given(logger.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
+        given(logger.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
 
         log = getLogBuilderWithMandatoryFields();
     }
