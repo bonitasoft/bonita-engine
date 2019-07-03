@@ -36,7 +36,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -254,7 +254,7 @@ public class IdentityServiceImplForGroupTest {
 
     @Test(expected = SIdentityException.class)
     public void getGroupByPathThrowException() throws Exception {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SGroup>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SGroup>> any())).thenThrow(new SBonitaReadException(""));
 
         identityServiceImpl.getGroupByPath("path");
     }

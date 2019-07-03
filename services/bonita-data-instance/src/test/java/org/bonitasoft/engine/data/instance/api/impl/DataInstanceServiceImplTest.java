@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.data.instance.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -77,7 +77,7 @@ public class DataInstanceServiceImplTest {
     public final void getLastSADataInstancesFromContainer() throws SBonitaException {
         final List<SADataInstance> archiveInstances = Collections.emptyList();
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doReturn(archiveInstances).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SADataInstance>> any());
+        doReturn(archiveInstances).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
@@ -86,7 +86,7 @@ public class DataInstanceServiceImplTest {
     @Test
     public final void getEmptyLastSADataInstancesFromContainer() throws SBonitaException {
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doReturn(Collections.emptyList()).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SADataInstance>> any());
+        doReturn(Collections.emptyList()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(Collections.emptyList(), dataInstances);
@@ -96,7 +96,7 @@ public class DataInstanceServiceImplTest {
     public final void getLastSADataInstancesFromContainerThrowsAnExceptionDueToProblemOnPersistenceService() throws SBonitaException {
         final List<SADataInstance> archiveInstances = Collections.emptyList();
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SADataInstance>> any());
+        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SADataInstance>> any());
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);

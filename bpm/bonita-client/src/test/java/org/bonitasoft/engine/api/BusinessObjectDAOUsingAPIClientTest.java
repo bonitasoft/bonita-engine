@@ -23,8 +23,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -72,7 +72,7 @@ public class BusinessObjectDAOUsingAPIClientTest {
 
     @Test
     public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session() throws Exception {
-        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(client).loadClass(Matchers.any(Class.class));
+        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(client).loadClass(ArgumentMatchers.any(Class.class));
 
         expectedEx.expect(BusinessObjectDaoCreationException.class);
         expectedEx.expectMessage("");

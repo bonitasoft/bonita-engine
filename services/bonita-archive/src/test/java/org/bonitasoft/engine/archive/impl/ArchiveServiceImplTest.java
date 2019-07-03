@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;

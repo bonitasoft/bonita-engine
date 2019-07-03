@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -59,7 +59,7 @@ public class BusinessObjectDAOFactoryTest {
 
     @Test(expected = BusinessObjectDaoCreationException.class)
     public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session() throws Exception {
-        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(factory).loadClass(Matchers.anyString());
+        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(factory).loadClass(ArgumentMatchers.anyString());
         factory.createDAO(session, DummyDAO.class);
     }
 

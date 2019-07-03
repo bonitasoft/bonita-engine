@@ -73,7 +73,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -130,7 +130,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfos() throws Exception {
         // Given
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfos(0, 10, "id", OrderByType.ASC);
@@ -142,7 +142,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfosThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfos(0, 10, "id", OrderByType.ASC);
@@ -155,7 +155,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfos() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos();
@@ -167,7 +167,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfos();
@@ -180,7 +180,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfoById() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.getProcessDeploymentInfo(2);
@@ -192,7 +192,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfoByIdThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfo(2);
@@ -207,7 +207,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosByActivationState() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosByActivationState(ActivationState.DISABLED);
@@ -219,7 +219,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosByActivationStateThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosByActivationState(ActivationState.DISABLED);
@@ -234,7 +234,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinitionIdsByActivationState() throws Exception {
         // Given
         final List<Long> processDefinitionIds = Arrays.asList(3L);
-        doReturn(processDefinitionIds).when(persistenceService).selectList(Matchers.<SelectListDescriptor<Long>>any());
+        doReturn(processDefinitionIds).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
 
         // When
         final List<Long> result = processDefinitionServiceImpl.getProcessDefinitionIds(ActivationState.DISABLED, 0, 10);
@@ -246,7 +246,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDefinitionIdsByActivationStateThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionIds(ActivationState.DISABLED, 0, 10);
@@ -259,7 +259,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinitionIds() throws Exception {
         // Given
         final List<Long> processDefinitionIds = Arrays.asList(3L);
-        doReturn(processDefinitionIds).when(persistenceService).selectList(Matchers.<SelectListDescriptor<Long>>any());
+        doReturn(processDefinitionIds).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
 
         // When
         final List<Long> result = processDefinitionServiceImpl.getProcessDefinitionIds(0, 10);
@@ -271,7 +271,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDefinitionIdsThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionIds(0, 10);
@@ -286,7 +286,7 @@ public class ProcessDefinitionServiceImplTest {
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(6L).when(sProcessDefinitionDeployInfo).getProcessId();
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = Arrays.asList(sProcessDefinitionDeployInfo);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final long processDeploymentInfoId = processDefinitionServiceImpl.getLatestProcessDefinitionId("name");
@@ -298,7 +298,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getLatestProcessDefinitionIdThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getLatestProcessDefinitionId("name");
@@ -350,7 +350,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDefinitionId_should_throw_SBonitaReadException_when_persistenceSservice_throws_exception() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDefinitionId("name", "version");
@@ -407,7 +407,7 @@ public class ProcessDefinitionServiceImplTest {
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
 
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done());
@@ -425,7 +425,7 @@ public class ProcessDefinitionServiceImplTest {
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), "the business log");
@@ -484,7 +484,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
-        doReturn(null).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(null).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(4, updateBuilder.done());
@@ -1019,7 +1019,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosUnrelatedToCategory() throws Exception {
         // Given
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10,
@@ -1032,7 +1032,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getProcessDeploymentInfosUnrelatedToCategoryThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosUnrelatedToCategory(9, 0, 10, ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
@@ -1046,7 +1046,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getNumberOfProcessDeploymentInfosUnrelatedToCategory() throws Exception {
         // Given
         final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosUnrelatedToCategory(9);
@@ -1058,7 +1058,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosUnrelatedToCategoryThrowException() throws Exception {
         // Given
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any());
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosUnrelatedToCategory(9);
@@ -1074,7 +1074,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.searchProcessDeploymentInfosOfCategory(9, options);
@@ -1087,7 +1087,7 @@ public class ProcessDefinitionServiceImplTest {
     public void searchProcessDeploymentInfosOfCategoryThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.searchProcessDeploymentInfosOfCategory(9, options);
@@ -1103,7 +1103,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfos(options);
@@ -1116,7 +1116,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithOptionsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfos(options);
@@ -1132,7 +1132,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroup(9,
@@ -1146,7 +1146,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForGroupThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroup(9, options);
@@ -1162,7 +1162,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroups(
@@ -1176,7 +1176,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForGroupsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForGroups(Arrays.asList(9L), options);
@@ -1192,7 +1192,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRole(9,
@@ -1206,7 +1206,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForRoleThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRole(9, options);
@@ -1222,7 +1222,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRoles(
@@ -1236,7 +1236,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForRolesThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForRoles(Arrays.asList(9L), options);
@@ -1252,7 +1252,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUser(9,
@@ -1266,7 +1266,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForUserThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUser(9, options);
@@ -1282,7 +1282,7 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = new ArrayList<>(3);
-        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfos).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         final List<SProcessDefinitionDeployInfo> processDeploymentInfos = processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUsers(
@@ -1296,7 +1296,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDeploymentInfosWithActorOnlyForUsersThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // When
         processDefinitionServiceImpl.getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(9L), options);
@@ -1678,7 +1678,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getLatestProcessDefinitionId_should_query_processes_order_by_deploymentDate_DESC() throws Exception {
         // given:
         final List<SProcessDefinitionDeployInfo> processes = Collections.<SProcessDefinitionDeployInfo>singletonList(new SProcessDefinitionDeployInfoImpl());
-        doReturn(processes).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(processes).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // when:
         processDefinitionServiceImpl.getLatestProcessDefinitionId("MySimpleProcess");

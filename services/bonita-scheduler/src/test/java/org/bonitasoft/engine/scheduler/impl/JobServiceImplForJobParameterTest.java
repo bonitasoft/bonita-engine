@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -55,7 +55,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -196,7 +196,7 @@ public class JobServiceImplForJobParameterTest {
         // Given
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
+        doReturn(sJobParameter).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobParameter>> any());
 
         // When
         jobServiceImpl.deleteJobParameter(3);
@@ -209,7 +209,7 @@ public class JobServiceImplForJobParameterTest {
     @Test(expected = SJobParameterNotFoundException.class)
     public final void deleteNotExistingJobParameter_by_id() throws Exception {
         // Given
-        when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobParameter>> any())).thenReturn(null);
 
         // When
         jobServiceImpl.deleteJobParameter(1);
@@ -220,7 +220,7 @@ public class JobServiceImplForJobParameterTest {
         // Given
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
+        doReturn(sJobParameter).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobParameter>> any());
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When

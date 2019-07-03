@@ -37,7 +37,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -76,7 +76,7 @@ public class DocumentServiceImplTest {
     public void should_getDocumentList_return_the_list() throws Exception {
         //given
         final List<SMappedDocumentImpl> documentList = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
-        doReturn(documentList).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any());
+        doReturn(documentList).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
         final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
@@ -88,7 +88,7 @@ public class DocumentServiceImplTest {
         //given
         final List<SMappedDocument> documentList1 = constructList(100);
         final List<SMappedDocument> documentList2 = constructList(50);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
         final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
@@ -101,7 +101,7 @@ public class DocumentServiceImplTest {
         //given
         final List<SMappedDocument> documentList1 = constructList(100);
         final List<SMappedDocument> documentList2 = constructList(0);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
         final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
@@ -119,7 +119,7 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_return_empty_list() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any());
+        doReturn(Collections.emptyList()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
         final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then

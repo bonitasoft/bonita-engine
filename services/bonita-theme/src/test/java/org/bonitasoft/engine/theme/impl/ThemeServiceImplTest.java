@@ -51,7 +51,7 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -126,7 +126,7 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
 
-        doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
+        doReturn(sTheme).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any());
 
         themeServiceImpl.deleteTheme(1);
     }
@@ -256,21 +256,21 @@ public class ThemeServiceImplTest {
     public void getThemeById() throws Exception {
         final STheme sTheme = mock(STheme.class);
 
-        doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
+        doReturn(sTheme).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any());
 
         assertEquals(sTheme, themeServiceImpl.getTheme(1));
     }
 
     @Test(expected = SThemeNotFoundException.class)
     public void getNoThemeById() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<STheme>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any())).thenReturn(null);
 
         themeServiceImpl.getTheme(1);
     }
 
     @Test(expected = SThemeReadException.class)
     public void getThemeByIdThrowException() throws Exception {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getTheme(1);
     }
@@ -287,7 +287,7 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         final SThemeType type = SThemeType.MOBILE;
 
-        doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
+        doReturn(sTheme).when(persistenceService).selectOne(ArgumentMatchers.<SelectOneDescriptor<STheme>> any());
 
         assertEquals(sTheme, themeServiceImpl.getLastModifiedTheme(type));
     }
@@ -296,7 +296,7 @@ public class ThemeServiceImplTest {
     public void getNoLastModifiedTheme() throws Exception {
         final SThemeType type = SThemeType.MOBILE;
 
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
 
         themeServiceImpl.getLastModifiedTheme(type);
     }
@@ -305,7 +305,7 @@ public class ThemeServiceImplTest {
     public void getLastModifiedThemeThrowException() throws Exception {
         final SThemeType type = SThemeType.MOBILE;
 
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getLastModifiedTheme(type);
     }

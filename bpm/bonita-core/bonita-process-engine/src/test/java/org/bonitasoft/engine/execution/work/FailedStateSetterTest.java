@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -72,7 +72,7 @@ public class FailedStateSetterTest {
         given(flowNodeStateManager.getFailedState()).willReturn(failedState);
         given(failedState.getId()).willReturn(FAILED_STATE_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
-        given(loggerService.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
+        given(loggerService.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class FailedStateSetterTest {
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
 
         //then
-        verify(loggerService).log(Matchers.<Class<?>>any(), eq(TechnicalLogSeverity.DEBUG),
+        verify(loggerService).log(ArgumentMatchers.<Class<?>>any(), eq(TechnicalLogSeverity.DEBUG),
                 eq("Impossible to put flow node instance in failed state: flow node instance with id '" + FLOW_NODE_INSTANCE_ID + "' not found."));
         verify(activityInstanceService, never()).setState(flowNodeInstance, failedState);
     }

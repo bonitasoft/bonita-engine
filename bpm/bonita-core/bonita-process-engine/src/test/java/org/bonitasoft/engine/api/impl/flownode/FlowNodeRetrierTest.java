@@ -17,7 +17,7 @@ package org.bonitasoft.engine.api.impl.flownode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.connector.ConnectorResetStrategy;

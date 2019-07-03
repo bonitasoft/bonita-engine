@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -133,7 +133,7 @@ public class BonitaHomeServerTest {
         Properties classPathProperties = new Properties();
         classPathProperties.setProperty("overriddenProperty", "classPathValue");
         classPathProperties.setProperty("classPathProperty", "aValueInClassPath");
-        doReturn(classPathProperties).when(bonitaHomeServer).getPropertiesFromClassPath(Matchers.<String> anyVararg());
+        doReturn(classPathProperties).when(bonitaHomeServer).getPropertiesFromClassPath(ArgumentMatchers.<String> anyVararg());
         //when
         Properties allProperties = bonitaHomeServer.getPlatformProperties();
         //then
