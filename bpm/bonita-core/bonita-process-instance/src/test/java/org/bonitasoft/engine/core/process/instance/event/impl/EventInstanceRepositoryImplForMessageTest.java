@@ -45,6 +45,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -220,6 +222,19 @@ public class EventInstanceRepositoryImplForMessageTest {
         // Then
         assertEquals("Should return the result of the mock.", sMessageInstance, result);
     }
+
+
+    @Test
+    public final void deleteMessage_should_process_ids_in_batch() throws Exception {
+        // Given
+        List<Long> ids = new Random().longs(0, 350).limit(350).boxed().collect(Collectors.toList());
+
+        // When
+        eventInstanceRepository.deleteMessageInstanceByIds(ids);
+        // Then
+        verify(persistenceService, times(4)).update(anyString(), anyMap());
+    }
+
 
     @Test
     public final void getMessageInstance_should_return_null_if_doesnt_exist() throws Exception {

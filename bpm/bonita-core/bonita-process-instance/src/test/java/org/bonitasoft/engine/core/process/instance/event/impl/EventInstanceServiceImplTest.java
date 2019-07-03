@@ -56,7 +56,7 @@ public class EventInstanceServiceImplTest {
         when(instanceRepository.getMessageInstanceIdOlderThanCreationDate(eq(creationDate), any()))
                 .thenReturn(idsToBeDeleted);
 
-        Integer totalRemoved = eventInstanceServiceImpl.deleteMessageAndDataInstanceOlderCreationDate(creationDate,
+        Integer totalRemoved = eventInstanceServiceImpl.deleteMessageAndDataInstanceOlderThanCreationDate(creationDate,
                 QueryOptions.countQueryOptions());
 
         assertThat(totalRemoved).isEqualTo(idsToBeDeleted.size());

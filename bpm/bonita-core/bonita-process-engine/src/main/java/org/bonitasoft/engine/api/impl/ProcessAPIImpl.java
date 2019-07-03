@@ -356,6 +356,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -383,6 +384,7 @@ import org.bonitasoft.engine.search.comment.SearchCommentsInvolvingUser;
 import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessSupervisorDescriptor;
@@ -432,6 +434,7 @@ import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
+import org.bonitasoft.engine.search.impl.SearchFilter;
 
 /**
  * @author Baptiste Mesta
@@ -463,8 +466,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI,
-            ProcessConfigurationAPIImpl processConfigurationAPI, TaskInvolvementDelegate taskInvolvementDelegate,
-            ProcessInvolvementDelegate processInvolvementDelegate) {
+                          ProcessConfigurationAPIImpl processConfigurationAPI, TaskInvolvementDelegate taskInvolvementDelegate,
+                          ProcessInvolvementDelegate processInvolvementDelegate) {
         this.processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
         this.processConfigurationAPI = processConfigurationAPI;
@@ -1937,7 +1940,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     + " to user (id: " + userId + ") | " + sbe.getMessage(), sbe);
         }
     }
-    
+
     @CustomTransactions
     @Override
     public void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs)
@@ -4879,6 +4882,36 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     }
 
+    @Override
+    public int deleteMessageByCreationDate(final long creationDate, SearchOptions searchOptions) throws ExecutionException {
+        try {
+            return getTenantAccessor().getEventInstanceService().deleteMessageAndDataInstanceOlderThanCreationDate(creationDate, buildQueryOptions(searchOptions, getTenantAccessor().getSearchEntitiesDescriptor().getSearchMessageInstanceDescriptor()));
+        } catch (SBonitaException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    /**
+     * Utility method to convert a SearchOptions into a QueryOptions
+     */
+    private <T extends PersistentObject> QueryOptions buildQueryOptions(SearchOptions searchOptions, SearchEntityDescriptor searchEntityDescriptor) {
+        if (searchOptions != null) {
+            final List<SearchFilter> filters = searchOptions.getFilters();
+
+            final List<FilterOption> filterOptions = new ArrayList<>(filters.size());
+            for (final SearchFilter filter : filters) {
+                final FilterOption option = searchEntityDescriptor.getEntityFilter(filter);
+                if (option != null) {// in case of a unknown filter on state
+                    filterOptions.add(option);
+                }
+            }
+
+            return new QueryOptions(searchOptions.getStartIndex(), searchOptions.getMaxResults(), Collections.emptyList(), filterOptions, null);
+        } else {
+            return QueryOptions.ALL_RESULTS;
+        }
+    }
+
     private void addMessageContent(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
             final ExpressionResolverService expressionResolverService, final Map<Expression, Expression> messageContent) throws SBonitaException {
         for (final Entry<Expression, Expression> entry : messageContent.entrySet()) {
@@ -6004,5 +6037,5 @@ public class ProcessAPIImpl implements ProcessAPI {
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         return processConfigurationAPI.getFormMapping(formMappingId);
     }
-    
+
 }

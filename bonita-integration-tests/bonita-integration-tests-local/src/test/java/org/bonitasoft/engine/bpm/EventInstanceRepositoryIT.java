@@ -30,7 +30,8 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
         transactionService.executeInTransaction(() -> {
             List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(System.currentTimeMillis(), new QueryOptions(0, 1000));
             System.out.println("ids" + messageInstanceIdOlderThanCreationDate);
-            return eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
+            eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
+            return null;
         });
     }
 
@@ -52,6 +53,27 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
     private SMessageInstance createMessageInstance(String myMessage) {
         return new SMessageInstance(myMessage, "targetProcess", "targetFlowNode", 12345L, "fnName");
+    }
+
+    @Test
+    public void should_get_older_message_with_creationDate_and_no_filters() throws Exception {
+        SMessageInstance myMessageNow = createMessageInstance("myMessage");
+        SMessageInstance myMessageOld2 = createMessageInstance("myMessage2");
+        SMessageInstance myMessageOld = createMessageInstance("myMessage");
+        myMessageOld2.setCreationDate(oneMinuteAgo);
+        myMessageOld.setCreationDate(oneMinuteAgo);
+
+
+        List<Long> ids = transactionService.executeInTransaction(() -> {
+            eventInstanceRepository.createMessageInstance(myMessageNow);
+            eventInstanceRepository.createMessageInstance(myMessageOld);
+            eventInstanceRepository.createMessageInstance(myMessageOld2);
+            return eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(oneMinuteAgo, null);
+
+        });
+        assertThat(ids).containsExactly(myMessageOld.getId(), myMessageOld2.getId());
+
+
     }
 
 
@@ -103,26 +125,6 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
     private SMessageInstance getMessageInstance(long id) throws Exception {
         return transactionService.executeInTransaction(() -> eventInstanceRepository.getMessageInstance(id));
-    }
-
-
-    @Test
-    public void should_get_older_message_without_filters() throws Exception {
-
-        SMessageInstance oldestMessage = createMessageInstance("myMessage");
-        long oneMinuteAgo = Instant.now().minusSeconds(60).toEpochMilli();
-        oldestMessage.setCreationDate(oneMinuteAgo);
-
-        SMessageInstance recentMessage = createMessageInstance("myMessage2");
-
-        List<Long> ids = transactionService.executeInTransaction(() -> {
-            eventInstanceRepository.createMessageInstance(oldestMessage);
-            eventInstanceRepository.createMessageInstance(recentMessage);
-            return eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(oneMinuteAgo, new QueryOptions(0, 100, SMessageInstance.class, "id", OrderByType.ASC));
-
-        });
-        assertThat(ids).containsExactly(oldestMessage.getId());
-
     }
 
 

@@ -1576,6 +1576,21 @@ public interface ProcessRuntimeAPI {
             Map<Expression, Expression> correlations) throws SendEventException;
 
     /**
+     * Delete messages until date and matching to search condition.
+     *
+     * @param creationDate
+     *        The date until the messages will be deleted.
+     * @param searchOptions
+     *       The optional search conditions for retrieve messages that will be removed.
+     * @return The number of message deleted
+     * @throws ExecutionException
+     *           If the deletion could not be completed correctly.
+     * @since 7.10
+     */
+
+    int deleteMessageByCreationDate(long creationDate, SearchOptions searchOptions) throws ExecutionException;
+
+    /**
      * Retrieve an <code>ArchivedProcessInstance</code> specified by its identifier.
      *
      * @param archivedProcessInstanceId

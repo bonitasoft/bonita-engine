@@ -54,6 +54,8 @@ public interface EventInstanceRepository {
 
     String MESSAGE_INSTANCE = "MESSAGE_INSTANCE";
 
+    int IN_REQUEST_SIZE = 100;
+
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;
 
     /**
@@ -127,7 +129,7 @@ public interface EventInstanceRepository {
 
     SMessageInstance getMessageInstance(long messageInstanceId) throws SMessageInstanceReadException;
 
-    int deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException;
+    void deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException;
 
     List<Long> getMessageInstanceIdOlderThanCreationDate(final long creationDate,
             QueryOptions queryOptions)

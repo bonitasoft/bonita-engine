@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import com.google.common.collect.Iterables;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -63,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.singletonMap;
 
@@ -87,8 +89,8 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
     private final TechnicalLoggerService logger;
 
     public EventInstanceRepositoryImpl(final Recorder recorder, final PersistenceService persistenceService,
-            final EventService eventService,
-            final TechnicalLoggerService logger, final ArchiveService archiveService) {
+                                       final EventService eventService,
+                                       final TechnicalLoggerService logger, final ArchiveService archiveService) {
 
         this.recorder = recorder;
         this.eventService = eventService;
@@ -174,7 +176,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public List<SBoundaryEventInstance> getActivityBoundaryEventInstances(final long activityInstanceId,
-            final int fromIndex, final int maxResults)
+                                                                          final int fromIndex, final int maxResults)
             throws SEventInstanceReadException {
         final SelectListDescriptor<SBoundaryEventInstance> selectDescriptor = SelectDescriptorBuilder
                 .getActivityBoundaryEvents(activityInstanceId, fromIndex,
@@ -220,8 +222,8 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public List<SEventInstance> getEventInstances(final long rootContainerId, final int fromIndex, final int maxResults,
-            final String fieldName,
-            final OrderByType orderByType) throws SEventInstanceReadException {
+                                                  final String fieldName,
+                                                  final OrderByType orderByType) throws SEventInstanceReadException {
         final SelectListDescriptor<SEventInstance> selectDescriptor = SelectDescriptorBuilder
                 .getEventsFromRootContainer(rootContainerId, fromIndex,
                         maxResults, fieldName, orderByType);
@@ -234,7 +236,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public <T extends STimerEventTriggerInstance> T getEventTriggerInstance(final Class<T> entityClass,
-            final long eventTriggerInstanceId)
+                                                                            final long eventTriggerInstanceId)
             throws SEventTriggerInstanceReadException {
         try {
             return persistenceService.selectById(
@@ -288,9 +290,13 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public List<Long> getMessageInstanceIdOlderThanCreationDate(final long creationDate,
-            QueryOptions queryOptions) throws SMessageInstanceReadException {
+                                                                QueryOptions queryOptions) throws SMessageInstanceReadException {
         try {
-            validateFiltersForGetMessage(queryOptions);
+            if (queryOptions != null) {
+                validateFiltersForGetMessage(queryOptions);
+            } else {
+                queryOptions = QueryOptions.ALL_RESULTS;
+            }
             final SelectListDescriptor<Long> selectDescriptor = SelectDescriptorBuilder
                     .getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
             return persistenceService.selectList(selectDescriptor);
@@ -303,30 +309,31 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
         List<FilterOption> notOkField = queryOptions.getFilters().stream().filter(filterOption -> filterOption.getFilterOperationType() != FilterOperationType.EQUALS
                 || !filterOption.getFieldName().equals("messageName")
                 || filterOption.getPersistentClass() != SMessageInstance.class).collect(Collectors.toList());
-        if(!notOkField.isEmpty()){
-            throw  new IllegalArgumentException("Unsupported filters  "+ notOkField  + ", can only filter on messageName");
+        if (!notOkField.isEmpty()) {
+            throw new IllegalArgumentException("Unsupported filters  " + notOkField + ", can only filter on messageName");
         }
 
     }
-
 
     @Override
-    public int deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("ids", ids);
-        try {
-            return persistenceService.update("deleteMessageInstanceByIds", parameters);
-        } catch (SPersistenceException e) {
-            throw new SMessageModificationException(e);
+    public void deleteMessageInstanceByIds(List<Long> ids) throws SMessageModificationException {
+        Iterable<List<Long>> listAsFragment = Iterables.partition(ids, IN_REQUEST_SIZE);
+        for (List<Long> fragmentIds : listAsFragment) {
+            try {
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("ids", fragmentIds);
+                persistenceService.update("deleteMessageInstanceByIds", parameters);
+            } catch (SPersistenceException e) {
+                throw new SMessageModificationException(e);
+            }
         }
+
     }
-
-
 
 
     @Override
     public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> entityClass,
-            final QueryOptions countOptions) throws SBonitaReadException {
+                                         final QueryOptions countOptions) throws SBonitaReadException {
         return persistenceService.getNumberOfEntities(entityClass, countOptions, null);
     }
 
@@ -363,7 +370,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
             throws SEventTriggerInstanceReadException {
         try {
             return persistenceService.selectList(new SelectListDescriptor<SWaitingEvent>("getWaitingEventsOfFlowNode",
-                    Collections.<String, Object> singletonMap("flowNodeInstanceId", flowNodeInstanceId),
+                    Collections.<String, Object>singletonMap("flowNodeInstanceId", flowNodeInstanceId),
                     SWaitingEvent.class, new QueryOptions(0, 100)));
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
@@ -372,7 +379,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public List<SWaitingSignalEvent> getWaitingSignalEvents(final String signalName, final int fromIndex,
-            final int maxResults)
+                                                            final int maxResults)
             throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SWaitingSignalEvent> descriptor = SelectDescriptorBuilder
                 .getListeningSignals(signalName, fromIndex, maxResults);
@@ -418,7 +425,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId,
-            final QueryOptions queryOptions)
+                                                                             final QueryOptions queryOptions)
             throws SBonitaReadException {
         final Map<String, Object> parameters = singletonMap("processInstanceId", processInstanceId);
         return persistenceService.searchEntity(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions,
@@ -427,7 +434,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> entityClass,
-            final QueryOptions searchOptions) throws SBonitaReadException {
+                                                                 final QueryOptions searchOptions) throws SBonitaReadException {
         return persistenceService.searchEntity(entityClass, searchOptions, null);
     }
 
@@ -443,7 +450,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public void updateWaitingMessage(final SWaitingMessageEvent waitingMessageEvent,
-            final EntityUpdateDescriptor descriptor)
+                                     final EntityUpdateDescriptor descriptor)
             throws SWaitingEventModificationException {
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(waitingMessageEvent, descriptor), MESSAGE_INSTANCE);
@@ -454,7 +461,7 @@ public class EventInstanceRepositoryImpl implements EventInstanceRepository {
 
     @Override
     public void updateEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance,
-            final EntityUpdateDescriptor descriptor)
+                                           final EntityUpdateDescriptor descriptor)
             throws SEventTriggerInstanceModificationException {
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(sTimerEventTriggerInstance, descriptor),
