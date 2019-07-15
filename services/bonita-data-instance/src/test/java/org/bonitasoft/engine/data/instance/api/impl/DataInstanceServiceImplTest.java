@@ -30,10 +30,10 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -105,20 +105,20 @@ public class DataInstanceServiceImplTest {
     @Test
     public final void should_archive_the_first_value_of_a_data_when_creating_it() throws Exception {
         //given
-        SShortTextDataInstanceImpl dataInstance = new SShortTextDataInstanceImpl();
+        SShortTextDataInstance dataInstance = new SShortTextDataInstance();
         dataInstance.setValue("theValue");
         //when
         dataInstanceServiceImpl.createDataInstance(dataInstance);
         //then
         verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
-        final SAShortTextDataInstanceImpl entity = (SAShortTextDataInstanceImpl) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue().getEntity();
         assertThat(entity.getValue()).isEqualTo("theValue");
     }
 
     @Test
     public final void should_archive_new_value_on_data_value_update() throws Exception {
         //given
-        SShortTextDataInstanceImpl dataInstance = new SShortTextDataInstanceImpl();
+        SShortTextDataInstance dataInstance = new SShortTextDataInstance();
         //set directly to "theNewValue" because the set is done by the persistence service
         dataInstance.setValue("theNewValue");
         EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
@@ -127,7 +127,7 @@ public class DataInstanceServiceImplTest {
         dataInstanceServiceImpl.updateDataInstance(dataInstance, updateDescriptor);
         //then
         verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
-        final SAShortTextDataInstanceImpl entity = (SAShortTextDataInstanceImpl) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        final SAShortTextDataInstance entity = (SAShortTextDataInstance) archiveInsertRecordArgumentCaptor.getValue().getEntity();
         assertThat(entity.getValue()).isEqualTo("theNewValue");
     }
 
@@ -177,8 +177,8 @@ public class DataInstanceServiceImplTest {
         assertThat(dataInstance.getValue()).isEqualTo("SUBTASK_VALUE");
     }
 
-    private SALongTextDataInstanceImpl createArchDataInstance(long id, long containerId, String containerType, long archiveDate, String value) {
-        SALongTextDataInstanceImpl dataInstance = new SALongTextDataInstanceImpl();
+    private SALongTextDataInstance createArchDataInstance(long id, long containerId, String containerType, long archiveDate, String value) {
+        SALongTextDataInstance dataInstance = new SALongTextDataInstance();
         dataInstance.setId(id);
         dataInstance.setContainerId(containerId);
         dataInstance.setContainerType(containerType);
@@ -187,8 +187,8 @@ public class DataInstanceServiceImplTest {
         return dataInstance;
     }
 
-    private SLongTextDataInstanceImpl createDataInstance(long id, long containerId, String containerType, String value) {
-        SLongTextDataInstanceImpl dataInstance = new SLongTextDataInstanceImpl();
+    private SLongTextDataInstance createDataInstance(long id, long containerId, String containerType, String value) {
+        SLongTextDataInstance dataInstance = new SLongTextDataInstance();
         dataInstance.setId(id);
         dataInstance.setContainerId(containerId);
         dataInstance.setContainerType(containerType);

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.home.BonitaResource;
@@ -35,7 +35,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -49,16 +48,15 @@ public abstract class AbstractDependencyService implements DependencyService {
         this.persistenceService = persistenceService;
     }
 
-    protected abstract void delete(SDependency dependency) throws SDependencyDeletionException;
+    protected abstract void delete(AbstractSDependency dependency) throws SDependencyDeletionException;
 
-    protected abstract List<SDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException;
+    protected abstract List<AbstractSDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException;
 
-    protected abstract SDependency getDependency(String name) throws SDependencyNotFoundException, SDependencyDeletionException;
+    protected abstract AbstractSDependency getDependency(String name) throws SDependencyNotFoundException, SDependencyDeletionException;
 
     @Override
     public void deleteDependency(final String name) throws SDependencyException {
-        final SDependency sDependency = getDependency(name);
-        deleteDependency(sDependency);
+        deleteDependency(getDependency(name));
     }
 
 
@@ -104,7 +102,7 @@ public abstract class AbstractDependencyService implements DependencyService {
     protected abstract QueryOptions getDefaultQueryOptionForDependencyMapping();
 
     @Override
-    public void deleteDependency(final SDependency dependency) throws SDependencyException {
+    public void deleteDependency(final AbstractSDependency dependency) throws SDependencyException {
         for (SDependencyMapping dependencyMapping : getDependencyMappings(dependency.getId(), getDefaultQueryOptionForDependencyMapping())) {
             deleteDependencyMapping(dependencyMapping);
         }

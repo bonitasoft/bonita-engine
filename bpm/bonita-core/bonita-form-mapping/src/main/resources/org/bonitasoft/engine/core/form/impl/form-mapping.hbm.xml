@@ -15,13 +15,13 @@
   ~-->
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.form.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.form">
 
     <filter-def name="tenantFilter" condition=":tenantId = tenantid">
         <filter-param name="tenantid" type="long" />
     </filter-def>
 
-    <class name="SFormMappingImpl" table="form_mapping">
+    <class name="SFormMapping" table="form_mapping">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -33,7 +33,7 @@
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
         <property name="target" type="string" column="target" />
 
-        <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.impl.SPageMappingImpl" update="true" fetch="join" lazy="false">
+        <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.SPageMapping" update="true" fetch="join" lazy="false">
             <column name="page_mapping_tenant_id" />
             <column name="page_mapping_id" />
         </many-to-one>

@@ -31,6 +31,7 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
 import org.bonitasoft.engine.business.data.generator.client.ClientBDMJarBuilder;
@@ -39,14 +40,13 @@ import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
 import org.bonitasoft.engine.business.data.generator.filter.OnlyDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.filter.WithoutDAOImplementationFileFilter;
 import org.bonitasoft.engine.business.data.generator.server.ServerBDMJarBuilder;
-import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -160,7 +160,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar,
+            final AbstractSDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar,
                     BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             //refresh classloader now, it is used to update the schema

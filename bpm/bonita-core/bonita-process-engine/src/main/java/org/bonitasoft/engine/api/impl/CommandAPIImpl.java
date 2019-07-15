@@ -42,7 +42,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.SCommandUpdateException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderFactory;
@@ -124,8 +123,10 @@ public class CommandAPIImpl implements CommandAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
-        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
-        final SCommand sCommand = fact.createNewInstance(name, description, implementation).setSystem(false).done();
+        final SCommand sCommand = SCommand.builder()
+                .name(name)
+                .description(description)
+                .implementation(implementation).isSystem(false).build();
         try {
             commandService.create(sCommand);
             return ModelConvertor.toCommandDescriptor(sCommand);

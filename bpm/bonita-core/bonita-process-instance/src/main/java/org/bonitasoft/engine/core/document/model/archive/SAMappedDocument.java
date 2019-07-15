@@ -13,10 +13,29 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SAMappedDocument extends SADocumentMapping, SMappedDocument {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAMappedDocument extends SMappedDocument implements ArchivedPersistentObject {
+
+    private long archiveDate;
+    private long sourceObjectId;
+
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SMappedDocument.class;
+    }
+
+
 }

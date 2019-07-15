@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.document.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.document.model">
 
     <filter-def name="tenantFilter" condition=":tenantId = tenantid">
         <filter-param name="tenantId" type="long"/>
     </filter-def>
 
-    <class name="SDocumentMappingImpl" table="document_mapping" polymorphism="explicit">
+    <class name="SDocumentMapping" table="document_mapping" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="id" type="long"/>
@@ -21,7 +21,7 @@
         <filter name="tenantFilter"/>
     </class>
 
-    <class name="SLightDocumentImpl" table="document" polymorphism="explicit">
+    <class name="SLightDocument" table="document" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="id" type="long"/>
@@ -35,7 +35,7 @@
         <filter name="tenantFilter"/>
     </class>
 
-    <class name="SDocumentImpl" table="document" polymorphism="explicit">
+    <class name="SDocument" table="document" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="id" type="long"/>
@@ -52,7 +52,7 @@
 
 
 
-    <class name="SMappedDocumentImpl" table="document_mapping" polymorphism="explicit">
+    <class name="SMappedDocument" table="document_mapping" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="id" type="long"/>
@@ -63,7 +63,7 @@
         <property name="description" type="string" column="description"/>
         <property name="version" type="string" column="version"/>
         <property name="index" type="int" column="index_"/>
-        <many-to-one name="document" class="SLightDocumentImpl" insert="false" update="false" lazy="false">
+        <many-to-one name="document" class="SLightDocument" insert="false" update="false" lazy="false">
             <column name="tenantid"/>
             <column name="documentid"/>
         </many-to-one>

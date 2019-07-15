@@ -20,9 +20,9 @@ import java.util.Random;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.dependency.model.DependencyContent;
+import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 import org.bonitasoft.engine.test.persistence.repository.DependencyRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,15 +41,15 @@ public class DependencyServiceQueriesTest {
     @Inject
     private DependencyRepository repository;
 
-    private static SDependencyImpl createDependency(final String fileName, Long tenantId) {
-        SDependencyImpl dependency = new SDependencyImpl(getSaltString(), fileName, "toutou".getBytes());
+    private static SDependency createDependency(final String fileName, Long tenantId) {
+        SDependency dependency = new SDependency(getSaltString(), fileName, "toutou".getBytes());
         dependency.setId(new Random().nextLong());
         dependency.setTenantId(tenantId);
         return dependency;
     }
 
-    private static SDependencyMappingImpl createDependencyMapping(Long artifactId, Long id, Long tenantId) {
-        SDependencyMappingImpl dependencyMapping = new SDependencyMappingImpl(artifactId, ScopeType.TENANT, id);
+    private static SDependencyMapping createDependencyMapping(Long artifactId, Long id, Long tenantId) {
+        SDependencyMapping dependencyMapping = new SDependencyMapping(artifactId, ScopeType.TENANT, id);
         dependencyMapping.setTenantId(tenantId);
         return dependencyMapping;
     }
@@ -69,7 +69,7 @@ public class DependencyServiceQueriesTest {
     public void should_retrieve_the_correct_dependencyId_from_tenant_and_filename() {
 
         //given
-        SDependencyImpl resource_to_retrieve = (SDependencyImpl) repository.add(createDependency("aFileName.zip", 1L));
+        SDependency resource_to_retrieve = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
 
         repository.add(createDependency("file.lst", 1L));
 
@@ -86,7 +86,7 @@ public class DependencyServiceQueriesTest {
     public void should_retrieve_nothing_when_BDM_not_deployed() {
 
         //given
-        SDependencyImpl resource_to_not_retrieve = (SDependencyImpl) repository.add(createDependency("aFileName.zip", 1L));
+        SDependency resource_to_not_retrieve = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
 
         repository.add(createDependencyMapping(666L, resource_to_not_retrieve.getId(), 1L));
 
@@ -112,7 +112,7 @@ public class DependencyServiceQueriesTest {
     @Test
     public void should_retrieve_dependency_content_only_using_disconnected_objects() throws Exception {
         // given:
-        SDependencyImpl aDependency = (SDependencyImpl) repository.add(createDependency("aFileName.zip", 1L));
+        SDependency aDependency = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
 
         // when:
         DependencyContent dependencyContentOnly = repository.getDependencyContentOnly(aDependency.getId());

@@ -19,9 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
-import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -36,17 +34,16 @@ public class SearchCommentDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> commentAllFields;
 
     public SearchCommentDescriptor() {
-        final SHumanCommentBuilderFactory sCommentBuilderFact = BuilderFactory.get(SHumanCommentBuilderFactory.class);
-        commentKeys = new HashMap<String, FieldDescriptor>(5);
-        commentKeys.put(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SComment.class, sCommentBuilderFact.getProcessInstanceIdKey()));
-        commentKeys.put(SearchCommentsDescriptor.POSTED_BY_ID, new FieldDescriptor(SComment.class, sCommentBuilderFact.getUserIdKey()));
-        commentKeys.put(SearchCommentsDescriptor.ID, new FieldDescriptor(SComment.class, sCommentBuilderFact.getIdKey()));
-        commentKeys.put(SearchCommentsDescriptor.POSTDATE, new FieldDescriptor(SComment.class, sCommentBuilderFact.getPostDateKey()));
-        commentKeys.put(SearchCommentsDescriptor.CONTENT, new FieldDescriptor(SComment.class, sCommentBuilderFact.getContentKey()));
+        commentKeys = new HashMap<>();
+        commentKeys.put(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SComment.class, SComment.PROCESSINSTANCEID_KEY));
+        commentKeys.put(SearchCommentsDescriptor.POSTED_BY_ID, new FieldDescriptor(SComment.class, SComment.USERID_KEY));
+        commentKeys.put(SearchCommentsDescriptor.ID, new FieldDescriptor(SComment.class, SComment.ID_KEY));
+        commentKeys.put(SearchCommentsDescriptor.POSTDATE, new FieldDescriptor(SComment.class, SComment.POSTDATE_KEY));
+        commentKeys.put(SearchCommentsDescriptor.CONTENT, new FieldDescriptor(SComment.class, SComment.CONTENT_KEY));
         commentKeys.put(SearchCommentsDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
-        commentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> commentFields = new HashSet<String>(1);
-        commentFields.add(sCommentBuilderFact.getContentKey());
+        commentAllFields = new HashMap<>();
+        final Set<String> commentFields = new HashSet<>();
+        commentFields.add(SComment.CONTENT_KEY);
         commentAllFields.put(SComment.class, commentFields);
     }
 

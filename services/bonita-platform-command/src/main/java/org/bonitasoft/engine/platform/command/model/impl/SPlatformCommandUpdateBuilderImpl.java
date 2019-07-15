@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.platform.command.model.impl;
 
+import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommandUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -30,13 +31,13 @@ public class SPlatformCommandUpdateBuilderImpl implements SPlatformCommandUpdate
 
     @Override
     public SPlatformCommandUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SPlatformCommandBuilderFactoryImpl.NAME, name);
+        this.descriptor.addField(SPlatformCommand.NAME, name);
         return this;
     }
 
     @Override
     public SPlatformCommandUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SPlatformCommandBuilderFactoryImpl.DESCRIPTION, description);
+        this.descriptor.addField(SPlatformCommand.DESCRIPTION, description);
         return this;
     }
 

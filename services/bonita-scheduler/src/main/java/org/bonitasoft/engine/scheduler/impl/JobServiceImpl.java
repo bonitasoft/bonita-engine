@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -41,7 +40,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
@@ -57,9 +55,6 @@ import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 
 /**
@@ -93,7 +88,7 @@ public class JobServiceImpl implements JobService {
         }
 
         // Set the tenant manually on the object because it will be serialized
-        final SJobDescriptorImpl sJobDescriptorToRecord = new SJobDescriptorImpl(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
+        final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
                 sJobDescriptor.getDescription(), sJobDescriptor.disallowConcurrentExecution());
         sJobDescriptorToRecord.setTenantId(tenantId);
 
@@ -191,8 +186,9 @@ public class JobServiceImpl implements JobService {
         }
 
         // Set the tenant manually on the object because it will be serialized
-        final SJobParameterImpl sJobParameterToRecord = (SJobParameterImpl) BuilderFactory.get(SJobParameterBuilderFactory.class)
-                .createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(jobDescriptorId).done();
+        final SJobParameter sJobParameterToRecord = SJobParameter.builder()
+                .key(sJobParameter.getKey())
+                .value(sJobParameter.getValue()).jobDescriptorId(jobDescriptorId).build();
         sJobParameterToRecord.setTenantId(tenantId);
 
         try {
@@ -384,7 +380,7 @@ public class JobServiceImpl implements JobService {
     public void createJobLog(final Throwable jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
         SJobDescriptor jobDescriptor = getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null) {
-            final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
+            final SJobLog jobLog = new SJobLog(jobDescriptorId);
             jobLog.setLastMessage(getStackTrace(jobException));
             jobLog.setRetryNumber(0L);
             jobLog.setLastUpdateDate(System.currentTimeMillis());

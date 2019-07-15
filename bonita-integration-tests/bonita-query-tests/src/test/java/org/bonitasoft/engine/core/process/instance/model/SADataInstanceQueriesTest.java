@@ -21,7 +21,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
 import org.bonitasoft.engine.test.persistence.repository.SADataInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ public class SADataInstanceQueriesTest {
     private SADataInstanceRepository repository;
 
     private void addSADataInstance(final int id, final String name, final int containerId, final String value, final long archiveDate, final long sourceObjectId) {
-        final SAShortTextDataInstanceImpl dataInstance = new SAShortTextDataInstanceImpl();
+        final SAShortTextDataInstance dataInstance = new SAShortTextDataInstance();
         dataInstance.setTenantId(1);
         dataInstance.setId(id);
         dataInstance.setName(name);

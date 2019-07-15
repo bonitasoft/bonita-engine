@@ -13,9 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SAActivityInstance extends SAFlowNodeInstance {
-
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SAActivityInstance extends SAFlowNodeInstance {
+    public SAActivityInstance(final SActivityInstance activityInstance) {
+        super(activityInstance);
+    }
 }

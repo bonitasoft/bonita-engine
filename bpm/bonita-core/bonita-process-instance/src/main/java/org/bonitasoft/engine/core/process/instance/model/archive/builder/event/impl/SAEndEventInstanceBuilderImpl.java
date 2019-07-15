@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.event.
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.event.SAEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SAEndEventInstanceBuilderImpl implements SAEndEventInstanceBuilder {
 
-    private final SAEndEventInstanceImpl entity;
+    private final SAEndEventInstance entity;
     
-    public SAEndEventInstanceBuilderImpl(final SAEndEventInstanceImpl entity) {
+    public SAEndEventInstanceBuilderImpl(final SAEndEventInstance entity) {
         super();
         this.entity = entity;
     }

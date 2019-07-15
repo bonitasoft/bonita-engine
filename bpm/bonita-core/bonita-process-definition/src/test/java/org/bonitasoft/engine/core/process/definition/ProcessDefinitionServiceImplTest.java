@@ -43,8 +43,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -105,14 +103,14 @@ public class ProcessDefinitionServiceImplTest {
     @InjectMocks
     @Spy
     private ProcessDefinitionServiceImpl processDefinitionServiceImpl;
-    private SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfo;
+    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
     private DesignProcessDefinition designProcessDefinition;
 
     @Before
     public void before() throws SProcessDefinitionNotFoundException, SBonitaReadException, IOException {
-        sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfoImpl();
+        sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
         sProcessDefinitionDeployInfo.setId(PROCESS_DEFINITION_DEPLOY_ID);
-        final SProcessDefinitionDesignContentImpl designContent = new SProcessDefinitionDesignContentImpl();
+        final SProcessDefinitionDesignContent designContent = new SProcessDefinitionDesignContent();
         designContent.setContent(THE_PROCESS_XML_CONTENT);
         sProcessDefinitionDeployInfo.setDesignContent(designContent);
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(PROCESS_ID);
@@ -1677,7 +1675,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test
     public void getLatestProcessDefinitionId_should_query_processes_order_by_deploymentDate_DESC() throws Exception {
         // given:
-        final List<SProcessDefinitionDeployInfo> processes = Collections.<SProcessDefinitionDeployInfo>singletonList(new SProcessDefinitionDeployInfoImpl());
+        final List<SProcessDefinitionDeployInfo> processes = Collections.<SProcessDefinitionDeployInfo>singletonList(new SProcessDefinitionDeployInfo());
         doReturn(processes).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>>any());
 
         // when:

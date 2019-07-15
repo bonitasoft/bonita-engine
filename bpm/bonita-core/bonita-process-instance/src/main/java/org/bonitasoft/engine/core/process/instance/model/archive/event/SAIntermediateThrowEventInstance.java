@@ -13,9 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Celine Souchet
- */
-public interface SAIntermediateThrowEventInstance extends SAThrowEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAIntermediateThrowEventInstance extends SAThrowEventInstance {
+    public SAIntermediateThrowEventInstance(final SIntermediateThrowEventInstance sIntermediateThrowEventInstance) {
+        super(sIntermediateThrowEventInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.INTERMEDIATE_THROW_EVENT;
+    }
+
+    @Override
+    public String getKind() {
+        return "intermediateThrowEvent";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SIntermediateThrowEventInstance.class;
+    }
 
 }

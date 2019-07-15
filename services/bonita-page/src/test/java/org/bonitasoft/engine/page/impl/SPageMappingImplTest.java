@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
+import org.bonitasoft.engine.page.SPageMapping;
 import org.junit.Test;
 
 /**
@@ -27,8 +28,8 @@ public class SPageMappingImplTest {
 
     @Test
     public void testEquals() throws Exception {
-        SPageMappingImpl sPageMapping1 = new SPageMappingImpl();
-        SPageMappingImpl sPageMapping2 = new SPageMappingImpl();
+        SPageMapping sPageMapping1 = new SPageMapping();
+        SPageMapping sPageMapping2 = new SPageMapping();
 
         setValues(sPageMapping1, sPageMapping2);
 
@@ -38,8 +39,8 @@ public class SPageMappingImplTest {
 
     @Test
     public void testHashCode() throws Exception {
-        SPageMappingImpl sPageMapping1 = new SPageMappingImpl();
-        SPageMappingImpl sPageMapping2 = new SPageMappingImpl();
+        SPageMapping sPageMapping1 = new SPageMapping();
+        SPageMapping sPageMapping2 = new SPageMapping();
 
         setValues(sPageMapping1, sPageMapping2);
 
@@ -49,8 +50,8 @@ public class SPageMappingImplTest {
 
     @Test
     public void testToString() throws Exception {
-        SPageMappingImpl sPageMapping1 = new SPageMappingImpl();
-        SPageMappingImpl sPageMapping2 = new SPageMappingImpl();
+        SPageMapping sPageMapping1 = new SPageMapping();
+        SPageMapping sPageMapping2 = new SPageMapping();
 
         setValues(sPageMapping1, sPageMapping2);
 
@@ -58,7 +59,7 @@ public class SPageMappingImplTest {
 
     }
 
-    void setValues(SPageMappingImpl sPageMapping1, SPageMappingImpl sPageMapping2) {
+    void setValues(SPageMapping sPageMapping1, SPageMapping sPageMapping2) {
         sPageMapping1.setKey("myKey");
         sPageMapping1.setUrlAdapter("urlAdapter");
         sPageMapping1.setPageAuthorizRules("net.comp.Rule");
@@ -73,14 +74,14 @@ public class SPageMappingImplTest {
 
     @Test
     public void parseRulesShouldSetListOfRules() throws Exception {
-        SPageMappingImpl mapping = new SPageMappingImpl();
+        SPageMapping mapping = new SPageMapping();
         mapping.setPageAuthorizRules(",,toto,titi,tutu,");
         assertThat(mapping.getPageAuthorizationRules()).containsExactly("toto", "titi", "tutu");
     }
 
     @Test
     public void buildRulesAsStringShouldConcatRulesWithComma() throws Exception {
-        SPageMappingImpl mapping = new SPageMappingImpl();
+        SPageMapping mapping = new SPageMapping();
         mapping.setPageAuthorizationRules(Arrays.asList("toto", "titi", "tata"));
         assertThat(mapping.getPageAuthorizRules()).contains("toto,titi,tata");
     }

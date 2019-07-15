@@ -28,8 +28,7 @@ import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,13 +110,13 @@ public class ProcessDeploymentInfoQueriesTest {
     }
 
     protected void buildAndCreateProcessDefinition(final long id, long processDefinitionId, final String processName) {
-        final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
-        sProcessDefinitionDeployInfoImpl.setId(id);
-        sProcessDefinitionDeployInfoImpl.setName(processName);
-        sProcessDefinitionDeployInfoImpl.setVersion("version");
-        sProcessDefinitionDeployInfoImpl.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfoImpl.setTenantId(1L);
-        repository.add(sProcessDefinitionDeployInfoImpl);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
+        sProcessDefinitionDeployInfo.setId(id);
+        sProcessDefinitionDeployInfo.setName(processName);
+        sProcessDefinitionDeployInfo.setVersion("version");
+        sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
+        sProcessDefinitionDeployInfo.setTenantId(1L);
+        repository.add(sProcessDefinitionDeployInfo);
     }
 
     // For
@@ -564,9 +563,9 @@ public class ProcessDeploymentInfoQueriesTest {
     }
 
     private void buildAndAddSupervisorMappedToUser() {
-        repository.add(new SProcessSupervisorImpl(3, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN, JOHN_ID, -1, -1));
-        repository.add(new SProcessSupervisorImpl(4, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS, JOHN_ID, -1, -1));
-        repository.add(new SProcessSupervisorImpl(5, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB, BOB_ID, -1, -1));
+        repository.add(new SProcessSupervisor(3, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN, JOHN_ID, -1, -1));
+        repository.add(new SProcessSupervisor(4, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS, JOHN_ID, -1, -1));
+        repository.add(new SProcessSupervisor(5, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB, BOB_ID, -1, -1));
     }
 
     private void buildAndAddSupervisorMappedToUserMembershipMappedToUser() {
@@ -574,9 +573,9 @@ public class ProcessDeploymentInfoQueriesTest {
         repository.add(aUserMembership().forUser(JOHN_ID).memberOf(GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, roleId).build());
         repository.add(aUserMembership().forUser(BOB_ID).memberOf(GROUP_FOR_SUPERVISOR_FOR_BOB_ID, roleId).build());
 
-        repository.add(new SProcessSupervisorImpl(3, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
-        repository.add(new SProcessSupervisorImpl(4, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
-        repository.add(new SProcessSupervisorImpl(5, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB, -1, GROUP_FOR_SUPERVISOR_FOR_BOB_ID, -1));
+        repository.add(new SProcessSupervisor(3, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
+        repository.add(new SProcessSupervisor(4, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
+        repository.add(new SProcessSupervisor(5, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB, -1, GROUP_FOR_SUPERVISOR_FOR_BOB_ID, -1));
     }
 
     private void buildAndAddAssignedTasks() {
@@ -707,14 +706,14 @@ public class ProcessDeploymentInfoQueriesTest {
 
     protected void buildAndCreateProcessDefinition(final long id, long processDefinitionId, final String processName, String processVersion,
                                                    String activationState) {
-        final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
-        sProcessDefinitionDeployInfoImpl.setId(id);
-        sProcessDefinitionDeployInfoImpl.setName(processName);
-        sProcessDefinitionDeployInfoImpl.setVersion(processVersion);
-        sProcessDefinitionDeployInfoImpl.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfoImpl.setTenantId(1L);
-        sProcessDefinitionDeployInfoImpl.setActivationState(activationState);
-        repository.add(sProcessDefinitionDeployInfoImpl);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
+        sProcessDefinitionDeployInfo.setId(id);
+        sProcessDefinitionDeployInfo.setName(processName);
+        sProcessDefinitionDeployInfo.setVersion(processVersion);
+        sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
+        sProcessDefinitionDeployInfo.setTenantId(1L);
+        sProcessDefinitionDeployInfo.setActivationState(activationState);
+        repository.add(sProcessDefinitionDeployInfo);
     }
 
     @Test

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.document.model.builder.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -30,13 +31,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SDocumentBuilderFactoryImplTest {
 
     @InjectMocks
-    private SDocumentBuilderFactoryImpl sDocumentBuilderFactoryImpl;
+    private SDocumentBuilderFactory sDocumentBuilderFactory;
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.document.model.builder.impl.SDocumentBuilderFactoryImpl#createNewProcessDocument(java.lang.String, java.lang.String, long, byte[])}
-     * .
-     */
+
     @Test(expected = IllegalArgumentException.class)
     public final void createNewProcessDocument_should_throw_exception_if_no_file_name() {
         // Given
@@ -46,7 +43,7 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = "content".getBytes();
 
         // When
-        sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        sDocumentBuilderFactory.createNewProcessDocument(fileName, mimeType, authorId, content);
     }
 
     /**
@@ -61,7 +58,7 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = "content".getBytes();
 
         // When
-        sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        sDocumentBuilderFactory.createNewProcessDocument(fileName, mimeType, authorId, content);
     }
 
     @Test
@@ -73,7 +70,7 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = null;
 
         // When
-        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactory.createNewProcessDocument(fileName, mimeType, authorId, content);
 
         // then
         assertThat(newProcessDocument).isNotNull();
@@ -91,7 +88,7 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = "".getBytes();
 
         // When
-        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactory.createNewProcessDocument(fileName, mimeType, authorId, content);
 
         // then
         assertThat(newProcessDocument).isNotNull();

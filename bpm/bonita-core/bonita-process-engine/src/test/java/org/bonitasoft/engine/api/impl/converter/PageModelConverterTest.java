@@ -11,7 +11,6 @@ import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.junit.Test;
 
 public class PageModelConverterTest {
@@ -98,7 +97,7 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         sPage.setContentType(SContentType.FORM);
@@ -124,7 +123,7 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage_with_no_processDefinitionId() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         //when
@@ -137,7 +136,7 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage_list() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         List<SPage> sPages = new ArrayList<>();

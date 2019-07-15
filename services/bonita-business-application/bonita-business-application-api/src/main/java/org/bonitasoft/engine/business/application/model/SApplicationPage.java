@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 
@@ -20,12 +24,27 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Elias Ricken de Medeiros
  *
  */
-public interface SApplicationPage extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SApplicationPage implements PersistentObject {
 
-    long getApplicationId();
+    public static final String ID = "id";
+    public static final String TOKEN = "token";
+    public static final String PAGE_ID = "pageId";
+    public static final String APPLICATION_ID = "applicationId";
+    private long id;
+    private long tenantId;
+    private long applicationId;
+    private long pageId;
+    private String token;
 
-    long getPageId();
-
-    String getToken();
+    public SApplicationPage(final long applicationId, final long pageId, final String token) {
+        super();
+        this.applicationId = applicationId;
+        this.pageId = pageId;
+        this.token = token;
+    }
 
 }

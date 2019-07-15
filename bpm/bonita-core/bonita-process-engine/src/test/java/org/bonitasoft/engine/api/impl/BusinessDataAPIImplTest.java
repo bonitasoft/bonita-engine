@@ -28,8 +28,6 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -59,7 +57,7 @@ public class BusinessDataAPIImplTest {
     }
 
     private SProcessSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String name, final String dataClassName, final Long dataId) {
-        final SProcessSimpleRefBusinessDataInstanceImpl reference = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SProcessSimpleRefBusinessDataInstance reference = new SProcessSimpleRefBusinessDataInstance();
         reference.setId(64645L);
         reference.setName(name);
         reference.setDataClassName(dataClassName);
@@ -68,7 +66,7 @@ public class BusinessDataAPIImplTest {
     }
 
     private SProcessMultiRefBusinessDataInstance buildMultiRefBusinessData(final String name, final String dataClassName, final List<Long> dataIds) {
-        final SProcessMultiRefBusinessDataInstanceImpl reference = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance reference = new SProcessMultiRefBusinessDataInstance();
         reference.setId(64645L);
         reference.setName(name);
         reference.setDataClassName(dataClassName);

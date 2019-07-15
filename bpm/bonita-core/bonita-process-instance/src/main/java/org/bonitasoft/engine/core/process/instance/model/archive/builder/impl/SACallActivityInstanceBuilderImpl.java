@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SACallActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SACallActivityInstanceBuilder {
 
-    public SACallActivityInstanceBuilderImpl(final SACallActivityInstanceImpl entity) {
+    public SACallActivityInstanceBuilderImpl(final SACallActivityInstance entity) {
         super(entity);
     }
 

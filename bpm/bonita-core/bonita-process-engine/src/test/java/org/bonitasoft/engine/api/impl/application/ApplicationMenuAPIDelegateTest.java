@@ -30,7 +30,6 @@ import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -135,7 +134,7 @@ public class ApplicationMenuAPIDelegateTest {
             throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        final SApplicationMenu sAppMenu = new SApplicationMenu("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         given(applicationService.getNextAvailableIndex(null)).willReturn(5);
         given(convertor.buildSApplicationMenu(creator, 5)).willReturn(sAppMenu);
@@ -154,7 +153,7 @@ public class ApplicationMenuAPIDelegateTest {
     public void createApplicationMenu_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        final SApplicationMenu sAppMenu = new SApplicationMenu("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         given(applicationService.getNextAvailableIndex(null)).willReturn(1);
         given(convertor.buildSApplicationMenu(creator, 1)).willReturn(sAppMenu);
         given(applicationService.createApplicationMenu(sAppMenu)).willThrow(new SObjectCreationException());
@@ -232,7 +231,7 @@ public class ApplicationMenuAPIDelegateTest {
     @Test
     public void getApplicationMenu_should_return_result_of_applicationService() throws Exception {
         //given
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        final SApplicationMenu sAppMenu = new SApplicationMenu("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         given(applicationService.getApplicationMenu(10)).willReturn(sAppMenu);
         given(convertor.toApplicationMenu(sAppMenu)).willReturn(appMenu);

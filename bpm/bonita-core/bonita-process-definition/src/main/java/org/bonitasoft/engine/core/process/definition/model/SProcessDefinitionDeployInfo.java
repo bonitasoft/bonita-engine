@@ -13,52 +13,47 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- * @author Yanyan Liu
- * @author Hongwen Zang
- * @author Celine Souchet
- */
-public interface SProcessDefinitionDeployInfo extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SProcessDefinitionDeployInfo implements PersistentObject {
 
-    long getProcessId();
-
-    String getName();
-
-    String getVersion();
-
-    String getDescription();
-
-    long getDeploymentDate();
-
-    long getDeployedBy();
-
-    long getSupervisorId();
-
-    String getDisplayName();
-
-    /**
-     * Get the dates of the last time execute update statement
-     *
-     * @return date of the last time execute update statement
-     */
-    long getLastUpdateDate();
-
-    String getIconPath();
-
-    String getDisplayDescription();
-
-    /**
-     * @return the Configuration State
-     */
-    String getConfigurationState();
-
-    /**
-     * @return Activation State
-     */
-    String getActivationState();
-
-    SProcessDefinitionDesignContent getDesignContent();
+    public static final String DESCRIPTION = "description";
+    public static final String ID_KEY = "id";
+    public static final String NAME_KEY = "name";
+    public static final String VERSION_KEY = "version";
+    public static final String DEPLOYMENT_DATE_KEY = "deploymentDate";
+    public static final String DEPLOYED_BY_KEY = "deployedBy";
+    public static final String ACTIVATION_STATE_KEY = "activationState";
+    public static final String CONFIGURATION_STATE_KEY = "configurationState";
+    public static final String PROCESS_ID_KEY = "processId";
+    public static final String DISPLAY_NAME_KEY = "displayName";
+    public static final String DISPLAY_DESCRIPTION_KEY = "displayDescription";
+    public static final String LAST_UPDATE_DATE_KEY = "lastUpdateDate";
+    public static final String ICON_PATH = "iconPath";
+    public static final String DESIGN_CONTENT = "designContent.content";
+    public static final String LABEL = "label";
+    private String name;
+    private long id;
+    private long deploymentDate;
+    private long deployedBy;
+    private String version;
+    private String description;
+    private String configurationState;
+    private String activationState;
+    private long tenantId;
+    private long processId;
+    private long supervisorId;
+    private String displayName;
+    private long lastUpdateDate;
+    private String iconPath;
+    private String displayDescription;
+    private SProcessDefinitionDesignContent designContent;
 }

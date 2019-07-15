@@ -22,8 +22,6 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorDeletionException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorBuilder;
-import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.impl.transaction.actor.ExportActorMapping;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
@@ -34,7 +32,6 @@ import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.Problem.Level;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
@@ -67,23 +64,19 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
     @Override
     public boolean deploy(final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
             throws ActorMappingImportException {
-        BuilderFactory.getInstance();
-        final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.get(SActorBuilderFactory.class);
         final Set<SActorDefinition> actors = processDefinition.getActors();
         final Set<SActor> sActors = new HashSet<>(actors.size() + 1);
         final SActorDefinition actorInitiator = processDefinition.getActorInitiator();
         String initiatorName = null;
         if (actorInitiator != null) {
             initiatorName = actorInitiator.getName();
-            final SActorBuilder sActorBuilder = sActorBuilderFactory.create(initiatorName, processDefinition.getId(), true);
-            sActorBuilder.addDescription(actorInitiator.getDescription());
-            sActors.add(sActorBuilder.getActor());
+            sActors.add(SActor.builder().name(initiatorName).scopeId(processDefinition.getId()).initiator(true)
+            .description(actorInitiator.getDescription()).build());
         }
         for (final SActorDefinition actor : actors) {
             if (initiatorName == null || !initiatorName.equals(actor.getName())) {
-                final SActorBuilder sActorBuilder = sActorBuilderFactory.create(actor.getName(), processDefinition.getId(), false);
-                sActorBuilder.addDescription(actor.getDescription());
-                sActors.add(sActorBuilder.getActor());
+                sActors.add((SActor.builder().name(actor.getName()).scopeId(processDefinition.getId()).initiator(false)
+                        .description(actor.getDescription())).build());
             }
         }
         try {

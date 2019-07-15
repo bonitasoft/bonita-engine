@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMultiInstanceActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMultiInstanceActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SAMultiInstanceActivityInstanceBuilderFactoryImpl extends SAActivit
 
     @Override
     public SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(final SMultiInstanceActivityInstance sMultiActivityInstance) {
-        final SAMultiInstanceActivityInstanceImpl entity = new SAMultiInstanceActivityInstanceImpl(sMultiActivityInstance);
+        final SAMultiInstanceActivityInstance entity = new SAMultiInstanceActivityInstance(sMultiActivityInstance);
         return new SAMultiInstanceActivityInstanceBuilderImpl(entity);
     }
 }

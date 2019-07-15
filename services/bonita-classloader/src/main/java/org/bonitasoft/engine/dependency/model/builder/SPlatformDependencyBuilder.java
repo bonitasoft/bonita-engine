@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder;
 
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 
 public interface SPlatformDependencyBuilder {
 
     SPlatformDependencyBuilder setDescription(final String description);
 
-    SDependency done();
+    SPlatformDependency done();
 
 }

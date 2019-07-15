@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,7 +34,7 @@ public class SAXMLDataInstanceImplTest {
     public void SAXMLDataInstanceImpl_should_return_given_value() {
         //given
         final Serializable givenValue = new String("serializable value");
-        final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl(dataInstance);
+        final SAXMLDataInstance sxmlObjectDataInstanceImpl = new SAXMLDataInstance(dataInstance);
 
         //when
         sxmlObjectDataInstanceImpl.setValue(givenValue);
@@ -46,7 +47,7 @@ public class SAXMLDataInstanceImplTest {
     @Test
     public void SAXMLDataInstanceImpl_should_return_null_when_no_given_value() {
         //given
-        final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl(dataInstance);
+        final SAXMLDataInstance sxmlObjectDataInstanceImpl = new SAXMLDataInstance(dataInstance);
 
         //when
         final Serializable returnedValue = sxmlObjectDataInstanceImpl.getValue();
@@ -59,7 +60,7 @@ public class SAXMLDataInstanceImplTest {
     public void nameSpaceTest() {
         //given
         final String expected = "namspace";
-        final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();
+        final SAXMLDataInstance sxmlObjectDataInstanceImpl = new SAXMLDataInstance();
 
         //when
         sxmlObjectDataInstanceImpl.setNamespace(expected);
@@ -73,7 +74,7 @@ public class SAXMLDataInstanceImplTest {
     public void elementTest() {
         //given
         final String expected = "namspace";
-        final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();
+        final SAXMLDataInstance sxmlObjectDataInstanceImpl = new SAXMLDataInstance();
 
         //when
         sxmlObjectDataInstanceImpl.setElement(expected);

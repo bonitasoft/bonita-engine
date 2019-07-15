@@ -23,7 +23,6 @@ import java.util.Map;
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
@@ -400,8 +399,7 @@ public class CommonBPMServicesTest {
     }
 
     private SActor buildSActor(final String name, final long scopeId, final boolean initiator) throws SActorCreationException {
-        final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.get(SActorBuilderFactory.class);
-        final SActor sActor = sActorBuilderFactory.create(name, scopeId, initiator).getActor();
+        final SActor sActor = SActor.builder().name(name).scopeId(scopeId).initiator(initiator).build();
         return getTenantAccessor().getActorMappingService().addActor(sActor);
     }
 

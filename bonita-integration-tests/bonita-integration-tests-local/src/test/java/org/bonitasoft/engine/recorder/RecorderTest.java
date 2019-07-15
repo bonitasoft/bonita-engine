@@ -24,7 +24,6 @@ import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -103,7 +102,7 @@ public class RecorderTest extends CommonBPMServicesTest {
     }
 
     private FilterOption getActionTypeFilterOption(final String actionType) {
-        return new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getActionTypeKey(), actionType);
+        return new FilterOption(SQueriableLog.class, SQueriableLog.ACTION_TYPE, actionType);
     }
 
     private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException {

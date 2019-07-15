@@ -15,15 +15,31 @@ package org.bonitasoft.engine.platform.command.model;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Zhang Bole
  */
-public interface SPlatformCommand extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SPlatformCommand implements PersistentObject {
 
-    String getName();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String IMPLEMENTATION = "implementation";
+    private long id;
+    private long tenantId;
+    private String name;
+    private String description;
+    private String implementation;
 
-    String getDescription();
-
-    String getImplementation();
+    public SPlatformCommand(final String name, final String description, final String implementation) {
+        super();
+        this.name = name;
+        this.description = description;
+        this.implementation = implementation;
+    }
 
 }

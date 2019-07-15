@@ -13,41 +13,17 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder;
 
+import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 
-/**
- * 
- * @author Celine Souchet
- * 
- */
-public interface SDependencyBuilderFactory {
+public class SDependencyBuilderFactory {
+    public SDependency createNewInstance(final String name, final long artifactId, final ScopeType artifactType, final String fileName,
+                                         final byte[] value) {
+        if (artifactType == ScopeType.PROCESS) {
+            return new SDependency(artifactId + "_" + name, fileName, value);
+        }
+        return new SDependency(name, fileName, value);
+    }
 
-    /**
-     * @param name
-     *            The name of the dependency
-     * @param artifactId
-     *            The identifier of the scope
-     * @param artifactType
-     *            The type of the scope
-     * @param version
-     *            The version of the dependency
-     * @param fileName
-     *            The name of the file of the dependency
-     * @param value
-     *            The content of the dependency
-     * @return The server dependency builder
-     * @since 6.2
-     */
-    SDependencyBuilder createNewInstance(String name, long artifactId, ScopeType artifactType, String fileName, byte[] value);
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getFileNameKey();
-
-    String getValueKey();
 
 }

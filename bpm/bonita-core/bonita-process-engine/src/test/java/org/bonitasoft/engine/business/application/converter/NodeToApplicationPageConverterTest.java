@@ -24,7 +24,6 @@ import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -59,7 +58,7 @@ public class NodeToApplicationPageConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        application = new SApplicationImpl();
+        application = new SApplication();
         application.setId(APPLICATION_ID);
     }
 

@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
 
 /**
  * @author Hongwen Zang
@@ -26,7 +26,7 @@ public class SAGatewayInstanceBuilderFactoryImpl extends SAActivityInstanceBuild
 
     @Override
     public SAGatewayInstanceBuilder createNewGatewayInstance(final SGatewayInstance sGatewayInstance) {
-        final SAGatewayInstanceImpl entity = new SAGatewayInstanceImpl(sGatewayInstance);
+        final SAGatewayInstance entity = new SAGatewayInstance(sGatewayInstance);
         return new SAGatewayInstanceBuilderImpl(entity);
     }
 

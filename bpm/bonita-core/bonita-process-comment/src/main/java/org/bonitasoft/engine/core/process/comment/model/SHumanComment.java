@@ -13,10 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model;
 
-/**
- * @author Hongwen Zang
- * 
- */
-public interface SHumanComment extends SComment {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SHumanComment extends SComment {
+    public SHumanComment(long processInstanceId, String content, Long userId) {
+        super(processInstanceId, content);
+        this.setUserId(userId);
+    }
 }

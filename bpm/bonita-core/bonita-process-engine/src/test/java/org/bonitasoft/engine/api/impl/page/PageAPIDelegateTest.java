@@ -38,7 +38,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
@@ -63,7 +62,6 @@ import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -168,8 +166,8 @@ public class PageAPIDelegateTest {
     @Test
     public void testDeletePage() throws Exception {
         final long pageId = 123;
-        final SFormMappingImpl formMapping = new SFormMappingImpl();
-        formMapping.setPageMapping(new SPageMappingImpl());
+        final SFormMapping formMapping = new SFormMapping();
+        formMapping.setPageMapping(new SPageMapping());
         doReturn(Collections.<SFormMapping> singletonList(formMapping)).when(formMappingService).searchFormMappings(any(QueryOptions.class));
 
         pageAPIDelegate.deletePage(pageId);
@@ -201,7 +199,7 @@ public class PageAPIDelegateTest {
     }
 
     private SFormMapping formMapping(Long processId) {
-        final SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        final SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setProcessDefinitionId(processId);
         return sFormMapping;
     }

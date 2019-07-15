@@ -20,7 +20,6 @@ import java.util.List;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -71,11 +70,10 @@ public class ApplicationMenuToNodeConverter {
      * @return the newly built {@link QueryOptions}
      */
     protected QueryOptions buildApplicationMenusQueryOptions(final long applicationId, final Long parentMenuId, final int startIndex, final int maxResults) {
-        final SApplicationMenuBuilderFactory factory = BuilderFactory.get(SApplicationMenuBuilderFactory.class);
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, factory.getIndexKey(), OrderByType.ASC));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
 
-        final List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, factory.getApplicationIdKey(), applicationId),
-                new FilterOption(SApplicationMenu.class, factory.getParentIdKey(), parentMenuId));
+        final List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID, applicationId),
+                new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentMenuId));
 
         return new QueryOptions(startIndex, maxResults, orderByOptions, filters, null);
     }

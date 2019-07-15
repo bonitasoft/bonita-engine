@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SALoopActivityInstanceBuilderFactoryImpl extends SAActivityInstance
 
     @Override
     public SALoopActivityInstanceBuilder createNewLoopActivityInstance(final SLoopActivityInstance sLoopActivityInstance) {
-        final SALoopActivityInstanceImpl entity = new SALoopActivityInstanceImpl(sLoopActivityInstance);
+        final SALoopActivityInstance entity = new SALoopActivityInstance(sLoopActivityInstance);
         return new SALoopActivityInstanceBuilderImpl(entity);
     }
 

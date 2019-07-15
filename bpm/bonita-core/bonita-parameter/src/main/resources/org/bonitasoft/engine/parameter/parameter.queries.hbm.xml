@@ -18,17 +18,17 @@
 
     <query name="getParametersWithNullValues">
         SELECT param
-        FROM org.bonitasoft.engine.parameter.SParameterImpl AS param
+        FROM org.bonitasoft.engine.parameter.SParameter AS param
         WHERE param.processDefinitionId = :processDefinitionId AND param.value is null
     </query>
     <query name="getParameterByName">
         SELECT param
-        FROM org.bonitasoft.engine.parameter.SParameterImpl AS param
+        FROM org.bonitasoft.engine.parameter.SParameter AS param
         WHERE param.processDefinitionId = :processDefinitionId AND param.name = :name
     </query>
     <query name="getParameters">
         SELECT param
-        FROM org.bonitasoft.engine.parameter.SParameterImpl AS param
+        FROM org.bonitasoft.engine.parameter.SParameter AS param
         WHERE param.processDefinitionId = :processDefinitionId
     </query>
 

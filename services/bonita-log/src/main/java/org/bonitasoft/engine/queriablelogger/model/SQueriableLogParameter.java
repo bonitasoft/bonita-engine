@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.model.BlobValue;
 
@@ -21,16 +23,16 @@ import org.bonitasoft.engine.persistence.model.BlobValue;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface SQueriableLogParameter extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SQueriableLogParameter implements PersistentObject {
 
-    long getQueriableLogId();
-
-    String getName();
-
-    String getStringValue();
-
-    BlobValue getBlobValue();
-
-    String getValueType();
+    private long tenantId;
+    private long id = -1;
+    private long queriableLogId;
+    private String name;
+    private String stringValue;
+    private BlobValue blobValue;
+    private String valueType;
 
 }

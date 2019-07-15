@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.core.category.model.builder.impl;
 
+import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilder;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
-import org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -24,7 +24,7 @@ public class SProcessCategoryMappingBuilderFactoryImpl implements SProcessCatego
 
     @Override
     public SProcessCategoryMappingBuilder createNewInstance(final long categoryId, final long processId) {
-        final SProcessCategoryMappingImpl entity = new SProcessCategoryMappingImpl(categoryId, processId);
+        final SProcessCategoryMapping entity = new SProcessCategoryMapping(categoryId, processId);
         return new SProcessCategoryMappingBuilderImpl(entity);
     }
 

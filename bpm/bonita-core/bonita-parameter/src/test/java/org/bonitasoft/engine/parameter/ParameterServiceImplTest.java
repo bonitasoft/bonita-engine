@@ -69,7 +69,7 @@ public class ParameterServiceImplTest {
     public void update_should_call_internal_update_with_retrieved_existing_value() throws Exception {
         final String aParam = "aParam";
         final long processDefinitionId = 1544878L;
-        final SParameterImpl sParameter = new SParameterImpl(aParam, "value", processDefinitionId);
+        final SParameter sParameter = new SParameter(aParam, "value", processDefinitionId);
         doReturn(sParameter).when(parameterService).get(processDefinitionId, aParam);
 
         final String newValue = "newValue";
@@ -82,7 +82,7 @@ public class ParameterServiceImplTest {
     public void update_should_convert_parameter_value() throws Exception {
         final String newValue = "newValue";
 
-        parameterService.update(new SParameterImpl("parameter", "defaultValue", 9874654654L), newValue);
+        parameterService.update(new SParameter("parameter", "defaultValue", 9874654654L), newValue);
 
         verify(parameterService).interpretParameterValue(newValue);
     }
@@ -126,7 +126,7 @@ public class ParameterServiceImplTest {
     @Test
     public void deleteAll_should_call_recordDelete() throws Exception {
         final long processDefinitionId = 123L;
-        doReturn(Collections.singletonList(new SParameterImpl())).when(parameterService).get(eq(processDefinitionId),
+        doReturn(Collections.singletonList(new SParameter())).when(parameterService).get(eq(processDefinitionId),
                 anyInt(), anyInt(), nullable(OrderBy.class));
         parameterService.deleteAll(processDefinitionId);
         verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
@@ -135,7 +135,7 @@ public class ParameterServiceImplTest {
     @Test
     public void containsNullValues_should_return_true_for_non_empty_persistenceService_result() throws Exception {
         final ArrayList<SParameter> toBeReturned = new ArrayList<>(1);
-        toBeReturned.add(new SParameterImpl());
+        toBeReturned.add(new SParameter());
         doReturn(toBeReturned).when(persistenceService).selectList(any());
         assertThat(parameterService.containsNullValues(123L)).isTrue();
     }
@@ -219,6 +219,6 @@ public class ParameterServiceImplTest {
     }
 
     private SParameter sParameter(String name, String value, long processDefinitionId) {
-        return new SParameterImpl(name, value, processDefinitionId);
+        return new SParameter(name, value, processDefinitionId);
     }
 }

@@ -39,7 +39,6 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCre
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -222,9 +221,9 @@ public class JobServiceImplForJobDescriptorTest {
 
     @Test
     public void deleteAllJobDescriptors_should_delete_all_job_descriptors() throws Exception {
-        SJobDescriptorImpl sJobDescriptor = new SJobDescriptorImpl();
+        SJobDescriptor sJobDescriptor = new SJobDescriptor();
         when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), nullable(Map.class))).thenReturn(
-                asList(new SJobDescriptorImpl(), new SJobDescriptorImpl()));
+                asList(new SJobDescriptor(), new SJobDescriptor()));
 
         jobServiceImpl.deleteAllJobDescriptors();
 

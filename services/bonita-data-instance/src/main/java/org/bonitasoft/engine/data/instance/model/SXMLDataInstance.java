@@ -13,13 +13,35 @@
  **/
 package org.bonitasoft.engine.data.instance.model;
 
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SXMLDataInstance extends SDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SXMLDataInstance extends SDataInstance {
 
-    String getNamespace();
 
-    String getElement();
+    private String value;
+    private String namespace;
+    private String element;
+
+    public SXMLDataInstance(final SXMLDataDefinition dataDefinition) {
+        super(dataDefinition);
+        namespace = dataDefinition.getNamespace();
+        element = dataDefinition.getElement();
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (String) value;
+    }
 
 }

@@ -13,10 +13,62 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SMappedDocument extends SLightDocument, SDocumentMapping {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SMappedDocument extends SDocumentMapping {
 
+    private SLightDocument document;
+
+
+    public SMappedDocument(SDocumentMapping documentMapping, SLightDocument document) {
+        this.setId(documentMapping.getId());
+        this.setName(documentMapping.getName());
+        this.setDescription(documentMapping.getDescription());
+        this.setVersion(documentMapping.getVersion());
+        this.setDocumentId(documentMapping.getDocumentId());
+        this.setProcessInstanceId(documentMapping.getProcessInstanceId());
+        this.setIndex(documentMapping.getIndex());
+        this.document = document;
+    }
+
+    public SLightDocument getDocument() {
+        return document;
+    }
+
+    public void setDocument(SLightDocument document) {
+        this.document = document;
+    }
+
+    public long getAuthor() {
+        return document.getAuthor();
+    }
+
+    public long getCreationDate() {
+        return document.getCreationDate();
+    }
+
+    public String getMimeType() {
+        return document.getMimeType();
+    }
+
+    public String getFileName() {
+        return document.getFileName();
+    }
+
+    public boolean hasContent() {
+        return document.hasContent();
+    }
+
+    public String getUrl() {
+        return document.getUrl();
+    }
 
 }

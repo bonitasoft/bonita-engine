@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
 
 /**
  * @author Hongwen Zang
@@ -23,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayI
  */
 public class SAGatewayInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl implements SAGatewayInstanceBuilder {
 
-    public SAGatewayInstanceBuilderImpl(final SAGatewayInstanceImpl entity) {
+    public SAGatewayInstanceBuilderImpl(final SAGatewayInstance entity) {
         super(entity);
     }
 

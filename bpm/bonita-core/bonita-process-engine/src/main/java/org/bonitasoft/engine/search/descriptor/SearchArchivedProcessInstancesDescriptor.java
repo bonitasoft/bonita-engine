@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -69,13 +68,13 @@ public class SearchArchivedProcessInstancesDescriptor extends SearchEntityDescri
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getCallerIdKey()));
         searchEntityKeys
                 .put(USER_ID, new FieldDescriptor(SProcessSupervisor.class,
-                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+                        SProcessSupervisor.USER_ID_KEY));
         searchEntityKeys.put(GROUP_ID,
                 new FieldDescriptor(SProcessSupervisor.class,
-                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+                        SProcessSupervisor.GROUP_ID_KEY));
         searchEntityKeys
                 .put(ROLE_ID, new FieldDescriptor(SProcessSupervisor.class,
-                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+                        SProcessSupervisor.ROLE_ID_KEY));
         searchEntityKeys.put(ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
 

@@ -13,15 +13,20 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SRefBusinessDataInstance extends PersistentObject {
+@Data
+@NoArgsConstructor
+public abstract class SRefBusinessDataInstance implements PersistentObject {
 
-    String getName();
-
-    String getDataClassName();
+    private long id;
+    private long tenantId;
+    private String name;
+    private String dataClassName;
 
 }

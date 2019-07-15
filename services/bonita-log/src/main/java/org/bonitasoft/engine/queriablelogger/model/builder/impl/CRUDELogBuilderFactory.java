@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model.builder.impl;
 
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEActionFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilderFactory;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -25,105 +25,15 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilderFactory;
  */
 public abstract class CRUDELogBuilderFactory implements HasCRUDEActionFactory, SLogBuilderFactory {
     
-    private SQueriableLogBuilderFactoryImpl sIndexedLogBuilderFactory;
 
     public CRUDELogBuilderFactory() {
-        sIndexedLogBuilderFactory = new SQueriableLogBuilderFactoryImpl();
+
     }
     
     @Override
     public SLogBuilder createNewInstance() {
-        return new SQueriableLogBuilderImpl();
+        return new SQueriableLogBuilder();
     }
 
-    @Override
-    public SLogBuilder fromInstance(final SQueriableLog log) {
-        return new SQueriableLogBuilderImpl(log);
-    }
-
-    @Override
-    public String getTimeStampKey() {
-        return sIndexedLogBuilderFactory.getTimeStampKey();
-    }
-
-    @Override
-    public String getYearKey() {
-        return sIndexedLogBuilderFactory.getYearKey();
-    }
-
-    @Override
-    public String getMonthKey() {
-        return sIndexedLogBuilderFactory.getMonthKey();
-    }
-
-    @Override
-    public String getDayOfYearKey() {
-        return sIndexedLogBuilderFactory.getDayOfYearKey();
-    }
-
-    @Override
-    public String getWeekOfYearKey() {
-        return sIndexedLogBuilderFactory.getWeekOfYearKey();
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return sIndexedLogBuilderFactory.getUserIdKey();
-    }
-
-    @Override
-    public String getThreadNumberKey() {
-        return sIndexedLogBuilderFactory.getThreadNumberKey();
-    }
-
-    @Override
-    public String getClusterNodeKey() {
-        return sIndexedLogBuilderFactory.getClusterNodeKey();
-    }
-
-    @Override
-    public String getProductVersionKey() {
-        return sIndexedLogBuilderFactory.getProductVersionKey();
-    }
-
-    @Override
-    public String getSeverityKey() {
-        return sIndexedLogBuilderFactory.getSeverityKey();
-    }
-
-    @Override
-    public String getActionScopeKey() {
-        return sIndexedLogBuilderFactory.getActionScopeKey();
-    }
-
-    @Override
-    public String getActionStatusKey() {
-        return sIndexedLogBuilderFactory.getActionStatusKey();
-    }
-
-    @Override
-    public String getRawMessageKey() {
-        return sIndexedLogBuilderFactory.getRawMessageKey();
-    }
-
-    @Override
-    public String getCallerClassNameKey() {
-        return sIndexedLogBuilderFactory.getCallerClassNameKey();
-    }
-
-    @Override
-    public String getCallerMethodNameKey() {
-        return sIndexedLogBuilderFactory.getCallerMethodNameKey();
-    }
-
-    @Override
-    public String getActionTypeKey() {
-        return sIndexedLogBuilderFactory.getActionTypeKey();
-    }
-
-    @Override
-    public Class<? extends SQueriableLog> getModelClass() {
-        return sIndexedLogBuilderFactory.getModelClass();
-    }
 
 }

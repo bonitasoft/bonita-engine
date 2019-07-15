@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.core.category.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -20,16 +24,37 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface SCategory extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class SCategory implements PersistentObject {
 
-    String getName();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String CREATOR = "creator";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    private long tenantId;
+    private long id;
+    private String name;
+    private String description;
+    private long creator;
+    private long creationDate;
+    private long lastUpdateDate;
 
-    String getDescription();
+    public SCategory(final String name) {
+        this.name = name;
+    }
 
-    long getCreator();
-
-    long getCreationDate();
-
-    long getLastUpdateDate();
+    public SCategory(final SCategory category) {
+        this.id = category.getId();
+        this.name = category.getName();
+        this.description = category.getDescription();
+        this.creator = category.getCreator();
+        this.creationDate = category.getCreationDate();
+        this.lastUpdateDate = category.getLastUpdateDate();
+    }
 
 }

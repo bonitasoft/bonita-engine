@@ -30,7 +30,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -98,7 +97,7 @@ public class IdentityServiceImplForUserTest {
     @Before
     public void setUp() throws SRecorderException {
         doReturn(sUserLogBuilder).when(identityServiceImpl).getUserLog(any(ActionType.class), anyString());
-        doReturn(log).when(sUserLogBuilder).done();
+        doReturn(log).when(sUserLogBuilder).build();
         SIcon newIcon = new SIcon("", null);
         newIcon.setId(NEW_ICON_ID);
         doAnswer(invocation -> {

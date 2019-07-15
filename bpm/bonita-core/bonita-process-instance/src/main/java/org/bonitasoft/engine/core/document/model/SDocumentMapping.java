@@ -13,31 +13,33 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- *
  * Mapping for a document
- *
+ * <p>
  * can be part of a list of document, in that case all documents have the same name and an index
  * If it's standalone documents index = -1
  *
  * @author Baptiste Mesta
  */
-public interface SDocumentMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SDocumentMapping implements PersistentObject {
+    private long id;
+    private long tenantId;
+    private long processInstanceId;
+    private long documentId;
+    private String name;
+    private String description;
+    private String version;
+    private int index;
 
-    long getTenantId();
-
-    long getDocumentId();
-
-    long getProcessInstanceId();
-
-    String getName();
-
-    String getDescription();
-
-    String getVersion();
-
-    int getIndex();
-
+    public SDocumentMapping(long documentId, long processInstanceId, String name) {
+        this.documentId = documentId;
+        this.processInstanceId = processInstanceId;
+        this.name = name;
+    }
 }

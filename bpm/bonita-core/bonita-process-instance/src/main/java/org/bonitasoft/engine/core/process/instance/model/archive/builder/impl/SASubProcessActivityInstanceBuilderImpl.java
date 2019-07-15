@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SASubProcessActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SASubProcessActivityInstanceBuilder {
 
-    public SASubProcessActivityInstanceBuilderImpl(final SASubProcessActivityInstanceImpl entity) {
+    public SASubProcessActivityInstanceBuilderImpl(final SASubProcessActivityInstance entity) {
         super(entity);
     }
 

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder.impl;
 
+import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -26,8 +27,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
 
     public SApplicationUpdateBuilderImpl(final long updaterUserId) {
         descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(SApplicationFields.UPDATED_BY, updaterUserId);
-        descriptor.addField(SApplicationFields.LAST_UPDATE_DATE, System.currentTimeMillis());
+        descriptor.addField(SApplication.UPDATED_BY, updaterUserId);
+        descriptor.addField(SApplication.LAST_UPDATE_DATE, System.currentTimeMillis());
     }
 
     @Override
@@ -37,61 +38,61 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
 
     @Override
     public SApplicationUpdateBuilder updateToken(final String token) {
-        descriptor.addField(SApplicationFields.TOKEN, token);
+        descriptor.addField(SApplication.TOKEN, token);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(SApplicationFields.DISPLAY_NAME, displayName);
+        descriptor.addField(SApplication.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateVersion(final String version) {
-        descriptor.addField(SApplicationFields.VERSION, version);
+        descriptor.addField(SApplication.VERSION, version);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateDescription(final String description) {
-        descriptor.addField(SApplicationFields.DESCRIPTION, description);
+        descriptor.addField(SApplication.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(SApplicationFields.ICON_PATH, iconPath);
+        descriptor.addField(SApplication.ICON_PATH, iconPath);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateState(final String state) {
-        descriptor.addField(SApplicationFields.STATE, state);
+        descriptor.addField(SApplication.STATE, state);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateProfileId(final Long profileId) {
-        descriptor.addField(SApplicationFields.PROFILE_ID, profileId);
+        descriptor.addField(SApplication.PROFILE_ID, profileId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateHomePageId(final Long homePageId) {
-        descriptor.addField(SApplicationFields.HOME_PAGE_ID, homePageId);
+        descriptor.addField(SApplication.HOME_PAGE_ID, homePageId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateLayoutId(final Long layoutId) {
-        descriptor.addField(SApplicationFields.LAYOUT_ID, layoutId);
+        descriptor.addField(SApplication.LAYOUT_ID, layoutId);
         return this;
     }
 
     @Override
     public SApplicationUpdateBuilder updateThemeId(final Long themeId) {
-        descriptor.addField(SApplicationFields.THEME_ID, themeId);
+        descriptor.addField(SApplication.THEME_ID, themeId);
         return this;
     }
 }

@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SAManualTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAManualTaskInstanceBuilder {
 
-    public SAManualTaskInstanceBuilderImpl(final SAManualTaskInstanceImpl entity) {
+    public SAManualTaskInstanceBuilderImpl(final SAManualTaskInstance entity) {
         super(entity);
     }
 

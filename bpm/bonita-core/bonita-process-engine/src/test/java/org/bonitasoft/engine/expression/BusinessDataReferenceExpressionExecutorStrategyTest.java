@@ -29,8 +29,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.operation.BusinessDataContext;
@@ -91,7 +89,7 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
     }
 
     SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(final String name, final long processInstanceId, final String type, final long businessDataId) {
-        final SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SProcessSimpleRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
@@ -100,7 +98,7 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
     }
 
     SFlowNodeSimpleRefBusinessDataInstance createFlowNodeSimpleDataReference(final String name, final long flowNodeInstanceId, final String type, final long businessDataId) {
-        final SFlowNodeSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
+        final SFlowNodeSimpleRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setFlowNodeInstanceId(flowNodeInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);

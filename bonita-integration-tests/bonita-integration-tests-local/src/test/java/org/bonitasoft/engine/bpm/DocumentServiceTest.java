@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -52,7 +51,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     public void before() {
         documentService = getTenantAccessor().getDocumentService();
         transactionService = getTransactionService();
-        documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
+        documentNameKey = SDocument.NAME;
     }
 
     @Test
@@ -196,14 +195,14 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     }
 
     private SDocument buildProcessDocumentWithContent(final int i, final byte[] documentContent) {
-        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance("getContentTest.txt", "text/plain", i);
+        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt", "text/plain", i);
         builder.setHasContent(true);
         builder.setContent(documentContent);
         return builder.done();
     }
 
     private SDocument buildProcessDocumentWithUrl(final int i) {
-        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance("getContentTest.txt", "text/plain", i);
+        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt", "text/plain", i);
         builder.setHasContent(false);
         builder.setURL("theUrl");
         return builder.done();

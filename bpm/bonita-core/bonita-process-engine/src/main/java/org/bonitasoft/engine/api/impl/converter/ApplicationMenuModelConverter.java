@@ -25,8 +25,6 @@ import org.bonitasoft.engine.business.application.ApplicationMenuField;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -44,13 +42,11 @@ public class ApplicationMenuModelConverter {
         final Long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
         final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
 
-        final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationId,
-                applicationPageId,
-                menuIndex);
+        final SApplicationMenu.SApplicationMenuBuilder builder = SApplicationMenu.builder().displayName(displayName).applicationId(applicationId).applicationPageId(applicationPageId).index(menuIndex);
         if (parentId != null) {
-            builder.setParentId(parentId);
+            builder.parentId(parentId);
         }
-        return builder.done();
+        return builder.build();
     }
 
     public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) {

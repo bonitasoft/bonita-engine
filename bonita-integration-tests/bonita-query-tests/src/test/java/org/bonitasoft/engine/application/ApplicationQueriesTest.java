@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -228,8 +227,8 @@ public class ApplicationQueriesTest {
         repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
 
-        ((SApplicationImpl) application).setHomePageId(firstPage.getId());
-        repository.update((SApplicationImpl) application);
+        application.setHomePageId(firstPage.getId());
+        repository.update(application);
 
         //when
         final SApplicationPage retrievedAppPage = repository.getApplicationHomePage(application.getId());

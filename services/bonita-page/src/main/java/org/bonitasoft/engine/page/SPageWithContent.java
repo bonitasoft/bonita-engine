@@ -13,9 +13,18 @@
  **/
 package org.bonitasoft.engine.page;
 
-/**
- * @author Emmanuel Duchastenier
- */
-public interface SPageWithContent extends SPage, SPageContent {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SPageWithContent extends SPage {
+    private byte[] content;
+
+    public SPageWithContent(final SPage sPage, final byte[] pagContent) {
+        super(sPage);
+        setContent(pagContent);
+    }
 }

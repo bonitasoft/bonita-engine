@@ -4,14 +4,14 @@
 
     <query name="getDataInstanceByIds">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE dataInstance.id IN (:ids)
         ORDER BY dataInstance.id
     </query>
 
     <query name="getDataInstancesByNameAndContainer">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE dataInstance.name = :name
         AND dataInstance.containerId = :containerId
         AND dataInstance.containerType = :containerType
@@ -19,7 +19,7 @@
 
     <query name="getDataInstancesByContainer">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE dataInstance.containerId = :containerId
         AND dataInstance.containerType = :containerType
     </query>
@@ -27,21 +27,21 @@
 
     <query name="getNumberOfDataInstancesForContainer">
         SELECT count(dataInstance)
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE dataInstance.containerId = :containerId
         AND dataInstance.containerType = :containerType
     </query>
 
     <query name="getDataInstancesOf1Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
     </query>
 
     <query name="getDataInstancesOf2Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
         OR
@@ -50,7 +50,7 @@
 
     <query name="getDataInstancesOf3Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
         OR
@@ -61,7 +61,7 @@
 
     <query name="getDataInstancesWithNamesOf1Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.name in (:dataNames)
         AND
@@ -72,7 +72,7 @@
 
     <query name="getDataInstancesWithNamesOf2Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.name in (:dataNames)
         AND
@@ -85,7 +85,7 @@
 
     <query name="getDataInstancesWithNamesOf3Containers">
         SELECT dataInstance
-        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE
         dataInstance.name in (:dataNames)
         AND

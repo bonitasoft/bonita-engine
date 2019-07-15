@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
@@ -50,17 +51,17 @@ public class SApplicationUpdateBuilderImplTest {
         final EntityUpdateDescriptor desc = builder.done();
         final Map<String, Object> fields = desc.getFields();
         assertThat(fields).hasSize(12);
-        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(updaterUserId);
-        assertThat(fields.get(SApplicationFields.LAST_UPDATE_DATE)).isNotNull();
-        assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("new desc");
-        assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(homePageId);
-        assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("new display name");
-        assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/icon.jpg");
-        assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(profileId);
-        assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(SApplicationState.DEACTIVATED.name());
-        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("newToken");
-        assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("2.0");
-        assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(layoutId);
-        assertThat(fields.get(SApplicationFields.THEME_ID)).isEqualTo(themeId);
+        assertThat(fields.get(SApplication.UPDATED_BY)).isEqualTo(updaterUserId);
+        assertThat(fields.get(SApplication.LAST_UPDATE_DATE)).isNotNull();
+        assertThat(fields.get(SApplication.DESCRIPTION)).isEqualTo("new desc");
+        assertThat(fields.get(SApplication.HOME_PAGE_ID)).isEqualTo(homePageId);
+        assertThat(fields.get(SApplication.DISPLAY_NAME)).isEqualTo("new display name");
+        assertThat(fields.get(SApplication.ICON_PATH)).isEqualTo("/icon.jpg");
+        assertThat(fields.get(SApplication.PROFILE_ID)).isEqualTo(profileId);
+        assertThat(fields.get(SApplication.STATE)).isEqualTo(SApplicationState.DEACTIVATED.name());
+        assertThat(fields.get(SApplication.TOKEN)).isEqualTo("newToken");
+        assertThat(fields.get(SApplication.VERSION)).isEqualTo("2.0");
+        assertThat(fields.get(SApplication.LAYOUT_ID)).isEqualTo(layoutId);
+        assertThat(fields.get(SApplication.THEME_ID)).isEqualTo(themeId);
     }
 }

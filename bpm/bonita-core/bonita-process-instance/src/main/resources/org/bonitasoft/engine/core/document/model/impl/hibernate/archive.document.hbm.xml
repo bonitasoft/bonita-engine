@@ -2,15 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field"
-                   package="org.bonitasoft.engine.core.document.model.archive.impl">
+                   package="org.bonitasoft.engine.core.document.model.archive">
 
     <filter-def name="tenantFilter" condition=":tenantId = tenantid">
         <filter-param name="tenantId" type="long"/>
     </filter-def>
 
-    <import class="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl"/>
+    <import class="org.bonitasoft.engine.core.document.model.SLightDocument"/>
 
-    <class name="SADocumentMappingImpl" table="arch_document_mapping">
+    <class name="SADocumentMapping" table="arch_document_mapping">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="ID" type="long"/>
@@ -27,7 +27,7 @@
     </class>
 
 
-    <class name="SAMappedDocumentImpl" table="arch_document_mapping" polymorphism="explicit">
+    <class name="SAMappedDocument" table="arch_document_mapping" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long"/>
             <key-property name="id" column="id" type="long"/>
@@ -40,7 +40,7 @@
         <property name="index" type="int" column="index_"/>
         <property name="archiveDate" type="long" column="archiveDate"/>
         <property name="documentId" type="long" column="documentid"/>
-        <many-to-one name="document" class="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" insert="false" update="false" lazy="false">
+        <many-to-one name="document" class="org.bonitasoft.engine.core.document.model.SLightDocument" insert="false" update="false" lazy="false">
             <column name="tenantid"/>
             <column name="documentid"/>
         </many-to-one>

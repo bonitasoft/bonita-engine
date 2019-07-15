@@ -13,11 +13,31 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public interface SAFlowNodeSimpleRefBusinessDataInstance extends SASimpleRefBusinessDataInstance, SFlowNodeSimpleRefBusinessDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAFlowNodeSimpleRefBusinessDataInstance extends SASimpleRefBusinessDataInstance {
 
+    private long flowNodeInstanceId;
+
+    @Override
+    public SRefBusinessDataInstance toSRefBusinessDataInstance() {
+        SFlowNodeSimpleRefBusinessDataInstance refBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstance();
+        refBusinessDataInstance.setId(sourceObjectId);
+        refBusinessDataInstance.setTenantId(tenantId);
+        refBusinessDataInstance.setName(getName());
+        refBusinessDataInstance.setDataClassName(getDataClassName());
+        refBusinessDataInstance.setDataId(getDataId());
+        refBusinessDataInstance.setFlowNodeInstanceId(flowNodeInstanceId);
+        return refBusinessDataInstance;
+    }
 }

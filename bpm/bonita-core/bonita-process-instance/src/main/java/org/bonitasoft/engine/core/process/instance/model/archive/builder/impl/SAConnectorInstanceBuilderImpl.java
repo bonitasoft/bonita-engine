@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SAConnectorInstanceBuilderImpl implements SAConnectorInstanceBuilder {
 
-    private final SAConnectorInstanceImpl entity;
+    private final SAConnectorInstance entity;
     
-    public SAConnectorInstanceBuilderImpl(final SAConnectorInstanceImpl entity) {
+    public SAConnectorInstanceBuilderImpl(final SAConnectorInstance entity) {
         this.entity = entity;
     }
 

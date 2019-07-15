@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -43,9 +42,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
-import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceState;
@@ -102,7 +99,7 @@ public class TenantAdministrationAPIImplTest {
     @InjectMocks
     private TenantAdministrationAPIImpl tenantManagementAPI;
 
-    private STenantImpl sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
+    private STenant sTenant = new STenant("myTenant", "john", 123456789, STenant.PAUSED, false);
 
     @Before
     public void before() throws Exception {
@@ -220,7 +217,7 @@ public class TenantAdministrationAPIImplTest {
         tenantManagementAPI.pause();
 
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        final String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
+        final String inMaintenanceKey = STenant.STATUS;
         entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
 
         verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
@@ -315,7 +312,7 @@ public class TenantAdministrationAPIImplTest {
     }
 
     private void whenTenantIsInState(final String status) throws STenantNotFoundException {
-        sTenant = new STenantImpl("myTenant", "john", 123456789, status, false);
+        sTenant = new STenant("myTenant", "john", 123456789, status, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
     }
 

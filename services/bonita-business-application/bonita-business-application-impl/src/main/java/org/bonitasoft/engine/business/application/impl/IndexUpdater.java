@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -62,10 +61,9 @@ public class IndexUpdater {
     }
 
     private List<SApplicationMenu> getCurrentPage(Long parentId, int from, int to, int firstResult) throws SBonitaReadException {
-        SApplicationMenuBuilderFactoryImpl appMenuFactory = new SApplicationMenuBuilderFactoryImpl();
-        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), OrderByType.ASC));
-        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), from, to), new FilterOption(
-                SApplicationMenu.class, appMenuFactory.getParentIdKey(), parentId));
+        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
+        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, from, to), new FilterOption(
+                SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
         QueryOptions options = new QueryOptions(firstResult, maxResults, orderBy, filters, null);
         return applicationService.searchApplicationMenus(options);
     }

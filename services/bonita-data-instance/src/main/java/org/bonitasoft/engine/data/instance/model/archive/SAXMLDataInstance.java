@@ -13,13 +13,52 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
-/**
- * @author Feng Hui
- */
-public interface SAXMLDataInstance extends SADataInstance {
+import java.io.Serializable;
 
-    String getNamespace();
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
-    String getElement();
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAXMLDataInstance extends SADataInstance {
+
+
+    private String value;
+    private String namespace;
+    private String element;
+
+    public SAXMLDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (String) sDataInstance.getValue();
+    }
+
+    @Override
+    public Serializable getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (String) value;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(final String namespace) {
+        this.namespace = namespace;
+    }
+
+    public String getElement() {
+        return element;
+    }
+
+    public void setElement(final String element) {
+        this.element = element;
+    }
 
 }

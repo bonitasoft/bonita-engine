@@ -28,9 +28,6 @@ import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.SCommandUpdateException;
 import org.bonitasoft.engine.command.api.record.SelectDescriptorBuilder;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactoryImpl;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandLogBuilder;
 import org.bonitasoft.engine.command.model.SCommandLogBuilderFactory;
@@ -273,7 +270,6 @@ public class CommandServiceImpl implements CommandService {
         }
         final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating command with name " + command.getName());
 
-        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(command, updateDescriptor), COMMAND);
             if (trace) {
@@ -376,7 +372,7 @@ public class CommandServiceImpl implements CommandService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerClassName, log);
         }
@@ -426,10 +422,11 @@ public class CommandServiceImpl implements CommandService {
         if (infoEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Creating missing system command: " + commandDeployment);
         }
-        SCommandBuilder commandBuilder = new SCommandBuilderFactoryImpl().createNewInstance(commandDeployment.getName(),
-                commandDeployment.getDescription(), commandDeployment.getImplementation());
-        commandBuilder.setSystem(true);
-        create(commandBuilder.done());
+        create(SCommand.builder()
+                .name(commandDeployment.getName())
+                .description(commandDeployment.getDescription())
+                .implementation(commandDeployment.getImplementation())
+                .isSystem(true).build());
     }
 
     private void deleteSystemCommandsNotPresentInDeployments(final Map<String, CommandDeployment> commandDeployments,
@@ -460,9 +457,8 @@ public class CommandServiceImpl implements CommandService {
     }
 
     private List<SCommand> getSystemCommands(int fromIndex, int maxResults) throws SBonitaReadException {
-        SCommandBuilderFactoryImpl factory = new SCommandBuilderFactoryImpl();
-        QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, factory.getIdKey(),
-                OrderByType.ASC)), Collections.singletonList(new FilterOption(SCommand.class, factory.getSystemKey(), true)), null);
+        QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, SCommand.ID,
+                OrderByType.ASC)), Collections.singletonList(new FilterOption(SCommand.class, SCommand.SYSTEM, true)), null);
         return searchCommands(queryOptions);
     }
 

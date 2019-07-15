@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.platform.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.platform.model">
 
-  <class name="SPlatformImpl" table="platform">
+  <class name="SPlatform" table="platform">
     <id column="id" name="id" type="long" />
     <property name="created" column="created" type="long" />
     <property name="createdBy" column="createdBy" type="java.lang.String"/>
@@ -13,7 +13,7 @@
     <property name="information" column="information" type="materialized_clob"/>
   </class>
 
-  <class name="STenantImpl" table="tenant">
+  <class name="STenant" table="tenant">
     <id column="id" name="id" type="long" />
     <property name="created" column="created" type="long" />
     <property name="createdBy" column="createdBy" type="java.lang.String"/>

@@ -13,12 +13,34 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
-/**
- * @author Celine Souchet
- */
-public interface SAFloatDataInstance extends SADataInstance {
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAFloatDataInstance extends SADataInstance {
+
+
+    private Float value;
+
+    public SAFloatDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (Float) sDataInstance.getValue();
+    }
 
     @Override
-    Float getValue();
+    public Float getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (Float) value;
+    }
 
 }

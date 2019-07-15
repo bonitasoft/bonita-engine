@@ -20,6 +20,4 @@ package org.bonitasoft.engine.queriablelogger.model.builder;
  */
 public interface HasCRUDEActionFactory {
 
-    String getActionTypeKey();
-
 }

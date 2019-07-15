@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -181,10 +180,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     }
 
     private void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class)
-                .getProcessInstanceIdKey(), processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(
-                SACommentBuilderFactory.class).getIdKey(), OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, SAComment.PROCESSINSTANCEID_KEY, processInstanceId));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, SAComment.ID_KEY, OrderByType.ASC));
         List<SAComment> searchArchivedComments;
         // fromIndex always will be zero because the elements will be deleted
         final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
@@ -352,15 +349,14 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
     private void removeArchivedDocument(final SAMappedDocument mappedDocument) throws SRecorderException, SBonitaReadException, SObjectNotFoundException {
         // Delete document itself and the mapping
-        delete((SADocumentMapping) mappedDocument);
+        delete(mappedDocument);
         delete(documentService.getDocument(mappedDocument.getDocumentId()));
     }
 
     private void delete(final SLightDocument document) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(document), "SDocument");
     }
-
-    private void delete(final SADocumentMapping mappedDocument) throws SRecorderException {
+    private void delete(final SAMappedDocument mappedDocument) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(mappedDocument), "SADocumentMapping");
     }
 

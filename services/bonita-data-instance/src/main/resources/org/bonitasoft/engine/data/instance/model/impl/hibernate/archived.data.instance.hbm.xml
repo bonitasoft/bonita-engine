@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.data.instance.model.archive.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.data.instance.model.archive">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SADataInstanceImpl" abstract="true" table="arch_data_instance">
+	<class name="SADataInstance" abstract="true" table="arch_data_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
-		<discriminator column="DISCRIMINANT" type="string" />
+		<discriminator column="DISCRIMINANT"/>
 		<property name="name" column="name" type="string" />
 		<property name="description" column="description" type="string" />
 		<property name="transientData" column="transientData" />
@@ -23,49 +23,49 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<subclass name="SAIntegerDataInstanceImpl" abstract="false" discriminator-value="SAIntegerDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SAIntegerDataInstance" abstract="false" discriminator-value="SAIntegerDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="intValue" />
 	</subclass>
 
-	<subclass name="SALongDataInstanceImpl" abstract="false" discriminator-value="SALongDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SALongDataInstance" abstract="false" discriminator-value="SALongDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="longValue" />
 	</subclass>
 
-	<subclass name="SADoubleDataInstanceImpl" abstract="false" discriminator-value="SADoubleDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SADoubleDataInstance" abstract="false" discriminator-value="SADoubleDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="doubleValue" />
 	</subclass>
 
-	<subclass name="SAFloatDataInstanceImpl" abstract="false" discriminator-value="SAFloatDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SAFloatDataInstance" abstract="false" discriminator-value="SAFloatDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="floatValue" />
 	</subclass>
 
-	<subclass name="SAShortTextDataInstanceImpl" abstract="false" discriminator-value="SAShortTextDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SAShortTextDataInstance" abstract="false" discriminator-value="SAShortTextDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="shortTextValue" type="string" />
 	</subclass>
 
-	<subclass name="SABooleanDataInstanceImpl" discriminator-value="SABooleanDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SABooleanDataInstance" discriminator-value="SABooleanDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="booleanValue" />
 	</subclass>
 
-	<subclass name="SALongTextDataInstanceImpl" abstract="false" discriminator-value="SALongTextDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SALongTextDataInstance" abstract="false" discriminator-value="SALongTextDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="clobValue" type="materialized_clob" />
 	</subclass>
 
-	<subclass name="SAXMLDataInstanceImpl" abstract="false" discriminator-value="SAXMLDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SAXMLDataInstance" abstract="false" discriminator-value="SAXMLDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="clobValue" type="materialized_clob" />
 		<property name="namespace" column="namespace" type="string" />
 		<property name="element" column="element" type="string" />
 	</subclass>
 
-	<subclass name="SAXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SAXMLObjectDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SAXMLObjectDataInstance" abstract="false" discriminator-value="SAXMLObjectDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="clobValue" type="materialized_clob"  />
 	</subclass>
 
-	<subclass name="SABlobDataInstanceImpl" abstract="false" discriminator-value="SABlobDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SABlobDataInstance" abstract="false" discriminator-value="SABlobDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="blobValue" type="materialized_blob" />
 	</subclass>
 
-	<subclass name="SADateDataInstanceImpl" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstanceImpl">
+	<subclass name="SADateDataInstance" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstance">
 		<property name="value" column="longValue">
 			<type name="org.bonitasoft.engine.persistence.DateStoredAsLongUserType" />
 		</property>

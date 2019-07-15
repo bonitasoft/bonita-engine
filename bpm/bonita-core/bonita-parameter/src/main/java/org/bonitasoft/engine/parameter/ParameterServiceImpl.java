@@ -126,7 +126,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     void add(long processDefinitionId, String name, String value) throws SObjectCreationException {
-        final SParameterImpl sParameter = new SParameterImpl(name, interpretParameterValue(value), processDefinitionId);
+        final SParameter sParameter = new SParameter(name, interpretParameterValue(value), processDefinitionId);
         try {
             recorder.recordInsert(new InsertRecord(sParameter), PARAMETER);
         } catch (SRecorderException e) {

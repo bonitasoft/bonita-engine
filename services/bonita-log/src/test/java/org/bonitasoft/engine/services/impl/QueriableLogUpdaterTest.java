@@ -24,7 +24,6 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ public class QueriableLogUpdaterTest {
     @Mock
     private TechnicalLoggerService logger;
 
-    private SQueriableLogImpl log;
+    private SQueriableLog log;
 
     @InjectMocks
     private QueriableLogUpdater updater;
@@ -65,8 +64,8 @@ public class QueriableLogUpdaterTest {
         log = getLogBuilderWithMandatoryFields();
     }
 
-    private SQueriableLogImpl getLogBuilderWithMandatoryFields() {
-        final SQueriableLogImpl log = new SQueriableLogImpl();
+    private SQueriableLog getLogBuilderWithMandatoryFields() {
+        final SQueriableLog log = SQueriableLog.builder().build();
         log.setSeverity(SQueriableLogSeverity.INTERNAL);
         log.setActionType("insert");
         log.setActionStatus(SQueriableLog.STATUS_OK);
@@ -96,7 +95,7 @@ public class QueriableLogUpdaterTest {
         while (stb.length() <= 255) {
             stb.append(base);
         }
-        final SQueriableLogImpl log = getLogBuilderWithMandatoryFields();
+        final SQueriableLog log = getLogBuilderWithMandatoryFields();
         log.setRawMessage(stb.toString());
 
         //when

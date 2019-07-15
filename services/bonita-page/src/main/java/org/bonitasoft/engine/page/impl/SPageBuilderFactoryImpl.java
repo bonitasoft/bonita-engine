@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageBuilder;
 import org.bonitasoft.engine.page.SPageBuilderFactory;
 
@@ -24,14 +25,14 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
     @Override
     public SPageBuilder createNewInstance(final String name, final String description, final String displayName, final long installationDate,
             final long installedBy, final boolean provided, boolean hidden, final String contentName) {
-        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, hidden, installationDate, installedBy,
+        return new SPageBuilderImpl(new SPage(name, description, displayName, installationDate, installedBy, provided, hidden, installationDate, installedBy,
                 contentName));
     }
 
     @Override
     public SPageBuilder createNewInstance(final String name, final long installationDate, final int installedBy, final boolean provided,
             final String contentName) {
-        return new SPageBuilderImpl(new SPageImpl(name, installationDate, installedBy, provided, contentName));
+        return new SPageBuilderImpl(new SPage(name, installationDate, installedBy, provided, contentName));
     }
 
     @Override

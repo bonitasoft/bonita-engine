@@ -13,12 +13,34 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
-/**
- * @author Feng Hui
- */
-public interface SADoubleDataInstance extends SADataInstance {
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SADoubleDataInstance extends SADataInstance {
+
+
+    private Double value;
+
+
+    public SADoubleDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (Double) sDataInstance.getValue();
+    }
 
     @Override
-    Double getValue();
+    public Double getValue() {
+        return value;
+    }
 
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (Double) value;
+    }
 }

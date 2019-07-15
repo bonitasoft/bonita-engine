@@ -38,8 +38,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -205,7 +204,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         initializeBuilder(dataDefinitionBuilder, description, defaultValueExpressionContent, className, isTransient, expressionType, expressionInterpreter);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue).done();
     }
 

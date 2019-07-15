@@ -13,21 +13,30 @@
  **/
 package org.bonitasoft.engine.actor.mapping.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Matthieu Chaffotte
- */
-public interface SActor extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SActor implements PersistentObject {
 
-    long getScopeId();
+    private long tenantId;
+    private long id;
+    private long scopeId;
+    private String name;
+    private String displayName;
+    private String description;
+    private boolean initiator;
 
-    String getName();
-
-    String getDisplayName();
-
-    String getDescription();
-
-    boolean isInitiator();
+    public SActor(final String name, final long scopeId, final boolean initiator) {
+        this.name = name;
+        this.scopeId = scopeId;
+        this.initiator = initiator;
+    }
 
 }

@@ -13,39 +13,48 @@
  **/
 package org.bonitasoft.engine.core.form;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- */
-public interface SFormMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SFormMapping implements PersistentObject {
 
-    String TARGET_INTERNAL = "INTERNAL";
-    String TARGET_URL = "URL";
-    String TARGET_LEGACY = "LEGACY";
-    String TARGET_UNDEFINED = "UNDEFINED";
-    String TARGET_NONE = "NONE";
+    public static final String TARGET_INTERNAL = "INTERNAL";
+    public static final String TARGET_URL = "URL";
+    public static final String TARGET_LEGACY = "LEGACY";
+    public static final String TARGET_UNDEFINED = "UNDEFINED";
+    public static final String TARGET_NONE = "NONE";
 
-    int TYPE_PROCESS_START = 1;
-    int TYPE_PROCESS_OVERVIEW = 2;
-    int TYPE_TASK = 3;
+    public static final int TYPE_PROCESS_START = 1;
+    public static final int TYPE_PROCESS_OVERVIEW = 2;
+    public static final int TYPE_TASK = 3;
+    private long id;
+    private long tenantId;
+    private long processDefinitionId;
+    private String task;
+    private String target;
+    private SPageMapping pageMapping;
+    private Integer type = null;
+    private long lastUpdateDate;
+    private long lastUpdatedBy;
 
-    long getTenantId();
+    public SFormMapping(long processDefinitionId, Integer type, String task, String target) {
+        this.processDefinitionId = processDefinitionId;
+        this.task = task;
+        this.type = type;
+        this.target = target;
+    }
 
-    long getProcessDefinitionId();
-
-    String getTask();
-
-    String getProcessElementName();
-
-    SPageMapping getPageMapping();
-
-    Integer getType();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
-
-    String getTarget();
+    public String getProcessElementName() {
+        switch (FormMappingType.getTypeFromId(this.getType())) {
+            case TASK: return this.getTask();
+            case PROCESS_OVERVIEW: return FormMappingType.PROCESS_OVERVIEW.toString();
+            case PROCESS_START: return FormMappingType.PROCESS_START.toString();
+            default: return null;
+        }
+    }
 }

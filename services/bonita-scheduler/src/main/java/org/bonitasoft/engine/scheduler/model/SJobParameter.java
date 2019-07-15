@@ -15,18 +15,30 @@ package org.bonitasoft.engine.scheduler.model;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- * @author Celine Souchet
- */
-public interface SJobParameter extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SJobParameter implements PersistentObject {
 
-    long getJobDescriptorId();
+    public static final String JOB_DESCRIPTOR_ID = "jobDescriptorId";
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
+    private long id;
+    private long tenantId;
+    private long jobDescriptorId;
+    private String key;
+    private Serializable value;
 
-    String getKey();
-
-    Serializable getValue();
+    public SJobParameter(final String key, final Serializable value) {
+        this.key = key;
+        this.value = value;
+    }
 
 }

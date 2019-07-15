@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SAAutomaticTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAAutomaticTaskInstanceBuilder {
     
-    public SAAutomaticTaskInstanceBuilderImpl(final SAAutomaticTaskInstanceImpl entity) {
+    public SAAutomaticTaskInstanceBuilderImpl(final SAAutomaticTaskInstance entity) {
         super(entity);
     }
 

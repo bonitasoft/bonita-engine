@@ -13,11 +13,22 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Celine Souchet
- */
-public interface SACatchEventInstance extends SAEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 
-    boolean isInterrupting();
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SACatchEventInstance extends SAEventInstance {
+
+    private boolean interrupting = true;
+
+    public SACatchEventInstance(final SCatchEventInstance sCatchEventInstance) {
+        super(sCatchEventInstance);
+        interrupting = sCatchEventInstance.isInterrupting();
+    }
+
 
 }

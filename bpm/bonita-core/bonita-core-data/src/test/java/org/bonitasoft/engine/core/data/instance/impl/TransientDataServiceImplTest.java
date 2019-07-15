@@ -38,7 +38,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -86,7 +86,7 @@ public class TransientDataServiceImplTest {
     @Test
     public void should_createDataInstance_add_in_cache() throws Exception {
         // given
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "containerType");
+        SShortTextDataInstance data = createData(12, 42, "name", "containerType");
 
         // when
         transientDataServiceImpl.createDataInstance(data);
@@ -96,9 +96,9 @@ public class TransientDataServiceImplTest {
         verify(cacheService, times(1)).store("transient_data", "name:42:containerType", data);
     }
 
-    private SShortTextDataInstanceImpl createData(final long id, final int containerId, final String name,
-                                                  final String containerType) throws SCacheException {
-        SShortTextDataInstanceImpl data = new SShortTextDataInstanceImpl();
+    private SShortTextDataInstance createData(final long id, final int containerId, final String name,
+                                              final String containerType) throws SCacheException {
+        SShortTextDataInstance data = new SShortTextDataInstance();
         data.setId(id);
         data.setName(name);
         data.setTransientData(true);
@@ -112,7 +112,7 @@ public class TransientDataServiceImplTest {
     @Test
     public void testUpdateDataInstance() throws Exception {
         // given
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "ctype");
+        SShortTextDataInstance data = createData(12, 42, "name", "ctype");
         when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList((Object) "name:42:ctype"));
 
         // when
@@ -127,7 +127,7 @@ public class TransientDataServiceImplTest {
 
     @Test
     public void testDeleteDataInstance() throws Exception {
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "ctype");
+        SShortTextDataInstance data = createData(12, 42, "name", "ctype");
 
         transientDataServiceImpl.deleteDataInstance(data);
 
@@ -137,7 +137,7 @@ public class TransientDataServiceImplTest {
     @Test
     public void should_getDataInstanceById_return_the_data() throws Exception {
         // given
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "ctype");
+        SShortTextDataInstance data = createData(12, 42, "name", "ctype");
         when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList((Object) "name:42:ctype"));
 
         // when
@@ -150,7 +150,7 @@ public class TransientDataServiceImplTest {
     @Test
     public void testGetDataInstanceStringLongString() throws Exception {
         // given
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "ctype");
+        SShortTextDataInstance data = createData(12, 42, "name", "ctype");
         when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList((Object) "name:42:ctype"));
 
         // when
@@ -172,9 +172,9 @@ public class TransientDataServiceImplTest {
         when(container.getFlowNode(42)).thenReturn(activityDefinition);
         when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDef);
         when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
-        SShortTextDataInstanceImpl data = createData(12, 42, "name", "ctype");
-        SShortTextDataInstanceImpl data1 = createData(13, 42, "name1", "ctype");
-        SShortTextDataInstanceImpl data2 = createData(14, 42, "name2", "ctype");
+        SShortTextDataInstance data = createData(12, 42, "name", "ctype");
+        SShortTextDataInstance data1 = createData(13, 42, "name1", "ctype");
+        SShortTextDataInstance data2 = createData(14, 42, "name2", "ctype");
         when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList("name:42:ctype","name:44:ctype","name:48:ctype"));
 
         List<SDataInstance> dataInstances = transientDataServiceImpl.getDataInstances(42, "ctype", 0, 10);

@@ -233,13 +233,13 @@
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-						org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+					FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+						org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 					WHERE actor.id = actormember.actorId
 					AND ( actormember.userId = :userId
  	  					OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -265,13 +265,13 @@
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-						org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+					FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+						org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 					WHERE actor.id = actormember.actorId
 					AND ( actormember.userId = :userId
  	  					OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -301,13 +301,13 @@
 					WHERE mapping.activityId=a.id
 					AND ( mapping.userId = :userId
 						OR mapping.actorId in (SELECT actor
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE actor.id = actormember.actorId
 							AND ( actormember.userId = :userId
 		 	  					OR actormember.id IN (
 									SELECT actormember.id
-									FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -339,13 +339,13 @@
 					WHERE mapping.activityId=a.id
 					AND ( mapping.userId = :userId
 						OR mapping.actorId in (SELECT actor
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE actor.id = actormember.actorId
 							AND ( actormember.userId = :userId
 		 	  					OR actormember.id IN (
 									SELECT actormember.id
-									FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
+									FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -647,306 +647,306 @@
 	<query name="getNumberOfSHumanTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSHumanTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSAutomaticTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSAutomaticTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSManualTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSManualTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSUserTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSUserTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSReceiveTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSReceiveTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSSendTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSSendTaskInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSCallActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSCallActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSMultiInstanceActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSMultiInstanceActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSSubProcessActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSSubProcessActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSLoopActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSLoopActivityInstancewithSActivityInstanceSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 	
 	<query name="getNumberOfSHumanTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSHumanTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSActivityInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSActivityInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSAutomaticTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSAutomaticTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSManualTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSManualTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSUserTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSUserTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSReceiveTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSReceiveTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSSendTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSSendTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSCallActivityInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSCallActivityInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSMultiInstanceActivityInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSMultiInstanceActivityInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSSubProcessActivityInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSSubProcessActivityInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSLoopActivityInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSLoopActivityInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSHumanTaskInstanceSupervisedBy">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.logicalGroup1 =  supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :supervisorId
 					AND (
@@ -962,12 +962,12 @@
 	<query name="searchSHumanTaskInstanceSupervisedBy">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.logicalGroup1 =  supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :supervisorId
 					AND (
@@ -984,13 +984,13 @@
 	<query name="searchSHumanTaskInstancePendingSupervisedBy">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.stateExecuting = FALSE
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :userId
 					AND (
@@ -1007,13 +1007,13 @@
 	<query name="getNumberOfSHumanTaskInstancePendingSupervisedBy">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE a.stateExecuting = FALSE
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :userId
 					AND (
@@ -1067,8 +1067,8 @@
            			WHERE u.managerUserId = :managerUserId )
             		OR mapping.actorId IN (
                 		SELECT actor.id
-						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-							 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+						FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+							 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
                 		WHERE actor.id = actormember.actorId 
                 		AND ( actormember.userId IN (
                 		       SELECT u.id 
@@ -1076,7 +1076,7 @@
                 		       WHERE u.managerUserId = :managerUserId)
                       		OR actormember.id IN (
                               	SELECT actormember.id
-                              	FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+                              	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
                               	     org.bonitasoft.engine.identity.model.SUserMembership as um
                               	WHERE um.userId IN (SELECT u.id 
                               	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1109,8 +1109,8 @@
           			WHERE u.managerUserId = :managerUserId )
            		OR mapping.actorId IN (
                		SELECT actor.id
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-						 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+					FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+						 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
                		WHERE actor.id = actormember.actorId 
                		AND ( actormember.userId IN (
                		       SELECT u.id 
@@ -1118,7 +1118,7 @@
                		       WHERE u.managerUserId = :managerUserId)
                      		OR actormember.id IN (
                              	SELECT actormember.id
-                             	FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+                             	FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
                              	     org.bonitasoft.engine.identity.model.SUserMembership as um
                              	WHERE um.userId IN (SELECT u.id 
                              	     				FROM org.bonitasoft.engine.identity.model.SUser AS u
@@ -1157,13 +1157,13 @@
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (SELECT actor
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-						org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+					FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+						org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 					WHERE actor.id = actormember.actorId 
 					AND ( actormember.userId = :userId
  	  					OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, 
 							org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId 
 							AND (
@@ -1216,12 +1216,12 @@
 	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
 		SELECT count(DISTINCT f)
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE f.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					     org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :supervisorId
 					AND (
@@ -1237,12 +1237,12 @@
 	<query name="searchSFlowNodeInstanceSupervisedBy">
 		SELECT DISTINCT f
 		FROM org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance AS f,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE f.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 					     org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :supervisorId
 					AND (
@@ -1463,21 +1463,21 @@
 	<query name="getNumberOfSProcessInstancewithSProcessSupervisor">
 		SELECT COUNT(DISTINCT p.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
 	<query name="searchSProcessInstancewithSProcessSupervisor">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		     org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
     <query name="getNumberOfSProcessInstancewithSProcessSupervisorSUserTaskInstance">
         SELECT COUNT(DISTINCT p.id)
         FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+             org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
              org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
         WHERE p.processDefinitionId = processsupervisor.processDefId
         AND p.id = a.logicalGroup4
@@ -1486,7 +1486,7 @@
     <query name="searchSProcessInstancewithSProcessSupervisorSUserTaskInstance">
         SELECT DISTINCT p
         FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+             org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
              org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance AS a
         WHERE p.processDefinitionId = processsupervisor.processDefId
         AND p.id = a.logicalGroup4
@@ -1549,7 +1549,7 @@
     <query name="getNumberOfSProcessInstanceFailedAndSupervisedBy">
         SELECT COUNT(DISTINCT p.id)
         FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+             org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
         WHERE (
             p.stateId = 7 
             OR EXISTS (
@@ -1563,7 +1563,7 @@
         AND (supervisor.userId = :userId
             OR (supervisor.id IN (
                     SELECT supervisor.id
-                    FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+                    FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
                          org.bonitasoft.engine.identity.model.SUserMembership AS um
                     WHERE um.userId = :userId
                     AND (
@@ -1579,7 +1579,7 @@
     <query name="searchSProcessInstanceFailedAndSupervisedBy">
         SELECT DISTINCT p
         FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+             org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
         WHERE (
             p.stateId = 7 
             OR EXISTS (
@@ -1593,7 +1593,7 @@
         AND (supervisor.userId = :userId
             OR (supervisor.id IN (
                     SELECT supervisor.id
-                    FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+                    FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
                          org.bonitasoft.engine.identity.model.SUserMembership AS um
                     WHERE um.userId = :userId
                     AND (
@@ -1609,13 +1609,13 @@
 	<query name="getNumberOfSProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT p.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE p.stateId != 6
 		AND p.processDefinitionId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 						 org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :userId
 					AND (
@@ -1631,13 +1631,13 @@
 	<query name="searchSProcessInstanceSupervisedBy">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
-			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE p.stateId != 6
 		AND p.processDefinitionId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
 						 org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE um.userId = :userId
 					AND (
@@ -1655,7 +1655,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
-					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
+					FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
 					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
@@ -1667,7 +1667,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
-					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
+					FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
 					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
@@ -1680,7 +1680,7 @@
 			 org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
-				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
 				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
@@ -1694,7 +1694,7 @@
 			 org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
-				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance AS at
 				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
@@ -1713,14 +1713,14 @@
 			mapping.userId = :userId
 			OR EXISTS (
 				SELECT actormember
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE
 					mapping.actorId = actormember.actorId
 					AND actormember.userId = :userId
 			)
 			OR EXISTS (
 				SELECT actormember
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
 				org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 				WHERE
 					mapping.actorId = actormember.actorId
@@ -1744,9 +1744,9 @@
           )
           OR user.id IN (
               SELECT actormember.userId
-              FROM    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+              FROM    org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
                       org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping,
-                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+                      org.bonitasoft.engine.actor.mapping.model.SActor AS actor
               WHERE 
                   mapping.activityId = :humanTaskInstanceId
                   AND mapping.actorId = actor.id 
@@ -1756,8 +1756,8 @@
               SELECT user_membership.userId
               FROM    org.bonitasoft.engine.identity.model.SUserMembership AS user_membership,
                       org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping,
-                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-                      org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+                      org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+                      org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
               WHERE
                   mapping.activityId = :humanTaskInstanceId
                   AND mapping.actorId = actor.id
@@ -1781,16 +1781,16 @@
 	       user.id = mapping.userId
 	       OR user.id IN (
 	           SELECT actormember.userId
-	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-	                org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+	           FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
+	                org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 	           WHERE mapping.actorId = actor.id 
 	           AND actor.id = actormember.actorId
 	       )
 	       OR user.id IN (
 	           SELECT user_membership.userId
 	           FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership,
-	           	    org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-	                org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	           	    org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+	                org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 	           WHERE mapping.actorId = actor.id
 	           AND actor.id = actormember.actorId
 	           AND (
@@ -1811,16 +1811,16 @@
 	       user.id = mapping.userId
 	       OR user.id IN (
 	           SELECT actormember.userId
-	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-	                org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+	           FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember,
+	                org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 	           WHERE mapping.actorId = actor.id 
 	           AND actor.id = actormember.actorId
 	       )
 	       OR user.id IN (
 	           SELECT user_membership.userId
 	           FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership,
-	           	    org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-	                org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	           	    org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+	                org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 	           WHERE mapping.actorId = actor.id
 	           AND actor.id = actormember.actorId
 	           AND (
@@ -1854,8 +1854,8 @@
 						mapping.userId = :userId
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
@@ -1899,8 +1899,8 @@
 						mapping.userId = :userId
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
@@ -1945,8 +1945,8 @@
 						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
@@ -1991,8 +1991,8 @@
 						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
@@ -2037,28 +2037,28 @@
 
     <query name="getSRefBusinessDataInstance">
         SELECT ref
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance AS ref
         WHERE ref.name = :name
         AND ref.processInstanceId = :processInstanceId
     </query>
 
     <query name="getSRefBusinessDataInstancesOfProcess">
         SELECT ref
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance AS ref
         WHERE ref.processInstanceId = :processInstanceId
         ORDER BY ref.id
     </query>
 
     <query name="getSFlowNodeRefBusinessDataInstance">
         SELECT ref
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance AS ref
         WHERE ref.name = :name
         AND ref.flowNodeInstanceId = :flowNodeInstanceId
     </query>
 
     <query name="getNumberOfDataOfMultiRefBusinessData">
         SELECT ref.dataIds.size
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl AS
+        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance AS
         ref
         WHERE ref.name = :name
         AND ref.processInstanceId = :processInstanceId

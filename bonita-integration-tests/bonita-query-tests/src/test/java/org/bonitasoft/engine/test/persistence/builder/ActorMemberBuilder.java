@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 
-public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl, ActorMemberBuilder> {
+public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMember, ActorMemberBuilder> {
 
     private long actorId;
     private Long userId;
@@ -33,8 +33,8 @@ public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl
     }
 
     @Override
-    SActorMemberImpl _build() {
-        SActorMemberImpl actorMember = new SActorMemberImpl();
+    SActorMember _build() {
+        SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         if (userId != null)
             actorMember.setUserId(userId);

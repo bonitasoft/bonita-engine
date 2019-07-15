@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
@@ -28,14 +27,10 @@ import org.bonitasoft.engine.business.application.impl.converter.MenuIndexConver
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -76,8 +71,6 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    private final SApplicationBuilderFactory applicationKeyProvider;
-
     private IndexManager indexManager;
     private MenuIndexConverter menuIndexConverter;
     private ApplicationDestructor applicationDestructor;
@@ -106,7 +99,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.queriableLoggerService = queriableLoggerService;
-        applicationKeyProvider = BuilderFactory.get(SApplicationBuilderFactory.class);
     }
 
     @Override
@@ -190,7 +182,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), methodName, log);
         }
@@ -246,7 +238,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void handleHomePageUpdate(final EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException, SObjectModificationException {
-        final Long homePageId = (Long) updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID);
+        final Long homePageId = (Long) updateDescriptor.getFields().get(SApplication.HOME_PAGE_ID);
         if (homePageId != null) {
             final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
             if (applicationPage == null) {
@@ -264,7 +256,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         try {
             validateUpdatedFields(updateDescriptor, application);
-            updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
+            updateDescriptor.addField(SApplication.LAST_UPDATE_DATE, now);
 
             recorder.recordUpdate(UpdateRecord.buildSetFields(application,
                     updateDescriptor), APPLICATION);
@@ -287,9 +279,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor, final SApplication application) throws SBonitaReadException,
             SObjectAlreadyExistsException {
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
-                && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
-            validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
+        if (updateDescriptor.getFields().containsKey(SApplication.TOKEN)
+                && !application.getToken().equals(updateDescriptor.getFields().get(SApplication.TOKEN))) {
+            validateApplicationToken((String) updateDescriptor.getFields().get(SApplication.TOKEN));
         }
     }
 
@@ -501,11 +493,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private void organizeIndexesOnUpdate(final SApplicationMenu applicationMenu, final EntityUpdateDescriptor updateDescriptor, final boolean organizeIndexes)
             throws SObjectModificationException, SBonitaReadException {
         final Map<String, Object> fields = updateDescriptor.getFields();
-        if (fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX)) {
+        if (fields.containsKey(SApplicationMenu.PARENT_ID) && !fields.containsKey(SApplicationMenu.INDEX)) {
             //we need to force the update of index, as it has change of parent
-            fields.put(SApplicationMenuFields.INDEX, getNextAvailableIndex((Long) fields.get(SApplicationMenuFields.PARENT_ID)));
+            fields.put(SApplicationMenu.INDEX, getNextAvailableIndex((Long) fields.get(SApplicationMenu.PARENT_ID)));
         }
-        final Integer newIndexValue = (Integer) fields.get(SApplicationMenuFields.INDEX);
+        final Integer newIndexValue = (Integer) fields.get(SApplicationMenu.INDEX);
         if (newIndexValue != null && organizeIndexes) {
             final MenuIndex oldIndex = menuIndexConverter.toMenuIndex(applicationMenu);
             final MenuIndex newIndex = menuIndexConverter.toMenuIndex(applicationMenu, updateDescriptor);
@@ -590,9 +582,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
                     SApplicationMenu.class);
         } else {
-            final SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
             selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForChildOf", Collections.<String, Object> singletonMap(
-                    factory.getParentIdKey(), parentMenuId),
+                    SApplicationMenu.PARENT_ID, parentMenuId),
                     SApplicationMenu.class);
         }
         final Integer lastUsedIndex = persistenceService.selectOne(selectDescriptor);

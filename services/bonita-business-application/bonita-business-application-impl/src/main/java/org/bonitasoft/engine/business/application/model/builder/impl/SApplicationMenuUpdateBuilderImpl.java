@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder.impl;
 
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -34,25 +35,25 @@ public class SApplicationMenuUpdateBuilderImpl implements SApplicationMenuUpdate
 
     @Override
     public SApplicationMenuUpdateBuilder updateDisplayName(String displayName) {
-        descriptor.addField(SApplicationMenuFields.DISPLAY_NAME, displayName);
+        descriptor.addField(SApplicationMenu.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SApplicationMenuUpdateBuilder updateApplicationPageId(Long applicationPageId) {
-        descriptor.addField(SApplicationMenuFields.APPLICATION_PAGE_ID, applicationPageId);
+        descriptor.addField(SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId);
         return this;
     }
 
     @Override
     public SApplicationMenuUpdateBuilder updateIndex(int index) {
-        descriptor.addField(SApplicationMenuFields.INDEX, index);
+        descriptor.addField(SApplicationMenu.INDEX, index);
         return this;
     }
 
     @Override
     public SApplicationMenuUpdateBuilder updateParentId(Long parentId) {
-        descriptor.addField(SApplicationMenuFields.PARENT_ID, parentId);
+        descriptor.addField(SApplicationMenu.PARENT_ID, parentId);
         return this;
     }
 }

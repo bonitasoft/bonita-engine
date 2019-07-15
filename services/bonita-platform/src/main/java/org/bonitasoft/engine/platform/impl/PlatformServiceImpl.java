@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -57,7 +56,6 @@ import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -447,7 +445,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         STenant tenant;
         try {
-            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), name);
+            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, name);
             tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_TENANT_BY_NAME, parameters, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with name: " + name);
@@ -541,7 +539,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
 
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
+        desc.addField(STenant.STATUS, STenant.ACTIVATED);
         try {
             platformPersistenceService.update(desc);
             if (isTraced) {
@@ -566,7 +564,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.DEACTIVATED);
+        desc.addField(STenant.STATUS, STenant.DEACTIVATED);
         try {
             platformPersistenceService.update(desc);
             if (isTraced) {

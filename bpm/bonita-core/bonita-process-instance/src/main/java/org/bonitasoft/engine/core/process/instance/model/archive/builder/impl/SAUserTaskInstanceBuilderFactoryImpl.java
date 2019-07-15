@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SAUserTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuil
 
     @Override
     public SAUserTaskInstanceBuilder createNewUserTaskInstance(final SUserTaskInstance sUserTaskInstance) {
-        final SAUserTaskInstanceImpl entity = new SAUserTaskInstanceImpl(sUserTaskInstance);
+        final SAUserTaskInstance entity = new SAUserTaskInstance(sUserTaskInstance);
         return new SAUserTaskInstanceBuilderImpl(entity);
     }
 

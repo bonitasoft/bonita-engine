@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplicationMenuImpl, ApplicationMenuBuilder> {
+public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplicationMenu, ApplicationMenuBuilder> {
 
     public static ApplicationMenuBuilder anApplicationMenu() {
         return new ApplicationMenuBuilder();
@@ -31,8 +31,8 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
     private Long parentId;
 
     @Override
-    SApplicationMenuImpl _build() {
-        final SApplicationMenuImpl menu = new SApplicationMenuImpl(displayName, applicationId, applicationPageId, index);
+    SApplicationMenu _build() {
+        final SApplicationMenu menu = new SApplicationMenu(displayName, applicationId, applicationPageId, index);
         menu.setParentId(parentId);
         return menu;
     }

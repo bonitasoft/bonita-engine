@@ -42,7 +42,6 @@ import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -317,7 +316,7 @@ public class JobServiceImplForJobLogTest {
     @Test
     public void updateJobLog_should_update_job_log() throws Exception {
         // Given
-        final SJobLog jobLog = new SJobLogImpl();
+        final SJobLog jobLog = new SJobLog();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
 
         // When
@@ -330,7 +329,7 @@ public class JobServiceImplForJobLogTest {
     @Test(expected = SJobLogUpdatingException.class)
     public void updateJobLog_should_throw_exception_when_recorder_failed() throws Exception {
         // Given
-        final SJobLog jobLog = new SJobLogImpl();
+        final SJobLog jobLog = new SJobLog();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
@@ -341,7 +340,7 @@ public class JobServiceImplForJobLogTest {
     @Test
     public void jobWasExecuted_should_update_jobLog_on_exception_if_previous_joblog() throws Exception {
         // Given
-        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
+        final SJobLog jobLog = mock(SJobLog.class);
         doReturn(1L).when(jobLog).getRetryNumber();
         final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
 

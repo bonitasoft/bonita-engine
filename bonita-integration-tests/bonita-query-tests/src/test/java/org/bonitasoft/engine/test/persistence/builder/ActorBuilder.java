@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 
 
-public class ActorBuilder extends PersistentObjectBuilder<SActorImpl, ActorBuilder> {
+public class ActorBuilder extends PersistentObjectBuilder<SActor, ActorBuilder> {
 
     @Override
     ActorBuilder getThisBuilder() {
@@ -29,8 +29,8 @@ public class ActorBuilder extends PersistentObjectBuilder<SActorImpl, ActorBuild
     }
     
     @Override
-    SActorImpl _build() {
-        return new SActorImpl();
+    SActor _build() {
+        return new SActor();
     }
 
 }

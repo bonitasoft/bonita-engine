@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SASendTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuil
 
     @Override
     public SASendTaskInstanceBuilder createNewSendTaskInstance(final SSendTaskInstance sSendTaskInstance) {
-        final SASendTaskInstanceImpl entity = new SASendTaskInstanceImpl(sSendTaskInstance);
+        final SASendTaskInstance entity = new SASendTaskInstance(sSendTaskInstance);
         return new SASendTaskInstanceBuilderImpl(entity);
     }
 

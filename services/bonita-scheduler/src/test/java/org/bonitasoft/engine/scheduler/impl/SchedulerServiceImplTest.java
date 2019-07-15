@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,8 +45,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -264,8 +261,10 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void should_execute_again_an_existing_job() throws Exception {SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
-        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+    public void should_execute_again_an_existing_job() throws Exception {
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
         doReturn(jobDescriptor)
                 .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
@@ -278,8 +277,9 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void should_retry_a_job_that_failed() throws Exception {
-        SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
-        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
         doReturn(jobDescriptor)
                 .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
@@ -292,11 +292,13 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void should_retry_a_job_that_failed_while_changing_parameters() throws Exception {
-        SJobDescriptorImpl jobDescriptor = new SJobDescriptorImpl("jobClassName", "jobName", false);
-        jobDescriptor.setId(JOB_DESCRIPTOR_ID);
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
         doReturn(jobDescriptor)
                 .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
-        List<SJobParameter> parameters = asList(new SJobParameterImpl("a", 1), new SJobParameterImpl("b", 2));
+        List<SJobParameter> parameters = asList(SJobParameter.builder().key("a").value(1).build(),
+                SJobParameter.builder().key("b").value(2).build());
 
         schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID, parameters);
 

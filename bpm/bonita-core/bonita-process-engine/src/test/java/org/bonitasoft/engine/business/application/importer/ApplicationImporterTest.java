@@ -28,7 +28,6 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
@@ -130,7 +129,7 @@ public class ApplicationImporterTest {
         ArgumentCaptor<EntityUpdateDescriptor> updateCaptor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
         verify(applicationService, times(1)).updateApplication(eq(app), updateCaptor.capture());
         EntityUpdateDescriptor updateDescriptor = updateCaptor.getValue();
-        assertThat(updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(homePageId);
+        assertThat(updateDescriptor.getFields().get(SApplication.HOME_PAGE_ID)).isEqualTo(homePageId);
     }
 
     @Test

@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl.business.
 
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SRefBusinessDataInstanceBuilderImpl implements SRefBusinessDataInstanceBuilder {
 
-    private final SRefBusinessDataInstanceImpl entity;
+    private final SRefBusinessDataInstance entity;
 
-    public SRefBusinessDataInstanceBuilderImpl(final SRefBusinessDataInstanceImpl entity) {
+    public SRefBusinessDataInstanceBuilderImpl(final SRefBusinessDataInstance entity) {
         super();
         this.entity = entity;
     }
