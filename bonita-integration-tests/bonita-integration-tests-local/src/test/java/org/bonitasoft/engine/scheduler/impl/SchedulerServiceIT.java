@@ -32,14 +32,10 @@ import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.util.FunctionalMatcher;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
@@ -96,12 +92,12 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     public void doNotExecuteAFutureJob() throws Exception {
         final Date future = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
+        final SJobDescriptor jobDescriptor = SJobDescriptor.builder()
+                .jobClassName("org.bonitasoft.engine.scheduler.job.IncrementVariableJob").jobName("IncrementVariableJob").build();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testDoNotExecuteAFutureJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
+        parameters.add(SJobParameter.builder().key("jobName").value("testDoNotExecuteAFutureJob").build());
+        parameters.add(SJobParameter.builder().key("variableName").value(variableName).build());
+        parameters.add(SJobParameter.builder().key("throwExceptionAfterNIncrements").value(-1).build());
         final Trigger trigger = new OneExecutionTrigger("events", future, 10);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -133,11 +129,11 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         changeTenant(tenantForJobTest1);
         final String jobName = "ReleaseWaitersJob";
         Date now = new Date();
-        SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "1").done();
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder()
+                .jobClassName(ReleaseWaitersJob.class.getName()).jobName(jobName + "1").build();
         List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "1").done());
+        parameters.add(SJobParameter.builder().key("jobName").value(jobName).build());
+        parameters.add(SJobParameter.builder().key("jobKey").value("1").build());
         Trigger trigger = new UnixCronTriggerForTest("events", now, 10, "0/1 * * * * ?");
 
         // trigger it
@@ -156,10 +152,11 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         // trigger the job in an other tenant
         changeTenant(tenantForJobTest2);
         now = new Date(System.currentTimeMillis() + 100);
-        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
+        jobDescriptor = SJobDescriptor.builder()
+                .jobClassName(ReleaseWaitersJob.class.getName()).jobName(jobName + "2").build();
         parameters = new ArrayList<>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName3", jobName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "3").done());
+        parameters.add(SJobParameter.builder().key("jobName3").value(jobName).build());
+        parameters.add(SJobParameter.builder().key("jobKey").value("3").build());
         trigger = new OneShotTrigger("events3", now, 10);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -299,8 +296,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
 
     private SJobDescriptor jobDescriptor(Class<?> jobClass, String jobName) {
-        return BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(jobClass.getName(), jobName).done();
+        return SJobDescriptor.builder()
+                .jobClassName(jobClass.getName()).jobName(jobName).build();
     }
 
     private void schedule(SJobDescriptor jobDescriptor, Trigger trigger, Map<String, Serializable> parameters) throws Exception {
@@ -312,7 +309,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     }
 
     private List<SJobParameter> toJobParameterList(Map<String, Serializable> parameters) {
-        return parameters.entrySet().stream().map(e -> BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(e.getKey(), e.getValue()).done()).collect(Collectors.toList());
+        return parameters.entrySet().stream().map(e -> SJobParameter.builder().key(e.getKey()).value(e.getValue()).build()).collect(Collectors.toList());
     }
 
 }

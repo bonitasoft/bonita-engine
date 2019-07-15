@@ -13,12 +13,48 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- */
-public interface SADocumentMapping extends SDocumentMapping, ArchivedPersistentObject {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SADocumentMapping extends SDocumentMapping implements ArchivedPersistentObject {
+
+    public static final String ID = "id";
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    public static final String ARCHIVE_DATE = "archiveDate";
+    public static final String SOURCE_OBJECT_ID = "sourceObjectId";
+    public static final String DOCUMENT_ID = "documentId";
+    public static final String URL = "url";
+    public static final String NAME = "name";
+    public static final String HAS_CONTENT = "hasContent";
+    public static final String AUTHOR = "author";
+    public static final String FILE_NAME = "fileName";
+    public static final String MIME_TYPE = "mimeType";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String DESCRIPTION = "description";
+    public static final String VERSION = "version";
+    public static final String INDEX = "index";
+    private long archiveDate;
+    private long sourceObjectId;
+
+    public SADocumentMapping(final long documentId, final long processInstanceId, final long archiveDate, final long sourceObjectId, final String name,
+                                 final String description, final String version) {
+        super(documentId, processInstanceId, name);
+        setDescription(description);
+        setVersion(version);
+        this.archiveDate = archiveDate;
+        this.sourceObjectId = sourceObjectId;
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SDocumentMapping.class;
+    }
 
 }

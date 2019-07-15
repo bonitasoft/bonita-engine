@@ -13,9 +13,17 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-/**
- * @author Celine Souchet
- */
-public interface SPlatformDependency extends SDependency {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SPlatformDependency extends AbstractSDependency {
+
+    public SPlatformDependency(final String name, final String fileName, final byte[] value) {
+        super(name, fileName, value);
+    }
 
 }

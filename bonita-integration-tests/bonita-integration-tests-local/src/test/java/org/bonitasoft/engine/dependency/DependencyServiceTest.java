@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class DependencyServiceTest extends CommonBPMServicesTest {
     public void testLifeCycle() throws Exception {
         getTransactionService().begin();
 
-        SDependency mappedDependency = dependencyService.createMappedDependency(defaultName, defaultValue, defaultFileName, 2L, ScopeType.PROCESS);
+        AbstractSDependency mappedDependency = dependencyService.createMappedDependency(defaultName, defaultValue, defaultFileName, 2L, ScopeType.PROCESS);
 
         List<Long> dependencyIds = dependencyService.getDependencyIds(2L, ScopeType.PROCESS, 0, 1);
 

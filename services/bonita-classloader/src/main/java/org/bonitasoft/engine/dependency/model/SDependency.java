@@ -13,19 +13,13 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import lombok.NoArgsConstructor;
 
-/**
- * @author Matthieu Chaffotte
- */
-public interface SDependency extends PersistentObject {
+@NoArgsConstructor
+public class SDependency extends AbstractSDependency {
 
-    String getName();
-
-    String getDescription();
-
-    String getFileName();
-
-    byte[] getValue();
+    public SDependency(final String name, final String fileName, final byte[] value) {
+        super(name, fileName, value);
+    }
 
 }

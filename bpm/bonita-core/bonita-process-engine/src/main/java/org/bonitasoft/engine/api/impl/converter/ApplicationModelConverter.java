@@ -28,8 +28,7 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
+import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.exception.CreationException;
@@ -51,18 +50,20 @@ public class ApplicationModelConverter {
 
     public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
-        final String name = (String) fields.get(ApplicationField.TOKEN);
-        final String displayName = (String) fields.get(ApplicationField.DISPLAY_NAME);
-        final String version = (String) fields.get(ApplicationField.VERSION);
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version,
-                creatorUserId, getLayoutId(creator), getThemeId(creator));
-        builder.setDescription(description);
-        builder.setIconPath(iconPath);
-        builder.setProfileId(profileId);
-        return builder.done();
+        return SApplication.builder().token((String) fields.get(ApplicationField.TOKEN))
+                .displayName((String) fields.get(ApplicationField.DISPLAY_NAME))
+                .version((String) fields.get(ApplicationField.VERSION))
+                .creationDate(System.currentTimeMillis())
+                .lastUpdateDate(System.currentTimeMillis())
+                .createdBy(creatorUserId)
+                .state(SApplicationState.ACTIVATED.name())
+                .layoutId(getLayoutId(creator))
+                .themeId(getThemeId(creator))
+                .updatedBy(creatorUserId)
+        .description(description).iconPath(iconPath).profileId(profileId).build();
     }
     
     protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {

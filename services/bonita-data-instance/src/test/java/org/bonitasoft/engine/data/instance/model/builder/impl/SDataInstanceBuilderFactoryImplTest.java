@@ -22,94 +22,94 @@ import java.util.Date;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.STextDataDefinition;
 import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
+import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
+import org.bonitasoft.engine.data.instance.model.SBooleanDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDateDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDoubleDataInstance;
+import org.bonitasoft.engine.data.instance.model.SFloatDataInstance;
+import org.bonitasoft.engine.data.instance.model.SIntegerDataInstance;
+import org.bonitasoft.engine.data.instance.model.SLongDataInstance;
+import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
+import org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
-import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.junit.Test;
 
 public class SDataInstanceBuilderFactoryImplTest {
 
     @Test
     public void createNewInstanceHandlesDateType() throws Exception {
-        testSpecificDataType(Date.class.getName(), SDateDataInstanceImpl.class);
+        testSpecificDataType(Date.class.getName(), SDateDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesIntegerType() throws Exception {
-        testSpecificDataType(Integer.class.getName(), SIntegerDataInstanceImpl.class);
+        testSpecificDataType(Integer.class.getName(), SIntegerDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesLongType() throws Exception {
-        testSpecificDataType(Long.class.getName(), SLongDataInstanceImpl.class);
+        testSpecificDataType(Long.class.getName(), SLongDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesStringType() throws Exception {
-        testSpecificDataType(String.class.getName(), SShortTextDataInstanceImpl.class);
+        testSpecificDataType(String.class.getName(), SShortTextDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesDoubleType() throws Exception {
-        testSpecificDataType(Double.class.getName(), SDoubleDataInstanceImpl.class);
+        testSpecificDataType(Double.class.getName(), SDoubleDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesFloatType() throws Exception {
-        testSpecificDataType(Float.class.getName(), SFloatDataInstanceImpl.class);
+        testSpecificDataType(Float.class.getName(), SFloatDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesByteArrayAsBLOBType() throws Exception {
-        testSpecificDataType(byte[].class.getName(), SBlobDataInstanceImpl.class);
+        testSpecificDataType(byte[].class.getName(), SBlobDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesBooleanType() throws Exception {
-        testSpecificDataType(Boolean.class.getName(), SBooleanDataInstanceImpl.class);
+        testSpecificDataType(Boolean.class.getName(), SBooleanDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesCustomTypeAsXMLObject() throws Exception {
-        testSpecificDataType(Object.class.getName(), SXMLObjectDataInstanceImpl.class);
+        testSpecificDataType(Object.class.getName(), SXMLObjectDataInstance.class);
     }
 
-    private void testSpecificDataType(final String dataTypeName, final Class<? extends SDataInstanceImpl> dataInstanceClass)
+    private void testSpecificDataType(final String dataTypeName, final Class<? extends SDataInstance> dataInstanceClass)
             throws SDataInstanceNotWellFormedException {
         final SDataDefinition dataDefinition = mock(SDataDefinition.class);
         when(dataDefinition.getClassName()).thenReturn(dataTypeName);
 
-        final SDataInstanceBuilder newInstance = new SDataInstanceBuilderFactoryImpl().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder newInstance = SDataInstanceBuilder.createNewInstance(dataDefinition);
 
         assertThat(newInstance.done()).isInstanceOf(dataInstanceClass);
     }
 
     @Test
     public void createNewInstanceHandlesXMLType() throws Exception {
-        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(mock(SXMLDataDefinition.class)).done()).isInstanceOf(SXMLDataInstance.class);
+        assertThat(SDataInstanceBuilder.createNewInstance(mock(SXMLDataDefinition.class)).done()).isInstanceOf(SXMLDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesShortTextType() throws Exception {
-        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(mock(STextDataDefinition.class)).done()).isInstanceOf(
-                SShortTextDataInstanceImpl.class);
+        assertThat(SDataInstanceBuilder.createNewInstance(mock(STextDataDefinition.class)).done()).isInstanceOf(
+                SShortTextDataInstance.class);
     }
 
     @Test
     public void createNewInstanceHandlesLongTextType() throws Exception {
         final STextDataDefinition dataDef = mock(STextDataDefinition.class);
         when(dataDef.isLongText()).thenReturn(true);
-        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(dataDef).done()).isInstanceOf(SLongTextDataInstanceImpl.class);
+        assertThat(SDataInstanceBuilder.createNewInstance(dataDef).done()).isInstanceOf(SLongTextDataInstance.class);
     }
 }

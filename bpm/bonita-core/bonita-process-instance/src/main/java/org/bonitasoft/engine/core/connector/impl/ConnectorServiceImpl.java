@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,7 +60,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -419,7 +418,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         Set<String> dependenciesToUpdate = new HashSet<>();
         if (jarFileNames != null) {
             for (String jarFileName : jarFileNames) {
-                SDependency dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, jarFileName);
+                AbstractSDependency dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, jarFileName);
                 if (dependencyOfArtifact == null) {
                     // For compatibility with older versions that may still have the wrong name in database:
                     dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS,
@@ -439,7 +438,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             if (dependenciesToUpdate.contains(file.getKey())) {
                 dependencyService.updateDependencyOfArtifact(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
             } else {
-                final SDependency existingDependency = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, file.getKey());
+                final AbstractSDependency existingDependency = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, file.getKey());
                 if (existingDependency != null) {
                     //a dependency with this name did exists event if it was not declared as a dependency of the connector inside the connector impl file
                     if (connectorImplementationDescriptorToReplace != null) {

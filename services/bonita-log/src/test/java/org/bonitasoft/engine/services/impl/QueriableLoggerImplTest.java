@@ -30,7 +30,6 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
@@ -61,10 +60,8 @@ public class QueriableLoggerImplTest {
     private QueriableLogSessionProvider sessionProvider;
     @Mock
     private TechnicalLoggerService logger;
-    @Mock
-    private SQueriableLogImpl log1;
-    @Mock
-    private SQueriableLogImpl log2;
+    private SQueriableLog log1 = SQueriableLog.builder().build();
+    private SQueriableLog log2 = SQueriableLog.builder().build();
     @Mock
     private PlatformService platformService;
     @Captor
@@ -81,13 +78,13 @@ public class QueriableLoggerImplTest {
     @Before
     public void setUp() {
         SPlatformProperties platformProperties = mock(SPlatformProperties.class);
-        doReturn(FIRST_ACTION).when(log1).getActionType();
-        doReturn(SQueriableLogSeverity.INTERNAL).when(log1).getSeverity();
-        doReturn("msg").when(log1).getRawMessage();
+        log1.setActionType(FIRST_ACTION);
+        log1.setSeverity(SQueriableLogSeverity.INTERNAL);
+        log1.setRawMessage("msg");
 
-        doReturn(SECOND_ACTION).when(log2).getActionType();
-        doReturn(SQueriableLogSeverity.INTERNAL).when(log2).getSeverity();
-        doReturn("new action msg").when(log2).getRawMessage();
+        log2.setActionType(SECOND_ACTION);
+        log2.setSeverity(SQueriableLogSeverity.INTERNAL);
+        log2.setRawMessage("new action msg");
 
         doReturn(platformProperties).when(platformService).getSPlatformProperties();
         doReturn("6.3").when(platformProperties).getPlatformVersion();
@@ -131,13 +128,14 @@ public class QueriableLoggerImplTest {
         // then
         verify(transactionService).registerBonitaSynchronization(synchroCaptor.capture());
         BatchLogSynchronization value = synchroCaptor.getValue();
-        assertThat(value.getLogs()).containsExactly(log1);
-        verify(log1).setClusterNode("node1");
-        verify(log1).setCallerClassName("CallerClass");
-        verify(log1).setCallerMethodName("callerMethod");
-        verify(log1).setProductVersion("6.3");
-        verify(log1).setUserId("walter.bates");
-
+        assertThat(value.getLogs()).hasSize(1);
+        SQueriableLog insertedLog = value.getLogs().get(0);
+        assertThat(insertedLog.getActionType()).isEqualTo(FIRST_ACTION);
+        assertThat(insertedLog.getClusterNode()).isEqualTo("node1");
+        assertThat(insertedLog.getCallerClassName()).isEqualTo("CallerClass");
+        assertThat(insertedLog.getCallerMethodName()).isEqualTo("callerMethod");
+        assertThat(insertedLog.getProductVersion()).isEqualTo("6.3");
+        assertThat(insertedLog.getUserId()).isEqualTo("walter.bates");
     }
 
     @Test
@@ -164,7 +162,7 @@ public class QueriableLoggerImplTest {
         // then
         verify(transactionService).registerBonitaSynchronization(synchroCaptor.capture());
         BatchLogSynchronization value = synchroCaptor.getValue();
-        assertThat(value.getLogs()).containsExactly(log1, log2);
+        assertThat(value.getLogs()).extracting("actionType").containsExactly(FIRST_ACTION, SECOND_ACTION);
     }
 
     @Test
@@ -183,7 +181,7 @@ public class QueriableLoggerImplTest {
     @Test
     public void getLogs_should_return_logs_from_persitence_service() throws Exception {
         // given
-        List<SQueriableLogImpl> persistenceLogs = Arrays.asList(log1, log2);
+        List<SQueriableLog> persistenceLogs = Arrays.asList(log1, log2);
         doReturn(persistenceLogs).when(persistenceService).selectList(selectListCaptor.capture());
 
         // when
@@ -213,7 +211,7 @@ public class QueriableLoggerImplTest {
     public void searchLogs_should_return_logs_from_persistence_service() throws Exception {
         // given
         QueryOptions queryOptions = new QueryOptions(0, 10);
-        List<SQueriableLogImpl> persistenceLogs = Arrays.asList(log1, log2);
+        List<SQueriableLog> persistenceLogs = Arrays.asList(log1, log2);
         doReturn(persistenceLogs).when(persistenceService).searchEntity(SQueriableLog.class, queryOptions, null);
 
         // when

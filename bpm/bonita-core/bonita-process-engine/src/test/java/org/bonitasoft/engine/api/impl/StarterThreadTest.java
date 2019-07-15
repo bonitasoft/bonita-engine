@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.model.impl.STenantImpl;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
@@ -44,10 +44,10 @@ public class StarterThreadTest {
     private PlatformServiceAccessor platformAccessor;
     @Mock
     private NodeConfiguration platformConfiguration;
-    private final STenantImpl tenant = createTenant();
+    private final STenant tenant = createTenant();
 
-    private STenantImpl createTenant() {
-        STenantImpl sTenant = new STenantImpl("tenant1", "system", 12345, "ACTIVATED", true);
+    private STenant createTenant() {
+        STenant sTenant = new STenant("tenant1", "system", 12345, "ACTIVATED", true);
         sTenant.setId(1L);
         return sTenant;
     }

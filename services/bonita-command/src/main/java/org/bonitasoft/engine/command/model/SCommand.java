@@ -13,18 +13,27 @@
  **/
 package org.bonitasoft.engine.command.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Matthieu Chaffotte
- */
-public interface SCommand extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SCommand implements PersistentObject {
 
-    String getName();
-
-    String getDescription();
-
-    String getImplementation();
-
-    boolean isSystem();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String IMPLEMENTATION = "implementation";
+    public static final String SYSTEM = "isSystem";
+    private long tenantId;
+    private long id;
+    private boolean isSystem;
+    private String name;
+    private String description;
+    private String implementation;
 }

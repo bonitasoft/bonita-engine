@@ -13,18 +13,24 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
-public interface SDependencyMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SDependencyMapping implements PersistentObject {
+    private long id;
+    private long artifactId;
+    private ScopeType artifactType;
+    private long dependencyId;
+    private long tenantId;
 
-    long getDependencyId();
-
-    long getArtifactId();
-
-    ScopeType getArtifactType();
+    public SDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+        super();
+        this.artifactId = artifactId;
+        this.artifactType = artifactType;
+        this.dependencyId = dependencyId;
+    }
 
 }

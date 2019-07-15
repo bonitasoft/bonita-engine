@@ -13,21 +13,46 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.archive;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Zhang Bole
- */
-public interface SAComment extends ArchivedPersistentObject {
+@Data
+@NoArgsConstructor
+public class SAComment implements ArchivedPersistentObject {
 
-    long getTenantId();
 
-    Long getUserId();
+    public static final String ID_KEY = "id";
+    public static final String TENANTID_KEY = "tenantId";
+    public static final String USERID_KEY = "userId";
+    public static final String PROCESSINSTANCEID_KEY = "processInstanceId";
+    public static final String POSTDATE_KEY = "postDate";
+    public static final String CONTENT_KEY = "content";
+    public static final String ARCHIVEDATE_KEY = "archiveDate";
+    public static final String SOURCEOBJECTID_KEY = "sourceObjectId";
+    private long id;
+    private long tenantId;
+    private Long userId;
+    private long processInstanceId;
+    private long sourceObjectId;
+    private long postDate;
+    private long archiveDate;
+    private String content;
 
-    long getProcessInstanceId();
+    public SAComment(final SComment sComment) {
+        tenantId = sComment.getTenantId();
+        content = sComment.getContent();
+        postDate = sComment.getPostDate();
+        sourceObjectId = sComment.getId();
+        processInstanceId = sComment.getProcessInstanceId();
+        userId = sComment.getUserId();
+    }
 
-    long getPostDate();
-
-    String getContent();
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SComment.class;
+    }
 
 }

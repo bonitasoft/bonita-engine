@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -25,7 +25,8 @@ public class SACallActivityInstanceBuilderFactoryImpl extends SAActivityInstance
 
     @Override
     public SACallActivityInstanceBuilder createNewArchivedCallActivityInstance(final SCallActivityInstance callActivityInstance) {
-        final SACallActivityInstanceImpl entity = new SACallActivityInstanceImpl(callActivityInstance);
+        final SACallActivityInstance entity = new SACallActivityInstance
+                (callActivityInstance);
         return new SACallActivityInstanceBuilderImpl(entity);
     }
 

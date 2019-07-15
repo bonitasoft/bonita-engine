@@ -41,7 +41,7 @@ public class PageQueriesTest {
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
 
         //when
-        final SPageContent pageContent = repository.getPageContent(page.getId());
+        final SPageWithContent pageContent = repository.getPageContent(page.getId());
         // //then
         assertThat(pageContent.getContent()).isEqualTo("The content".getBytes());
         assertThat(pageContent.getId()).isEqualTo(page.getId());

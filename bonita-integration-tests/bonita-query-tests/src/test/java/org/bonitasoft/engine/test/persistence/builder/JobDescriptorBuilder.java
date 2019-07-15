@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class JobDescriptorBuilder extends PersistentObjectBuilder<SJobDescriptorImpl, JobDescriptorBuilder> {
+public class JobDescriptorBuilder extends PersistentObjectBuilder<SJobDescriptor, JobDescriptorBuilder> {
 
     public static JobDescriptorBuilder aJobDescriptor() {
         return new JobDescriptorBuilder();
@@ -30,8 +30,8 @@ public class JobDescriptorBuilder extends PersistentObjectBuilder<SJobDescriptor
     }
 
     @Override
-    SJobDescriptorImpl _build() {
-        return new SJobDescriptorImpl();
+    SJobDescriptor _build() {
+        return new SJobDescriptor();
     }
 
 }

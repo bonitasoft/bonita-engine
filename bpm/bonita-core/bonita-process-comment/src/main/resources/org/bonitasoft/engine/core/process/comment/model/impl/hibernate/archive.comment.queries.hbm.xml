@@ -5,31 +5,31 @@
 
   <query name="getNumberOfSAComment">
 	SELECT COUNT(DISTINCT saComment)
-	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS saComment
 	WHERE saComment.archiveDate = (
-			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS sac
+			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS sac
 			WHERE sac.sourceObjectId = saComment.sourceObjectId
 	)
   </query>
   
   <query name="searchSAComment">
 	SELECT saComment
-	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS saComment
 	WHERE saComment.archiveDate = (
-			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS sac
+			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS sac
 			WHERE sac.sourceObjectId = saComment.sourceObjectId
 	)
   </query>
   
   <query name="getArchivedCommentById">
 	SELECT saComment
-	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS saComment
 	WHERE saComment.id = :id
   </query>
 
 	<query name="deleteArchiveCommentsOfProcessInstances">
 		DELETE
-		FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+		FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS saComment
 		WHERE saComment.processInstanceId IN (:processInstanceIds)
 	</query>
 </hibernate-mapping>

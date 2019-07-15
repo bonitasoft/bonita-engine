@@ -129,7 +129,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                 throw new IllegalArgumentException("Illegal form target " + target);
 
         }
-        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task, target);
+        SFormMapping sFormMapping = new SFormMapping(processDefinitionId, type, task, target);
         insertFormMapping(sFormMapping, sPageMapping);
         return sFormMapping;
     }
@@ -146,7 +146,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         return pageByName == null ? null : pageByName.getId();
     }
 
-    private void insertFormMapping(SFormMappingImpl sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {
+    private void insertFormMapping(SFormMapping sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {
         sFormMapping.setPageMapping(sPageMapping);
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.CREATED);
         try {
@@ -175,7 +175,7 @@ public class FormMappingServiceImpl implements FormMappingService {
             // case where page mapping did not exist already (TARGET == UNDEFINED):
             if (formMapping.getPageMapping() == null) {
                 SPageMapping sPageMapping = createPageMappingForExistingFormMapping(formMapping, url, pageId);
-                ((SFormMappingImpl) formMapping).setPageMapping(sPageMapping);
+                formMapping.setPageMapping(sPageMapping);
             } else {
                 oldPageId = formMapping.getPageMapping().getPageId();
                 oldUrlAdapter = formMapping.getPageMapping().getUrlAdapter();
@@ -233,7 +233,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(formMapping.getId());
         logBuilder.rawMessage(rawMessage);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }

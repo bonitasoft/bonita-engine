@@ -29,7 +29,7 @@ import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -87,7 +87,7 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         final List<SDependencyMapping> dependencyMappings = dependencyService
                 .getDependencyMappings(new QueryOptions(0, Integer.MAX_VALUE, null, filters, null));
         for (SDependencyMapping dependencyMapping : dependencyMappings) {
-            final SDependency dependency = dependencyService.getDependency(dependencyMapping.getDependencyId());
+            final AbstractSDependency dependency = dependencyService.getDependency(dependencyMapping.getDependencyId());
             businessArchiveBuilder.addClasspathResource(new BarResource(dependency.getFileName(), dependency.getValue()));
         }
     }
@@ -113,9 +113,9 @@ public class ClasspathArtifactManager implements BusinessArchiveArtifactManager 
         if (dependencyIds.isEmpty()) {
             return Collections.emptyList();
         }
-        final List<SDependency> dependencies = dependencyService.getDependencies(dependencyIds);
+        final List<AbstractSDependency> dependencies = dependencyService.getDependencies(dependencyIds);
         final ArrayList<String> dependencyNames = new ArrayList<>(dependencies.size());
-        for (final SDependency sDependency : dependencies) {
+        for (final AbstractSDependency sDependency : dependencies) {
             dependencyNames.add(sDependency.getName());
         }
         return dependencyNames;

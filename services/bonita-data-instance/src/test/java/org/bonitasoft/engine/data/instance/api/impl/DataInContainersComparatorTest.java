@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance;
 import org.junit.Test;
 
 /**
@@ -38,7 +38,7 @@ public class DataInContainersComparatorTest {
                     new DataContainer(3L, "PROC")));
 
     private SADataInstance data(long containerId, String containerType) throws ParseException {
-        SALongTextDataInstanceImpl sLongTextDataInstance = new SALongTextDataInstanceImpl();
+        SALongTextDataInstance sLongTextDataInstance = new SALongTextDataInstance();
         sLongTextDataInstance.setId(UUID.randomUUID().getLeastSignificantBits());
         sLongTextDataInstance.setContainerId(containerId);
         sLongTextDataInstance.setContainerType(containerType);

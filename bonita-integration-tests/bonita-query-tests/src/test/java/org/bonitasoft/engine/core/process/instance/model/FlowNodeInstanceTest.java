@@ -29,7 +29,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
@@ -79,13 +79,13 @@ public class FlowNodeInstanceTest {
     }
 
     protected void buildAndCreateProcessDefinition(final long id, final long processDefinitionId, final String processName) {
-        final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
-        sProcessDefinitionDeployInfoImpl.setId(id);
-        sProcessDefinitionDeployInfoImpl.setName(processName);
-        sProcessDefinitionDeployInfoImpl.setVersion("version");
-        sProcessDefinitionDeployInfoImpl.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfoImpl.setTenantId(1L);
-        repository.add(sProcessDefinitionDeployInfoImpl);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
+        sProcessDefinitionDeployInfo.setId(id);
+        sProcessDefinitionDeployInfo.setName(processName);
+        sProcessDefinitionDeployInfo.setVersion("version");
+        sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
+        sProcessDefinitionDeployInfo.setTenantId(1L);
+        repository.add(sProcessDefinitionDeployInfo);
     }
 
     @Test

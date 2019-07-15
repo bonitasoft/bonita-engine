@@ -13,25 +13,26 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- */
-public interface SLightDocument extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SLightDocument implements PersistentObject {
 
-    long getTenantId();
 
-    long getAuthor();
+    private long id;
+    private long tenantId;
+    private long author;
+    private long creationDate;
+    private boolean hasContent;
+    private String fileName;
+    private String mimeType;
+    private String url;
 
-    long getCreationDate();
-
-    String getMimeType();
-
-    String getFileName();
-
-    boolean hasContent();
-
-    String getUrl();
+    public boolean hasContent() {
+        return hasContent;
+    }
 
 }

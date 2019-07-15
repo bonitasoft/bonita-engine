@@ -46,12 +46,9 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageBuilderFactory;
-import org.bonitasoft.engine.page.SPageContent;
 import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -249,7 +246,7 @@ public class PageServiceImpl implements PageService {
     SPage insertPage(final SPage page, final byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, "Adding a new page with name " + page.getName());
         try {
-            final SPageWithContent pageContent = new SPageWithContentImpl(page, content);
+            final SPageWithContent pageContent = new SPageWithContent(page, content);
             final SPage pageByName = checkIfPageAlreadyExists(page);
             if (null != pageByName) {
                 initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
@@ -420,7 +417,7 @@ public class PageServiceImpl implements PageService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), methodName, log);
         }
@@ -543,13 +540,12 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
         try {
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
-                    SPageContent.class, pageId));
-            final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
-                    .createNewInstance(new EntityUpdateDescriptor());
-            builder.updateContent(content);
+            final SPageWithContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
+                    SPageWithContent.class, pageId));
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField("content", content);
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent,
-                    builder.done()), PAGE);
+                    entityUpdateDescriptor), PAGE);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 

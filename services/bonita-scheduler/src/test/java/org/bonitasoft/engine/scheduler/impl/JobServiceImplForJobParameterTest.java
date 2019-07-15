@@ -18,8 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -30,12 +28,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -48,7 +44,6 @@ import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDelet
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterReadException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -302,7 +297,7 @@ public class JobServiceImplForJobParameterTest {
 
     @Test
     public void should_list_parameters() throws Exception {
-        when(readPersistenceService.selectList(any())).thenReturn(Collections.singletonList(new SJobParameterImpl("key", "value")));
+        when(readPersistenceService.selectList(any())).thenReturn(Collections.singletonList(SJobParameter.builder().key("key").value("value").build()));
 
         List<SJobParameter> result = jobServiceImpl.getJobParameters(123L);
 

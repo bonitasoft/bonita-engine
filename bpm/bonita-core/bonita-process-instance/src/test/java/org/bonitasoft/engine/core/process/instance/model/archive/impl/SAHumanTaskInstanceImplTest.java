@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.junit.Test;
 
 /**
@@ -39,7 +40,7 @@ public class SAHumanTaskInstanceImplTest {
         taskInstance.setExecutedBySubstitute(11111L);
         final long expectedEndDate = System.currentTimeMillis() + 10;
         taskInstance.setExpectedEndDate(expectedEndDate);
-        final SAUserTaskInstanceImpl archivedTaskInstance = new SAUserTaskInstanceImpl(taskInstance);
+        final SAUserTaskInstance archivedTaskInstance = new SAUserTaskInstance(taskInstance);
 
         assertThat(archivedTaskInstance.getType()).isEqualTo(taskInstance.getType());
         assertThat(archivedTaskInstance.getActorId()).isEqualTo(7L);
@@ -72,7 +73,7 @@ public class SAHumanTaskInstanceImplTest {
 
         //when
         taskInstance.setExpectedEndDate(null);
-        final SAUserTaskInstanceImpl archivedTaskInstance = new SAUserTaskInstanceImpl(taskInstance);
+        final SAUserTaskInstance archivedTaskInstance = new SAUserTaskInstance(taskInstance);
 
         //then
         assertThat(archivedTaskInstance.getExpectedEndDate()).isNull();

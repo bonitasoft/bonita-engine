@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SAManualTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBu
 
     @Override
     public SAManualTaskInstanceBuilder createNewManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {
-        final SAManualTaskInstanceImpl entity = new SAManualTaskInstanceImpl(sManualTaskInstance);
+        final SAManualTaskInstance entity = new SAManualTaskInstance(sManualTaskInstance);
         return new SAManualTaskInstanceBuilderImpl(entity);
     }
 

@@ -22,9 +22,9 @@ import org.bonitasoft.engine.page.SPageBuilder;
  */
 public class SPageBuilderImpl implements SPageBuilder {
 
-    private final SPageImpl page;
+    private final SPage page;
 
-    public SPageBuilderImpl(final SPageImpl page) {
+    public SPageBuilderImpl(final SPage page) {
         super();
         this.page = page;
     }

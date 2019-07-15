@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.test.util;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 public class PlatformUtil {
@@ -37,9 +34,7 @@ public class PlatformUtil {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status,
-                    false);
-            final STenant tenant = tenantBuilder.done();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created).status(status).defaultTenant(false).build();
             platformService.createTenant(tenant);
             BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
@@ -55,9 +50,7 @@ public class PlatformUtil {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class)
-                    .createNewInstance(tenantName, createdBy, created, status, true);
-            final STenant tenant = tenantBuilder.done();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created).status(status).defaultTenant(true).build();
             platformService.createTenant(tenant);
             BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());

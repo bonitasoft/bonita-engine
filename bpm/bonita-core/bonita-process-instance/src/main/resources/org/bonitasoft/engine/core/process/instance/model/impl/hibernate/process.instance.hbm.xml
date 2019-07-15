@@ -303,7 +303,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true" table="ref_biz_data_inst">
+    <class name="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" abstract="true" table="ref_biz_data_inst">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -314,19 +314,19 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" extends="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" abstract="true">
         <property name="dataId" column="data_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="proc_simple_ref">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance" extends="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" discriminator-value="proc_simple_ref">
         <property name="processInstanceId" column="proc_inst_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="fn_simple_ref">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance" extends="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" discriminator-value="fn_simple_ref">
         <property name="flowNodeInstanceId" column="fn_inst_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance" extends="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" abstract="true">
         <list name="dataIds" table="multi_biz_data">
             <key>
                 <column name="tenantid" />
@@ -337,7 +337,7 @@
         </list>
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" discriminator-value="proc_multi_ref">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance" extends="org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance" discriminator-value="proc_multi_ref">
         <property name="processInstanceId" column="proc_inst_id" />
     </subclass>
 

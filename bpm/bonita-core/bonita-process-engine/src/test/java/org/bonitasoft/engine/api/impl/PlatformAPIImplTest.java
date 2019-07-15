@@ -36,7 +36,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -177,9 +176,9 @@ public class PlatformAPIImplTest {
     @Test
     public void should_deactivate_and_delete_tenant_when_cleaning_platform() throws Exception {
         //given
-        STenantImpl tenant1 = new STenantImpl("t1", "john", 123342, "ACTIVATED", true);
+        STenant tenant1 = new STenant("t1", "john", 123342, "ACTIVATED", true);
         tenant1.setId(1L);
-        STenantImpl tenant2 = new STenantImpl("t2", "john", 12335645, "ACTIVATED", false);
+        STenant tenant2 = new STenant("t2", "john", 12335645, "ACTIVATED", false);
         tenant2.setId(2L);
         doReturn(Arrays.asList(tenant1,
                 tenant2)).when(platformService).getTenants(any(QueryOptions.class));

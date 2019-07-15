@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -39,12 +38,11 @@ public class ApplicationRelatedMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public QueryOptions buildQueryOptions() {
-        SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, factory.getIdKey(), OrderByType.ASC));
+        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
         List<FilterOption> filters = new ArrayList<FilterOption>(2);
-        filters.add(new FilterOption(SApplicationMenu.class, factory.getApplicationIdKey(), applicationId));
+        filters.add(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID, applicationId));
         //only too menu will be deleted as children menus will be deleted by the parent
-        filters.add(new FilterOption(SApplicationMenu.class, factory.getParentIdKey(), null));
+        filters.add(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, null));
         return new QueryOptions(range.getStartIndex(), range.getMaxResults(), orderByOptions, filters, null);
     }
 

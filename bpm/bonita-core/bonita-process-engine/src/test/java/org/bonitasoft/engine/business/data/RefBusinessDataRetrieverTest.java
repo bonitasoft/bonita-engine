@@ -29,11 +29,10 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -60,10 +59,10 @@ public class RefBusinessDataRetrieverTest {
     private static long EVENT_SUBPROCESS_ID = 5452220L;
     private static long FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS = 213215L;
     private static long FLOW_NODE_INSTANCE_ID = 100L;
-    private SAFlowNodeInstanceImpl archivedFlowNodeInstance;
+    private SAFlowNodeInstance archivedFlowNodeInstance;
     private SFlowNodeInstance flowNodeInstance;
     private SProcessInstance processInstance;
-    private SAProcessInstanceImpl archivedProcessInstance;
+    private SAProcessInstance archivedProcessInstance;
     private SProcessInstance eventSubProcessInstance;
     private SFlowNodeInstance eventSubProcessFlowNode;
 
@@ -72,10 +71,10 @@ public class RefBusinessDataRetrieverTest {
         flowNodeInstance = new SAutomaticTaskInstance("auto1", 312490L, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, 0L, 0L);
         flowNodeInstance.setLogicalGroup(1, PROCESS_INSTANCE_ID);
         flowNodeInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
-        archivedFlowNodeInstance = new SAAutomaticTaskInstanceImpl((SAutomaticTaskInstance) flowNodeInstance);
+        archivedFlowNodeInstance = new SAAutomaticTaskInstance((SAutomaticTaskInstance) flowNodeInstance);
         processInstance = new SProcessInstance("MyProcess", 809234L);
         processInstance.setId(PROCESS_INSTANCE_ID);
-        archivedProcessInstance = new SAProcessInstanceImpl(processInstance);
+        archivedProcessInstance = new SAProcessInstance(processInstance);
         eventSubProcessInstance = new SProcessInstance();
         eventSubProcessInstance.setId(EVENT_SUBPROCESS_ID);
         eventSubProcessInstance.setCallerType(SFlowNodeType.SUB_PROCESS);
@@ -119,7 +118,7 @@ public class RefBusinessDataRetrieverTest {
                 .getRefBusinessDataInstance(new BusinessDataContext("data", new Container(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
 
         //then
-        assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
+        assertThat(retrievedData).isEqualToComparingFieldByField(refBusinessDataInstance);
     }
 
     @Test
@@ -165,7 +164,7 @@ public class RefBusinessDataRetrieverTest {
                 new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
-        assertThat(retrievedData).isEqualTo(archRefBusinessDataInstance);
+        assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
     }
 
     @Test
@@ -183,7 +182,7 @@ public class RefBusinessDataRetrieverTest {
                 new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
-        assertThat(retrievedData).isEqualTo(archRefBusinessDataInstance);
+        assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
     }
 
     @Test
@@ -203,7 +202,7 @@ public class RefBusinessDataRetrieverTest {
                 new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
-        assertThat(retrievedData).isEqualTo(archRefBusinessDataInstance);
+        assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
     }
 
     @Test

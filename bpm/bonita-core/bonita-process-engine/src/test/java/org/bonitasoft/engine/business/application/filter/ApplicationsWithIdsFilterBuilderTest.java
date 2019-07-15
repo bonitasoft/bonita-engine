@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -28,7 +27,6 @@ public class ApplicationsWithIdsFilterBuilderTest {
     @Test
     public void buildQueryOptions_should_filter_on_applicationIds() throws Exception {
         //given
-        SApplicationBuilderFactoryImpl factory = new SApplicationBuilderFactoryImpl();
         ApplicationsWithIdsFilterBuilder builder = new ApplicationsWithIdsFilterBuilder(4L, 7L, 10L);
 
         //when
@@ -38,8 +36,8 @@ public class ApplicationsWithIdsFilterBuilderTest {
         assertThat(queryOptions).isNotNull();
         assertThat(queryOptions.getFromIndex()).isEqualTo(0);
         assertThat(queryOptions.getNumberOfResults()).isEqualTo(3);
-        assertThat(queryOptions.getOrderByOptions()).containsExactly(new OrderByOption(SApplication.class, factory.getIdKey(), OrderByType.ASC));
-        FilterOption filterOption = new FilterOption(SApplication.class, factory.getIdKey());
+        assertThat(queryOptions.getOrderByOptions()).containsExactly(new OrderByOption(SApplication.class, SApplication.ID, OrderByType.ASC));
+        FilterOption filterOption = new FilterOption(SApplication.class, SApplication.ID);
         filterOption.in(4L, 7L, 10L);
         assertThat(queryOptions.getFilters()).containsExactly(filterOption);
     }

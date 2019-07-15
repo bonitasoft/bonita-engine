@@ -13,10 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
- */
-public interface SAEndEventInstance extends SAThrowEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAEndEventInstance extends SAThrowEventInstance {
+    public SAEndEventInstance(final SEndEventInstance endEvent) {
+        super(endEvent);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.END_EVENT;
+    }
+
+    @Override
+    public String getKind() {
+        return "endEvent";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SEndEventInstance.class;
+    }
 
 }

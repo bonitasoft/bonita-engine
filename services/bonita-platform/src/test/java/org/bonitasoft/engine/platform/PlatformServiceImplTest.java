@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -49,12 +48,8 @@ import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.STenantUpdateBuilderImpl;
-import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
-import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
@@ -75,9 +70,6 @@ public class PlatformServiceImplTest {
 
     @Mock
     private PlatformRetriever platformRetriever;
-
-    @Mock
-    private STenantBuilder tenantBuilder;
 
     @Mock
     private TechnicalLoggerService logger;
@@ -213,7 +205,7 @@ public class PlatformServiceImplTest {
     @Test
     public final void getTenantByName() throws SBonitaException {
         final STenant sTenant = buildTenant(486, "name");
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(sTenant);
 
         assertEquals(sTenant, platformServiceImpl.getTenantByName("name"));
@@ -221,7 +213,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByNameNotExists() throws SBonitaException {
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(null);
 
         platformServiceImpl.getTenantByName("name");
@@ -229,7 +221,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByNameThrowException() throws SBonitaException {
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenThrow(
                 new SBonitaReadException(""));
 
@@ -249,7 +241,7 @@ public class PlatformServiceImplTest {
     }
 
     private QueryOptions getQueryOptions() {
-        return new QueryOptions(0, 10, Arrays.asList(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(),
+        return new QueryOptions(0, 10, Arrays.asList(new OrderByOption(STenant.class, STenant.ID,
                 OrderByType.DESC)));
     }
 
@@ -358,7 +350,7 @@ public class PlatformServiceImplTest {
         final EntityUpdateDescriptor descriptor = updateDescriptor.done();
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(tenant, descriptor);
 
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(tenant);
 
         // When
@@ -373,7 +365,7 @@ public class PlatformServiceImplTest {
         final String tenantName = "tenantName";
         final STenant tenant = buildTenant(15, tenantName);
         final STenant actual = buildTenant(45, tenantName);
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(actual);
 
         final STenantUpdateBuilder updateDescriptor = new STenantUpdateBuilderImpl(new EntityUpdateDescriptor());
@@ -387,13 +379,13 @@ public class PlatformServiceImplTest {
     }
 
     private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
-        final STenantImpl tenant = new STenantImpl(name, createdBy, created, status, defaultTenant);
+        final STenant tenant = new STenant(name, createdBy, created, status, defaultTenant);
         tenant.setId(id);
         return tenant;
     }
 
     private SPlatform buildPlatform() {
-        return new SPlatformImpl("1.0", "0.9", "0.5", "me", 654687344687645l);
+        return new SPlatform("1.0", "0.9", "0.5", "me", 654687344687645l);
     }
 
 }

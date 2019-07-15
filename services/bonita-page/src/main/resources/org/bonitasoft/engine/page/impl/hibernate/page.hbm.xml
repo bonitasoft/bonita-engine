@@ -6,7 +6,7 @@
         <filter-param name="tenantId" type="long" />
     </filter-def>
 
-	<class name="SPageImpl" table="page" polymorphism="explicit">
+	<class name="org.bonitasoft.engine.page.SPage" table="page" polymorphism="explicit">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -26,7 +26,7 @@
         <filter name="tenantFilter" />
 	</class>
 
-	<class name="SPageWithContentImpl" table="page" polymorphism="explicit">
+	<class name="org.bonitasoft.engine.page.SPageWithContent" table="page" polymorphism="explicit">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -47,16 +47,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-    <class name="SPageContentImpl" table="page">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantId" type="long" />
-            <key-property name="id" column="id" type="long" />
-        </composite-id>
-        <property name="content" type="materialized_blob" column="content" />
-        <filter name="tenantFilter" />
-    </class>
-
-    <class name="SPageMappingImpl" table="page_mapping">
+    <class name="org.bonitasoft.engine.page.SPageMapping" table="page_mapping">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantId" type="long" />
             <key-property name="id" column="id" type="long" />

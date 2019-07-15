@@ -90,7 +90,7 @@ public class PageMappingServiceImpl implements PageMappingService {
             throw new SObjectCreationException(String.format("Failed to get page mapping %s", key), e);
         }
         if (pageMapping == null) {
-            final SPageMappingImpl entity = new SPageMappingImpl();
+            final SPageMapping entity = new SPageMapping();
             entity.setPageId(pageId);
             entity.setPageAuthorizationRules(authorizationRules);
             entity.setKey(key);
@@ -99,7 +99,7 @@ public class PageMappingServiceImpl implements PageMappingService {
         throw new SObjectCreationException(String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
     }
 
-    SPageMapping insert(final SPageMappingImpl entity) throws SObjectCreationException {
+    SPageMapping insert(final SPageMapping entity) throws SObjectCreationException {
         try {
             recorder.recordInsert(new InsertRecord(entity), PAGE_MAPPING);
         } catch (final SRecorderException e) {
@@ -118,7 +118,7 @@ public class PageMappingServiceImpl implements PageMappingService {
             throw new SObjectCreationException(String.format("Failed to get page mapping %s", key), e);
         }
         if (pageMapping == null) {
-            final SPageMappingImpl entity = new SPageMappingImpl();
+            final SPageMapping entity = new SPageMapping();
             entity.setUrl(url);
             entity.setUrlAdapter(urlAdapter);
             entity.setPageAuthorizationRules(authorizationRules);

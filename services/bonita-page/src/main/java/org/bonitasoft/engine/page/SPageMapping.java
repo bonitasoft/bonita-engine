@@ -14,26 +14,62 @@
 
 package org.bonitasoft.engine.page;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SPageMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(exclude = "authorizationRules")
+public class SPageMapping implements PersistentObject {
 
-    String getKey();
+    public static final String COMMA_DELIM = ",";
+    private long id;
+    private long tenantId;
+    private String key;
+    private Long pageId;
+    private String url;
+    private String urlAdapter;
+    private String pageAuthorizRules;
+    private List<String> authorizationRules = new ArrayList<>();
+    private long lastUpdateDate;
+    private long lastUpdatedBy;
 
-    String getUrlAdapter();
+    private void parseRules() {
+        if (pageAuthorizRules != null) {
+            authorizationRules.clear();
+            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIM, false); stringTk.hasMoreTokens();) {
+                String rule = stringTk.nextToken();
+                authorizationRules.add(rule);
+            }
+        }
+    }
 
-    List<String> getPageAuthorizationRules();
+    private void buildRulesAsString() {
+        pageAuthorizRules = null;
+        if (authorizationRules != null && !authorizationRules.isEmpty()) {
+            pageAuthorizRules = "";
+            for (String authorizationRule : authorizationRules) {
+                pageAuthorizRules += (authorizationRule + COMMA_DELIM);
+            }
+        }
+    }
 
-    Long getPageId();
+    public List<String> getPageAuthorizationRules() {
+        parseRules(); // Need to do it here because Hibernate does not call setter to set fields from DB to Object
+        return authorizationRules;
+    }
 
-    String getUrl();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
+    public void setPageAuthorizationRules(List<String> rules) {
+        authorizationRules = rules;
+        buildRulesAsString();
+    }
 }

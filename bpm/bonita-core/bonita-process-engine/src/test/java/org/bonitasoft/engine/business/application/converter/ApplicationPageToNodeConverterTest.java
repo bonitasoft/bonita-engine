@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
@@ -56,7 +56,7 @@ public class ApplicationPageToNodeConverterTest {
         doReturn(customPage).when(sPage).getName();
 
         // when:
-        final ApplicationPageNode convertedPage = converter.toPage(new SApplicationPageImpl(applicationId, pageId, token));
+        final ApplicationPageNode convertedPage = converter.toPage(new SApplicationPage(applicationId, pageId, token));
 
         // then:
         assertThat(convertedPage.getCustomPage()).isEqualTo(customPage);

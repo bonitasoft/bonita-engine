@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
+import org.bonitasoft.engine.scheduler.model.SJobLog;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class JobLogBuilder extends PersistentObjectBuilder<SJobLogImpl, JobLogBuilder> {
+public class JobLogBuilder extends PersistentObjectBuilder<SJobLog, JobLogBuilder> {
 
     long jobDescriptorId;
 
@@ -32,11 +32,11 @@ public class JobLogBuilder extends PersistentObjectBuilder<SJobLogImpl, JobLogBu
     }
 
     @Override
-    SJobLogImpl _build() {
+    SJobLog _build() {
         // lastUpdateDate must not be null for the SFailedJobImpl constructor to be called normally:
-        SJobLogImpl sJobLogImpl = new SJobLogImpl(jobDescriptorId);
-        sJobLogImpl.setLastUpdateDate(System.currentTimeMillis());
-        return sJobLogImpl;
+        SJobLog sJobLog = new SJobLog(jobDescriptorId);
+        sJobLog.setLastUpdateDate(System.currentTimeMillis());
+        return sJobLog;
     }
 
     public JobLogBuilder withJobDescriptorId(final long jobDescriptorId) {

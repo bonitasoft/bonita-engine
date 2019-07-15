@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- */
-public interface SProcessDefinitionDesignContent extends PersistentObject {
-
-    String getContent();
+@Data
+@NoArgsConstructor
+public class SProcessDefinitionDesignContent implements PersistentObject {
+    private long tenantId;
+    private long id;
+    private String content;
 }

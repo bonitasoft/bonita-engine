@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -47,7 +47,7 @@ public interface DependencyService {
      * @throws SDependencyDeletionException
      *         Error thrown if has exception during the dependency deletion.
      */
-    void deleteDependency(SDependency dependency) throws SDependencyException;
+    void deleteDependency(AbstractSDependency dependency) throws SDependencyException;
 
     /**
      * Delete the dependency specified by name
@@ -69,7 +69,7 @@ public interface DependencyService {
      * @throws SDependencyNotFoundException
      *         Error thrown if no dependency have an id corresponding to the parameter.
      */
-    SDependency getDependency(long id) throws SDependencyNotFoundException;
+    AbstractSDependency getDependency(long id) throws SDependencyNotFoundException;
 
 
     /**
@@ -92,7 +92,7 @@ public interface DependencyService {
      * @return a list of SDependency object
      * @throws SDependencyException
      */
-    List<SDependency> getDependencies(Collection<Long> ids) throws SDependencyException;
+    List<AbstractSDependency> getDependencies(Collection<Long> ids) throws SDependencyException;
 
     /**
      * Get all dependencyMappings for specific the queryOptions
@@ -127,11 +127,11 @@ public interface DependencyService {
      */
     void deleteDependencies(long id, ScopeType type) throws SDependencyException;
 
-    SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
+    AbstractSDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
 
-    SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
+    AbstractSDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
 
-    SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
+    AbstractSDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
 
     Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
 }

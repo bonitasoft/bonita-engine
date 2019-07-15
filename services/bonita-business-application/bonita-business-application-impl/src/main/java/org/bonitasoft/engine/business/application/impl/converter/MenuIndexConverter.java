@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application.impl.converter;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.MenuIndex;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -46,7 +45,7 @@ public class MenuIndexConverter {
 
     private Integer getIndexValue(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) {
         Integer indexValue;
-        indexValue = (Integer) updateDescriptor.getFields().get(SApplicationMenuFields.INDEX);
+        indexValue = (Integer) updateDescriptor.getFields().get(SApplicationMenu.INDEX);
         if(indexValue == null) {
             indexValue = oldAppMenu.getIndex();
         }
@@ -55,8 +54,8 @@ public class MenuIndexConverter {
 
     private Long getParentId(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) {
         Long parentId;
-        if(updateDescriptor.getFields().containsKey(SApplicationMenuFields.PARENT_ID)) {
-            parentId = (Long) updateDescriptor.getFields().get(SApplicationMenuFields.PARENT_ID);
+        if(updateDescriptor.getFields().containsKey(SApplicationMenu.PARENT_ID)) {
+            parentId = (Long) updateDescriptor.getFields().get(SApplicationMenu.PARENT_ID);
         } else {
             parentId = oldAppMenu.getParentId();
         }

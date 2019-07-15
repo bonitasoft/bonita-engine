@@ -24,14 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,7 @@ public class ImportActorMappingTest {
         ActorMapping actorMapping = new ActorMapping();
         actorMapping.setActors(actors);
         long ACTOR_ID = 12;
-        SActorImpl sActor = new SActorImpl("Lulu", 1458714L, true);
+        SActor sActor = SActor.builder().name("Lulu").scopeId(1458714L).initiator(true).build();
         sActor.setId(ACTOR_ID);
 
         SUser sUser = new SUser();

@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.business.data.SARefBusinessDataInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.business.data.SARefBusinessDataInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAFlowNodeSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SARefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
@@ -45,7 +45,7 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
 
     @Override
     public SARefBusinessDataInstanceBuilder createNewInstance(SProcessSimpleRefBusinessDataInstance businessDataInstance) {
-        final SAProcessSimpleRefBusinessDataInstanceImpl entity = new SAProcessSimpleRefBusinessDataInstanceImpl();
+        final SAProcessSimpleRefBusinessDataInstance entity = new SAProcessSimpleRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setProcessInstanceId(businessDataInstance.getProcessInstanceId());
         entity.setDataId(businessDataInstance.getDataId());
@@ -54,7 +54,7 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
 
     @Override
     public SARefBusinessDataInstanceBuilder createNewInstance(SProcessMultiRefBusinessDataInstance businessDataInstance) {
-        final SAProcessMultiRefBusinessDataInstanceImpl entity = new SAProcessMultiRefBusinessDataInstanceImpl();
+        final SAProcessMultiRefBusinessDataInstance entity = new SAProcessMultiRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setProcessInstanceId(businessDataInstance.getProcessInstanceId());
         final ArrayList<Long> dataIds = new ArrayList<>(businessDataInstance.getDataIds().size());
@@ -67,14 +67,14 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
 
     @Override
     public SARefBusinessDataInstanceBuilder createNewInstanceForFlowNode(SFlowNodeSimpleRefBusinessDataInstance businessDataInstance) {
-        final SAFlowNodeSimpleRefBusinessDataInstanceImpl entity = new SAFlowNodeSimpleRefBusinessDataInstanceImpl();
+        final SAFlowNodeSimpleRefBusinessDataInstance entity = new SAFlowNodeSimpleRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setFlowNodeInstanceId(businessDataInstance.getFlowNodeInstanceId());
         entity.setDataId(businessDataInstance.getDataId());
         return new SARefBusinessDataInstanceBuilderImpl(entity);
     }
 
-    protected void setCommonAttributes(SRefBusinessDataInstance businessDataInstance, SARefBusinessDataInstanceImpl entity) {
+    protected void setCommonAttributes(SRefBusinessDataInstance businessDataInstance, SARefBusinessDataInstance entity) {
         entity.setName(businessDataInstance.getName());
         entity.setDataClassName(businessDataInstance.getDataClassName());
     }

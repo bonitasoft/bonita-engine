@@ -24,7 +24,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.repository.SupervisorRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,8 +64,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, userId, -1, -1));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, userId, -1, -1));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -86,8 +85,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, groupId, 0));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId, 0));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -107,8 +106,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, 0, roleId));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, 0, roleId));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -128,9 +127,9 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, groupId,
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId,
                 roleId));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 

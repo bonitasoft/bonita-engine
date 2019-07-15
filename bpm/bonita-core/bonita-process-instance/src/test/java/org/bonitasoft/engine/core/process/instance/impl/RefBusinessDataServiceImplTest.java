@@ -14,7 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +25,9 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectBusinessDataDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -60,8 +62,8 @@ public class RefBusinessDataServiceImplTest {
     @InjectMocks
     private RefBusinessDataServiceImpl service;
 
-    private SSimpleRefBusinessDataInstanceImpl buildSRefBusinessDataInstance() {
-        final SSimpleRefBusinessDataInstanceImpl instance = new SProcessSimpleRefBusinessDataInstanceImpl();
+    private SSimpleRefBusinessDataInstance buildSRefBusinessDataInstance() {
+        final SSimpleRefBusinessDataInstance instance = new SProcessSimpleRefBusinessDataInstance();
         instance.setName("myLeaveRequest");
         instance.setDataId(45l);
         instance.setDataClassName("org.bonitasoft.LeaveRequest");
@@ -104,7 +106,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test
     public void updateRefBusinessData() throws Exception {
-        final SSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = buildSRefBusinessDataInstance();
+        final SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
@@ -117,7 +119,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test(expected = SRefBusinessDataInstanceModificationException.class)
     public void updateRefBusinessDataThrowException() throws Exception {
-        final SSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = buildSRefBusinessDataInstance();
+        final SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);

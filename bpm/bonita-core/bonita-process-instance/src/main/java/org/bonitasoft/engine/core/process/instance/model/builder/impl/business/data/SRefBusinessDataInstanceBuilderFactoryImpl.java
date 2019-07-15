@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 
 
 /**
@@ -29,7 +29,7 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
 
     @Override
     public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final Long dataId, final String dataClassName) {
-        final SProcessSimpleRefBusinessDataInstanceImpl entity = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SProcessSimpleRefBusinessDataInstance entity = new SProcessSimpleRefBusinessDataInstance();
         entity.setProcessInstanceId(processInstanceId);
         entity.setName(name);
         entity.setDataId(dataId);
@@ -40,7 +40,7 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
     @Override
     public SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(final String name, final long flowNodeInstanceId, final Long dataId,
             final String dataClassName) {
-        final SFlowNodeSimpleRefBusinessDataInstanceImpl entity = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
+        final SFlowNodeSimpleRefBusinessDataInstance entity = new SFlowNodeSimpleRefBusinessDataInstance();
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
         entity.setName(name);
         entity.setDataId(dataId);
@@ -51,7 +51,7 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
     @Override
     public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final List<Long> dataIds,
             final String dataClassName) {
-        final SProcessMultiRefBusinessDataInstanceImpl entity = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance entity = new SProcessMultiRefBusinessDataInstance();
         entity.setProcessInstanceId(processInstanceId);
         entity.setName(name);
         entity.setDataIds(dataIds);

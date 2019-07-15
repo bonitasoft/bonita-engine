@@ -122,8 +122,7 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -132,7 +131,7 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -327,7 +326,7 @@ public class ProcessAPIImplTest {
         sUserTaskInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         sUserTaskInstance.setId(FLOW_NODE_INSTANCE_ID);
         when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).thenReturn(sUserTaskInstance);
-        SAUserTaskInstanceImpl value = new SAUserTaskInstanceImpl(sUserTaskInstance);
+        SAUserTaskInstance value = new SAUserTaskInstance(sUserTaskInstance);
         value.setId(ARCHIVED_FLOW_NODE_INSTANCE_ID);
         when(activityInstanceService.getArchivedFlowNodeInstance(ARCHIVED_FLOW_NODE_INSTANCE_ID)).thenReturn(value);
         processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
@@ -340,7 +339,7 @@ public class ProcessAPIImplTest {
 
         SProcessInstance sProcessInstance = new SProcessInstance("processName", PROCESS_DEFINITION_ID);
         when(processInstanceService.getProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(sProcessInstance);
-        SAProcessInstanceImpl value1 = new SAProcessInstanceImpl(sProcessInstance);
+        SAProcessInstance value1 = new SAProcessInstance(sProcessInstance);
         value1.setId(ARCHIVED_PROCESS_INSTANCE_ID);
         when(processInstanceService.getArchivedProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(value1);
         doReturn(SSession.builder().id(54L).tenantId(1).userName("john").userId(12).build()).when(processAPI).getSession();
@@ -427,11 +426,11 @@ public class ProcessAPIImplTest {
         when(processClassLoader.loadClass(String.class.getName())).thenReturn((Class) String.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
 
-        final SBlobDataInstanceImpl sDataFoo = new SBlobDataInstanceImpl();
+        final SBlobDataInstance sDataFoo = new SBlobDataInstance();
         sDataFoo.setClassName(String.class.getName());
         sDataFoo.setName("foo");
 
-        final SBlobDataInstanceImpl sDataBar = new SBlobDataInstanceImpl();
+        final SBlobDataInstance sDataBar = new SBlobDataInstance();
         sDataBar.setClassName(String.class.getName());
         sDataBar.setName("bar");
 
@@ -464,7 +463,7 @@ public class ProcessAPIImplTest {
 
         final Map<String, Serializable> dataNameValues = singletonMap(dataName, "dataValue");
 
-        final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
+        final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(Collections.singletonList(dataInstance)).when(dataInstanceService).getDataInstances(Collections.singletonList(dataName),
@@ -625,7 +624,7 @@ public class ProcessAPIImplTest {
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
-        final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
+        final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
@@ -654,7 +653,7 @@ public class ProcessAPIImplTest {
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
-        final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
+        final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(dataInstance).when(transientDataService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
@@ -714,7 +713,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
+        final SBlobDataInstance dataInstance = new SBlobDataInstance();
         dataInstance.setClassName(String.class.getName());
         dataInstance.setName(dataName);
         when(transientDataService.getDataInstance(dataName, FLOW_NODE_INSTANCE_ID,

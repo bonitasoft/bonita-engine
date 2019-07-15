@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.definition;
 
+import static org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo.*;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,15 +47,12 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilderFactory;
-import org.bonitasoft.engine.core.process.definition.model.builder.impl.SProcessDefinitionDeployInfoBuilderFactoryImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.expression.Expression;
@@ -155,7 +154,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getActivationStateKey(), ActivationState.DISABLED.name());
+        descriptor.addField(SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY, ActivationState.DISABLED.name());
 
         final SPersistenceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Disabling the process");
         try {
@@ -196,7 +195,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     + processDefinitionDeployInfo.getVersion() + " can't be enabled since all dependencies are not resolved yet");
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getActivationStateKey(), ActivationState.ENABLED.name());
+        descriptor.addField(SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY, ActivationState.ENABLED.name());
 
         final SPersistenceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Enabling the process");
         try {
@@ -313,7 +312,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
             final String processDefinitionContent = getProcessContent(designProcessDefinition);
-            final SProcessDefinitionDesignContentImpl sProcessDefinitionDesignContent = new SProcessDefinitionDesignContentImpl();
+            final SProcessDefinitionDesignContent sProcessDefinitionDesignContent = new SProcessDefinitionDesignContent();
             sProcessDefinitionDesignContent.setContent(processDefinitionContent);
 
             recorder.recordInsert(new InsertRecord(sProcessDefinitionDesignContent), PROCESSDEFINITION_CONTENT);
@@ -333,8 +332,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return definition;
     }
 
-    SProcessDefinitionDeployInfoImpl createProcessDefinitionDeployInfo(DesignProcessDefinition designProcessDefinition, SProcessDefinition definition,
-            SProcessDefinitionDesignContentImpl sProcessDefinitionDesignContent, long processId) {
+    SProcessDefinitionDeployInfo createProcessDefinitionDeployInfo(DesignProcessDefinition designProcessDefinition, SProcessDefinition definition,
+                                                                   SProcessDefinitionDesignContent sProcessDefinitionDesignContent, long processId) {
             String displayName = designProcessDefinition.getDisplayName();
             if (displayName == null || displayName.isEmpty()) {
                 displayName = definition.getName();
@@ -343,7 +342,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             if (displayDescription == null || displayDescription.isEmpty()) {
                 displayDescription = definition.getDescription();
             }
-            final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfoImpl();
+            final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
             sProcessDefinitionDeployInfo.setName(definition.getName());
             sProcessDefinitionDeployInfo.setVersion(definition.getVersion());
             sProcessDefinitionDeployInfo.setProcessId(processId);
@@ -393,7 +392,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor
-                .addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getConfigurationStateKey(), ConfigurationState.RESOLVED.name());
+                .addField(SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY, ConfigurationState.RESOLVED.name());
 
         final SPersistenceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Resolved the process");
 
@@ -526,14 +525,14 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     void update(long processId, SProcessDefinitionDeployInfo processDefinitionDeployInfo, UpdateRecord updateRecord, String eventType)
             throws SRecorderException, SCacheException {
         recorder.recordUpdate(updateRecord, eventType);
-        if (!updateRecord.getFields().containsKey(SProcessDefinitionDeployInfoBuilderFactoryImpl.DESIGN_CONTENT)) {
+        if (!updateRecord.getFields().containsKey(SProcessDefinitionDeployInfo.DESIGN_CONTENT)) {
             updateSProcessDefinitionTimestampInCache(processId, processDefinitionDeployInfo);
         }
     }
 
     private UpdateRecord getUpdateRecord(final EntityUpdateDescriptor descriptor, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
         final long now = System.currentTimeMillis();
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getLastUpdateDateKey(), now);
+        descriptor.addField(LAST_UPDATE_DATE_KEY, now);
         return UpdateRecord.buildSetFields(processDefinitionDeployInfo, descriptor);
     }
 
@@ -682,33 +681,28 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     private SProcessDefinitionDeployInfo buildSProcessDefinitionDeployInfo(final Map<String, Object> sProcessDeploymentInfo) {
-        final SProcessDefinitionDeployInfoBuilderFactory builder = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
 
-        final Long id = (Long) sProcessDeploymentInfo.get(builder.getIdKey());
-        final Long processId = (Long) sProcessDeploymentInfo.get(builder.getProcessIdKey());
-        final String name = (String) sProcessDeploymentInfo.get(builder.getNameKey());
-        final String version = (String) sProcessDeploymentInfo.get(builder.getVersionKey());
-        final String description = (String) sProcessDeploymentInfo.get(builder.getVersionKey());
-        final Long deploymentDate = (Long) sProcessDeploymentInfo.get(builder.getDeploymentDateKey());
-        final Long deployedBy = (Long) sProcessDeploymentInfo.get(builder.getDeployedByKey());
-        final String activationState = (String) sProcessDeploymentInfo.get(builder.getActivationStateKey());
-        final String configurationState = (String) sProcessDeploymentInfo.get(builder.getConfigurationStateKey());
-        final String displayName = (String) sProcessDeploymentInfo.get(builder.getDisplayNameKey());
-        final Long lastUpdateDate = (Long) sProcessDeploymentInfo.get(builder.getLastUpdateDateKey());
-        final String iconPath = (String) sProcessDeploymentInfo.get(builder.getIconPathKey());
-        final String displayDescription = (String) sProcessDeploymentInfo.get(builder.getDisplayDescriptionKey());
-
-        return builder.createNewInstance(name, version).setId(id).setDescription(description)
-                .setDisplayDescription(displayDescription).setActivationState(activationState).setConfigurationState(configurationState)
-                .setDeployedBy(deployedBy).setProcessId(processId).setLastUpdateDate(lastUpdateDate).setDisplayName(displayName)
-                .setDeploymentDate(deploymentDate).setIconPath(iconPath).done();
+        return SProcessDefinitionDeployInfo.builder()
+                .id((Long) sProcessDeploymentInfo.get(ID_KEY))
+                .name((String) sProcessDeploymentInfo.get(NAME_KEY))
+                .version((String) sProcessDeploymentInfo.get(VERSION_KEY))
+                .description((String) sProcessDeploymentInfo.get(VERSION_KEY))
+                .displayDescription((String) sProcessDeploymentInfo.get(DISPLAY_DESCRIPTION_KEY))
+                .activationState((String) sProcessDeploymentInfo.get(ACTIVATION_STATE_KEY))
+                .configurationState((String) sProcessDeploymentInfo.get(CONFIGURATION_STATE_KEY))
+                .deployedBy((Long) sProcessDeploymentInfo.get(DEPLOYED_BY_KEY))
+                .processId((Long) sProcessDeploymentInfo.get(PROCESS_ID_KEY))
+                .lastUpdateDate((Long) sProcessDeploymentInfo.get(LAST_UPDATE_DATE_KEY))
+                .displayName((String) sProcessDeploymentInfo.get(DISPLAY_NAME_KEY))
+                .deploymentDate((Long) sProcessDeploymentInfo.get(DEPLOYMENT_DATE_KEY))
+                .iconPath((String) sProcessDeploymentInfo.get(ICON_PATH)).build();
     }
 
     private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
@@ -744,38 +738,37 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private QueryOptions createQueryOptions(final int pageIndex, final int numberPerPage, final ProcessDeploymentInfoCriterion pagingCriterion) {
         String field;
         OrderByType order;
-        final SProcessDefinitionDeployInfoBuilderFactory fact = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
         switch (pagingCriterion) {
             case NAME_ASC:
-                field = fact.getNameKey();
+                field = SProcessDefinitionDeployInfo.NAME_KEY;
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = fact.getNameKey();
+                field = SProcessDefinitionDeployInfo.NAME_KEY;
                 order = OrderByType.DESC;
                 break;
             case ACTIVATION_STATE_ASC:
-                field = fact.getActivationStateKey();
+                field = SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY;
                 order = OrderByType.ASC;
                 break;
             case ACTIVATION_STATE_DESC:
-                field = fact.getActivationStateKey();
+                field = SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY;
                 order = OrderByType.DESC;
                 break;
             case CONFIGURATION_STATE_ASC:
-                field = fact.getConfigurationStateKey();
+                field = SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY;
                 order = OrderByType.ASC;
                 break;
             case CONFIGURATION_STATE_DESC:
-                field = fact.getConfigurationStateKey();
+                field = SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY;
                 order = OrderByType.DESC;
                 break;
             case VERSION_ASC:
-                field = fact.getVersionKey();
+                field = SProcessDefinitionDeployInfo.VERSION_KEY;
                 order = OrderByType.ASC;
                 break;
             case VERSION_DESC:
-                field = fact.getVersionKey();
+                field = SProcessDefinitionDeployInfo.VERSION_KEY;
                 order = OrderByType.DESC;
                 break;
             case DEFAULT:

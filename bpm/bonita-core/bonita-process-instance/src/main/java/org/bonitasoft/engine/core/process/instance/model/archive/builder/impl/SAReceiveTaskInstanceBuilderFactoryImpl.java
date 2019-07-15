@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAReceiveTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAReceiveTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl;
 
 /**
  * @author Julien Molinaro
@@ -25,7 +25,7 @@ public class SAReceiveTaskInstanceBuilderFactoryImpl extends SAActivityInstanceB
 
     @Override
     public SAReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final SReceiveTaskInstance sReceiveTaskInstance) {
-        final SAReceiveTaskInstanceImpl entity = new SAReceiveTaskInstanceImpl(sReceiveTaskInstance);
+        final SAReceiveTaskInstance entity = new SAReceiveTaskInstance(sReceiveTaskInstance);
         return new SAReceiveTaskInstanceBuilderImpl(entity);
     }
 

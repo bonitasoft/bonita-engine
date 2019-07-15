@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -58,11 +57,11 @@ public class SearchActivityInstanceDescriptor extends SearchEntityDescriptor {
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.DISPLAY_NAME,
                 new FieldDescriptor(SActivityInstance.class, keyProvider.getDisplayNameKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.USER_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.ROLE_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY));
 
         activityInstanceDescriptorAllFields = new HashMap<>();
         final Set<String> tasksInstanceFields = new HashSet<>();

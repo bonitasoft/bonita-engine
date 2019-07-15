@@ -15,10 +15,7 @@ package org.bonitasoft.engine.business.application.impl.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.business.application.impl.filter.ChildrenMenusFilterBuilder;
-import org.bonitasoft.engine.business.application.impl.filter.SelectRange;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -33,7 +30,6 @@ public class ChildrenMenusFilterBuilderTest {
     @Test
     public void build_query_options_should_filter_on_parent_id() throws Exception {
         //given
-        SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
         long parentId = 4L;
         ChildrenMenusFilterBuilder builder = new ChildrenMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS), parentId);
 
@@ -44,8 +40,8 @@ public class ChildrenMenusFilterBuilderTest {
         assertThat(options).isNotNull();
         assertThat(options.getFromIndex()).isEqualTo(START_INDEX);
         assertThat(options.getNumberOfResults()).isEqualTo(MAX_RESULTS);
-        assertThat(options.getOrderByOptions()).containsExactly(new OrderByOption(SApplicationMenu.class, factory.getIdKey(), OrderByType.ASC));
-        assertThat(options.getFilters()).containsExactly(new FilterOption(SApplicationMenu.class, factory.getParentIdKey(), parentId));
+        assertThat(options.getOrderByOptions()).containsExactly(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        assertThat(options.getFilters()).containsExactly(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
     }
 
 }

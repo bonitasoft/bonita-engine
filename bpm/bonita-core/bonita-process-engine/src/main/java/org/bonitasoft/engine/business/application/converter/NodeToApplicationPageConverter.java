@@ -16,12 +16,9 @@ package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -57,9 +54,7 @@ public class NodeToApplicationPageConverter {
         } else {
             importError = new ImportError(applicationPageNode.getCustomPage(), ImportError.Type.PAGE);
         }
-        SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        SApplicationPageBuilder builder = factory.createNewInstance(application.getId(), pageId, token);
-        return new ApplicationPageImportResult(builder.done(), importError);
+        return new ApplicationPageImportResult(SApplicationPage.builder().applicationId(application.getId()).pageId(pageId).token(token).build(), importError);
     }
 
 }

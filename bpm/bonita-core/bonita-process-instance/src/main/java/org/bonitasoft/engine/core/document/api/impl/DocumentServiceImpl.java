@@ -31,10 +31,8 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
-import org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl;
-import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
-import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -79,7 +77,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             insertDocument(document);
             final SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, -1);
-            return new SMappedDocumentImpl(documentMapping, document);
+            return new SMappedDocument(documentMapping, document);
         } catch (final SBonitaException e) {
             throw new SObjectCreationException(e.getMessage(), e);
         }
@@ -98,7 +96,7 @@ public class DocumentServiceImpl implements DocumentService {
             }
             insertDocument(document);
             final SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, index);
-            return new SMappedDocumentImpl(documentMapping, document);
+            return new SMappedDocument(documentMapping, document);
         } catch (final SObjectAlreadyExistsException e) {
             throw new SObjectAlreadyExistsException(e);
         } catch (final SBonitaException e) {
@@ -394,7 +392,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     private SDocumentMapping create(final long documentId, final long processInstanceId, final String name, final String description, final int index)
             throws SRecorderException {
-        final SDocumentMappingImpl documentMapping = new SDocumentMappingImpl(documentId, processInstanceId, name);
+        final SDocumentMapping documentMapping = new SDocumentMapping(documentId, processInstanceId, name);
         documentMapping.setDescription(description);
         documentMapping.setVersion("1");
         documentMapping.setIndex(index);
@@ -405,7 +403,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void archive(final SDocumentMapping docMapping, final long archiveDate) throws SObjectModificationException {
         if (archiveService.isArchivable(SDocumentMapping.class)) {
-            final SADocumentMappingImpl saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(),
+            final SADocumentMapping saDocumentMapping = new SADocumentMapping(docMapping.getDocumentId(), docMapping.getProcessInstanceId(),
                     archiveDate, docMapping.getId(), docMapping.getName(), docMapping.getDescription(), docMapping.getVersion());
             saDocumentMapping.setIndex(docMapping.getIndex());
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDocumentMapping);
@@ -454,7 +452,7 @@ public class DocumentServiceImpl implements DocumentService {
         //update mapping
         archive(documentToUpdate, System.currentTimeMillis());
         updateMapping(sDocument.getId(), documentToUpdate, documentToUpdate.getDescription(), index);
-        return new SMappedDocumentImpl(documentToUpdate, sDocument);
+        return new SMappedDocument(documentToUpdate, sDocument);
     }
 
     @Override

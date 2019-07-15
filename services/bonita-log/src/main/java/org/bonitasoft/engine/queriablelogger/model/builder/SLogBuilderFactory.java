@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model.builder;
 
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Nicolas Chabanoles
@@ -24,38 +22,5 @@ public interface SLogBuilderFactory {
 
     SLogBuilder createNewInstance();
 
-    SLogBuilder fromInstance(SQueriableLog log);
-
-    Class<? extends SQueriableLog> getModelClass();
-
-    String getTimeStampKey();
-
-    String getYearKey();
-
-    String getMonthKey();
-
-    String getDayOfYearKey();
-
-    String getWeekOfYearKey();
-
-    String getUserIdKey();
-
-    String getThreadNumberKey();
-
-    String getClusterNodeKey();
-
-    String getProductVersionKey();
-
-    String getSeverityKey();
-
-    String getActionScopeKey();
-
-    String getActionStatusKey();
-
-    String getRawMessageKey();
-
-    String getCallerClassNameKey();
-
-    String getCallerMethodNameKey();
 
 }

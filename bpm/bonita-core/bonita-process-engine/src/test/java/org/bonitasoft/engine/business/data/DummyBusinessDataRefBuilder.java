@@ -16,14 +16,11 @@ package org.bonitasoft.engine.business.data;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SASimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -31,32 +28,32 @@ import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSim
 public class DummyBusinessDataRefBuilder {
 
     public static SSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final Long dataId) {
-        final SSimpleRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SProcessSimpleRefBusinessDataInstanceImpl();
-        sRefBusinessDataInstanceImpl.setDataId(dataId);
-        return sRefBusinessDataInstanceImpl;
+        final SSimpleRefBusinessDataInstance sRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
+        sRefBusinessDataInstance.setDataId(dataId);
+        return sRefBusinessDataInstance;
     }
 
     public static SSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String dataName, final String dataClassName) {
-        final SSimpleRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SProcessSimpleRefBusinessDataInstanceImpl();
-        sRefBusinessDataInstanceImpl.setName(dataName);
-        sRefBusinessDataInstanceImpl.setDataClassName(dataClassName);
-        return sRefBusinessDataInstanceImpl;
+        final SSimpleRefBusinessDataInstance sRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
+        sRefBusinessDataInstance.setName(dataName);
+        sRefBusinessDataInstance.setDataClassName(dataClassName);
+        return sRefBusinessDataInstance;
     }
 
     public static SProcessMultiRefBusinessDataInstance buildMultiRefBusinessData(final List<Long> dataIds) {
-        final SProcessMultiRefBusinessDataInstanceImpl reference = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance reference = new SProcessMultiRefBusinessDataInstance();
         reference.setDataIds(dataIds);
         return reference;
     }
 
     public static SProcessMultiRefBusinessDataInstance buildMultiRefBusinessData(final String dataClassName) {
-        final SProcessMultiRefBusinessDataInstanceImpl reference = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance reference = new SProcessMultiRefBusinessDataInstance();
         reference.setDataClassName(dataClassName);
         return reference;
     }
 
     public static SASimpleRefBusinessDataInstance buildArchivedSimpleRefBusinessData(final Long dataId) {
-        final SASimpleRefBusinessDataInstanceImpl saProcessSimpleRefBusinessDataInstance = new SAProcessSimpleRefBusinessDataInstanceImpl();
+        final SASimpleRefBusinessDataInstance saProcessSimpleRefBusinessDataInstance = new SAProcessSimpleRefBusinessDataInstance();
         saProcessSimpleRefBusinessDataInstance.setDataId(dataId);
         return saProcessSimpleRefBusinessDataInstance;
     }

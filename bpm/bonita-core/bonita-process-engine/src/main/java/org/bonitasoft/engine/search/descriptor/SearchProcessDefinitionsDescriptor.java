@@ -23,7 +23,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -38,37 +37,36 @@ public class SearchProcessDefinitionsDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> processDefDeployInfos;
 
     public SearchProcessDefinitionsDescriptor() {
-        final SProcessDefinitionDeployInfoBuilderFactory definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
         searchEntityKeys = new HashMap<String, FieldDescriptor>(12);
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.ACTIVATION_STATE, new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                definitionDeployInfo.getActivationStateKey()));
+                SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY));
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.CONFIGURATION_STATE, new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                definitionDeployInfo.getConfigurationStateKey()));
+                SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY));
         searchEntityKeys
-                .put(ProcessDeploymentInfoSearchDescriptor.ID, new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getIdKey()));
+                .put(ProcessDeploymentInfoSearchDescriptor.ID, new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.ID_KEY));
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.NAME,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getNameKey()));
+                new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.NAME_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.VERSION,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getVersionKey()));
+                new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.VERSION_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                definitionDeployInfo.getDeploymentDateKey()));
+                SProcessDefinitionDeployInfo.DEPLOYMENT_DATE_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.DEPLOYED_BY,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getDeployedByKey()));
+                new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.DEPLOYED_BY_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.LABEL, new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                definitionDeployInfo.getLabelStateKey()));
+                SProcessDefinitionDeployInfo.LABEL));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.PROCESS_ID,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getProcessIdKey()));
+                new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.PROCESS_ID_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SProcessDefinitionDeployInfo.class, definitionDeployInfo.getDisplayNameKey()));
+                new FieldDescriptor(SProcessDefinitionDeployInfo.class, SProcessDefinitionDeployInfo.DISPLAY_NAME_KEY));
 
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.LAST_UPDATE_DATE, new FieldDescriptor(SProcessDefinitionDeployInfo.class,
-                definitionDeployInfo.getLastUpdateDateKey()));
+                SProcessDefinitionDeployInfo.LAST_UPDATE_DATE_KEY));
 
         final SProcessCategoryMappingBuilderFactory processCategoryMappingBuilderFactory = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class);
         searchEntityKeys.put(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, new FieldDescriptor(SProcessCategoryMapping.class,
@@ -76,9 +74,9 @@ public class SearchProcessDefinitionsDescriptor extends SearchEntityDescriptor {
 
         processDefDeployInfos = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> processFields = new HashSet<String>(3);
-        processFields.add(definitionDeployInfo.getNameKey());
-        processFields.add(definitionDeployInfo.getDisplayNameKey());
-        processFields.add(definitionDeployInfo.getVersionKey());
+        processFields.add(SProcessDefinitionDeployInfo.NAME_KEY);
+        processFields.add(SProcessDefinitionDeployInfo.DISPLAY_NAME_KEY);
+        processFields.add(SProcessDefinitionDeployInfo.VERSION_KEY);
         processDefDeployInfos.put(SProcessDefinitionDeployInfo.class, processFields);
     }
 

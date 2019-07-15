@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.event.
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.event.SAStartEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SAStartEventInstanceBuilderImpl implements SAStartEventInstanceBuilder {
 
-    private final SAStartEventInstanceImpl entity;
+    private final SAStartEventInstance entity;
 
-    public SAStartEventInstanceBuilderImpl(final SAStartEventInstanceImpl entity) {
+    public SAStartEventInstanceBuilderImpl(final SAStartEventInstance entity) {
         super();
         this.entity = entity;
     }

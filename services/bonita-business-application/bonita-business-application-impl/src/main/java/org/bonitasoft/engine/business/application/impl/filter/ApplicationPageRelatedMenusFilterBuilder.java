@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -38,9 +37,8 @@ public class ApplicationPageRelatedMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public QueryOptions buildQueryOptions() {
-        SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, factory.getIdKey(), OrderByType.ASC));
-        List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationMenu.class, factory.getApplicationPageIdKey(), applicationPageId));
+        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId));
         return new QueryOptions(range.getStartIndex(), range.getMaxResults(), orderByOptions, filters, null);
     }
 

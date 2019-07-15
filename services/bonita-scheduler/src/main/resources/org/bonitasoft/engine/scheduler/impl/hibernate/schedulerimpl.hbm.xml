@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.scheduler.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.scheduler.model">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SJobDescriptorImpl" table="job_desc">
+	<class name="SJobDescriptor" table="job_desc">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -18,7 +18,7 @@
 		<filter name="tenantFilter"></filter>
 	</class>
 	
-	<class name="SJobParameterImpl" table="job_param">
+	<class name="SJobParameter" table="job_param">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -29,7 +29,7 @@
 		<filter name="tenantFilter"></filter>
 	</class>
 	
-	<class name="SJobLogImpl" table="job_log">
+	<class name="SJobLog" table="job_log">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />

@@ -49,7 +49,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -363,7 +362,7 @@ public class ConnectorServiceImplTest {
                         createConnectorImplFile("connectorId", "connectorVersion"))))
                                 .when(processResourcesService)
                                 .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
-        doReturn(new SDependencyImpl("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
+        doReturn(new SDependency("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
                 .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
         //when
         connectorService.setConnectorImplementation(processDefinition, "connectorId", "connectorVersion", zip);
@@ -430,7 +429,7 @@ public class ConnectorServiceImplTest {
                         .when(processResourcesService)
                         .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         for (BarResource jar : jars) {
-            doReturn(new SDependencyImpl(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
+            doReturn(new SDependency(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
                     .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, jar.getName());
         }
     }
@@ -457,7 +456,7 @@ public class ConnectorServiceImplTest {
                         .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         for (BarResource jar : jars) {
             doReturn(null).when(dependencyService).getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, jar.getName());
-            doReturn(new SDependencyImpl(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
+            doReturn(new SDependency(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
                     .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, processDefinition.getId()+ "_" + jar.getName());
         }
     }

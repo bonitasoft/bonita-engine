@@ -13,11 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public interface SAMultiRefBusinessDataInstance extends SARefBusinessDataInstance, SMultiRefBusinessDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SAMultiRefBusinessDataInstance extends SARefBusinessDataInstance {
 
+    private List<Long> dataIds;
 }

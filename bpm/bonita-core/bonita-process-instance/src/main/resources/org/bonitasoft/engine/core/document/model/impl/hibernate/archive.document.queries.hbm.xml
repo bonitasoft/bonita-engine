@@ -6,17 +6,17 @@
 
     <query name="getNumberOfSAMappedDocument">
         SELECT COUNT(mappeddoc.id)
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
     </query>
 
     <query name="searchSAMappedDocument">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
     </query>
 
     <query name="getSAMappedDocumentOfProcessWithName">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
         WHERE mappeddoc.processInstanceId = :processInstanceId
         AND mappeddoc.name = :name
         AND mappeddoc.archiveDate >= :time
@@ -25,7 +25,7 @@
 
     <query name="getArchivedDocumentList">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
         WHERE mappeddoc.processInstanceId = :processInstanceId
         AND mappeddoc.name = :name
         AND mappeddoc.archiveDate >= :time
@@ -35,7 +35,7 @@
 
     <query name="getArchivedVersionOfDocument">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
         WHERE mappeddoc.sourceObjectId = :sourceObjectId
         ORDER BY mappeddoc.archiveDate DESC, mappeddoc.id DESC
     </query>
@@ -43,17 +43,17 @@
 
     <query name="getNumberOfSAMappedDocumentSupervisedBy">
         SELECT COUNT(mappeddoc)
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc,
-        org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc,
+        org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS p
         WHERE mappeddoc.processInstanceId = p.sourceObjectId
         AND p.processDefinitionId IN (
         SELECT supervisor.processDefId
-        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
         WHERE (supervisor.userId = :userId)
         OR (supervisor.id IN
         (
         SELECT supervisor.id
-        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
         org.bonitasoft.engine.identity.model.SUserMembership AS um
         WHERE um.userId = :userId
         AND (
@@ -68,17 +68,17 @@
 
     <query name="searchSAMappedDocumentSupervisedBy">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc,
-        org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc,
+        org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS p
         WHERE mappeddoc.processInstanceId = p.sourceObjectId
         AND p.processDefinitionId IN (
         SELECT supervisor.processDefId
-        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
         WHERE (supervisor.userId = :userId)
         OR (supervisor.id IN
         (
         SELECT supervisor.id
-        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
         org.bonitasoft.engine.identity.model.SUserMembership AS um
         WHERE um.userId = :userId
         AND (
@@ -93,17 +93,17 @@
 
     <query name="getArchiveMappingsOfProcessInstances">
         SELECT mappeddoc
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
         WHERE mappeddoc.processInstanceId IN (:processInstanceIds)
     </query>
     <query name="deleteArchiveDocumentsByIds">
         DELETE
-        FROM org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl AS doc
+        FROM org.bonitasoft.engine.core.document.model.SLightDocument AS doc
         WHERE doc.id IN (:ids)
     </query>
     <query name="deleteArchiveMappingsByIds">
         DELETE
-        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc
         WHERE mappeddoc.id IN (:ids)
     </query>
 

@@ -23,8 +23,6 @@ import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,7 +76,7 @@ public class ApplicationMenuModelConverterTest {
         //given
         final long appPageId = 15;
         final long applicationId = 18;
-        final SApplicationMenuImpl sMenu = new SApplicationMenuImpl("main", applicationId, appPageId, 1);
+        final SApplicationMenu sMenu = new SApplicationMenu("main", applicationId, appPageId, 1);
         sMenu.setId(3);
         sMenu.setParentId(21L);
 
@@ -124,10 +122,10 @@ public class ApplicationMenuModelConverterTest {
         EntityUpdateDescriptor updateDescriptor = convertor.toApplicationMenuUpdateDescriptor(updater);
         assertThat(updateDescriptor).isNotNull();
         assertThat(updateDescriptor.getFields()).hasSize(4);
-        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.APPLICATION_PAGE_ID)).isEqualTo(1L);
-        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.DISPLAY_NAME)).isEqualTo("disp");
-        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.INDEX)).isEqualTo(2);
-        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.PARENT_ID)).isEqualTo(3L);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenu.APPLICATION_PAGE_ID)).isEqualTo(1L);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenu.DISPLAY_NAME)).isEqualTo("disp");
+        assertThat(updateDescriptor.getFields().get(SApplicationMenu.INDEX)).isEqualTo(2);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenu.PARENT_ID)).isEqualTo(3L);
 
     }
 }

@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder.archive;
 
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class ArchivedUserTaskInstanceBuilder extends ArchivedFlowNodeInstanceBuilder<SAUserTaskInstanceImpl, ArchivedUserTaskInstanceBuilder> {
+public class ArchivedUserTaskInstanceBuilder extends ArchivedFlowNodeInstanceBuilder<SAUserTaskInstance, ArchivedUserTaskInstanceBuilder> {
 
     public static ArchivedUserTaskInstanceBuilder anArchivedUserTask() {
         return new ArchivedUserTaskInstanceBuilder();
@@ -32,8 +32,8 @@ public class ArchivedUserTaskInstanceBuilder extends ArchivedFlowNodeInstanceBui
     }
 
     @Override
-    SAUserTaskInstanceImpl _build() {
-        final SAUserTaskInstanceImpl userTaskInstanceImpl = new SAUserTaskInstanceImpl();
+    SAUserTaskInstance _build() {
+        final SAUserTaskInstance userTaskInstanceImpl = new SAUserTaskInstance();
         userTaskInstanceImpl.setAssigneeId(assigneeId);
         return userTaskInstanceImpl;
     }

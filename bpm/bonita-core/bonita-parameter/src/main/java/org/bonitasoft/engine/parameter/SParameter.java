@@ -13,16 +13,26 @@
  **/
 package org.bonitasoft.engine.parameter;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SParameter extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SParameter implements PersistentObject {
 
-    String getName();
+    private String name;
+    private String value;
+    private long processDefinitionId;
+    private long id;
+    private long tenantId;
 
-    String getValue();
-
-    long getProcessDefinitionId();
+    public SParameter(String name, String value, long processDefinitionId) {
+        this.name = name;
+        this.value = value;
+        this.processDefinitionId = processDefinitionId;
+    }
 }

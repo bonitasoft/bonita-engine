@@ -13,15 +13,33 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
-/**
- * @author Feng Hui
- * @author Matthieu Chaffotte
- */
-public interface SALongDataInstance extends SDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SALongDataInstance extends SADataInstance {
+
+    private Long value;
+
+    public SALongDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (Long) sDataInstance.getValue();
+    }
 
     @Override
-    Long getValue();
+    public Long getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (Long) value;
+    }
 
 }

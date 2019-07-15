@@ -13,9 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Celine Souchet
- */
-public interface SAThrowEventInstance extends SAEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SAThrowEventInstance extends SAEventInstance {
+    public SAThrowEventInstance(final SThrowEventInstance sThrowEventInstance) {
+        super(sThrowEventInstance);
+    }
 }

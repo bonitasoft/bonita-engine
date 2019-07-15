@@ -21,7 +21,6 @@ import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteSPlatformCommand;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetSPlatformCommands;
 import org.bonitasoft.engine.api.impl.transaction.platform.UpdateSPlatformCommand;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.CommandCriterion;
@@ -47,7 +46,6 @@ import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.SPlatformCommandGettingException;
 import org.bonitasoft.engine.platform.command.SPlatformCommandNotFoundException;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderFactory;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -110,8 +108,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         } catch (SPlatformCommandGettingException e) {
             throw new CreationException("Unable to create the platform command", e);
         }
-        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class).createNewInstance(name, description, implementation)
-                .done();
+        final SPlatformCommand sPlatformCommand = new SPlatformCommand(name, description, implementation);
         try {
             platformCommandService.create(sPlatformCommand);
             return ModelConvertor.toCommandDescriptor(sPlatformCommand);

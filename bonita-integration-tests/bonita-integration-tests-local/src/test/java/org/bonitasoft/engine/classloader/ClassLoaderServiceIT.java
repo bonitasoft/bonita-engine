@@ -28,14 +28,11 @@ import java.util.Map;
 import org.bonitasoft.engine.CallableWithException;
 import org.bonitasoft.engine.RunnableWithException;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -131,9 +128,7 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     }
 
     private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException, SClassLoaderException {
-        final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
-                .createNewInstance(name, fileName, value);
-        final SDependency dependency = builder.done();
+        final SPlatformDependency dependency = new SPlatformDependency(name, fileName, value);
         platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(),
                 ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
         classLoaderService.refreshClassLoaderImmediately(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),

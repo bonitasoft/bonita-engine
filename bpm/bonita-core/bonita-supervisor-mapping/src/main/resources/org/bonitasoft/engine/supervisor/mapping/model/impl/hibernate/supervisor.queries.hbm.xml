@@ -4,38 +4,38 @@
 
 	<query name="getNumberOfSProcessSupervisor">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 	</query>
 	
 	<query name="searchSProcessSupervisor">
 		SELECT DISTINCT processsupervisor
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 	</query>
 
 	<query name="getNumberOfSProcessSupervisorwithSUser">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SUser as user
 		WHERE processsupervisor.userId = user.id
 	</query>
 	
 	<query name="searchSProcessSupervisorwithSUser">
 		SELECT DISTINCT processsupervisor
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SUser as user
 		WHERE processsupervisor.userId = user.id
 	</query>
 	
 	<query name="getNumberOfSProcessSupervisorwithSGroup">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE processsupervisor.groupId = group_.id
 	</query>
 	
 	<query name="searchSProcessSupervisorwithSGroup">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE processsupervisor.groupId = group_.id
 	</query>
@@ -43,21 +43,21 @@
 	
 	<query name="getNumberOfSProcessSupervisorwithSRole">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE processsupervisor.roleId = role.id
 	</query>
 	
 	<query name="searchSProcessSupervisorwithSRole">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			 org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE processsupervisor.roleId = role.id
 	</query>
 		
 	<query name="getNumberOfSProcessSupervisorwithSGroupSRole">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SGroup AS group_,
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE processsupervisor.roleId = role.id
@@ -66,7 +66,7 @@
 	
 	<query name="searchSProcessSupervisorwithSGroupSRole">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SGroup AS group_,
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE processsupervisor.roleId = role.id
@@ -75,7 +75,7 @@
 	
 	<query name="getNumberOfSProcessSupervisorwithSUserSRole">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE (processsupervisor.userId &lt;= 0 AND  processsupervisor.roleId = role.id)
@@ -84,7 +84,7 @@
 	
 	<query name="searchSProcessSupervisorwithSUserSRole">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE (processsupervisor.userId &lt;= 0 AND  processsupervisor.roleId = role.id)
@@ -93,7 +93,7 @@
 	
 	<query name="getNumberOfSProcessSupervisorwithSUserSGroup">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE (processsupervisor.userId = user.id AND processsupervisor.groupId &lt;= 0)
@@ -102,7 +102,7 @@
 	
 	<query name="searchSProcessSupervisorwithSUserSGroup">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE (processsupervisor.userId = user.id AND processsupervisor.groupId &lt;= 0)
@@ -111,7 +111,7 @@
 	
 	<query name="getNumberOfSProcessSupervisorwithSUserSGroupSRole">
 		SELECT COUNT(DISTINCT processsupervisor.id)
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SGroup AS group_,
 			org.bonitasoft.engine.identity.model.SRole AS role
@@ -124,7 +124,7 @@
 	
 	<query name="searchSProcessSupervisorwithSUserSGroupSRole">
 		SELECT DISTINCT processsupervisor.id
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 			org.bonitasoft.engine.identity.model.SUser as user,
 			org.bonitasoft.engine.identity.model.SGroup AS group_,
 			org.bonitasoft.engine.identity.model.SRole AS role
@@ -137,19 +137,19 @@
 	
 	<query name="getSupervisorById">
 		SELECT processsupervisor
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE processsupervisor.id = :id
 	</query>
 
 	<query name="getSupervisor">
 		SELECT processsupervisor
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor
 		WHERE processsupervisor.processDefId = :processDefId
 		AND (
 			processsupervisor.userId = :userId
 			OR processsupervisor.id IN (
 				SELECT processsupervisor.id
-				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+				FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS processsupervisor,
 		 			org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 	 			WHERE  user_membership.userId = :userId
 				AND (

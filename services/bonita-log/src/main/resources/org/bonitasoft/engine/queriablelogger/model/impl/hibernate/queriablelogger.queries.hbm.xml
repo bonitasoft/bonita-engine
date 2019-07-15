@@ -5,31 +5,31 @@
 
 	<query name="searchQueriableLog">
 		SELECT log
-		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
 	<query name="deleteAllSQueriableLogImpl">
-		DELETE FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl
+		DELETE FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog
 	</query>
 
 	<query name="getNumberOfLogs">
 		SELECT COUNT(log)
-		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
 	<query name="getLogs">
 		SELECT log
-		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
 	<query name="searchSQueriableLog">
 		SELECT log
-		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
 	<query name="getNumberOfSQueriableLog">
 		SELECT COUNT(log)
-		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
 </hibernate-mapping>

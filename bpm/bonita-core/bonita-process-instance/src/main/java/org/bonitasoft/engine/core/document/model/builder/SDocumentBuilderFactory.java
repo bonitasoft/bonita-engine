@@ -13,49 +13,40 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
+
 /**
  * @author Nicolas Chabanoles
  * @author Zhang Bole
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface SDocumentBuilderFactory {
+public class SDocumentBuilderFactory {
 
-    String getIdKey();
+    public SDocumentBuilder createNewInstance(final String fileName, final String mimetype, final long authorId) {
+        final SDocumentBuilder sDocumentBuilder = new SDocumentBuilder();
+        sDocumentBuilder.setFileName(fileName);
+        sDocumentBuilder.setMimeType(mimetype);
+        sDocumentBuilder.setAuthor(authorId);
+        sDocumentBuilder.setCreationDate(System.currentTimeMillis());
+        return sDocumentBuilder;
+    }
 
-    String getNameKey();
+    public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId, final byte[] content) {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("The fileName must be filled for a document with content");
+        }
 
-    String getAuthorKey();
+        final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
+        sDocumentBuilder.setContent(content);
+        sDocumentBuilder.setHasContent(true);
+        return sDocumentBuilder;
+    }
 
-    String getCreationDateKey();
+    public SDocumentBuilder createNewExternalProcessDocumentReference(final String fileName, final String mimetype, final long authorId, final String url) {
+        final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
+        sDocumentBuilder.setURL(url);
+        sDocumentBuilder.setHasContent(false);
+        return sDocumentBuilder;
+    }
 
-    String getHasContentKey();
-
-    String getFileNameKey();
-
-    String getMimeTypeKey();
-
-    String getURLKey();
-
-    SDocumentBuilder createNewInstance(String fileName, String mimetype, long authorId);
-
-    /**
-     * @param fileName
-     * @param mimetype
-     * @param authorId
-     * @param content
-     * @return
-     * @throws IllegalArgumentException
-     *         if the content or the fileName is null or empty
-     * @since 6.4.0
-     */
-    SDocumentBuilder createNewProcessDocument(String fileName, String mimetype, long authorId, byte[] content);
-
-    SDocumentBuilder createNewExternalProcessDocumentReference(String fileName, String mimetype, long authorId, final String url);
-
-    String getDescriptionKey();
-
-    String getVersionKey();
-
-    String getIndexKey();
 }

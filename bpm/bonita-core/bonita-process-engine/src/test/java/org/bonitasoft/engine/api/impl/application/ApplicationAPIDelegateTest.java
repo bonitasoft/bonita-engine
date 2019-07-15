@@ -30,7 +30,6 @@ import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -107,7 +106,7 @@ public class ApplicationAPIDelegateTest {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
-        final SApplicationImpl sApp = buildDefaultApplication();
+        final SApplication sApp = buildDefaultApplication();
         sApp.setDescription(DESCRIPTION);
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, DESCRIPTION);
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
@@ -121,8 +120,8 @@ public class ApplicationAPIDelegateTest {
         assertThat(createdApplication).isEqualTo(application);
     }
 
-    private SApplicationImpl buildDefaultApplication() {
-        return new SApplicationImpl(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
+    private SApplication buildDefaultApplication() {
+        return new SApplication(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
                 SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
     }
 
@@ -130,7 +129,7 @@ public class ApplicationAPIDelegateTest {
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplicationImpl sApp = buildDefaultApplication();
+        final SApplication sApp = buildDefaultApplication();
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
 
@@ -144,7 +143,7 @@ public class ApplicationAPIDelegateTest {
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplicationImpl sApp = buildDefaultApplication();
+        final SApplication sApp = buildDefaultApplication();
         given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
 
@@ -222,7 +221,7 @@ public class ApplicationAPIDelegateTest {
 
     @Test
     public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
-        final SApplicationImpl sApp = buildDefaultApplication();
+        final SApplication sApp = buildDefaultApplication();
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
         given(converter.toApplication(sApp)).willReturn(application);

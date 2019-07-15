@@ -13,21 +13,37 @@
  **/
 package org.bonitasoft.engine.supervisor.mapping.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Yanyan Liu
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
- */
-public interface SProcessSupervisor extends PersistentObject {
 
-    long getProcessDefId();
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SProcessSupervisor implements PersistentObject {
 
-    long getUserId();
+    public static final String ID_KEY = "id";
+    public static final String USER_ID_KEY = "userId";
+    public static final String GROUP_ID_KEY = "groupId";
+    public static final String ROLE_ID_KEY = "roleId";
+    public static final String PROCESS_DEF_ID_KEY = "processDefId";
+    private long id;
+    private long tenantId;
+    private long processDefId;
+    @Builder.Default
+    private long userId = -1;
+    @Builder.Default
+    private long groupId = -1;
+    @Builder.Default
+    private long roleId = -1;
 
-    long getGroupId();
+    public SProcessSupervisor(final long processDefId) {
+        this.processDefId = processDefId;
+    }
 
-    long getRoleId();
 
 }

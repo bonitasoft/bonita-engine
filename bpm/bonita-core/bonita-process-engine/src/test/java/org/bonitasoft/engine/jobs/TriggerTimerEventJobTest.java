@@ -1,8 +1,5 @@
 package org.bonitasoft.engine.jobs;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -17,14 +14,11 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -98,8 +92,7 @@ public class TriggerTimerEventJobTest {
 
     @Test
     public void should_retrigger_timer_if_work_service_is_stopped() throws Exception {
-        SJobDescriptor jobDescriptor = new SJobDescriptorImpl();
-        jobDescriptor.setId(jobDescriptorId);
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().id(jobDescriptorId).build();
         doReturn(jobDescriptor).when(jobService).getJobDescriptor(jobDescriptorId);
         setAttributes();
         doReturn(true).when(workService).isStopped();

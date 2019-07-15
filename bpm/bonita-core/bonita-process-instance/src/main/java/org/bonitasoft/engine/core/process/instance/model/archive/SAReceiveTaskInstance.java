@@ -13,9 +13,35 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
-/**
- * @author Julien Molinaro
- */
-public interface SAReceiveTaskInstance extends SATaskInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+
+public class SAReceiveTaskInstance extends SAActivityInstance {
+    public SAReceiveTaskInstance(final SReceiveTaskInstance sReceiveTaskInstance) {
+        super(sReceiveTaskInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.RECEIVE_TASK;
+    }
+
+    @Override
+    public String getKind() {
+        return "receive";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SReceiveTaskInstance.class;
+    }
 
 }

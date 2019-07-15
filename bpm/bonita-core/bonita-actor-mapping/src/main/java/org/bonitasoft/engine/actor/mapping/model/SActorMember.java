@@ -13,20 +13,19 @@
  **/
 package org.bonitasoft.engine.actor.mapping.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
- */
-public interface SActorMember extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SActorMember implements PersistentObject {
 
-    long getActorId();
-
-    long getUserId();
-
-    long getGroupId();
-
-    long getRoleId();
+    private long tenantId;
+    private long id;
+    private long actorId;
+    private long userId = -1;
+    private long groupId = -1;
+    private long roleId = -1;
 
 }

@@ -23,7 +23,6 @@ import java.util.List;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import org.junit.Test;
 
 
@@ -38,7 +37,7 @@ public class ApplicationPageModelConverterTest {
     @Test
     public void toApplicationPage_should_map_all_server_fields() throws Exception {
         //given
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
         sAppPage.setId(ID);
 
         //when
@@ -55,8 +54,8 @@ public class ApplicationPageModelConverterTest {
     @Test
     public void toApplicationPageList_should_call_toApplitionPage_for_each_element_and_return_the_list_of_converted_values() throws Exception {
         //given
-        final SApplicationPageImpl sAppPage1 = new SApplicationPageImpl(10, 21, "appPage1");
-        final SApplicationPageImpl sAppPage2 = new SApplicationPageImpl(10, 21, "appPage2");
+        final SApplicationPage sAppPage1 = new SApplicationPage(10, 21, "appPage1");
+        final SApplicationPage sAppPage2 = new SApplicationPage(10, 21, "appPage2");
         final ApplicationPageImpl appPage1 = new ApplicationPageImpl(10, 21, "appPage1");
         final ApplicationPageImpl appPage2 = new ApplicationPageImpl(10, 21, "appPage2");
         final ApplicationPageModelConverter convertorMock = spy(convertor);

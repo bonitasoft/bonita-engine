@@ -13,9 +13,18 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-/**
- * @author Celine Souchet
- */
-public interface SPlatformDependencyMapping extends SDependencyMapping {
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SPlatformDependencyMapping extends SDependencyMapping {
+
+    public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+        super(artifactId, artifactType, dependencyId);
+    }
 
 }

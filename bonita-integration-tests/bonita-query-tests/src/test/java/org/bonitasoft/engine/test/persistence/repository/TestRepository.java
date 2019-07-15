@@ -15,30 +15,22 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
+import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -46,7 +38,6 @@ import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.page.SPageWithContent;
-import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
@@ -55,10 +46,7 @@ import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -120,12 +108,12 @@ public class TestRepository {
                 new PersistentObjectId(pendingActivityMapping.getId(), pendingActivityMapping.getTenantId()));
     }
 
-    public SActorMember add(final SActorMemberImpl actorMember) {
+    public SActorMember add(final SActorMember actorMember) {
         getSession().save(actorMember);
         return (SActorMember) getSession().get(actorMember.getClass(), new PersistentObjectId(actorMember.getId(), actorMember.getTenantId()));
     }
 
-    public SActor add(final SActorImpl actor) {
+    public SActor add(final SActor actor) {
         getSession().save(actor);
         return (SActor) getSession().get(actor.getClass(), new PersistentObjectId(actor.getId(), actor.getTenantId()));
     }
@@ -145,16 +133,16 @@ public class TestRepository {
         return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(), new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
     }
 
-    public SProcessSupervisor add(final SProcessSupervisorImpl sProcessSupervisor) {
+    public SProcessSupervisor add(final SProcessSupervisor sProcessSupervisor) {
         getSession().save(sProcessSupervisor);
         return (SProcessSupervisor) getSession().get(sProcessSupervisor.getClass(),
                 new PersistentObjectId(sProcessSupervisor.getId(), sProcessSupervisor.getTenantId()));
     }
 
-    public SProcessDefinitionDeployInfoImpl add(final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl) {
-        getSession().save(sProcessDefinitionDeployInfoImpl);
-        return (SProcessDefinitionDeployInfoImpl) getSession().get(sProcessDefinitionDeployInfoImpl.getClass(),
-                new PersistentObjectId(sProcessDefinitionDeployInfoImpl.getId(), sProcessDefinitionDeployInfoImpl.getTenantId()));
+    public SProcessDefinitionDeployInfo add(final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo) {
+        getSession().save(sProcessDefinitionDeployInfo);
+        return (SProcessDefinitionDeployInfo) getSession().get(sProcessDefinitionDeployInfo.getClass(),
+                new PersistentObjectId(sProcessDefinitionDeployInfo.getId(), sProcessDefinitionDeployInfo.getTenantId()));
     }
 
     public SProcessInstance add(final SProcessInstance sProcessInstance) {
@@ -163,9 +151,9 @@ public class TestRepository {
                 new PersistentObjectId(sProcessInstance.getId(), sProcessInstance.getTenantId()));
     }
 
-    public SAProcessInstanceImpl add(final SAProcessInstanceImpl saProcessInstance) {
+    public SAProcessInstance add(final SAProcessInstance saProcessInstance) {
         getSession().save(saProcessInstance);
-        return (SAProcessInstanceImpl) getSession().get(saProcessInstance.getClass(),
+        return (SAProcessInstance) getSession().get(saProcessInstance.getClass(),
                 new PersistentObjectId(saProcessInstance.getId(), saProcessInstance.getTenantId()));
     }
 
@@ -174,7 +162,7 @@ public class TestRepository {
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
 
-    public SAFlowNodeInstance add(final SAFlowNodeInstanceImpl saFlowNode) {
+    public SAFlowNodeInstance add(final SAFlowNodeInstance saFlowNode) {
         getSession().save(saFlowNode);
         return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
     }
@@ -195,17 +183,17 @@ public class TestRepository {
         return (SCustomUserInfoValue) getSession().get(infoValue.getClass(), new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
     }
 
-    public SJobLog addJobLog(final SJobLogImpl jobLog) {
+    public SJobLog addJobLog(final SJobLog jobLog) {
         getSession().save(jobLog);
         return (SJobLog) getSession().get(jobLog.getClass(), new PersistentObjectId(jobLog.getId(), jobLog.getTenantId()));
     }
 
-    public SJobDescriptor addJobDescriptor(final SJobDescriptorImpl jobDescriptor) {
+    public SJobDescriptor addJobDescriptor(final SJobDescriptor jobDescriptor) {
         getSession().save(jobDescriptor);
         return (SJobDescriptor) getSession().get(jobDescriptor.getClass(), new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
     }
 
-    public SADataInstance add(final SADataInstanceImpl dataInstance) {
+    public SADataInstance add(final SADataInstance dataInstance) {
         getSession().save(dataInstance);
         return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
     }
@@ -213,25 +201,25 @@ public class TestRepository {
     /**
      * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
      */
-    public SPageWithContent add(final SPageWithContentImpl sPageWithContentImpl) {
-        getSession().save(sPageWithContentImpl);
-        return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
-                new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
+    public SPageWithContent add(final SPageWithContent sPageWithContent) {
+        getSession().save(sPageWithContent);
+        return (SPageWithContent) getSession().get(sPageWithContent.getClass(),
+                new PersistentObjectId(sPageWithContent.getId(), sPageWithContent.getTenantId()));
     }
 
-    public SApplication add(final SApplicationImpl application) {
+    public SApplication add(final SApplication application) {
         getSession().save(application);
         return (SApplication) getSession().get(application.getClass(),
                 new PersistentObjectId(application.getId(), application.getTenantId()));
     }
 
-    public SApplicationPage add(final SApplicationPageImpl applicationPage) {
+    public SApplicationPage add(final SApplicationPage applicationPage) {
         getSession().save(applicationPage);
         return (SApplicationPage) getSession().get(applicationPage.getClass(),
                 new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
     }
 
-    public SApplicationMenu add(final SApplicationMenuImpl applicationMenu) {
+    public SApplicationMenu add(final SApplicationMenu applicationMenu) {
         getSession().save(applicationMenu);
         return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
                 new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
@@ -267,19 +255,19 @@ public class TestRepository {
                 new PersistentObjectId(sTenantResource.getId(), sTenantResource.getTenantId()));
     }
 
-    public void update(final SApplicationImpl application) {
+    public void update(final SApplication application) {
         getSession().update(application);
     }
 
-    public SDependency add(SDependencyImpl dependency){
+    public SDependency add(SDependency dependency){
         getSession().save(dependency);
         return (SDependency)getSession().get(dependency.getClass(),
                 new PersistentObjectId(dependency.getId(), dependency.getTenantId()));
     }
 
-    public SDependencyMappingImpl add(SDependencyMappingImpl dependencyMapping){
+    public SDependencyMapping add(SDependencyMapping dependencyMapping){
         getSession().save(dependencyMapping);
-        return (SDependencyMappingImpl) getSession().get(dependencyMapping.getClass(),
+        return (SDependencyMapping) getSession().get(dependencyMapping.getClass(),
                 new PersistentObjectId(dependencyMapping.getId(), dependencyMapping.getTenantId()));
     }
 

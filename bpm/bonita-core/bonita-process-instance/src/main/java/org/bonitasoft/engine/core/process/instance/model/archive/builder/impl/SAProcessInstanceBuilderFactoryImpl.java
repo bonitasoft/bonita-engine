@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -52,7 +52,7 @@ public class SAProcessInstanceBuilderFactoryImpl implements SAProcessInstanceBui
 
     @Override
     public SAProcessInstanceBuilder createNewInstance(final SProcessInstance processInstance) {
-        final SAProcessInstanceImpl entity = new SAProcessInstanceImpl(processInstance);
+        final SAProcessInstance entity = new SAProcessInstance(processInstance);
         return new SAProcessInstanceBuilderImpl(entity);
     }
 

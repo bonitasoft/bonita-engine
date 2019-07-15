@@ -13,50 +13,60 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Yanyan Liu
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
-public interface SAProcessInstance extends SANamedElement {
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-    long getProcessDefinitionId();
+@Data
+@NoArgsConstructor
+public class SAProcessInstance implements ArchivedPersistentObject {
 
-    String getDescription();
+    private long id;
+    private long tenantId;
+    private long archiveDate;
+    private long sourceObjectId;
+    private String name;
+    private long processDefinitionId;
+    private String description;
+    private int stateId;
+    private long startDate;
+    private long startedBy;
+    private long startedBySubstitute;
+    private long endDate;
+    private long lastUpdate;
+    private long rootProcessInstanceId = -1;
+    private long callerId = -1;
+    private String stringIndex1;
+    private String stringIndex2;
+    private String stringIndex3;
+    private String stringIndex4;
+    private String stringIndex5;
 
-    int getStateId();
+    public SAProcessInstance(final SProcessInstance processInstance) {
+        sourceObjectId = processInstance.getId();
+        name = processInstance.getName();
+        processDefinitionId = processInstance.getProcessDefinitionId();
+        description = processInstance.getDescription();
+        startDate = processInstance.getStartDate();
+        endDate = processInstance.getEndDate();
+        startedBy = processInstance.getStartedBy();
+        startedBySubstitute = processInstance.getStartedBySubstitute();
+        lastUpdate = processInstance.getLastUpdate();
+        stateId = processInstance.getStateId();
+        rootProcessInstanceId = processInstance.getRootProcessInstanceId();
+        callerId = processInstance.getCallerId();
+        stringIndex1 = processInstance.getStringIndex1();
+        stringIndex2 = processInstance.getStringIndex2();
+        stringIndex3 = processInstance.getStringIndex3();
+        stringIndex4 = processInstance.getStringIndex4();
+        stringIndex5 = processInstance.getStringIndex5();
+    }
 
-    long getStartDate();
-
-    /**
-     * @return id of the user who originally started the process
-     * @since 6.0.1
-     */
-    long getStartedBy();
-
-    /**
-     * @return id of the user (delegate) who started the process for the original starter
-     * @since 6.0.1
-     */
-    long getStartedBySubstitute();
-
-    long getEndDate();
-
-    long getLastUpdate();
-
-    long getRootProcessInstanceId();
-
-    long getCallerId();
-
-    String getStringIndex1();
-
-    String getStringIndex2();
-
-    String getStringIndex3();
-
-    String getStringIndex4();
-
-    String getStringIndex5();
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SProcessInstance.class;
+    }
 
 }

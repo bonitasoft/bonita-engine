@@ -27,6 +27,7 @@ import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
@@ -34,7 +35,6 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFactory;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -101,11 +101,11 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected List<SDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException {
-        List<SDependency> dependencies;
+    protected List<AbstractSDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException {
+        List<AbstractSDependency> dependencies;
         try {
-            dependencies = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
-                    SDependency.class, queryOptions));
+            dependencies = persistenceService.selectList(new SelectListDescriptor<>("getDependencies", null,
+                    AbstractSDependency.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SDependencyException("Can't get dependencies", e);
         }
@@ -113,8 +113,8 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected SDependency getDependency(String name) throws SDependencyDeletionException, SDependencyNotFoundException {
-        final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
+    protected SDependency getDependency(String name) throws SDependencyNotFoundException {
+        final Map<String, Object> parameters = Collections.singletonMap("name", name);
         final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<>("getDependencyByName", parameters, SDependency.class);
         final SDependency sDependency;
         try {
@@ -149,7 +149,7 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected void delete(SDependency dependency) throws SDependencyDeletionException {
+    protected void delete(AbstractSDependency dependency) throws SDependencyDeletionException {
         NullCheckingUtil.checkArgsNotNull(dependency);
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency named " + dependency.getName());
         try {
@@ -178,10 +178,10 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public List<SDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
+    public List<AbstractSDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
         NullCheckingUtil.checkArgsNotNull(ids);
         try {
-            final SelectListDescriptor<SDependency> desc = new SelectListDescriptor<>("getDependenciesByIds", CollectionUtil.buildSimpleMap("ids",
+            final SelectListDescriptor<AbstractSDependency> desc = new SelectListDescriptor<>("getDependenciesByIds", CollectionUtil.buildSimpleMap("ids",
                     ids), SDependency.class, QueryOptions.countQueryOptions());
             return persistenceService.selectList(desc);
         } catch (final SBonitaReadException e) {
@@ -199,7 +199,7 @@ public class TenantDependencyService extends AbstractDependencyService {
     public List<SDependencyMapping> getDependencyMappings(final QueryOptions queryOptions) throws SDependencyException {
         NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
-            return persistenceService.selectList(new SelectListDescriptor<SDependencyMapping>(
+            return persistenceService.selectList(new SelectListDescriptor<>(
                     "getDependencyMappings", null, SDependencyMapping.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SDependencyException("Can't get dependency mappings", e);
@@ -234,7 +234,7 @@ public class TenantDependencyService extends AbstractDependencyService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
@@ -263,8 +263,7 @@ public class TenantDependencyService extends AbstractDependencyService {
 
     private SDependency createDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
             throws SDependencyCreationException {
-        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId, scopeType, fileName, jarContent)
-                .done();
+        final SDependency sDependency = new SDependencyBuilderFactory().createNewInstance(name, artifactId, scopeType, fileName, jarContent);
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency with name " + sDependency.getName());
         NullCheckingUtil.checkArgsNotNull(sDependency);
         try {
@@ -281,8 +280,7 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     private void createDependencyMapping(long artifactId, ScopeType scopeType, SDependency sDependency) throws SDependencyException {
-        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+        final SDependencyMapping sDependencyMapping = new SDependencyMapping(artifactId, scopeType, sDependency.getId());
         createDependencyMapping(sDependencyMapping);
     }
 
@@ -305,7 +303,7 @@ public class TenantDependencyService extends AbstractDependencyService {
         inputParameters.put("artifactId", artifactId);
         inputParameters.put("artifactType", artifactType);
         inputParameters.put("fileName", fileName);
-        return persistenceService.selectOne(new SelectOneDescriptor<SDependency>("getDependencyOfArtifact", inputParameters, SDependency.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<>("getDependencyOfArtifact", inputParameters, SDependency.class));
     }
 
     @Override
@@ -314,7 +312,7 @@ public class TenantDependencyService extends AbstractDependencyService {
         inputParameters.put("artifactId", artifactId);
         inputParameters.put("artifactType", artifactType);
         inputParameters.put("fileName", fileName);
-        Long idOfDependencyOfArtifact = persistenceService.selectOne(new SelectOneDescriptor<Long>("getIdOfDependencyOfArtifact", inputParameters, SDependency.class));
+        Long idOfDependencyOfArtifact = persistenceService.selectOne(new SelectOneDescriptor<>("getIdOfDependencyOfArtifact", inputParameters, SDependency.class));
         return Optional.ofNullable(idOfDependencyOfArtifact);
     }
 }

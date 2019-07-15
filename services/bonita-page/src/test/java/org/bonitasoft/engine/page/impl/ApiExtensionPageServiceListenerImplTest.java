@@ -14,7 +14,13 @@
 package org.bonitasoft.engine.page.impl;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Rule;
@@ -50,8 +57,8 @@ public class ApiExtensionPageServiceListenerImplTest {
     @InjectMocks
     private ApiExtensionPageServiceListenerImpl listener;
 
-    private SPageImpl buildPage(final long id) {
-        final SPageImpl page = new SPageImpl();
+    private SPage buildPage(final long id) {
+        final SPage page = new SPage();
         page.setId(id);
         page.setContentType(SContentType.API_EXTENSION);
         return page;
@@ -62,7 +69,7 @@ public class ApiExtensionPageServiceListenerImplTest {
 
     @Test
     public void pageInserted_should_only_care_of_api_extension() throws Exception {
-        final SPageImpl page = new SPageImpl();
+        final SPage page = new SPage();
         page.setId(2L);
         page.setContentType(SContentType.PAGE);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -75,7 +82,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     @Test
     public void pageInserted_should_add_api_resources() throws Exception {
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee, address");
@@ -99,7 +106,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     @Test
     public void pageInserted_should_throw_an_exception_if_the_file_does_not_exists() throws Exception {
         //given
-        final SPageImpl page = buildPage(10L);
+        final SPage page = buildPage(10L);
         final byte[] content = new byte[] { 1, 0, 0 };
         when(helper.loadPageProperties(content)).thenThrow(new SInvalidPageZipMissingPropertiesException());
 
@@ -114,7 +121,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     @Test
     public void pageInserted_should_throw_an_exception_if_an_io_exception_occurs() throws Exception {
         //given
-        final SPageImpl page = buildPage(10L);
+        final SPage page = buildPage(10L);
         final byte[] content = new byte[] { 1, 0, 0 };
         when(helper.loadPageProperties(content)).thenThrow(new IOException());
 
@@ -130,7 +137,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageInserted_should_throw_an_exception_if_the_resource_path_template_is_missing() throws Exception {
         //given
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee");
@@ -150,7 +157,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageInserted_should_throw_an_exception_if_the_resource_path_template_is_empty() throws Exception {
         //given
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee");
@@ -171,7 +178,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageInserted_should_throw_an_exception_if_the_method_is_missing() throws Exception {
         //given
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee");
@@ -191,7 +198,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageInserted_should_throw_an_exception_if_the_class_file_name_is_missing() throws Exception {
         //given
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee ");
@@ -211,7 +218,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageInserted_should_throw_an_exception_if_the_permissions_are_missing() throws Exception {
         //given
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employee ");
@@ -231,7 +238,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     @Test
     public void pageInserted_should_throw_an_exception_if_api_extension_is_missing() throws Exception {
         final long pageId = 1983L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("employee.method", "GET");
@@ -248,7 +255,7 @@ public class ApiExtensionPageServiceListenerImplTest {
 
     @Test
     public void pageDeleted_should_only_care_of_api_extension() throws Exception {
-        final SPageImpl page = new SPageImpl();
+        final SPage page = new SPage();
         page.setId(2L);
         page.setContentType(SContentType.PAGE);
 
@@ -261,7 +268,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageDeleted_should_delete_all_mappings() throws Exception {
         //given
         final long pageId = 10L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final List<SPageMapping> mappings = buildPageMappings(100);
         final List<SPageMapping> mappings2 = buildPageMappings(53);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings, mappings2);
@@ -276,7 +283,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     private List<SPageMapping> buildPageMappings(final int numberOfResults) {
         final List<SPageMapping> mappings = new ArrayList<>();
         for (int i = 0; i < numberOfResults; i++) {
-            mappings.add(new SPageMappingImpl());
+            mappings.add(new SPageMapping());
         }
         return mappings;
     }
@@ -285,7 +292,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_getting_mappings() throws Exception {
         //given
         final long pageId = 10L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
 
         //then
@@ -300,7 +307,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_deleting_mappings() throws Exception {
         //given
         final long pageId = 10L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final List<SPageMapping> mappings = buildPageMappings(10);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
         doThrow(new SDeletionException("message")).when(pageMappingService).delete(any(SPageMapping.class));
@@ -316,7 +323,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     @Test
     public void pageUpdated_should_delete_old_mappings_and_add_new_ones() throws Exception {
         final long pageId = 10L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
         properties.setProperty("apiExtensions", "employees, employee ");
@@ -345,7 +352,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     }
 
     private SPageMapping buildPageMapping(final String key) {
-        final SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final SPageMapping pageMapping = new SPageMapping();
         pageMapping.setKey(key);
         return pageMapping;
     }
@@ -354,7 +361,7 @@ public class ApiExtensionPageServiceListenerImplTest {
     public void pageUpdated_should_throw_an_update_exception_if_an_internal_exception_occurs() throws Exception {
         //given
         final long pageId = 10L;
-        final SPageImpl page = buildPage(pageId);
+        final SPage page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         when(helper.loadPageProperties(content)).thenThrow(new IOException("exception"));
 
@@ -368,7 +375,7 @@ public class ApiExtensionPageServiceListenerImplTest {
 
     @Test
     public void pageUpdated_should_only_care_of_api_extension() throws Exception {
-        final SPageImpl page = new SPageImpl();
+        final SPage page = new SPage();
         page.setId(2L);
         page.setContentType(SContentType.PAGE);
         final byte[] content = new byte[] { 1, 0, 0 };

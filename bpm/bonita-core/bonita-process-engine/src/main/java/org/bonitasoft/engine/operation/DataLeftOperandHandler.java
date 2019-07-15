@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -26,7 +25,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -60,8 +58,7 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
     protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-        updateDescriptor.addField(fact.getValueKey(), content);
+        updateDescriptor.addField(SDataInstance.VALUE, content);
 
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }

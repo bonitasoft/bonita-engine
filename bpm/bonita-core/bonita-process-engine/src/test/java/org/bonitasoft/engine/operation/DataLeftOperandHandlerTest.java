@@ -28,7 +28,7 @@ import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -127,7 +127,7 @@ public class DataLeftOperandHandlerTest {
     }
 
     private SDataInstance data(String data1, String value1) {
-        SShortTextDataInstanceImpl sShortTextDataInstance = new SShortTextDataInstanceImpl();
+        SShortTextDataInstance sShortTextDataInstance = new SShortTextDataInstance();
         sShortTextDataInstance.setName(data1);
         sShortTextDataInstance.setValue(value1);
         return sShortTextDataInstance;

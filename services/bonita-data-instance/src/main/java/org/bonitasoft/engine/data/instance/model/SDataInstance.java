@@ -15,25 +15,59 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Zhao Na
  */
-public interface SDataInstance extends PersistentObject {
+@Data
+@NoArgsConstructor
+public abstract class SDataInstance implements PersistentObject {
 
-    String getName();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String VALUE = "value";
+    public static final String CONTAINER_ID = "containerId";
+    public static final String CONTAINER_TYPE = "containerType";
+    private long tenantId;
+    private long id;
+    private String name;
+    private String description;
+    private boolean transientData;
+    private String className;
+    private long containerId;
+    private String containerType;
 
-    String getDescription();
+    public SDataInstance(final SDataDefinition dataDefinition) {
+        name = dataDefinition.getName();
+        description = dataDefinition.getDescription();
+        transientData = dataDefinition.isTransientData();
+        className = dataDefinition.getClassName();
+    }
 
-    String getClassName();
+    public abstract void setValue(Serializable value);
+    public abstract Serializable getValue();
 
-    Boolean isTransientData();
+    public Boolean isTransientData() {
+        return transientData;
+    }
 
-    Serializable getValue();
+    public void setDataTypeClassName(final String className) {
+        this.className = className;
+    }
+    /**
+     * Check if the data is well formed
+     *
+     * @throws org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException
+     *         thrown if the data is not well formed
+     */
+    public void validate() throws SDataInstanceNotWellFormedException {
+    }
 
-    long getContainerId();
-
-    String getContainerType();
 
 }

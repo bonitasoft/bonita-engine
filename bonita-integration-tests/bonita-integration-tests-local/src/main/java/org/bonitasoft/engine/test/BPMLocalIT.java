@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +53,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -215,7 +213,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         processDef.addTransition("start", "step1");
         processDef.addTransition("step1", "end");
         processDef.addActor(ACTOR_NAME);
-        final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7 };
+        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7};
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef.done())
                 .addClasspathResource(new BarResource("myDep", content)).done();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
@@ -224,7 +222,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0,
                 100));
         assertEquals(1, dependencyIds.size());
-        final SDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
+        final AbstractSDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertTrue(dependency.getName().endsWith("myDep"));
         assertTrue(Arrays.equals(content, dependency.getValue()));
 
@@ -247,7 +245,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         processDef.addActor(ACTOR_NAME);
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef.done());
         for (int i = 0; i < 25; i++) {
-            final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, (byte) (i >>> 24), (byte) (i >> 16 & 0xff), (byte) (i >> 8 & 0xff), (byte) (i & 0xff) };
+            final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, (byte) (i >>> 24), (byte) (i >> 16 & 0xff), (byte) (i >> 8 & 0xff), (byte) (i & 0xff)};
             businessArchiveBuilder.addClasspathResource(new BarResource("myDep" + i, content));
         }
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, john);
@@ -257,7 +255,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService,
                 0, 100));
         assertEquals(25, dependencyIds.size());
-        final SDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
+        final AbstractSDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertNotNull(dependency);
 
         assignAndExecuteStep(step1Id, john.getId());
@@ -507,7 +505,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         private final int maxResult;
 
         public GetDependenciesIds(final APISession session, final long processDefinitionId, final DependencyService dependencyService,
-                final int startIndex, final int maxResult) {
+                                  final int startIndex, final int maxResult) {
             this.session = session;
             this.processDefinitionId = processDefinitionId;
             this.dependencyService = dependencyService;
@@ -522,7 +520,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         }
     }
 
-    private static class GetSDependency implements Callable<SDependency> {
+    private static class GetSDependency implements Callable<AbstractSDependency> {
 
         private final long dependencyId;
 
@@ -534,7 +532,7 @@ public class BPMLocalIT extends CommonAPILocalIT {
         }
 
         @Override
-        public SDependency call() throws Exception {
+        public AbstractSDependency call() throws Exception {
             return dependencyService.getDependency(dependencyId);
         }
     }
@@ -546,11 +544,11 @@ public class BPMLocalIT extends CommonAPILocalIT {
         TestHandler testHandler = new TestHandler();
         logger.addHandler(testHandler);
 
-        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.<String, String> emptyMap());
+        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.<String, String>emptyMap());
 
         //then
         String log = testHandler.getLogs();
-        APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+        APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
 
         logger.removeHandler(testHandler);
 

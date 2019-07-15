@@ -37,7 +37,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -171,7 +170,7 @@ public class DocumentHelperTest {
     private List<SMappedDocument> createList(int size) {
         List<SMappedDocument> sMappedDocuments = new ArrayList<SMappedDocument>(size);
         for (int i = 0; i < size; i++) {
-            SMappedDocumentImpl sMappedDocument = new SMappedDocumentImpl();
+            SMappedDocument sMappedDocument = new SMappedDocument();
             sMappedDocument.setId(size + (i * 1000));
             sMappedDocuments.add(sMappedDocument);
         }
@@ -217,7 +216,7 @@ public class DocumentHelperTest {
     @Test
     public void should_createOrUpdate_update_if_found() throws Exception {
         //given
-        SMappedDocumentImpl docToUpdate = new SMappedDocumentImpl();
+        SMappedDocument docToUpdate = new SMappedDocument();
         docToUpdate.setId(145);
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
@@ -241,7 +240,7 @@ public class DocumentHelperTest {
     @Test
     public void should_setDocumentList_set_the_list() throws Exception {
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = Arrays.<SMappedDocument>asList(new SMappedDocumentImpl());
+        List<SMappedDocument> existingList = Arrays.asList(new SMappedDocument());
         doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
 
         DocumentValue docValue1 = new DocumentValue("url1");
@@ -327,7 +326,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_unmodified_content_update_only_index() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l);
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
@@ -339,7 +338,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_unmodified_content_and_index_do_nothing() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l);
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(2);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
@@ -351,7 +350,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_modified_content_update_everything() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l, "the new url");
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);

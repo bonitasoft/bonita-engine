@@ -20,20 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
-import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -58,11 +56,11 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public List<SDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
-        final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) ids);
+    public List<AbstractSDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
+        final Map<String, Object> parameters = Collections.singletonMap("ids", ids);
         final QueryOptions queryOptions = new QueryOptions(0, ids.size(), SPlatformDependency.class, "id", OrderByType.ASC);
         try {
-            return platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependenciesById",
+            return platformPersistenceService.selectList(new SelectListDescriptor<>("getPlatformDependenciesById",
                     parameters, SPlatformDependency.class, queryOptions));
         } catch (final SBonitaReadException bre) {
             throw new SDependencyException(bre);
@@ -70,7 +68,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected void delete(SDependency dependency) throws SDependencyDeletionException {
+    protected void delete(AbstractSDependency dependency) throws SDependencyDeletionException {
         try {
             platformPersistenceService.delete(dependency);
         } catch (final SPersistenceException pe) {
@@ -79,11 +77,11 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected List<SDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException {
-        List<SDependency> dependencies;
+    protected List<AbstractSDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException {
+        List<AbstractSDependency> dependencies;
         try {
-            dependencies = platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependencies",
-                    Collections.<String, Object> emptyMap(), SDependency.class, queryOptions));
+            dependencies = platformPersistenceService.selectList(new SelectListDescriptor<>("getPlatformDependencies",
+                    Collections.emptyMap(), SPlatformDependency.class, queryOptions));
         } catch (final SBonitaReadException bre) {
             throw new SDependencyException(bre);
         }
@@ -91,7 +89,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public SDependency getDependency(final long id) throws SDependencyNotFoundException {
+    public AbstractSDependency getDependency(final long id) throws SDependencyNotFoundException {
         final SelectByIdDescriptor<SPlatformDependency> selectByIdDescriptor = new SelectByIdDescriptor<>(
                 SPlatformDependency.class, id);
         try {
@@ -115,10 +113,10 @@ public class PlatformDependencyService extends AbstractDependencyService {
 
 
     @Override
-    protected SDependency getDependency(final String name) throws SDependencyNotFoundException {
-        final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
+    protected AbstractSDependency getDependency(final String name) throws SDependencyNotFoundException {
+        final Map<String, Object> parameters = Collections.singletonMap("name", name);
         try {
-            final SPlatformDependency sDependency = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatformDependency>(
+            final SPlatformDependency sDependency = platformPersistenceService.selectOne(new SelectOneDescriptor<>(
                     "getPlatformDependencyByName", parameters, SPlatformDependency.class));
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("No dependency exists using name: " + name);
@@ -150,7 +148,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     @Override
     public List<SDependencyMapping> getDependencyMappings(final QueryOptions queryOptions) throws SDependencyException {
         try {
-            return platformPersistenceService.selectList(new SelectListDescriptor<SDependencyMapping>("getPlatformDependencyMappings", null,
+            return platformPersistenceService.selectList(new SelectListDescriptor<>("getPlatformDependencyMappings", null,
                     SPlatformDependencyMapping.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SDependencyException("can't get dependency mappings", e);
@@ -177,19 +175,16 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+    public AbstractSDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
             throws SDependencyException {
-        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
-                .createNewInstance(name, fileName, jarContent)
-                .done();
+        final SPlatformDependency sDependency = new SPlatformDependency(name, fileName, jarContent);
         NullCheckingUtil.checkArgsNotNull(sDependency);
         try {
             platformPersistenceService.insert(sDependency);
         } catch (final SPersistenceException pe) {
             throw new SDependencyCreationException(pe);
         }
-        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class)
-                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+        final SDependencyMapping sDependencyMapping = new SPlatformDependencyMapping(artifactId, scopeType, sDependency.getId());
         createDependencyMapping(sDependencyMapping);
         return sDependency;
     }
@@ -200,7 +195,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException {
+    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) {
         return Optional.empty();
     }
 

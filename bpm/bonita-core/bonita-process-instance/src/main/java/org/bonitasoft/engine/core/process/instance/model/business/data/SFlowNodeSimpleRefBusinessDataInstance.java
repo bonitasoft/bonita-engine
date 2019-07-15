@@ -13,11 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Matthieu Chaffotte
  */
-public interface SFlowNodeSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SFlowNodeSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
 
-    long getFlowNodeInstanceId();
+    private long flowNodeInstanceId;
 
 }

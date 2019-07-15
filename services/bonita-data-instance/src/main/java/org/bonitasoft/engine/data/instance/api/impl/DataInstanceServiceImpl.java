@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -42,8 +41,7 @@ import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceExceptio
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilderFactory;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -95,7 +93,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
         if (!sDataInstance.isTransientData()) {
             try {
-                final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
+                final SADataInstance saDataInstance = new SADataInstanceBuilder().createNewInstance(sDataInstance);
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
                 archiveService.recordInsert(System.currentTimeMillis(), archiveInsertRecord);
             } catch (final SRecorderException e) {
@@ -207,10 +205,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     private SDataInstance internalGetLocalDataInstance(final String dataName, final long containerId, final String containerType)
             throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getNameKey(), dataName);
-        paraMap.put(fact.getContainerIdKey(), containerId);
-        paraMap.put(fact.getContainerTypeKey(), containerType);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(SDataInstance.NAME, dataName);
+        paraMap.put(SDataInstance.CONTAINER_ID, containerId);
+        paraMap.put(SDataInstance.CONTAINER_TYPE, containerType);
 
         try {
             return persistenceService.selectOne(new SelectOneDescriptor<SDataInstance>("getDataInstancesByNameAndContainer",
@@ -225,10 +222,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public List<SDataInstance> getLocalDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
             throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getContainerIdKey(), containerId);
-        final OrderByOption orderByOption = new OrderByOption(SDataInstance.class, fact.getIdKey(), OrderByType.ASC);
-        paraMap.put(fact.getContainerTypeKey(), containerType);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(SDataInstance.CONTAINER_ID, containerId);
+        final OrderByOption orderByOption = new OrderByOption(SDataInstance.class, SDataInstance.ID, OrderByType.ASC);
+        paraMap.put(SDataInstance.CONTAINER_TYPE, containerType);
 
         try {
             return persistenceService.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,

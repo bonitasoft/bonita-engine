@@ -40,7 +40,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
@@ -224,7 +223,7 @@ public class JDBCJobListenerTest {
     @Test
     public void jobToBeExecuted_should_do_nothing_when_job_descriptor_exists() throws Exception {
         // Given
-        final SJobDescriptor sJobDescriptor = new SJobDescriptorImpl();
+        final SJobDescriptor sJobDescriptor = new SJobDescriptor();
         doReturn(sJobDescriptor).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
         // When

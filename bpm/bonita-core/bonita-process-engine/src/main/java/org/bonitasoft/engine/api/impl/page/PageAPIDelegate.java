@@ -64,8 +64,6 @@ import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -316,11 +314,6 @@ public class PageAPIDelegate {
 
     protected SPage constructPage(final PageCreator pageCreator, final long userId) {
         return new PageModelConverter().constructSPage(pageCreator, userId);
-    }
-
-    protected SPageUpdateContentBuilder getPageUpdateContentBuilder() {
-        return BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
-                .createNewInstance(new EntityUpdateDescriptor());
     }
 
     protected SPage constructPage(final PageUpdater pageUpdater, final long userId) {

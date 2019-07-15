@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,30 +34,29 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
     SearchApplicationDescriptor() {
-        final SApplicationBuilderFactory keyProvider = BuilderFactory.get(SApplicationBuilderFactory.class);
         keys = new HashMap<>(13);
-        keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, keyProvider.getIdKey()));
-        keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, keyProvider.getTokenKey()));
-        keys.put(ApplicationSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplication.class, keyProvider.getDisplayNameKey()));
-        keys.put(ApplicationSearchDescriptor.VERSION, new FieldDescriptor(SApplication.class, keyProvider.getVersionKey()));
-        keys.put(ApplicationSearchDescriptor.ICON_PATH, new FieldDescriptor(SApplication.class, keyProvider.getIconPathKey()));
-        keys.put(ApplicationSearchDescriptor.CREATION_DATE, new FieldDescriptor(SApplication.class, keyProvider.getCreationDateKey()));
-        keys.put(ApplicationSearchDescriptor.CREATED_BY, new FieldDescriptor(SApplication.class, keyProvider.getCreatedByKey()));
-        keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE, new FieldDescriptor(SApplication.class, keyProvider.getLastUpdatedDateKey()));
-        keys.put(ApplicationSearchDescriptor.UPDATED_BY, new FieldDescriptor(SApplication.class, keyProvider.getUpdatedByKey()));
-        keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, keyProvider.getStateKey()));
-        keys.put(ApplicationSearchDescriptor.PROFILE_ID, new FieldDescriptor(SApplication.class, keyProvider.getProfileIdKey()));
-        keys.put(ApplicationSearchDescriptor.LAYOUT_ID, new FieldDescriptor(SApplication.class, keyProvider.getLayoutIdKey()));
-        keys.put(ApplicationSearchDescriptor.THEME_ID, new FieldDescriptor(SApplication.class, keyProvider.getThemeIdKey()));
+        keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, SApplication.ID));
+        keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, SApplication.TOKEN));
+        keys.put(ApplicationSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplication.class, SApplication.DISPLAY_NAME));
+        keys.put(ApplicationSearchDescriptor.VERSION, new FieldDescriptor(SApplication.class, SApplication.VERSION));
+        keys.put(ApplicationSearchDescriptor.ICON_PATH, new FieldDescriptor(SApplication.class, SApplication.ICON_PATH));
+        keys.put(ApplicationSearchDescriptor.CREATION_DATE, new FieldDescriptor(SApplication.class, SApplication.CREATION_DATE));
+        keys.put(ApplicationSearchDescriptor.CREATED_BY, new FieldDescriptor(SApplication.class, SApplication.CREATED_BY));
+        keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE, new FieldDescriptor(SApplication.class, SApplication.LAST_UPDATE_DATE));
+        keys.put(ApplicationSearchDescriptor.UPDATED_BY, new FieldDescriptor(SApplication.class, SApplication.UPDATED_BY));
+        keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, SApplication.STATE));
+        keys.put(ApplicationSearchDescriptor.PROFILE_ID, new FieldDescriptor(SApplication.class, SApplication.PROFILE_ID));
+        keys.put(ApplicationSearchDescriptor.LAYOUT_ID, new FieldDescriptor(SApplication.class, SApplication.LAYOUT_ID));
+        keys.put(ApplicationSearchDescriptor.THEME_ID, new FieldDescriptor(SApplication.class, SApplication.THEME_ID));
 
         allFields = new HashMap<>(1);
 
         final Set<String> pageFields = new HashSet<>(5);
-        pageFields.add(keyProvider.getTokenKey());
-        pageFields.add(keyProvider.getDisplayNameKey());
-        pageFields.add(keyProvider.getVersionKey());
-        pageFields.add(keyProvider.getIconPathKey());
-        pageFields.add(keyProvider.getStateKey());
+        pageFields.add(SApplication.TOKEN);
+        pageFields.add(SApplication.DISPLAY_NAME);
+        pageFields.add(SApplication.VERSION);
+        pageFields.add(SApplication.ICON_PATH);
+        pageFields.add(SApplication.STATE);
         allFields.put(SApplication.class, pageFields);
     }
 

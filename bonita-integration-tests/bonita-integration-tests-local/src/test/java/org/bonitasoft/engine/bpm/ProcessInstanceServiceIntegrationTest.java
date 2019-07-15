@@ -36,8 +36,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -376,10 +375,9 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     private SDataInstance createDataInTransaction(final String dataName, final String dataType, final long containerId,
             final DataInstanceContainer containerType) throws SBonitaException {
         getTransactionService().begin();
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         final SDataDefinitionBuilder dataDefBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(dataName, dataType);
 
-        final SDataInstanceBuilder dataInstanceBuilder = fact.createNewInstance(dataDefBuilder.done());
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefBuilder.done());
         dataInstanceBuilder.setContainerId(containerId);
         dataInstanceBuilder.setContainerType(containerType.name());
 

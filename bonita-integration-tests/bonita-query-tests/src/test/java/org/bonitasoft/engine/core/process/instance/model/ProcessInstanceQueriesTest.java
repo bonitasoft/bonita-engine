@@ -38,7 +38,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
@@ -817,13 +816,13 @@ public class ProcessInstanceQueriesTest {
         assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
     }
 
-    private SAProcessInstanceImpl buildSAProcessInstance(final long id) {
-        final SAProcessInstanceImpl saProcessInstanceImpl = new SAProcessInstanceImpl();
-        saProcessInstanceImpl.setId(id);
-        saProcessInstanceImpl.setSourceObjectId(id);
-        saProcessInstanceImpl.setTenantId(DEFAULT_TENANT_ID);
-        saProcessInstanceImpl.setName("process" + id);
-        return saProcessInstanceImpl;
+    private SAProcessInstance buildSAProcessInstance(final long id) {
+        final SAProcessInstance saProcessInstance = new SAProcessInstance();
+        saProcessInstance.setId(id);
+        saProcessInstance.setSourceObjectId(id);
+        saProcessInstance.setTenantId(DEFAULT_TENANT_ID);
+        saProcessInstance.setName("process" + id);
+        return saProcessInstance;
     }
 
 }

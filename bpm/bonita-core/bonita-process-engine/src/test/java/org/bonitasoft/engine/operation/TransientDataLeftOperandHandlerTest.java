@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -52,7 +52,7 @@ public class TransientDataLeftOperandHandlerTest {
     @Test
     public void should_update_call_transient_data_service() throws Exception {
         // given
-        final SShortTextDataInstanceImpl data = createData();
+        final SShortTextDataInstance data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
         // when
         transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String,Object>emptyMap(), "new Value", 42, "ctype");
@@ -73,7 +73,7 @@ public class TransientDataLeftOperandHandlerTest {
     @Test
     public void should_retrieve_get_data_from_transient_service() throws Exception {
         // given
-        final SShortTextDataInstanceImpl data = createData();
+        final SShortTextDataInstance data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
         SExpressionContext sExpressionContext = new SExpressionContext(42l, "ctype", 12l);
         // when
@@ -83,8 +83,8 @@ public class TransientDataLeftOperandHandlerTest {
         assertThat(sExpressionContext.getInputValues()).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
     }
 
-    private SShortTextDataInstanceImpl createData() {
-        final SShortTextDataInstanceImpl data = new SShortTextDataInstanceImpl();
+    private SShortTextDataInstance createData() {
+        final SShortTextDataInstance data = new SShortTextDataInstance();
         data.setName("myData");
         data.setId(56);
         data.setValue("The data value");

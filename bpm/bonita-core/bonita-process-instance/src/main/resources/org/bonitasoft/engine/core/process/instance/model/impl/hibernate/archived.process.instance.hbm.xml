@@ -6,7 +6,7 @@
         <filter-param name="tenantId" type="long" />
     </filter-def>
 
-    <class name="SAProcessInstanceImpl" table="arch_process_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" table="arch_process_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -32,7 +32,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SAFlowNodeInstanceImpl" abstract="true" table="arch_flownode_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" abstract="true" table="arch_flownode_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -65,14 +65,14 @@
     </class>
 
 
-    <subclass name="SAActivityInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" abstract="true" />
 
-    <subclass name="SALoopActivityInstanceImpl" discriminator-value="loop" extends="SAActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" discriminator-value="loop" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance">
         <property name="loopCounter" column="loop_counter" />
         <property name="loopMax" column="loop_max" />
     </subclass>
 
-    <subclass name="SAMultiInstanceActivityInstanceImpl" discriminator-value="multi" extends="SAActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance" discriminator-value="multi" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance">
         <property name="sequential" column="sequential" />
         <property name="loopDataInputRef" column="loopDataInputRef" />
         <property name="loopDataOutputRef" column="loopDataOutputRef" />
@@ -84,7 +84,7 @@
         <property name="numberOfTerminatedInstances" column="nbTerminatedInst" />
     </subclass>
 
-    <subclass name="SAHumanTaskInstanceImpl" extends="SAActivityInstanceImpl" abstract="true">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" abstract="true">
         <property name="actorId" column="actorId" type="long" />
         <property name="assigneeId" column="assigneeId" type="long" />
         <property name="expectedEndDate" column="expectedEndDate" />
@@ -96,7 +96,7 @@
         </property>
     </subclass>
 
-    <subclass name="SAGatewayInstanceImpl" discriminator-value="gate" extends="SAFlowNodeInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" discriminator-value="gate" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance">
         <property name="gatewayType" column="gatewayType">
             <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
                 <param name="enumClass">
@@ -107,7 +107,7 @@
         <property name="hitBys" column="hitBys" />
     </subclass>
 
-    <class name="SAConnectorInstanceImpl" table="arch_connector_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" table="arch_connector_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -130,45 +130,45 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="SAUserTaskInstanceImpl" discriminator-value="user" extends="SAHumanTaskInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" discriminator-value="user" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" />
 
-    <subclass name="SAManualTaskInstanceImpl" discriminator-value="manual" extends="SAHumanTaskInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" discriminator-value="manual" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" />
 
-    <subclass name="SAAutomaticTaskInstanceImpl" discriminator-value="auto" extends="SAActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" discriminator-value="auto" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" />
 
-    <subclass name="SAReceiveTaskInstanceImpl" discriminator-value="receive" extends="SAActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance" discriminator-value="receive" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" />
 
-    <subclass name="SASendTaskInstanceImpl" discriminator-value="send" extends="SAActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance" discriminator-value="send" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" />
 
-    <subclass name="SACallActivityInstanceImpl" discriminator-value="call" extends="SAActivityInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" discriminator-value="call" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" />
 
-    <subclass name="SASubProcessActivityInstanceImpl" discriminator-value="subProc" extends="SAActivityInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" discriminator-value="subProc" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance">
         <property name="triggeredByEvent" column="triggeredByEvent" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEventInstance" extends="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" abstract="true" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SACatchEventInstance" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEventInstance">
         <property name="interrupting" column="interrupting" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SACatchEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateCatchEventInstanceImpl" discriminator-value="intermediateCatchEvent"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAIntermediateCatchEventInstance" discriminator-value="intermediateCatchEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SACatchEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SABoundaryEventInstanceImpl" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl">
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SABoundaryEventInstance" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SACatchEventInstance">
         <property name="activityInstanceId" column="activityInstanceId" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAThrowEventInstance" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateThrowEventInstanceImpl" discriminator-value="intermediateThrowEvent"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAIntermediateThrowEventInstance" discriminator-value="intermediateThrowEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SAThrowEventInstance" />
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.SAThrowEventInstance" />
 
-    <class name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SARefBusinessDataInstanceImpl" abstract="true" table="arch_ref_biz_data_inst">
+    <class name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance" abstract="true" table="arch_ref_biz_data_inst">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
@@ -179,26 +179,26 @@
         <filter name="tenantFilter" />
     </class>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SASimpleRefBusinessDataInstanceImpl"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SARefBusinessDataInstanceImpl"
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance"
               abstract="true">
         <property name="dataId" column="data_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessSimpleRefBusinessDataInstanceImpl"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SASimpleRefBusinessDataInstanceImpl"
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance"
               discriminator-value="proc_simple_ref">
         <property name="processInstanceId" column="orig_proc_inst_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAFlowNodeSimpleRefBusinessDataInstanceImpl"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SASimpleRefBusinessDataInstanceImpl"
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance"
               discriminator-value="fn_simple_ref">
         <property name="flowNodeInstanceId" column="orig_fn_inst_id" />
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAMultiRefBusinessDataInstanceImpl"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SARefBusinessDataInstanceImpl"
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAMultiRefBusinessDataInstance"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance"
               abstract="true">
         <list name="dataIds" table="arch_multi_biz_data">
             <key>
@@ -210,8 +210,8 @@
         </list>
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessMultiRefBusinessDataInstanceImpl"
-              extends="org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAMultiRefBusinessDataInstanceImpl"
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAMultiRefBusinessDataInstance"
               discriminator-value="proc_multi_ref">
         <property name="processInstanceId" column="orig_proc_inst_id" />
     </subclass>

@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,19 +34,18 @@ public class SearchApplicationMenuDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
     SearchApplicationMenuDescriptor() {
-        final SApplicationMenuBuilderFactory appMenuKeyProvider = BuilderFactory.get(SApplicationMenuBuilderFactory.class);
         keys = new HashMap<String, FieldDescriptor>(6);
-        keys.put(ApplicationMenuSearchDescriptor.ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getIdKey()));
-        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getApplicationPageIdKey()));
-        keys.put(ApplicationMenuSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getDisplayNameKey()));
-        keys.put(ApplicationMenuSearchDescriptor.INDEX, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getIndexKey()));
-        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getApplicationIdKey()));
-        keys.put(ApplicationMenuSearchDescriptor.PARENT_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getParentIdKey()));
+        keys.put(ApplicationMenuSearchDescriptor.ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.ID));
+        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID));
+        keys.put(ApplicationMenuSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.DISPLAY_NAME));
+        keys.put(ApplicationMenuSearchDescriptor.INDEX, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.INDEX));
+        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID));
+        keys.put(ApplicationMenuSearchDescriptor.PARENT_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.PARENT_ID));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 
         final Set<String> pageFields = new HashSet<String>(1);
-        pageFields.add(appMenuKeyProvider.getDisplayNameKey());
+        pageFields.add(SApplicationMenu.DISPLAY_NAME);
         allFields.put(SApplicationMenu.class, pageFields);
     }
 

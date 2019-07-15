@@ -25,8 +25,6 @@ import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -75,11 +73,10 @@ public class ApplicationPageAPIDelegate {
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token) throws AlreadyExistsException,
             CreationException {
         validateToken(token);
-        final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        final SApplicationPageBuilder pageBuilder = factory.createNewInstance(applicationId, pageId, token);
+        final SApplicationPage.SApplicationPageBuilder pageBuilder = SApplicationPage.builder().applicationId(applicationId).pageId(pageId).token(token);
         SApplicationPage sAppPage;
         try {
-            sAppPage = applicationService.createApplicationPage(pageBuilder.done());
+            sAppPage = applicationService.createApplicationPage(pageBuilder.build());
             applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
                     .done());
             return converter.toApplicationPage(sAppPage);

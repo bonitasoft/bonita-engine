@@ -32,7 +32,7 @@ public abstract class CRUDELogBuilder implements HasCRUDEAction, SLogBuilder {
     private static final String SEPARATOR = "_";
 
     protected CRUDELogBuilder() {
-        queriableLogBuilder = new SQueriableLogBuilderImpl();
+        queriableLogBuilder = new SQueriableLogBuilder();
     }
 
     protected abstract String getActionTypePrefix();
@@ -98,8 +98,8 @@ public abstract class CRUDELogBuilder implements HasCRUDEAction, SLogBuilder {
     }
 
     @Override
-    public SQueriableLog done() {
-        final SQueriableLog log = queriableLogBuilder.done();
+    public SQueriableLog build() {
+        final SQueriableLog log = queriableLogBuilder.build();
         checkExtraRules(log);
         return log;
     }

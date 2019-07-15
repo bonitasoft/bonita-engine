@@ -28,7 +28,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.junit.Test;
@@ -80,14 +80,14 @@ public class FormRequiredAnalyzerTest {
 
     @Test
     public void isFormRequiredShouldBeFalseForOverview() throws Exception {
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(1L, SFormMappingImpl.TYPE_PROCESS_OVERVIEW, null, ""));
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(1L, SFormMapping.TYPE_PROCESS_OVERVIEW, null, ""));
         assertThat(formRequired).isFalse();
     }
 
     @Test
     public void isFormRequiredShouldBeFalseIfExceptionOccurs() throws Exception {
         doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getDesignProcessDefinition(157L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(157L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(157L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 
@@ -96,7 +96,7 @@ public class FormRequiredAnalyzerTest {
         final DesignProcessDefinition definition = mock(DesignProcessDefinition.class);
         doReturn(null).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 
@@ -107,7 +107,7 @@ public class FormRequiredAnalyzerTest {
         contractDefinition.addInput(new InputDefinitionImpl("input1", "theInput"));
         doReturn(contractDefinition).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isTrue();
     }
 
@@ -117,7 +117,7 @@ public class FormRequiredAnalyzerTest {
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
         doReturn(contractDefinition).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 
@@ -135,7 +135,7 @@ public class FormRequiredAnalyzerTest {
 
         doReturn(userTaskDefinition).when(spy).findActivityWithName(anyList(), nullable(String.class));
 
-        final boolean formRequired = spy.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_TASK, null, ""));
+        final boolean formRequired = spy.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_TASK, null, ""));
         assertThat(formRequired).isTrue();
     }
 
@@ -147,7 +147,7 @@ public class FormRequiredAnalyzerTest {
 
         final FormRequiredAnalyzer spy = spy(formRequiredAnalyzer);
 
-        final boolean formRequired = spy.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_TASK, null, ""));
+        final boolean formRequired = spy.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_TASK, null, ""));
         assertThat(formRequired).isFalse();
     }
 }

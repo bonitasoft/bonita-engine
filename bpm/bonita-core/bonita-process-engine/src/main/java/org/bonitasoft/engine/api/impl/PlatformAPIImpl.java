@@ -30,7 +30,6 @@ import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
@@ -65,7 +64,6 @@ import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -483,8 +481,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             // add tenant to database
             final String createdBy = "defaultUser";
-            final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true).setDescription(description).done();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(true).description(description).build();
             tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();

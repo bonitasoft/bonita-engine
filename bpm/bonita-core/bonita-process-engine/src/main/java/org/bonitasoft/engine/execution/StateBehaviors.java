@@ -106,7 +106,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -867,8 +866,7 @@ public class StateBehaviors {
 
     private void updateLoopDataOutputDataInstance(final SDataInstance loopDataOutput, final ArrayList<Object> newOutputList) throws SDataInstanceException {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-        updateDescriptor.addField(fact.getValueKey(), newOutputList);
+        updateDescriptor.addField(SDataInstance.VALUE, newOutputList);
         dataInstanceService.updateDataInstance(loopDataOutput, updateDescriptor);
     }
 

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -45,7 +45,7 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void testRecordInsert() throws Exception {
         getTransactionService().begin();
 
-        final SAShortTextDataInstanceImpl dataInstance = insertDataWithYesterdayDate();
+        final SAShortTextDataInstance dataInstance = insertDataWithYesterdayDate();
         assertNotNull(dataInstance);
 
         getTransactionService().complete();
@@ -55,12 +55,12 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void archiveInSlidingArchiveNotDone() throws Exception {
 
         getTransactionService().begin();
-        final SAShortTextDataInstanceImpl dataInstance = insertDataWithFirstJanuary2009Date();
+        final SAShortTextDataInstance dataInstance = insertDataWithFirstJanuary2009Date();
         getTransactionService().complete();
 
         getTransactionService().begin();
 
-        final SAShortTextDataInstanceImpl dataInstanceFromArchive = selectDataByIdFromDefinitiveArchive(dataInstance);
+        final SAShortTextDataInstance dataInstanceFromArchive = selectDataByIdFromDefinitiveArchive(dataInstance);
         assertNotNull("should be in definitive archive", dataInstanceFromArchive);
         assertEquals(dataInstance.getName(), dataInstanceFromArchive.getName());
         assertEquals(dataInstance.getValue(), dataInstanceFromArchive.getValue());
@@ -78,28 +78,28 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
         }
     }
 
-    private SAShortTextDataInstanceImpl insertDataWithYesterdayDate() throws SRecorderException {
+    private SAShortTextDataInstance insertDataWithYesterdayDate() throws SRecorderException {
         return insertData(System.currentTimeMillis() - ONE_DAY);
     }
 
-    private SAShortTextDataInstanceImpl insertDataWithFirstJanuary2009Date() throws SRecorderException {
+    private SAShortTextDataInstance insertDataWithFirstJanuary2009Date() throws SRecorderException {
         return insertData(START_OF_2009);
     }
 
-    private SAShortTextDataInstanceImpl insertDataWithBefore2009Date() throws SRecorderException {
+    private SAShortTextDataInstance insertDataWithBefore2009Date() throws SRecorderException {
         return insertData(BEFORE_2009);
     }
 
-    private SAShortTextDataInstanceImpl insertData(long before2009) throws SRecorderException {
-        final SAShortTextDataInstanceImpl data = new SAShortTextDataInstanceImpl();
+    private SAShortTextDataInstance insertData(long before2009) throws SRecorderException {
+        final SAShortTextDataInstance data = new SAShortTextDataInstance();
         data.setName("archiveTestEmployee");
         data.setValue("password");
         archiveService.recordInsert(before2009, new ArchiveInsertRecord(data));
         return data;
     }
 
-    private SAShortTextDataInstanceImpl selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstanceImpl dataInstance) throws SBonitaReadException {
-        final SelectByIdDescriptor<SAShortTextDataInstanceImpl> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstanceImpl.class,
+    private SAShortTextDataInstance selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstance dataInstance) throws SBonitaReadException {
+        final SelectByIdDescriptor<SAShortTextDataInstance> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstance.class,
                 dataInstance.getId());
         return archiveService.getDefinitiveArchiveReadPersistenceService().selectById(selectByIdDescriptor1);
     }
@@ -108,7 +108,7 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void testRecordDelete() throws Exception {
         getTransactionService().begin();
 
-        final SAShortTextDataInstanceImpl dataInstance = insertDataWithYesterdayDate();
+        final SAShortTextDataInstance dataInstance = insertDataWithYesterdayDate();
 
         getTransactionService().complete();
 

@@ -18,10 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Emmanuel Duchastenier
@@ -39,12 +37,12 @@ public class SearchProcessSupervisorDescriptor extends SearchEntityDescriptor {
         // final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
         fieldDescriptorMap = new HashMap<String, FieldDescriptor>(5);
         fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ID_KEY));
         fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getProcessDefIdKey()));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.GROUP_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
-        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.PROCESS_DEF_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.GROUP_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY));
+        fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_FISRT_NAME, new FieldDescriptor(SUser.class, userBuilder.getFirstNameKey()));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USER_LAST_NAME, new FieldDescriptor(SUser.class, userBuilder.getLastNameKey()));
         // fieldDescriptorMap.put(ProcessSupervisorSearchDescriptor.USERNAME, new FieldDescriptor(SUser.class, userBuilder.getUserNameKey()));
