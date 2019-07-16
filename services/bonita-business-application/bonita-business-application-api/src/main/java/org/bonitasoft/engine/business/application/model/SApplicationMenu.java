@@ -13,17 +13,28 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder@Entity
+@Table(name = "business_app_menu")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SApplicationMenu implements PersistentObject {
 
     public static String ID = "id";
@@ -32,12 +43,19 @@ public class SApplicationMenu implements PersistentObject {
     public static String APPLICATION_PAGE_ID = "applicationPageId";
     public static String PARENT_ID = "parentId";
     public static String INDEX = "index";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private String displayName;
+    @Column
     private long applicationId;
+    @Column
     private Long applicationPageId;
+    @Column
     private Long parentId;
+    @Column(name = "index_")
     private int index;
 
 
