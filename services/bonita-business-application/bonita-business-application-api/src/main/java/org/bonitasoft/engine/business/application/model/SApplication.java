@@ -13,17 +13,28 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "business_app")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SApplication implements PersistentObject {
 
     public static final String ID = "id";
@@ -41,21 +52,38 @@ public class SApplication implements PersistentObject {
     public static final String PROFILE_ID = "profileId";
     public static final String LAYOUT_ID = "layoutId";
     public static final String THEME_ID = "themeId";
+
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private String token;
+    @Column
     private String description;
+    @Column
     private String version;
+    @Column
     private String iconPath;
+    @Column
     private long creationDate;
+    @Column
     private long createdBy;
+    @Column
     private long lastUpdateDate;
+    @Column
     private long updatedBy;
+    @Column
     private String state;
+    @Column
     private Long homePageId;
+    @Column
     private String displayName;
+    @Column
     private Long profileId;
+    @Column
     private Long layoutId;
+    @Column
     private Long themeId;
 
     public SApplication(final String token, final String displayName, final String version, final long creationDate, final long createdBy,

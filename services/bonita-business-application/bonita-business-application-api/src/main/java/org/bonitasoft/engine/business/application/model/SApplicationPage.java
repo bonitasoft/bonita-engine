@@ -13,11 +13,19 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 
 /**
@@ -28,16 +36,25 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "business_app_page")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SApplicationPage implements PersistentObject {
 
     public static final String ID = "id";
     public static final String TOKEN = "token";
     public static final String PAGE_ID = "pageId";
     public static final String APPLICATION_ID = "applicationId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private long applicationId;
+    @Column
     private long pageId;
+    @Column
     private String token;
 
     public SApplicationPage(final long applicationId, final long pageId, final String token) {

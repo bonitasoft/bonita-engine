@@ -23,6 +23,9 @@
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplication</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
+                <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -61,7 +64,6 @@
                 <value>/org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
                 <value>/org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
