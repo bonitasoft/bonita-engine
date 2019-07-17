@@ -1118,26 +1118,6 @@
         </property>
     </bean>
 
-    <bean id="interfaceToClassMapping" parent="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
-        <property name="targetMapClass">
-            <value>java.util.HashMap</value>
-        </property>
-        <property name="sourceMap">
-            <map merge="true">
-            </map>
-        </property>
-    </bean>
-
-    <bean id="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
-        <property name="targetMapClass">
-            <value>java.util.HashMap</value>
-        </property>
-        <property name="sourceMap">
-            <map>
-            </map>
-        </property>
-    </bean>
-
     <bean id="mappingExclusions" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list>
@@ -1147,7 +1127,6 @@
     </bean>
     <bean id="hbmConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
         <constructor-arg name="properties" ref="hbmConfigurationProviderProperties" />
-        <constructor-arg name="interfaceToClassMapping" ref="interfaceToClassMapping" />
         <constructor-arg name="mappingExclusions" ref="mappingExclusions" />
         <constructor-arg ref="hbmResourcesConfigurationProvider" />
     </bean>

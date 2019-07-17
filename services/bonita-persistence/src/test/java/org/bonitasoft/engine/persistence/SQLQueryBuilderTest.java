@@ -43,11 +43,9 @@ public class SQLQueryBuilderTest {
     private SQLQuery mockedQuery;
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
-    private Map<String, Class<? extends PersistentObject>> interfaceToClassMapping = Collections
-            .singletonMap(TestObject.class.getName(), TestObject.class);
 
     private QueryBuilder createQueryBuilder(String baseQuery, Vendor vendor) {
-        return new SQLQueryBuilder(baseQuery, vendor, TestObject.class, new DefaultOrderByBuilder(), classAliasMappings, interfaceToClassMapping,
+        return new SQLQueryBuilder(baseQuery, vendor, TestObject.class, new DefaultOrderByBuilder(), classAliasMappings,
                 LIKE_ESCAPE_CHARACTER);
     }
 

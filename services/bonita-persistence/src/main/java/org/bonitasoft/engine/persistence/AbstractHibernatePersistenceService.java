@@ -69,8 +69,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private final List<Class<? extends PersistentObject>> classMapping;
 
-    protected final Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
-
     private final List<String> mappingExclusions;
     final OrderByBuilder orderByBuilder;
     private Statistics statistics;
@@ -88,7 +86,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         orderByCheckingMode = getOrderByCheckingMode();
         statistics = sessionFactory.getStatistics();
         cacheQueries = Collections.emptyMap();
-        interfaceToClassMapping = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
         orderByBuilder = new DefaultOrderByBuilder();
     }
@@ -159,8 +156,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
 
         classAliasMappings = hbmConfigurationProvider.getClassAliasMappings();
-
-        interfaceToClassMapping = hbmConfigurationProvider.getInterfaceToClassMapping();
 
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
 
@@ -332,15 +327,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         if (classMapping.contains(entityClass)) {
             return entityClass;
         }
-        if (interfaceToClassMapping.containsKey(entityClass.getName())) {
-            return interfaceToClassMapping.get(entityClass.getName());
-        }
         throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
     }
 
     private void checkClassMapping(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        if (!classMapping.contains(entityClass) && !interfaceToClassMapping.containsKey(entityClass.getName())
-                && !mappingExclusions.contains(entityClass.getName())) {
+        if (!classMapping.contains(entityClass) && !mappingExclusions.contains(entityClass.getName())) {
             throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
         }
     }
@@ -427,7 +418,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
             QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(query, selectDescriptor.getEntityType(), orderByBuilder,
-                    classAliasMappings, interfaceToClassMapping,
+                    classAliasMappings,
                     likeEscapeCharacter);
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
