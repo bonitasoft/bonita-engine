@@ -35,15 +35,12 @@ abstract class QueryBuilder {
     private final String baseQuery;
     StringBuilder stringQueryBuilder;
     Map<String, String> classAliasMappings;
-    Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
     private String likeEscapeCharacter;
     private OrderByBuilder orderByBuilder;
 
-    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
-            Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
+    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings, char likeEscapeCharacter) {
         this.orderByBuilder = orderByBuilder;
         this.classAliasMappings = classAliasMappings;
-        this.interfaceToClassMapping = interfaceToClassMapping;
         this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
         stringQueryBuilder = new StringBuilder(baseQuery);
         this.baseQuery = baseQuery;

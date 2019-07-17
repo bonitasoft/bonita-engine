@@ -28,13 +28,12 @@ public class QueryBuilderFactory {
     private Vendor vendor;
 
     public QueryBuilder createQueryBuilderFor(Query query, Class<? extends PersistentObject> entityType, OrderByBuilder orderByBuilder,
-            Map<String, String> classAliasMappings,
-            Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
+            Map<String, String> classAliasMappings, char likeEscapeCharacter) {
         if (query instanceof SQLQuery) {
-            return new SQLQueryBuilder(query.getQueryString(), vendor, entityType, orderByBuilder, classAliasMappings, interfaceToClassMapping,
+            return new SQLQueryBuilder(query.getQueryString(), vendor, entityType, orderByBuilder, classAliasMappings,
                     likeEscapeCharacter);
         } else {
-            return new HQLQueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, interfaceToClassMapping, likeEscapeCharacter);
+            return new HQLQueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, likeEscapeCharacter);
         }
     }
 

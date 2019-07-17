@@ -24,9 +24,8 @@ import org.hibernate.Session;
  */
 public class HQLQueryBuilder extends QueryBuilder {
 
-    HQLQueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
-            Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
-        super(baseQuery, orderByBuilder, classAliasMappings, interfaceToClassMapping, likeEscapeCharacter);
+    HQLQueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings, char likeEscapeCharacter) {
+        super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
     }
 
     Query buildQuery(Session session) {
