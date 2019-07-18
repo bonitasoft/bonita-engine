@@ -24,21 +24,6 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SRole" table="role">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantid" type="long" />
-            <key-property name="id" column="ID" type="long" />
-        </composite-id>
-        <property name="name" type="java.lang.String" column="name" />
-        <property name="displayName" type="java.lang.String" column="displayName" />
-        <property name="description" type="java.lang.String" column="description" />
-        <property name="createdBy" type="long" column="createdBy" />
-        <property name="creationDate" type="long" column="creationDate" />
-        <property name="lastUpdate" type="long" column="lastUpdate" />
-        <property name="iconId" type="long" column="iconid" />
-        <filter name="tenantFilter" />
-    </class>
-
     <class name="SUser" table="user_">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />

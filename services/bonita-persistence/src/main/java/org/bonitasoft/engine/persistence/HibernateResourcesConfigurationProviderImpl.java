@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,9 +27,10 @@ import java.util.Set;
  */
 public class HibernateResourcesConfigurationProviderImpl implements HibernateResourcesConfigurationProvider {
 
-    private final Set<String> resources = new HashSet<String>();
+    private final Set<String> resources = new HashSet<>();
 
-    private final Map<String, String> classAliasMappings = new HashMap<String, String>();
+    private final Map<String, String> classAliasMappings = new HashMap<>();
+    private Set<Class> entities = new HashSet<>();
 
     public HibernateResourcesConfigurationProviderImpl() {
         super();
@@ -41,7 +43,19 @@ public class HibernateResourcesConfigurationProviderImpl implements HibernateRes
                 this.resources.add(resource);
             }
             classAliasMappings.putAll(hibernateResourcesProvider.getClassAliasMappings());
+            for (String entity : hibernateResourcesProvider.getEntities()) {
+                try {
+                    entities.add(Class.forName(entity));
+                } catch (ClassNotFoundException e) {
+                    throw new IllegalArgumentException(String.format("Entity class %s not found", entity));
+                }
+            }
         }
+    }
+
+    @Override
+    public Set<Class> getEntities() {
+        return entities;
     }
 
     @Override

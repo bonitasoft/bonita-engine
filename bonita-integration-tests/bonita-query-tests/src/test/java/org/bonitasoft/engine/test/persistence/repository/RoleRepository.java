@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,24 +10,32 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.persistence;
+ */
+package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 
 /**
- * @author Celine Souchet
+ * author Emmanuel Duchastenier
  */
-public interface HibernateResourcesConfigurationProvider {
+public class RoleRepository extends TestRepository {
 
-    void setHbmResources(final List<HibernateResourcesProvider> resources);
+    public RoleRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
+    }
 
-    Set<Class> getEntities();
+    public SRole getRoleByName(long tenantId, String name) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+        Query namedQuery = getNamedQuery("getRoleByName");
+        namedQuery.setParameter("name", name);
+        return ((SRole) namedQuery.uniqueResult());
+    }
 
-    Set<String> getResources();
-
-    Map<String, String> getClassAliasMappings();
 
 }
