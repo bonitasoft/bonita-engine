@@ -1,18 +1,18 @@
 apply plugin: 'bonita-docker-database'
 
 dependencies {
-    compile project(':engine:bpm:bonita-common')
-    compile project(':engine:services:bonita-business-data:bonita-business-data-generator')
-    compile project(':engine:services:bonita-classloader')
-    compile project(':engine:services:bonita-log-technical')
-    compile project(':engine:services:bonita-business-data:bonita-business-data-api')
-    compile project(':engine:services:bonita-resources')
-    compile project(':engine:services:bonita-transaction')
-    compile project(':engine:services:bonita-commons')
+    compile project(':bpm:bonita-common')
+    compile project(':services:bonita-business-data:bonita-business-data-generator')
+    compile project(':services:bonita-classloader')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-business-data:bonita-business-data-api')
+    compile project(':services:bonita-resources')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-commons')
     compile(group: 'org.hibernate', name: 'hibernate-core', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compile(group: 'org.hibernate', name: 'hibernate-entitymanager', version: Deps.hibernateVersion) { exclude(module: 'jboss-transaction-api_1.2_spec') }
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile project(':engine:services:bonita-classloader')
+    compile project(':services:bonita-classloader')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
@@ -27,7 +27,7 @@ dependencies {
     testCompile "org.springframework:spring-context:${Deps.springVersion}"
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
-    testCompile project(':engine:bpm:bonita-util:bonita-common-util-test')
+    testCompile project(':bpm:bonita-util:bonita-common-util-test')
     compileOnly "javax.transaction:jta:${Deps.javaxJtaVersion}"
     testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
     compileOnly "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
