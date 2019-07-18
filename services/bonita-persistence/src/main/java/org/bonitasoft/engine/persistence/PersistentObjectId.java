@@ -15,6 +15,8 @@ package org.bonitasoft.engine.persistence;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,7 +33,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PersistentObjectId implements Serializable {
 
+    @Column(name = "id")
     private long id;
+    @Column(name = "tenantid")
     private long tenantId;
 
 }

@@ -52,6 +52,9 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
             configuration.addResource(resource);
         }
+        for (Class entity : hibernateResourcesConfigurationProvider.getEntities()) {
+            configuration.addAnnotatedClass(entity);
+        }
         configuration.buildMappings();
         return configuration;
     }

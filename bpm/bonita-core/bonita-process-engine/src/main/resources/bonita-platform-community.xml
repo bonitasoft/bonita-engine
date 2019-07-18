@@ -1005,6 +1005,11 @@
                 <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="apcd" />
             </map>
         </property>
+        <property name="entities">
+            <set>
+                <value>org.bonitasoft.engine.identity.model.SRole</value>
+            </set>
+        </property>
     </bean>
 
     <bean id="extraPlatformHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
