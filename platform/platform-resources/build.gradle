@@ -22,7 +22,9 @@ dependencies {
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
 }
 
+
 processResources {
+    inputs.property("version", project.version)
     from('src/main/resources') {
         include 'PLATFORM_ENGINE_VERSION'
         filter(ReplaceTokens, tokens: [version: project.version])
