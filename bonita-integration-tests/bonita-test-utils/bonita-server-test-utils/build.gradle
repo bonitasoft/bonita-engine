@@ -1,10 +1,10 @@
 
 
 dependencies {
-    compile project(':engine:bonita-test-api')
-    compile project(':engine:bpm:bonita-server')
-    compile project(':engine:bpm:bonita-common')
-    compile project(':engine:bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
+    compile project(':bonita-test-api')
+    compile project(':bpm:bonita-server')
+    compile project(':bpm:bonita-common')
+    compile project(':bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile "junit:junit:${Deps.junit4Version}"
 }

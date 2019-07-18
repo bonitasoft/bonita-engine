@@ -2,9 +2,9 @@
 
 dependencies {
     compile "net.sf.ehcache:ehcache-core:${Deps.ehcacheVersion}"
-    compile project(':engine:services:bonita-commons')
-    compile project(':engine:services:bonita-session')
-    compile project(':engine:services:bonita-log-technical')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-log-technical')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
