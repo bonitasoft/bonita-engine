@@ -1,11 +1,11 @@
 
 
 dependencies {
-    compile project(':engine:platform:platform-resources')
-    compile project(':engine:bpm:bonita-core:bonita-process-engine')
-    compile project(':engine:services:bonita-platform-session')
-    compile project(':engine:services:bonita-session')
-    compile project(':engine:bpm:bonita-common')
+    compile project(':platform:platform-resources')
+    compile project(':bpm:bonita-core:bonita-process-engine')
+    compile project(':services:bonita-platform-session')
+    compile project(':services:bonita-session')
+    compile project(':bpm:bonita-common')
     compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
     compile 'commons-fileupload:commons-fileupload:1.2.2'
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"

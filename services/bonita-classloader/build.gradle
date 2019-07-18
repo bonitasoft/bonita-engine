@@ -1,10 +1,10 @@
 
 
 dependencies {
-    compile project(':engine:services:bonita-commons')
-    compile project(':engine:services:bonita-events')
-    compile project(':engine:bpm:bonita-core:bonita-home-server')
-    compile project(':engine:services:bonita-log-technical')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-events')
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':services:bonita-log-technical')
     compile "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
