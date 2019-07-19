@@ -7,6 +7,7 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
     <context:property-placeholder/>
+    <context:annotation-config />
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
@@ -1139,10 +1140,8 @@
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
     <bean id="meterRegistryFactory" class="org.bonitasoft.engine.configuration.MeterRegistryFactory" autowire="byType"/>
-    <bean class="io.micrometer.core.instrument.logging.LoggingMeterRegistry" />
-    <bean class="io.micrometer.jmx.JmxMeterRegistry">
-        <constructor-arg name="config" value="DEFAULT"/>
-        <constructor-arg name="clock" value="SYSTEM"/>
-    </bean>
+
+    <bean class="org.bonitasoft.engine.configuration.MeterConfiguration" />
+
     <bean id="meterRegistry" factory-bean="meterRegistryFactory" factory-method="create"/>
 </beans>
