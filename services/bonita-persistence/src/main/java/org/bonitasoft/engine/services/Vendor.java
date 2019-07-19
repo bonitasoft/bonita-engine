@@ -19,6 +19,8 @@ import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import org.hibernate.cfg.Configuration;
+
 /**
  * @author Baptiste Mesta
  */
@@ -36,6 +38,25 @@ public enum Vendor {
             }
             if (containsIgnoreCase(productName, "Microsoft SQL Server")) {
                 return SQLSERVER;
+            }
+        }
+        return OTHER;
+    }
+
+    /**
+     * Get database vendor from databases metadata
+     */
+    public static Vendor fromHibernateConfiguration(Configuration configuration){
+        String hibernateDialect = configuration.getProperty("hibernate.dialect");
+        if (hibernateDialect != null) {
+            if (hibernateDialect.toLowerCase().contains("postgresql")) {
+                return POSTGRES;
+            } else if (hibernateDialect.toLowerCase().contains("sqlserver")) {
+                return SQLSERVER;
+            } else if (hibernateDialect.toLowerCase().contains("oracle")) {
+                return ORACLE;
+            } else if (hibernateDialect.toLowerCase().contains("mysql")) {
+                return MYSQL;
             }
         }
         return OTHER;
