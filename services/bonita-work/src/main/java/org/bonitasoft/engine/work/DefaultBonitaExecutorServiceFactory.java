@@ -20,6 +20,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -48,11 +49,12 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private WorkFactory workFactory;
     private final long tenantId;
     private final WorkExecutionAuditor workExecutionAuditor;
+    private SimpleMeterRegistry meterRegistry;
 
     public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, WorkFactory workFactory, final long tenantId, final int corePoolSize, final int queueCapacity,
                                                final int maximumPoolSize,
                                                final long keepAliveTimeSeconds,
-                                               EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor) {
+                                               EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor, SimpleMeterRegistry meterRegistry) {
         this.logger = logger;
         this.workFactory = workFactory;
         this.tenantId = tenantId;
@@ -62,6 +64,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         this.keepAliveTimeSeconds = keepAliveTimeSeconds;
         this.engineClock = engineClock;
         this.workExecutionAuditor = workExecutionAuditor;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -71,7 +74,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         return new BonitaThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                 workQueue, threadFactory, handler, workFactory, logger, engineClock, workExecutionCallback,
-                workExecutionAuditor);
+                workExecutionAuditor, meterRegistry);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

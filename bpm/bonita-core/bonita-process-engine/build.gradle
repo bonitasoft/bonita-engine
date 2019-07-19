@@ -56,6 +56,7 @@ dependencies {
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "org.codehaus.groovy:groovy-all:${Deps.groovyAllVersion}"
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"

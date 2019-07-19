@@ -28,6 +28,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.awaitility.Awaitility;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -55,19 +58,21 @@ public class BonitaThreadPoolExecutorTest {
     private WorkExecutionAuditor workExecutionAuditor;
     private MyWorkExecutionCallback workExecutionCallback = new MyWorkExecutionCallback();
     private BonitaThreadPoolExecutor bonitaThreadPoolExecutor;
+    private static int threadNumber = 3;
     private FixedEngineClock engineClock = new FixedEngineClock(Instant.now());
     private WorkFactory workFactory = new LocalWorkFactory(2);
+    private SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @Before
     public void before() throws Exception {
         doReturn(log).when(technicalLoggerService).asLogger(any());
-        bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3 //
+        bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(threadNumber, threadNumber //
                 , 1_000, TimeUnit.SECONDS //
                 , new ArrayBlockingQueue<>(1_000) //
-                , new WorkerThreadFactory("test-worker", 1, 3) //
+                , new WorkerThreadFactory("test-worker", 1, threadNumber) //
                 , (r, executor) -> {
                 } //
-                , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor);
+                , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor, meterRegistry);
     }
 
     @Test
@@ -144,6 +149,19 @@ public class BonitaThreadPoolExecutorTest {
     }
 
 
+     @Test
+    public void should_update_meter_when_work_executes(){
+        //given:
+
+         Gauge currentWorkQueue = meterRegistry.find("org.bonitasoft.engine.work.queue.size.current").gauge();
+         for (int i = 0; i <= threadNumber + 3 ; i++) {
+             WorkDescriptor workDescriptor = WorkDescriptor.create("SLEEP");
+             bonitaThreadPoolExecutor.submit(workDescriptor);
+         }
+         Awaitility.await().until(() -> currentWorkQueue.value() > 0);
+    }
+
+
     @Test
     public void should_call_on_success_callback_only_when_async_work_executed_properly() throws InterruptedException {
         WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
@@ -189,7 +207,7 @@ public class BonitaThreadPoolExecutorTest {
                 , (r, executor) -> {
                 } //
                 , workFactory //
-                , technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor);
+                , technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor, new SimpleMeterRegistry());
 
         //when:
         bonitaThreadPoolExecutor.submit(WorkDescriptor.create("SLEEP"));
