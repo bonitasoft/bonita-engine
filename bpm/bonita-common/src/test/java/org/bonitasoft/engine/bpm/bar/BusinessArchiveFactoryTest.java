@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,14 +48,12 @@ public class BusinessArchiveFactoryTest {
         charset.set(null, null);
     }
 
-
     @Before
     public void setUp() throws Exception {
         File barFile1 = temporaryFolder.newFile("myBar.bar");
-        barFile1.delete();
+        assert barFile1.delete();
         barFile = barFile1;
     }
-
 
     @Test
     public void should_write_non_UTF8_and_read_UTF8_BAR_works() throws Exception {
@@ -89,6 +86,5 @@ public class BusinessArchiveFactoryTest {
                 .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("说话_éé", "1.0").addAutomaticTask("说话_éé_task").getProcess())
                 .done();
     }
-
 
 }
