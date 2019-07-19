@@ -285,11 +285,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public boolean isStillScheduled(final SJobDescriptor jobDescriptor) throws SSchedulerException {
-        return schedulerExecutor.isStillScheduled(getTenantIdAsString(), jobDescriptor.getJobName());
-    }
-
-    @Override
     public void pause() throws SBonitaException {
         pauseJobs(getTenantId());
     }
@@ -317,5 +312,10 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean isExistingJob(final String jobName) throws SSchedulerException {
         return schedulerExecutor.isExistingJob(jobName, String.valueOf(getTenantId()));
+    }
+
+    @Override
+    public int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException {
+        return schedulerExecutor.getNumberOfTriggers(groupName, jobName);
     }
 }
