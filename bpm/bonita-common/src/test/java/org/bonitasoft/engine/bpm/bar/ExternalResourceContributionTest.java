@@ -20,7 +20,7 @@ public class ExternalResourceContributionTest {
     BusinessArchive businessArchive;
 
     @Test
-    public void should_not_be_mandatory_contribution() throws Exception {
+    public void should_not_be_mandatory_contribution() {
         //given
         ExternalResourceContribution externalResourceContribution = new ExternalResourceContribution();
 
@@ -30,7 +30,7 @@ public class ExternalResourceContributionTest {
     }
 
     @Test
-    public void should_have_a_name() throws Exception {
+    public void should_have_a_name() {
         //given
         ExternalResourceContribution externalResourceContribution = new ExternalResourceContribution();
 
@@ -48,7 +48,7 @@ public class ExternalResourceContributionTest {
         externalResourceContribution.readFromBarFolder(businessArchive, barFolder);
 
         //then
-        verify(businessArchive).addResource(eq("resources/customPages/custompage_step1.zip"), notNull(byte[].class));
-        verify(businessArchive).addResource(eq("resources/customPages/custompage_step2.zip"), notNull(byte[].class));
+        verify(businessArchive).addResource(eq("resources/customPages/custompage_step1.zip"), notNull());
+        verify(businessArchive).addResource(eq("resources/customPages/custompage_step2.zip"), notNull());
     }
 }

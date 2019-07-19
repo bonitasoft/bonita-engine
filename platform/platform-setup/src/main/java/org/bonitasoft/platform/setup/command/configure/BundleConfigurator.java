@@ -48,13 +48,11 @@ import org.slf4j.LoggerFactory;
  */
 abstract class BundleConfigurator {
 
-    protected final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+    final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
-    static final String H2 = "h2";
-    static final String MYSQL = "mysql";
-    static final String ORACLE = "oracle";
-    static final String POSTGRES = "postgres";
-    static final String SQLSERVER = "sqlserver";
+    private static final String H2 = "h2";
+    private static final String ORACLE = "oracle";
+    private static final String SQLSERVER = "sqlserver";
 
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
@@ -120,21 +118,20 @@ abstract class BundleConfigurator {
         }
     }
 
-    boolean copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor)
+    void copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor)
             throws PlatformException {
         if (srcDriverFile == null || targetDriverFile == null) {
-            return false;
+            return;
         }
         if (Files.exists(targetDriverFile)) {
             LOGGER.info("Your " + dbVendor + " driver file '" + getRelativePath(targetDriverFile)
                     + "' already exists. Skipping the copy.");
-            return false;
+            return;
         }
         copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
-        return true;
     }
 
-    Path getRelativePath(Path pathToRelativize) {
+    private Path getRelativePath(Path pathToRelativize) {
         return rootPath.toAbsolutePath().relativize(pathToRelativize.toAbsolutePath());
     }
 
@@ -166,7 +163,7 @@ abstract class BundleConfigurator {
         return value.replaceAll("\\\\", "/");
     }
 
-    void writeContentToFile(Path path, String content) throws PlatformException {
+    private void writeContentToFile(Path path, String content) throws PlatformException {
         try {
             Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
@@ -259,7 +256,7 @@ abstract class BundleConfigurator {
      * @param partialPath path relative to rootPath
      * @return the real path, constructed from rootPath, appending the partialPath
      */
-    protected Path getPath(String partialPath) throws PlatformException {
+    private Path getPath(String partialPath) throws PlatformException {
         return getPath(partialPath, false);
     }
 
@@ -270,7 +267,7 @@ abstract class BundleConfigurator {
      * @param failIfNotExist should we fail if file does not exist?
      * @return the real path, constructed from rootPath, appending the partialPath
      */
-    protected Path getPath(String partialPath, boolean failIfNotExist) throws PlatformException {
+    private Path getPath(String partialPath, boolean failIfNotExist) throws PlatformException {
         final String[] paths = partialPath.split("/");
         Path build = rootPath;
         for (String path : paths) {
@@ -291,15 +288,15 @@ abstract class BundleConfigurator {
         return getPath(APPSERVER_FOLDERNAME + "/" + path, false);
     }
 
-    protected Path getPathUnderAppServer(String path, boolean failIfNotExist) throws PlatformException {
+    Path getPathUnderAppServer(String path, boolean failIfNotExist) throws PlatformException {
         return getPath(APPSERVER_FOLDERNAME + "/" + path, failIfNotExist);
     }
 
-    protected static String getDatabaseConnectionUrlForXmlFile(DatabaseConfiguration configuration) {
+    static String getDatabaseConnectionUrlForXmlFile(DatabaseConfiguration configuration) {
         return escapeXmlCharacters(Matcher.quoteReplacement(getDatabaseConnectionUrl(configuration)));
     }
 
-    protected static String getDatabaseConnectionUrlForPropertiesFile(DatabaseConfiguration configuration) {
+    static String getDatabaseConnectionUrlForPropertiesFile(DatabaseConfiguration configuration) {
         String url = getDatabaseConnectionUrl(configuration);
         if (H2.equals(configuration.getDbVendor())) {
             url = StringEscapeUtils.escapeJava(url);
@@ -307,7 +304,7 @@ abstract class BundleConfigurator {
         return Matcher.quoteReplacement(url);
     }
 
-    static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
+    private static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
         String url = configuration.getUrl();
         if (H2.equals(configuration.getDbVendor())) {
             url = convertWindowsBackslashes(url);

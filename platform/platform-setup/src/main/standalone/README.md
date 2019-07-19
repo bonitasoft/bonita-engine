@@ -8,7 +8,7 @@ What it does?
 * it creates the structure of the database (tables, primary / foreign keys, indices, ...)
 * it inserts the default minimum data 
 * it inserts the Bonita Engine + Bonita Portal minimum configuration in database
-* it also allows to automatically configure a Bonita Tomcat / WildFly bundle to run on the right database
+* it also allows to automatically configure a Bonita Tomcat bundle to run on the right database
 
 Requirements
 ---
