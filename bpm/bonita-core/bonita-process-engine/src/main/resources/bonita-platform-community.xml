@@ -1138,6 +1138,11 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean id= "meterRegistry" class="io.micrometer.core.instrument.simple.SimpleMeterRegistry" />
-
+    <bean id="meterRegistryFactory" class="org.bonitasoft.engine.configuration.MeterRegistryFactory" autowire="byType"/>
+    <bean class="io.micrometer.core.instrument.logging.LoggingMeterRegistry" />
+    <bean class="io.micrometer.jmx.JmxMeterRegistry">
+        <constructor-arg name="config" value="DEFAULT"/>
+        <constructor-arg name="clock" value="SYSTEM"/>
+    </bean>
+    <bean id="meterRegistry" factory-bean="meterRegistryFactory" factory-method="create"/>
 </beans>

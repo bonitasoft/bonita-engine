@@ -20,7 +20,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -49,12 +49,12 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private WorkFactory workFactory;
     private final long tenantId;
     private final WorkExecutionAuditor workExecutionAuditor;
-    private SimpleMeterRegistry meterRegistry;
+    private MeterRegistry meterRegistry;
 
     public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, WorkFactory workFactory, final long tenantId, final int corePoolSize, final int queueCapacity,
                                                final int maximumPoolSize,
                                                final long keepAliveTimeSeconds,
-                                               EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor, SimpleMeterRegistry meterRegistry) {
+                                               EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry) {
         this.logger = logger;
         this.workFactory = workFactory;
         this.tenantId = tenantId;
