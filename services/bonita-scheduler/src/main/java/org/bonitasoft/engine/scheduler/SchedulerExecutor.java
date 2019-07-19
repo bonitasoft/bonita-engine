@@ -48,6 +48,8 @@ public interface SchedulerExecutor {
      */
     void shutdown() throws SSchedulerException;
 
+    int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException;
+
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
     boolean delete(String jobName, String groupName) throws SSchedulerException;
@@ -61,8 +63,6 @@ public interface SchedulerExecutor {
     List<String> getAllJobs() throws SSchedulerException;
 
     void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
-
-    boolean isStillScheduled(String groupName, String jobName) throws SSchedulerException;
 
     void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
 

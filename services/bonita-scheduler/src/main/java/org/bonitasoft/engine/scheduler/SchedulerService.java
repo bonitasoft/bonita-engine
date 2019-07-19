@@ -148,8 +148,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      */
     List<String> getAllJobs() throws SSchedulerException;
 
-    boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
-
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
     /**
@@ -227,5 +225,7 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @since 6.4.0
      */
     boolean isExistingJob(String jobName) throws SSchedulerException;
+
+    int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException;
 
 }
