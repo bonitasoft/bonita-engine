@@ -21,6 +21,7 @@ import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
 
 public class PostgresXMLType
         extends AbstractSingleColumnStandardBasicType<Serializable> {
+    public static final PostgresXMLType INSTANCE = new PostgresXMLType();
 
     public PostgresXMLType() {
         // forcing VARCHAR to String as there is no real CLOB in PSQL

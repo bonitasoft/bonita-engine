@@ -14,15 +14,12 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.bonitasoft.engine.services.SPersistenceException;
+import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.PersistentClass;
 
 /**
  * @author Charles Souillard
@@ -37,8 +34,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     protected final Configuration configuration;
 
     public HibernateConfigurationProviderImpl(final Properties properties,
-            final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
-            final List<String> mappingExclusions) {
+                                              final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
+                                              final List<String> mappingExclusions) {
         this.properties = properties;
         this.hibernateResourcesConfigurationProvider = hibernateResourcesConfigurationProvider;
 
@@ -49,6 +46,26 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     protected Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
         final Configuration configuration = new Configuration();
         configuration.addProperties(properties);
+        Vendor vendor = Vendor.fromHibernateConfiguration(configuration);
+
+        //register type before loading mappings/entities, type should be present before loading JPA entities
+        switch (vendor) {
+            case ORACLE:
+            case MYSQL:
+            case OTHER:
+                configuration.registerTypeOverride(XMLType.INSTANCE);
+                break;
+            case SQLSERVER:
+                configuration.setInterceptor(new SQLServerInterceptor());
+                configuration.registerTypeOverride(XMLType.INSTANCE);
+                break;
+            case POSTGRES:
+                configuration.setInterceptor(new PostgresInterceptor());
+                configuration.registerTypeOverride(new PostgresMaterializedBlobType());
+                configuration.registerTypeOverride(new PostgresMaterializedClobType());
+                configuration.registerTypeOverride(PostgresXMLType.INSTANCE);
+                break;
+        }
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
             configuration.addResource(resource);
         }

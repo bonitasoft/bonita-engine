@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.services.Vendor.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -33,6 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
+import org.bonitasoft.engine.services.Vendor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
@@ -76,8 +74,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory();
 
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
-            final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
+                                                  final Map<String, String> classAliasMappings, final boolean enableWordSearch,
+                                                  final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
             throws ClassNotFoundException {
         super("TEST", '#', enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
@@ -91,8 +89,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties, final char likeEscapeCharacter, final TechnicalLoggerService logger,
-            final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+                                               final Properties extraHibernateProperties, final char likeEscapeCharacter, final TechnicalLoggerService logger,
+                                               final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
             throws SPersistenceException, ClassNotFoundException {
         super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
@@ -107,34 +105,13 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SPersistenceException(e);
         }
 
-        final String dialect = configuration.getProperty("hibernate.dialect");
-        OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
-
-        if (dialect != null) {
-            if (dialect.toLowerCase().contains("postgresql")) {
-                configuration.setInterceptor(new PostgresInterceptor());
-                configuration.registerTypeOverride(new PostgresMaterializedBlobType());
-                configuration.registerTypeOverride(new PostgresMaterializedClobType());
-                configuration.registerTypeOverride(new PostgresXMLType());
-                queryBuilderFactory.setVendor(POSTGRES);
-            } else if (dialect.toLowerCase().contains("sqlserver")) {
-                SQLServerInterceptor sqlServerInterceptor = new SQLServerInterceptor();
-                configuration.setInterceptor(sqlServerInterceptor);
-                configuration.registerTypeOverride(new XMLType());
-                orderByBuilder = new SQLServerOrderByBuilder();
-                queryBuilderFactory.setVendor(SQLSERVER);
-            } else if (dialect.toLowerCase().contains("oracle")) {
-                configuration.registerTypeOverride(new XMLType());
-                queryBuilderFactory.setVendor(ORACLE);
-            } else if (dialect.toLowerCase().contains("mysql")) {
-                configuration.registerTypeOverride(new XMLType());
-                queryBuilderFactory.setVendor(MYSQL);
-            }else{
-                configuration.registerTypeOverride(new XMLType());
-            }
+        Vendor vendor = Vendor.fromHibernateConfiguration(configuration);
+        queryBuilderFactory.setVendor(vendor);
+        if (vendor == Vendor.SQLSERVER) {
+            this.orderByBuilder = new SQLServerOrderByBuilder();
+        } else {
+            this.orderByBuilder = new DefaultOrderByBuilder();
         }
-
-        this.orderByBuilder = orderByBuilder;
         final String className = configuration.getProperty("hibernate.interceptor");
         if (className != null && !className.isEmpty()) {
             try {
@@ -444,8 +421,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             checkOrderByClause(query);
 
-            @SuppressWarnings("unchecked")
-            final List<T> list = query.list();
+            @SuppressWarnings("unchecked") final List<T> list = query.list();
             if (list != null) {
                 disconnectIfReadOnly(list, query, session);
                 return list;
