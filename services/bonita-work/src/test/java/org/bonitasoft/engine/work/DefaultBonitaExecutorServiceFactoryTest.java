@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
@@ -38,7 +39,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         long tenantId = 999;
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
                 new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
-                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class));
+                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), new SimpleMeterRegistry());
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
         Runnable r = () -> {

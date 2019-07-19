@@ -29,6 +29,7 @@ class Deps {
     public static String javaxActivationVersion = "1.1.1"
     public static String quartzVersion = "2.2.1"
     public static String guavaVersion = "19.0"
+    public static String micrometerVersion = "1.2.0"
 
     public static String mysqlVersion = "8.0.14"
     public static String mssqlVersion = "7.2.1.jre8"

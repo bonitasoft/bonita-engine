@@ -1138,4 +1138,6 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
+    <bean id= "meterRegistry" class="io.micrometer.core.instrument.simple.SimpleMeterRegistry" />
+
 </beans>

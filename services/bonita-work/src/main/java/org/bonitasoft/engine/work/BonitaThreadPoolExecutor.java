@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -52,7 +55,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
                                     final BlockingQueue<Runnable> workQueue,
                                     final ThreadFactory threadFactory,
                                     final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-                                    EngineClock engineClock, WorkExecutionCallback workExecutionCallback, WorkExecutionAuditor workExecutionAuditor) {
+                                    EngineClock engineClock, WorkExecutionCallback workExecutionCallback, WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
@@ -60,6 +63,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
         this.workExecutionAuditor = workExecutionAuditor;
+        meterRegistry.gauge("org.bonitasoft.engine.work.queue.size.current",workQueue, Collection::size);
     }
 
     @Override

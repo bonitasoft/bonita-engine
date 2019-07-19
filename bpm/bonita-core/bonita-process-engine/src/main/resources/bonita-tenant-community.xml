@@ -1077,6 +1077,7 @@
         <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
         <constructor-arg name="engineClock" ref="engineClock" />
         <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
 
     <bean id="workExecutionAuditor" class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor">
