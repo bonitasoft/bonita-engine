@@ -63,7 +63,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
         this.workExecutionAuditor = workExecutionAuditor;
-        meterRegistry.gauge("org.bonitasoft.engine.work.queue.size.current",workQueue, Collection::size);
+        meterRegistry.gauge("org.bonitasoft.engine.work.queue.size.current", workQueue, Collection::size);
     }
 
     @Override
