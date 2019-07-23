@@ -1,10 +1,10 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-core:bonita-process-engine')
+    compile project(':engine:bpm:bonita-core:bonita-process-engine')
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
-    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
-    compile project(':services:bonita-log-technical')
+    compile project(':engine:bpm:bonita-synchro-repository:bonita-synchro-service-impl')
+    compile project(':engine:services:bonita-log-technical')
     compileOnly 'javax.jms:jms-api:1.1-rev-1'
     compileOnly 'org.apache.activemq:activemq-client:5.8.0'
 }

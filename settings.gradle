@@ -16,3 +16,17 @@ pluginManagement {
 rootProject.name = 'bonita-engine'
 
 apply from: 'engine-settings.gradle'
+
+def fixPath
+fixPath = { project ->
+    java.nio.file.Path enginePath = settingsDir.toPath().resolve("engine")
+    java.nio.file.Path rootPath = settingsDir.toPath()
+    java.nio.file.Path projectPath = project.projectDir.toPath()
+    def relativeProjectPath = enginePath.relativize(projectPath)
+    project.projectDir = rootPath.resolve(relativeProjectPath).toFile()
+    logger.debug("Path of project ${project.path} set to ${project.projectDir}")
+    project.children.each fixPath
+}
+//change the path of the root ":", real root is ":engine"
+rootProject.projectDir = rootProject.projectDir.toPath().resolve("fakeRoot").toFile()
+rootProject.children.each fixPath

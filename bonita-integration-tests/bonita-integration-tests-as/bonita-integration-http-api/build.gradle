@@ -1,10 +1,10 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-api:bonita-server-api-http')
-    compile project(':bpm:bonita-server')
-    compile project(':bpm:bonita-client')
+    compile project(':engine:bpm:bonita-api:bonita-server-api-http')
+    compile project(':engine:bpm:bonita-server')
+    compile project(':engine:bpm:bonita-client')
     compile 'org.eclipse.jetty:jetty-server:9.4.9.v20180320'
     compile 'org.eclipse.jetty:jetty-servlet:9.4.9.v20180320'
-    testCompile project(':bonita-integration-tests:bonita-integration-tests-client')
+    testCompile project(':engine:bonita-integration-tests:bonita-integration-tests-client')
 }

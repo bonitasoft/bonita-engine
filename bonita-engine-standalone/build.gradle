@@ -6,10 +6,10 @@ plugins {
 
 dependencies{
 
-    api(project(":bpm:bonita-client"))
+    api(project(":engine:bpm:bonita-client"))
 
-    implementation(project(":bpm:bonita-server"))
-    implementation(project(':platform:platform-resources'))
+    implementation(project(":engine:bpm:bonita-server"))
+    implementation(project(':engine:platform:platform-resources'))
 
     implementation "org.springframework:spring-context:${Deps.springVersion}"
     implementation "org.jboss.narayana.jta:narayana-jta:${Deps.naranayaVersion}"

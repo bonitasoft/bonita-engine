@@ -11,7 +11,7 @@ dependencies {
     testCompile 'org.springframework:spring-orm:4.3.16.RELEASE'
     testCompile "org.springframework:spring-jdbc:${Deps.springVersion}"
     testCompile 'javax.inject:javax.inject:1'
-    testCompile project(':bpm:bonita-server')
-    testCompile project(':bpm:bonita-common')
+    testCompile project(':engine:bpm:bonita-server')
+    testCompile project(':engine:bpm:bonita-common')
     testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
 }
