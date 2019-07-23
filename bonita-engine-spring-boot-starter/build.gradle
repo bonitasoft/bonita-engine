@@ -3,13 +3,13 @@ import org.bonitasoft.engine.gradle.PomUtils
 plugins { id "java-library" }
 
 dependencies {
-    api(project(":bpm:bonita-common"))
-    api(project(":bpm:bonita-client"))
+    api(project(":engine:bpm:bonita-common"))
+    api(project(":engine:bpm:bonita-client"))
 
     api("org.springframework.boot:spring-boot-starter:${Deps.springBootVersion}")
 
-    implementation(project(":bonita-engine-standalone"))
-    implementation(project(":bpm:bonita-server"))
+    implementation(project(":engine:bonita-engine-standalone"))
+    implementation(project(":engine:bpm:bonita-server"))
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Deps.springBootVersion}")
 

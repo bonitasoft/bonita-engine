@@ -1,7 +1,7 @@
 
 
 dependencies {
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-builder')
-    compile project(':services:bonita-log-technical')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:services:bonita-log-technical')
 }

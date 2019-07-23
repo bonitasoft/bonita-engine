@@ -1,20 +1,20 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile project(':services:bonita-identity')
-    compile project(':services:bonita-dependency')
-    compile project(':services:bonita-expression')
-    compile project(':services:bonita-data-definition')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-recorder')
-    compile project(':services:bonita-log')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-time-tracker')
-    compile project(':services:bonita-data-instance')
-    compile project(':services:bonita-classloader')
-    compile project(':services:bonita-log-technical')
-    compile project(':services:bonita-builder')
+    compile project(':engine:bpm:bonita-common')
+    compile project(':engine:services:bonita-identity')
+    compile project(':engine:services:bonita-dependency')
+    compile project(':engine:services:bonita-expression')
+    compile project(':engine:services:bonita-data-definition')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-recorder')
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-persistence')
+    compile project(':engine:services:bonita-time-tracker')
+    compile project(':engine:services:bonita-data-instance')
+    compile project(':engine:services:bonita-classloader')
+    compile project(':engine:services:bonita-log-technical')
+    compile project(':engine:services:bonita-builder')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
