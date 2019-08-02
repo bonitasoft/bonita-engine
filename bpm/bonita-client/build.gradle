@@ -1,7 +1,7 @@
 import org.bonitasoft.engine.gradle.PomUtils
 
 dependencies {
-    compile project(':bpm:bonita-common')
+    compile project(':engine:bpm:bonita-common')
     compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
     compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
     compile "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"

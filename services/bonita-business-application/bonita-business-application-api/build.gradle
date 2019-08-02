@@ -1,8 +1,8 @@
 
 
 dependencies {
-    compile project(':services:bonita-log')
-    compile project(':services:bonita-recorder')
+    compile project(':engine:services:bonita-log')
+    compile project(':engine:services:bonita-recorder')
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
 }

@@ -21,7 +21,7 @@ dependencies {
     compile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"
     compile "com.h2database:h2:${Deps.h2Version}"
     compile "commons-cli:commons-cli:${Deps.commonsCLIVersion}"
-    compile(project(":platform:platform-resources"))
+    compile(project(":engine:platform:platform-resources"))
     runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
@@ -29,9 +29,9 @@ dependencies {
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) { exclude(module: 'json-path') }
     testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
-    testCompile project(':platform:platform-setup-test')
+    testCompile project(':engine:platform:platform-setup-test')
 
-    inDistrib project(path: ':platform:platform-resources', configuration: 'distributionZip')
+    inDistrib project(path: ':engine:platform:platform-resources', configuration: 'distributionZip')
 }
 
 group = 'org.bonitasoft.platform'

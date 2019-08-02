@@ -1,15 +1,15 @@
 
 
 dependencies {
-    compile project(':bpm:bonita-common')
-    compile project(':services:bonita-session')
-    compile project(':bpm:bonita-core:bonita-process-definition')
-    compile project(':services:bonita-page')
-    compile project(':services:bonita-builder')
-    compile project(':services:bonita-persistence')
-    compile project(':services:bonita-commons')
-    compile project(':services:bonita-events')
-    compile project(':services:bonita-recorder')
+    compile project(':engine:bpm:bonita-common')
+    compile project(':engine:services:bonita-session')
+    compile project(':engine:bpm:bonita-core:bonita-process-definition')
+    compile project(':engine:services:bonita-page')
+    compile project(':engine:services:bonita-builder')
+    compile project(':engine:services:bonita-persistence')
+    compile project(':engine:services:bonita-commons')
+    compile project(':engine:services:bonita-events')
+    compile project(':engine:services:bonita-recorder')
     compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
