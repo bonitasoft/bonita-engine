@@ -114,4 +114,9 @@ public final class TenantAPIAccessor {
         return getAPI(BusinessDataAPI.class, session);
     }
 
+    public static ProjectAPI getProjectAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(ProjectAPI.class, session);
+    }
+
 }

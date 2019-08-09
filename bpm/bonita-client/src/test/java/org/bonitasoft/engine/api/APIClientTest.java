@@ -14,17 +14,13 @@
 package org.bonitasoft.engine.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.LoginException;
@@ -45,8 +41,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class APIClientTest {
 
-    public static final String VALID_USERNAME = "username";
-    public static final String VALID_PASSWORD = "password";
+    private static final String VALID_USERNAME = "username";
+    private static final String VALID_PASSWORD = "password";
 
     @Spy
     APIClient client;
@@ -57,16 +53,14 @@ public class APIClientTest {
     @Mock
     APISession session;
 
-    @Mock
-    LoginAPI loginAPI;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
-    public void before() throws IOException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, ServerWrappedException {
+    public void before() throws IOException, ServerAPIException, UnknownAPITypeException, ServerWrappedException {
         doReturn(server).when(client).getServerAPI();
-        doReturn(session).when(server).invokeMethod(anyMap(), eq("org.bonitasoft.engine.api.LoginAPI"), eq("login"), anyList(),
+        doReturn(session).when(server).invokeMethod(anyMap(), eq("org.bonitasoft.engine.api.LoginAPI"), eq("login"),
+                anyList(),
                 eq(new Object[] { VALID_USERNAME, VALID_PASSWORD }));
     }
 
@@ -163,6 +157,13 @@ public class APIClientTest {
     }
 
     @Test
+    public void should_get_ProjectAPI_from_server() throws LoginException {
+        client.login(VALID_USERNAME, VALID_PASSWORD);
+        ProjectAPI api = client.getProjectAPI();
+        assertThat(api).isNotNull();
+    }
+
+    @Test
     public void should_throw_exception_when_accessing_api_after_logout() throws LoginException, LogoutException {
         client.login(VALID_USERNAME, VALID_PASSWORD);
         client.logout();
@@ -174,19 +175,19 @@ public class APIClientTest {
     }
 
     @Test
-    public void should_return_session_used_at_creation() throws LoginException, LogoutException {
+    public void should_return_session_used_at_creation() {
         APIClient clientToTest = new APIClient(session);
         assertThat(clientToTest.getSession()).isEqualTo(session);
     }
 
     @Test
-    public void should_return_session_created_at_login() throws LoginException, LogoutException {
+    public void should_return_session_created_at_login() throws LoginException {
         client.login(VALID_USERNAME, VALID_PASSWORD);
         assertThat(client.getSession()).isEqualTo(session);
     }
 
     @Test
-    public void should_newly_created_client_has_no_session() throws LoginException, LogoutException {
+    public void should_newly_created_client_has_no_session() {
         assertThat(client.getSession()).isNull();
     }
 

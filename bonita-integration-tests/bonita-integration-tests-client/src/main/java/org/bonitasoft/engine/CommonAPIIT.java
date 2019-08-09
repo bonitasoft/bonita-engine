@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
@@ -26,6 +27,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.filter.user.GroupUserFilter;
 import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
@@ -33,6 +36,10 @@ import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.page.PageSearchDescriptor;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
@@ -64,6 +71,7 @@ public abstract class CommonAPIIT extends APITestUtil {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         cleanCommands();
         cleanProcessInstances();
+        cleanPages();
         cleanArchiveProcessInstances();
         cleanProcessDefinitions();
         cleanCategories();
@@ -74,25 +82,35 @@ public abstract class CommonAPIIT extends APITestUtil {
         logoutOnTenant();
     }
 
+    private void cleanPages() throws SearchException, DeletionException {
+        final SearchResult<Page> result = getPageAPI()
+                .searchPages(new SearchOptionsBuilder(0, 100).filter(PageSearchDescriptor.PROVIDED, false).done());
+        getPageAPI().deletePages(result.getResult().stream().map(Page::getId).collect(Collectors.toList()));
+    }
+
     public BarResource getResource(final String path, final String name) throws IOException {
         return getBarResource(path, name, CommonAPIIT.class);
     }
 
-    public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
+    public void addResource(final List<BarResource> resources, final String path, final String name)
+            throws IOException {
         final BarResource barResource = getResource(path, name);
         resources.add(barResource);
     }
 
-    protected ProcessDefinition deployProcessWithTestFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user,
+    protected ProcessDefinition deployProcessWithTestFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user,
             final String filterName) throws BonitaException, IOException {
         final List<BarResource> userFilters = generateFilterImplementations(filterName);
         final List<BarResource> generateFilterDependencies = generateFilterDependencies();
-        return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);
+        return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user,
+                generateFilterDependencies, userFilters);
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
         final List<BarResource> resources = new ArrayList<>(1);
-        final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
+        final InputStream inputStream = TestConnector.class.getClassLoader()
+                .getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
         final byte[] data = IOUtil.getAllContentFrom(inputStream);
         inputStream.close();
         resources.add(new BarResource(filterName + ".impl", data));

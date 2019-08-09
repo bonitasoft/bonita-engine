@@ -58,6 +58,12 @@ dependencies {
     compile "org.codehaus.groovy:groovy-all:${Deps.groovyAllVersion}"
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     compile "io.micrometer:micrometer-registry-jmx:${Deps.micrometerVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
