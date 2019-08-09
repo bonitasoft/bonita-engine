@@ -28,9 +28,9 @@ import org.bonitasoft.engine.api.impl.projectdeployer.descriptor.DeploymentDescr
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Application;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.BdmAccessControl;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.BusinessDataModel;
+import org.bonitasoft.engine.api.impl.projectdeployer.model.CustomPage;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Layout;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Organization;
-import org.bonitasoft.engine.api.impl.projectdeployer.model.Page;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Process;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Profile;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.RestAPIExtension;
@@ -103,7 +103,7 @@ public class ApplicationArchive implements Closeable {
         return getFile(restAPIExtension.getFile());
     }
 
-    public File getFile(Page page) throws FileNotFoundException {
+    public File getFile(CustomPage page) throws FileNotFoundException {
         return getFile(page.getFile());
     }
 

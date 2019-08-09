@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class Theme {
+public class Theme implements CustomPage {
 
     @JsonProperty("file")
     private String file;

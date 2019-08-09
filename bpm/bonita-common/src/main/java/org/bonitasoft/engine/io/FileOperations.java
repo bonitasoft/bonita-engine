@@ -110,7 +110,7 @@ public class FileOperations {
     }
 
     public static InputStream resource(String name) {
-        return IOUtils.class.getResourceAsStream(name);
+        return FileOperations.class.getResourceAsStream(name);
     }
 
     /** Gets the contents of a classpath resource as a byte array. */

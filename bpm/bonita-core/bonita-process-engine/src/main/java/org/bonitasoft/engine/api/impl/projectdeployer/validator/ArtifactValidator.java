@@ -189,6 +189,13 @@ public class ArtifactValidator {
                 : error(file.getName(), ArtifactTypes.PAGE);
     }
 
+    public void validateLayoutType(File file) throws InvalidArtifactException {
+        ValidationStatus status = computeLayoutValidationStatus(file);
+        if (!status.isOK()) {
+            throw new InvalidArtifactException(status.getMessage());
+        }
+    }
+
     private ValidationStatus computeValidationStatus(ApplicationArchive applicationArchive, Layout layout) {
         try {
             return computeLayoutValidationStatus(applicationArchive.getFile(layout));
@@ -202,6 +209,13 @@ public class ArtifactValidator {
         return artifactTypeDetector.isLayout(file)
                 ? ValidationStatus.ok()
                 : error(file.getName(), ArtifactTypes.LAYOUT);
+    }
+
+    public void validateThemeType(File file) throws InvalidArtifactException {
+        ValidationStatus status = computeThemeValidationStatus(file);
+        if (!status.isOK()) {
+            throw new InvalidArtifactException(status.getMessage());
+        }
     }
 
     private ValidationStatus computeValidationStatus(ApplicationArchive applicationArchive, Theme theme) {
