@@ -27,9 +27,12 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.BusinessDataModel;
+import org.bonitasoft.engine.api.impl.projectdeployer.model.Layout;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Organization;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Page;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Process;
+import org.bonitasoft.engine.api.impl.projectdeployer.model.RestAPIExtension;
+import org.bonitasoft.engine.api.impl.projectdeployer.model.Theme;
 import org.bonitasoft.engine.api.impl.projectdeployer.validator.ArtifactValidator;
 import org.bonitasoft.engine.api.impl.projectdeployer.validator.InvalidArtifactException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -49,7 +52,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -93,10 +96,10 @@ public class Deployer {
             //                deployProfiles(applicationArchive);
             deployBDM(applicationArchive);
             //                deployBdmAccessControl(applicationArchive);
-            //                deployRestApiExtensions(applicationArchive, restApiConfigurationProperties);
             deployPages(applicationArchive);
-            //                deployLayouts(applicationArchive);
-            //                deployThemes(applicationArchive);
+            deployLayouts(applicationArchive);
+            deployThemes(applicationArchive);
+            deployRestApiExtensions(applicationArchive);
             //                deployApplications(applicationArchive);
             deployProcesses(applicationArchive);
 
@@ -107,64 +110,6 @@ public class Deployer {
         }
     }
 
-    //    private void inSession(ClientInteraction clientInteraction) throws ClientException, IOException {
-    //        bonitaClient.login(username, password);
-    //        try {
-    //            clientInteraction.apply();
-    //        } finally {
-    //            bonitaClient.logout();
-    //        }
-    //    }
-    //
-    //    private <T> T inSession(ClientInteractionWithReturn<T> clientInteraction) throws ClientException, IOException {
-    //        bonitaClient.login(username, password);
-    //        try {
-    //            return clientInteraction.apply();
-    //        } finally {
-    //            bonitaClient.logout();
-    //        }
-    //    }
-    //
-    //    public void deployRestApiExtension(File restApiExtension)
-    //            throws ClientException, IOException, InvalidArtifactException {
-    //        artifactValidator.validateRestApiExtensionType(restApiExtension);
-    //        inSession(() -> bonitaClient.importPage(restApiExtension));
-    //    }
-    //
-    //    public void deployPage(File page) throws ClientException, IOException, InvalidArtifactException {
-    //        artifactValidator.validatePageType(page);
-    //        inSession(() -> bonitaClient.importPage(page));
-    //    }
-    //
-    //    public void deployProfiles(File profiles, ProfileImportPolicy policy)
-    //            throws ClientException, IOException, InvalidArtifactException {
-    //        artifactValidator.validateProfileType(profiles);
-    //        inSession(() -> bonitaClient.importProfiles(profiles, policy));
-    //    }
-    //
-    //    public void deployApplications(File applications, ApplicationImportPolicy policy)
-    //            throws ClientException, IOException, InvalidArtifactException {
-    //        artifactValidator.validateApplicationType(applications);
-    //        inSession(() -> bonitaClient.importApplications(applications, policy));
-    //    }
-    //
-    //    private void deployRestApiExtensions(ApplicationArchive applicationArchive,
-    //            Properties configurationProperties)
-    //            throws IOException, ClientException {
-    //        for (RestAPIExtension restAPIExtension : applicationArchive.getDeploymentDescriptor().getRestAPIExtensions()) {
-    //            File file = artifactConfigurator.reconfigure(applicationArchive.getFile(restAPIExtension),
-    //                    restAPIExtension.getFilesToReconfigure(), configurationProperties);
-    //            bonitaClient.importPage(file);
-    //        }
-    //    }
-    //
-    //    private void deployOrganization(ApplicationArchive applicationArchive) throws IOException, ClientException {
-    //        Organization organization = applicationArchive.getDeploymentDescriptor().getOrganization();
-    //        if (organization != null) {
-    //            bonitaClient.importOrganization(applicationArchive.getFile(organization), organization.getPolicy());
-    //        }
-    //    }
-    //
     //    private void deployProfiles(ApplicationArchive applicationArchive) throws IOException, ClientException {
     //        for (Profile profile : applicationArchive.getDeploymentDescriptor().getProfiles()) {
     //            bonitaClient.importProfiles(applicationArchive.getFile(profile), profile.getPolicy());
@@ -187,22 +132,56 @@ public class Deployer {
     }
 
     private void deployPages(ApplicationArchive applicationArchive)
-            throws IOException, SearchException, UpdateException, CreationException, InvalidArtifactException {
+            throws IOException, BonitaException, InvalidArtifactException {
         for (Page page : applicationArchive.getDeploymentDescriptor().getPages()) {
             final File pageFile = applicationArchive.getFile(page);
             artifactValidator.validatePageType(pageFile);
-            final byte[] pageContent = Files.readAllBytes(pageFile.toPath());
-            String pageToken = getPageToken(pageFile);
-            org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
-            if (existingPage != null) {
-                //page already exists, we update it
-                log.debug("Updating existing page...");
-                pageAPI.updatePageContent(existingPage.getId(), pageContent);
-            } else {
-                //page do not exists, we create it
-                log.debug("Creating new page...");
-                pageAPI.createPage(pageToken, pageContent);
-            }
+            deployUnitPage(pageFile);
+        }
+    }
+
+    private void deployLayouts(ApplicationArchive applicationArchive)
+            throws IOException, BonitaException, InvalidArtifactException {
+        for (Layout layout : applicationArchive.getDeploymentDescriptor().getLayouts()) {
+            final File pageFile = applicationArchive.getFile(layout);
+            artifactValidator.validateLayoutType(pageFile);
+            deployUnitPage(pageFile);
+        }
+    }
+
+    private void deployThemes(ApplicationArchive applicationArchive)
+            throws IOException, BonitaException, InvalidArtifactException {
+        for (Theme theme : applicationArchive.getDeploymentDescriptor().getThemes()) {
+            final File pageFile = applicationArchive.getFile(theme);
+            artifactValidator.validateThemeType(pageFile);
+            deployUnitPage(pageFile);
+        }
+    }
+
+    private void deployRestApiExtensions(ApplicationArchive applicationArchive)
+            throws IOException, BonitaException, InvalidArtifactException {
+        for (RestAPIExtension restAPIExtension : applicationArchive.getDeploymentDescriptor().getRestAPIExtensions()) {
+            final File pageFile = applicationArchive.getFile(restAPIExtension);
+            artifactValidator.validateRestApiExtensionType(pageFile);
+            deployUnitPage(pageFile);
+        }
+    }
+
+    /**
+     * From the Engine perspective, all custom pages, layouts, themes, custom Rest APIs are of type <code>Page</code>
+     */
+    private void deployUnitPage(File pageFile) throws IOException, BonitaException {
+        final byte[] pageContent = Files.readAllBytes(pageFile.toPath());
+        String pageToken = getPageToken(pageFile);
+        org.bonitasoft.engine.page.Page existingPage = getPage(pageToken);
+        if (existingPage != null) {
+            //page already exists, we update it
+            log.info("Updating existing page...");
+            pageAPI.updatePageContent(existingPage.getId(), pageContent);
+        } else {
+            //page do not exists, we create it
+            log.info("Creating new page...");
+            pageAPI.createPage(pageToken, pageContent);
         }
     }
 
@@ -218,19 +197,6 @@ public class Deployer {
         return name;
     }
 
-    //
-    //    private void deployLayouts(ApplicationArchive applicationArchive) throws IOException, ClientException {
-    //        for (Layout layout : applicationArchive.getDeploymentDescriptor().getLayouts()) {
-    //            bonitaClient.importPage(applicationArchive.getFile(layout));
-    //        }
-    //    }
-    //
-    //    private void deployThemes(ApplicationArchive applicationArchive) throws IOException, ClientException {
-    //        for (Theme theme : applicationArchive.getDeploymentDescriptor().getThemes()) {
-    //            bonitaClient.importPage(applicationArchive.getFile(theme));
-    //        }
-    //    }
-    //
     //    private void deployApplications(ApplicationArchive applicationArchive)
     //            throws IOException, ClientException {
     //        for (Application application : applicationArchive.getDeploymentDescriptor().getApplications()) {
@@ -334,37 +300,13 @@ public class Deployer {
             }
         }
     }
-    //
+
     //    private void deployBdmAccessControl(ApplicationArchive applicationArchive)
     //            throws ClientException, IOException {
     //        BdmAccessControl bdmAccessControl = applicationArchive.getDeploymentDescriptor().getBdmAccessControl();
     //        if (bdmAccessControl != null) {
     //            bonitaClient.importBdmAccessControl(applicationArchive.getFile(bdmAccessControl.getFile()));
     //        }
-    //    }
-    //
-    //    // =================================================================================================================
-    //    // Delete methods
-    //    // =================================================================================================================
-    //
-    //    /**
-    //     * delete the application identified by this token
-    //     *
-    //     * @param applicationToken
-    //     * @return true if the application was deleted, false otherwise
-    //     * @throws UnauthorizedException
-    //     * @throws IOException
-    //     */
-    //    public boolean deleteApplication(String applicationToken) throws ClientException, IOException {
-    //        return inSession(() -> bonitaClient.deleteApplication(applicationToken));
-    //    }
-
-    //    public boolean deletePage(String token) throws DeletionException, SearchException {
-    //        org.bonitasoft.engine.page.Page page = getPage(token);
-    //        if (page == null) {
-    //            return false;
-    //        }
-    //        pageAPI.deletePage(page.getId());
     //    }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
@@ -377,9 +319,5 @@ public class Deployer {
         log.debug("Page '{}' retrieved successfully.", urlToken);
         return pages.getResult().get(0);
     }
-
-    //    public boolean deleteRestApiExtension(String token) throws IOException {
-    //        return bonitaClient.deletePage(token);
-    //    }
 
 }

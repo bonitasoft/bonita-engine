@@ -13,23 +13,10 @@
  **/
 package org.bonitasoft.engine.api.impl.projectdeployer.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+/**
+ * @author Emmanuel Duchastenier
+ */
+public interface CustomPage {
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "file"
-})
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
-public class Page implements CustomPage {
-
-    @JsonProperty("file")
-    private String file;
+    String getFile();
 }
