@@ -1,0 +1,32 @@
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application profile="User" state="ACTIVATED" token="HR-dashboard_Client_tests" version="2.0" homePage="my-new-custom-page"
+                 layout="custompage_defaultlayout" theme="custompage_bootstrapdefaulttheme">
+
+        <displayName>My HR dashboard</displayName>
+        <description>This is the HR dashboard.</description>
+        <iconPath>/icon.jpg</iconPath>
+        <applicationPages>
+            <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page"/>
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu>
+                <displayName>HR follow-up</displayName>
+                <applicationMenus>
+                    <applicationMenu applicationPage="my-new-custom-page">
+                        <displayName>Daily HR follow-up</displayName>
+                    </applicationMenu>
+                </applicationMenus>
+            </applicationMenu>
+            <applicationMenu>
+                <displayName>Empty menu</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+    <application state="ACTIVATED" token="MyApplication_Client_tests" version="2.0" layout="custompage_defaultlayout"
+                 theme="custompage_bootstrapdefaulttheme">
+
+        <displayName>Marketing</displayName>
+        <applicationPages/>
+        <applicationMenus/>
+    </application>
+</applications>

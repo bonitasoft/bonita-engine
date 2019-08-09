@@ -117,7 +117,7 @@ public class APIClient {
     /**
      * This methods serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one, where no session is needed to access the
      * API class.
-     * 
+     *
      * @param apiClass the API to retrieve
      * @param <T> The type of the API, extending {@link org.bonitasoft.engine.api.LoginAPI}
      * @return the retrieved API
@@ -302,6 +302,15 @@ public class APIClient {
     @Deprecated
     public BusinessDataAPI getBusinessDataAPI() {
         return getAPI(BusinessDataAPI.class);
+    }
+
+    /**
+     * Get API to access Bonita Projects.
+     *
+     * @since 7.10
+     */
+    public ProjectAPI getProjectAPI() {
+        return getAPI(ProjectAPI.class);
     }
 
 }

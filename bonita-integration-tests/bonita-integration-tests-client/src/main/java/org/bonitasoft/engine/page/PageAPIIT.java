@@ -539,8 +539,8 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        assertThat(results.size()).as("should have onlmy one matching page").isEqualTo(1);
-        assertThat(results.get(0)).as("should get the page whith matching search term").isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
+        assertThat(results.size()).as("should have only one matching page").isEqualTo(1);
+        assertThat(results.get(0)).as("should get the page with matching search term").isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
     }
 
     private String generateUniquePageName(final int i) {

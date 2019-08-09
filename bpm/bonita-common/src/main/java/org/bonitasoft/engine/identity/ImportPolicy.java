@@ -16,7 +16,8 @@ package org.bonitasoft.engine.identity;
 /**
  * Define how to handle conflicts when an organization is imported.
  * <br>
- * Check {@link org.bonitasoft.engine.api.OrganizationAPI#importOrganization(String)} and {@link org.bonitasoft.engine.api.OrganizationAPI#importOrganization(String, ImportPolicy)} to see the usage.
+ * Check {@link org.bonitasoft.engine.api.OrganizationAPI#importOrganization(String)} and
+ * {@link org.bonitasoft.engine.api.OrganizationAPI#importOrganization(String, ImportPolicy)} to see the usage.
  *
  * @see org.bonitasoft.engine.api.OrganizationAPI
  * @author Baptiste Mesta
@@ -39,4 +40,7 @@ public enum ImportPolicy {
      */
     IGNORE_DUPLICATES;
 
+    public static ImportPolicy fromName(String policyName) {
+        return ImportPolicy.valueOf(policyName);
+    }
 }

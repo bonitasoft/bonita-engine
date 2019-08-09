@@ -44,6 +44,7 @@ import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.platform.login.PlatformLoginServiceTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
+import org.bonitasoft.engine.project.ProjectIT;
 import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.SchedulerServiceIT;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
@@ -90,7 +91,8 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformLoginServiceTest.class,
         FormMappingServiceIT.class,
         PageMappingServiceIT.class,
-        EventInstanceRepositoryIT.class
+        EventInstanceRepositoryIT.class,
+        ProjectIT.class
 })
 @RunWith(Suite.class)
 public class AllBPMTests {

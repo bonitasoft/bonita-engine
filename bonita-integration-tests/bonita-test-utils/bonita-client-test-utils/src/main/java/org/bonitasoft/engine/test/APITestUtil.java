@@ -15,10 +15,7 @@ package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder.aBusinessArchive;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,6 +43,7 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.ProjectAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -774,7 +772,7 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
     }
-    
+
 
     public HumanTaskInstance waitForUserTaskAssignAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user, Map<String, Serializable> inputs) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
@@ -1291,6 +1289,10 @@ public class APITestUtil extends PlatformTestUtil {
         return getApiClient().getLivingApplicationAPI();
     }
 
+    public ProjectAPI getProjectAPI() {
+        return getApiClient().getProjectAPI();
+    }
+
     public TenantAdministrationAPI getTenantAdministrationAPI() {
         return getApiClient().getTenantAdministrationAPI();
     }
@@ -1481,7 +1483,7 @@ public class APITestUtil extends PlatformTestUtil {
         birthDate.setName("birthDate");
         birthDate.setType(FieldType.LOCALDATE);
         birthDate.setNullable(Boolean.TRUE);
-        
+
         final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);

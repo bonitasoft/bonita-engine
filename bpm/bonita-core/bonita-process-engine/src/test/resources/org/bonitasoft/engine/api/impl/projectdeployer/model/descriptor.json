@@ -1,0 +1,76 @@
+{
+  "name": "LeaveRequest",
+  "version": "1.0.0-SNAPSHOT",
+  "description": "Description of foo is bar",
+  "targetVersion": "7.2.0",
+  "organization": {
+    "file": "organization/ACME.xml",
+    "policy": "MERGE_DUPLICATES"
+  },
+  "profiles": [
+    {
+      "file": "organization/Profile_Data.xml",
+      "policy": "REPLACE_DUPLICATES"
+    }
+  ],
+  "businessDataModel": {
+    "file": "bdm.zip",
+    "policy": "DROP"
+  },
+  "processes": [
+    {
+      "file": "processes/New-Vacation-Request--1.0.bar",
+      "policy": "REPLACE_DUPLICATES",
+      "configuration": {
+        "parameters": "processes/New-Vacation-Request.properties",
+        "actorMapping": "processes/New-Vacation-Request_Mapping.xml",
+        "connectorImplementations": [
+          {
+            "connectorName": "email",
+            "connectorVersion": "1.4",
+            "file": "processes/email-impl-2.0.zip"
+          }
+        ]
+      }
+    },
+    {
+      "file": "processes/Initiate-Vacation-Available--1.0.bar",
+      "policy": "FAIL_ON_DUPLICATES"
+    }
+  ],
+  "restAPIExtensions": [
+    {
+      "file": "restAPIExtensions/VacationRequestRestAPI-1.0.0-SNAPSHOT.zip",
+      "reconfigure": [
+        {
+          "path": "page.properties",
+          "properties": [
+            "org.foo"
+          ]
+        },
+        {
+          "path": "configuration.properties",
+          "properties": [
+            "com.foo",
+            "com.bar"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "restAPIExtensions/CancelRequestRestAPI-1.0.0-SNAPSHOT.zip"
+    }
+  ],
+  "pages": [
+    {
+      "file": "pages/page-ExampleVacationManagement.zip"
+    }
+  ],
+  "applications": [
+    {
+      "file": "tahiti/Application_Data.xml",
+      "policy": "FAIL_ON_DUPLICATES"
+    }
+  ],
+  "modelVersion": "0.1"
+}

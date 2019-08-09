@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -54,13 +53,7 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {
-        return userTransactionService.executeInTransaction(new Callable<Long>() {
-
-            @Override
-            public Long call() throws Exception {
-                return activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
-            }
-        });
+        return userTransactionService.executeInTransaction(() -> activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions));
     }
 
     @Test
@@ -146,12 +139,12 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void isTaskPendingForUser() throws Exception {
-        long flowNodeDefinitionId = 12355467l;
-        long processDefinitionId = 123445566l;
-        long rootProcessInstanceID = 7754l;
-        long actorId = 5589l;
+        long flowNodeDefinitionId = 12355467L;
+        long processDefinitionId = 123445566L;
+        long rootProcessInstanceID = 7754L;
+        long actorId = 5589L;
         SUserTaskInstance step1 = createSUserTaskInstance("step1", flowNodeDefinitionId, -1, processDefinitionId, rootProcessInstanceID, actorId);
-        long userId = 4411l;
+        long userId = 4411L;
         //given
         getTransactionService().begin();
         final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(step1.getId()).userId(userId).build();
@@ -165,6 +158,11 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         //then
         assertTrue("task should be pending", taskPendingForUser);
 
+        // clean-up:
+        getTransactionService().begin();
+        activityInstanceService.deleteAllPendingMappings();
+        activityInstanceService.deleteFlowNodeInstance(step1);
+        getTransactionService().complete();
     }
 
 }
