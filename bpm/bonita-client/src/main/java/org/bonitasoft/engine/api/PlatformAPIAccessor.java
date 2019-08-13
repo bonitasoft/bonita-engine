@@ -48,9 +48,6 @@ public class PlatformAPIAccessor {
             switch (apiType) {
                 case LOCAL:
                     return LocalServerAPIFactory.getServerAPI();
-                case EJB3:
-                    parameters = APITypeManager.getAPITypeParameters();
-                    return new EJB3ServerAPI(parameters);
                 case HTTP:
                     parameters = APITypeManager.getAPITypeParameters();
                     return new HTTPServerAPI(parameters);

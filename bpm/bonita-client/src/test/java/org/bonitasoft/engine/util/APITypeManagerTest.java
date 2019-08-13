@@ -80,11 +80,11 @@ public class APITypeManagerTest {
         File bonitaHome = temporaryFolder.newFolder();
         System.setProperty("bonita.home", bonitaHome.getAbsolutePath());
         writePropertiesFile(bonitaHome, "work" + File.separator
-                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = EJB3");
+                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = HTTP");
         //when
         ApiAccessType apiType = APITypeManager.getAPIType();
         //then
-        assertThat(apiType).isEqualTo(ApiAccessType.EJB3);
+        assertThat(apiType).isEqualTo(ApiAccessType.HTTP);
     }
 
     @Test
@@ -93,11 +93,11 @@ public class APITypeManagerTest {
         File bonitaHome = temporaryFolder.newFolder();
         System.setProperty("bonita.home", "      " + bonitaHome.getAbsolutePath() + File.separator + "       ");
         writePropertiesFile(bonitaHome, "work" + File.separator
-                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = EJB3");
+                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = HTTP");
         //when
         ApiAccessType apiType = APITypeManager.getAPIType();
         //then
-        assertThat(apiType).isEqualTo(ApiAccessType.EJB3);
+        assertThat(apiType).isEqualTo(ApiAccessType.HTTP);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class APITypeManagerTest {
         File bonitaHome = temporaryFolder.newFolder();
         System.setProperty("bonita.home", bonitaHome.getAbsolutePath());
         writePropertiesFile(bonitaHome, "work" + File.separator
-                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = EJB3");
+                + "bonita-client-community.properties", "org.bonitasoft.engine.api-type = LOCAL");
         writePropertiesFile(bonitaHome, "conf" + File.separator
                 + "bonita-client-custom.properties", "org.bonitasoft.engine.api-type = HTTP");
         //when
@@ -129,7 +129,8 @@ public class APITypeManagerTest {
     }
 
     @Test
-    public void should_getAPIType_when_set_with_bonita_home_custom_properties_and_system_properties_works() throws Exception {
+    public void should_getAPIType_when_set_with_bonita_home_custom_properties_and_system_properties_works()
+            throws Exception {
         //given
         System.setProperty("org.bonitasoft.engine.api-type.server.url", "localhost");
         File bonitaHome = temporaryFolder.newFolder();
@@ -195,7 +196,8 @@ public class APITypeManagerTest {
     }
 
     @Test
-    public void should_getAPITypeParameters_when_set_with_bonita_home_community_and_custom_properties_works() throws Exception {
+    public void should_getAPITypeParameters_when_set_with_bonita_home_community_and_custom_properties_works()
+            throws Exception {
         //given
         File bonitaHome = temporaryFolder.newFolder();
         System.setProperty("bonita.home", bonitaHome.getAbsolutePath());
@@ -220,7 +222,8 @@ public class APITypeManagerTest {
     }
 
     private void writePropertiesFile(File bonitaHome, String fileName, String content) throws IOException {
-        File file = new File(bonitaHome.getAbsolutePath() + File.separator + "engine-client" + File.separator + fileName);
+        File file = new File(
+                bonitaHome.getAbsolutePath() + File.separator + "engine-client" + File.separator + fileName);
         file.getParentFile().mkdirs();
         FileUtils.write(file, content);
     }
@@ -234,7 +237,8 @@ public class APITypeManagerTest {
     }
 
     @Test(expected = UnknownAPITypeException.class)
-    public void should_getAPIType_when_set_with_bad_bonita_home_community_properties_throw_exception() throws Exception {
+    public void should_getAPIType_when_set_with_bad_bonita_home_community_properties_throw_exception()
+            throws Exception {
         //given
         File bonitaHome = temporaryFolder.newFolder();
         System.setProperty("bonita.home", bonitaHome.getAbsolutePath());

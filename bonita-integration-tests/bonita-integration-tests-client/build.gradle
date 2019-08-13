@@ -1,5 +1,3 @@
-
-
 dependencies {
     compile project(':engine:bonita-test-api')
     compile "org.springframework:spring-context:${Deps.springVersion}"
@@ -25,13 +23,13 @@ dependencies {
 }
 
 integrationTest.doFirst {
-    def emptyFile = new File("$project.buildDir/bonita_home_client_EJB3/engine-client/conf/bonita-client-custom.properties")
+    def emptyFile = new File("$project.buildDir/bonita_home_client_HTTP/engine-client/conf/bonita-client-custom.properties")
     emptyFile.getParentFile().mkdirs()
     emptyFile.text = ""
     copy {
-        from file("$projectDir/bonita-client-ejb3.properties")
-        into file("$project.buildDir/bonita_home_client_EJB3/engine-client/work")
-        rename 'bonita-client-ejb3.properties', 'bonita-client-community.properties'
+        from file("$projectDir/bonita-client-http.properties")
+        into file("$project.buildDir/bonita_home_client_HTTP/engine-client/work")
+        rename 'bonita-client-http.properties', 'bonita-client-community.properties'
     }
     def invalidFile = new File("$project.buildDir/bonita_home_client_invalidAPIType/engine-client/conf/bonita-client-custom.properties")
     invalidFile.getParentFile().mkdirs()

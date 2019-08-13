@@ -52,15 +52,6 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * </ul>
  * </p>
  * </li>
- * <li>EJB3 <b>DEPRECATED</b>
- * <p>
- * connect to the server using EJB3. You must also specify<br/> For Wildfly 10 :
- * <ul>
- * <li><code>-Djava.naming.factory.url.pkgs=org.jboss.ejb.client.naming</code></li>
- * <li><code>-Dorg.bonitasoft.engine.ejb.naming.reference=ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI</code></li>
- * </ul>
- * </p>
- * </li>
  * <li>TCP
  * <p>
  * not recommended, only for testing purpose.
@@ -81,17 +72,6 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);</code>
  * </pre>
  *
- * </li>
- * <li>
- * EJB3 access: <b>DEPRECATED</b>
- * 
- * <pre>
- * <code>HashMap<String,String> parameters= new HashMap<>();
- * parameters.put("java.naming.factory.url.pkgs", "org.jboss.ejb.client.naming");
- * parameters.put("org.bonitasoft.engine.ejb.naming.reference","ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI");
- * APITypeManager.setAPITypeAndParams(ApiAccessType.EJB3, parameters);</code>
- * </pre>
- * 
  * </li>
  * </ul>
  *
@@ -115,9 +95,6 @@ public class APITypeManager {
             final String apiType = getAPITypeFromProperties();
             if (LOCAL.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = LOCAL;
-            } else if (EJB3.name().equalsIgnoreCase(apiType)) {
-                warnEJB3IsDeprecated();
-                apiAccessType = EJB3;
             } else if (HTTP.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = HTTP;
             } else if (TCP.name().equalsIgnoreCase(apiType)) {
@@ -127,10 +104,6 @@ public class APITypeManager {
             }
         }
         return apiAccessType;
-    }
-
-    private static void warnEJB3IsDeprecated() {
-        LOGGER.warning("EJB communication protocol is Deprecated and will be removed in 7.10");
     }
 
     private static String getAPITypeFromProperties() throws IOException {
@@ -157,9 +130,6 @@ public class APITypeManager {
 
     public static void setAPITypeAndParams(final ApiAccessType type, final Map<String, String> parameters) {
         warnIfUsingRemoteConnectionWithLocalEngine(type);
-        if (EJB3 == type) {
-            warnEJB3IsDeprecated();
-        }
         apiAccessType = type;
         apiTypeParameters = new HashMap<>();
         if (parameters != null) {
@@ -198,8 +168,6 @@ public class APITypeManager {
         }
         addParameter(properties, "org.bonitasoft.engine.api-type.", "server.url");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
-        addParameter(properties, "", "org.bonitasoft.engine.ejb.naming.reference");
-        addParameter(properties, "", "java.naming.factory.url.pkgs");
         return properties;
     }
 
