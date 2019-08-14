@@ -18,13 +18,13 @@ import java.util.List;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationAPIDelegate;
 import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationExporterDelegate;
 import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationMenuAPIDelegate;
 import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationPageAPIDelegate;
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
@@ -63,6 +63,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -266,12 +267,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ExecutionResult deployApplication(byte[] applicationArchive) {
+    public ExecutionResult deployApplication(byte[] applicationArchive) throws DeployerException {
         return getApplicationAPIDelegate().deployApplication(applicationArchive);
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return new ApplicationAPIDelegate(getTenantAccessor());
+        return new ApplicationAPIDelegate();
     }
 
 }

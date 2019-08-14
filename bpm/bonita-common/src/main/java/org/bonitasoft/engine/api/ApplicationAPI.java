@@ -30,6 +30,7 @@ import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -338,5 +339,13 @@ public interface ApplicationAPI {
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 
-    ExecutionResult deployApplication(byte[] applicationArchive);
+    /**
+     * Deploys a complete Bonita Application.
+     * 
+     * @param applicationArchive the binary zip archive representing the full application to deploy
+     * @return the result of the deployment
+     * @throws DeployerException in case of deployment problem
+     * @see org.bonitasoft.engine.application.Application
+     */
+    ExecutionResult deployApplication(byte[] applicationArchive) throws DeployerException;
 }
