@@ -270,7 +270,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of archived process instances.
-     * Process instances in state COMPLETED are counted.
+     * Root process instances in state COMPLETED are counted. Process instances started by call activities won't be counted.
      *
      * @return The number of archived process instances.
      * @since 6.0
@@ -2092,7 +2092,8 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived root process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved.
+     * Search for archived root process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved. Process instances started by call activities won't be retrieved.
+     * See {@link #searchArchivedProcessInstancesInAllStates(SearchOptions) searchArchivedProcessInstancesInAllStates} to search amoung any archived instance.
      *
      * @param searchOptions
      *        The search options (pagination, filter, order sort).

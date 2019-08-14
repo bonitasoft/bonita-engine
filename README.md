@@ -1,4 +1,4 @@
-# Bonita Engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
+# Bonita Engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg)](https://travis-ci.org/bonitasoft/bonita-engine)
 
 Deploy, execute, manage applications made with Bonita Studio.
 
