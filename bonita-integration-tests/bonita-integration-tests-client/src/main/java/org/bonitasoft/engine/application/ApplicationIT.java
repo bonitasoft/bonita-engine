@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.project;
+package org.bonitasoft.engine.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
@@ -34,12 +34,17 @@ import org.junit.Test;
 /**
  * @author Emmanuel Duchastenier
  */
-public class ProjectIT extends TestWithTechnicalUser {
+public class ApplicationIT extends TestWithTechnicalUser {
 
     @Test
-    public void should_deploy_all_project_artifacts() throws Exception {
-        getApiClient().getProjectAPI().deployProject(createCompleteApp());
+    public void should_deploy_all_artifacts_from_application() throws Exception {
+        // given:
+        final byte[] completeApplicationZip = createCompleteApp();
 
+        // when:
+        getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
+
+        // then:
         String organization = getIdentityAPI().exportOrganization();
         assertThat(organization).contains("daniela.angelo");
         assertThat(organization).contains("april.sanchez");
@@ -84,12 +89,15 @@ public class ProjectIT extends TestWithTechnicalUser {
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("myProcess", "1.0");
         assertThat(processDefinitionId).isGreaterThan(0L);
 
-        // For now, the process is not resolved, as the organization is not deployed, so actor mapping cannot complete:
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
         assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
         assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
 
         getIdentityAPI().deleteOrganization();
+
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI().resume();
     }
 
     private byte[] createCompleteApp() throws IOException {

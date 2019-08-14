@@ -43,7 +43,6 @@ import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.ProjectAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -1291,10 +1290,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ApplicationAPI getApplicationAPI() {
         return getApiClient().getApplicationAPI();
-    }
-
-    public ProjectAPI getProjectAPI() {
-        return getApiClient().getProjectAPI();
     }
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {

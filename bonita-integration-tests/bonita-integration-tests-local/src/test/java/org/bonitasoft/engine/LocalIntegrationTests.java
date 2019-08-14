@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.application.ApplicationIT;
 import org.bonitasoft.engine.business.application.LivingApplicationIT;
 import org.bonitasoft.engine.business.application.LivingApplicationImportExportIT;
 import org.bonitasoft.engine.business.application.LivingApplicationMenuIT;
@@ -39,6 +40,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LivingApplicationPageIT.class,
         LivingApplicationMenuIT.class,
         LivingApplicationImportExportIT.class,
+        ApplicationIT.class,
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,

@@ -302,15 +302,6 @@ public class APIClient {
     }
 
     /**
-     * Get API to access Bonita Projects.
-     *
-     * @since 7.10
-     */
-    public ProjectAPI getProjectAPI() {
-        return getAPI(ProjectAPI.class);
-    }
-
-    /**
      * Get API to manage Bonita Applications.
      *
      * @since 7.10
