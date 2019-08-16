@@ -28,7 +28,6 @@ import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.tenant.TenantResourceState;
 import org.junit.Test;
 
 /**
@@ -45,11 +44,6 @@ public class ApplicationIT extends TestWithTechnicalUser {
         getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
 
         // then:
-        String organization = getIdentityAPI().exportOrganization();
-        assertThat(organization).contains("daniela.angelo");
-        assertThat(organization).contains("april.sanchez");
-        assertThat(organization).contains("helen.kelly");
-
         assertThat(getPageAPI()
                 .searchPages(new SearchOptionsBuilder(0, 10)
                         .filter(PageSearchDescriptor.PROVIDED, false)
@@ -83,27 +77,16 @@ public class ApplicationIT extends TestWithTechnicalUser {
                         .done())
                 .getResult()).extracting("name").containsExactly("custompage_resourceNameRestAPI");
 
-        assertThat(getTenantAdministrationAPI().getBusinessDataModelResource().getState())
-                .isEqualTo(TenantResourceState.INSTALLED);
-
         final long processDefinitionId = getProcessAPI().getProcessDefinitionId("myProcess", "1.0");
         assertThat(processDefinitionId).isGreaterThan(0L);
 
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
-        assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
-        assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
-
-        getIdentityAPI().deleteOrganization();
-
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().resume();
+        assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
+        assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.DISABLED);
     }
 
     private byte[] createCompleteApp() throws IOException {
         return zip(
-                //    file("deploy.json", resource("/complete_app/deploy.json")),
-                file("organization/ACME.xml", resource("/complete_app/Organization_Data.xml")),
                 //    file("applications/Application_Data.xml", resource("/complete_app/Application_Data.xml")),
                 //    file("profiles/profile1.xml", resource("/complete_app/profile1.xml")),
                 file("pages/page1.zip", resource("/complete_app/page1.zip")),

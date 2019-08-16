@@ -92,9 +92,9 @@ public class Deployer {
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive deployment...");
             //            inSession(() -> {
-            deployOrganization(applicationArchive);
+            //            deployOrganization(applicationArchive);
             //                deployProfiles(applicationArchive);
-            deployBDM(applicationArchive);
+            //            deployBDM(applicationArchive);
             //                deployBdmAccessControl(applicationArchive);
             deployPages(applicationArchive);
             deployLayouts(applicationArchive);
