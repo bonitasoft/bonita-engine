@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -35,7 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationExporterDelegateTest {
+public class LivingApplicationExporterDelegateTest {
 
     @Mock
     private ApplicationExporter exporter;
@@ -44,7 +44,7 @@ public class ApplicationExporterDelegateTest {
     private ApplicationService applicationService;
 
     @InjectMocks
-    private ApplicationExporterDelegate delegate;
+    private LivingApplicationExporterDelegate delegate;
 
     @Test
     public void exportApplications_should_return_result_of_ApplicationsExporter() throws Exception {

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -53,7 +53,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationPageAPIDelegateTest {
+public class LivingApplicationPageAPIDelegateTest {
 
     @Mock
     private TenantServiceAccessor accessor;
@@ -76,7 +76,7 @@ public class ApplicationPageAPIDelegateTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private ApplicationPageAPIDelegate delegate;
+    private LivingApplicationPageAPIDelegate delegate;
 
     private static final long APPLICATION_ID = 15;
 
@@ -91,7 +91,7 @@ public class ApplicationPageAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationPageAPIDelegate(accessor, converter, 9999L, validator);
+        delegate = new LivingApplicationPageAPIDelegate(accessor, converter, 9999L, validator);
         given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 

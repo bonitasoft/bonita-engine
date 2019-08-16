@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
@@ -39,15 +39,15 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationMenuAPIDelegate {
+public class LivingApplicationMenuAPIDelegate {
 
     private final ApplicationMenuModelConverter converter;
     private final ApplicationService applicationService;
     private final ApplicationMenuCreatorValidator creatorValidator;
     private final long loggedUserId;
 
-    public ApplicationMenuAPIDelegate(final TenantServiceAccessor accessor, final ApplicationMenuModelConverter converter,
-            final ApplicationMenuCreatorValidator creatorValidator, final long loggedUserId) {
+    public LivingApplicationMenuAPIDelegate(final TenantServiceAccessor accessor, final ApplicationMenuModelConverter converter,
+                                            final ApplicationMenuCreatorValidator creatorValidator, final long loggedUserId) {
         this.creatorValidator = creatorValidator;
         this.loggedUserId = loggedUserId;
         applicationService = accessor.getApplicationService();

@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationMenuIT extends TestWithCustomPage {
+public class LivingApplicationMenuIT extends TestWithCustomPage {
 
     private Application application;
 
@@ -37,14 +37,14 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
-        appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
+        application = getLivingApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
+        appPage = getLivingApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
     }
 
     @Override
     @After
     public void tearDown() throws Exception {
-        getApplicationAPI().deleteApplication(application.getId());
+        getLivingApplicationAPI().deleteApplication(application.getId());
         application = null;
         appPage = null;
         super.tearDown();
@@ -56,7 +56,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main");
 
         //when
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu createdAppMenu = getLivingApplicationAPI().createApplicationMenu(creator);
 
         //then
         assertThat(createdAppMenu).isNotNull();
@@ -69,7 +69,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
         //when
         //create a second menu
-        ApplicationMenu index2Menu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second menu"));
+        ApplicationMenu index2Menu = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second menu"));
 
         //then
         // should have a index incremented
@@ -83,7 +83,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
 
         //when
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu createdAppMenu = getLivingApplicationAPI().createApplicationMenu(creator);
 
         //then
         assertThat(createdAppMenu).isNotNull();
@@ -94,13 +94,13 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     public void createApplicationMenu_with_parent_menu_should_return_ApplicationMenu_with_parentId_and_should_manage_indexes() throws Exception {
         //given
         final ApplicationMenuCreator mainCreator = new ApplicationMenuCreator(application.getId(), "Main");
-        final ApplicationMenu mainMenu = getApplicationAPI().createApplicationMenu(mainCreator);
+        final ApplicationMenu mainMenu = getLivingApplicationAPI().createApplicationMenu(mainCreator);
 
         final ApplicationMenuCreator childCreator = new ApplicationMenuCreator(application.getId(), "Child", appPage.getId());
         childCreator.setParentId(mainMenu.getId());
 
         //when
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(childCreator);
+        final ApplicationMenu createdAppMenu = getLivingApplicationAPI().createApplicationMenu(childCreator);
 
         //then
         assertThat(createdAppMenu).isNotNull();
@@ -111,7 +111,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         //create a child menu second menu
         ApplicationMenuCreator secondChildCreator = new ApplicationMenuCreator(application.getId(), "second child", appPage.getId());
         secondChildCreator.setParentId(mainMenu.getId());
-        ApplicationMenu secondChild = getApplicationAPI().createApplicationMenu(secondChildCreator);
+        ApplicationMenu secondChild = getLivingApplicationAPI().createApplicationMenu(secondChildCreator);
 
         //then
         //should have incremented index
@@ -124,8 +124,8 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         //given
         final ApplicationMenuCreator parentCreator = new ApplicationMenuCreator(application.getId(), "Main");
         final ApplicationMenuCreator childCreator = new ApplicationMenuCreator(application.getId(), "Child");
-        final ApplicationMenu parentAppMenu = getApplicationAPI().createApplicationMenu(parentCreator);
-        final ApplicationMenu childCreatedAppMenu = getApplicationAPI().createApplicationMenu(childCreator);
+        final ApplicationMenu parentAppMenu = getLivingApplicationAPI().createApplicationMenu(parentCreator);
+        final ApplicationMenu childCreatedAppMenu = getLivingApplicationAPI().createApplicationMenu(childCreator);
 
         ApplicationMenuUpdater updater = new ApplicationMenuUpdater();
         updater.setApplicationPageId(appPage.getId());
@@ -133,7 +133,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         updater.setDisplayName("Updated child");
 
         //when
-        ApplicationMenu updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
+        ApplicationMenu updatedChildMenu = getLivingApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
 
         //then
         assertThat(updatedChildMenu).isNotNull();
@@ -152,11 +152,11 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         updater.setParentId(null);
 
         //when
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
+        updatedChildMenu = getLivingApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
 
         //then
         assertThat(updatedChildMenu).isNotNull();
-        assertThat(updatedChildMenu).isEqualTo(getApplicationAPI().getApplicationMenu(updatedChildMenu.getId()));
+        assertThat(updatedChildMenu).isEqualTo(getLivingApplicationAPI().getApplicationMenu(updatedChildMenu.getId()));
         // updated:
         assertThat(updatedChildMenu.getApplicationPageId()).isNull();
         assertThat(updatedChildMenu.getParentId()).isNull();
@@ -170,8 +170,8 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void updateApplicationMenu_index_should_organize_indexes_for_elements_having_the_same_parent() throws Exception {
         //given
-        final ApplicationMenu parentAppMenu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main1"));
-        final ApplicationMenu parentAppMenu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main2"));
+        final ApplicationMenu parentAppMenu1 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main1"));
+        final ApplicationMenu parentAppMenu2 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main2"));
 
         final ApplicationMenuCreator childCreator1 = new ApplicationMenuCreator(application.getId(), "Child");
         childCreator1.setParentId(parentAppMenu1.getId());
@@ -180,34 +180,34 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenuCreator childCreator3 = new ApplicationMenuCreator(application.getId(), "Child");
         childCreator3.setParentId(parentAppMenu1.getId());
 
-        final ApplicationMenu childCreatedAppMenu1 = getApplicationAPI().createApplicationMenu(childCreator1);
-        final ApplicationMenu childCreatedAppMenu2 = getApplicationAPI().createApplicationMenu(childCreator2);
-        final ApplicationMenu childCreatedAppMenu3 = getApplicationAPI().createApplicationMenu(childCreator3);
+        final ApplicationMenu childCreatedAppMenu1 = getLivingApplicationAPI().createApplicationMenu(childCreator1);
+        final ApplicationMenu childCreatedAppMenu2 = getLivingApplicationAPI().createApplicationMenu(childCreator2);
+        final ApplicationMenu childCreatedAppMenu3 = getLivingApplicationAPI().createApplicationMenu(childCreator3);
 
         //when move up
-        ApplicationMenu updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(1));
+        ApplicationMenu updatedChildMenu = getLivingApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(1));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(1);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(2);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(2);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
 
         //when move down
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(2));
+        updatedChildMenu = getLivingApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(2));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(2);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(1);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(1);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
 
         //when change parent
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),
+        updatedChildMenu = getLivingApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),
                 new ApplicationMenuUpdater().setParentId(parentAppMenu2.getId()));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(1);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(1);
-        assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(2);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu1.getId()).getIndex()).isEqualTo(1);
+        assertThat(getLivingApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(2);
 
     }
 
@@ -215,10 +215,10 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     public void getApplicationMenu_should_return_the_applicationMenu_identified_by_the_given_id() throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu createdAppMenu = getLivingApplicationAPI().createApplicationMenu(creator);
 
         //when
-        final ApplicationMenu retrievedMenu = getApplicationAPI().getApplicationMenu(createdAppMenu.getId());
+        final ApplicationMenu retrievedMenu = getLivingApplicationAPI().getApplicationMenu(createdAppMenu.getId());
 
         //then
         assertThat(retrievedMenu).isNotNull();
@@ -230,27 +230,27 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     public void deleteApplicationMenu_should_remove_the_applicationMenu_identified_by_the_given_id() throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu createdAppMenu = getLivingApplicationAPI().createApplicationMenu(creator);
 
         //when
-        getApplicationAPI().deleteApplicationMenu(createdAppMenu.getId());
+        getLivingApplicationAPI().deleteApplicationMenu(createdAppMenu.getId());
 
         //then
-        getApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
+        getLivingApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
     }
 
     @Test
     public void deleteApplication_also_deletes_application_pages_and_applicationMenu() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My secpond app", "1.0"));
-        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
-        final ApplicationMenu mainMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
+        final Application application = getLivingApplicationAPI().createApplication(new ApplicationCreator("app2", "My secpond app", "1.0"));
+        final ApplicationPage appPage = getLivingApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
+        final ApplicationMenu mainMenu = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
         ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
         subMenuCreator.setParentId(mainMenu.getId());
-        final ApplicationMenu subMenu = getApplicationAPI().createApplicationMenu(subMenuCreator);
+        final ApplicationMenu subMenu = getLivingApplicationAPI().createApplicationMenu(subMenuCreator);
 
         //when
-        getApplicationAPI().deleteApplication(application.getId());
+        getLivingApplicationAPI().deleteApplication(application.getId());
 
         //then
         verifyNotExists(mainMenu);
@@ -262,16 +262,16 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void deleteApplicationPage_also_deletes_related_applicationMenu() throws Exception {
         //given
-        final ApplicationPage pageToDelete = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToDelete");
-        final ApplicationPage pageToKeep = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToKeep");
-        final ApplicationMenu menuToDelete = getApplicationAPI().createApplicationMenu(
+        final ApplicationPage pageToDelete = getLivingApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToDelete");
+        final ApplicationPage pageToKeep = getLivingApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToKeep");
+        final ApplicationMenu menuToDelete = getLivingApplicationAPI().createApplicationMenu(
                 new ApplicationMenuCreator(application.getId(), "Main", pageToDelete.getId()));
-        final ApplicationMenu menuToKeep = getApplicationAPI().createApplicationMenu(
+        final ApplicationMenu menuToKeep = getLivingApplicationAPI().createApplicationMenu(
                 new ApplicationMenuCreator(application.getId(), "Main", pageToKeep.getId()));
-        final ApplicationMenu containerMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
+        final ApplicationMenu containerMenu = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
 
         //when
-        getApplicationAPI().deleteApplicationPage(pageToDelete.getId());
+        getLivingApplicationAPI().deleteApplicationPage(pageToDelete.getId());
 
         //then
         // container menu and menu related to another page are keep
@@ -283,13 +283,13 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     }
 
     private void verifyExists(ApplicationMenu applicationMenu) throws ApplicationMenuNotFoundException {
-        ApplicationMenu retrievedMenu = getApplicationAPI().getApplicationMenu(applicationMenu.getId());
+        ApplicationMenu retrievedMenu = getLivingApplicationAPI().getApplicationMenu(applicationMenu.getId());
         assertThat(retrievedMenu).isNotNull();
     }
 
     private void verifyNotExists(ApplicationMenu applicationMenu) {
         try {
-            getApplicationAPI().getApplicationMenu(applicationMenu.getId()); //throws exception
+            getLivingApplicationAPI().getApplicationMenu(applicationMenu.getId()); //throws exception
             fail("exception expected");
         } catch (ApplicationMenuNotFoundException e) {
             //OK
@@ -298,7 +298,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     private void verifyNotExists(ApplicationPage applicationPage) {
         try {
-            getApplicationAPI().getApplicationPage(applicationPage.getId()); //throws exception
+            getLivingApplicationAPI().getApplicationPage(applicationPage.getId()); //throws exception
             fail("exception expected");
         } catch (ApplicationPageNotFoundException e) {
             //OK
@@ -308,13 +308,13 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_without_filters_without_search_term_should_return_all_applicationMenues_pagged() throws Exception {
         //given
-        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
-        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
-        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        final ApplicationMenu menu1 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
+        final ApplicationMenu menu2 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
+        final ApplicationMenu menu3 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchResult<ApplicationMenu> firstPage = getApplicationAPI().searchApplicationMenus(buildSearchOptions(0, 2));
-        final SearchResult<ApplicationMenu> secondPage = getApplicationAPI().searchApplicationMenus(buildSearchOptions(2, 2));
+        final SearchResult<ApplicationMenu> firstPage = getLivingApplicationAPI().searchApplicationMenus(buildSearchOptions(0, 2));
+        final SearchResult<ApplicationMenu> secondPage = getLivingApplicationAPI().searchApplicationMenus(buildSearchOptions(2, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -328,14 +328,14 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_displayname() throws Exception {
         //given
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
-        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
+        final ApplicationMenu menu2 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.DISPLAY_NAME, "second");
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -346,14 +346,14 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_index() throws Exception {
         //given
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
-        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
+        final ApplicationMenu menu3 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.INDEX, 3);
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -364,15 +364,15 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_applicationPageId() throws Exception {
         //given
-        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "mySecondPage");
-        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage2.getId()));
-        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        final ApplicationPage appPage2 = getLivingApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "mySecondPage");
+        final ApplicationMenu menu1 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage2.getId()));
+        final ApplicationMenu menu3 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, appPage.getId());
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -383,17 +383,17 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_applicationId() throws Exception {
         //given
-        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My second app", "1.0"));
-        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "mySecondPage");
+        final Application application2 = getLivingApplicationAPI().createApplication(new ApplicationCreator("app2", "My second app", "1.0"));
+        final ApplicationPage appPage2 = getLivingApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "mySecondPage");
 
-        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application2.getId(), "first", appPage2.getId()));
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
-        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application2.getId(), "third", appPage2.getId()));
+        final ApplicationMenu menu1 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application2.getId(), "first", appPage2.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
+        final ApplicationMenu menu3 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application2.getId(), "third", appPage2.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, application2.getId());
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -404,18 +404,18 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_parentId() throws Exception {
         //given
-        final ApplicationMenu parentMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "parent"));
+        final ApplicationMenu parentMenu = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "parent"));
 
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "child", appPage.getId());
         creator.setParentId(parentMenu.getId());
-        final ApplicationMenu childMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu childMenu = getLivingApplicationAPI().createApplicationMenu(creator);
 
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.PARENT_ID, parentMenu.getId());
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -426,14 +426,14 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_use_searchTerm() throws Exception {
         //given
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
-        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
-        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "first", appPage.getId()));
+        final ApplicationMenu menu2 = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "second", appPage.getId()));
+        getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
         final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.searchTerm("second");
-        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> searchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();

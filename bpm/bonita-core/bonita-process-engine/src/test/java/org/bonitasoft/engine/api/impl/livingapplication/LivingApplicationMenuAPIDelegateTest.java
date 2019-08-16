@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -49,7 +49,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationMenuAPIDelegateTest {
+public class LivingApplicationMenuAPIDelegateTest {
 
     @Mock
     private TenantServiceAccessor accessor;
@@ -69,7 +69,7 @@ public class ApplicationMenuAPIDelegateTest {
     @Mock
     private SearchResult<ApplicationMenu> appMenuSearchResult;
 
-    private ApplicationMenuAPIDelegate delegate;
+    private LivingApplicationMenuAPIDelegate delegate;
 
     private static final long APPLICATION_ID = 34;
 
@@ -78,7 +78,7 @@ public class ApplicationMenuAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, creatorValidator, 911L);
+        delegate = new LivingApplicationMenuAPIDelegate(accessor, convertor, creatorValidator, 911L);
         given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
     }
 
