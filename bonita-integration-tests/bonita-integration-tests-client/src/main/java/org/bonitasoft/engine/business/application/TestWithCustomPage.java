@@ -21,7 +21,7 @@ import org.junit.Before;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class TestWithCustomPage extends TestWithApplication {
+public class TestWithCustomPage extends TestWithLivingApplication {
 
     private Page page;
 

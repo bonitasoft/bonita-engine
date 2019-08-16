@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -337,4 +338,5 @@ public interface ApplicationAPI {
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 
+    ExecutionResult deployApplication(byte[] applicationArchive);
 }

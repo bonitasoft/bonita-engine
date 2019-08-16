@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationIT extends TestWithApplication {
+public class LivingApplicationIT extends TestWithLivingApplication {
 
     @Test
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
@@ -41,7 +41,7 @@ public class ApplicationIT extends TestWithApplication {
         creator.setProfileId(profile.getId());
 
         //when
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getLivingApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -58,7 +58,7 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getLayoutId()).isEqualTo(defaultLayout.getId());
         assertThat(application.getThemeId()).isEqualTo(defaultTheme.getId());
 
-        getApplicationAPI().deleteApplication(application.getId());
+        getLivingApplicationAPI().deleteApplication(application.getId());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
 
         //when
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getLivingApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -79,7 +79,7 @@ public class ApplicationIT extends TestWithApplication {
         //given
         final Profile profile = getProfileUser();
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getLivingApplicationAPI().createApplication(creator);
 
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("My-updated-app");
@@ -91,7 +91,7 @@ public class ApplicationIT extends TestWithApplication {
         updater.setState(ApplicationState.ACTIVATED.name());
 
         //when
-        final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
+        final Application updatedApplication = getLivingApplicationAPI().updateApplication(application.getId(), updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
@@ -102,20 +102,20 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
+        assertThat(updatedApplication).isEqualTo(getLivingApplicationAPI().getApplication(application.getId()));
 
-        getApplicationAPI().deleteApplication(application.getId());
+        getLivingApplicationAPI().deleteApplication(application.getId());
     }
 
     @Test
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = getApplicationAPI().createApplication(creator);
+        final Application createdApp = getLivingApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        final Application retrievedApp = getApplicationAPI().getApplication(createdApp.getId());
+        final Application retrievedApp = getLivingApplicationAPI().getApplication(createdApp.getId());
 
         //then
         assertThat(retrievedApp).isEqualTo(createdApp);
@@ -125,15 +125,15 @@ public class ApplicationIT extends TestWithApplication {
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = getApplicationAPI().createApplication(creator);
+        final Application createdApp = getLivingApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        getApplicationAPI().deleteApplication(createdApp.getId());
+        getLivingApplicationAPI().deleteApplication(createdApp.getId());
 
         //then
         try {
-            getApplicationAPI().getApplication(createdApp.getId());
+            getLivingApplicationAPI().getApplication(createdApp.getId());
             fail("Not found exception");
         } catch (final NotFoundException e) {
             //ok
@@ -147,12 +147,12 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchResult<Application> firstPage = getApplicationAPI().searchApplications(buildSearchOptions(0, 2));
+        final SearchResult<Application> firstPage = getLivingApplicationAPI().searchApplications(buildSearchOptions(0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -160,7 +160,7 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(firstPage.getResult()).containsExactly(engineering, hr);
 
         //when
-        final SearchResult<Application> secondPage = getApplicationAPI().searchApplications(buildSearchOptions(2, 2));
+        final SearchResult<Application> secondPage = getLivingApplicationAPI().searchApplications(buildSearchOptions(2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -175,15 +175,15 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        getApplicationAPI().createApplication(marketingCreator);
+        getLivingApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
+        getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
@@ -196,15 +196,15 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
+        getLivingApplicationAPI().createApplication(engineeringCreator);
+        getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(hr);
@@ -217,15 +217,15 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "2.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
+        getLivingApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);
@@ -241,22 +241,22 @@ public class ApplicationIT extends TestWithApplication {
         engineeringCreator.setProfileId(profile.getId());
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
 
-        getApplicationAPI().deleteApplication(hr.getId());
-        getApplicationAPI().deleteApplication(engineering.getId());
-        getApplicationAPI().deleteApplication(marketing.getId());
+        getLivingApplicationAPI().deleteApplication(hr.getId());
+        getLivingApplicationAPI().deleteApplication(engineering.getId());
+        getLivingApplicationAPI().deleteApplication(marketing.getId());
     }
 
     @Test
@@ -266,15 +266,15 @@ public class ApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
+        getLivingApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.searchTerm("My");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getLivingApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);

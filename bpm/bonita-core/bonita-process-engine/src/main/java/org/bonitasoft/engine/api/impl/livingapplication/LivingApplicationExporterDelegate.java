@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import java.util.List;
 
@@ -26,12 +26,12 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationExporterDelegate {
+public class LivingApplicationExporterDelegate {
 
     private final ApplicationService applicationService;
     private final ApplicationExporter exporter;
 
-    public ApplicationExporterDelegate(ApplicationService applicationService, ApplicationExporter exporter) {
+    public LivingApplicationExporterDelegate(ApplicationService applicationService, ApplicationExporter exporter) {
         this.applicationService = applicationService;
         this.exporter = exporter;
     }

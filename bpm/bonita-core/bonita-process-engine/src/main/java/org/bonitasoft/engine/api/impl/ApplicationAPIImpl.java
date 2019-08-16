@@ -18,9 +18,10 @@ import java.util.List;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
-import org.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
-import org.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
-import org.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
+import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationAPIDelegate;
+import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationExporterDelegate;
+import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationMenuAPIDelegate;
+import org.bonitasoft.engine.api.impl.livingapplication.LivingApplicationPageAPIDelegate;
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -84,11 +86,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
-        return getApplicationAPIDelegate().createApplication(applicationCreator);
+        return getLivingApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
-    private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return new ApplicationAPIDelegate(getTenantAccessor(), getApplicationModelConverter(getTenantAccessor().getPageService()),
+    private LivingApplicationAPIDelegate getLivingApplicationAPIDelegate() {
+        return new LivingApplicationAPIDelegate(getTenantAccessor(), getApplicationModelConverter(getTenantAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession(), new ApplicationTokenValidator());
     }
 
@@ -96,17 +98,17 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return new ApplicationModelConverter(pageService);
     }
 
-    private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession(),
+    private LivingApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
+        return new LivingApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession(),
                 new ApplicationTokenValidator());
     }
 
-    private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        return new ApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(), new ApplicationMenuCreatorValidator(),
+    private LivingApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
+        return new LivingApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(), new ApplicationMenuCreatorValidator(),
                 SessionInfos.getUserIdFromSession());
     }
 
-    private ApplicationExporterDelegate getApplicationExporterDelegate() {
+    private LivingApplicationExporterDelegate getLivingApplicationExporterDelegate() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final PageService pageService = tenantAccessor.getPageService();
@@ -115,7 +117,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ApplicationsToNodeContainerConverter applicationsToNodeContainerConverter = new ApplicationsToNodeContainerConverter(applicationToNodeConverter);
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationsToNodeContainerConverter, applicationContainerExporter);
-        return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
+        return new LivingApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
     }
 
     protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService, final ApplicationImportValidator importValidator) {
@@ -138,18 +140,18 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        return getApplicationAPIDelegate().getApplication(applicationId);
+        return getLivingApplicationAPIDelegate().getApplication(applicationId);
     }
 
     @Override
     public void deleteApplication(final long applicationId) throws DeletionException {
-        getApplicationAPIDelegate().deleteApplication(applicationId);
+        getLivingApplicationAPIDelegate().deleteApplication(applicationId);
     }
 
     @Override
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException,
             AlreadyExistsException {
-        return getApplicationAPIDelegate().updateApplication(applicationId, updater);
+        return getLivingApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -169,7 +171,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, converter);
-        return getApplicationAPIDelegate().searchApplications(searchApplications);
+        return getLivingApplicationAPIDelegate().searchApplications(searchApplications);
     }
 
     @Override
@@ -255,12 +257,21 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public byte[] exportApplications(final long... applicationIds) throws ExportException {
-        return getApplicationExporterDelegate().exportApplications(applicationIds);
+        return getLivingApplicationExporterDelegate().exportApplications(applicationIds);
     }
 
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException {
         return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
+    }
+
+    @Override
+    public ExecutionResult deployApplication(byte[] applicationArchive) {
+        return getApplicationAPIDelegate().deployApplication(applicationArchive);
+    }
+
+    private ApplicationAPIDelegate getApplicationAPIDelegate() {
+        return new ApplicationAPIDelegate(getTenantAccessor());
     }
 
 }

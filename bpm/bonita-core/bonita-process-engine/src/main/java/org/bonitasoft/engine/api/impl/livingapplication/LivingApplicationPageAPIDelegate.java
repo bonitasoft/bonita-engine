@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.application;
+package org.bonitasoft.engine.api.impl.livingapplication;
 
 import java.util.List;
 
@@ -44,14 +44,14 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationPageAPIDelegate {
+public class LivingApplicationPageAPIDelegate {
 
     private final ApplicationPageModelConverter converter;
     private final ApplicationService applicationService;
     private final long loggedUserId;
     private final ApplicationTokenValidator tokenValidator;
 
-    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
+    public LivingApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
         this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();
         this.converter = converter;

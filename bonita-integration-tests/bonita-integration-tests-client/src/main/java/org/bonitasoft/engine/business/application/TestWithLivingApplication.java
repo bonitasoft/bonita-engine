@@ -38,10 +38,10 @@ import org.junit.Before;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class TestWithApplication extends CommonAPIIT {
+public class TestWithLivingApplication extends CommonAPIIT {
 
-    public static final String DEFAULT_LAYOUT_NAME = "custompage_layoutBonita";
-    public static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
+    static final String DEFAULT_LAYOUT_NAME = "custompage_layoutBonita";
+    static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
     private User user;
 
     @Before
@@ -54,9 +54,9 @@ public class TestWithApplication extends CommonAPIIT {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
+        final SearchResult<Application> searchResult = getLivingApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
         for (final Application app : searchResult.getResult()) {
-            getApplicationAPI().deleteApplication(app.getId());
+            getLivingApplicationAPI().deleteApplication(app.getId());
         }
         logoutThenlogin();
         deleteUser(user);
@@ -67,11 +67,11 @@ public class TestWithApplication extends CommonAPIIT {
         return getProfile("User");
     }
 
-    protected Profile getProfileAdmin() throws SearchException {
+    Profile getProfileAdmin() throws SearchException {
         return getProfile("Administrator");
     }
 
-    protected Profile getProfile(String profileName) throws SearchException {
+    private Profile getProfile(String profileName) throws SearchException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
         builder.filter(ProfileSearchDescriptor.NAME, profileName);
         SearchResult<Profile> profileSearchResult = getProfileAPI().searchProfiles(builder.done());

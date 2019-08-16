@@ -1285,8 +1285,12 @@ public class APITestUtil extends PlatformTestUtil {
         return getApiClient().getCustomPageAPI();
     }
 
-    public ApplicationAPI getApplicationAPI() {
+    public ApplicationAPI getLivingApplicationAPI() {
         return getApiClient().getLivingApplicationAPI();
+    }
+
+    public ApplicationAPI getApplicationAPI() {
+        return getApiClient().getApplicationAPI();
     }
 
     public ProjectAPI getProjectAPI() {

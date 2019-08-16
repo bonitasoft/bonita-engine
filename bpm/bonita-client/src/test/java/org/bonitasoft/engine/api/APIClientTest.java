@@ -136,7 +136,7 @@ public class APIClientTest {
     }
 
     @Test
-    public void should_get_ApplicationAPI_from_server() throws LoginException {
+    public void should_get_LivingApplicationAPI_from_server() throws LoginException {
         client.login(VALID_USERNAME, VALID_PASSWORD);
         ApplicationAPI api = client.getLivingApplicationAPI();
         assertThat(api).isNotNull();
@@ -160,6 +160,13 @@ public class APIClientTest {
     public void should_get_ProjectAPI_from_server() throws LoginException {
         client.login(VALID_USERNAME, VALID_PASSWORD);
         ProjectAPI api = client.getProjectAPI();
+        assertThat(api).isNotNull();
+    }
+
+    @Test
+    public void should_get_ApplicationAPI_from_server() throws LoginException {
+        client.login(VALID_USERNAME, VALID_PASSWORD);
+        ApplicationAPI api = client.getApplicationAPI();
         assertThat(api).isNotNull();
     }
 

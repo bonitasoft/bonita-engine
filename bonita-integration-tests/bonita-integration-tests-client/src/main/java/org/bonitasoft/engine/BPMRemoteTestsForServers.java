@@ -15,7 +15,7 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.activity.ContractIT;
 import org.bonitasoft.engine.activity.PendingTasksIT;
-import org.bonitasoft.engine.business.application.ApplicationIT;
+import org.bonitasoft.engine.business.application.LivingApplicationIT;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandIT;
@@ -62,7 +62,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AdvancedStartProcessCommandIT.class,
         MultipleStartPointsProcessCommandIT.class,
         PageAPIIT.class,
-        ApplicationIT.class,
+        LivingApplicationIT.class,
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
