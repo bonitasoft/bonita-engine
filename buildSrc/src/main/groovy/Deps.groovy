@@ -53,6 +53,7 @@ class Deps {
     public static String systemRulesVersion = "1.16.0"
     public static String concurrentUnitVersion = "0.4.0"
     public static String jettyVersion = "9.4.9.v20180320"
+    public static String javaxAnnotationsVersion = "1.3.2"
 
 
     //Build plugins
