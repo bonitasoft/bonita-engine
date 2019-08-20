@@ -14,8 +14,16 @@
 package org.bonitasoft.engine.configuration;
 
 import static io.micrometer.core.instrument.Clock.SYSTEM;
+import static io.micrometer.core.instrument.config.MeterFilter.denyNameStartsWith;
 import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
+import java.util.List;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
 import org.springframework.context.ApplicationContext;
@@ -27,13 +35,16 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class MeterConfiguration {
-
     private final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + "jmx.enable", enableIfMissing = true)
     public JmxMeterRegistry jmxMeterRegistry(JmxConfig jmxConfig) {
-        return new JmxMeterRegistry(jmxConfig, SYSTEM);
+        JmxMeterRegistry jmxMeterRegistry = new JmxMeterRegistry(jmxConfig, SYSTEM);
+        jmxMeterRegistry.config()
+                //ignore jvm related metrics that are already exposed on jmx
+                .meterFilter(denyNameStartsWith("jvm."));
+        return jmxMeterRegistry;
     }
 
     @Bean
@@ -55,4 +66,32 @@ public class MeterConfiguration {
     public JmxConfig jmxRegistryConfig(ApplicationContext context) {
         return key -> context.getEnvironment().getProperty(MONITORING_PREFIX + key);
     }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.memory.enable", enableIfMissing = false)
+    public JvmMemoryMetrics jvmMemoryMetrics() {
+        return new JvmMemoryMetrics();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.threads.enable", enableIfMissing = false)
+    public JvmThreadMetrics jvmThreadMetrics() {
+        return new JvmThreadMetrics();
+    }
+
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.gc.enable", enableIfMissing = false)
+    public JvmGcMetrics jvmGcMetrics() {
+        return new JvmGcMetrics();
+    }
+
+    @Bean
+    public MeterRegistry meterRegistry(List<MeterRegistry> meterRegistries, List<MeterBinder> meterBinders) {
+        MeterRegistryFactory meterRegistryFactory = new MeterRegistryFactory();
+        meterRegistryFactory.setMeterRegistries(meterRegistries);
+        meterRegistryFactory.setMeterBinders(meterBinders);
+        return meterRegistryFactory.create();
+    }
+
 }

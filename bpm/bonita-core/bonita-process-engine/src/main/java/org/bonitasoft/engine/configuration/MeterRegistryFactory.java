@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.slf4j.Logger;
@@ -29,8 +30,18 @@ public class MeterRegistryFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MeterRegistryFactory.class);
     private List<MeterRegistry> meterRegistries;
+    private List<MeterBinder> meterBinders;
 
     public MeterRegistry create() {
+        MeterRegistry registry = instantiate();
+        meterBinders.forEach(b -> {
+            LOGGER.debug("Register {} metrics on the registry", b.getClass().getName());
+            b.bindTo(registry);
+        });
+        return registry;
+    }
+
+    private MeterRegistry instantiate() {
         if (meterRegistries == null || meterRegistries.isEmpty()) {
             LOGGER.debug("No meter registry configured, using SimpleMeterRegistry");
             return new SimpleMeterRegistry();
@@ -49,4 +60,7 @@ public class MeterRegistryFactory {
         this.meterRegistries = meterRegistries;
     }
 
+    public void setMeterBinders(List<MeterBinder> meterBinders) {
+        this.meterBinders = meterBinders;
+    }
 }
