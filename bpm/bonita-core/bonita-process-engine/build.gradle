@@ -74,6 +74,7 @@ dependencies {
     compileOnly project(':engine:bpm:bonita-common')
     testCompile project(':engine:bpm:bonita-common')
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
 }
 jaxb {
     schemaGen {
