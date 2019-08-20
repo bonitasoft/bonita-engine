@@ -1140,9 +1140,6 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean id="meterRegistryFactory" class="org.bonitasoft.engine.configuration.MeterRegistryFactory" autowire="byType" />
-
     <bean class="org.bonitasoft.engine.configuration.MeterConfiguration" />
 
-    <bean id="meterRegistry" factory-bean="meterRegistryFactory" factory-method="create" />
 </beans>
