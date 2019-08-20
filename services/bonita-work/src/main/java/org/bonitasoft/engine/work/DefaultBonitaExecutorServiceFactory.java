@@ -74,7 +74,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         return new BonitaThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                 workQueue, threadFactory, handler, workFactory, logger, engineClock, workExecutionCallback,
-                workExecutionAuditor, meterRegistry);
+                workExecutionAuditor, meterRegistry, tenantId);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

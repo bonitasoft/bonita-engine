@@ -46,6 +46,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplTest {
 
+    public static final long TENANT_ID = 12L;
     @Mock
     private TechnicalLoggerService loggerService;
 
@@ -73,7 +74,7 @@ public class ConnectorExecutorImplTest {
                 Clock.SYSTEM);
         connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService,
                 timeTracker,
-                meterRegistry);
+                meterRegistry, TENANT_ID);
 
         connectorExecutorImpl.start();
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
@@ -273,6 +274,14 @@ public class ConnectorExecutorImplTest {
         public void disconnect() {
             // do nothing
         }
+    }
+
+
+    @Test
+    public void should_have_tenant_id_in_all_meters() {
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
 }

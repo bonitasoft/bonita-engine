@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
@@ -52,6 +53,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 @RunWith(MockitoJUnitRunner.class)
 public class MessagesHandlingServiceTest {
 
+    public static final long TENANT_ID = 1L;
     @Mock
     private EventInstanceService eventInstanceService;
     @Mock
@@ -77,7 +79,7 @@ public class MessagesHandlingServiceTest {
                 k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
                 Clock.SYSTEM);
         messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, loggerService,
-                lockService, 1L, userTransactionService, sessionAccessor, workFactory, meterRegistry));
+                lockService, TENANT_ID, userTransactionService, sessionAccessor, workFactory, meterRegistry));
     }
 
     @Test
@@ -246,5 +248,11 @@ public class MessagesHandlingServiceTest {
         assertThat(meterRegistry.find(MessagesHandlingService.MESSAGE_MESSAGES_EXECUTED).counter().count())
                 .isEqualTo(1);
 
+    }
+
+
+    @Test
+    public void should_have_tenant_id_in_all_meters() {
+        assertThat(meterRegistry.find(MessagesHandlingService.MESSAGE_MESSAGES_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
     }
 }

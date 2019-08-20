@@ -49,6 +49,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  */
 public class BonitaThreadPoolExecutorTest {
 
+    public static final long TENANT_ID = 13L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -76,9 +77,9 @@ public class BonitaThreadPoolExecutorTest {
                 , new ArrayBlockingQueue<>(1_000) //
                 , new WorkerThreadFactory("test-worker", 1, threadNumber) //
                 , (r, executor) -> {
-                } //
+        } //
                 , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor,
-                meterRegistry);
+                meterRegistry, TENANT_ID);
     }
 
     @Test
@@ -190,6 +191,13 @@ public class BonitaThreadPoolExecutorTest {
     }
 
     @Test
+    public void should_have_tenant_id_in_all_meters() {
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+    }
+
+    @Test
     public void should_call_on_success_callback_only_when_async_work_executed_properly() throws InterruptedException {
         WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
 
@@ -235,7 +243,7 @@ public class BonitaThreadPoolExecutorTest {
 
         @Override
         public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
-                Throwable thrown) {
+                              Throwable thrown) {
             this.thrown = thrown;
             onFailureCalled.set(true);
         }
