@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
@@ -87,7 +88,8 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
-        executedMessagesCounter = meterRegistry.counter(MESSAGE_MESSAGES_EXECUTED);
+        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+        executedMessagesCounter = meterRegistry.counter(MESSAGE_MESSAGES_EXECUTED, tags);
     }
 
     @Override

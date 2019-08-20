@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
@@ -78,6 +79,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
 
     private final TimeTracker timeTracker;
     private MeterRegistry meterRegistry;
+    private long tenantId;
 
     private final AtomicLong pendingWorks = new AtomicLong();
     private final AtomicLong runningWorks = new AtomicLong();
@@ -109,7 +111,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize,
             final TechnicalLoggerService loggerService, final int maximumPoolSize,
             final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final TimeTracker timeTracker, final MeterRegistry meterRegistry) {
+            final TimeTracker timeTracker, final MeterRegistry meterRegistry, long tenantId ) {
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
         this.loggerService = loggerService;
@@ -119,6 +121,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         this.sessionService = sessionService;
         this.timeTracker = timeTracker;
         this.meterRegistry = meterRegistry;
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -334,9 +337,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
                     "ConnectorExecutor");
             setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                     workQueue, threadFactory, handler));
-            meterRegistry.gauge(CONNECTOR_CONNECTORS_PENDING, workQueue, Collection::size);
-            meterRegistry.gauge(CONNECTOR_CONNECTORS_RUNNING, runningWorks);
-            executedWorkCounter = meterRegistry.counter(CONNECTOR_CONNECTORS_EXECUTED, Collections.emptyList());
+            Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+            meterRegistry.gauge(CONNECTOR_CONNECTORS_PENDING, tags, workQueue, Collection::size);
+            meterRegistry.gauge(CONNECTOR_CONNECTORS_RUNNING, tags, runningWorks);
+            executedWorkCounter = meterRegistry.counter(CONNECTOR_CONNECTORS_EXECUTED, tags);
         }
     }
 

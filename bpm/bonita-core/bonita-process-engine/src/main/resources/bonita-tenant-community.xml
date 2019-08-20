@@ -802,6 +802,7 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
+        <constructor-arg name="tenantId" value="${tenantId}"/>
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
