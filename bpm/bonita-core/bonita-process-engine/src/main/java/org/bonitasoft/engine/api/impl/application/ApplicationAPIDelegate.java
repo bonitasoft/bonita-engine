@@ -17,10 +17,9 @@ import static org.bonitasoft.engine.api.impl.projectdeployer.validator.ArtifactV
 
 import java.io.IOException;
 
-import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.projectdeployer.ApplicationArchiveReader;
 import org.bonitasoft.engine.api.impl.projectdeployer.Deployer;
 import org.bonitasoft.engine.api.result.ExecutionResult;
@@ -41,8 +40,7 @@ public class ApplicationAPIDelegate {
         final APIAccessResolver apiAccessResolver = getApiAccessResolver();
         final Deployer deployer = Deployer.builder()
                 .pageAPI(getApi(apiAccessResolver, PageAPI.class))
-                .tenantAdministrationAPI(getApi(apiAccessResolver, TenantAdministrationAPI.class))
-                .identityAPI(getApi(apiAccessResolver, IdentityAPI.class))
+                .applicationAPI(getApi(apiAccessResolver, ApplicationAPI.class))
                 .processAPI(getApi(apiAccessResolver, ProcessAPI.class))
                 .applicationArchiveReader(new ApplicationArchiveReader(artifactValidator()))
                 .artifactValidator(artifactValidator())

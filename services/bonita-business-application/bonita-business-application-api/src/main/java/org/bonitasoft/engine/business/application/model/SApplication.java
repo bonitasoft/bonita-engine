@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SApplication implements PersistentObject {
-
 
     public static final String ID = "id";
     public static final String TOKEN = "token";

@@ -134,7 +134,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                 new NodeToApplicationPageConverter(pageService, importValidator));
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 new NodeToApplicationMenuConverter(applicationService));
-        final ApplicationImporter applicationImporter = new ApplicationImporter(applicationService, new StrategySelector().selectStrategy(policy),
+        final ApplicationImporter applicationImporter = new ApplicationImporter(applicationService, new StrategySelector(applicationService).selectStrategy(policy),
                 getNodeToApplicationConverter(pageService, tenantAccessor.getProfileService(), importValidator), applicationPageImporter, applicationMenuImporter);
         return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }

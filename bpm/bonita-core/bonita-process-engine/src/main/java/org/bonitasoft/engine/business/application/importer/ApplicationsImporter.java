@@ -37,7 +37,7 @@ public class ApplicationsImporter {
 
     public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = containerImporter.importXML(xmlContent);
-        ArrayList<ImportStatus> importStatus = new ArrayList<ImportStatus>(applicationNodeContainer.getApplications().size());
+        ArrayList<ImportStatus> importStatus = new ArrayList<>(applicationNodeContainer.getApplications().size());
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {
             importStatus.add(applicationImporter.importApplication(applicationNode, createdBy));
         }

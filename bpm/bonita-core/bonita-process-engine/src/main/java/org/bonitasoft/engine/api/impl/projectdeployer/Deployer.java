@@ -13,19 +13,20 @@
  **/
 package org.bonitasoft.engine.api.impl.projectdeployer;
 
-import static org.bonitasoft.engine.identity.ImportPolicy.fromName;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
+import org.bonitasoft.engine.api.impl.projectdeployer.model.Application;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.BusinessDataModel;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Layout;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Organization;
@@ -49,14 +50,17 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.DeployerException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
@@ -85,6 +89,7 @@ public class Deployer {
     private final PageAPI pageAPI;
     private final IdentityAPI identityAPI;
     private final TenantAdministrationAPI tenantAdministrationAPI;
+    private final ApplicationAPI applicationAPI;
     private final ProcessAPI processAPI;
 
     public void deploy(byte[] applicationArchiveFile) throws DeployerException {
@@ -100,7 +105,7 @@ public class Deployer {
             deployLayouts(applicationArchive);
             deployThemes(applicationArchive);
             deployRestApiExtensions(applicationArchive);
-            //                deployApplications(applicationArchive);
+            deployApplications(applicationArchive);
             deployProcesses(applicationArchive);
 
             log.info("The Application Archive has been deployed successfully in {} ms.",
@@ -117,6 +122,20 @@ public class Deployer {
     //    }
     //
 
+    private void deployApplications(ApplicationArchive applicationArchive)
+            throws InvalidArtifactException, IOException, AlreadyExistsException,
+            ImportException {
+        log.info("Deploying applications...");
+        List<Application> applications = applicationArchive.getDeploymentDescriptor().getApplications();
+        for (Application application : applications) {
+            File applicationArchiveFile = applicationArchive.getFile(application);
+            artifactValidator.validateApplicationType(applicationArchiveFile);
+            applicationAPI.importApplications(
+                    Files.readAllBytes(Paths.get(applicationArchiveFile.toString())),
+                    ApplicationImportPolicy.valueOf(application.getPolicy().name()));
+        }
+    }
+
     void deployOrganization(ApplicationArchive applicationArchive)
             throws OrganizationImportException, IOException, InvalidArtifactException {
         Organization organization = applicationArchive.getDeploymentDescriptor().getOrganization();
@@ -125,7 +144,8 @@ public class Deployer {
             artifactValidator.validateOrganizationType(applicationArchiveFile);
             String organizationContent = FileOperations.read(applicationArchiveFile);
             log.info("Deploying organization ...");
-            identityAPI.importOrganizationWithWarnings(organizationContent, fromName(organization.getPolicy().name()));
+            identityAPI.importOrganizationWithWarnings(organizationContent,
+                    ImportPolicy.valueOf(organization.getPolicy().name()));
         } else {
             log.warn("There is no organisation file in the archive");
         }

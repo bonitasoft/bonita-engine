@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -71,6 +72,7 @@ public abstract class CommonAPIIT extends APITestUtil {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         cleanCommands();
         cleanProcessInstances();
+        cleanApplications();
         cleanPages();
         cleanArchiveProcessInstances();
         cleanProcessDefinitions();
@@ -80,6 +82,13 @@ public abstract class CommonAPIIT extends APITestUtil {
         cleanRoles();
         cleanSupervisors();
         logoutOnTenant();
+    }
+
+    private void cleanApplications() throws SearchException, DeletionException {
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 100).done());
+        for (Application application : applications.getResult()) {
+            getApplicationAPI().deleteApplication(application.getId());
+        }
     }
 
     private void cleanPages() throws SearchException, DeletionException {
