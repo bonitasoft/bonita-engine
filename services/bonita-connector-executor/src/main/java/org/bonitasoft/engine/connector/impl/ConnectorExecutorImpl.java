@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.connector.impl;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -42,6 +44,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 /**
  * Execute connectors directly
  *
@@ -50,6 +55,10 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  * @author Matthieu Chaffotte
  */
 public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecutor {
+
+    public static final String CONNECTOR_CONNECTORS_PENDING = "org.bonitasoft.engine.connector.connectors.pending";
+    public static final String CONNECTOR_CONNECTORS_RUNNING = "org.bonitasoft.engine.connector.connectors.running";
+    public static final String CONNECTOR_CONNECTORS_EXECUTED = "org.bonitasoft.engine.connector.connectors.executed";
 
     private ExecutorService executorService;
 
@@ -68,10 +77,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     private final TechnicalLoggerService loggerService;
 
     private final TimeTracker timeTracker;
+    private MeterRegistry meterRegistry;
 
     private final AtomicLong pendingWorks = new AtomicLong();
     private final AtomicLong runningWorks = new AtomicLong();
     private final AtomicLong executedWorks = new AtomicLong();
+    private Counter executedWorkCounter;
 
     /**
      * The handling of threads relies on the JVM
@@ -95,9 +106,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
      *        the core, this is the maximum time that excess idle threads
      *        will wait for new tasks before terminating. (in seconds)
      */
-    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService, final TimeTracker timeTracker) {
-
+    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize,
+            final TechnicalLoggerService loggerService, final int maximumPoolSize,
+            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService,
+            final TimeTracker timeTracker, final MeterRegistry meterRegistry) {
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
         this.loggerService = loggerService;
@@ -106,10 +118,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.timeTracker = timeTracker;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
-    public CompletableFuture<Map<String, Object>> execute(final SConnector sConnector, final Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException {
+    public CompletableFuture<Map<String, Object>> execute(final SConnector sConnector,
+            final Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException {
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
@@ -121,11 +135,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
         }
 
-        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader, loggerService.asLogger(ConnectorExecutorImpl.class));
+        ExecuteConnectorCallable task = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader,
+                loggerService.asLogger(ConnectorExecutorImpl.class));
         return execute(sConnector, task);
     }
 
-    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector, InterruptibleCallable<Map<String, Object>> task) {
+    protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector,
+            InterruptibleCallable<Map<String, Object>> task) {
         pendingWorks.incrementAndGet();
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -144,6 +160,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             try {
                 Map<String, Object> call = task.call();
                 executedWorks.incrementAndGet();
+                executedWorkCounter.increment();
                 return call;
             } finally {
                 runningWorks.decrementAndGet();
@@ -151,7 +168,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         };
     }
 
-    private void track(final TimeTrackerRecords recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
+    private void track(final TimeTrackerRecords recordName, final long startTime, final SConnector sConnector,
+            final Map<String, Object> inputParameters) {
         if (timeTracker.isTrackable(recordName)) {
             final long endTime = System.currentTimeMillis();
             final StringBuilder desc = new StringBuilder();
@@ -169,7 +187,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             sConnector.disconnect();
         } catch (final Exception t) {
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occurred while disconnecting the connector: " + sConnector, t);
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "An error occurred while disconnecting the connector: " + sConnector, t);
             }
         }
     }
@@ -217,8 +236,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         private boolean interrupted;
         private boolean completed;
 
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId,
-                                         final ClassLoader loader, TechnicalLogger technicalLogger) {
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector,
+                final long tenantId,
+                final ClassLoader loader, TechnicalLogger technicalLogger) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
             this.tenantId = tenantId;
@@ -265,9 +285,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             interrupted = true;
             if (thread != null) {
                 StackTraceElement[] stackTrace = thread.getStackTrace();
-                String stack = Arrays.stream(stackTrace).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
-                technicalLogger.warn("Interrupt thread of connector {}, thread is {}, {}, connectors was doing :\n {}, activate debug logs to have the full execution stacktrace.", sConnector.getClass(), thread.getName(), thread.getId(), stackTrace[0].toString());
-                technicalLogger.debug("Interrupt thread of connector {}, thread is {}, {}, stack is:\n {}", sConnector.getClass(), thread.getName(), thread.getId(), stack);
+                String stack = Arrays.stream(stackTrace).map(StackTraceElement::toString)
+                        .collect(Collectors.joining("\n"));
+                technicalLogger.warn(
+                        "Interrupt thread of connector {}, thread is {}, {}, connectors was doing :\n {}, activate debug logs to have the full execution stacktrace.",
+                        sConnector.getClass(), thread.getName(), thread.getId(), stackTrace[0].toString());
+                technicalLogger.debug("Interrupt thread of connector {}, thread is {}, {}, stack is:\n {}",
+                        sConnector.getClass(), thread.getName(), thread.getId(), stack);
                 thread.interrupt();
             }
         }
@@ -289,7 +313,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The work was rejected. Requeue work : " + task.toString());
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                        "The work was rejected. Requeue work : " + task.toString());
             }
             try {
                 executor.getQueue().put(task);
@@ -303,10 +328,15 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     @Override
     public void start() {
         if (executorService == null) {
-            final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
+            final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(queueCapacity);
             final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
-            final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
-            setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler));
+            final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory(
+                    "ConnectorExecutor");
+            setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
+                    workQueue, threadFactory, handler));
+            meterRegistry.gauge(CONNECTOR_CONNECTORS_PENDING, workQueue, Collection::size);
+            meterRegistry.gauge(CONNECTOR_CONNECTORS_RUNNING, runningWorks);
+            executedWorkCounter = meterRegistry.counter(CONNECTOR_CONNECTORS_EXECUTED, Collections.emptyList());
         }
     }
 
@@ -325,10 +355,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
             executorService.shutdown();
             try {
                 if (!executorService.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout (5s) trying to stop the connector executor thread pool.");
+                    loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+                            "Timeout (5s) trying to stop the connector executor thread pool.");
                 }
             } catch (final InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool.", e);
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Error while stopping the connector executor thread pool.", e);
             }
             executorService = null;
         }

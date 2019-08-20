@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.work;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -25,18 +26,23 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * @author Julien Reboul
  * @author Baptiste Mesta
  */
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
+
+    public static final String WORK_WORKS_PENDING = "org.bonitasoft.engine.work.works.pending";
+    public static final String WORK_WORKS_RUNNING = "org.bonitasoft.engine.work.works.running";
+    public static final String WORK_WORKS_EXECUTED = "org.bonitasoft.engine.work.works.executed";
 
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
@@ -47,15 +53,17 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
 
     private final AtomicLong runningWorks = new AtomicLong();
     private final AtomicLong executedWorks = new AtomicLong();
+    private final Counter executedWorkCounter;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
-                                    final int maximumPoolSize,
-                                    final long keepAliveTime,
-                                    final TimeUnit unit,
-                                    final BlockingQueue<Runnable> workQueue,
-                                    final ThreadFactory threadFactory,
-                                    final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-                                    EngineClock engineClock, WorkExecutionCallback workExecutionCallback, WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry) {
+            final int maximumPoolSize,
+            final long keepAliveTime,
+            final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue,
+            final ThreadFactory threadFactory,
+            final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
+            EngineClock engineClock, WorkExecutionCallback workExecutionCallback,
+            WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
@@ -63,7 +71,10 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
         this.workExecutionAuditor = workExecutionAuditor;
-        meterRegistry.gauge("org.bonitasoft.engine.work.queue.size.current", workQueue, Collection::size);
+
+        meterRegistry.gauge(WORK_WORKS_PENDING, workQueue, Collection::size);
+        meterRegistry.gauge(WORK_WORKS_RUNNING, runningWorks);
+        executedWorkCounter = meterRegistry.counter(WORK_WORKS_EXECUTED, Collections.emptyList());
     }
 
     @Override
@@ -106,6 +117,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             try {
                 asyncResult = bonitaWork.work(context);
             } catch (Exception e) {
+                executedWorkCounter.increment();
                 executedWorks.incrementAndGet();
                 runningWorks.decrementAndGet();
                 workExecutionCallback.onFailure(work, bonitaWork, context, e);
@@ -113,6 +125,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             }
 
             asyncResult.handle((result, error) -> {
+                executedWorkCounter.increment();
                 executedWorks.incrementAndGet();
                 runningWorks.decrementAndGet();
                 if (error != null) {

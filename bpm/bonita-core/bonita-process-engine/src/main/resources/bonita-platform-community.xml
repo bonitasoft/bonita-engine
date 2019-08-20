@@ -6,7 +6,7 @@
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
-    <context:property-placeholder/>
+    <context:property-placeholder />
     <context:annotation-config />
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
@@ -164,7 +164,9 @@
         <constructor-arg name="schedulerService" ref="scheduler" />
     </bean>
 
-    <bean id="monitoringJobListener" class="org.bonitasoft.engine.scheduler.impl.MonitoringJobListener"/>
+    <bean id="monitoringJobListener" class="org.bonitasoft.engine.scheduler.impl.MonitoringJobListener">
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
+    </bean>
 
     <bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -215,9 +217,9 @@
     </bean>
 
     <bean id="classLoaderUpdater" class="org.bonitasoft.engine.classloader.ClassLoaderUpdater">
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor"/>
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
-        <constructor-arg name="userTransactionService" ref="transactionService"/>
+        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
@@ -285,7 +287,7 @@
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
     </bean>
 
-    <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor"/>
+    <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor" />
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
@@ -1138,9 +1140,9 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean id="meterRegistryFactory" class="org.bonitasoft.engine.configuration.MeterRegistryFactory" autowire="byType"/>
+    <bean id="meterRegistryFactory" class="org.bonitasoft.engine.configuration.MeterRegistryFactory" autowire="byType" />
 
     <bean class="org.bonitasoft.engine.configuration.MeterConfiguration" />
 
-    <bean id="meterRegistry" factory-bean="meterRegistryFactory" factory-method="create"/>
+    <bean id="meterRegistry" factory-bean="meterRegistryFactory" factory-method="create" />
 </beans>

@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -51,6 +52,9 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 /**
  * @author Baptiste Mesta
  */
@@ -58,6 +62,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
 
     private static final int MAX_COUPLES = 100;
     private static final String LOCK_TYPE = "EVENTS";
+    public static final String MESSAGE_MESSAGES_EXECUTED = "org.bonitasoft.engine.message.messages.executed";
     private ThreadPoolExecutor threadPoolExecutor;
     private EventInstanceService eventInstanceService;
     private WorkService workService;
@@ -69,10 +74,11 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
     private BPMWorkFactory workFactory;
 
     private AtomicLong executedMessages = new AtomicLong();
+    private final Counter executedMessagesCounter;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
-            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-            SessionAccessor sessionAccessor, BPMWorkFactory workFactory) {
+                                   LockService lockService, Long tenantId, UserTransactionService userTransactionService,
+                                   SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;
@@ -81,6 +87,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
+        executedMessagesCounter = meterRegistry.counter(MESSAGE_MESSAGES_EXECUTED);
     }
 
     @Override
@@ -162,7 +169,8 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         }
     }
 
-    private void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
+    @VisibleForTesting
+    void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
             SMessageModificationException, SWaitingEventModificationException, SWorkRegisterException {
 
         // Mark messages that will be treated as "treatment in progress":
@@ -175,6 +183,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
             markWaitingMessageAsInProgress(waitingMsg);
         }
         executedMessages.incrementAndGet();
+        executedMessagesCounter.increment();
         workService.registerWork(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMsg));
     }
 

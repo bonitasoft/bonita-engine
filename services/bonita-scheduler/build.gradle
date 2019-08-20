@@ -12,6 +12,7 @@ dependencies {
     compile project(':engine:services:bonita-transaction')
     compile project(':engine:services:bonita-incident')
     compile "org.quartz-scheduler:quartz:${Deps.quartzVersion}"
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
