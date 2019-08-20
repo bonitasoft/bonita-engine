@@ -162,6 +162,7 @@
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workFactory" ref="workFactory" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
 
     <bean id="transitionConditionEvaluator"
@@ -800,6 +801,7 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">

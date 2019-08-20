@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplTest {
 
@@ -59,9 +63,18 @@ public class ConnectorExecutorImplTest {
 
     private ConnectorExecutorImpl connectorExecutorImpl;
 
+    private SimpleMeterRegistry meterRegistry;
+
     @Before
     public void before() {
-        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService, timeTracker);
+        meterRegistry = new SimpleMeterRegistry(
+                // So that micrometer updates its counters every 1 ms:
+                k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
+                Clock.SYSTEM);
+        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService,
+                timeTracker,
+                meterRegistry);
+
         connectorExecutorImpl.start();
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
     }
@@ -69,6 +82,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_execute_submit_callable() throws Exception {
         SConnector connector = new SConnector() {
+
             @Override
             public void setInputParameters(Map<String, Object> parameters) {
 
@@ -96,7 +110,8 @@ public class ConnectorExecutorImplTest {
         };
         when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
         final Map<String, Object> result = connectorExecutorImpl.execute(connector,
-                Collections.singletonMap("key", "value"), Thread.currentThread().getContextClassLoader()).get(100,TimeUnit.MILLISECONDS);
+                Collections.singletonMap("key", "value"), Thread.currentThread().getContextClassLoader())
+                .get(100, TimeUnit.MILLISECONDS);
 
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get("result")).isEqualTo("resultValue");
@@ -187,27 +202,37 @@ public class ConnectorExecutorImplTest {
     public void should_update_connectors_counters_when_adding_a_connector_with_immediate_execution() throws Exception {
         //when:
         when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
-        connectorExecutorImpl.execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader()).get();
+        connectorExecutorImpl
+                .execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader())
+                .get();
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
         //then:
-        assertThat(connectorExecutorImpl.getExecuted()).as("Executed connectors number").isEqualTo(1);
-        assertThat(connectorExecutorImpl.getRunnings()).as("Running connectors number").isEqualTo(0);
-        assertThat(connectorExecutorImpl.getPendings()).as("Pending connectors number").isEqualTo(0);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).counter().count())
+                .as("Executed connectors number").isEqualTo(1);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).gauge().value())
+                .as("Running connectors number").isEqualTo(0);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).gauge().value())
+                .as("Pending connectors number").isEqualTo(0);
     }
 
     @Test
     public void should_update_connectors_counters_when_enqueuing_connectors_with_long_processing_time()
             throws Exception {
         when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
-        connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(), Thread.currentThread().getContextClassLoader());
-        connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(), Thread.currentThread().getContextClassLoader());
+        connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(),
+                Thread.currentThread().getContextClassLoader());
+        connectorExecutorImpl.execute(new LocalSConnector(2), new HashMap<>(),
+                Thread.currentThread().getContextClassLoader());
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
         //then:  one is in queue (only one thread to execute connectors) and one is pending
-        assertThat(connectorExecutorImpl.getExecuted()).as("Executed connectors number").isEqualTo(0);
-        assertThat(connectorExecutorImpl.getRunnings()).as("Running connectors number").isEqualTo(1);
-        assertThat(connectorExecutorImpl.getPendings()).as("Pending connectors number").isEqualTo(1);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).counter().count())
+                .as("Executed connectors number").isEqualTo(0);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).gauge().value())
+                .as("Running connectors number").isEqualTo(1);
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).gauge().value())
+                .as("Pending connectors number").isEqualTo(1);
     }
 
     // =================================================================================================================

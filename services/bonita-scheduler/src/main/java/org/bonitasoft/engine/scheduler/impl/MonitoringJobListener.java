@@ -14,38 +14,65 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+
 public class MonitoringJobListener implements BonitaJobListener {
 
     private static final long serialVersionUID = 2830540082890033377L;
 
-    private final Map<Long, AtomicLong> executing = new ConcurrentHashMap<>();
-    private final Map<Long, AtomicLong> executed = new ConcurrentHashMap<>();
+    public static final String JOB_JOBS_RUNNING = "org.bonitasoft.engine.job.jobs.running";
+    public static final String JOB_JOBS_EXECUTED = "org.bonitasoft.engine.job.jobs.executed";
 
+    private final Map<Long, AtomicLong> runningJobs = new ConcurrentHashMap<>();
+    private final Map<Long, Counter> executedCounter = new ConcurrentHashMap<>();
 
-    public MonitoringJobListener() {
+    private MeterRegistry meterRegistry;
+
+    public MonitoringJobListener(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
     public void jobToBeExecuted(final Map<String, Serializable> context) {
         final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGet(tenantId, this.executing).incrementAndGet();
-
+        initializeOrGetRunningJob(tenantId).incrementAndGet();
     }
 
-    private AtomicLong initializeOrGet(Long tenantId, Map<Long, AtomicLong> map) {
-        AtomicLong counter = map.get(tenantId);
+    private AtomicLong initializeOrGetRunningJob(Long tenantId) {
+        AtomicLong counter = runningJobs.get(tenantId);
         if (counter == null) {
-            synchronized(this) {
-                if (map.get(tenantId) == null) {
-                    map.put(tenantId, new AtomicLong());
+            synchronized (this) {
+                if (runningJobs.get(tenantId) == null) {
+                    AtomicLong atomicLong = new AtomicLong();
+                    runningJobs.put(tenantId, atomicLong);
+                    meterRegistry.gauge(JOB_JOBS_RUNNING,
+                            Collections.singletonList(Tag.of("tenant", tenantId.toString())),
+                            atomicLong);
                 }
-                counter = map.get(tenantId);
+                counter = runningJobs.get(tenantId);
+            }
+        }
+        return counter;
+    }
+
+    private Counter initializeOrGetExecutedJobs(Long tenantId) {
+        Counter counter = executedCounter.get(tenantId);
+        if (counter == null) {
+            synchronized (this) {
+                if (executedCounter.get(tenantId) == null) {
+                    executedCounter.put(tenantId,
+                            meterRegistry.counter(JOB_JOBS_EXECUTED, "tenant", tenantId.toString()));
+                }
+                counter = executedCounter.get(tenantId);
             }
         }
         return counter;
@@ -54,23 +81,23 @@ public class MonitoringJobListener implements BonitaJobListener {
     @Override
     public void jobExecutionVetoed(final Map<String, Serializable> context) {
         final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGet(tenantId, this.executing).decrementAndGet();
+        initializeOrGetRunningJob(tenantId).decrementAndGet();
     }
 
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final Long tenantId = (Long) context.get(TENANT_ID);
-        initializeOrGet(tenantId, this.executing).decrementAndGet();
-        initializeOrGet(tenantId, this.executed).incrementAndGet();
+        initializeOrGetRunningJob(tenantId).decrementAndGet();
+        initializeOrGetExecutedJobs(tenantId).increment();
     }
 
     public long getNumberOfExecutingJobs(Long tenantId) {
-        return initializeOrGet(tenantId, this.executing).get();
+        return initializeOrGetRunningJob(tenantId).get();
     }
+
     public long getNumberOfExecutedJobs(Long tenantId) {
-        return initializeOrGet(tenantId, this.executed).get();
+        return Double.valueOf(initializeOrGetExecutedJobs(tenantId).count()).longValue();
 
     }
-
 
 }

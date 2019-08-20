@@ -14,10 +14,11 @@
 
 package org.bonitasoft.engine.message;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,17 +27,23 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * @author Celine Souchet
@@ -57,12 +64,24 @@ public class MessagesHandlingServiceTest {
     private UserTransactionService userTransactionService;
     @Mock
     private SessionAccessor sessionAccessor;
-    @Spy
-    @InjectMocks
+    @Mock
+    private BPMWorkFactory workFactory;
+
     private MessagesHandlingService messagesHandlingService;
+    private MeterRegistry meterRegistry;
+
+    @Before
+    public void setup() {
+        meterRegistry = new SimpleMeterRegistry(
+                // So that micrometer updates its counters every 1 ms:
+                k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
+                Clock.SYSTEM);
+        messagesHandlingService = spy(new MessagesHandlingService(eventInstanceService, workService, loggerService,
+                lockService, 1L, userTransactionService, sessionAccessor, workFactory, meterRegistry));
+    }
 
     @Test
-    public void getMessageUniqueCouplesWithDuplicateMessage() throws SEventTriggerInstanceReadException {
+    public void getMessageUniqueCouplesWithDuplicateMessage() {
         // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
@@ -93,7 +112,7 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void getMessageUniqueCouplesWithDuplicateWaitingEvent() throws SEventTriggerInstanceReadException {
+    public void getMessageUniqueCouplesWithDuplicateWaitingEvent() {
         // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
@@ -179,7 +198,8 @@ public class MessagesHandlingServiceTest {
     }
 
     @Test
-    public void getMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() throws SEventTriggerInstanceReadException {
+    public void getMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent()
+            throws SEventTriggerInstanceReadException {
         // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
@@ -213,4 +233,18 @@ public class MessagesHandlingServiceTest {
         assertEquals(20L, second.getWaitingMessageId());
     }
 
+    @Test
+    public void executeMessageCouple_should_increment_executed_message_counter() throws Exception {
+        // given:
+        doReturn(new SWaitingMessageEvent()).when(eventInstanceService).getWaitingMessage(2L);
+        doReturn(new SMessageInstance()).when(eventInstanceService).getMessageInstance(1L);
+
+        // when:
+        messagesHandlingService.executeMessageCouple(1L, 2L);
+
+        // then:
+        assertThat(meterRegistry.find(MessagesHandlingService.MESSAGE_MESSAGES_EXECUTED).counter().count())
+                .isEqualTo(1);
+
+    }
 }
