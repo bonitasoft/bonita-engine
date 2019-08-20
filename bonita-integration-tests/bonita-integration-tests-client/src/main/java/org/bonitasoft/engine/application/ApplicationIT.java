@@ -19,14 +19,18 @@ import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.FileOperations.resource;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.business.application.Application;
+import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.Test;
 
@@ -38,7 +42,7 @@ public class ApplicationIT extends TestWithTechnicalUser {
     @Test
     public void should_deploy_all_artifacts_from_application() throws Exception {
         // given:
-        final byte[] completeApplicationZip = createCompleteApp();
+        final byte[] completeApplicationZip = createCompleteApplication();
 
         // when:
         getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
@@ -83,11 +87,18 @@ public class ApplicationIT extends TestWithTechnicalUser {
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
         assertThat(deploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
         assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.DISABLED);
+
+        List<Application> insertedApplicationList = getLivingApplicationAPI()
+                .searchApplications(getApplicationSearchOptionsOrderById(0, 10)).getResult();
+        assertThat(insertedApplicationList).hasSize(1);
+        assertThat(insertedApplicationList.get(0).getDisplayName()).isEqualToIgnoringCase("Loan request");
     }
 
-    private byte[] createCompleteApp() throws IOException {
+    private byte[] createCompleteApplication() throws IOException {
         return zip(
-                //    file("applications/Application_Data.xml", resource("/complete_app/Application_Data.xml")),
+                //    file("deploy.json", resource("/complete_app/deploy.json")),
+                // file("organization/ACME.xml", resource("/complete_app/Organization_Data.xml")),
+                file("applications/Application_Data.xml", resource("/complete_app/Application_Data.xml")),
                 //    file("profiles/profile1.xml", resource("/complete_app/profile1.xml")),
                 file("pages/page1.zip", resource("/complete_app/page1.zip")),
                 file("processes/myProcess--1.0.bar", resource("/complete_app/myProcess--1.0.bar")),
@@ -97,6 +108,10 @@ public class ApplicationIT extends TestWithTechnicalUser {
                 //    file("bdm/bdm_access_control.xml", resource("/complete_app/bdm_access_control.xml")),
                 file("layouts/layout.zip", resource("/complete_app/layout.zip")),
                 file("themes/custom-theme.zip", resource("/complete_app/custom-theme.zip")));
+    }
+
+    private SearchOptions getApplicationSearchOptionsOrderById(final int startIndex, final int maxResults) {
+        return new SearchOptionsBuilder(startIndex, maxResults).sort(ApplicationSearchDescriptor.ID, Order.ASC).done();
     }
 
 }

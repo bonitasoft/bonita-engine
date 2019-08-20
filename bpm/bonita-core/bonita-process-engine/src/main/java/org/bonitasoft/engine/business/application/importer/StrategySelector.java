@@ -14,15 +14,27 @@
 package org.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
-
+import org.bonitasoft.engine.business.application.ApplicationService;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class StrategySelector {
 
+    private ApplicationService applicationService;
+
+    public StrategySelector(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
+
     public ApplicationImportStrategy selectStrategy(ApplicationImportPolicy policy) {
-        return new FailOnDuplicateApplicationImportStrategy();
+        switch (policy) {
+            case REPLACE_DUPLICATES:
+                return new ReplaceDuplicateApplicationImportStrategy(applicationService);
+            case FAIL_ON_DUPLICATES:
+            default:
+                return new FailOnDuplicateApplicationImportStrategy();
+        }
     }
 
 }

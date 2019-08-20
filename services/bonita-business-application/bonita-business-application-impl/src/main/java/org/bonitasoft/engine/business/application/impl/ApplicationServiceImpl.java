@@ -130,10 +130,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e,
+    private void handleCreationException(final PersistentObject persistentObject, final SPersistenceLogBuilder logBuilder, final Exception e,
             final String methodName)
             throws SObjectCreationException {
-        log(persitentObject.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+        log(persistentObject.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         throw new SObjectCreationException(e);
     }
 

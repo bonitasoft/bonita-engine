@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.impl.projectdeployer.descriptor.DeploymentDescriptor;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Application;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.api.impl.projectdeployer.policies.ProfileImportPoli
 import org.bonitasoft.engine.api.impl.projectdeployer.validator.ArtifactValidator;
 import org.bonitasoft.engine.api.impl.projectdeployer.validator.InvalidArtifactException;
 import org.bonitasoft.engine.exception.DeployerException;
-import org.bonitasoft.engine.identity.ImportPolicy;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,9 +62,6 @@ public class DeployerTest {
     @Mock
     private PageAPI pageAPI;
 
-    @Mock
-    private IdentityAPI identityAPI;
-
     @Captor
     private ArgumentCaptor<File> fileCaptor;
 
@@ -87,7 +82,6 @@ public class DeployerTest {
 
         deployer = spy(new Deployer.DeployerBuilder()
                 .pageAPI(pageAPI)
-                .identityAPI(identityAPI)
                 .applicationArchiveReader(applicationArchiveReader)
                 .artifactValidator(mock(ArtifactValidator.class))
                 .build());
@@ -110,11 +104,11 @@ public class DeployerTest {
                 "}";
         final byte[] customPageZipFile = zip(
                 file("page.properties", "name=custompage_test\ncontentType=page"));
-        byte[] zip = zip(
+        byte[] applicationZip = zip(
                 file("deploy.json", deployJsonContent),
                 file("pages/myCustomPage.zip", asInputStream(customPageZipFile)));
 
-        deployer.deploy(zip);
+        deployer.deploy(applicationZip);
 
         verify(pageAPI).createPage("custompage_test", customPageZipFile);
     }
@@ -139,41 +133,17 @@ public class DeployerTest {
                 .hasMessageEndingWith("path_of_the_page");
     }
 
-    //    @Test
-    //    public void should_deploy_profiles_of_archive() throws Exception {
-    //        applicationArchive.getDeploymentDescriptor().add(aProfile("path_of_the_profile"));
-    //        applicationArchive.addFile("path_of_the_profile", asInputStream("content of the profile xml"));
-    //
-    //        deployer.deploy(applicationArchiveFile);
-    //
-    //        verify(bonitaClient).importProfiles(fileCaptor.capture(), profilePolicyArgumentCaptor.capture());
-    //        assertThat(fileCaptor.getValue()).hasName("path_of_the_profile");
-    //        assertThat(profilePolicyArgumentCaptor.getValue()).isEqualTo(ProfileImportPolicy.REPLACE_DUPLICATES);
-    //    }
+//    @Test
+//    public void should_deploy_restApi_extension() throws Exception {
+//        applicationArchive.getDeploymentDescriptor().add(aRestAPIExtension("path_to_restApiExtension"));
+//        applicationArchive.addFile("path_to_restApiExtension", asInputStream("restApiExtension content"));
+//
+//        deployer.deploy(applicationArchiveFile);
+//
+//        verify(bonitaClient).importPage(fileCaptor.capture());
+//        assertThat(fileCaptor.getValue()).hasName("path_to_restApiExtension");
+//    }
 
-    @Test
-    public void should_deploy_organization() throws Exception {
-        ApplicationArchive applicationArchive = new ApplicationArchive();
-        applicationArchive.setDeploymentDescriptor(new DeploymentDescriptor());
-        applicationArchive.getDeploymentDescriptor().setOrganization(anOrganization("path_to_organization"));
-        applicationArchive.addFile("path_to_organization", asInputStream("organization content"));
-
-        deployer.deployOrganization(applicationArchive);
-
-        verify(identityAPI).importOrganizationWithWarnings("organization content", ImportPolicy.MERGE_DUPLICATES);
-    }
-
-    //    @Test
-    //    public void should_deploy_restApi_extension() throws Exception {
-    //        applicationArchive.getDeploymentDescriptor().add(aRestAPIExtension("path_to_restApiExtension"));
-    //        applicationArchive.addFile("path_to_restApiExtension", asInputStream("restApiExtension content"));
-    //
-    //        deployer.deploy(applicationArchiveFile);
-    //
-    //        verify(bonitaClient).importPage(fileCaptor.capture());
-    //        assertThat(fileCaptor.getValue()).hasName("path_to_restApiExtension");
-    //    }
-    //
     //    @Test
     //    public void should_deploy_artifacts_in_expected_order() throws Exception {
     //        applicationArchive.addFile("path_to_organization", asInputStream("organization content"));
@@ -227,42 +197,6 @@ public class DeployerTest {
     //        doThrow(new IOException()).when(bonitaClient).importPage(any());
     //
     //        deployer.deployRestApiExtension(restApiExtension);
-    //    }
-    //
-    //    @Test
-    //    public void should_import_single_page_file() throws Exception {
-    //        File page = new File("");
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //
-    //        deployer.deployPage(page);
-    //
-    //        inOrder.verify(bonitaClient).login(USERNAME, PASSWORD);
-    //        inOrder.verify(bonitaClient).importPage(eq(page));
-    //        inOrder.verify(bonitaClient).logout();
-    //    }
-    //
-    //    @Test
-    //    public void should_import_single_profiles_file() throws Exception {
-    //        File profiles = new File("");
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //
-    //        deployer.deployProfiles(profiles, ProfileImportPolicy.REPLACE_DUPLICATES);
-    //
-    //        inOrder.verify(bonitaClient).login(USERNAME, PASSWORD);
-    //        inOrder.verify(bonitaClient).importProfiles(profiles, ProfileImportPolicy.REPLACE_DUPLICATES);
-    //        inOrder.verify(bonitaClient).logout();
-    //    }
-    //
-    //    @Test
-    //    public void should_import_single_organization_file() throws Exception {
-    //        File organization = new File("");
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //
-    //        deployer.deployOrganization(organization, OrganizationImportPolicy.MERGE_DUPLICATES);
-    //
-    //        inOrder.verify(bonitaClient).login(USERNAME, PASSWORD);
-    //        inOrder.verify(bonitaClient).importOrganization(organization, OrganizationImportPolicy.MERGE_DUPLICATES);
-    //        inOrder.verify(bonitaClient).logout();
     //    }
     //
     //    @Test

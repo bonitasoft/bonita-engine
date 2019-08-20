@@ -13,17 +13,23 @@
  **/
 package org.bonitasoft.engine.business.application;
 
-
 /**
  * Contains available policies during {@link Application}s import
+ * 
  * @author Elias Ricken de Medeiros
  * @see org.bonitasoft.engine.business.application.Application
  */
 public enum ApplicationImportPolicy {
 
     /**
-     * Import will fail on import an existent {@link org.bonitasoft.engine.business.application.Application} or {@link org.bonitasoft.engine.business.application.ApplicationPage}
+     * Import will fail on import an existent {@link org.bonitasoft.engine.business.application.Application} or
+     * {@link org.bonitasoft.engine.business.application.ApplicationPage}
      */
-    FAIL_ON_DUPLICATES
+    FAIL_ON_DUPLICATES,
+
+    /**
+     * Import will replace the applications that exist with the same token.
+     */
+    REPLACE_DUPLICATES
 
 }

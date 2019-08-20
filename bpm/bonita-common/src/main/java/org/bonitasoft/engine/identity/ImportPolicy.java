@@ -38,9 +38,6 @@ public enum ImportPolicy {
     /**
      * Existing items are kept
      */
-    IGNORE_DUPLICATES;
+    IGNORE_DUPLICATES
 
-    public static ImportPolicy fromName(String policyName) {
-        return ImportPolicy.valueOf(policyName);
-    }
 }
