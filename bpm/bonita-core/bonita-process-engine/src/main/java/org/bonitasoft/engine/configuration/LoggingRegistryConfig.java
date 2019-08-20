@@ -13,22 +13,14 @@
  **/
 package org.bonitasoft.engine.configuration;
 
-import org.springframework.context.annotation.Conditional;
+import io.micrometer.core.instrument.step.StepRegistryConfig;
 
-/**
- * @author Danila Mazour
- */
+public interface LoggingRegistryConfig extends StepRegistryConfig {
+    LoggingRegistryConfig DEFAULT = k -> null;
 
-@Conditional(OnPropertyCondition.class)
-public @interface ConditionalOnProperty {
-
-    /**
-     * The name of the boolean property that activate the target class
-     */
-    String value();
-
-    boolean enableIfMissing();
-
-
+    @Override
+    default String prefix() {
+        return "logging";
+    }
 
 }

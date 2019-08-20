@@ -73,6 +73,7 @@ dependencies {
     testCompile "org.springframework:spring-test:${Deps.springVersion}"
     compileOnly project(':engine:bpm:bonita-common')
     testCompile project(':engine:bpm:bonita-common')
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
 }
 jaxb {
     schemaGen {
