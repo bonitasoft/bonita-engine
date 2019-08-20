@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.configuration;
 
 import static io.micrometer.core.instrument.Clock.SYSTEM;
+import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
 import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
@@ -38,7 +39,11 @@ public class MeterConfiguration {
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + "logging.enable", enableIfMissing = false)
     public LoggingMeterRegistry loggingMeterRegistry(LoggingRegistryConfig loggingRegistryConfig) {
-        return new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
+        LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
+        //deny all meters that are not bonita related
+        registry.config()
+                .meterFilter(denyUnless(id -> id.getName().startsWith("org.bonitasoft.engine.")));
+        return registry;
     }
 
     @Bean
