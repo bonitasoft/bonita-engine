@@ -92,20 +92,18 @@ public class ApplicationIT extends TestWithTechnicalUser {
                 .searchApplications(getApplicationSearchOptionsOrderById(0, 10)).getResult();
         assertThat(insertedApplicationList).hasSize(1);
         assertThat(insertedApplicationList.get(0).getDisplayName()).isEqualToIgnoringCase("Loan request");
+
+        // We must be able to redeploy the same application:
+        getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
     }
 
     private byte[] createCompleteApplication() throws IOException {
         return zip(
-                //    file("deploy.json", resource("/complete_app/deploy.json")),
-                // file("organization/ACME.xml", resource("/complete_app/Organization_Data.xml")),
                 file("applications/Application_Data.xml", resource("/complete_app/Application_Data.xml")),
-                //    file("profiles/profile1.xml", resource("/complete_app/profile1.xml")),
                 file("pages/page1.zip", resource("/complete_app/page1.zip")),
                 file("processes/myProcess--1.0.bar", resource("/complete_app/myProcess--1.0.bar")),
                 file("extensions/resourceNameRestAPI-1.0.0.zip",
                         resource("/complete_app/resourceNameRestAPI-1.0.0.zip")),
-                file("bdm/bdm.zip", resource("/complete_app/bdm.zip")),
-                //    file("bdm/bdm_access_control.xml", resource("/complete_app/bdm_access_control.xml")),
                 file("layouts/layout.zip", resource("/complete_app/layout.zip")),
                 file("themes/custom-theme.zip", resource("/complete_app/custom-theme.zip")));
     }

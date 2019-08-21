@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Application;
-import org.bonitasoft.engine.api.impl.projectdeployer.model.BusinessDataModel;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Layout;
-import org.bonitasoft.engine.api.impl.projectdeployer.model.Organization;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Page;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.Process;
 import org.bonitasoft.engine.api.impl.projectdeployer.model.RestAPIExtension;
@@ -51,23 +47,17 @@ import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.identity.ImportPolicy;
-import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.io.FileOperations;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.tenant.TenantResourceState;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -87,8 +77,6 @@ public class Deployer {
     private final ApplicationArchiveReader applicationArchiveReader;
     private final ArtifactValidator artifactValidator;
     private final PageAPI pageAPI;
-    private final IdentityAPI identityAPI;
-    private final TenantAdministrationAPI tenantAdministrationAPI;
     private final ApplicationAPI applicationAPI;
     private final ProcessAPI processAPI;
 
@@ -96,16 +84,11 @@ public class Deployer {
         try (ApplicationArchive applicationArchive = applicationArchiveReader.read(applicationArchiveFile)) {
             final long startPoint = System.currentTimeMillis();
             log.info("Starting Application Archive deployment...");
-            //            inSession(() -> {
-            //            deployOrganization(applicationArchive);
-            //                deployProfiles(applicationArchive);
-            //            deployBDM(applicationArchive);
-            //                deployBdmAccessControl(applicationArchive);
             deployPages(applicationArchive);
             deployLayouts(applicationArchive);
             deployThemes(applicationArchive);
             deployRestApiExtensions(applicationArchive);
-            deployApplications(applicationArchive);
+            deployLivingApplications(applicationArchive);
             deployProcesses(applicationArchive);
 
             log.info("The Application Archive has been deployed successfully in {} ms.",
@@ -115,14 +98,7 @@ public class Deployer {
         }
     }
 
-    //    private void deployProfiles(ApplicationArchive applicationArchive) throws IOException, ClientException {
-    //        for (Profile profile : applicationArchive.getDeploymentDescriptor().getProfiles()) {
-    //            bonitaClient.importProfiles(applicationArchive.getFile(profile), profile.getPolicy());
-    //        }
-    //    }
-    //
-
-    private void deployApplications(ApplicationArchive applicationArchive)
+    private void deployLivingApplications(ApplicationArchive applicationArchive)
             throws InvalidArtifactException, IOException, AlreadyExistsException,
             ImportException {
         log.info("Deploying applications...");
@@ -133,21 +109,6 @@ public class Deployer {
             applicationAPI.importApplications(
                     Files.readAllBytes(Paths.get(applicationArchiveFile.toString())),
                     ApplicationImportPolicy.valueOf(application.getPolicy().name()));
-        }
-    }
-
-    void deployOrganization(ApplicationArchive applicationArchive)
-            throws OrganizationImportException, IOException, InvalidArtifactException {
-        Organization organization = applicationArchive.getDeploymentDescriptor().getOrganization();
-        if (organization != null) {
-            File applicationArchiveFile = applicationArchive.getFile(organization);
-            artifactValidator.validateOrganizationType(applicationArchiveFile);
-            String organizationContent = FileOperations.read(applicationArchiveFile);
-            log.info("Deploying organization ...");
-            identityAPI.importOrganizationWithWarnings(organizationContent,
-                    ImportPolicy.valueOf(organization.getPolicy().name()));
-        } else {
-            log.warn("There is no organisation file in the archive");
         }
     }
 
@@ -217,13 +178,6 @@ public class Deployer {
         return name;
     }
 
-    //    private void deployApplications(ApplicationArchive applicationArchive)
-    //            throws IOException, ClientException {
-    //        for (Application application : applicationArchive.getDeploymentDescriptor().getApplications()) {
-    //            bonitaClient.importApplications(applicationArchive.getFile(application), application.getPolicy());
-    //        }
-    //    }
-
     private void deployProcesses(ApplicationArchive applicationArchive)
             throws InvalidBusinessArchiveFormatException, IOException, ProcessDeployException {
 
@@ -243,11 +197,12 @@ public class Deployer {
                     // if it already exists, replace it with the new version:
                     final long existingProcessDefinitionId = processAPI.getProcessDefinitionId(processName,
                             processVersion);
-                    deleteExistingProcess(existingProcessDefinitionId);
+                    deleteExistingProcess(existingProcessDefinitionId, processName, processVersion);
                     processDefinition = processAPI.deploy(businessArchive);
-                } catch (ProcessDefinitionNotFoundException | ProcessActivationException | DeletionException
-                        | AlreadyExistsException | SearchException ex) {
-                    log.info("Cannot properly replace process {} ({}). Skipping.", processName, processVersion);
+                } catch (ProcessDefinitionNotFoundException | DeletionException | AlreadyExistsException
+                        | SearchException ex) {
+                    log.info("Cannot properly replace process {} ({}) because {}. Skipping.", processName,
+                            processVersion, ex.getMessage());
                     return;
                 }
             }
@@ -269,10 +224,13 @@ public class Deployer {
         }
     }
 
-    private void deleteExistingProcess(long processDefinitionId)
-            throws DeletionException, SearchException, ProcessActivationException, ProcessDefinitionNotFoundException {
-
-        processAPI.disableProcess(processDefinitionId);
+    private void deleteExistingProcess(long processDefinitionId, String processName, String processVersion)
+            throws DeletionException, SearchException, ProcessDefinitionNotFoundException {
+        try {
+            processAPI.disableProcess(processDefinitionId);
+        } catch (ProcessActivationException e) {
+            log.debug("Process {} ({}) is disabled.", processName, processVersion);
+        }
 
         final SearchOptions options = new SearchOptionsBuilder(0, 100)
                 .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId).done();
@@ -296,38 +254,6 @@ public class Deployer {
         processAPI.deleteProcessDefinition(processDefinitionId);
 
     }
-
-    private void deployBDM(ApplicationArchive applicationArchive)
-            throws IOException, BusinessDataRepositoryDeploymentException, UpdateException,
-            InvalidBusinessDataModelException {
-        BusinessDataModel bdm = applicationArchive.getDeploymentDescriptor().getBusinessDataModel();
-        if (bdm != null) {
-            try {
-                if (!tenantAdministrationAPI.isPaused()) {
-                    tenantAdministrationAPI.pause();
-                }
-                // TODO: in SP, also uninstall BDM Access Control here
-                if (tenantAdministrationAPI.getBusinessDataModelResource()
-                        .getState() == TenantResourceState.INSTALLED) {
-                    tenantAdministrationAPI.uninstallBusinessDataModel();
-                }
-                tenantAdministrationAPI
-                        .installBusinessDataModel(Files.readAllBytes(applicationArchive.getFile(bdm).toPath()));
-            } finally {
-                if (tenantAdministrationAPI.isPaused()) {
-                    tenantAdministrationAPI.resume();
-                }
-            }
-        }
-    }
-
-    //    private void deployBdmAccessControl(ApplicationArchive applicationArchive)
-    //            throws ClientException, IOException {
-    //        BdmAccessControl bdmAccessControl = applicationArchive.getDeploymentDescriptor().getBdmAccessControl();
-    //        if (bdmAccessControl != null) {
-    //            bonitaClient.importBdmAccessControl(applicationArchive.getFile(bdmAccessControl.getFile()));
-    //        }
-    //    }
 
     org.bonitasoft.engine.page.Page getPage(String urlToken) throws SearchException {
         final SearchResult<org.bonitasoft.engine.page.Page> pages = pageAPI
