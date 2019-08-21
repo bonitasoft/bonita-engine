@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.application;
 
-import static org.bonitasoft.engine.api.impl.projectdeployer.validator.ArtifactValidatorFactory.artifactValidator;
+import static org.bonitasoft.engine.api.impl.application.deployer.validator.ArtifactValidatorFactory.artifactValidator;
 
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.impl.projectdeployer.ApplicationArchiveReader;
-import org.bonitasoft.engine.api.impl.projectdeployer.Deployer;
+import org.bonitasoft.engine.api.impl.application.deployer.ApplicationArchiveReader;
+import org.bonitasoft.engine.api.impl.application.deployer.Deployer;
 import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
