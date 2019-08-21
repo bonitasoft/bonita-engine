@@ -88,7 +88,7 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
             }
             // ignored
         } catch (SBonitaException e) {
-            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, "Error in importing the actor-mapping", e);
+            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, "Error in importing the actor-mapping: " + e.getMessage());
         }
         return checkResolution(actorMappingService, processDefinition.getId()).isEmpty();
     }
