@@ -17,9 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 
-import java.io.File;
-import java.nio.file.Files;
-
+import org.bonitasoft.engine.io.FileAndContent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -35,10 +33,11 @@ public class ThemeDetectorTest {
     @Test
     public void isCompliant_should_accept_if_theme_css_file_exists() throws Exception {
         // given:
-        final File file = new File(this.getClass().getResource("/custom-theme.zip").toURI());
+        final byte[] content = zip(file("page.properties", "name=custompage_test1\ncontentType=theme"),
+                file("resources/theme.css", "someContent"));
 
         // when:
-        final boolean compliant = new ThemeDetector().isCompliant(file);
+        final boolean compliant = new ThemeDetector().isCompliant(new FileAndContent("custom-theme.zip", content));
 
         // then:
         assertThat(compliant).isTrue();
@@ -47,7 +46,9 @@ public class ThemeDetectorTest {
     @Test
     public void isCompliant_should_reject_if_page_is_not_a_theme() throws Exception {
         // given:
-        final File file = new File(this.getClass().getResource("/layout.zip").toURI());
+        final FileAndContent file = file("layout.zip",
+                zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
+                        file("resources/index.html", "someContent")));
 
         // when:
         final boolean compliant = new ThemeDetector().isCompliant(file);
@@ -60,11 +61,9 @@ public class ThemeDetectorTest {
     public void isCompliant_should_reject_theme_css_file_absence() throws Exception {
         // given:
         byte[] zip = zip(file("page.properties", "contentType=theme"));
-        final File file = tempFolder.newFile("invalid-theme.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = new ThemeDetector().isCompliant(file);
+        final boolean compliant = new ThemeDetector().isCompliant(new FileAndContent("invalid-theme.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();

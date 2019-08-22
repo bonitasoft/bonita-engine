@@ -23,12 +23,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.bonitasoft.engine.io.FileAndContent;
+
 public class CustomPageDetector {
 
     private static final String CONTENT_TYPE_PROPERTY = "contentType";
     private static final String PAGE_PROPERTIES_FILE = "page.properties";
 
-    public boolean isCompliant(File file, String... contentTypes) {
+    public boolean isCompliant(FileAndContent file, String... contentTypes) {
         return getPageProperties(file)
                 .map(properties -> properties.getProperty(CONTENT_TYPE_PROPERTY))
                 .filter(Objects::nonNull)
@@ -36,9 +38,9 @@ public class CustomPageDetector {
                 .isPresent();
     }
 
-    private Optional<Properties> getPageProperties(File file) {
+    private Optional<Properties> getPageProperties(FileAndContent file) {
         try {
-            byte[] fileFromZip = getFileFromZip(file, PAGE_PROPERTIES_FILE);
+            byte[] fileFromZip = getFileFromZip(file.getContent(), PAGE_PROPERTIES_FILE);
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(fileFromZip));
             return Optional.of(properties);
@@ -47,9 +49,9 @@ public class CustomPageDetector {
         }
     }
 
-    public boolean isFilePresent(File file, String filename) {
+    public boolean isFilePresent(FileAndContent file, String filename) {
         try {
-            getFileFromZip(file, filename);
+            getFileFromZip(file.getContent(), filename);
             return true;
         } catch (IOException e) {
             return false;

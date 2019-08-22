@@ -20,6 +20,7 @@ import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import java.io.File;
 import java.nio.file.Files;
 
+import org.bonitasoft.engine.io.FileAndContent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,11 +40,9 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=toto"),
                 file("resources/index.html", "anything"));
-        final File file = tempFolder.newFile("myPage.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(file);
+        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();
@@ -54,11 +53,9 @@ public class PageAndFormDetectorTest {
         // given:
         final PageAndFormDetector detector = new PageAndFormDetector();
         byte[] zip = zip(file("page.properties", "contentType=layout"));
-        final File file = tempFolder.newFile("myPage.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(file);
+        final boolean compliant = detector.isCompliant(new FileAndContent("myPage.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();
@@ -70,11 +67,9 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=page"),
                 file("resources/index.html", "some HTML content"));
-        final File file = tempFolder.newFile("myPage.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = new PageAndFormDetector().isCompliant(file);
+        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myPage.zip", zip));
 
         // then:
         assertThat(compliant).isTrue();
@@ -86,11 +81,9 @@ public class PageAndFormDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=form"),
                 file("resources/Index.groovy", "some Groovy content"));
-        final File file = tempFolder.newFile("myGroovyForm.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = new PageAndFormDetector().isCompliant(file);
+        final boolean compliant = new PageAndFormDetector().isCompliant(new FileAndContent("myGroovyForm.zip", zip));
 
         // then:
         assertThat(compliant).isTrue();

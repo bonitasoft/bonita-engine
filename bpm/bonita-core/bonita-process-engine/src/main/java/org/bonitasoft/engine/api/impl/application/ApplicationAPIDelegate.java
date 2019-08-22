@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl.application;
 
-import static org.bonitasoft.engine.api.impl.application.deployer.validator.ArtifactValidatorFactory.artifactValidator;
-
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
@@ -40,13 +38,11 @@ public class ApplicationAPIDelegate {
         final APIAccessResolver apiAccessResolver = getApiAccessResolver();
         final Deployer deployer = Deployer.builder()
                 .pageAPI(getApi(apiAccessResolver, PageAPI.class))
-                .applicationAPI(getApi(apiAccessResolver, ApplicationAPI.class))
+                .livingApplicationAPI(getApi(apiAccessResolver, ApplicationAPI.class))
                 .processAPI(getApi(apiAccessResolver, ProcessAPI.class))
-                .applicationArchiveReader(new ApplicationArchiveReader(artifactValidator()))
-                .artifactValidator(artifactValidator())
+                .applicationArchiveReader(new ApplicationArchiveReader())
                 .build();
-        deployer.deploy(applicationArchive);
-        return ExecutionResult.OK;
+        return deployer.deploy(applicationArchive);
     }
 
     @SuppressWarnings("unchecked")
