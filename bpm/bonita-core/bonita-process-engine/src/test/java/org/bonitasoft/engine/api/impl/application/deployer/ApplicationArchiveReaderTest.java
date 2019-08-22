@@ -14,15 +14,13 @@
 package org.bonitasoft.engine.api.impl.application.deployer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.bonitasoft.engine.io.FileAndContentUtils.*;
+import static org.bonitasoft.engine.io.FileAndContentUtils.file;
+import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.bonitasoft.engine.io.FileOperations.asInputStream;
-import static org.bonitasoft.engine.api.impl.application.deployer.validator.ArtifactValidatorFactory.artifactValidator;
 
-import java.io.InputStream;
+import java.io.IOException;
 
-import org.bonitasoft.engine.api.impl.application.deployer.model.Application;
-import org.junit.After;
+import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 
 /**
@@ -30,96 +28,90 @@ import org.junit.Test;
  */
 public class ApplicationArchiveReaderTest {
 
-    private ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader(artifactValidator());
-    private ApplicationArchive applicationArchive;
-
-    @After
-    public void after() throws Exception {
-        if (applicationArchive != null) {
-            applicationArchive.close();
-        }
-    }
+    private ApplicationArchiveReader applicationArchiveReader = new ApplicationArchiveReader();
 
     @Test
-    public void should_throw_exception_when_inputstream_is_not_a_zip() {
-        InputStream byteArrayInputStream = asInputStream(new byte[] { 1, 2, 3 });
-
-        Throwable thrown = catchThrowable(() -> applicationArchiveReader.read(byteArrayInputStream));
-
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Application archive is empty or is not a valid file");
-    }
-
-    @Test
-    public void should_generate_descriptor_when_archive_do_not_contains_descriptor() throws Exception {
-        byte[] zip = zip(file("MyApp.xml", "<applications></applications>"));
-        InputStream byteArrayInputStream = asInputStream(zip);
-
-        applicationArchive = applicationArchiveReader.read(byteArrayInputStream);
-
-        assertThat(applicationArchive.getDeploymentDescriptor()).isNotNull();
-    }
-
-    @Test
-    public void should_read_application_from_zip() throws Exception {
-        byte[] zip = zip(file("deploy.json", "{}"), file("apps/MyApp.xml", "<applications></applications>"));
-
-        applicationArchive = applicationArchiveReader.read(asInputStream(zip));
-
-        assertThat(applicationArchive.getDeploymentDescriptor()).isNotNull();
-    }
-
-    @Test
-    public void should_read_application_with_applicationFile_as_stream() throws Exception {
-        String deployJsonContent = "{\n" +
-                " \"name\":\"LeaveRequest\",\n" +
-                " \"version\":\"1.0.0-SNAPSHOT\",\n" +
-                " \"description\":\"Description of foo is bar\",\n" +
-                " \"targetVersion\":\"7.2.0\",\n" +
-                " \"applications\":[\n" +
-                "  {\n" +
-                "   \"file\":\"apps/MyApp.xml\",\n" +
-                "   \"policy\":\"FAIL_ON_DUPLICATES\"\n" +
-                "  }\n" +
-                " ],\n" +
-                " \"modelVersion\":\"0.1\"\n" +
-                "}";
-        byte[] zip = zip(file("deploy.json", deployJsonContent),
-                directory("apps/"),
+    public void should_read_application_archive_with_a_live_application() throws Exception {
+        byte[] zip = zip(
                 file("apps/MyApp.xml",
                         "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>"));
 
-        applicationArchive = applicationArchiveReader.read(asInputStream(zip));
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
-        Application application = applicationArchive.getDeploymentDescriptor().getApplications().get(0);
-        assertThat(applicationArchive.getFile(application.getFile())).hasContent(
-                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
+        assertThat(applicationArchive.getApplications()).hasOnlyOneElementSatisfying(a -> {
+            assertThat(a.getFileName()).isEqualTo("MyApp.xml");
+            assertThat(new String(a.getContent())).contains(
+                    "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
+        });
     }
 
     @Test
-    public void should_read_application_with_applicationFile_as_file() throws Exception {
-        String deployJsonContent = "{\n" +
-                " \"name\":\"LeaveRequest\",\n" +
-                " \"version\":\"1.0.0-SNAPSHOT\",\n" +
-                " \"description\":\"Description of foo is bar\",\n" +
-                " \"targetVersion\":\"7.2.0\",\n" +
-                " \"applications\":[\n" +
-                "  {\n" +
-                "   \"file\":\"apps/MyApp.xml\",\n" +
-                "   \"policy\":\"FAIL_ON_DUPLICATES\"\n" +
-                "  }\n" +
-                " ],\n" +
-                " \"modelVersion\":\"0.1\"\n" +
-                "}";
-        byte[] zip = zip(file("deploy.json", deployJsonContent),
-                file("apps/MyApp.xml",
-                        "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>"));
+    public void should_read_application_archive_with_pages() throws IOException {
+        byte[] zip = zip(
+                file("pages/myCustomPage1.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=page"), file("resources/index.html", "someContent"))),
+                file("pages/myCustomPage2.zip", zip(file("page.properties", "name=custompage_test2\ncontentType=page"), file("resources/Index.groovy", "someContent"))),
+                file("pages/myCustomPage3.zip", zip(file("page.properties", "name=custompage_test3\ncontentType=page"))) //ignored, no index
+        );
 
-        applicationArchive = applicationArchiveReader.read(zip);
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(zip);
 
-        Application application = applicationArchive.getDeploymentDescriptor().getApplications().get(0);
-        assertThat(applicationArchive.getFile(application.getFile())).hasContent(
-                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>");
+        assertThat(applicationArchive.getPages()).hasSize(2)
+                .extracting("fileName", "content")
+                .containsExactly(
+                        new Tuple("myCustomPage1.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=page"), file("resources/index.html", "someContent"))),
+                        new Tuple("myCustomPage2.zip", zip(file("page.properties", "name=custompage_test2\ncontentType=page"), file("resources/Index.groovy", "someContent")))
+                );
     }
 
+    @Test
+    public void should_read_application_archive_with_layout() throws IOException {
+        byte[] layout = zip(file("page.properties", "name=custompage_test1\ncontentType=layout"), file("resources/index.html", "someContent"));
+        byte[] zip = zip(
+                file("layout.zip", layout)
+        );
+
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
+
+        assertThat(applicationArchive.getLayouts())
+                .containsExactly(file("layout.zip", layout));
+    }
+
+    @Test
+    public void should_read_application_archive_with_theme() throws IOException {
+        byte[] themeContent = zip(file("page.properties", "name=custompage_test1\ncontentType=theme"), file("resources/theme.css", "someContent"));
+        byte[] zip = zip(
+                file("theme.zip", themeContent)
+        );
+
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
+
+        assertThat(applicationArchive.getThemes())
+                .containsExactly(file("theme.zip", themeContent));
+    }
+
+    @Test
+    public void should_read_application_archive_with_apiExtension() throws IOException {
+        byte[] apiExtensionContent = zip(file("page.properties", "name=custompage_test1\ncontentType=apiExtension"));
+        byte[] zip = zip(
+                file("apiExtension.zip", apiExtensionContent)
+        );
+
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
+
+        assertThat(applicationArchive.getRestAPIExtensions())
+                .containsExactly(file("apiExtension.zip", apiExtensionContent));
+    }
+
+    @Test
+    public void should_read_application_archive_with_process() throws IOException {
+        byte[] barContent = zip(file("process-design.xml", "<process xmlns=\"http://www.bonitasoft.org/ns/process/client/\"></process>"));
+        byte[] zip = zip(
+                file("myprocess.bar", barContent)
+        );
+
+        ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
+
+        assertThat(applicationArchive.getProcesses())
+                .containsExactly(file("myprocess.bar", barContent));
+    }
 }

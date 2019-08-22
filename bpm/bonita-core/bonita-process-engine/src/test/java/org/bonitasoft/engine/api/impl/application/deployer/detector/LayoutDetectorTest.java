@@ -17,9 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 
-import java.io.File;
-import java.nio.file.Files;
-
+import org.bonitasoft.engine.io.FileAndContent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,11 +37,9 @@ public class LayoutDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=toto"),
                 file("resources/index.html", "anything"));
-        final File file = tempFolder.newFile("myLayout.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(file);
+        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();
@@ -56,11 +52,9 @@ public class LayoutDetectorTest {
         byte[] zip = zip(
                 file("page.properties", "contentType=layout"),
                 file("resources/toto.html", "anything"));
-        final File file = tempFolder.newFile("myLayout.zip");
-        Files.write(file.toPath(), zip);
 
         // when:
-        final boolean compliant = detector.isCompliant(file);
+        final boolean compliant = detector.isCompliant(new FileAndContent("myLayout.zip", zip));
 
         // then:
         assertThat(compliant).isFalse();
@@ -69,7 +63,7 @@ public class LayoutDetectorTest {
     @Test
     public void isCompliant_should_accept_valid_layout() throws Exception {
         // given:
-        final File file = new File(this.getClass().getResource("/layout.zip").toURI());
+        final FileAndContent file = file("layout.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=layout"), file("resources/index.html", "someContent")));
 
         // when:
         final boolean compliant = new LayoutDetector().isCompliant(file);

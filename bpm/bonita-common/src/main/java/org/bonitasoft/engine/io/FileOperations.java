@@ -55,6 +55,10 @@ public class FileOperations {
         }
     }
 
+    public static byte[] getFileFromZip(byte[] content, String filePath) throws IOException {
+        return getFileFromZip(new ByteArrayInputStream(content), filePath);
+    }
+
     public static byte[] getFileFromZip(InputStream inputStream, String filePath) throws IOException {
         try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry zipEntry;
@@ -89,12 +93,12 @@ public class FileOperations {
         }
     }
 
-    public static boolean isBarFile(File file) {
-        return file.getName().endsWith(".bar");
+    public static boolean isBarFile(String fileName) {
+        return fileName.endsWith(".bar");
     }
 
-    public static boolean isXmlFile(File file) {
-        return file.getName().endsWith(".xml");
+    public static boolean isXmlFile(String fileName) {
+        return fileName.endsWith(".xml");
     }
 
     public static boolean isZipFile(File file) {
@@ -113,7 +117,9 @@ public class FileOperations {
         return FileOperations.class.getResourceAsStream(name);
     }
 
-    /** Gets the contents of a classpath resource as a byte array. */
+    /**
+     * Gets the contents of a classpath resource as a byte array.
+     */
     public static byte[] resourceAsBytes(String name) throws IOException {
         return FileOperations.readFully(resource(name));
     }

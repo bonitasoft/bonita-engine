@@ -19,6 +19,8 @@ import static org.bonitasoft.engine.io.FileOperations.isBarFile;
 import java.io.File;
 import java.io.IOException;
 
+import org.bonitasoft.engine.io.FileAndContent;
+
 public class ProcessDetector {
 
     private static final String PROCESS_DEFINITION_NAMESPACE = "http://www.bonitasoft.org/ns/process/client/";
@@ -30,10 +32,10 @@ public class ProcessDetector {
         this.xmlDetector = xmlDetector;
     }
 
-    public boolean isCompliant(File file) {
-        if (isBarFile(file)) {
+    public boolean isCompliant(FileAndContent file) {
+        if (isBarFile(file.getFileName())) {
             try {
-                byte[] processDesignContent = getFileFromZip(file, PROCESS_DESIGN_DEFINITION);
+                byte[] processDesignContent = getFileFromZip(file.getContent(), PROCESS_DESIGN_DEFINITION);
                 return xmlDetector.isCompliant(processDesignContent, PROCESS_DEFINITION_NAMESPACE);
             } catch (IOException e) {
                 // ignore

@@ -19,60 +19,32 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.bonitasoft.engine.api.impl.application.deployer.descriptor.DeploymentDescriptorReader;
-import org.bonitasoft.engine.api.impl.application.deployer.validator.ArtifactValidator;
-import org.bonitasoft.engine.api.impl.application.deployer.validator.InvalidArtifactException;
+import org.bonitasoft.engine.api.impl.application.deployer.detector.ArtifactTypeDetectorFactory;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta.
  */
 public class ApplicationArchiveReader {
 
-    private ArtifactValidator artifactValidator;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationArchiveReader.class);
-
-    public ApplicationArchiveReader(ArtifactValidator validator) {
-        this.artifactValidator = validator;
-    }
-
-    public ApplicationArchive read(byte[] applicationArchiveFile) throws IOException, InvalidArtifactException {
+    public ApplicationArchive read(byte[] applicationArchiveFile) throws IOException {
         try (InputStream inputStream = new ByteArrayInputStream(applicationArchiveFile)) {
             return read(inputStream);
         }
     }
 
     @VisibleForTesting
-    ApplicationArchive read(InputStream inputStream) throws IOException, InvalidArtifactException {
+    ApplicationArchive read(InputStream inputStream) throws IOException {
+        ApplicationArchive.ApplicationArchiveBuilder builder = ApplicationArchive.builder();
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-        ApplicationArchive applicationArchive = new ApplicationArchive();
         ZipEntry zipEntry;
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-            if (zipEntry.getName().equals("deploy.json")) {
-                applicationArchive.setDeploymentDescriptor(new DeploymentDescriptorReader().fromJson(zipInputStream));
-            } else if (!zipEntry.isDirectory()) {
-                applicationArchive.addFile(zipEntry.getName(), zipInputStream);
+            if (!zipEntry.isDirectory()) {
+                ArtifactTypeDetectorFactory.artifactTypeDetector()
+                        .detectAndStore(zipEntry.getName(), zipInputStream, builder);
             }
         }
-        validate(applicationArchive);
-        return applicationArchive;
-    }
-
-    private void validate(ApplicationArchive applicationArchive) throws IOException, InvalidArtifactException {
-        if (applicationArchive.isEmpty()) {
-            applicationArchive.close(); // ensure to free all temp resources
-            throw new IllegalArgumentException("Application archive is empty or is not a valid file");
-        }
-        if (applicationArchive.getDeploymentDescriptor() != null) {
-            LOGGER.info("Starting artifacts validation...");
-            artifactValidator.validate(applicationArchive);
-            LOGGER.info("Artifacts validation completed successfully.");
-        } else {
-            LOGGER.info("No deployment descriptor has been provided");
-            applicationArchive.generateDeploymentDescriptor();
-        }
+        return builder.build();
     }
 
 }

@@ -13,17 +13,18 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DefaultDetectedArtifact;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedApplication;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedLayout;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedPage;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedProcess;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedRestAPIExtension;
-import org.bonitasoft.engine.api.impl.application.deployer.detector.artifact.DetectedTheme;
+import org.bonitasoft.engine.api.impl.application.deployer.ApplicationArchive;
+import org.bonitasoft.engine.io.FileAndContent;
+import org.bonitasoft.engine.io.FileAndContentUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArtifactTypeDetector {
+
+    private static Logger logger = LoggerFactory.getLogger(ArtifactTypeDetector.class);
 
     private static final String APPLICATION_NAMESPACE = "http://documentation.bonitasoft.com/application-xml-schema/1.0";
     private static final String REST_API_EXTENSION_CONTENT_TYPE = "apiExtension";
@@ -45,51 +46,52 @@ public class ArtifactTypeDetector {
         this.layoutDetector = layoutDetector;
     }
 
-    public DefaultDetectedArtifact detect(File file) {
-        String path = file.getAbsolutePath();
-        if (isApplication(file)) {
-            return new DetectedApplication(path);
-        }
-        if (isProcess(file)) {
-            return new DetectedProcess(path);
-        }
-        if (isPage(file)) {
-            return new DetectedPage(path);
-        }
-        if (isLayout(file)) {
-            return new DetectedLayout(path);
-        }
-        if (isTheme(file)) {
-            return new DetectedTheme(path);
-        }
-        if (isRestApiExtension(file)) {
-            return new DetectedRestAPIExtension(path);
-        }
-        return new DefaultDetectedArtifact(path);
-    }
-
-    public boolean isApplication(File file) {
+    public boolean isApplication(FileAndContent file) {
         return xmlDetector.isCompliant(file, APPLICATION_NAMESPACE);
     }
 
-    public boolean isRestApiExtension(File file) {
+    public boolean isRestApiExtension(FileAndContent file) {
         return customPageDetector.isCompliant(file, REST_API_EXTENSION_CONTENT_TYPE);
     }
 
-    public boolean isPage(File file) {
+    public boolean isPage(FileAndContent file) {
         return pageAndFormDetector.isCompliant(file);
     }
 
-    public boolean isLayout(File file) {
+    public boolean isLayout(FileAndContent file) {
         return layoutDetector.isCompliant(file);
     }
 
-    public boolean isTheme(File file) {
+    public boolean isTheme(FileAndContent file) {
         return themeDetector.isCompliant(file);
     }
 
-    public boolean isProcess(File file) {
+    public boolean isProcess(FileAndContent file) {
         return processDetector.isCompliant(file);
     }
 
+    public void detectAndStore(String fileName, InputStream content, ApplicationArchive.ApplicationArchiveBuilder builder) throws IOException {
+        FileAndContent file = FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
+        if (isApplication(file)) {
+            logger.info("Found application file: '{}'. ", file);
+            builder.application(file);
+        } else if (isProcess(file)) {
+            logger.info("Found process file: '{}'. ", file);
+            builder.process(file);
+        } else if (isPage(file)) {
+            logger.info("Found page file: '{}'. ", file);
+            builder.page(file);
+        } else if (isLayout(file)) {
+            logger.info("Found layout file: '{}'. ", file);
+            builder.layout(file);
+        } else if (isTheme(file)) {
+            logger.info("Found theme file: '{}'. ", file);
+            builder.theme(file);
+        } else if (isRestApiExtension(file)) {
+            logger.info("Found rest api extension file: '{}'. ", file);
+            builder.restAPIExtension(file);
+        } else {
+            logger.warn("Ignoring file '{}'.", fileName);
+        }
+    }
 }

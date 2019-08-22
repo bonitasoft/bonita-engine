@@ -13,33 +13,48 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static java.util.Collections.emptyList;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
-import static org.bonitasoft.engine.io.FileOperations.asInputStream;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.PageAPI;
-import org.bonitasoft.engine.api.impl.application.deployer.descriptor.DeploymentDescriptor;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Application;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Page;
-import org.bonitasoft.engine.api.impl.application.deployer.model.RestAPIExtension;
-import org.bonitasoft.engine.api.impl.application.deployer.policies.ApplicationImportPolicy;
-import org.bonitasoft.engine.api.impl.application.deployer.validator.ArtifactValidator;
-import org.bonitasoft.engine.api.impl.application.deployer.validator.InvalidArtifactException;
-import org.bonitasoft.engine.exception.DeployerException;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDefinitionImpl;
+import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.io.FileAndContent;
+import org.bonitasoft.engine.io.FileOperations;
+import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -52,192 +67,128 @@ public class DeployerTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private ApplicationArchiveReader applicationArchiveReader = spy(new ApplicationArchiveReader(
-            mock(ArtifactValidator.class)));
+    private ApplicationArchiveReader applicationArchiveReader = spy(new ApplicationArchiveReader());
 
     @Mock
     private PageAPI pageAPI;
-
-    @Captor
-    private ArgumentCaptor<File> fileCaptor;
-
-    @Captor
-    private ArgumentCaptor<ApplicationImportPolicy> applicationImportPolicyArgumentCaptor;
+    @Mock
+    private ApplicationAPI livingApplicationAPI;
+    @Mock
+    private ProcessAPI processAPI;
 
     private Deployer deployer;
 
     @Before
     public void before() throws Exception {
-        //                applicationArchiveFile = temporaryFolder.newFile();
-
-        deployer = spy(new Deployer.DeployerBuilder()
+        deployer = new Deployer.DeployerBuilder()
                 .pageAPI(pageAPI)
+                .livingApplicationAPI(livingApplicationAPI)
+                .processAPI(processAPI)
                 .applicationArchiveReader(applicationArchiveReader)
-                .artifactValidator(mock(ArtifactValidator.class))
-                .build());
-        doReturn(null).when(deployer).getPage(anyString());
+                .build();
+        doReturn(new SearchResultImpl<Page>(0, emptyList())).when(pageAPI).searchPages(any());
     }
 
     @Test
-    public void should_deploy_application_containing_1_page() throws Exception {
-        String deployJsonContent = "{\n" +
-                " \"name\":\"LeaveRequest\",\n" +
-                " \"version\":\"1.0.0-SNAPSHOT\",\n" +
-                " \"description\":\"Description of foo is bar\",\n" +
-                " \"targetVersion\":\"7.10.0\",\n" +
-                " \"pages\":[\n" +
-                "  {\n" +
-                "   \"file\":\"pages/myCustomPage.zip\"\n" +
-                "  }\n" +
-                " ],\n" +
-                " \"modelVersion\":\"0.1\"\n" +
-                "}";
-        final byte[] customPageZipFile = zip(
-                file("page.properties", "name=custompage_test\ncontentType=page"));
-        byte[] applicationZip = zip(
-                file("deploy.json", deployJsonContent),
-                file("pages/myCustomPage.zip", asInputStream(customPageZipFile)));
+    public void should_deploy_application_containing_all_kind_of_custom_pages() throws Exception {
+        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                .page(new FileAndContent("page.zip", zip(file("page.properties", "name=page"))))
+                .layout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
+                .theme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
+                .restAPIExtension(new FileAndContent("restApiExtension.zip", zip(file("page.properties", "name=restApiExtension")))).build();
 
-        deployer.deploy(applicationZip);
+        deployer.deploy(applicationArchive);
 
-        verify(pageAPI).createPage("custompage_test", customPageZipFile);
+
+        verify(pageAPI).createPage("page", zip(file("page.properties", "name=page")));
+        verify(pageAPI).createPage("layout", zip(file("page.properties", "name=layout")));
+        verify(pageAPI).createPage("theme", zip(file("page.properties", "name=theme")));
+        verify(pageAPI).createPage("restApiExtension", zip(file("page.properties", "name=restApiExtension")));
+    }
+
+
+    @Test
+    public void should_deploy_application_containing_living_applications() throws Exception {
+        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                .application(new FileAndContent("application.xml", "content".getBytes())).build();
+
+        deployer.deploy(applicationArchive);
+
+        verify(livingApplicationAPI).importApplications("content".getBytes(), ApplicationImportPolicy.REPLACE_DUPLICATES);
     }
 
     @Test
-    public void should_throw_a_wrapped_FileNotFound_if_page_is_not_present()
-            throws IOException, InvalidArtifactException {
-        // given
-        ApplicationArchive applicationArchive = new ApplicationArchive();
-        applicationArchive.setDeploymentDescriptor(new DeploymentDescriptor());
-        doReturn(applicationArchive).when(applicationArchiveReader).read(any(byte[].class));
-        applicationArchive.getDeploymentDescriptor().add(aPage("path_of_the_page"));
+    public void should_deploy_and_enable_resolved_process() throws Exception {
+        byte[] barContent = createValidBusinessArchive();
+        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                .process(new FileAndContent("process.bar", barContent)).build();
+        ProcessDefinition myProcess = aProcessDefinition(123L);
+        doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
+        hasConfigurationState(myProcess, ConfigurationState.RESOLVED);
 
-        // when
-        Throwable thrown = catchThrowable(() -> deployer.deploy(new byte[] {}));
 
-        // then
-        assertThat(thrown).isInstanceOf(DeployerException.class)
-                .hasCauseExactlyInstanceOf(FileNotFoundException.class)
-                .hasMessageStartingWith(
-                        "The Application Archive deploy operation has been aborted - cause: FileNotFoundException - ")
-                .hasMessageEndingWith("path_of_the_page");
+        deployer.deploy(applicationArchive);
+
+        verify(processAPI).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(processAPI).enableProcess(123L);
     }
 
-//    @Test
-//    public void should_deploy_restApi_extension() throws Exception {
-//        applicationArchive.getDeploymentDescriptor().add(aRestAPIExtension("path_to_restApiExtension"));
-//        applicationArchive.addFile("path_to_restApiExtension", asInputStream("restApiExtension content"));
-//
-//        deployer.deploy(applicationArchiveFile);
-//
-//        verify(bonitaClient).importPage(fileCaptor.capture());
-//        assertThat(fileCaptor.getValue()).hasName("path_to_restApiExtension");
-//    }
 
-    //    @Test
-    //    public void should_deploy_artifacts_in_expected_order() throws Exception {
-    //        applicationArchive.addFile("path_to_organization", asInputStream("organization content"));
-    //        applicationArchive.addFile("path_of_the_profile", asInputStream("content of the profile xml"));
-    //        applicationArchive.addFile("path_to_restApiExtension", asInputStream("restApiExtension content"));
-    //        applicationArchive.addFile("theApplicationXmlPath", asInputStream("content of the xml file"));
-    //        applicationArchive.addFile("path_of_the_page", asInputStream("content of the page zip"));
-    //
-    //        applicationArchive.setDeploymentDescriptor(
-    //                DeploymentDescriptor.builder()
-    //                        .profile(aProfile("path_of_the_profile"))
-    //                        .restAPIExtension(aRestAPIExtension("path_to_restApiExtension"))
-    //                        .application(anApplication("theApplicationXmlPath"))
-    //                        .page(aPage("path_of_the_page"))
-    //                        .organization(anOrganization("path_to_organization"))
-    //                        .build());
-    //
-    //        deployer.deploy(applicationArchiveFile);
-    //
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //        inOrder.verify(bonitaClient).importOrganization(fileCaptor.capture(),
-    //                organizationImportPolicyArgumentCaptor.capture());
-    //        inOrder.verify(bonitaClient).importProfiles(fileCaptor.capture(), profilePolicyArgumentCaptor.capture());
-    //        inOrder.verify(bonitaClient, times(2)).importPage(fileCaptor.capture());
-    //        inOrder.verify(bonitaClient).importApplications(fileCaptor.capture(),
-    //                applicationImportPolicyArgumentCaptor.capture());
-    //
-    //        assertThat(fileCaptor.getAllValues()).extracting(File::getName).containsExactlyInAnyOrder(
-    //                "path_to_organization",
-    //                "path_of_the_profile",
-    //                "path_to_restApiExtension",
-    //                "path_of_the_page",
-    //                "theApplicationXmlPath");
-    //    }
-    //
-    //    @Test
-    //    public void should_import_single_api_extension_file() throws Exception {
-    //        File restApiExtension = new File("");
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //
-    //        deployer.deployRestApiExtension(restApiExtension);
-    //
-    //        inOrder.verify(bonitaClient).login(USERNAME, PASSWORD);
-    //        inOrder.verify(bonitaClient).importPage(eq(restApiExtension));
-    //        inOrder.verify(bonitaClient).logout();
-    //    }
-    //
-    //    @Test(expected = IOException.class)
-    //    public void should_throw_exception_when_importing_single_api_extension_file() throws Exception {
-    //        File restApiExtension = new File("");
-    //        doThrow(new IOException()).when(bonitaClient).importPage(any());
-    //
-    //        deployer.deployRestApiExtension(restApiExtension);
-    //    }
-    //
-    //    @Test
-    //    public void should_import_single_applications_file() throws Exception {
-    //        File applications = new File("");
-    //        InOrder inOrder = inOrder(bonitaClient);
-    //
-    //        deployer.deployApplications(applications, ApplicationImportPolicy.REPLACE_DUPLICATES);
-    //
-    //        inOrder.verify(bonitaClient).login(USERNAME, PASSWORD);
-    //        inOrder.verify(bonitaClient).importApplications(applications, ApplicationImportPolicy.REPLACE_DUPLICATES);
-    //        inOrder.verify(bonitaClient).logout();
-    //    }
-    //
-    //    @Test
-    //    public void should_deploy_application_configuration() throws IOException {
-    //        //given:
-    //        Deployer spyDeployer = spy(deployer);
-    //        final File applicationConfigurationFile = temporaryFolder.newFile("application.bconf");
-    //        ApplicationDeployment applicationDeployment = ApplicationDeployment.builder()
-    //                .applicationArchiveFile(null)
-    //                .applicationConfigurationFile(applicationConfigurationFile)
-    //                .build();
-    //
-    //        //when:
-    //        spyDeployer.deploy(applicationDeployment);
-    //
-    //        //then:
-    //        verify(spyDeployer).doBonitaConfigurationDeployment(applicationConfigurationFile);
-    //    }
+    @Test
+    public void should_deploy_only_unresolved_process() throws Exception {
+        byte[] barContent = createValidBusinessArchive();
+        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                .process(new FileAndContent("process.bar", barContent)).build();
+        ProcessDefinition myProcess = aProcessDefinition(123L);
+        doReturn(myProcess).when(processAPI).deploy(any(BusinessArchive.class));
+        hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
 
-    // =================================================================================================================
-    // UTILS
-    // =================================================================================================================
 
-    private static Page aPage(String path) {
-        Page page = new Page();
-        page.setFile(path);
-        return page;
+        deployer.deploy(applicationArchive);
+
+        verify(processAPI).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
+        verify(processAPI, never()).enableProcess(anyLong());
     }
 
-    private static RestAPIExtension aRestAPIExtension(String path) {
-        RestAPIExtension restAPIExtension = new RestAPIExtension();
-        restAPIExtension.setFile(path);
-        return restAPIExtension;
+
+    @Test
+    public void should_replace_existing_process() throws Exception {
+        byte[] barContent = createValidBusinessArchive();
+        ApplicationArchive applicationArchive = ApplicationArchive.builder()
+                .process(new FileAndContent("process.bar", barContent)).build();
+        ProcessDefinition myProcess = aProcessDefinition(123L);
+        when(processAPI.deploy(any(BusinessArchive.class))).thenThrow(new AlreadyExistsException("already exists")).thenReturn(myProcess);
+        doReturn(456L).when(processAPI).getProcessDefinitionId("myProcess", "1.0");
+        hasConfigurationState(myProcess, ConfigurationState.UNRESOLVED);
+        doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchProcessInstances(any());
+        doReturn(new SearchResultImpl<>(0, emptyList())).when(processAPI).searchArchivedProcessInstances(any());
+
+        deployer.deploy(applicationArchive);
+
+        verify(processAPI).disableProcess(456L);
+        verify(processAPI).deleteProcessDefinition(456L);
+        verify(processAPI, times(2)).deploy(ArgumentMatchers.<BusinessArchive>argThat(b -> b.getProcessDefinition().getName().equals("myProcess")));
     }
 
-    private static Application anApplication(String path) {
-        Application application = new Application();
-        application.setFile(path);
-        return application;
+    private ProcessDefinitionImpl aProcessDefinition(long id) {
+        ProcessDefinitionImpl myProcess = new ProcessDefinitionImpl("myProcess", "1.0");
+        myProcess.setId(id);
+        return myProcess;
+    }
+
+
+    private void hasConfigurationState(ProcessDefinition myProcess, ConfigurationState state) throws ProcessDefinitionNotFoundException {
+        ProcessDeploymentInfo processDeploymentInfo = mock(ProcessDeploymentInfo.class);
+        doReturn(state).when(processDeploymentInfo).getConfigurationState();
+        doReturn(processDeploymentInfo).when(processAPI).getProcessDeploymentInfo(myProcess.getId());
+    }
+
+    private byte[] createValidBusinessArchive() throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException, IOException {
+        BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").done()).done();
+        File businessArchiveFile = temporaryFolder.newFile();
+        businessArchiveFile.delete();
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, businessArchiveFile);
+        return FileOperations.readFully(businessArchiveFile);
     }
 
 }

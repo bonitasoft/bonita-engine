@@ -15,6 +15,8 @@ package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
 import java.io.File;
 
+import org.bonitasoft.engine.io.FileAndContent;
+
 /**
  * @author Emmanuel Duchastenier
  */
@@ -23,7 +25,7 @@ public class ThemeDetector extends CustomPageDetector {
     private static final String THEME_CSS = "resources/theme.css";
     private static final String THEME_CONTENT_TYPE = "theme";
 
-    public boolean isCompliant(File file) {
+    public boolean isCompliant(FileAndContent file) {
         return super.isCompliant(file, THEME_CONTENT_TYPE) && isFilePresent(file, THEME_CSS);
     }
 }

@@ -13,106 +13,33 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Comparator;
+import java.util.List;
 
-import org.bonitasoft.engine.api.impl.application.deployer.descriptor.DeploymentDescriptor;
-import org.bonitasoft.engine.api.impl.application.deployer.descriptor.DeploymentDescriptorGenerator;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Application;
-import org.bonitasoft.engine.api.impl.application.deployer.model.CustomPage;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Layout;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Process;
-import org.bonitasoft.engine.api.impl.application.deployer.model.RestAPIExtension;
-import org.bonitasoft.engine.api.impl.application.deployer.model.Theme;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Singular;
+import org.bonitasoft.engine.io.FileAndContent;
 
-/**
- * @author Baptiste Mesta.
- */
-public class ApplicationArchive implements Closeable {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ApplicationArchive {
 
-    private final Path applicationArchiveDir;
-    private DeploymentDescriptor deploymentDescriptor;
+    @Singular
+    private List<FileAndContent> processes;
+    @Singular
+    private List<FileAndContent> restAPIExtensions;
+    @Singular
+    private List<FileAndContent> pages;
+    @Singular
+    private List<FileAndContent> layouts;
+    @Singular
+    private List<FileAndContent> themes;
+    @Singular
+    private List<FileAndContent> applications;
 
-    public ApplicationArchive() throws IOException {
-        applicationArchiveDir = Files.createTempDirectory("applicationArchive");
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (applicationArchiveDir.toFile().exists()) {
-            Files.walk(applicationArchiveDir)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        }
-    }
-
-    public void addFile(String name, InputStream inputStream) throws IOException {
-        Path target = applicationArchiveDir.resolve(name);
-        if (!target.getParent().toFile().exists()) {
-            target.getParent().toFile().mkdirs();
-        }
-        Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    public DeploymentDescriptor getDeploymentDescriptor() {
-        return deploymentDescriptor;
-    }
-
-    public void setDeploymentDescriptor(DeploymentDescriptor deploymentDescriptor) {
-        this.deploymentDescriptor = deploymentDescriptor;
-    }
-
-    public File getFile(String relativePath) throws FileNotFoundException {
-        File file;
-        if (relativePath.startsWith(applicationArchiveDir.toString())) {
-            file = new File(relativePath);
-        } else {
-            file = applicationArchiveDir.resolve(relativePath).toFile();
-        }
-        if (!file.isFile()) {
-            throw new FileNotFoundException(file.getPath());
-        }
-        return file;
-    }
-
-    public File getFile(Application application) throws FileNotFoundException {
-        return getFile(application.getFile());
-    }
-
-    public File getFile(RestAPIExtension restAPIExtension) throws FileNotFoundException {
-        return getFile(restAPIExtension.getFile());
-    }
-
-    public File getFile(CustomPage page) throws FileNotFoundException {
-        return getFile(page.getFile());
-    }
-
-    public File getFile(Process process) throws FileNotFoundException {
-        return getFile(process.getFile());
-    }
-
-    public File getFile(Layout layout) throws FileNotFoundException {
-        return getFile(layout.getFile());
-    }
-
-    public File getFile(Theme theme) throws FileNotFoundException {
-        return getFile(theme.getFile());
-    }
-
-    public void generateDeploymentDescriptor() {
-        deploymentDescriptor = DeploymentDescriptorGenerator.create().fromDirectory(applicationArchiveDir.toFile());
-    }
-
-    public boolean isEmpty() {
-        return applicationArchiveDir.toFile().list().length == 0;
-    }
 
 }

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.io;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -43,6 +44,14 @@ public class FileAndContentUtils {
 
     public static FileAndContent file(String fileName, String content) {
         return new FileAndContent(fileName, content.getBytes());
+    }
+
+    public static FileAndContent file(String fileName, byte[] content) {
+        return new FileAndContent(fileName, content);
+    }
+
+    public static FileAndContent fromFile(File file) throws IOException {
+        return new FileAndContent(file.getName(), FileOperations.readFully(file));
     }
 
     public static FileAndContent directory(String fileName) {

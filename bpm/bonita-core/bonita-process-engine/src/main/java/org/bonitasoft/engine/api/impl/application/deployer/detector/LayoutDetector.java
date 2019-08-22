@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
-import java.io.File;
+import org.bonitasoft.engine.io.FileAndContent;
 
 /**
  * @author Emmanuel Duchastenier
@@ -25,7 +25,7 @@ public class LayoutDetector extends CustomPageDetector {
 
     private static final String LAYOUT_CONTENT_TYPE = "layout";
 
-    public boolean isCompliant(File file) {
+    public boolean isCompliant(FileAndContent file) {
         return super.isCompliant(file, LAYOUT_CONTENT_TYPE)
                 && (isFilePresent(file, INDEX_HTML) || isFilePresent(file, INDEX_GROOVY));
     }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;
 
+import org.bonitasoft.engine.io.FileAndContent;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -33,14 +34,9 @@ public class XmlDetector {
         this.documentBuilder = documentBuilder;
     }
 
-    public boolean isCompliant(File file, String namespace) {
-        if (isXmlFile(file)) {
-            try {
-                byte[] fileContentBytes = readFully(file);
-                return isCompliant(fileContentBytes, namespace);
-            } catch (IOException e) {
-                // ignore
-            }
+    public boolean isCompliant(FileAndContent file, String namespace) {
+        if (isXmlFile(file.getFileName())) {
+            return isCompliant(file.getContent(), namespace);
         }
         return false;
     }

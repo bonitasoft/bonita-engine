@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
-import java.io.File;
+import org.bonitasoft.engine.io.FileAndContent;
 
 /**
  * @author Emmanuel Duchastenier
@@ -26,7 +26,7 @@ public class PageAndFormDetector extends CustomPageDetector {
     private static final String INDEX_GROOVY = "resources/Index.groovy";
     private static final String INDEX_HTML = "resources/index.html";
 
-    public boolean isCompliant(File file) {
+    public boolean isCompliant(FileAndContent file) {
         return super.isCompliant(file, PAGE_CONTENT_TYPE, FORM_CONTENT_TYPE)
                 && (isFilePresent(file, INDEX_HTML) || isFilePresent(file, INDEX_GROOVY));
     }
