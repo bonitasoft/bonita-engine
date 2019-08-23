@@ -73,22 +73,22 @@ public class ArtifactTypeDetector {
     public void detectAndStore(String fileName, InputStream content, ApplicationArchive.ApplicationArchiveBuilder builder) throws IOException {
         FileAndContent file = FileAndContentUtils.file(fileName.substring(fileName.lastIndexOf('/') + 1), content);
         if (isApplication(file)) {
-            logger.info("Found application file: '{}'. ", file);
+            logger.info("Found application file: '{}'. ", file.getFileName());
             builder.application(file);
         } else if (isProcess(file)) {
-            logger.info("Found process file: '{}'. ", file);
+            logger.info("Found process file: '{}'. ", file.getFileName());
             builder.process(file);
         } else if (isPage(file)) {
-            logger.info("Found page file: '{}'. ", file);
+            logger.info("Found page file: '{}'. ", file.getFileName());
             builder.page(file);
         } else if (isLayout(file)) {
-            logger.info("Found layout file: '{}'. ", file);
+            logger.info("Found layout file: '{}'. ", file.getFileName());
             builder.layout(file);
         } else if (isTheme(file)) {
-            logger.info("Found theme file: '{}'. ", file);
+            logger.info("Found theme file: '{}'. ", file.getFileName());
             builder.theme(file);
         } else if (isRestApiExtension(file)) {
-            logger.info("Found rest api extension file: '{}'. ", file);
+            logger.info("Found rest api extension file: '{}'. ", file.getFileName());
             builder.restAPIExtension(file);
         } else {
             logger.warn("Ignoring file '{}'.", fileName);

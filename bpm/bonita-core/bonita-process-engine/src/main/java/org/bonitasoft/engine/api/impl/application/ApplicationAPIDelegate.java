@@ -25,7 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.DeployerException;
+import org.bonitasoft.engine.exception.ApplicationDeploymentException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
@@ -34,7 +34,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  */
 public class ApplicationAPIDelegate {
 
-    public ExecutionResult deployApplication(byte[] applicationArchive) throws DeployerException {
+    public ExecutionResult deployApplication(byte[] applicationArchive) throws ApplicationDeploymentException {
         final APIAccessResolver apiAccessResolver = getApiAccessResolver();
         final Deployer deployer = Deployer.builder()
                 .pageAPI(getApi(apiAccessResolver, PageAPI.class))

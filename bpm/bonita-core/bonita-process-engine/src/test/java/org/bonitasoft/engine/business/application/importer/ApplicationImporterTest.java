@@ -225,8 +225,7 @@ public class ApplicationImporterTest {
         SApplication appToBeImported = mock(SApplication.class);
         given(appToBeImported.getToken()).willReturn("application");
 
-        ImportResult importResult = mock(ImportResult.class);
-        given(importResult.getApplication()).willReturn(appToBeImported);
+        ImportResult importResult = new ImportResult(appToBeImported, new ImportStatus("name"));
 
         SApplication appInConflict = mock(SApplication.class);
 

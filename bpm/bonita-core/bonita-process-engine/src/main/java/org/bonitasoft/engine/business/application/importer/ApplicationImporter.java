@@ -55,7 +55,7 @@ public class ApplicationImporter {
     public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException, AlreadyExistsException {
         try {
             ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, createdBy);
-            SApplication application = importApplication(importResult.getApplication());
+            SApplication application = importApplication(importResult.getApplication(), importResult);
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
             updateHomePage(application, applicationNode, createdBy, importResult);
@@ -103,10 +103,12 @@ public class ApplicationImporter {
         }
     }
 
-    private SApplication importApplication(SApplication applicationToBeImported) throws SBonitaException, AlreadyExistsException {
+    private SApplication importApplication(SApplication applicationToBeImported, ImportResult importResult) throws SBonitaException, AlreadyExistsException {
         SApplication conflictingApplication = applicationService.getApplicationByToken(applicationToBeImported.getToken());
         if (conflictingApplication != null) {
             strategy.whenApplicationExists(conflictingApplication, applicationToBeImported);
+            // if no exception is thrown, this is a replacement:
+            importResult.getImportStatus().setStatus(ImportStatus.Status.REPLACED);
         }
         return applicationService.createApplication(applicationToBeImported);
     }

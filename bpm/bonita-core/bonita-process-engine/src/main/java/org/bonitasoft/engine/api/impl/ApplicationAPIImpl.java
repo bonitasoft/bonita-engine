@@ -60,10 +60,10 @@ import org.bonitasoft.engine.business.application.importer.ApplicationPageImport
 import org.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationDeploymentException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -267,7 +267,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ExecutionResult deployApplication(byte[] applicationArchive) throws DeployerException {
+    public ExecutionResult deployApplication(byte[] applicationArchive) throws ApplicationDeploymentException {
         return getApplicationAPIDelegate().deployApplication(applicationArchive);
     }
 
