@@ -270,6 +270,7 @@ public class NodeToApplicationConverterTest {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setProfile(null);
+        node.setToken("TokenName"); // token can never be null in the XML
 
         //when
         final ImportResult importResult = converter.toSApplication(node, 1L);

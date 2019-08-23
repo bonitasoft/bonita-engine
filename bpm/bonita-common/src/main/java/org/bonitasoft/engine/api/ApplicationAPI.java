@@ -28,9 +28,9 @@ import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ApplicationDeploymentException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.DeployerException;
 import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -57,7 +57,8 @@ public interface ApplicationAPI {
      * @see Application
      * @see ApplicationCreator
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException;
+    Application createApplication(ApplicationCreator applicationCreator)
+            throws AlreadyExistsException, CreationException;
 
     /**
      * Retrieves an {@link Application} from its identifier.
@@ -93,7 +94,8 @@ public interface ApplicationAPI {
      * @see Application
      * @see ApplicationUpdater
      */
-    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
+    Application updateApplication(long applicationId, ApplicationUpdater updater)
+            throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Searches for {@link Application}s with specific search criteria. Use {@link org.bonitasoft.engine.business.application.ApplicationSearchDescriptor} to
@@ -116,7 +118,8 @@ public interface ApplicationAPI {
      *        {@link org.bonitasoft.engine.page.Page} will be associated
      * @param pageId the identifier of <code>Page</code> to be associated to the <code>Application</code>
      * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
-     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used
+     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved
+     *        key words and cannot be used
      *        as token: 'api', 'content', 'theme'.
      * @return the created {@link ApplicationPage}
      * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this <code>Application</code>
@@ -126,7 +129,8 @@ public interface ApplicationAPI {
      * @see Application
      * @see org.bonitasoft.engine.page.Page
      */
-    ApplicationPage createApplicationPage(long applicationId, long pageId, String token) throws AlreadyExistsException, CreationException,
+    ApplicationPage createApplicationPage(long applicationId, long pageId, String token)
+            throws AlreadyExistsException, CreationException,
             ApplicationNotFoundException;
 
     /**
@@ -139,7 +143,8 @@ public interface ApplicationAPI {
      *         <code>ApplicationPage</code> token
      * @see ApplicationPage
      */
-    ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken) throws ApplicationPageNotFoundException;
+    ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken)
+            throws ApplicationPageNotFoundException;
 
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
@@ -188,7 +193,8 @@ public interface ApplicationAPI {
      * @see Application
      * @see ApplicationPage
      */
-    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, ApplicationNotFoundException;
+    void setApplicationHomePage(long applicationId, long applicationPageId)
+            throws UpdateException, ApplicationNotFoundException;
 
     /**
      * Retrieves the {@link ApplicationPage} defined as the {@link Application} home page
@@ -230,7 +236,8 @@ public interface ApplicationAPI {
      * @see org.bonitasoft.engine.business.application.ApplicationMenu
      * @see org.bonitasoft.engine.business.application.ApplicationMenuUpdater
      */
-    ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException;
+    ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater)
+            throws ApplicationMenuNotFoundException, UpdateException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier
@@ -337,15 +344,21 @@ public interface ApplicationAPI {
      * @see org.bonitasoft.engine.profile.Profile
      * @see org.bonitasoft.engine.page.Page
      */
-    List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
+    List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
+            throws ImportException, AlreadyExistsException;
 
     /**
      * Deploys a complete Bonita Application.
-     * 
+     * The format of the <code>applicationArchive</code> must be a zip containing other Bonita artifacts.
+     * Those artifacts can be inside sub-folders or directly at the root level of the zip file.
+     * Those artifacts are normal .bar files for processes, .zip files for all types of custom pages (pages, forms,
+     * themes, layouts, Rest API extensions), or valid .xml files for Living Applications (See {@link Application}).
+     *
      * @param applicationArchive the binary zip archive representing the full application to deploy
-     * @return the result of the deployment
-     * @throws DeployerException in case of deployment problem
-     * @see org.bonitasoft.engine.application.Application
+     * @return the result of the deployment, with fully detailed information of what happened for each artifact deployed
+     *         (created, updated, with or without info / warnings / errors)
+     * @throws ApplicationDeploymentException in case of deployment problem that prevented the whole application
+     *         from being deployed correctly.
      */
-    ExecutionResult deployApplication(byte[] applicationArchive) throws DeployerException;
+    ExecutionResult deployApplication(byte[] applicationArchive) throws ApplicationDeploymentException;
 }

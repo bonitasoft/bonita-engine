@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
+import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -33,11 +34,15 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Duchastenier
  */
 public class ApplicationIT extends TestWithTechnicalUser {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationIT.class);
 
     @Test
     public void should_deploy_all_artifacts_from_application() throws Exception {
@@ -45,9 +50,13 @@ public class ApplicationIT extends TestWithTechnicalUser {
         final byte[] completeApplicationZip = createCompleteApplication();
 
         // when:
-        getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
+        ExecutionResult result = getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
 
         // then:
+        assertThat(result.hasErrors()).isFalse();
+
+        result.getAllStatus().forEach(s -> LOGGER.info(s.toString()));
+
         assertThat(getPageAPI()
                 .searchPages(new SearchOptionsBuilder(0, 10)
                         .filter(PageSearchDescriptor.PROVIDED, false)
@@ -89,12 +98,19 @@ public class ApplicationIT extends TestWithTechnicalUser {
         assertThat(deploymentInfo.getActivationState()).isEqualTo(ActivationState.DISABLED);
 
         List<Application> insertedApplicationList = getLivingApplicationAPI()
-                .searchApplications(getApplicationSearchOptionsOrderById(0, 10)).getResult();
-        assertThat(insertedApplicationList).hasSize(1);
-        assertThat(insertedApplicationList.get(0).getDisplayName()).isEqualToIgnoringCase("Loan request");
+                .searchApplications(getApplicationSearchOptionsOrderByToken(0, 10)).getResult();
+        assertThat(insertedApplicationList).hasSize(2);
+        assertThat(insertedApplicationList.get(0).getDisplayName()).isEqualToIgnoringCase("Loan request"); // token LoanApp
+        assertThat(insertedApplicationList.get(1).getDisplayName()).isEqualToIgnoringCase("Leave request application"); // token Tahiti
 
         // We must be able to redeploy the same application:
-        getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
+        result = getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
+
+        // then:
+        assertThat(result.hasErrors()).isFalse();
+
+        result.getAllStatus().forEach(s -> LOGGER.info(s.toString()));
+
     }
 
     private byte[] createCompleteApplication() throws IOException {
@@ -108,8 +124,9 @@ public class ApplicationIT extends TestWithTechnicalUser {
                 file("themes/custom-theme.zip", resource("/complete_app/custom-theme.zip")));
     }
 
-    private SearchOptions getApplicationSearchOptionsOrderById(final int startIndex, final int maxResults) {
-        return new SearchOptionsBuilder(startIndex, maxResults).sort(ApplicationSearchDescriptor.ID, Order.ASC).done();
+    private SearchOptions getApplicationSearchOptionsOrderByToken(final int startIndex, final int maxResults) {
+        return new SearchOptionsBuilder(startIndex, maxResults).sort(ApplicationSearchDescriptor.TOKEN, Order.ASC)
+                .done();
     }
 
 }

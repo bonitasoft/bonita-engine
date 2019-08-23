@@ -41,6 +41,10 @@ public class ExecutionResult implements Serializable {
         this.statuses.addAll(requireNonNull(statusList));
     }
 
+    public void addStatus(Status... statuses) {
+        this.statuses.addAll(asList(requireNonNull(statuses)));
+    }
+
     public boolean isOk() {
         return statuses.isEmpty() || statuses.stream()
                 .allMatch(status -> status.getLevel() == Level.OK);
@@ -82,5 +86,4 @@ public class ExecutionResult implements Serializable {
     public List<Status> getAllStatus() {
         return Collections.unmodifiableList(statuses);
     }
-
 }

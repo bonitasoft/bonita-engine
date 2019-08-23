@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -96,6 +97,7 @@ public class DeployerTest {
                 .layout(new FileAndContent("layout.zip", zip(file("page.properties", "name=layout"))))
                 .theme(new FileAndContent("theme.zip", zip(file("page.properties", "name=theme"))))
                 .restAPIExtension(new FileAndContent("restApiExtension.zip", zip(file("page.properties", "name=restApiExtension")))).build();
+        doReturn(mock(Page.class)).when(pageAPI).createPage(anyString(), any(byte[].class));
 
         deployer.deploy(applicationArchive);
 

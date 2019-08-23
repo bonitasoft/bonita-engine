@@ -18,12 +18,15 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serializable;
 import java.util.Map;
 
+import lombok.ToString;
+
 /**
  * A status represents a generic result of some action.
  * It has a severity level, a technical message (non internationalized),
  * a unique status code used for internationalization and
  * an optional context saving the implicated item (eg: a data or process name)
  */
+@ToString
 public class Status implements Serializable {
 
     public enum Level {
