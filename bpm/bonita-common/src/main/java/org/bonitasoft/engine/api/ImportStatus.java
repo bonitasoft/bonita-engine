@@ -36,7 +36,6 @@ public class ImportStatus implements Serializable {
         ADDED, REPLACED, SKIPPED
     }
 
-    @NonNull
     private final String name;
 
     private Status status = Status.ADDED;
