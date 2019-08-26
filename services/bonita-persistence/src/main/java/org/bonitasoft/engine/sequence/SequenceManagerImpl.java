@@ -41,23 +41,18 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final LockService lockService;
 
-    private final Map<Long, TenantSequenceManagerImpl> sequenceManagers = new HashMap<Long, TenantSequenceManagerImpl>();
+    private final Map<Long, TenantSequenceManagerImpl> sequenceManagers = new HashMap<>();
 
-    private final Object mutex = new SequenceManagerImplMutex();
 
     public SequenceManagerImpl(final LockService lockService,
-            final SequenceMappingProvider sequenceMappingProvider,
-            final DataSource datasource, final int retries, final int delay, final int delayFactor) {
+                               final SequenceMappingProvider sequenceMappingProvider,
+                               final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.lockService = lockService;
         this.sequenceMappingProvider = sequenceMappingProvider;
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
-    }
-
-    private static final class SequenceManagerImplMutex {
-
     }
 
     @Override
@@ -67,18 +62,23 @@ public class SequenceManagerImpl implements SequenceManager {
 
     @Override
     public long getNextId(final String entityName, final long tenantId) throws SObjectNotFoundException {
-        TenantSequenceManagerImpl mgr = this.sequenceManagers.get(tenantId);
-        if (mgr == null) {
-            synchronized (mutex) {
-                mgr = this.sequenceManagers.get(tenantId);
-                if (mgr == null) {
-                    mgr = new TenantSequenceManagerImpl(tenantId, lockService, getSequenceIdToRangeSizeMap(), getClassNameToSequenceIdMap(), datasource, retries, delay,
-                            delayFactor);
-                    this.sequenceManagers.put(tenantId, mgr);
+        return getTenantSequenceManager(tenantId).getNextId(entityName);
+    }
+
+    private TenantSequenceManagerImpl getTenantSequenceManager(long tenantId) {
+        if (sequenceManagers.get(tenantId) == null) {
+            synchronized (this) {
+                if (sequenceManagers.get(tenantId) == null) {
+                    this.sequenceManagers.put(tenantId, createTenantSequenceManager(tenantId));
                 }
             }
         }
-        return mgr.getNextId(entityName);
+        return sequenceManagers.get(tenantId);
+    }
+
+    TenantSequenceManagerImpl createTenantSequenceManager(long tenantId) {
+        return new TenantSequenceManagerImpl(tenantId, lockService, getSequenceIdToRangeSizeMap(), getClassNameToSequenceIdMap(), datasource, retries, delay,
+                delayFactor);
     }
 
     @Override
