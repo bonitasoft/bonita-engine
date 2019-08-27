@@ -31,7 +31,7 @@ public class SpringServiceAccessors implements ServiceAccessors {
     private Map<Long, SpringBeanAccessor> tenants = new HashMap<>();
 
     //----  Initialize spring contexts
-    private synchronized SpringBeanAccessor getPlatformInitBeanAccessor() {
+    protected synchronized SpringBeanAccessor getPlatformInitBeanAccessor() {
         if (platformInit == null) {
             platformInit = new PlatformInitBeanAccessor();
         }
@@ -40,9 +40,13 @@ public class SpringServiceAccessors implements ServiceAccessors {
 
     protected synchronized SpringBeanAccessor getPlatformBeanAccessor() {
         if (platform == null) {
-            platform = new PlatformBeanAccessor(getPlatformInitBeanAccessor().getContext());
+            platform = createPlatformBeanAccessor();
         }
         return platform;
+    }
+
+    protected PlatformBeanAccessor createPlatformBeanAccessor() {
+        return new PlatformBeanAccessor(getPlatformInitBeanAccessor().getContext());
     }
 
     protected synchronized SpringBeanAccessor getTenantBeanAccessor(final long tenantId) {

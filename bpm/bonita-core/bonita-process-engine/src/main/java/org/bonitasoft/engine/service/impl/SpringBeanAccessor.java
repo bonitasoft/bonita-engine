@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -33,13 +32,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 public abstract class SpringBeanAccessor {
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
-    private final ApplicationContext parent;
     private BonitaSpringContext context;
-
-
-    public SpringBeanAccessor(ApplicationContext parent) {
-        this.parent = parent;
-    }
 
     public <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
@@ -78,9 +71,7 @@ public abstract class SpringBeanAccessor {
         propertySources.addFirst(new PropertiesPropertySource("contextProperties", getProperties()));
     }
 
-    protected BonitaSpringContext createContext() {
-        return new BonitaSpringContext(parent);
-    }
+    protected abstract BonitaSpringContext createContext();
 
     public void destroy() {
         if (context != null) {
