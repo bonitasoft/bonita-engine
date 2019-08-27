@@ -27,11 +27,17 @@ import org.springframework.context.ApplicationContext;
  */
 public class TenantBeanAccessor extends SpringBeanAccessor {
 
+    private ApplicationContext parent;
     private final long tenantId;
 
     protected TenantBeanAccessor(final ApplicationContext parent, final long tenantId) {
-        super(parent);
+        this.parent = parent;
         this.tenantId = tenantId;
+    }
+
+    @Override
+    protected BonitaSpringContext createContext() {
+        return new BonitaSpringContext(parent, "Tenant "+tenantId);
     }
 
     @Override

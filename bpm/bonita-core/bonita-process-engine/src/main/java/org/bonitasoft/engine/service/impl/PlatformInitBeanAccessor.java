@@ -26,8 +26,10 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
  */
 public class PlatformInitBeanAccessor extends SpringBeanAccessor {
 
-    PlatformInitBeanAccessor() {
-        super(null);
+
+    @Override
+    protected BonitaSpringContext createContext() {
+        return new BonitaSpringContext(null, "Platform init");
     }
 
     @Override

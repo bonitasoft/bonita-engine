@@ -32,9 +32,10 @@ import org.springframework.context.ApplicationContext;
 public class PlatformBeanAccessor extends SpringBeanAccessor {
 
     private File bonita_conf;
+    private ApplicationContext parent;
 
-    PlatformBeanAccessor(ApplicationContext parent) {
-        super(parent);
+    protected PlatformBeanAccessor(ApplicationContext parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -42,6 +43,11 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
         Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
         platformProperties.setProperty("bonita.conf.folder", bonita_conf.getAbsolutePath());
         return platformProperties;
+    }
+
+    @Override
+    protected BonitaSpringContext createContext() {
+        return new BonitaSpringContext(parent, "Platform");
     }
 
     @Override
