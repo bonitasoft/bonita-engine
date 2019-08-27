@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -41,18 +42,8 @@ public class TenantSequenceManagerImpl {
     static final String SEQUENCE = "SEQUENCE";
 
     private final Long tenantId;
-
+    private final Map<Long, SequenceRange> sequences = new HashMap<>();
     private final Map<Long, Integer> sequenceIdToRangeSize;
-
-    // Map of available IDs: key=sequenceId, value = nextAvailableId to be assigned to a new entity of the given sequence
-    private final Map<Long, Long> nextAvailableIds = new HashMap<>();
-
-    // Map of lastId that can be consumed for a given sequence
-    private final Map<Long, Long> lastIdInRanges = new HashMap<>();
-
-    // Map of sequenceId, mutex
-    private static final Map<Long, Object> SEQUENCE_MUTEXS = new HashMap<>();
-
     private final Map<String, Long> classNameToSequenceId;
 
     private final int retries;
@@ -76,40 +67,47 @@ public class TenantSequenceManagerImpl {
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
-
-        for (final Long sequenceId : classNameToSequenceId.values()) {
-            SEQUENCE_MUTEXS.put(sequenceId, new TenantSequenceManagerImplMutex());
-            nextAvailableIds.put(sequenceId, 0L);
-            lastIdInRanges.put(sequenceId, -1L);
-        }
-    }
-
-    private static final class TenantSequenceManagerImplMutex {
-
     }
 
     public long getNextId(final String entityName) throws SObjectNotFoundException {
+        final Long sequenceId = getSeqenceId(entityName);
+        SequenceRange sequence = getSequence(sequenceId);
+        Optional<Long> nextAvailableId = sequence.getNextAvailableId();
+        if (nextAvailableId.isPresent()) {
+            return nextAvailableId.get();
+        }
+        //synchronize on the sequence object itself (we will read/update only on this one)
+        synchronized (sequence) {
+            nextAvailableId = sequence.getNextAvailableId();
+            if (!nextAvailableId.isPresent()) {
+                sequence.updateToNextRange(setNewRange(sequenceId));
+                nextAvailableId = sequence.getNextAvailableId();
+            }
+            return nextAvailableId.orElseThrow(() -> new IllegalStateException("No new available id found for sequence " + entityName));
+        }
+    }
+
+    private SequenceRange getSequence(Long sequenceId) {
+        if (!sequences.containsKey(sequenceId)) {
+            synchronized (this) {
+                if (!sequences.containsKey(sequenceId)) {
+                    sequences.put(sequenceId, new SequenceRange(sequenceIdToRangeSize.get(sequenceId)));
+                }
+            }
+        }
+        return sequences.get(sequenceId);
+    }
+
+    private Long getSeqenceId(String entityName) throws SObjectNotFoundException {
         final Long sequenceId = classNameToSequenceId.get(entityName);
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);
         }
-        final Object sequenceMutex = SEQUENCE_MUTEXS.get(sequenceId);
-        synchronized (sequenceMutex) {
-            Long nextAvailableId = nextAvailableIds.get(sequenceId);
-            final Long lastIdInRange = lastIdInRanges.get(sequenceId);
-            if (nextAvailableId > lastIdInRange) {
-                nextAvailableId = setNewRange(sequenceId);
-                nextAvailableIds.put(sequenceId, nextAvailableId);
-                lastIdInRanges.put(sequenceId, nextAvailableId + sequenceIdToRangeSize.get(sequenceId) - 1);
-
-            }
-            nextAvailableIds.put(sequenceId, nextAvailableId + 1);
-
-            return nextAvailableId;
-        }
+        return sequenceId;
     }
 
     /**
+     * get the next abailable id of a sequence and update in database its value
      * @return the next available id of the sequence
      */
     private long setNewRange(final long sequenceId) throws SObjectNotFoundException {
