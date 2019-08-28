@@ -43,13 +43,13 @@ public class MeterRegistryFactory {
 
     private MeterRegistry instantiate() {
         if (meterRegistries == null || meterRegistries.isEmpty()) {
-            LOGGER.debug("No meter registry configured, using SimpleMeterRegistry");
+            LOGGER.info("No monitoring system registered, Metrics will not be published");
             return new SimpleMeterRegistry();
         } else if (meterRegistries.size() == 1) {
-            LOGGER.debug("Using single meter registry : {}", meterRegistries.get(0).getClass().getName());
+            LOGGER.info("Publishing monitoring metrics to : {}", meterRegistries.get(0).getClass().getName());
             return meterRegistries.get(0);
         } else {
-            LOGGER.debug("Using composite meter registry : {}", meterRegistries.stream().map((m) -> m.getClass().getName()).collect(Collectors.joining(", ")));
+            LOGGER.info("Publishing monitoring metrics to : {}", meterRegistries.stream().map((m) -> m.getClass().getName()).collect(Collectors.joining(", ")));
             CompositeMeterRegistry compositeMeterRegistry = new CompositeMeterRegistry();
             meterRegistries.forEach(compositeMeterRegistry::add);
             return compositeMeterRegistry;
