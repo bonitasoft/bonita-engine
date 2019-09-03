@@ -1,13 +1,13 @@
 
 
 dependencies {
-    compile project(':engine:services:bonita-log-technical')
-    compile project(':engine:services:bonita-recorder')
-    compile project(':engine:services:bonita-cache')
-    compile project(':engine:services:bonita-builder')
-    compile project(':engine:services:bonita-persistence')
-    compile project(':engine:services:bonita-commons')
-    testCompile project(':engine:services:bonita-events')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-cache')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-commons')
+    testCompile project(':services:bonita-events')
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
