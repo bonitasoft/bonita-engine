@@ -64,7 +64,7 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.start();
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
     }
-    
+
     @Test
     public void should_submit_work_on_the_executor() throws Exception {
 
@@ -201,8 +201,9 @@ public class WorkExecutorServiceImplTest {
 
         // then: will only be started one time
 
-        verify(logger).warn(contains("Interrupted"),any(InterruptedException.class));
+        verify(logger).warn(contains("Interrupted"), any(InterruptedException.class));
     }
+
     @Test
     public void checkStartStatus() {
         // when
@@ -256,6 +257,15 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.stop();
 
         verify(bonitaExecutorService).awaitTermination(WORK_TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void should_log_when_work_is_ignored_because_of_precondition() {
+        workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(), new SWorkPreconditionException("My precondition"));
+
+        verifyZeroInteractions(bonitaExecutorService);
+        verifyZeroInteractions(bonitaWork);
+        verify(logger).warn(contains("Work was not executed because preconditions were not met,"), any(), any());
     }
 
 }

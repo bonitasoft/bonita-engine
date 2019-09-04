@@ -73,7 +73,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             return;
         }
         if (thrown instanceof SWorkPreconditionException) {
-            logger.info("Work was not executed because preconditions were not met, {} : {}", work, thrown.getMessage());
+            logger.warn("Work was not executed because preconditions were not met, {} : {}", work, thrown.getMessage());
             return;
         }
         try {
