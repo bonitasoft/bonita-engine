@@ -84,7 +84,6 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
 
     @Override
     protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        stateBehaviors.handleCatchEvents(processDefinition, flowNodeInstance);
         stateBehaviors.createData(processDefinition, flowNodeInstance);
         stateBehaviors.createAttachedBoundaryEvents(processDefinition, (SActivityInstance) flowNodeInstance);
         stateBehaviors.mapActors(flowNodeInstance, processDefinition.getProcessContainer());
@@ -96,5 +95,6 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
         stateBehaviors.updateExpectedDuration(processDefinition, flowNodeInstance);
         stateBehaviors.addAssignmentSystemCommentIfTaskWasAutoAssign(flowNodeInstance);
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
+        stateBehaviors.registerWaitingEvent(processDefinition, flowNodeInstance);
     }
 }

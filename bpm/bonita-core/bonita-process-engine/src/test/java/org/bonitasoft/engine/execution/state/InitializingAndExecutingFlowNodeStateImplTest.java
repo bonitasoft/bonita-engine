@@ -46,7 +46,6 @@ public class InitializingAndExecutingFlowNodeStateImplTest {
         initializingAndExecutingFlowNodeStateImpl.beforeOnEnter(processDefinition, flowNodeInstance);
 
         // then
-        verify(stateBehaviors).handleCatchEvents(processDefinition, flowNodeInstance);
         verify(stateBehaviors).createData(processDefinition, flowNodeInstance);
         verify(stateBehaviors).mapActors(flowNodeInstance, processDefinition.getProcessContainer());
     }

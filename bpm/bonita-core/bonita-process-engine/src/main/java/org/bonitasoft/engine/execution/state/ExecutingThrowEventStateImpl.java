@@ -83,7 +83,6 @@ public class ExecutingThrowEventStateImpl extends OnEnterAndFinishConnectorState
 
     @Override
     protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        stateBehaviors.handleCatchEvents(processDefinition, flowNodeInstance);
         stateBehaviors.createData(processDefinition, flowNodeInstance);
     }
 
