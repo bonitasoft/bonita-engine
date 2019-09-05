@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -35,5 +36,14 @@ public class InitializingActivityStateImplTest {
 
         //then
         verify(stateBehaviors).updateExpectedDuration(sProcessDefinition, sFlowNodeInstance);
+    }
+
+    @Test
+    public void should_register_waiting_event_after_connectors() throws Exception {
+        InitializingActivityStateImpl initializingActivityState = new InitializingActivityStateImpl(stateBehaviors);
+
+        initializingActivityState.afterConnectors(sProcessDefinition, sFlowNodeInstance);
+
+        verify(stateBehaviors).registerWaitingEvent(sProcessDefinition, sFlowNodeInstance);
     }
 }

@@ -1,13 +1,13 @@
 dependencies {
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
-    compile project(':engine:bonita-engine-standalone')
+    compile project(':bonita-engine-standalone')
     compile "junit:junit:${Deps.junit4Version}"
-    compile(project(':engine:platform:platform-resources'))
+    compile(project(':platform:platform-resources'))
 
     annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     
-    testCompile project(':engine:bpm:bonita-server')
+    testCompile project(':bpm:bonita-server')
     testCompile "org.postgresql:postgresql:${Deps.postgresqlVersion}"
     testCompile "mysql:mysql-connector-java:${Deps.mysqlVersion}"
     testCompile "com.microsoft.sqlserver:mssql-jdbc:${Deps.mssqlVersion}"

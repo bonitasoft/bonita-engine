@@ -1,16 +1,16 @@
 
 
 dependencies {
-    compile project(':engine:services:bonita-session')
-    compile project(':engine:services:bonita-log')
-    compile project(':engine:services:bonita-recorder')
-    compile project(':engine:services:bonita-builder')
-    compile project(':engine:services:bonita-events')
-    compile project(':engine:services:bonita-log-technical')
-    compile project(':engine:services:bonita-persistence')
-    compile project(':engine:services:bonita-commons')
-    compile project(':engine:services:bonita-transaction')
-    compile project(':engine:services:bonita-incident')
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-incident')
     compile "org.quartz-scheduler:quartz:${Deps.quartzVersion}"
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"

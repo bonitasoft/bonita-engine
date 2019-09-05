@@ -85,7 +85,7 @@ public class InitializingAndExecutingFlowNodeStateImpl extends OnEnterAndFinishC
 
     @Override
     protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        stateBehaviors.handleCatchEvents(processDefinition, flowNodeInstance);
+
         stateBehaviors.createData(processDefinition, flowNodeInstance);
         stateBehaviors.mapActors(flowNodeInstance, processDefinition.getProcessContainer());
     }

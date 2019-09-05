@@ -37,4 +37,13 @@ public class InitializingActivityWithBoundaryEventsStateImplTest {
         //then
         verify(stateBehaviors).updateExpectedDuration(sProcessDefinition, sFlowNodeInstance);
     }
+
+    @Test
+    public void should_register_waiting_event_after_connectors() throws Exception {
+        InitializingActivityWithBoundaryEventsStateImpl initializingActivityStateWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);
+
+        initializingActivityStateWithBoundary.afterConnectors(sProcessDefinition, sFlowNodeInstance);
+
+        verify(stateBehaviors).registerWaitingEvent(sProcessDefinition, sFlowNodeInstance);
+    }
 }
