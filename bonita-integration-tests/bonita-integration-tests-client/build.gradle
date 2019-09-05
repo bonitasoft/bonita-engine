@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':engine:bonita-test-api')
+    compile project(':bonita-test-api')
     compile "org.springframework:spring-context:${Deps.springVersion}"
     compile "junit:junit:${Deps.junit4Version}"
     compile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
@@ -8,17 +8,17 @@ dependencies {
     compile "commons-pool:commons-pool:${Deps.commonsPoolVersion}"
     compile "commons-io:commons-io:${Deps.commonsIOVersion}"
     compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
-    compile project(':engine:bpm:bonita-common')
-    compile project(':engine:bpm:bonita-client')
-    compile project(':engine:bonita-integration-tests:bonita-test-utils:bonita-common-test-utils')
-    compile project(':engine:bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
+    compile project(':bpm:bonita-common')
+    compile project(':bpm:bonita-client')
+    compile project(':bonita-integration-tests:bonita-test-utils:bonita-common-test-utils')
+    compile project(':bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
     compile "org.assertj:assertj-core:${Deps.assertjVersion}"
     compile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
     compile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    compile project(':engine:bpm:bonita-util:bonita-common-util-test')
+    compile project(':bpm:bonita-util:bonita-common-util-test')
     compile "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
     runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
-    testCompile project(':engine:bpm:bonita-server')
+    testCompile project(':bpm:bonita-server')
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
 }
 

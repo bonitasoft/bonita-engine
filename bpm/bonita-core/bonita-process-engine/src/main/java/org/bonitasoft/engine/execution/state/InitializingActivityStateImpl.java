@@ -85,7 +85,6 @@ public class InitializingActivityStateImpl extends OnEnterConnectorState {
 
     @Override
     protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        stateBehaviors.handleCatchEvents(processDefinition, flowNodeInstance);
         stateBehaviors.createData(processDefinition, flowNodeInstance);
         stateBehaviors.mapActors(flowNodeInstance, processDefinition.getProcessContainer());
     }
@@ -95,5 +94,6 @@ public class InitializingActivityStateImpl extends OnEnterConnectorState {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
         stateBehaviors.updateExpectedDuration(processDefinition, flowNodeInstance);
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
+        stateBehaviors.registerWaitingEvent(processDefinition, flowNodeInstance);
     }
 }

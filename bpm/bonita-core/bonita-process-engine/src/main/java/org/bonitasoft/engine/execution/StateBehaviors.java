@@ -333,7 +333,7 @@ public class StateBehaviors {
         }
     }
 
-    public void handleCatchEvents(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    public void registerWaitingEvent(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         // handle catch event
         if (flowNodeInstance instanceof SIntermediateCatchEventInstance) {
