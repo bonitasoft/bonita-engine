@@ -150,6 +150,8 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      */
     void deleteEventTriggerInstance(STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
 
+    void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException;
+
     /**
      * @param flowNodeInstance
      * @throws SWaitingEventModificationException
