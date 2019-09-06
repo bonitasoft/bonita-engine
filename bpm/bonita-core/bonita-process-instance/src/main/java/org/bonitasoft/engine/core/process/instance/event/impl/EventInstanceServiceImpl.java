@@ -146,6 +146,15 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
+    public void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException {
+        Optional<STimerEventTriggerInstance> timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+        if (!timerEventTriggerInstanceOfFlowNode.isPresent()) {
+            return;
+        }
+        deleteEventTriggerInstance(timerEventTriggerInstanceOfFlowNode.get());
+    }
+
+    @Override
     public void deleteMessageInstance(final SMessageInstance messageInstance) throws SMessageModificationException {
         try {
             getRecorder().recordDelete(new DeleteRecord(messageInstance), MESSAGE_INSTANCE);
