@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.io;
 
+import static java.util.Collections.singletonMap;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -30,6 +32,8 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +43,8 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -68,6 +73,23 @@ public class IOUtil {
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
         return generateJar(getResources(classes));
+    }
+
+    public static byte[] generateJar(String className, String... content) throws IOException {
+        File root = File.createTempFile("tempCompile", "");
+        root.delete();
+        root.mkdir();
+        File sourceFile = new File(root, className + ".java");
+        Files.write(sourceFile.toPath(), String.join("\n", content).getBytes(StandardCharsets.UTF_8));
+
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        int run = compiler.run(null, null, null, sourceFile.getPath());
+        if (run != 0) {
+            throw new IllegalArgumentException("Unable to compile the file, see logs");
+        }
+        byte[] bytes = Files.readAllBytes(root.toPath().resolve(className + ".class"));
+
+        return generateJar(singletonMap(className + ".class", bytes));
     }
 
     public static Map<String, byte[]> getResources(final Class<?>... classes) throws IOException {
@@ -147,7 +169,7 @@ public class IOUtil {
         final byte[] resultArray;
 
         try (BufferedInputStream bis = new BufferedInputStream(in);
-                ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+             ByteArrayOutputStream result = new ByteArrayOutputStream()) {
             int amountRead;
             while ((amountRead = bis.read(buffer)) > 0) {
                 result.write(buffer, 0, amountRead);
@@ -419,7 +441,7 @@ public class IOUtil {
 
     public static void write(final File file, final byte[] fileContent) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(file);
-                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             bos.write(fileContent);
             bos.flush();
         }
@@ -427,7 +449,7 @@ public class IOUtil {
 
     public static byte[] getContent(final File file) throws IOException {
         try (FileInputStream fin = new FileInputStream(file);
-                FileChannel ch = fin.getChannel()) {
+             FileChannel ch = fin.getChannel()) {
             final int size = (int) ch.size();
             final MappedByteBuffer buf = ch.map(MapMode.READ_ONLY, 0, size);
             final byte[] bytes = new byte[size];
