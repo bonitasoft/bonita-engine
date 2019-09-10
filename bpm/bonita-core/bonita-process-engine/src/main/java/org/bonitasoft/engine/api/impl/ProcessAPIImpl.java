@@ -272,6 +272,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -3413,11 +3414,16 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SCatchEventInstance sCatchEventInstance) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
         final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
-
+        EventInstanceService eventInstanceService = getTenantAccessor().getEventInstanceService();
         try {
             if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
                 final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sCatchEventInstance);
                 final boolean delete = schedulerService.delete(jobName);
+                try {
+                    eventInstanceService.deleteEventTriggerInstanceOfFlowNode(sCatchEventInstance.getId());
+                } catch (SEventTriggerInstanceDeletionException e) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Unable to delete event trigger of flow node instance " + sCatchEventInstance + " because: " + e.getMessage());
+                }
                 if (!delete && schedulerService.isExistingJob(jobName)) {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(this.getClass(), TechnicalLogSeverity.WARNING,

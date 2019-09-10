@@ -284,7 +284,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
-            Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
+            Connector connector = (Connector) classLoader.loadClass(implementationClassName).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
             return connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader)
                     .thenApply(result -> new ConnectorResult(connector, result));
