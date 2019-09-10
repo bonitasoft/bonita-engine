@@ -41,6 +41,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LivingApplicationMenuIT.class,
         LivingApplicationImportExportIT.class,
         ApplicationIT.class,
+        DeleteEventTriggerInstanceIT.class,
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,

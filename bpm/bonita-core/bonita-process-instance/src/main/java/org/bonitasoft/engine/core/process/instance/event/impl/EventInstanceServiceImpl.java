@@ -89,6 +89,15 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
+    public void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException {
+        Optional<STimerEventTriggerInstance> timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+        if (!timerEventTriggerInstanceOfFlowNode.isPresent()) {
+            return;
+        }
+        deleteEventTriggerInstance(timerEventTriggerInstanceOfFlowNode.get());
+    }
+
+    @Override
     public void deleteMessageInstance(SMessageInstance messageInstance) throws SMessageModificationException {
         this.eventInstanceRepository.deleteMessageInstance(messageInstance);
     }
