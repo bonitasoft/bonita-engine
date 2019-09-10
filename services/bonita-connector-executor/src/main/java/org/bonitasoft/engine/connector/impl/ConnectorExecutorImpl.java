@@ -37,6 +37,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -80,6 +81,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     private final TimeTracker timeTracker;
     private MeterRegistry meterRegistry;
     private long tenantId;
+    private ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider;
 
     private final AtomicLong pendingWorks = new AtomicLong();
     private final AtomicLong runningWorks = new AtomicLong();
@@ -108,10 +110,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
      *        the core, this is the maximum time that excess idle threads
      *        will wait for new tasks before terminating. (in seconds)
      */
-    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize,
-            final TechnicalLoggerService loggerService, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final TimeTracker timeTracker, final MeterRegistry meterRegistry, long tenantId ) {
+    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService,
+                                 final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor,
+                                 final SessionService sessionService, final TimeTracker timeTracker, final MeterRegistry meterRegistry,
+                                 long tenantId, ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider) {
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
         this.loggerService = loggerService;
@@ -122,6 +124,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         this.timeTracker = timeTracker;
         this.meterRegistry = meterRegistry;
         this.tenantId = tenantId;
+        this.executorServiceMeterBinderProvider = executorServiceMeterBinderProvider;
     }
 
     @Override
@@ -337,6 +340,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
                     "ConnectorExecutor");
             setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                     workQueue, threadFactory, handler));
+            executorServiceMeterBinderProvider
+                    .createMeterBinder(executorService, "bonita-connector-executor", tenantId)
+                    .ifPresent(m -> m.bindTo(meterRegistry));
             Tags tags = Tags.of("tenant", String.valueOf(tenantId));
             meterRegistry.gauge(CONNECTOR_CONNECTORS_PENDING, tags, workQueue, Collection::size);
             meterRegistry.gauge(CONNECTOR_CONNECTORS_RUNNING, tags, runningWorks);

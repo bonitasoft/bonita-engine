@@ -25,12 +25,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -74,7 +76,7 @@ public class ConnectorExecutorImplTest {
                 Clock.SYSTEM);
         connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService,
                 timeTracker,
-                meterRegistry, TENANT_ID);
+                meterRegistry, TENANT_ID, new DefaultExecutorServiceMeterBinderProvider());
 
         connectorExecutorImpl.start();
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
@@ -234,6 +236,16 @@ public class ConnectorExecutorImplTest {
                 .as("Running connectors number").isEqualTo(1);
         assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).gauge().value())
                 .as("Pending connectors number").isEqualTo(1);
+    }
+
+
+    @Test
+    public void createExecutorService_should_register_ExecutorServiceMetrics() {
+        assertThat(
+                meterRegistry.find("executor.pool.size")
+                        .tag("name", "bonita-connector-executor")
+                        .tag("tenant", String.valueOf(TENANT_ID))
+                        .gauge()).isNotNull();
     }
 
     // =================================================================================================================

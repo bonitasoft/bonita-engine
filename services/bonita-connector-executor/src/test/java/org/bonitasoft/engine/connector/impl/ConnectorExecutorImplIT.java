@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -55,7 +56,7 @@ public class ConnectorExecutorImplIT {
     @Before
     public void setUp() {
         connectorExecutor = new ConnectorExecutorImpl(10, 5, loggerService, 100, 100, sessionAccessor, sessionService,
-                timeTracker, new SimpleMeterRegistry(), 12L);
+                timeTracker, new SimpleMeterRegistry(), 12L, new DefaultExecutorServiceMeterBinderProvider());
         connectorExecutor.start();
     }
 
