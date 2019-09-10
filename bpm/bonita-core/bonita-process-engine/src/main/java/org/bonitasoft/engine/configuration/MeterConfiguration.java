@@ -19,6 +19,13 @@ import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
 import java.util.List;
 
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
@@ -26,15 +33,13 @@ import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Danila Mazour
  */
 @Configuration
 public class MeterConfiguration {
+
     private final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
 
     @Bean
@@ -79,7 +84,6 @@ public class MeterConfiguration {
         return new JvmThreadMetrics();
     }
 
-
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.gc.enable", enableIfMissing = false)
     public JvmGcMetrics jvmGcMetrics() {
@@ -92,6 +96,20 @@ public class MeterConfiguration {
         meterRegistryFactory.setMeterRegistries(meterRegistries);
         meterRegistryFactory.setMeterBinders(meterBinders);
         return meterRegistryFactory.create();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX
+            + "metrics.executors.enable" /* , havingValue=true */, enableIfMissing = false)
+    public ExecutorServiceMeterBinderProvider meterBinder() {
+        return new DefaultExecutorServiceMeterBinderProvider();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX
+            + "metrics.executors.enable", havingValue = false, enableIfMissing = true)
+    public ExecutorServiceMeterBinderProvider emptyMeterBinder() {
+        return new EmptyExecutorServiceMeterBinderProvider();
     }
 
 }

@@ -18,34 +18,60 @@ import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultBonitaExecutorServiceFactoryTest {
+
     @Mock
     private WorkFactory workFactory;
     @Mock
     private WorkExecutionCallback workExecutionCallback;
 
     @Test
-    public void ThreadNameInExecutorServiceShouldContainsTenantId() {
+    public void threadNameInExecutorService_should_contain_tenantId() {
         long tenantId = 999;
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
                 new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
-                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), new SimpleMeterRegistry());
+                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), new SimpleMeterRegistry(),
+                new DefaultExecutorServiceMeterBinderProvider());
 
-        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
+        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory
+                .createExecutorService(workExecutionCallback);
         Runnable r = () -> {
         };
 
         String name = ((ThreadPoolExecutor) createExecutorService).getThreadFactory().newThread(r).getName();
         assertThat(name).as("thread name should contains the tenantId").contains(Long.toString(tenantId));
+    }
+
+    @Test
+    public void createExecutorService_should_register_ExecutorServiceMetrics() {
+        // given:
+        long tenantId = 97L;
+        final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
+                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), meterRegistry,
+                new DefaultExecutorServiceMeterBinderProvider());
+
+        // when:
+        defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
+
+        // then:
+        assertThat(
+                meterRegistry.find("executor.pool.size")
+                        .tag("name", "bonita-work-executor")
+                        .tag("tenant", String.valueOf(tenantId))
+                        .gauge()).isNotNull();
     }
 }

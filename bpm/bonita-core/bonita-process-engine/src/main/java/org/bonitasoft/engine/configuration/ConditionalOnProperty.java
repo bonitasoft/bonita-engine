@@ -34,8 +34,14 @@ public @interface ConditionalOnProperty {
      */
     String value();
 
+    /**
+     * Should the bean be created if property is missing?
+     */
     boolean enableIfMissing();
 
-
+    /**
+     * for this condition to match, the value of the property must be equal to havingValue()
+     */
+    boolean havingValue() default true;
 
 }
