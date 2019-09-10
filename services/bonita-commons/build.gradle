@@ -10,6 +10,7 @@ dependencies {
         exclude(module: 'xpp3_min')
         exclude(module: 'xmlpull')
     }
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
