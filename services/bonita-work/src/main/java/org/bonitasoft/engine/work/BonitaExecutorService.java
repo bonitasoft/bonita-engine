@@ -15,8 +15,6 @@ package org.bonitasoft.engine.work;
 
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.monitoring.ObservableExecutor;
-
 /**
  *
  * This is the interface we use to wrap the ThreadPool that execute works
@@ -24,7 +22,7 @@ import org.bonitasoft.engine.monitoring.ObservableExecutor;
  * @author Julien Reboul
  * @author Baptiste Mesta
  */
-public interface BonitaExecutorService extends ObservableExecutor {
+public interface BonitaExecutorService {
 
     /**
      * clear the queue of work

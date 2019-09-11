@@ -120,42 +120,6 @@ public class BonitaThreadPoolExecutorTest {
     }
 
     @Test
-    public void should_update_works_counters_when_adding_a_workDescriptor_with_immediate_execution() throws Exception {
-        //given:
-        WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
-
-        //when:
-        bonitaThreadPoolExecutor.submit(workDescriptor);
-        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
-
-        //then:
-        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(1);
-        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(0);
-        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
-    }
-
-    @Test
-    public void should_update_works_counters_only_when_async_work_completes() throws Exception {
-        //given:
-        WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
-
-        //when:
-        bonitaThreadPoolExecutor.submit(workDescriptor);
-        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
-
-        //then:
-        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(0);
-        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(1);
-        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
-
-        //when
-        TimeUnit.MILLISECONDS.sleep(500); // wait for the completable future to finish
-        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(1);
-        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(0);
-        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
-    }
-
-    @Test
     public void should_update_meter_when_work_executes() {
         Gauge currentWorkQueue = meterRegistry.find("org.bonitasoft.engine.work.works.pending").gauge();
         for (int i = 0; i <= threadNumber + 3; i++) {

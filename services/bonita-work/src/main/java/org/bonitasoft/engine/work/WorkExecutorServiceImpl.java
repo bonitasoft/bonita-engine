@@ -15,20 +15,18 @@
 package org.bonitasoft.engine.work;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 /**
  * @author Baptiste Mesta
  */
-public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecutionCallback, ObservableExecutor {
+public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecutionCallback {
 
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private BonitaExecutorService executor;
@@ -146,21 +144,6 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     @Override
     public void notifyNodeStopped(String nodeName) {
-    }
-
-    @Override
-    public long getPendings() {
-        return ofNullable(executor).map(ObservableExecutor::getPendings).orElse(0L);
-    }
-
-    @Override
-    public long getRunnings() {
-        return ofNullable(executor).map(ObservableExecutor::getRunnings).orElse(0L);
-    }
-
-    @Override
-    public long getExecuted() {
-        return ofNullable(executor).map(ObservableExecutor::getExecuted).orElse(0L);
     }
 
 }
