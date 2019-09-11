@@ -20,7 +20,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
@@ -43,7 +42,6 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -59,7 +57,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 /**
  * @author Baptiste Mesta
  */
-public class MessagesHandlingService implements TenantLifecycleService, ObservableExecutor {
+public class MessagesHandlingService implements TenantLifecycleService {
 
     private static final int MAX_COUPLES = 100;
     private static final String LOCK_TYPE = "EVENTS";
@@ -74,7 +72,6 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
     private SessionAccessor sessionAccessor;
     private BPMWorkFactory workFactory;
 
-    private AtomicLong executedMessages = new AtomicLong();
     private final Counter executedMessagesCounter;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
@@ -184,7 +181,6 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         if (!SBPMEventType.START_EVENT.equals(waitingMsg.getEventType())) {
             markWaitingMessageAsInProgress(waitingMsg);
         }
-        executedMessages.incrementAndGet();
         executedMessagesCounter.increment();
         workService.registerWork(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMsg));
     }
@@ -259,21 +255,6 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
-    }
-
-    @Override
-    public long getPendings() {
-        return 0;
-    }
-
-    @Override
-    public long getRunnings() {
-        return 0;
-    }
-
-    @Override
-    public long getExecuted() {
-        return executedMessages.get();
     }
 
     private class MatchEventCallable implements Callable<Void> {

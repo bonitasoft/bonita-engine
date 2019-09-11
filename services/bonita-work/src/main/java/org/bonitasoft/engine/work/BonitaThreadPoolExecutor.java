@@ -53,7 +53,6 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private WorkExecutionAuditor workExecutionAuditor;
 
     private final AtomicLong runningWorks = new AtomicLong();
-    private final AtomicLong executedWorks = new AtomicLong();
     private final Counter executedWorkCounter;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
@@ -120,7 +119,6 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
                 asyncResult = bonitaWork.work(context);
             } catch (Exception e) {
                 executedWorkCounter.increment();
-                executedWorks.incrementAndGet();
                 runningWorks.decrementAndGet();
                 workExecutionCallback.onFailure(work, bonitaWork, context, e);
                 return;
@@ -128,7 +126,6 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
 
             asyncResult.handle((result, error) -> {
                 executedWorkCounter.increment();
-                executedWorks.incrementAndGet();
                 runningWorks.decrementAndGet();
                 if (error != null) {
                     if (error instanceof CompletionException) {
@@ -145,20 +142,5 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
 
     private boolean isRequiringDelayedExecution(WorkDescriptor work) {
         return work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now());
-    }
-
-    @Override
-    public long getPendings() {
-        return workQueue.size();
-    }
-
-    @Override
-    public long getRunnings() {
-        return runningWorks.get();
-    }
-
-    @Override
-    public long getExecuted() {
-        return executedWorks.get();
     }
 }

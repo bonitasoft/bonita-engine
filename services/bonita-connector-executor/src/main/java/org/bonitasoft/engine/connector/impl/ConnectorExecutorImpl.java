@@ -15,7 +15,6 @@ package org.bonitasoft.engine.connector.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
-import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -56,7 +54,7 @@ import io.micrometer.core.instrument.MeterRegistry;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecutor {
+public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     public static final String CONNECTOR_CONNECTORS_PENDING = "org.bonitasoft.engine.connector.connectors.pending";
     public static final String CONNECTOR_CONNECTORS_RUNNING = "org.bonitasoft.engine.connector.connectors.running";
@@ -83,9 +81,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
     private long tenantId;
     private ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider;
 
-    private final AtomicLong pendingWorks = new AtomicLong();
     private final AtomicLong runningWorks = new AtomicLong();
-    private final AtomicLong executedWorks = new AtomicLong();
     private Counter executedWorkCounter;
 
     /**
@@ -148,7 +144,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
 
     protected CompletableFuture<Map<String, Object>> execute(SConnector sConnector,
             InterruptibleCallable<Map<String, Object>> task) {
-        pendingWorks.incrementAndGet();
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return wrapForStats(task).call();
@@ -161,11 +156,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
 
     private Callable<Map<String, Object>> wrapForStats(final Callable<Map<String, Object>> task) {
         return () -> {
-            pendingWorks.decrementAndGet();
             runningWorks.incrementAndGet();
             try {
                 Map<String, Object> call = task.call();
-                executedWorks.incrementAndGet();
                 executedWorkCounter.increment();
                 return call;
             } finally {
@@ -208,21 +201,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecu
         } catch (final Exception t) {
             throw new SConnectorException(t);
         }
-    }
-
-    @Override
-    public long getPendings() {
-        return pendingWorks.get();
-    }
-
-    @Override
-    public long getRunnings() {
-        return runningWorks.get();
-    }
-
-    @Override
-    public long getExecuted() {
-        return executedWorks.get();
     }
 
     /**
