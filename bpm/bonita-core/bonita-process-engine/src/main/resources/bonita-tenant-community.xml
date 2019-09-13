@@ -1903,4 +1903,7 @@
 
     <bean id="engineClock" class="org.bonitasoft.engine.commons.time.DefaultEngineClock" />
 
+
+    <bean class="org.bonitasoft.engine.configuration.EngineTenantConfiguration" />
+
 </beans>
