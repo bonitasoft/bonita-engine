@@ -19,6 +19,9 @@ import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
 import java.util.List;
 
+import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
+import org.bonitasoft.engine.configuration.monitoring.LoggingRegistryConfig;
+import org.bonitasoft.engine.configuration.monitoring.MeterRegistryFactory;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
@@ -38,9 +41,8 @@ import io.micrometer.jmx.JmxMeterRegistry;
  * @author Danila Mazour
  */
 @Configuration
-public class MeterConfiguration {
-
-    private final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
+public class EnginePlatformConfiguration {
+    final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + "jmx.enable", enableIfMissing = true)

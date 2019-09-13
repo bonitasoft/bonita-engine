@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.configuration;
+package org.bonitasoft.engine.configuration.monitoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -6,6 +6,7 @@ import static org.awaitility.Awaitility.await;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;

@@ -2,6 +2,7 @@ package org.bonitasoft.engine.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
@@ -17,10 +18,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.jmx.JmxMeterRegistry;
 
-public class MeterConfigurationTest {
+public class EnginePlatformConfigurationTest {
 
     @RunWith(SpringRunner.class)
-    @ContextConfiguration(classes = MeterConfiguration.class)
+    @ContextConfiguration(classes = EnginePlatformConfiguration.class)
     public abstract static class BaseMeterConfigurationTest {
 
         @Autowired
@@ -32,7 +33,7 @@ public class MeterConfigurationTest {
 
     }
 
-    public static class DefaultMeterConfigurationTest extends BaseMeterConfigurationTest {
+    public static class DefaultEnginePlatformConfigurationTest extends BaseMeterConfigurationTest {
 
         @Test
         public void should_have_all_registries_activated_by_default() {
@@ -60,7 +61,7 @@ public class MeterConfigurationTest {
             "org.bonitasoft.engine.monitoring.metrics.jvm.gc.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.executors.enable=true"
     })
-    public static class OverriddenPropertiesMeterConfigurationTest extends BaseMeterConfigurationTest {
+    public static class OverriddenPropertiesEnginePlatformConfigurationTest extends BaseMeterConfigurationTest {
 
         @Test
         public void should_have_all_registries_activated() {

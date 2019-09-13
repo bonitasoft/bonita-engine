@@ -541,4 +541,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
         sessionFactory.close();
     }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
 }
