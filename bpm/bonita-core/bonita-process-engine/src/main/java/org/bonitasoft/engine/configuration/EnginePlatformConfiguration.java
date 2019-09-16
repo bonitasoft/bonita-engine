@@ -25,12 +25,14 @@ import org.bonitasoft.engine.configuration.monitoring.MeterRegistryFactory;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jpa.HibernateMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
@@ -42,7 +44,8 @@ import io.micrometer.jmx.JmxMeterRegistry;
  */
 @Configuration
 public class EnginePlatformConfiguration {
-    final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
+
+    private final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
     private final static String PUBLISHER = "publisher.";
     private final static String METRICS = "metrics.";
 
@@ -114,6 +117,21 @@ public class EnginePlatformConfiguration {
             + METRICS + "executors.enable", havingValue = false, enableIfMissing = true)
     public ExecutorServiceMeterBinderProvider emptyMeterBinder() {
         return new EmptyExecutorServiceMeterBinderProvider();
+    }
+
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "hibernate.enable", enableIfMissing = false)
+    public HibernateMetricsBinder activatedHibernateMetrics(MeterRegistry meterRegistry) {
+        return ((sessionFactory) ->
+                new HibernateMetrics(sessionFactory, "persistence", null).bindTo(meterRegistry));
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "hibernate.enable", havingValue = false, enableIfMissing = true)
+    public HibernateMetricsBinder deactivatedHibernateMetrics() {
+        return ((sessionFactory) -> {
+        });
     }
 
 }
