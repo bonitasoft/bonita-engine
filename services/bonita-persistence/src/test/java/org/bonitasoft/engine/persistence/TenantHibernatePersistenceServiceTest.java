@@ -13,12 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -71,9 +69,9 @@ public class TenantHibernatePersistenceServiceTest {
     @Mock
     private Session session;
 
-    private Set<String> wordSearchExclusionMappings;
-
     private TenantHibernatePersistenceService tenantHibernatePersistenceService;
+    private HibernateMetricsBinder metricsBinder = (sessionFactory) -> {
+    };
 
     @Before
     public void before() throws ConfigurationException {
@@ -83,7 +81,7 @@ public class TenantHibernatePersistenceServiceTest {
         doReturn(mock(Statistics.class)).when(sessionFactory).getStatistics();
         doReturn(session).when(sessionFactory).getCurrentSession();
 
-        final Iterator<PersistentClass> classMappingsIterator = Arrays.asList((PersistentClass) new RootClass()).iterator();
+        final Iterator<PersistentClass> classMappingsIterator = singletonList((PersistentClass) new RootClass()).iterator();
 
         final Configuration configuration = mock(Configuration.class);
         doReturn(sessionFactory).when(configuration).buildSessionFactory();
@@ -103,8 +101,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
@@ -122,8 +120,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource,
-                enableWordSearch, wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                enableWordSearch, null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
@@ -141,8 +139,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
@@ -160,8 +158,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
@@ -179,8 +177,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
@@ -205,8 +203,8 @@ public class TenantHibernatePersistenceServiceTest {
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
                 likeEscapeCharacter, logger, sequenceManager, datasource,
-                enableWordSearch, wordSearchExclusionMappings));
-        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+                enableWordSearch, null, metricsBinder));
+        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
         tenantHibernatePersistenceService.selectList(selectDescriptor);
