@@ -43,9 +43,11 @@ import io.micrometer.jmx.JmxMeterRegistry;
 @Configuration
 public class EnginePlatformConfiguration {
     final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
+    private final static String PUBLISHER = "publisher.";
+    private final static String METRICS = "metrics.";
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + "jmx.enable", enableIfMissing = true)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "jmx.enable", enableIfMissing = true)
     public JmxMeterRegistry jmxMeterRegistry(JmxConfig jmxConfig) {
         JmxMeterRegistry jmxMeterRegistry = new JmxMeterRegistry(jmxConfig, SYSTEM);
         jmxMeterRegistry.config()
@@ -55,7 +57,7 @@ public class EnginePlatformConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + "logging.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "logging.enable", enableIfMissing = false)
     public LoggingMeterRegistry loggingMeterRegistry(LoggingRegistryConfig loggingRegistryConfig) {
         LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
         //deny all meters that are not bonita related
@@ -66,28 +68,28 @@ public class EnginePlatformConfiguration {
 
     @Bean
     public LoggingRegistryConfig loggingRegistryConfig(ApplicationContext context) {
-        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX + key);
+        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX+ PUBLISHER + key);
     }
 
     @Bean
     public JmxConfig jmxRegistryConfig(ApplicationContext context) {
-        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX + key);
+        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX+ PUBLISHER + key);
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.memory.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.memory.enable", enableIfMissing = false)
     public JvmMemoryMetrics jvmMemoryMetrics() {
         return new JvmMemoryMetrics();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.threads.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.threads.enable", enableIfMissing = false)
     public JvmThreadMetrics jvmThreadMetrics() {
         return new JvmThreadMetrics();
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + "metrics.jvm.gc.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.gc.enable", enableIfMissing = false)
     public JvmGcMetrics jvmGcMetrics() {
         return new JvmGcMetrics();
     }
@@ -102,14 +104,14 @@ public class EnginePlatformConfiguration {
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX
-            + "metrics.executors.enable" /* , havingValue=true */, enableIfMissing = false)
+            + METRICS + "executors.enable" /* , havingValue=true */, enableIfMissing = false)
     public ExecutorServiceMeterBinderProvider meterBinder() {
         return new DefaultExecutorServiceMeterBinderProvider();
     }
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX
-            + "metrics.executors.enable", havingValue = false, enableIfMissing = true)
+            + METRICS + "executors.enable", havingValue = false, enableIfMissing = true)
     public ExecutorServiceMeterBinderProvider emptyMeterBinder() {
         return new EmptyExecutorServiceMeterBinderProvider();
     }
