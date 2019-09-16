@@ -54,8 +54,8 @@ public class EnginePlatformConfigurationTest {
     }
 
     @TestPropertySource(properties = {
-            "org.bonitasoft.engine.monitoring.jmx.enable=true",
-            "org.bonitasoft.engine.monitoring.logging.enable=true",
+            "org.bonitasoft.engine.monitoring.publisher.jmx.enable=true",
+            "org.bonitasoft.engine.monitoring.publisher.logging.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.jvm.memory.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.jvm.threads.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.jvm.gc.enable=true",
