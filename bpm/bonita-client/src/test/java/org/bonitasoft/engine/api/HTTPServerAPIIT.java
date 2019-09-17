@@ -116,6 +116,7 @@ public class HTTPServerAPIIT {
         Map<String, String> configuration = new HashMap<>();
         configuration.put("server.url", baseResourceUrl);
         configuration.put("application.name", APPLICATION_NAME);
+        configuration.put("connections.max", "2");
         configuration.put("basicAuthentication.active", "true");
         configuration.put("basicAuthentication.username", "john");
         configuration.put("basicAuthentication.password", "doe");

@@ -50,6 +50,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <li><code>-Dorg.bonitasoft.engine.api-type.server.url=HTTP_SERVER_URL</code>, e.g. <code>http://localhost:8080</code></li>
  * <li><code>-Dorg.bonitasoft.engine.api-type.application.name=WEBAPP_NAME</code>, this is the name of the web application, e.g. <code>bonita</code></li>
  * </ul>
+ * Optionally you can specify the maximum number of connections (JVM-wide) using <code>-Dorg.bonitasoft.engine.api-type.connections.max=CONNECTIONS_MAX</code>
  * </p>
  * </li>
  * <li>TCP
@@ -69,6 +70,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * <code>HashMap<String, String> parameters = new HashMap<>();
  * parameters.put("server.url", "http://myserver.com:8080");
  * parameters.put("application.name", "bonita-application");
+ * parameters.put("connections.max", "5");
  * APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);</code>
  * </pre>
  *
@@ -168,6 +170,7 @@ public class APITypeManager {
         }
         addParameter(properties, "org.bonitasoft.engine.api-type.", "server.url");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
+        addParameter(properties, "org.bonitasoft.engine.api-type.", "connections.max");
         return properties;
     }
 

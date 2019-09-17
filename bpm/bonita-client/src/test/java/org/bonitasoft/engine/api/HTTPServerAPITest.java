@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.IOUtil;
@@ -55,7 +58,23 @@ public class HTTPServerAPITest {
         HashMap<String, String> map = new HashMap<>();
         map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
         map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
+        map.put(HTTPServerAPI.CONNECTIONS_MAX, "3");
         httpServerAPI = new HTTPServerAPI(map);
+    }
+
+    @Test
+    public void should_have_max_connections_configured() throws Exception {
+        Field httpclient = httpServerAPI.getClass().getDeclaredField("httpclient");
+        httpclient.setAccessible(true);
+        HttpClient httpClient = (HttpClient) httpclient.get(null);
+        Field connManager = httpClient.getClass().getDeclaredField("connManager");
+        connManager.setAccessible(true);
+
+
+        PoolingHttpClientConnectionManager connectionManager = (PoolingHttpClientConnectionManager) connManager.get(httpClient);
+
+        assertThat(connectionManager.getDefaultMaxPerRoute()).isEqualTo(3);
+        assertThat(connectionManager.getMaxTotal()).isEqualTo(3);
     }
 
     @Test
