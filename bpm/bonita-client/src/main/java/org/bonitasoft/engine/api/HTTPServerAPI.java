@@ -29,6 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -38,8 +39,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.bonitasoft.engine.api.impl.XmlConverter;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -84,6 +84,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     // package-private for testing purpose
     static final String APPLICATION_NAME = "application.name";
+    static final String CONNECTIONS_MAX = "connections.max";
 
     private final String serverUrl;
 
@@ -95,7 +96,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private final String basicAuthenticationPassword;
 
-    private static DefaultHttpClient httpclient;
+    private static HttpClient httpclient;
 
     private static final ResponseHandler<String> RESPONSE_HANDLER = new BasicResponseHandler();
 
@@ -106,13 +107,26 @@ public class HTTPServerAPI implements ServerAPI {
         // initialize httpclient in the constructor to avoid incompatibility when running tests:
         // java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl$TLS10Context not a SSLContext
         if (httpclient == null) {
-            httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+            httpclient = createHttpClient(parameters);
         }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
         basicAuthenticationActive = "true".equalsIgnoreCase(parameters.get(BASIC_AUTHENTICATION_ACTIVE));
         basicAuthenticationUserName = parameters.get(BASIC_AUTHENTICATION_USERNAME);
         basicAuthenticationPassword = parameters.get(BASIC_AUTHENTICATION_PASSWORD);
+    }
+
+    private HttpClient createHttpClient(final Map<String, String> parameters) {
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        try {
+            int connectionsMax = Integer.parseInt(parameters.getOrDefault(CONNECTIONS_MAX, "20"));
+            // we have only one route, use same number for connection max and max per route
+            builder.setMaxConnPerRoute(connectionsMax);
+            builder.setMaxConnTotal(connectionsMax);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Client connection pool size '" + CONNECTIONS_MAX + "' must be set to a number");
+        }
+        return builder.build();
     }
 
     @Override
