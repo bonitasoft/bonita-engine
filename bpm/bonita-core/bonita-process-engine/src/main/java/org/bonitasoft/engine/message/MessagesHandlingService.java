@@ -85,8 +85,11 @@ public class MessagesHandlingService implements TenantLifecycleService {
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
-        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-        executedMessagesCounter = meterRegistry.counter(MESSAGE_MESSAGES_EXECUTED, tags);
+        executedMessagesCounter = Counter.builder(MESSAGE_MESSAGES_EXECUTED)
+                .tags(Tags.of("tenant", String.valueOf(tenantId)))
+                .baseUnit("messages")
+                .description("BPMN message couples executed")
+                .register(meterRegistry);
     }
 
     @Override

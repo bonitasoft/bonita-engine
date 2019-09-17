@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -322,9 +323,15 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                     .createMeterBinder(executorService, "bonita-connector-executor", tenantId)
                     .ifPresent(m -> m.bindTo(meterRegistry));
             Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-            meterRegistry.gauge(CONNECTOR_CONNECTORS_PENDING, tags, workQueue, Collection::size);
-            meterRegistry.gauge(CONNECTOR_CONNECTORS_RUNNING, tags, runningWorks);
-            executedWorkCounter = meterRegistry.counter(CONNECTOR_CONNECTORS_EXECUTED, tags);
+            Gauge.builder(CONNECTOR_CONNECTORS_PENDING, workQueue, Collection::size)
+                    .tags(tags).baseUnit("connectors").description("Connectors pending in the execution queue")
+                    .register(meterRegistry);
+            Gauge.builder(CONNECTOR_CONNECTORS_RUNNING, runningWorks, AtomicLong::get)
+                    .tags(tags).baseUnit("connectors").description("Connectors currently executing")
+                    .register(meterRegistry);
+            executedWorkCounter = Counter.builder(CONNECTOR_CONNECTORS_EXECUTED)
+                    .tags(tags).baseUnit("connectors").description("Total connectors executed since last server start")
+                    .register(meterRegistry);
         }
     }
 
