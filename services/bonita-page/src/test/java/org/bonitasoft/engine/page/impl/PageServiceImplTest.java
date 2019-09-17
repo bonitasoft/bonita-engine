@@ -473,6 +473,27 @@ public class PageServiceImplTest {
         assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
         assertThat(pageProperties.get("description")).isEqualTo("mypage description");
     }
+    @Test
+    public void getPageContent_should_add_properties_in_the_zip_with_non_mandatory_metadata() throws SBonitaException, IOException {
+        final SPageWithContentImpl page = new SPageWithContentImpl();
+        page.setName("mypage");
+        page.setDisplayName("mypage display name");
+        //no description
+        page.setId(12);
+        page.setContent(IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes())));
+        doReturn(page).when(readPersistenceService).selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, 12));
+
+        // when
+        final byte[] result = pageServiceImpl.getPageContent(12);
+
+        // then
+        final Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(IOUtil.unzip(result).get(PAGE_PROPERTIES)));
+
+        assertThat(pageProperties.get("name")).isEqualTo("mypage");
+        assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
+        assertThat(pageProperties.get("description")).isNull();
+    }
 
     @Test
     public void getPageContent_should_update_properties_in_the_zip_if_exists_and_keep_others() throws SBonitaException, IOException {
