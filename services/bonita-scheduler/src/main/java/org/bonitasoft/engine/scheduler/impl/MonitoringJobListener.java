@@ -14,16 +14,15 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.micrometer.core.instrument.Gauge;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 
 public class MonitoringJobListener implements BonitaJobListener {
 
@@ -54,9 +53,10 @@ public class MonitoringJobListener implements BonitaJobListener {
                 if (runningJobs.get(tenantId) == null) {
                     AtomicLong atomicLong = new AtomicLong();
                     runningJobs.put(tenantId, atomicLong);
-                    meterRegistry.gauge(JOB_JOBS_RUNNING,
-                            Collections.singletonList(Tag.of("tenant", tenantId.toString())),
-                            atomicLong);
+                    Gauge.builder(JOB_JOBS_RUNNING, atomicLong, AtomicLong::get)
+                            .tag("tenant", tenantId.toString()).baseUnit("jobs")
+                            .description("Number of jobs currently running")
+                            .register(meterRegistry);
                 }
                 counter = runningJobs.get(tenantId);
             }

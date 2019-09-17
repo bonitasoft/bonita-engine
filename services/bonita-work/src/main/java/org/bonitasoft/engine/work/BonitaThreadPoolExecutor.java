@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.work;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
@@ -73,9 +73,15 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.workExecutionAuditor = workExecutionAuditor;
 
         Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-        meterRegistry.gauge(WORK_WORKS_PENDING, tags, workQueue, Collection::size);
-        meterRegistry.gauge(WORK_WORKS_RUNNING, tags, runningWorks);
-        executedWorkCounter = meterRegistry.counter(WORK_WORKS_EXECUTED, tags);
+        Gauge.builder(WORK_WORKS_PENDING, workQueue, Collection::size)
+                .tags(tags).baseUnit("works").description("Works pending in the execution queue")
+                .register(meterRegistry);
+        Gauge.builder(WORK_WORKS_RUNNING, runningWorks, AtomicLong::get)
+                .tags(tags).baseUnit("works").description("Works currently executing")
+                .register(meterRegistry);
+        executedWorkCounter = Counter.builder(WORK_WORKS_EXECUTED)
+                .tags(tags).baseUnit("works").description("total works executed since last server start")
+                .register(meterRegistry);
     }
 
     @Override
