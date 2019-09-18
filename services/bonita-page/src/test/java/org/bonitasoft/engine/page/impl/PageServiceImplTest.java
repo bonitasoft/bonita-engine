@@ -475,7 +475,7 @@ public class PageServiceImplTest {
     }
     @Test
     public void getPageContent_should_add_properties_in_the_zip_with_non_mandatory_metadata() throws SBonitaException, IOException {
-        final SPageWithContentImpl page = new SPageWithContentImpl();
+        final SPageWithContent page = new SPageWithContent();
         page.setName("mypage");
         page.setDisplayName("mypage display name");
         //no description
