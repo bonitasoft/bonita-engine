@@ -82,3 +82,5 @@ afterEvaluate {
         }
     }
 }
+
+task listDependencies(type: DependencyReportTask) {}
