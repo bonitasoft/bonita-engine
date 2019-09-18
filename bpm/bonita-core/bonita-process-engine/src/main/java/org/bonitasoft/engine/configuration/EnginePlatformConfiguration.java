@@ -45,9 +45,9 @@ import io.micrometer.jmx.JmxMeterRegistry;
 @Configuration
 public class EnginePlatformConfiguration {
 
-    private final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
+    public final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
     private final static String PUBLISHER = "publisher.";
-    private final static String METRICS = "metrics.";
+    public final static String METRICS = "metrics.";
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + PUBLISHER + "jmx.enable", enableIfMissing = true)
@@ -65,7 +65,9 @@ public class EnginePlatformConfiguration {
         LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
         //deny all meters that are not bonita related
         registry.config()
-                .meterFilter(denyUnless(id -> id.getName().startsWith("org.bonitasoft.engine.")));
+                .meterFilter(denyUnless(id ->
+                        id.getName().startsWith("org.bonitasoft.engine.")
+                                || id.getName().startsWith("com.bonitasoft.engine.")));
         return registry;
     }
 
