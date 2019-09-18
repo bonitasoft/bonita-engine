@@ -54,6 +54,9 @@ task javadocJar(type: Jar) {
     from javadoc
     archiveClassifier = 'javadoc'
 }
+
+task listDependencies(type: DependencyReportTask) {}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -76,15 +79,15 @@ jaxb {
     schemaGen {
         forms {
             javaFiles = fileTree(dir: 'src/main/java', includes: [
-                'org/bonitasoft/engine/bpm/bar/form/model/*.java',
-                'org/bonitasoft/engine/form/*.java'
+                    'org/bonitasoft/engine/bpm/bar/form/model/*.java',
+                    'org/bonitasoft/engine/form/*.java'
             ])
             namespaceconfigs = ['http://www.bonitasoft.org/ns/form/6.0': 'form-mapping.xsd']
             outputDir = project.file("build/generated/jaxb/schemas/form-mapping")
         }
         application {
             javaFiles = fileTree(dir: 'src/main/java', includes: ['org/bonitasoft/engine/business/application/xml/**/*.java'],
-            excludes: ['**/*Builder.java'])
+                    excludes: ['**/*Builder.java'])
             namespaceconfigs = ['http://documentation.bonitasoft.com/application-xml-schema/1.0': 'application.xsd']
             outputDir = project.file("build/generated/jaxb/schemas/application")
         }
@@ -101,10 +104,12 @@ jaxb {
     }
 }
 
-processResources { from "$buildDir/generated/jaxb/schemas/form-mapping"
+processResources {
+    from "$buildDir/generated/jaxb/schemas/form-mapping"
     from "$buildDir/generated/jaxb/schemas/application"
     from "$buildDir/generated/jaxb/schemas/bom"
-    from "$buildDir/generated/jaxb/schemas/profiles" }
+    from "$buildDir/generated/jaxb/schemas/profiles"
+}
 
 //tasks.processResources.dependsOn tasks.jaxbSchemaGenProcessdefinition
 tasks.jaxbSchemaGenApplication.outputs.cacheIf { true }

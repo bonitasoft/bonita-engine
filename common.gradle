@@ -50,6 +50,11 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.encoding = 'UTF-8'
         }
+        tasks.withType(DependencyReportTask) {
+            group "Documentation"
+            description "List runtime dependencies for a specified configuration"
+            configurations = [project.configurations.runtimeClasspath]
+        }
 
     }
 }
