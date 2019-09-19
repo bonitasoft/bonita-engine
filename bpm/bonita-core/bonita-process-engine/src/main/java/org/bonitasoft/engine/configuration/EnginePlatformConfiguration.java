@@ -22,6 +22,7 @@ import java.util.List;
 import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
 import org.bonitasoft.engine.configuration.monitoring.LoggingRegistryConfig;
 import org.bonitasoft.engine.configuration.monitoring.MeterRegistryFactory;
+import org.bonitasoft.engine.configuration.monitoring.TomcatMetrics;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
@@ -40,7 +41,11 @@ import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
 
 /**
+ * Bonita Engine Spring configuration at platform-level
+ * 
  * @author Danila Mazour
+ * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 @Configuration
 public class EnginePlatformConfiguration {
@@ -54,8 +59,9 @@ public class EnginePlatformConfiguration {
     public JmxMeterRegistry jmxMeterRegistry(JmxConfig jmxConfig) {
         JmxMeterRegistry jmxMeterRegistry = new JmxMeterRegistry(jmxConfig, SYSTEM);
         jmxMeterRegistry.config()
-                //ignore jvm related metrics that are already exposed on jmx
-                .meterFilter(denyNameStartsWith("jvm."));
+                //ignore jvm and tomcat related metrics that are already exposed on jmx
+                .meterFilter(denyNameStartsWith("jvm."))
+                .meterFilter(denyNameStartsWith("tomcat."));
         return jmxMeterRegistry;
     }
 
@@ -65,20 +71,19 @@ public class EnginePlatformConfiguration {
         LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
         //deny all meters that are not bonita related
         registry.config()
-                .meterFilter(denyUnless(id ->
-                        id.getName().startsWith("org.bonitasoft.engine.")
-                                || id.getName().startsWith("com.bonitasoft.engine.")));
+                .meterFilter(denyUnless(id -> id.getName().startsWith("org.bonitasoft.engine.")
+                        || id.getName().startsWith("com.bonitasoft.engine.")));
         return registry;
     }
 
     @Bean
     public LoggingRegistryConfig loggingRegistryConfig(ApplicationContext context) {
-        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX+ PUBLISHER + key);
+        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX + PUBLISHER + key);
     }
 
     @Bean
     public JmxConfig jmxRegistryConfig(ApplicationContext context) {
-        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX+ PUBLISHER + key);
+        return key -> context.getEnvironment().getProperty(MONITORING_PREFIX + PUBLISHER + key);
     }
 
     @Bean
@@ -97,6 +102,12 @@ public class EnginePlatformConfiguration {
     @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "jvm.gc.enable", enableIfMissing = false)
     public JvmGcMetrics jvmGcMetrics() {
         return new JvmGcMetrics();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "tomcat.enable", enableIfMissing = false)
+    public TomcatMetrics tomcatMetrics() {
+        return new TomcatMetrics();
     }
 
     @Bean
@@ -121,16 +132,15 @@ public class EnginePlatformConfiguration {
         return new EmptyExecutorServiceMeterBinderProvider();
     }
 
-
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "hibernate.enable", enableIfMissing = false)
     public HibernateMetricsBinder activatedHibernateMetrics(MeterRegistry meterRegistry) {
-        return ((sessionFactory) ->
-                new HibernateMetrics(sessionFactory, "persistence", null).bindTo(meterRegistry));
+        return ((sessionFactory) -> new HibernateMetrics(sessionFactory, "persistence", null).bindTo(meterRegistry));
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "hibernate.enable", havingValue = false, enableIfMissing = true)
+    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS
+            + "hibernate.enable", havingValue = false, enableIfMissing = true)
     public HibernateMetricsBinder deactivatedHibernateMetrics() {
         return ((sessionFactory) -> {
         });
