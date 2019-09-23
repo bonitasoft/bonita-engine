@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
+import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
@@ -52,6 +54,7 @@ import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.resources.BARResourceType;
@@ -61,6 +64,7 @@ import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -78,6 +82,8 @@ public class ConnectorServiceImplTest {
 
     private static final long PROCESS_DEFINITION_ID = 123153L;
     private SProcessDefinitionImpl processDefinition;
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
@@ -96,15 +102,12 @@ public class ConnectorServiceImplTest {
     private OperationService operationService;
     @Mock
     private TimeTracker timeTracker;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Captor
     private ArgumentCaptor<SConnector> connectorArgumentCaptor;
     @Captor
     ArgumentCaptor<SDependency> dependencyArgumentCaptor;
     @Captor
     ArgumentCaptor<SBARResource> sBarResourceArgumentCaptor;
-    @InjectMocks
     private ConnectorServiceImpl connectorService;
 
     @Rule
@@ -113,6 +116,9 @@ public class ConnectorServiceImplTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
+        TechnicalLoggerSLF4JImpl logger = new TechnicalLoggerSLF4JImpl();
+        connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, expressionResolverService, operationService,
+                dependencyService, logger, timeTracker, processResourcesService);
         processDefinition = new SProcessDefinitionImpl("proc", "1");
         processDefinition.setId(PROCESS_DEFINITION_ID);
     }
@@ -362,16 +368,16 @@ public class ConnectorServiceImplTest {
                                 .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         doReturn(new SDependencyImpl("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
                 .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
+        systemOutRule.clearLog();
         //when
         connectorService.setConnectorImplementation(processDefinition, "connectorId", "connectorVersion", zip);
         //then
         verify(dependencyService, never()).createMappedDependency(anyString(), any(byte[].class), anyString(), anyLong(), any(ScopeType.class));
         verify(dependencyService, never()).deleteDependency(any(SDependency.class));
         verify(dependencyService).updateDependencyOfArtifact("jar2.jar", new byte[] { 3 }, "jar2.jar", processDefinition.getId(), ScopeType.PROCESS);
-        verify(technicalLoggerService).log(ConnectorServiceImpl.class, TechnicalLogSeverity.WARNING,
-                "Updating a dependency of the connector connectorId in version connectorVersion of process definition 123153. " +
-                        "The jar file jar2.jar was not declared in the previous connector implementation but is in the dependencies of the process. " +
-                        "The jar is still updated but this can lead to inconsistencies.");
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*Updating a dependency of the connector connectorId in version connectorVersion of process definition 123153. " +
+                "The jar file jar2.jar was not declared in the previous connector implementation but is in the dependencies of the process. " +
+                "The jar is still updated but this can lead to inconsistencies.");
     }
 
     @Test
@@ -520,5 +526,27 @@ public class ConnectorServiceImplTest {
         expectedException.expect(SConnectorException.class);
 
         connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
+    }
+
+    @Test
+    public void should_log_connector_details_when_executing_it() throws Exception{
+        //given
+        SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
+                "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
+        SConnectorInstance connectorInstance = new SConnectorInstance("myConnectorInstance", 123L,"containerType", "connectorId", "connectorVersion", ConnectorEvent.ON_ENTER);
+        when(connectorExecutor.execute(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(Collections.emptyMap()));
+        systemOutRule.clearLog();
+        //when
+        Map<String, Object> inputParameters = new HashMap<>();
+        inputParameters.put("param1", "value1");
+        inputParameters.put("param2", "value2");
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
+        //then
+        assertThat(systemOutRule.getLog()).contains("Executing connector  [name: <myConnectorInstance>, version: <connectorVersion>, connector id: <connectorId>, " +
+                "connector instance id: <0>, container type: <containerType>, container id: <123>, activation event: <ON_ENTER>]\n" +
+                "Inputs: \n" +
+                " <param1> : <value1>\n" +
+                " <param2> : <value2>\n");
     }
 }
