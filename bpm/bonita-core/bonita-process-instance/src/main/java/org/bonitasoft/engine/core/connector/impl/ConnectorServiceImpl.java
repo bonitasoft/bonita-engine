@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.XMLConstants;
@@ -142,15 +143,13 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private static String buildConnectorInputMessage(final Map<String, Object> inputParameters) {
         final StringBuilder stb = new StringBuilder();
-        if (inputParameters != null && !inputParameters.isEmpty()) {
+        if (!inputParameters.isEmpty()) {
             stb.append(LINE_SEPARATOR);
             stb.append("Inputs: ");
             stb.append(LINE_SEPARATOR);
-            final Set<String> inputNames = inputParameters.keySet();
-            for (final String inputName : inputNames) {
-                stb.append("    <").append(inputName).append("> : <").append(inputParameters.get(inputName)).append(">");
-                stb.append(LINE_SEPARATOR);
-            }
+            stb.append(inputParameters.entrySet().stream()
+                    .map(e -> " <" + e.getKey() + "> : <" + e.getValue() + ">")
+                    .collect(Collectors.joining(LINE_SEPARATOR)));
         }
         return stb.toString();
     }
@@ -160,13 +159,12 @@ public class ConnectorServiceImpl implements ConnectorService {
                                                                SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
                                                                final Map<String, Object> inputParameters) throws SConnectorException {
         final String implementationClassName = connectorImplementationDescriptor.getImplementationClassName();
-        final CompletableFuture<ConnectorResult> connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            final String message = "Executed connector " + buildConnectorContextMessage(sConnectorInstance)
+            final String message = "Executing connector " + buildConnectorContextMessage(sConnectorInstance)
                     + buildConnectorInputMessage(inputParameters);
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
-        return connectorResult;
+        return executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
     }
 
     @Override

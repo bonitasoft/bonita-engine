@@ -14,12 +14,9 @@
 package org.bonitasoft.engine.core.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.notNull;
 
 import java.io.Serializable;
@@ -32,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.connector.AbstractConnector;
@@ -51,8 +49,7 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
@@ -61,11 +58,11 @@ import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -78,16 +75,14 @@ public class ConnectorServiceImplTest {
 
     private static final long PROCESS_DEFINITION_ID = 123153L;
     private SProcessDefinitionImpl processDefinition;
-    @Mock
-    private BonitaHomeServer bonitaHomeServer;
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
     @Mock
     private CacheService cacheService;
     @Mock
     private DependencyService dependencyService;
     @Mock
     private ProcessResourcesService processResourcesService;
-    @Mock
-    private SConnectorImplementationDescriptor connectorImplDescriptorInCache;
     @Mock
     private ConnectorExecutor connectorExecutor;
     @Mock
@@ -97,8 +92,6 @@ public class ConnectorServiceImplTest {
     @Mock
     private TimeTracker timeTracker;
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
-    @Mock
     private ClassLoaderService classLoaderService;
     @Captor
     private ArgumentCaptor<SConnector> connectorArgumentCaptor;
@@ -106,7 +99,6 @@ public class ConnectorServiceImplTest {
     ArgumentCaptor<SDependency> dependencyArgumentCaptor;
     @Captor
     ArgumentCaptor<SBARResource> sBarResourceArgumentCaptor;
-    @InjectMocks
     private ConnectorServiceImpl connectorService;
 
     @Rule
@@ -115,6 +107,9 @@ public class ConnectorServiceImplTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
+        TechnicalLoggerSLF4JImpl logger = new TechnicalLoggerSLF4JImpl();
+        connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, expressionResolverService, operationService,
+                dependencyService, classLoaderService, logger, timeTracker, processResourcesService);
         processDefinition = new SProcessDefinitionImpl("proc", "1");
         processDefinition.setId(PROCESS_DEFINITION_ID);
     }
@@ -364,16 +359,16 @@ public class ConnectorServiceImplTest {
                                 .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
         doReturn(new SDependency("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
                 .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
+        systemOutRule.clearLog();
         //when
         connectorService.setConnectorImplementation(processDefinition, "connectorId", "connectorVersion", zip);
         //then
         verify(dependencyService, never()).createMappedDependency(anyString(), any(byte[].class), anyString(), anyLong(), any(ScopeType.class));
         verify(dependencyService, never()).deleteDependency(any(SDependency.class));
         verify(dependencyService).updateDependencyOfArtifact("jar2.jar", new byte[] { 3 }, "jar2.jar", processDefinition.getId(), ScopeType.PROCESS);
-        verify(technicalLoggerService).log(ConnectorServiceImpl.class, TechnicalLogSeverity.WARNING,
-                "Updating a dependency of the connector connectorId in version connectorVersion of process definition 123153. " +
-                        "The jar file jar2.jar was not declared in the previous connector implementation but is in the dependencies of the process. " +
-                        "The jar is still updated but this can lead to inconsistencies.");
+        assertThat(systemOutRule.getLog()).containsPattern("WARN.*Updating a dependency of the connector connectorId in version connectorVersion of process definition 123153. " +
+                "The jar file jar2.jar was not declared in the previous connector implementation but is in the dependencies of the process. " +
+                "The jar is still updated but this can lead to inconsistencies.");
     }
 
     @Test
@@ -522,5 +517,27 @@ public class ConnectorServiceImplTest {
         expectedException.expect(SConnectorException.class);
 
         connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
+    }
+
+    @Test
+    public void should_log_connector_details_when_executing_it() throws Exception{
+        //given
+        SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
+                "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
+        SConnectorInstance connectorInstance = new SConnectorInstance("myConnectorInstance", 123L,"containerType", "connectorId", "connectorVersion", ConnectorEvent.ON_ENTER);
+        when(connectorExecutor.execute(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(Collections.emptyMap()));
+        systemOutRule.clearLog();
+        //when
+        Map<String, Object> inputParameters = new HashMap<>();
+        inputParameters.put("param1", "value1");
+        inputParameters.put("param2", "value2");
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
+        //then
+        assertThat(systemOutRule.getLog()).contains("Executing connector  [name: <myConnectorInstance>, version: <connectorVersion>, connector id: <connectorId>, " +
+                "connector instance id: <0>, container type: <containerType>, container id: <123>, activation event: <ON_ENTER>]\n" +
+                "Inputs: \n" +
+                " <param1> : <value1>\n" +
+                " <param2> : <value2>\n");
     }
 }
