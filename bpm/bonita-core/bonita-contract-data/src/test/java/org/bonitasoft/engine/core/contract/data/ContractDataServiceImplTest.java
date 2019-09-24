@@ -64,6 +64,7 @@ public class ContractDataServiceImplTest {
     @Before
     public void setUp() {
         when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(persistenceService);
+        when(archiveService.isArchivable(SContractData.class)).thenReturn(true);
     }
 
     @Test
@@ -165,6 +166,27 @@ public class ContractDataServiceImplTest {
         contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
 
         verify(archiveService).recordInserts(time, archivedata);
+    }
+
+    @Test
+    public void archiveContractData_should_not_create_archive_data_when_archivingContractData_is_disabled() throws Exception {
+        final long usertTaskId = 1983L;
+        final long time = 1010101010101001L;
+        final List<STaskContractData> data = new ArrayList<STaskContractData>();
+        final STaskContractData scd1 = new STaskContractData(usertTaskId, "id", 456478L);
+        final STaskContractData scd2 = new STaskContractData(usertTaskId, "id2", 4564456478L);
+        data.add(scd1);
+        data.add(scd2);
+        final ArchiveInsertRecord[] archivedata = new ArchiveInsertRecord[2];
+        archivedata[0] = new ArchiveInsertRecord(new SATaskContractData(scd1));
+        archivedata[1] = new ArchiveInsertRecord(new SATaskContractData(scd2));
+        when(archiveService.isArchivable(SContractData.class)).thenReturn(false);
+        doReturn(data).when(persistenceService).selectList(any());
+
+        contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
+
+
+        verify(archiveService, never()).recordInserts(time, archivedata);
     }
 
     @Test

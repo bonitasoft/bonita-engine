@@ -31,9 +31,4 @@ public class SAProcessContractData extends SAContractData {
         super(processContract);
     }
 
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SAProcessContractData.class;
-    }
-
 }

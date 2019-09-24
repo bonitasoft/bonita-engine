@@ -18,6 +18,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 
 /**
@@ -42,5 +43,11 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     public SAContractData(SContractData contractData) {
         this(contractData.getId(), contractData.getName(), contractData.getValue(), contractData.getScopeId());
     }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SContractData.class;
+    }
+
 
 }
