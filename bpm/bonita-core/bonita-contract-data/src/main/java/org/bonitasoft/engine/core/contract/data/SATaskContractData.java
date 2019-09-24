@@ -35,9 +35,4 @@ public class SATaskContractData extends SAContractData implements ArchivedPersis
         super(taskContractData);
     }
 
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SATaskContractData.class;
-    }
-
 }
