@@ -74,7 +74,7 @@ public class EnginePlatformConfigurationTest {
             "org.bonitasoft.engine.monitoring.metrics.jvm.threads.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.jvm.gc.enable=true",
             "org.bonitasoft.engine.monitoring.metrics.executors.enable=true",
-            "org.bonitasoft.engine.monitoring.metrics.hibernate.enable=true"
+            "bonita.platform.persistence.generate_statistics=true"
     })
     public static class OverriddenPropertiesEnginePlatformConfigurationTest extends BaseMeterConfigurationTest {
 

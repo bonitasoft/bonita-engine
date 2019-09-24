@@ -133,14 +133,13 @@ public class EnginePlatformConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS + "hibernate.enable", enableIfMissing = false)
+    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics", enableIfMissing = false)
     public HibernateMetricsBinder activatedHibernateMetrics(MeterRegistry meterRegistry) {
         return ((sessionFactory) -> new HibernateMetrics(sessionFactory, "persistence", null).bindTo(meterRegistry));
     }
 
     @Bean
-    @ConditionalOnProperty(value = MONITORING_PREFIX + METRICS
-            + "hibernate.enable", havingValue = false, enableIfMissing = true)
+    @ConditionalOnProperty(value = "bonita.platform.persistence.generate_statistics", havingValue = false, enableIfMissing = true)
     public HibernateMetricsBinder deactivatedHibernateMetrics() {
         return ((sessionFactory) -> {
         });
