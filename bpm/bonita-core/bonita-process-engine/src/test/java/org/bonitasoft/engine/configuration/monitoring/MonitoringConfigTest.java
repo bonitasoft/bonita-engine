@@ -1,10 +1,9 @@
-package org.bonitasoft.engine.configuration;
+package org.bonitasoft.engine.configuration.monitoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
@@ -27,10 +26,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.jmx.JmxMeterRegistry;
 
-public class EnginePlatformConfigurationTest {
+public class MonitoringConfigTest {
 
     @RunWith(SpringRunner.class)
-    @ContextConfiguration(classes = EnginePlatformConfiguration.class)
+    @ContextConfiguration(classes = MonitoringConfiguration.class)
     public abstract static class BaseMeterConfigurationTest {
 
         @Autowired
@@ -42,7 +41,7 @@ public class EnginePlatformConfigurationTest {
 
     }
 
-    public static class DefaultEnginePlatformConfigurationTest extends BaseMeterConfigurationTest {
+    public static class DefaultMonitoringConfigTest extends BaseMeterConfigurationTest {
 
         @Test
         public void should_have_all_registries_activated_by_default() {
@@ -76,7 +75,7 @@ public class EnginePlatformConfigurationTest {
             "org.bonitasoft.engine.monitoring.metrics.executors.enable=true",
             "bonita.platform.persistence.generate_statistics=true"
     })
-    public static class OverriddenPropertiesEnginePlatformConfigurationTest extends BaseMeterConfigurationTest {
+    public static class OverriddenPropertiesMonitoringConfigTest extends BaseMeterConfigurationTest {
 
         @Rule
         public MockitoRule mockitoRule = MockitoJUnit.rule();

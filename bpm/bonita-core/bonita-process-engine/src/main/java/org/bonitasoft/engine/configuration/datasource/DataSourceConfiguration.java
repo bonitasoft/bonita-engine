@@ -11,24 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.configuration;
+package org.bonitasoft.engine.configuration.datasource;
 
-import org.bonitasoft.engine.configuration.datasource.DataSourceConfiguration;
-import org.bonitasoft.engine.configuration.monitoring.MonitoringConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-/**
- * Bonita Engine Spring configuration at platform-level
- * 
- * @author Danila Mazour
- * @author Baptiste Mesta
- * @author Emmanuel Duchastenier
- */
 @Configuration
-@Import({DataSourceConfiguration.class,
-        MonitoringConfiguration.class})
-public class EnginePlatformConfiguration {
+@ComponentScan
+public class DataSourceConfiguration {
 
 
 }
