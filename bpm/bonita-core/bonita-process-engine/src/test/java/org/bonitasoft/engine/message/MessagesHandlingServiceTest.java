@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
@@ -245,7 +244,7 @@ public class MessagesHandlingServiceTest {
         messagesHandlingService.executeMessageCouple(1L, 2L);
 
         // then:
-        assertThat(meterRegistry.find(MessagesHandlingService.MESSAGE_MESSAGES_EXECUTED).counter().count())
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED).counter().count())
                 .isEqualTo(1);
 
     }
@@ -253,6 +252,6 @@ public class MessagesHandlingServiceTest {
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(MessagesHandlingService.MESSAGE_MESSAGES_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(MessagesHandlingService.NUMBER_OF_MESSAGES_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
     }
 }

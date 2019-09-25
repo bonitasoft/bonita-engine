@@ -25,15 +25,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Julien Reboul
@@ -41,9 +41,9 @@ import io.micrometer.core.instrument.MeterRegistry;
  */
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
-    public static final String WORK_WORKS_PENDING = "org.bonitasoft.engine.work.works.pending";
-    public static final String WORK_WORKS_RUNNING = "org.bonitasoft.engine.work.works.running";
-    public static final String WORK_WORKS_EXECUTED = "org.bonitasoft.engine.work.works.executed";
+    public static final String NUMBER_OF_WORKS_PENDING = "bonita.bpmengine.work.pending";
+    public static final String NUMBER_OF_WORKS_RUNNING = "bonita.bpmengine.work.running";
+    public static final String NUMBER_OF_WORKS_EXECUTED = "bonita.bpmengine.work.executed";
 
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
@@ -73,13 +73,13 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.workExecutionAuditor = workExecutionAuditor;
 
         Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-        Gauge.builder(WORK_WORKS_PENDING, workQueue, Collection::size)
+        Gauge.builder(NUMBER_OF_WORKS_PENDING, workQueue, Collection::size)
                 .tags(tags).baseUnit("works").description("Works pending in the execution queue")
                 .register(meterRegistry);
-        Gauge.builder(WORK_WORKS_RUNNING, runningWorks, AtomicLong::get)
+        Gauge.builder(NUMBER_OF_WORKS_RUNNING, runningWorks, AtomicLong::get)
                 .tags(tags).baseUnit("works").description("Works currently executing")
                 .register(meterRegistry);
-        executedWorkCounter = Counter.builder(WORK_WORKS_EXECUTED)
+        executedWorkCounter = Counter.builder(NUMBER_OF_WORKS_EXECUTED)
                 .tags(tags).baseUnit("works").description("total works executed since last server start")
                 .register(meterRegistry);
     }
