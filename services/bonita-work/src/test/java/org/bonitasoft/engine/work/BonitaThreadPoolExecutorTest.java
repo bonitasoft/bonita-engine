@@ -121,7 +121,7 @@ public class BonitaThreadPoolExecutorTest {
 
     @Test
     public void should_update_meter_when_work_executes() {
-        Gauge currentWorkQueue = meterRegistry.find("org.bonitasoft.engine.work.works.pending").gauge();
+        Gauge currentWorkQueue = meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_PENDING).gauge();
         for (int i = 0; i <= threadNumber + 3; i++) {
             WorkDescriptor workDescriptor = WorkDescriptor.create("SLEEP");
             bonitaThreadPoolExecutor.submit(workDescriptor);
@@ -144,21 +144,21 @@ public class BonitaThreadPoolExecutorTest {
 
         //then:
         // 1 executed because normal work is submitted first.
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_EXECUTED).counter().count())
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_EXECUTED).counter().count())
                 .as("Executed works number").isEqualTo(1);
         // 3 running works because we have 3 threads in the pool and sleeping works wait for 2s to execute:
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_RUNNING).gauge().value())
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_RUNNING).gauge().value())
                 .as("Running works number").isEqualTo(3);
         // 2 pending works because all 3 threads are busy, so the last 2 works are in the queue:
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_PENDING).gauge().value())
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_PENDING).gauge().value())
                 .as("Pending works number").isEqualTo(2);
     }
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.WORK_WORKS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
     @Test

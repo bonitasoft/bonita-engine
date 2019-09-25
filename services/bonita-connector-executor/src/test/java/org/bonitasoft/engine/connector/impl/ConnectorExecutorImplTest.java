@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -211,11 +210,11 @@ public class ConnectorExecutorImplTest {
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
         //then:
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).counter().count())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).counter().count())
                 .as("Executed connectors number").isEqualTo(1);
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).gauge().value())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING).gauge().value())
                 .as("Running connectors number").isEqualTo(0);
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).gauge().value())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).gauge().value())
                 .as("Pending connectors number").isEqualTo(0);
     }
 
@@ -230,11 +229,11 @@ public class ConnectorExecutorImplTest {
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
         //then:  one is in queue (only one thread to execute connectors) and one is pending
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).counter().count())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).counter().count())
                 .as("Executed connectors number").isEqualTo(0);
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).gauge().value())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING).gauge().value())
                 .as("Running connectors number").isEqualTo(1);
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).gauge().value())
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).gauge().value())
                 .as("Pending connectors number").isEqualTo(1);
     }
 
@@ -291,9 +290,9 @@ public class ConnectorExecutorImplTest {
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.CONNECTOR_CONNECTORS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
 }

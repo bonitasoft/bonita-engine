@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
@@ -53,6 +52,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Baptiste Mesta
@@ -61,7 +61,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
 
     private static final int MAX_COUPLES = 100;
     private static final String LOCK_TYPE = "EVENTS";
-    public static final String MESSAGE_MESSAGES_EXECUTED = "org.bonitasoft.engine.message.messages.executed";
+    public static final String NUMBER_OF_MESSAGES_EXECUTED = "bonita.bpmengine.message.executed";
     private ThreadPoolExecutor threadPoolExecutor;
     private EventInstanceService eventInstanceService;
     private WorkService workService;
@@ -85,7 +85,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
-        executedMessagesCounter = Counter.builder(MESSAGE_MESSAGES_EXECUTED)
+        executedMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_EXECUTED)
                 .tags(Tags.of("tenant", String.valueOf(tenantId)))
                 .baseUnit("messages")
                 .description("BPMN message couples executed")
