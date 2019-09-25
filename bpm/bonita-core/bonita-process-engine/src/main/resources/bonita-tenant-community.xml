@@ -1679,13 +1679,23 @@
         <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
     </bean>
 
+
+
+    <bean id="bdmDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${bdm.datasource.jndi.path}" />
+    </bean>
+
+    <bean id="bdmNonXaDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${bdm.notmanageddatasource.jndi.path}" />
+    </bean>
+
     <bean id="businessDataRepository" class="org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
         <constructor-arg name="configuration">
             <map>
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${bdm.datasource.jndi.path}" />
+                <entry key="hibernate.connection.datasource" value-ref="bdmDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.repository.show_sql}" />
                 <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.repository.format_sql}" />
                 <entry key="hibernate.transaction.jta.platform"
@@ -1718,7 +1728,7 @@
         <constructor-arg name="configuration">
             <map>
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${bdm.notmanageddatasource.jndi.path}" />
+                <entry key="hibernate.connection.datasource" value-ref="bdmNonXaDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.schemamanager.show_sql}" />
                 <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.schemamanager.format_sql}" />
                 <entry key="hibernate.transaction.jta.platform"

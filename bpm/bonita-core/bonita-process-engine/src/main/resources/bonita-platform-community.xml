@@ -26,8 +26,10 @@
                 <prop key="org.quartz.jobStore.dataSource">managedDS</prop>
                 <prop key="org.quartz.jobStore.useProperties">true</prop>
                 <prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>
-                <prop key="org.quartz.dataSource.managedDS.jndiURL">${database.journal.datasource.name}</prop>
-                <prop key="org.quartz.dataSource.notManagedDS.jndiURL">${database.sequence.manager.datasource.name}</prop>
+                <prop key="org.quartz.dataSource.managedDS.connectionProvider.class">org.bonitasoft.engine.configuration.datasource.QuartzConnectionProvider</prop>
+                <prop key="org.quartz.dataSource.managedDS.xaDataSource">true</prop>
+                <prop key="org.quartz.dataSource.notManagedDS.connectionProvider.class">org.bonitasoft.engine.configuration.datasource.QuartzConnectionProvider</prop>
+                <prop key="org.quartz.dataSource.notManagedDS.xaDataSource">false</prop>
                 <prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
                 <prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
                 <prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
@@ -126,7 +128,7 @@
         <constructor-arg ref="platformCacheService" />
         <constructor-arg ref="platformProperties" />
         <constructor-arg name="recorder" ref="platformRecorderSync" />
-        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <!-- read SQL files from within bonita-server.jar -->
         <constructor-arg name="sqlFolders" ref="sqlFolders" />
     </bean>
@@ -193,8 +195,16 @@
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
-    <bean id="bonitaSequenceManagerDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <bean id="bonitaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${database.journal.datasource.name}" />
+    </bean>
+
+    <bean id="bonitaNonXaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiName" value="${database.sequence.manager.datasource.name}" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${transaction.manager}" />
     </bean>
 
     <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyService">
@@ -764,15 +774,13 @@
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
         <constructor-arg name="lockService" ref="lockService" />
         <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
-        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
         <constructor-arg name="delay" value="${bonita.platform.sequence.delay}" />
         <constructor-arg name="delayFactor" value="${bonita.platform.sequence.delayFactor}" />
     </bean>
 
-    <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName" value="${transaction.manager}" />
-    </bean>
+
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -1035,7 +1043,7 @@
         <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.platform.likeEscapeCharacter}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
-        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.platform.enableWordSearch}" />
         <constructor-arg name="wordSearchExclusionMappings" ref="platformWordSearchExclusionMappings" />
     </bean>
@@ -1070,7 +1078,7 @@
         <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
-        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="datasource" ref="bonitaNonXaDataSource" />
         <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
         <constructor-arg name="wordSearchExclusionMappings" ref="tenantWordSearchExclusionMappings" />
     </bean>
@@ -1107,7 +1115,7 @@
     <bean id="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
         <property name="map">
             <map>
-                <entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}" />
+                <entry key="hibernate.connection.datasource" value-ref="bonitaDataSource" />
                 <entry key="hibernate.current_session_context_class" value="jta" />
                 <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
                 <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />

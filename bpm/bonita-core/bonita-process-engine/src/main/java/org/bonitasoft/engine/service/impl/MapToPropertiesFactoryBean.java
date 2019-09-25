@@ -24,7 +24,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  */
 public class MapToPropertiesFactoryBean extends AbstractFactoryBean<Properties> {
 
-    private Map<String, String> map;
+    private Map<String, Object> map;
 
     @Override
     public Class<?> getObjectType() {
@@ -38,7 +38,7 @@ public class MapToPropertiesFactoryBean extends AbstractFactoryBean<Properties> 
         return properties;
     }
 
-    public void setMap(final Map<String, String> map) {
+    public void setMap(final Map<String, Object> map) {
         this.map = map;
     }
 }
