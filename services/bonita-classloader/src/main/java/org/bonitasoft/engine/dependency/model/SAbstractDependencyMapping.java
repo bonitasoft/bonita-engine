@@ -13,18 +13,24 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SPlatformDependencyMapping extends SAbstractDependencyMapping {
+public class SAbstractDependencyMapping implements PersistentObject {
+    private long id;
+    private long artifactId;
+    private ScopeType artifactType;
+    private long dependencyId;
+    private long tenantId;
 
-    public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
-        super(artifactId, artifactType, dependencyId);
+    public SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+        super();
+        this.artifactId = artifactId;
+        this.artifactType = artifactType;
+        this.dependencyId = dependencyId;
     }
 
 }

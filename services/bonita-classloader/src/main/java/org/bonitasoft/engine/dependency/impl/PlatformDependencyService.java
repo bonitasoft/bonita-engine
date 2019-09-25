@@ -27,6 +27,7 @@ import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
+import org.bonitasoft.engine.dependency.model.SAbstractDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
@@ -128,7 +129,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected void createDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
+    protected void createDependencyMapping(final SAbstractDependencyMapping dependencyMapping) throws SDependencyException {
         try {
             platformPersistenceService.insert(dependencyMapping);
         } catch (final SPersistenceException pe) {
@@ -137,7 +138,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected void deleteDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
+    protected void deleteDependencyMapping(final SAbstractDependencyMapping dependencyMapping) throws SDependencyException {
         try {
             platformPersistenceService.delete(dependencyMapping);
         } catch (final SPersistenceException pe) {
@@ -156,11 +157,11 @@ public class PlatformDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected List<SDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
+    protected List<SAbstractDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
         try {
             final Map<String, Object> parameters = new HashMap<>();
             parameters.put("dependencyId", dependencyId);
-            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<>("getPlatformDependencyMappingsByDependency",
+            final SelectListDescriptor<SAbstractDependencyMapping> desc = new SelectListDescriptor<>("getPlatformDependencyMappingsByDependency",
                     parameters, SPlatformDependencyMapping.class, queryOptions);
             return platformPersistenceService.selectList(desc);
         } catch (final SBonitaReadException e) {
@@ -184,7 +185,7 @@ public class PlatformDependencyService extends AbstractDependencyService {
         } catch (final SPersistenceException pe) {
             throw new SDependencyCreationException(pe);
         }
-        final SDependencyMapping sDependencyMapping = new SPlatformDependencyMapping(artifactId, scopeType, sDependency.getId());
+        final SPlatformDependencyMapping sDependencyMapping = new SPlatformDependencyMapping(artifactId, scopeType, sDependency.getId());
         createDependencyMapping(sDependencyMapping);
         return sDependency;
     }

@@ -29,6 +29,7 @@ import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.AbstractSDependency;
 import org.bonitasoft.engine.dependency.model.DependencyContent;
+import org.bonitasoft.engine.dependency.model.SAbstractDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -91,7 +92,7 @@ public class TenantDependencyService extends AbstractDependencyService {
         logBuilder.setActionType(actionType);
     }
 
-    private SDependencyMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SDependencyMapping dependencyMapping) {
+    private SDependencyMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SAbstractDependencyMapping dependencyMapping) {
         final SDependencyMappingLogBuilder logBuilder = BuilderFactory.get(SDependencyMappingLogBuilderFactory.class).createNewInstance();
         initializeLogBuilder(logBuilder, message);
         updateLog(actionType, logBuilder);
@@ -130,12 +131,12 @@ public class TenantDependencyService extends AbstractDependencyService {
 
 
     @Override
-    protected List<SDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
+    protected List<SAbstractDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
         NullCheckingUtil.checkArgsNotNull(dependencyId, queryOptions);
         try {
             final Map<String, Object> parameters = new HashMap<>();
             parameters.put("dependencyId", dependencyId);
-            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<>("getDependencyMappingsByDependency", parameters,
+            final SelectListDescriptor<SAbstractDependencyMapping> desc = new SelectListDescriptor<>("getDependencyMappingsByDependency", parameters,
                     SDependencyMapping.class, queryOptions);
             return persistenceService.selectList(desc);
         } catch (final SBonitaReadException e) {
@@ -165,7 +166,8 @@ public class TenantDependencyService extends AbstractDependencyService {
         recorder.recordDelete(new DeleteRecord(object), eventType);
     }
 
-    public void deleteDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
+    @Override
+    public void deleteDependencyMapping(final SAbstractDependencyMapping dependencyMapping) throws SDependencyException {
         NullCheckingUtil.checkArgsNotNull(dependencyMapping);
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency mapping", dependencyMapping);
         try {
@@ -285,7 +287,7 @@ public class TenantDependencyService extends AbstractDependencyService {
     }
 
     @Override
-    protected void createDependencyMapping(SDependencyMapping dependencyMapping) throws SDependencyException {
+    protected void createDependencyMapping(SAbstractDependencyMapping dependencyMapping) throws SDependencyException {
         final SDependencyMappingLogBuilder logBuilder1 = getQueriableLog(ActionType.CREATED, "Creating a dependency mapping", dependencyMapping);
         NullCheckingUtil.checkArgsNotNull(dependencyMapping);
         try {
@@ -296,6 +298,7 @@ public class TenantDependencyService extends AbstractDependencyService {
             throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);
         }
     }
+
 
     @Override
     public SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException {
