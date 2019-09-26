@@ -28,8 +28,6 @@ import org.bonitasoft.engine.execution.work.TenantRestartHandler;
  */
 public class NodeConfigurationImpl implements NodeConfiguration {
 
-    private boolean shouldStartScheduler = true;
-
     private boolean shouldRestartElements = true;
 
     private List<RestartHandler> restartHandlers;
@@ -37,11 +35,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     private List<TenantRestartHandler> tenantRestartHandlers;
 
     private List<PlatformLifecycleService> lifecycleServices;
-
-    @Override
-    public boolean shouldStartScheduler() {
-        return shouldStartScheduler;
-    }
 
     @Override
     public boolean shouldResumeElements() {
@@ -64,10 +57,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     public void setTenantRestartHandlers(final List<TenantRestartHandler> tenantRestartHandlers) {
         this.tenantRestartHandlers = tenantRestartHandlers;
-    }
-
-    public void setShouldStartScheduler(final boolean shouldStartScheduler) {
-        this.shouldStartScheduler = shouldStartScheduler;
     }
 
     public void setShouldRestartElements(final boolean shouldRestartElements) {
