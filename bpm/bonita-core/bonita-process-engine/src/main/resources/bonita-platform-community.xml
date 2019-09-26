@@ -136,7 +136,6 @@
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
 
     <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
-        <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
         <property name="tenantRestartHandlers">
             <list>

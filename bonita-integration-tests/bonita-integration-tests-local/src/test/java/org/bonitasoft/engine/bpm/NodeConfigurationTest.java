@@ -58,12 +58,6 @@ public class NodeConfigurationTest {
     }
 
     @Test
-    public void getShouldStartScheduler() {
-        boolean startScheduler = ((NodeConfigurationImpl) nodeConfiguration).shouldStartScheduler();
-        assertEquals(true, startScheduler);
-    }
-
-    @Test
     public void getShouldRestartElements() {
         boolean restartElements = ((NodeConfigurationImpl) nodeConfiguration).shouldResumeElements();
         assertEquals(true, restartElements);

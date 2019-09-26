@@ -276,7 +276,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     void startScheduler(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
+        if (!schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
             schedulerService.start();
         }
@@ -366,10 +366,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             final List<PlatformLifecycleService> otherServicesToStop = getPlatformServicesToStart(nodeConfiguration);
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            if (nodeConfiguration.shouldStartScheduler()) {
-                // we shutdown the scheduler only if we are also responsible of starting it
-                shutdownScheduler(platformAccessor);
-            }
+            shutdownScheduler(platformAccessor);
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
                 if (nodeConfiguration.shouldClearSessions()) {

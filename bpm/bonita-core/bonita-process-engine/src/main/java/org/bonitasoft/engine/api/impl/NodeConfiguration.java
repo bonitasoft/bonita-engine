@@ -30,14 +30,6 @@ import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 public interface NodeConfiguration {
 
     /**
-     * specify if the scheduler should start on this node
-     *
-     * @return
-     *         true if the scheduler
-     */
-    boolean shouldStartScheduler();
-
-    /**
      * specify if we should resume unfinished elements when the node is started
      *
      * @return
