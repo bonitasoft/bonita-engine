@@ -19,14 +19,6 @@ import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
 import java.util.List;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.binder.MeterBinder;
-import io.micrometer.core.instrument.binder.jpa.HibernateMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.jmx.JmxConfig;
-import io.micrometer.jmx.JmxMeterRegistry;
 import org.bonitasoft.engine.configuration.ConditionalOnProperty;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
@@ -35,12 +27,21 @@ import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jpa.HibernateMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.jmx.JmxConfig;
+import io.micrometer.jmx.JmxMeterRegistry;
+
 /**
  * Configuration related to Monitoring
  */
 @Configuration
 public class MonitoringConfiguration {
-
 
     public final static String MONITORING_PREFIX = "org.bonitasoft.engine.monitoring.";
     private final static String PUBLISHER = "publisher.";
@@ -62,9 +63,7 @@ public class MonitoringConfiguration {
     public LoggingMeterRegistry loggingMeterRegistry(LoggingRegistryConfig loggingRegistryConfig) {
         LoggingMeterRegistry registry = new LoggingMeterRegistry(loggingRegistryConfig, SYSTEM);
         //deny all meters that are not bonita related
-        registry.config()
-                .meterFilter(denyUnless(id -> id.getName().startsWith("org.bonitasoft.engine.")
-                        || id.getName().startsWith("com.bonitasoft.engine.")));
+        registry.config().meterFilter(denyUnless(id -> id.getName().startsWith("bonita.bpmengine.")));
         return registry;
     }
 

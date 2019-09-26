@@ -18,18 +18,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import io.micrometer.core.instrument.Gauge;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 
 public class MonitoringJobListener implements BonitaJobListener {
 
     private static final long serialVersionUID = 2830540082890033377L;
 
-    public static final String JOB_JOBS_RUNNING = "org.bonitasoft.engine.job.jobs.running";
-    public static final String JOB_JOBS_EXECUTED = "org.bonitasoft.engine.job.jobs.executed";
+    public static final String JOB_JOBS_RUNNING = "bonita.bpmengine.job.running";
+    public static final String JOB_JOBS_EXECUTED = "bonita.bpmengine.job.executed";
 
     private final Map<Long, AtomicLong> runningJobs = new ConcurrentHashMap<>();
     private final Map<Long, Counter> executedCounter = new ConcurrentHashMap<>();
