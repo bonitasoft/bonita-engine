@@ -1,5 +1,8 @@
-# Bonita Engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg)](https://travis-ci.org/bonitasoft/bonita-engine)
+# Bonita Engine
 
+[![Travis-ci Status](https://travis-ci.org/bonitasoft/bonita-engine.svg)](https://travis-ci.org/bonitasoft/bonita-engine)
+
+[![Github Actions status](https://github.com/bonitasoft/bonita-engine/workflows/Build%20Engine%20Community/badge.svg)](https://github.com/bonitasoft/bonita-engine/actions)
 Deploy, execute, manage applications made with Bonita Studio.
 
 
