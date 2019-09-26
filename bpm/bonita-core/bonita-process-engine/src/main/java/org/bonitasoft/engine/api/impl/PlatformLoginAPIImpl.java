@@ -35,7 +35,7 @@ import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements PlatformLoginAPI {
+public class PlatformLoginAPIImpl implements PlatformLoginAPI {
 
     @Override
     @CustomTransactions
