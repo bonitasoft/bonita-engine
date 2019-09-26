@@ -50,7 +50,7 @@ import org.springframework.util.CollectionUtils;
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  */
-public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
+public class LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
