@@ -16,7 +16,7 @@ class Deps {
     public static String slf4jVersion = "1.7.25"
     public static String h2Version = "1.4.199"
     public static String hibernateVersion = "4.3.11.Final"
-    public static String jacksonDataBindingVersion = "2.9.8"
+    public static String jacksonDataBindingVersion = "2.9.10"
     public static String javaxJtaVersion = "1.1"
     public static String groovyAllVersion = "2.4.16"
     public static String javassistVersion = "3.18.1-GA"
