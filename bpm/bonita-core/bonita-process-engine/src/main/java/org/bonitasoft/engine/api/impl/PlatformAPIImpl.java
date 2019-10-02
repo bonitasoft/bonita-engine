@@ -13,29 +13,20 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.START;
 import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
-import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
-import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -44,13 +35,12 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.execution.work.TenantRestarter;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -88,7 +78,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-    static boolean isNodeStarted = false;
 
     public PlatformAPIImpl() {
         super();
@@ -151,57 +140,22 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-        if (isNodeStarted) {
-            throw new StartNodeException("Node already started");
-        }
+
         final PlatformServiceAccessor platformAccessor;
-        SessionAccessor sessionAccessor;
+        PlatformManager platformManager;
         try {
             platformAccessor = getPlatformAccessor();
-            sessionAccessor = createSessionAccessor();
+            platformManager = platformAccessor.getPlatformManager();
         } catch (final Exception e) {
             throw new StartNodeException(e);
         }
+        if (platformManager.getState() == PlatformState.STARTED) {
+            throw new StartNodeException("Node already started");
+        }
         try {
-            try {
-                checkPlatformVersion(platformAccessor);
-                final List<STenant> tenants = getTenants(platformAccessor);
-                startPlatformServices(platformAccessor);
-                final boolean mustRestartElements = !isNodeStarted();
-                Map<STenant, List<TenantRestartHandler>> restartHandlersOfTenant = null;
-                if (mustRestartElements) {
-                    // restart handlers of tenant are executed before any service start
-                    restartHandlersOfTenant = beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
-                }
-                startServicesOfTenants(platformAccessor, sessionAccessor, tenants);
-                if (mustRestartElements) {
-                    startScheduler(platformAccessor);
-                    restartHandlersOfPlatform(platformAccessor);
-                }
-                isNodeStarted = true;
-                if (mustRestartElements) {
-                    afterServicesStartOfRestartHandlersOfTenant(platformAccessor, restartHandlersOfTenant);
-                }
-
-            } catch (final SClassLoaderException | SDependencyException e) {
-                throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
-            } catch (final StartNodeException sne) {
-                throw sne;
-            } catch (final Exception e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } finally {
-                cleanSessionAccessor(sessionAccessor, -1);
-            }
-        } catch (final StartNodeException e) {
-            // If an exception is thrown, stop the platform that was started.
-            try {
-                shutdownScheduler(platformAccessor);
-            } catch (final StartNodeException sne) {
-                throw sne;
-            } catch (final Exception exp) {
-                throw new StartNodeException("Platform stopping failed : " + exp.getMessage(), e);
-            }
-            throw e;
+            platformManager.start();
+        } catch (final Exception e) {
+            throw new StartNodeException("Platform starting failed.", e);
         }
     }
 
@@ -210,71 +164,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
-    void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor,
-            final Map<STenant, List<TenantRestartHandler>> tenantRestartHandlersOfTenants) {
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        if (platformConfiguration.shouldResumeElements()) {
-            // Here get all elements that are not "finished"
-            // * FlowNodes that have flag: stateExecuting to true: call execute on them (connectors were executing)
-            // * Process instances with token count == 0 (either not started again or finishing) -> same thing connectors were executing
-            // * transitions that are in state created: call execute on them
-            // * flow node that are completed and not deleted : call execute to make it create transitions and so on
-            // * all element that are in not stable state
-            for (Entry<STenant, List<TenantRestartHandler>> tenantRestartHandlers : tenantRestartHandlersOfTenants.entrySet()) {
-                TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantRestartHandlers.getKey().getId());
-                new TenantRestarter(platformAccessor, tenantServiceAccessor).executeAfterServicesStart(tenantRestartHandlers.getValue());
-            }
 
-        }
-    }
-
-    Map<STenant, List<TenantRestartHandler>> beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor,
-            final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) throws Exception {
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        Map<STenant, List<TenantRestartHandler>> restartHandlers = new HashMap<>();
-        if (platformConfiguration.shouldResumeElements()) {
-            // Here get all elements that are not "finished"
-            // * FlowNodes that have flag: stateExecuting to true: call execute on them (connectors were executing)
-            // * Process instances with token count == 0 (either not started again or finishing) -> same thing connectors were executing
-            // * transitions that are in state created: call execute on them
-            // * flow node that are completed and not deleted : call execute to make it create transitions and so on
-            // * all element that are in not stable state
-            for (final STenant tenant : tenants) {
-                if (!tenant.isPaused()) {
-                    final long tenantId = tenant.getId();
-                    final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-                    long sessionId = -1;
-                    long platformSessionId = -1;
-                    try {
-                        platformSessionId = sessionAccessor.getSessionId();
-                        sessionAccessor.deleteSessionId();
-                        sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-
-                        restartHandlers.put(tenant, beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, tenantId));
-                    } finally {
-                        sessionService.deleteSession(sessionId);
-                        cleanSessionAccessor(sessionAccessor, platformSessionId);
-                    }
-                }
-            }
-        }
-        return restartHandlers;
-    }
-
-    void restartHandlersOfPlatform(final PlatformServiceAccessor platformAccessor) throws Exception {
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
-
-            platformAccessor.getTransactionService().executeInTransaction(() -> {
-                restartHandler.execute();
-                return null;
-            });
-        }
-    }
 
     void startScheduler(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (!schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
@@ -282,80 +174,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
-            final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
 
-        for (final STenant tenant : tenants) {
-            final long tenantId = tenant.getId();
-            if (!tenant.isPaused() && tenant.isActivated()) {
-                final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-                long sessionId = -1;
-                long platformSessionId = -1;
-                try {
-                    platformSessionId = sessionAccessor.getSessionId();
-                    sessionAccessor.deleteSessionId();
-                    sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-                    final SetServiceState startService = new SetServiceState(tenantId, START);
-                    platformAccessor.getTransactionService().executeInTransaction(startService);
-                } finally {
-                    sessionService.deleteSession(sessionId);
-                    cleanSessionAccessor(sessionAccessor, platformSessionId);
-                }
-            }
-        }
-    }
-
-    void checkPlatformVersion(final PlatformServiceAccessor platformAccessor) throws Exception {
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-
-        final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
-        if (!transactionService.executeInTransaction(checkPlatformVersion)) {
-            throw new StartNodeException(checkPlatformVersion.getErrorMessage());
-        }
-    }
-
-    void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SBonitaException, StartNodeException {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        final List<PlatformLifecycleService> servicesToStart = getPlatformServicesToStart(platformConfiguration);
-        for (final PlatformLifecycleService serviceWithLifecycle : servicesToStart) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform : " + serviceWithLifecycle.getClass().getName());
-            }
-            // scheduler might be already running
-            // skip service start
-            if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
-                serviceWithLifecycle.start();
-            }
-        }
-    }
-
-    protected List<PlatformLifecycleService> getPlatformServicesToStart(NodeConfiguration platformConfiguration) throws StartNodeException {
-        return platformConfiguration.getLifecycleServices();
-    }
-
-    private List<TenantRestartHandler> beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final long tenantId)
-            throws Exception {
-        final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-
-        final Callable<List<TenantRestartHandler>> callable = new Callable<List<TenantRestartHandler>>() {
-
-            @Override
-            public List<TenantRestartHandler> call() throws Exception {
-                return new TenantRestarter(platformAccessor, tenantServiceAccessor).executeBeforeServicesStart();
-            }
-        };
-        return tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
-
-    }
-
-    List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        return transactionService.executeInTransaction(new GetTenantsCallable(platformService));
-    }
 
     @Override
     @CustomTransactions
@@ -363,41 +182,11 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
-            final List<PlatformLifecycleService> otherServicesToStop = getPlatformServicesToStart(nodeConfiguration);
-            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            shutdownScheduler(platformAccessor);
-            final List<STenant> tenantIds = getTenants(platformAccessor);
-            for (final STenant tenant : tenantIds) {
-                if (nodeConfiguration.shouldClearSessions()) {
-                    final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
-                    tenantServiceAccessor.getSessionService().deleteSessions();
-                }
-                // stop the tenant services:
-                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), STOP));
-            }
-            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
-                serviceWithLifecycle.stop();
-            }
-            isNodeStarted = false;
-        } catch (final SBonitaException | BonitaHomeNotSetException | InstantiationException | IllegalAccessException | ClassNotFoundException
-                | IOException e) {
-            throw new StopNodeException(e);
-        } catch (final BonitaHomeConfigurationException e) {
-            throw new StopNodeException(e.getMessage());
+            platformAccessor.getPlatformManager().stop();
         } catch (final StopNodeException e) {
             throw e;
         } catch (final Exception e) {
             throw new StopNodeException(e);
-        }
-    }
-
-    private void shutdownScheduler(final PlatformServiceAccessor platformAccessor) throws Exception {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-
-        if (isNodeStarted()) {
-            schedulerService.stop();
         }
     }
 
@@ -656,10 +445,11 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public PlatformState getPlatformState() {
-        if (isNodeStarted()) {
-            return PlatformState.STARTED;
+        try {
+            return getPlatformAccessor().getPlatformManager().getState();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
-        return PlatformState.STOPPED;
     }
 
     private STenant getDefaultTenant() throws STenantNotFoundException {
@@ -680,7 +470,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @AvailableOnStoppedNode
     public boolean isNodeStarted() {
-        return isNodeStarted;
+        return getPlatformState() == PlatformState.STARTED;
     }
 
     @Override

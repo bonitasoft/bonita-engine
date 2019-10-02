@@ -86,14 +86,10 @@ public class PlatformAPIImplTest {
     @Before
     public void setup() throws Exception {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
-        doReturn(platformConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
-        doReturn(sessionAccessor).when(platformAPI).createSessionAccessor();
-        doReturn(tenants).when(platformAPI).getTenants(platformServiceAccessor);
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServerInstance();
-        PlatformAPIImpl.isNodeStarted = false;
     }
 
     @Test
@@ -115,40 +111,6 @@ public class PlatformAPIImplTest {
         doThrow(new IOException()).when(platformAPI).getPlatformAccessor();
 
         platformAPI.rescheduleErroneousTriggers();
-    }
-
-    @Test
-    public void startNode_should_call_startScheduler_when_node_is_not_started() throws Exception {
-        // Given
-        doNothing().when(platformAPI).checkPlatformVersion(platformServiceAccessor);
-        doNothing().when(platformAPI).startPlatformServices(platformServiceAccessor);
-        doReturn(false).when(platformAPI).isNodeStarted();
-        doReturn(Collections.singletonMap(sTenant, Collections.emptyList())).when(platformAPI)
-                .beforeServicesStartOfRestartHandlersOfTenant(platformServiceAccessor, sessionAccessor, tenants);
-        doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
-        doNothing().when(platformAPI).restartHandlersOfPlatform(platformServiceAccessor);
-        doNothing().when(platformAPI).afterServicesStartOfRestartHandlersOfTenant(eq(platformServiceAccessor), anyMap());
-
-        // When
-        platformAPI.startNode();
-
-        // Then
-        verify(platformAPI).startScheduler(platformServiceAccessor);
-    }
-
-    @Test
-    public void startNode_should_not_call_startScheduler_when_node_is_started() throws Exception {
-        // Given
-        doNothing().when(platformAPI).checkPlatformVersion(platformServiceAccessor);
-        doNothing().when(platformAPI).startPlatformServices(platformServiceAccessor);
-        doReturn(true).when(platformAPI).isNodeStarted();
-        doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
-
-        // When
-        platformAPI.startNode();
-
-        // Then
-        verify(platformAPI, never()).startScheduler(platformServiceAccessor);
     }
 
     @Test

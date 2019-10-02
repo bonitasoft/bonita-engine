@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -30,11 +31,15 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SetServiceState implements Callable<Void>, Serializable {
+
+    private static Logger logger = LoggerFactory.getLogger(SetServiceState.class);
 
     public enum ServiceAction {START, STOP, PAUSE, RESUME}
 
@@ -50,25 +55,26 @@ public class SetServiceState implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
+        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
+        final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
+        return changeServiceState(classLoaderService, tenantConfiguration);
+    }
+
+    public Void changeServiceState(ClassLoaderService classLoaderService, TenantConfiguration tenantConfiguration) throws SClassLoaderException, UpdateException {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
-            final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
 
             // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
             if (action == ServiceAction.START || action == ServiceAction.RESUME) {
-                final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
                 final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
                 Thread.currentThread().setContextClassLoader(serverClassLoader);
             }
 
-            final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, action + " tenant-level service "
-                            + tenantService.getClass().getName() + " on tenant with ID " + tenantId);
-                }
+                logger.info("{} tenant-level service {} on tenant with ID {}", action, tenantService.getClass().getName(), tenantId);
+
                 try {
                     switch (action) {
                         case START:

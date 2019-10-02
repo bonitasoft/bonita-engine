@@ -34,6 +34,10 @@ public class SPlatformPropertiesImpl implements SPlatformProperties {
         platformVersion = (String) properties.get("version");
     }
 
+    public SPlatformPropertiesImpl(String platformVersion) {
+        this.platformVersion = platformVersion;
+    }
+
     @Override
     public String getPlatformVersion() {
         return platformVersion;
