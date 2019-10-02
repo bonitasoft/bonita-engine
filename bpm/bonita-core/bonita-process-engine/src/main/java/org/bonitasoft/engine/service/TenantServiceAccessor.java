@@ -72,6 +72,7 @@ import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesExporter;
 import org.bonitasoft.engine.profile.ProfilesImporter;
@@ -86,6 +87,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
+import org.bonitasoft.engine.tenant.TenantManager;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -264,4 +266,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BPMWorkFactory getBPMWorkFactory();
 
     TechnicalUser getTechnicalUser();
+
+    TenantManager getTenantManager();
 }

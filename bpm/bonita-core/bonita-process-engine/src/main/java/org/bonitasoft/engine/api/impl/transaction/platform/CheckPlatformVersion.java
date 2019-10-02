@@ -70,9 +70,6 @@ public class CheckPlatformVersion implements Callable<Boolean> {
         return platform;
     }
 
-    public SPlatformProperties getPlatformProperties() {
-        return platformProperties;
-    }
 
     public String getErrorMessage() {
         return errorMessage;

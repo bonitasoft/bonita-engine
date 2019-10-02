@@ -15,6 +15,7 @@ package org.bonitasoft.engine.configuration;
 
 import org.bonitasoft.engine.configuration.datasource.DataSourceConfiguration;
 import org.bonitasoft.engine.configuration.monitoring.MonitoringConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({DataSourceConfiguration.class,
         MonitoringConfiguration.class})
+@ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {
 
 

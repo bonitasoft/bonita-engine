@@ -76,7 +76,6 @@ public class SetServiceStateTest {
         when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
         when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(tenantConfiguration);
         when(tenantConfiguration.getLifecycleServices()).thenReturn(asList(tenantService1, tenantService2));
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
     }
 
     private SetServiceState createService(ServiceAction action) throws Exception {
