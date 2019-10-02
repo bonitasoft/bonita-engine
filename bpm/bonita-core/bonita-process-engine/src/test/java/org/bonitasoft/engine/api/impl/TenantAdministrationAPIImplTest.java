@@ -13,50 +13,31 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.PAUSE;
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.RESUME;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.tenant.TenantManager;
 import org.bonitasoft.engine.tenant.TenantResource;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.SWorkException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,184 +52,32 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TenantAdministrationAPIImplTest {
 
-    private final long tenantId = 17;
-    @Mock
-    private TransactionService transactionService;
     @Mock
     private TenantResourcesService tenantResourcesService;
     @Mock
-    private PlatformService platformService;
-    @Mock
-    private SchedulerService schedulerService;
-    @Mock
     private PlatformServiceAccessor platformServiceAccessor;
-    @Mock
-    private SessionService sessionService;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
-    private NodeConfiguration nodeConfiguration;
-    @Mock
-    private BroadcastService broadcastService;
-    @Mock
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
+    private TenantManager tenantManager;
 
     @Spy
     @InjectMocks
     private TenantAdministrationAPIImpl tenantManagementAPI;
 
-    private STenant sTenant = new STenant("myTenant", "john", 123456789, STenant.PAUSED, false);
-
     @Before
     public void before() throws Exception {
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
-        doReturn(tenantId).when(tenantManagementAPI).getTenantId();
+        doReturn(17L).when(tenantManagementAPI).getTenantId();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
         doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
 
-        when(platformServiceAccessor.getTransactionService()).thenReturn(transactionService);
-        when(platformServiceAccessor.getBroadcastService()).thenReturn(broadcastService);
-        when(platformServiceAccessor.getSchedulerService()).thenReturn(schedulerService);
-        when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
-        when(platformServiceAccessor.getPlatformConfiguration()).thenReturn(nodeConfiguration);
-        when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
+        when(platformServiceAccessor.getTenantServiceAccessor(17)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
-        when(tenantServiceAccessor.getSessionService()).thenReturn(sessionService);
-
-        when(platformService.getTenant(tenantId)).thenReturn(sTenant);
-        doNothing().when(tenantManagementAPI).execute(any());
-    }
-
-    @Test
-    public void pause_should_pause_tenant_service_with_lifecycle() throws Exception {
-        // Given
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-        whenTenantIsInState(STenant.ACTIVATED);
-
-        // When a tenant moved to pause mode:
-        tenantManagementAPI.pause();
-
-        // Then tenant service with lifecycle should be pause
-        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId,PAUSE);
-        verify(schedulerService).pauseJobs(tenantId);
-        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, RESUME);
-    }
-
-    @Test
-    public void resume_should_resume_tenant_service_with_lifecycle() throws Exception {
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-        // When a tenant moved to available mode
-        tenantManagementAPI.resume();
-
-        // Then tenant service with lifecycle should be resumed
-        verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId,RESUME);
-        verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, PAUSE);
-    }
-
-    private static Map<String, TaskResult<String>> okFuture() {
-        return singletonMap("workService", TaskResult.ok("ok"));
-    }
-
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail() throws Exception {
-        // Given
-        TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
-        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        // When a tenant moved to available mode
-        tenantManagementAPI.resume();
-    }
-
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_is_time_out() throws Exception {
-        // Given
-        TaskResult<Void> taskResult = new TaskResult<>(5l, TimeUnit.HOURS);
-        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        // When a tenant moved to available mode
-        tenantManagementAPI.resume();
-    }
-
-    @Test
-    public void resume_should_restart_tenant_handlers() throws Exception {
-        // Given
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-        final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
-        final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-
-        // When a tenant moved to available mode
-        tenantManagementAPI.resume();
-
-        // Then elements must be restarted
-        verify(tenantRestartHandler1, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-    }
-
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_exception_when_restart_tenant_handlers_fail() throws Exception {
-        // Given
-        final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
-        final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        doThrow(RestartException.class).when(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-
-        // When a tenant moved to available mode
-        tenantManagementAPI.resume();
-    }
-
-    @Test
-    public void resume_should_resolve_dependecies_for_deployed_processes() throws Exception {
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        tenantManagementAPI.resume();
-
-        verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
-    }
-
-    @Test
-    public void pause_should_update_tenant_in_pause() throws Exception {
-        whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        tenantManagementAPI.pause();
-
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        final String inMaintenanceKey = STenant.STATUS;
-        entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
-
-        verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
-    }
-
-    @Test
-    public void resume_should_resume_jobs() throws Exception {
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        tenantManagementAPI.resume();
-
-        verify(schedulerService).resumeJobs(tenantId);
-    }
-
-    @Test
-    public void pause_should_delete_sessions() throws Exception {
-        whenTenantIsInState(STenant.ACTIVATED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        tenantManagementAPI.pause();
-
-        verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
-    }
-
-    @Test
-    public void resume_should_delete_sessions() throws Exception {
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
-
-        tenantManagementAPI.resume();
-
-        verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
+        when(tenantServiceAccessor.getTenantManager()).thenReturn(tenantManager);
     }
 
     @Test
@@ -283,45 +112,14 @@ public class TenantAdministrationAPIImplTest {
                 "Annotation @AvailableOnMaintenanceTenant should be present on PageAPIIml");
     }
 
-    @Test(expected = UpdateException.class)
-    public void pause_should_throw_UpdateException_on_a_paused_tenant() throws Exception {
-        whenTenantIsInState(STenant.PAUSED);
-
-        tenantManagementAPI.pause();
-    }
-
-    @Test(expected = UpdateException.class)
-    public void pause_should_throw_UpdateException_on_a_deactivated_tenant() throws Exception {
-        whenTenantIsInState(STenant.DEACTIVATED);
-
-        tenantManagementAPI.pause();
-    }
-
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_on_a_paused_tenant() throws Exception {
-        whenTenantIsInState(STenant.ACTIVATED);
-
+    @Test
+    public void resume_should_resolve_dependencies_for_deployed_processes() throws Exception {
         tenantManagementAPI.resume();
+
+        verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
     }
 
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_on_a_deactivated_tenant() throws Exception {
-        whenTenantIsInState(STenant.DEACTIVATED);
 
-        tenantManagementAPI.resume();
-    }
-
-    private void whenTenantIsInState(final String status) throws STenantNotFoundException {
-        sTenant = new STenant("myTenant", "john", 123456789, status, false);
-        when(platformService.getTenant(tenantId)).thenReturn(sTenant);
-    }
-
-    @Test(expected = UpdateException.class)
-    public void pause_should_throw_UpdateException_on_a_unexisting_tenant() throws Exception {
-        doThrow(STenantNotFoundException.class).when(platformService).getTenant(tenantId);
-
-        tenantManagementAPI.resume();
-    }
 
     @Test
     public void installBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
@@ -364,22 +162,6 @@ public class TenantAdministrationAPIImplTest {
 
         // When
         tenantManagementAPI.uninstallBusinessDataModel();
-    }
-
-    @Test
-    public void pause_should_update_tenant_state_on_activated_tenant() throws Exception {
-        // Given
-        sTenant.setStatus(STenant.ACTIVATED);
-        doNothing().when(platformService).updateTenant(any(STenant.class), any(EntityUpdateDescriptor.class));
-        doNothing().when(tenantManagementAPI).pauseServicesForTenant(eq(platformServiceAccessor), eq(tenantId));
-
-        // When
-        tenantManagementAPI.pause();
-
-        // Then
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(STenantUpdateBuilderFactory.STATUS, STenant.PAUSED);
-        verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
     @Test
