@@ -15,9 +15,9 @@ package org.bonitasoft.engine.core.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.notNull;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,7 +47,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -535,9 +534,6 @@ public class ConnectorServiceImplTest {
         connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
         //then
         assertThat(systemOutRule.getLog()).contains("Executing connector  [name: <myConnectorInstance>, version: <connectorVersion>, connector id: <connectorId>, " +
-                "connector instance id: <0>, container type: <containerType>, container id: <123>, activation event: <ON_ENTER>]\n" +
-                "Inputs: \n" +
-                " <param1> : <value1>\n" +
-                " <param2> : <value2>\n");
+                "connector instance id: <0>, container type: <containerType>, container id: <123>, activation event: <ON_ENTER>");
     }
 }
