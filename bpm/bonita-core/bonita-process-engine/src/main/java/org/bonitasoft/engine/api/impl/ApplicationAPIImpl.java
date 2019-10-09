@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -60,7 +58,6 @@ import org.bonitasoft.engine.business.application.importer.ApplicationPageImport
 import org.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.ApplicationDeploymentException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -264,15 +261,6 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException {
         return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
-    }
-
-    @Override
-    public ExecutionResult deployApplication(byte[] applicationArchive) throws ApplicationDeploymentException {
-        return getApplicationAPIDelegate().deployApplication(applicationArchive);
-    }
-
-    private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return new ApplicationAPIDelegate();
     }
 
 }

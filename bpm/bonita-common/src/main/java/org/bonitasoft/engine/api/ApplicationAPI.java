@@ -346,19 +346,4 @@ public interface ApplicationAPI {
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy)
             throws ImportException, AlreadyExistsException;
-
-    /**
-     * Deploys a complete Bonita Application.
-     * The format of the <code>applicationArchive</code> must be a zip containing other Bonita artifacts.
-     * Those artifacts can be inside sub-folders or directly at the root level of the zip file.
-     * Those artifacts are normal .bar files for processes, .zip files for all types of custom pages (pages, forms,
-     * themes, layouts, Rest API extensions), or valid .xml files for Living Applications (See {@link Application}).
-     *
-     * @param applicationArchive the binary zip archive representing the full application to deploy
-     * @return the result of the deployment, with fully detailed information of what happened for each artifact deployed
-     *         (created, updated, with or without info / warnings / errors)
-     * @throws ApplicationDeploymentException in case of deployment problem that prevented the whole application
-     *         from being deployed correctly.
-     */
-    ExecutionResult deployApplication(byte[] applicationArchive) throws ApplicationDeploymentException;
 }
