@@ -14,6 +14,9 @@
 
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -46,18 +49,24 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import java.util.List;
-import java.util.Optional;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 public class EventInstanceServiceImpl implements EventInstanceService {
 
     private final DataInstanceService dataInstanceService;
+    public static final String BONITA_BPMENGINE_MESSAGE_SENT = "bonita.bpmengine.message.sent";
+    private final Counter messageSentCounter;
+
     private EventInstanceRepository eventInstanceRepository;
 
+
     public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
-                                    DataInstanceService dataInstanceService) {
+                                    DataInstanceService dataInstanceService, MeterRegistry meterRegistry, Long tenantId) {
         this.eventInstanceRepository = eventInstanceRepository;
         this.dataInstanceService = dataInstanceService;
+        messageSentCounter = meterRegistry.counter(BONITA_BPMENGINE_MESSAGE_SENT, "tenant", tenantId.toString());
     }
 
     @Override
@@ -74,6 +83,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public void createMessageInstance(SMessageInstance messageInstance) throws SMessageInstanceCreationException {
+        messageSentCounter.increment();
         this.eventInstanceRepository.createMessageInstance(messageInstance);
     }
 

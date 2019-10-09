@@ -14,30 +14,43 @@
 
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import java.util.Collections;
 
-import static org.mockito.Mockito.*;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventInstanceServiceImplForWaitingTest {
     @Mock
     private EventInstanceRepository instanceRepository;
 
-    @Spy
-    @InjectMocks
+    @Mock
+    private MeterRegistry meterRegistry;
+
+    @Mock
+    private DataInstanceService dataInstanceService;
+
+
     private EventInstanceServiceImpl eventInstanceServiceImpl;
+
+    @Before
+    public void setUp(){
+        eventInstanceServiceImpl = spy( new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L));
+    }
 
     @Test
     public final void deleteWaitingEvents_should_delete_waiting_events() throws Exception {
