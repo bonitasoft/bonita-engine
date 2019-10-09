@@ -14,23 +14,31 @@
 
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl.BONITA_BPMENGINE_MESSAGE_SENT;
+import static org.bonitasoft.engine.data.instance.api.DataInstanceContainer.MESSAGE_INSTANCE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.data.instance.api.DataInstanceContainer.MESSAGE_INSTANCE;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventInstanceServiceImplTest {
@@ -41,9 +49,19 @@ public class EventInstanceServiceImplTest {
     @Mock
     private DataInstanceService dataInstanceService;
 
-    @Spy
-    @InjectMocks
     private EventInstanceServiceImpl eventInstanceServiceImpl;
+
+    private MeterRegistry meterRegistry = new SimpleMeterRegistry(
+            // So that micrometer updates its counters every 1 ms:
+            k -> k.equals("simple.step") ? Duration.ofMillis(1).toString() : null,
+            Clock.SYSTEM);
+
+   @Before
+   public void setUp(){
+       eventInstanceServiceImpl = new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L);
+   }
+
+
 
     @Test
     public final void deleteMessageAndDataInstanceOlderCreationDate_should_call_expected_method_and_return_nbMessage_deleted()
@@ -68,5 +86,18 @@ public class EventInstanceServiceImplTest {
                 MESSAGE_INSTANCE.name());
         verify(dataInstanceService).deleteLocalArchivedDataInstances(2L,
                 MESSAGE_INSTANCE.name());
+    }
+
+
+
+
+
+    @Test
+    public final void should_count_message_thrown() throws SMessageInstanceCreationException {
+
+        eventInstanceServiceImpl.createMessageInstance(new SMessageInstance());
+        eventInstanceServiceImpl.createMessageInstance(new SMessageInstance());
+
+        assertThat(meterRegistry.find(BONITA_BPMENGINE_MESSAGE_SENT).tag("tenant", "1").counter().count()).isEqualTo(2);
     }
 }

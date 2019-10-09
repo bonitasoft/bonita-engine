@@ -1287,6 +1287,8 @@
     <bean id="eventInstanceService"
           class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
         <constructor-arg name="eventInstanceRepository" ref="eventInstanceRepository" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 
