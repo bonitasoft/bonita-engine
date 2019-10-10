@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 public class XStreamFactory {
@@ -28,7 +27,7 @@ public class XStreamFactory {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         XStream xStream = XSTREAM_MAP.get(classLoader);
         if (xStream == null) {
-            xStream = new XStream(new StaxDriver());
+            xStream = new XStream();
             XStream.setupDefaultSecurity(xStream);
             xStream.addPermission(AnyTypePermission.ANY);
             XSTREAM_MAP.put(classLoader, xStream);
@@ -38,6 +37,7 @@ public class XStreamFactory {
 
         return xStream;
     }
+
 
     /**
      * Removes the XStream object related from given ClassLoader from the cache
