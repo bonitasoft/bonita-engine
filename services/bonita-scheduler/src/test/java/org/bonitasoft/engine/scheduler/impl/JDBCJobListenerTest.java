@@ -68,7 +68,7 @@ public class JDBCJobListenerTest {
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
         context.put(BonitaJobListener.JOB_NAME, "myJob");
         context.put(BonitaJobListener.JOB_GROUP, "myGroup");
-        doReturn(1).when(schedulerService).getNumberOfTriggers("myGroup", "myJob");
+        doReturn(false).when(schedulerService).mayFireAgain("myGroup", "myJob");
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
@@ -82,7 +82,7 @@ public class JDBCJobListenerTest {
         context.put(BonitaJobListener.JOB_DESCRIPTOR_ID, JOB_DESCRIPTOR_ID);
         context.put(BonitaJobListener.JOB_NAME, "myJob");
         context.put(BonitaJobListener.JOB_GROUP, "myGroup");
-        doReturn(2).when(schedulerService).getNumberOfTriggers("myGroup", "myJob");
+        doReturn(true).when(schedulerService).mayFireAgain("myGroup", "myJob");
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);

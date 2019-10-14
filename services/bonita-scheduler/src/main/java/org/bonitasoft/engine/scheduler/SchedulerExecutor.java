@@ -48,7 +48,7 @@ public interface SchedulerExecutor {
      */
     void shutdown() throws SSchedulerException;
 
-    int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException;
+    boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException;
 
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
@@ -64,7 +64,7 @@ public interface SchedulerExecutor {
 
     void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
-    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution, int delayInMillis) throws SSchedulerException;
 
     void pauseJobs(String groupName) throws SSchedulerException;
 

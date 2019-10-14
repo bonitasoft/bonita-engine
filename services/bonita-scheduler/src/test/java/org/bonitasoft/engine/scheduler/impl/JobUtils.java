@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
@@ -64,6 +65,29 @@ public class JobUtils {
             @Override
             public void execute() throws SJobExecutionException, SFireEventException {
                 throw new SJobExecutionException("exception");
+            }
+
+            @Override
+            public void setAttributes(Map<String, Serializable> attributes) throws SJobConfigurationException {
+
+            }
+        };
+    }
+    static StatelessJob jobThatThrowASRetryableException() {
+        return new StatelessJob() {
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public void execute() throws SJobExecutionException, SFireEventException {
+                throw new SRetryableException("exception");
             }
 
             @Override

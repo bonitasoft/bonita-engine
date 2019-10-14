@@ -55,11 +55,11 @@ public class PlatformManager {
             logger.info("Platform already stopped, nothing to do.");
             return;
         }
-        schedulerService.stop();
         List<TenantManager> tenantManagers = getTenantManagers();
         for (TenantManager tenantManager : tenantManagers) {
             tenantManager.stop();
         }
+        schedulerService.stop();
         //does not contain the scheduler
         for (final PlatformLifecycleService serviceWithLifecycle : nodeConfiguration.getLifecycleServices()) {
             logger.info("Stop service of platform: {}", serviceWithLifecycle.getClass().getName());

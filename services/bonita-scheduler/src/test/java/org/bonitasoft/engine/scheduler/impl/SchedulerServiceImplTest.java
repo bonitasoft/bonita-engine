@@ -268,10 +268,10 @@ public class SchedulerServiceImplTest {
         doReturn(jobDescriptor)
                 .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
-        schedulerService.executeAgain(JOB_DESCRIPTOR_ID);
+        schedulerService.executeAgain(JOB_DESCRIPTOR_ID, 5000);
 
         verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 5000);
         verify(jobService, never()).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
@@ -286,7 +286,7 @@ public class SchedulerServiceImplTest {
         schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID);
 
         verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
         verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
@@ -303,7 +303,7 @@ public class SchedulerServiceImplTest {
         schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID, parameters);
 
         verify(jobService).setJobParameters(TENANT_ID, JOB_DESCRIPTOR_ID, parameters);
-        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
         verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 }

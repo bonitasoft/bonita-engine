@@ -169,10 +169,6 @@
         <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
 
-    <bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
     <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
         <constructor-arg name="schedulerService" ref="scheduler" />
         <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />

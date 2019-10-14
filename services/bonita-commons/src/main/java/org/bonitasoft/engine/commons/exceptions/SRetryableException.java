@@ -24,6 +24,10 @@ public class SRetryableException extends SBonitaRuntimeException {
         super(cause);
     }
 
+    public SRetryableException(String message) {
+        super(message);
+    }
+
     @Override
     public synchronized Exception getCause() {
         return (Exception) super.getCause();
