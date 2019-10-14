@@ -1490,6 +1490,11 @@ public class ProcessAPIImplTest {
 
         }
 
+        @Override
+        public boolean isTransactionActive() {
+            return false;
+        }
+
         public void failFirstTx() {
             failOnce = true;
         }
