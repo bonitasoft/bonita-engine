@@ -21,7 +21,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.quartz.core.QuartzScheduler;
+import org.quartz.JobExecutionException;
 
 /**
  * @author Celine Souchet
@@ -56,7 +56,11 @@ public class JDBCJobListener implements BonitaJobListener {
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         if (jobException != null) {
-            logger.warn("An exception occurs during the job execution.", jobException);
+            if (jobException instanceof JobExecutionException && ((JobExecutionException) jobException).refireImmediately()) {
+                logger.debug("An exception occurs during the job execution but it will be retried.", jobException);
+            } else {
+                logger.warn("An exception occurs during the job execution.", jobException);
+            }
             return;
         }
         Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
@@ -74,11 +78,14 @@ public class JDBCJobListener implements BonitaJobListener {
     private void deleteJobDescriptor(Map<String, Serializable> context, Long jobDescriptorId) {
         try {
             //delete job only if there is no other trigger
-            if (schedulerService.getNumberOfTriggers(((String) context.get(JOB_GROUP)), ((String) context.get(JOB_NAME))) <= 1) {
+            boolean mayFireAgain = schedulerService.mayFireAgain(((String) context.get(JOB_GROUP)), ((String) context.get(JOB_NAME)));
+
+            logger.debug("{} job descriptor of job {} because it may {}fire again.", mayFireAgain ? "Keeping" : "Deleting", context.get(JOB_NAME), mayFireAgain ? "" : "not ");
+            if (!mayFireAgain) {
                 jobService.deleteJobDescriptor(jobDescriptorId);
             }
         } catch (final Exception e) {
-            logger.warn("Unable to delete cleanup job {}", jobDescriptorId, e);
+            logger.warn("Unable to delete job descriptor {} of job {}", jobDescriptorId, context.get(JOB_NAME), e);
         }
     }
 

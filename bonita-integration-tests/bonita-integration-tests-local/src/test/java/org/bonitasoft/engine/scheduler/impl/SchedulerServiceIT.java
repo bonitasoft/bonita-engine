@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.ERROR;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.FAIL_ONCE;
+import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.FAIL_ONCE_WITH_RETRYABLE;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.JOBEXCEPTION;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.NO_EXCEPTION;
 import static org.bonitasoft.engine.scheduler.impl.JobThatMayThrowErrorOrJobException.TYPE;
@@ -280,6 +281,25 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(1));
         //ensure no more failed job is present
         assertThat(inTx(() -> jobService.getFailedJobs(0, 100))).isEmpty();
+    }
+
+
+    @Test
+    public void should_let_quartz_retry_a_job_that_failed_because_of_a_SRetryableException() throws Exception {
+        // schedule one shot job that throws a SJobExecutionException
+        schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
+                new OneShotTrigger("triggerJob", new Date(System.currentTimeMillis() + 100)),
+                singletonMap(TYPE, FAIL_ONCE_WITH_RETRYABLE));
+        SJobDescriptor persistedJobDescriptor = getFirstPersistedJob();
+
+        //this job fail once and is immediately retried, even if its a one shot job
+        await().until(() -> storage.getVariableValue("nbJobException", 0), isGreaterThan(0));
+        await().until(() -> storage.getVariableValue("nbSuccess", 0), isGreaterThan(0));
+
+        List<SFailedJob> sFailedJobs = inTx(() -> jobService.getFailedJobs(0, 100));
+
+        //no error traced, it was retried
+        assertThat(sFailedJobs).hasSize(0);
     }
 
     private FunctionalMatcher<Integer> isGreaterThan(int i) {

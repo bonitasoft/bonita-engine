@@ -88,8 +88,9 @@ public interface SchedulerService extends PlatformLifecycleService {
     /**
      * Execute a job again
      * @param jobDescriptorId the job to re execute
+     * @param delayInMillis
      */
-    void executeAgain(long jobDescriptorId) throws SSchedulerException;
+    void executeAgain(long jobDescriptorId, int delayInMillis) throws SSchedulerException;
 
     /**
      * Retry a job once
@@ -226,6 +227,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      */
     boolean isExistingJob(String jobName) throws SSchedulerException;
 
-    int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException;
+    boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException;
 
 }

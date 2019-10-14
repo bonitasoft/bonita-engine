@@ -16,13 +16,13 @@ package org.bonitasoft.engine.scheduler.impl;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
@@ -111,16 +111,16 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void executeAgain(final long jobDescriptorId) throws SSchedulerException {
+    public void executeAgain(final long jobDescriptorId, int delayInMillis) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), delayInMillis);
     }
 
     @Override
     public void retryJobThatFailed(long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), 0);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), 0);
     }
 
     private void deleteFailedJobs(long jobDescriptorId) throws SSchedulerException {
@@ -246,7 +246,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
             return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
         } catch (final Exception e) {
-            throw new SSchedulerException("The job class couldn't be instantiated", e);
+            throw new SSchedulerException(e);
         } finally {
             sessionAccessor.deleteTenantId();
         }
@@ -264,8 +264,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         public JobWrapper call() throws Exception {
             final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
             if (sJobDescriptor == null) {
-                logger.log(SchedulerServiceImpl.class, TechnicalLogSeverity.WARNING, String.format("The job %s does not exist anymore. It might be already executed", jobIdentifier));
-                return null;
+                throw new SObjectNotFoundException(String.format("The job %s does not exist anymore. It might be already executed", jobIdentifier));
             }
             final String jobClassName = sJobDescriptor.getJobClassName();
             final Class<?> jobClass = Class.forName(jobClassName);
@@ -315,7 +314,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public int getNumberOfTriggers(String groupName, String jobName) throws SSchedulerException {
-        return schedulerExecutor.getNumberOfTriggers(groupName, jobName);
+    public boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException {
+        return schedulerExecutor.mayFireAgain(groupName, jobName);
     }
 }

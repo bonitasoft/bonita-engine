@@ -18,16 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
 import static org.bonitasoft.engine.scheduler.impl.JobUtils.jobThatFails;
+import static org.bonitasoft.engine.scheduler.impl.JobUtils.jobThatThrowASRetryableException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -44,25 +40,42 @@ public class AbstractQuartzJobTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    SchedulerServiceImpl schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
-    private AbstractQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
+    private ConcurrentQuartzJob abstractQuartzJob = new ConcurrentQuartzJob();
+
+    @Before
+    public void before() {
+        abstractQuartzJob.setSchedulerService(schedulerService);
+        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
+    }
+
 
     @Test
     public void should_not_unschedule_job_on_exception() throws Exception {
         // job should never throw an exception and be handled by the JobWrapper
         // we do not unschedule the job in that case. we don't want to loose the job
-        //given
         doReturn(jobThatFails()).when(schedulerService).getPersistedJob(any());
-        abstractQuartzJob.setSchedulerService(schedulerService);
-        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
 
         try{
             abstractQuartzJob.execute(null);
             fail("should throw exception");
         } catch (JobExecutionException e ){
             assertThat(e.unscheduleFiringTrigger()).isFalse();
+            assertThat(e.refireImmediately()).isFalse();
         }
+    }
+
+    @Test
+    public void should_retry_job_that_failed_with_SRetryable() throws Exception {
+        doReturn(jobThatThrowASRetryableException()).when(schedulerService).getPersistedJob(any());
+        abstractQuartzJob.setSchedulerService(schedulerService);
+        abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
+
+
+        abstractQuartzJob.execute(null);
+
+        verify(schedulerService).executeAgain(2, 5000);
     }
 
 

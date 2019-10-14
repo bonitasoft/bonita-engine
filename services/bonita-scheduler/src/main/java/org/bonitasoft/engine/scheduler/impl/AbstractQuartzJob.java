@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a Bonita job.
@@ -29,16 +33,25 @@ import org.quartz.JobExecutionException;
  */
 public abstract class AbstractQuartzJob implements org.quartz.Job {
 
+    private static Logger logger = LoggerFactory.getLogger(AbstractQuartzJob.class);
+
     private StatelessJob bosJob;
     private SchedulerServiceImpl schedulerService;
     private JobDetail jobDetail;
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
+        final JobIdentifier jobIdentifier = getJobIdentifier(jobDetail.getJobDataMap());
         try {
-            final JobIdentifier jobIdentifier = getJobIdentifier(jobDetail.getJobDataMap());
             bosJob = retrieveJob(jobIdentifier);
             bosJob.execute();
+        } catch (final SRetryableException e) {
+            logger.info("Job {} failed but it will be retried {}", jobIdentifier, e.getMessage());
+            try {
+                schedulerService.executeAgain(jobIdentifier.getId(), 5000);
+            } catch (SSchedulerException ex) {
+                throw new JobExecutionException("Unable to reschedule job that could be retried", ex);
+            }
         } catch (final Throwable e) {
             throw new JobExecutionException(e);
         }

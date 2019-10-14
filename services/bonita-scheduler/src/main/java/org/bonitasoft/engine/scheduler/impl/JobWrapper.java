@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
@@ -110,6 +111,8 @@ public class JobWrapper implements StatelessJob {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Finished execution of " + statelessJob.getName());
             }
 
+        } catch (final SRetryableException e) {
+            throw e;
         } catch (final Throwable e) {
             handleFailure(e);
             //throw an exception: if it's a "one shot" timer it should delete the timer trigger only if job succeeded (see TimerEventTriggerJobListener)

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
@@ -90,8 +91,8 @@ public class TriggerTimerEventJobTest {
         triggerTimerEventJob.setAttributes(attributes);
     }
 
-    @Test
-    public void should_retrigger_timer_if_work_service_is_stopped() throws Exception {
+    @Test(expected = SRetryableException.class)
+    public void should_throw_retryableException_when_tenant_is_stopped() throws Exception {
         SJobDescriptor jobDescriptor = SJobDescriptor.builder().id(jobDescriptorId).build();
         doReturn(jobDescriptor).when(jobService).getJobDescriptor(jobDescriptorId);
         setAttributes();
@@ -99,7 +100,6 @@ public class TriggerTimerEventJobTest {
 
         triggerTimerEventJob.execute();
 
-        verify(schedulerService).executeAgain(jobDescriptorId);
     }
 
     @Test

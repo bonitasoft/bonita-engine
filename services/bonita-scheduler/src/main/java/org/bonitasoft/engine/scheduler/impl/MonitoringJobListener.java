@@ -91,13 +91,4 @@ public class MonitoringJobListener implements BonitaJobListener {
         initializeOrGetExecutedJobs(tenantId).increment();
     }
 
-    public long getNumberOfExecutingJobs(Long tenantId) {
-        return initializeOrGetRunningJob(tenantId).get();
-    }
-
-    public long getNumberOfExecutedJobs(Long tenantId) {
-        return Double.valueOf(initializeOrGetExecutedJobs(tenantId).count()).longValue();
-
-    }
-
 }
