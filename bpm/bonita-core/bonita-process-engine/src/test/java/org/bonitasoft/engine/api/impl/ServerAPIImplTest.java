@@ -137,6 +137,11 @@ public class ServerAPIImplTest {
             @Override
             public void registerBeforeCommitCallable(Callable<Void> callable) {
             }
+
+            @Override
+            public boolean isTransactionActive() {
+                return false;
+            }
         }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class), any(ServerAPIImpl.SessionType.class));
         try {
             // when:

@@ -45,8 +45,6 @@ public interface TransactionService extends UserTransactionService {
      */
     TransactionState getState() throws STransactionException;
 
-    @Deprecated
-    boolean isTransactionActive() throws STransactionException;
 
     /**
      * Modify the transaction associated with the current thread such that
