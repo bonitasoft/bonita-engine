@@ -21,6 +21,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
@@ -36,7 +37,15 @@ public class TenantRestarter {
         this.tenantServiceAccessor = tenantServiceAccessor;
     }
 
-    public List<TenantRestartHandler> executeBeforeServicesStart() throws RestartException {
+    public List<TenantRestartHandler> executeBeforeServicesStart() throws Exception {
+        TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        if (transactionService.isTransactionActive()) {
+            return beforeServicesStart();
+        }
+        return transactionService.executeInTransaction(this::beforeServicesStart);
+    }
+
+    private List<TenantRestartHandler> beforeServicesStart() throws RestartException {
         List<TenantRestartHandler> tenantRestartHandlers = platformServiceAccessor.getPlatformConfiguration().getTenantRestartHandlers();
         for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
             tenantRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
@@ -44,12 +53,19 @@ public class TenantRestarter {
         return tenantRestartHandlers;
     }
 
-    public void executeAfterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) {
+    public void executeAfterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
+        if (platformServiceAccessor.getTransactionService().isTransactionActive()) {
+            executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
+        } else {
+            afterServicesStart(tenantRestartHandlers);
+        }
+    }
 
+    private void afterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) {
         new StarterThread(platformServiceAccessor, tenantServiceAccessor, tenantRestartHandlers).start();
     }
 
-    public void executeAfterServicesStartAfterCurrentTransaction(final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
+    private void executeAfterServicesStartAfterCurrentTransaction(final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
         platformServiceAccessor.getTransactionService().registerBonitaSynchronization(new BonitaTransactionSynchronization() {
 
             @Override
@@ -60,7 +76,7 @@ public class TenantRestarter {
             @Override
             public void afterCompletion(TransactionState txState) {
                 if (txState.equals(TransactionState.COMMITTED)) {
-                    executeAfterServicesStart(tenantRestartHandlers);
+                    afterServicesStart(tenantRestartHandlers);
                 }
             }
         });
