@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
@@ -53,7 +55,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SBusinessDataDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -66,6 +70,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -73,6 +79,10 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.lock.LockService;
@@ -350,6 +360,66 @@ public class ProcessExecutorImplTest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(sProcessInstance, result);
+    }
+
+    private SFlowElementContainerDefinitionImpl createProcessWithBusinessData(SBusinessDataDefinitionImpl businessDataDefinition) {
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        processContainer.addBusinessDataDefinition(businessDataDefinition);
+        return processContainer;
+    }
+
+    @Test
+    public void should_not_fail_when_initialize_multiple_businessData_even_when_expression_returns_null() throws Exception {
+        SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
+        businessDataDefinition.setMultiple(true);
+        businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
+        SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
+
+
+        processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
+
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SMultiRefBusinessDataInstance.class));
+    }
+
+    @Test
+    public void should_initialize_multiple_business_data_on_process_instance() throws Exception {
+        SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
+        businessDataDefinition.setMultiple(true);
+        businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
+        SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
+        doReturn(Arrays.asList(mock(Entity.class), mock(Entity.class))).when(expressionResolverService).evaluate(any(SExpression.class), any());
+
+
+        processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
+
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SMultiRefBusinessDataInstance.class));
+    }
+
+    @Test
+    public void should_not_fail_when_initialize_simple_businessData_even_when_expression_returns_null() throws Exception {
+        SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
+        businessDataDefinition.setMultiple(false);
+        businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
+        SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
+
+
+        processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
+
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SSimpleRefBusinessDataInstance.class));
+    }
+
+    @Test
+    public void should_initialize_simple_business_data_on_process_instance() throws Exception {
+        SBusinessDataDefinitionImpl businessDataDefinition = new SBusinessDataDefinitionImpl();
+        businessDataDefinition.setMultiple(false);
+        businessDataDefinition.setDefaultValueExpression(new SExpressionImpl());
+        doReturn(mock(Entity.class)).when(expressionResolverService).evaluate(any(SExpression.class), any());
+        SFlowElementContainerDefinitionImpl processContainer = createProcessWithBusinessData(businessDataDefinition);
+
+
+        processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
+
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SSimpleRefBusinessDataInstance.class));
     }
 
     @Test
