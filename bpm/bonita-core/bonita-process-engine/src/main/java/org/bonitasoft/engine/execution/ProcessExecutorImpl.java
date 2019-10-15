@@ -416,8 +416,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // nothing to do
     }
 
-    private void initializeBusinessData(SFlowElementContainerDefinition processContainer, final SProcessInstance sInstance,
-            final SExpressionContext expressionContext)
+    protected void initializeBusinessData(SFlowElementContainerDefinition processContainer, SProcessInstance sInstance,
+                                          SExpressionContext expressionContext)
             throws SBonitaException {
         final List<SBusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
@@ -452,8 +452,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final List<Long> dataIds = new ArrayList<>();
         if (expression != null) {
             final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
-            for (final Entity entity : businessData) {
-                dataIds.add(saveBusinessData(entity));
+            if (businessData != null) {
+                for (final Entity entity : businessData) {
+                    dataIds.add(saveBusinessData(entity));
+                }
             }
         }
         return dataIds;
