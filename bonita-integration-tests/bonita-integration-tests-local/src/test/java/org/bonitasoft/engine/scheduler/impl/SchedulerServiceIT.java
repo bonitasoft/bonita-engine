@@ -73,7 +73,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         jobService = getTenantAccessor().getJobService();
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         if (!schedulerService.isStarted()) {
-            schedulerService.initializeScheduler();
             schedulerService.start();
         }
         getTenantAccessor().getSessionAccessor().setTenantId(getDefaultTenantId());
@@ -88,7 +87,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     public void canRestartTheSchedulerAfterShutdown() throws Exception {
         schedulerService.stop();
         assertTrue(schedulerService.isStopped());
-        schedulerService.initializeScheduler();
         schedulerService.start();
         assertTrue(schedulerService.isStarted());
     }

@@ -304,11 +304,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void initializeScheduler() throws SSchedulerException {
-        schedulerExecutor.initializeScheduler();
-    }
-
-    @Override
     public boolean isExistingJob(final String jobName) throws SSchedulerException {
         return schedulerExecutor.isExistingJob(jobName, String.valueOf(getTenantId()));
     }

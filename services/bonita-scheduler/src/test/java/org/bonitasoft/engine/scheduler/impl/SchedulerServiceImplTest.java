@@ -252,15 +252,6 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void initializeScheduler_should_call_initializeScheduler() throws Exception {
-        // When
-        schedulerService.initializeScheduler();
-
-        // Then
-        verify(schedulerExecutor).initializeScheduler();
-    }
-
-    @Test
     public void should_execute_again_an_existing_job() throws Exception {
         SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
                 .jobName("jobName")

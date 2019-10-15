@@ -29,10 +29,6 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  */
 public interface SchedulerService extends PlatformLifecycleService {
 
-    String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
-
-    String JOB_PARAMETER = "JOB_PARAMETER";
-
     /**
      * This service will fire the following events :
      * <ul>
@@ -189,18 +185,9 @@ public interface SchedulerService extends PlatformLifecycleService {
     Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
 
     /**
-     * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
-     *
-     * @throws SSchedulerException
-     * @since 6.4.0
-     */
-    void initializeScheduler() throws SSchedulerException;
-
-    /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     @Override
@@ -210,7 +197,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     @Override

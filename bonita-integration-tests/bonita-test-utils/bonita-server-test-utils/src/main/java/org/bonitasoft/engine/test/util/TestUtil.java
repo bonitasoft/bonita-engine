@@ -46,7 +46,6 @@ public class TestUtil {
 
     public static void startScheduler(final SchedulerService scheduler) throws Exception {
         if (!scheduler.isStarted()) {
-            scheduler.initializeScheduler();
             scheduler.start();
         }
     }
