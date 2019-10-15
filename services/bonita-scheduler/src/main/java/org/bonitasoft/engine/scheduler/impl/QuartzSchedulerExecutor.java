@@ -237,13 +237,15 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public void start() throws SSchedulerException {
         try {
-            if (!isShutdown()) {
-                if (isStarted()) {
-                    throw new SSchedulerException("The scheduler is already started.");
-                }
+            if (isStarted()) {
+                throw new SSchedulerException("The scheduler is already started.");
             }
-            if (scheduler.isShutdown()) {
-                initializeScheduler();
+            if (scheduler == null || scheduler.isShutdown()) {
+                try {
+                    scheduler = schedulerFactory.getScheduler();
+                } catch (final SchedulerException e) {
+                    throw new SSchedulerException(e);
+                }
             }
 
             scheduler.start();
@@ -267,16 +269,21 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public void shutdown() throws SSchedulerException {
         try {
-            checkSchedulerState();
-            scheduler.shutdown(true);
+            if (scheduler != null && !scheduler.isShutdown()) {
+                scheduler.shutdown(true);
+            }
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
 
     private void checkSchedulerState() throws SSchedulerException {
-        if (scheduler == null) {
-            throw new SSchedulerException("The scheduler is not started");
+        try {
+            if (scheduler == null || scheduler.isShutdown()) {
+                throw new SSchedulerException("The scheduler is not started");
+            }
+        } catch (SchedulerException e) {
+            throw new SSchedulerException("The scheduler is not started", e);
         }
     }
 
@@ -418,12 +425,4 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    @Override
-    public void initializeScheduler() throws SSchedulerException {
-        try {
-            scheduler = schedulerFactory.getScheduler();
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        }
-    }
 }

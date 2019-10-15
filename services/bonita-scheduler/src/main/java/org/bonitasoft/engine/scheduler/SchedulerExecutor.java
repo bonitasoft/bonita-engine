@@ -34,7 +34,6 @@ public interface SchedulerExecutor {
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     void start() throws SSchedulerException;
@@ -43,7 +42,6 @@ public interface SchedulerExecutor {
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     void shutdown() throws SSchedulerException;
@@ -89,14 +87,6 @@ public interface SchedulerExecutor {
      * @since 6.4.0
      */
     Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
-
-    /**
-     * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
-     *
-     * @throws SSchedulerException
-     * @since 6.4.0
-     */
-    void initializeScheduler() throws SSchedulerException;
 
     /**
      * Check if a job exists.

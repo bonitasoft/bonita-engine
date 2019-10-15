@@ -169,7 +169,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     void startScheduler(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (!schedulerService.isStarted()) {
-            schedulerService.initializeScheduler();
             schedulerService.start();
         }
     }

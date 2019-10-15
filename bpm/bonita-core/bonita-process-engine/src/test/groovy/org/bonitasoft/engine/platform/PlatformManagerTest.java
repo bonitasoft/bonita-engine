@@ -59,7 +59,6 @@ public class PlatformManagerTest {
     public void should_not_start_scheduler_when_starting_node_if_node_is_already_started() throws Exception {
         platformManager.start();
         verify(schedulerService).start();
-        verify(schedulerService).initializeScheduler();
         verify(schedulerService).isStarted();
 
         platformManager.start();

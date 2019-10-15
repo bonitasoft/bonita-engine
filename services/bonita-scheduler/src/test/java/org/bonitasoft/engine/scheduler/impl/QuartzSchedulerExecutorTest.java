@@ -111,14 +111,8 @@ public class QuartzSchedulerExecutorTest {
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
         final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor, new TechnicalLoggerSLF4JImpl(), useOptimization);
-        quartz.initializeScheduler();
         quartz.start();
         return quartz;
-    }
-
-    @After
-    public void after() throws Exception {
-        quartzSchedulerExecutor.shutdown();
     }
 
     private Set<JobKey> newSet(final JobKey... jobKeys) {
@@ -573,25 +567,22 @@ public class QuartzSchedulerExecutorTest {
 
     @Test
     public void is_shutdown_should_be_true() throws Exception {
-        checkIsSchutdown(true);
+        doReturn(true).when(scheduler).isShutdown();
+
+        final boolean started = quartzSchedulerExecutor.isShutdown();
+
+        assertThat(started).isEqualTo(true);
 
     }
 
     @Test
     public void is_shutdown_should_be_false() throws Exception {
-        checkIsSchutdown(true);
+        doReturn(false).when(scheduler).isShutdown();
 
-    }
+        boolean started = quartzSchedulerExecutor.isShutdown();
 
-    private void checkIsSchutdown(final boolean expectedResponse) throws SchedulerException, SSchedulerException {
-        // given
-        doReturn(expectedResponse).when(scheduler).isShutdown();
+        assertThat(started).isEqualTo(false);
 
-        // when
-        final boolean started = quartzSchedulerExecutor.isShutdown();
-
-        // then exception
-        assertThat(started).isEqualTo(expectedResponse);
     }
 
     @Test(expected = SSchedulerException.class)
@@ -629,19 +620,15 @@ public class QuartzSchedulerExecutorTest {
         quartzSchedulerExecutor.isExistingJob("name", "group");
     }
 
-    @Test(expected = SSchedulerException.class)
+    @Test
     public void isExistingJob_should_throw_exception_when_scheduler_is_null() throws Exception {
         // Given
         quartzSchedulerExecutor.shutdown();
-        when(schedulerFactory.getScheduler()).thenReturn(null);
-        quartzSchedulerExecutor.initializeScheduler();
 
         try {
             // When
             quartzSchedulerExecutor.isExistingJob("name", "group");
         } finally {
-            when(schedulerFactory.getScheduler()).thenReturn(scheduler);
-            quartzSchedulerExecutor.initializeScheduler();
             quartzSchedulerExecutor.start();
         }
     }
@@ -675,12 +662,7 @@ public class QuartzSchedulerExecutorTest {
         // Given
         doThrow(SchedulerException.class).when(scheduler).shutdown(true);
 
-        try {
-            // When
-            quartzSchedulerExecutor.shutdown();
-        } finally {
-            doNothing().when(scheduler).shutdown(true);
-        }
+        quartzSchedulerExecutor.shutdown();
     }
 
     @Test
@@ -690,7 +672,6 @@ public class QuartzSchedulerExecutorTest {
         quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor, new TechnicalLoggerSLF4JImpl(), false);
         quartzSchedulerExecutor.setJobListeners(asList(listener1, listener2));
 
-        quartzSchedulerExecutor.initializeScheduler();
         quartzSchedulerExecutor.start();
 
         verify(listenerManager).addJobListener(argThat((quartzListener) -> ((QuartzJobListener) quartzListener).getBonitaJobListeners().containsAll(asList(listener1, listener2))));

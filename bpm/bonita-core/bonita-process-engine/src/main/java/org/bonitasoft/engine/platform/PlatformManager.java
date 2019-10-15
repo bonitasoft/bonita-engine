@@ -124,7 +124,6 @@ public class PlatformManager {
 
     private void startScheduler() throws SBonitaException {
         if (!schedulerService.isStarted()) {
-            schedulerService.initializeScheduler();
             schedulerService.start();
         }
     }
