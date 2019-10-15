@@ -241,7 +241,7 @@ public class TenantManager {
         // on all nodes
         changeStateOfServices(RESUME);
 
-        tenantRestarter.executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
+        tenantRestarter.executeAfterServicesStart(tenantRestartHandlers);
         platformService.updateTenant(tenant, new STenantUpdateBuilderFactoryImpl().createNewInstance().setStatus(STenant.ACTIVATED).done());
     }
 

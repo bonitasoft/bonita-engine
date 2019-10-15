@@ -180,6 +180,7 @@ public class TenantManagerTest {
     @Test
     public void resume_should_restart_tenant_handlers() throws Exception {
         // Given
+        doReturn(true).when(transactionService).isTransactionActive();
         whenTenantIsInState(STenant.PAUSED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
         final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
