@@ -201,7 +201,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 final PlatformService platformService = platformAccessor.getPlatformService();
                 final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
                 for (final STenant sTenant : tenants) {
-                    platformService.deactiveTenant(sTenant.getId());
+                    platformService.deactivateTenant(sTenant.getId());
                 }
                 return tenants;
             });

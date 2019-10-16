@@ -160,7 +160,7 @@ public class LoginAPIImpl implements LoginAPI {
     }
 
     protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser) throws LoginException {
-        if (!sTenant.isActivated()) {
+        if (sTenant.isDeactivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
         if (sTenant.isPaused()) {

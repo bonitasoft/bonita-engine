@@ -13,15 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -57,25 +55,33 @@ public class ActivateTenantTest {
     }
 
     @Test
-    public void executeShouldStartConnectorExecutor() throws Exception {
-        given(platformService.activateTenant(tenantId)).willReturn(true);
+    public void should_start_connector_service_if_tenant_was_not_activated() throws Exception {
+        STenant tenant = new STenant();
+        tenant.setStatus(STenant.PAUSED);
+        doReturn(tenant).when(platformService).getTenant(tenantId);
+
         activateTenant.execute();
 
         verify(connectorExecutor).start();
     }
 
     @Test
-    public void should_resume_jobs_of_the_tenant() throws Exception {
-        given(platformService.activateTenant(tenantId)).willReturn(true);
-        activateTenant.execute();
+    public void should_resume_jobs_of_the_tenant_if_tenant_was_not_activated() throws Exception {
+        STenant tenant = new STenant();
+        tenant.setStatus(STenant.PAUSED);
+        doReturn(tenant).when(platformService).getTenant(tenantId);
 
+        activateTenant.execute();
         verify(schedulerService).resumeJobs(tenantId);
     }
 
 
     @Test
-    public void should_not_do_anything_if_tenant_was_not_activated() throws Exception {
-        given(platformService.activateTenant(tenantId)).willReturn(false);
+    public void should_not_do_anything_if_tenant_was_already_activated() throws Exception {
+        STenant tenant = new STenant();
+        tenant.setStatus(STenant.ACTIVATED);
+        doReturn(tenant).when(platformService).getTenant(tenantId);
+
         activateTenant.execute();
 
         verifyZeroInteractions(schedulerService);

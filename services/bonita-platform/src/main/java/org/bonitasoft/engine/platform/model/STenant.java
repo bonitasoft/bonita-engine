@@ -65,8 +65,11 @@ public class STenant implements PersistentObject {
      * @since 6.0
      */
     public boolean isActivated() {
-        // the tenant is activated as soon as it is not deactivated (but it can be paused)
-        return !DEACTIVATED.equals(getStatus());
+        return ACTIVATED.equals(status);
+    }
+
+    public boolean isDeactivated() {
+        return DEACTIVATED.equals(status);
     }
 
     public boolean isPaused() {
