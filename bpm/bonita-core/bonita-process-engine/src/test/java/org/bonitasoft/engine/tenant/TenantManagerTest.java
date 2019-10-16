@@ -123,7 +123,7 @@ public class TenantManagerTest {
 
         verify(schedulerService).pauseJobs(TENANT_ID);
         verify(tenantManager).changeStateOfServices(SetServiceState.ServiceAction.PAUSE);
-        verify(platformService).updateTenant(eq(tenant), argThat(e -> e.getFields().size() == 1 && e.getFields().containsValue(STenant.PAUSED) && e.getFields().containsKey("status")));
+        verify(platformService).pauseTenant(TENANT_ID);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class TenantManagerTest {
 
         verify(schedulerService).resumeJobs(TENANT_ID);
         verify(tenantManager).changeStateOfServices(SetServiceState.ServiceAction.RESUME);
-        verify(platformService).updateTenant(eq(tenant), argThat(e -> e.getFields().size() == 1 && e.getFields().containsValue(STenant.ACTIVATED) && e.getFields().containsKey("status")));
+        verify(platformService).activateTenant(TENANT_ID);
     }
 
 
@@ -224,11 +224,7 @@ public class TenantManagerTest {
 
         tenantManager.pause();
 
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        final String inMaintenanceKey = STenant.STATUS;
-        entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
-
-        verify(platformService).updateTenant(argThat(t -> t.getId() == TENANT_ID), eq(entityUpdateDescriptor));
+        verify(platformService).pauseTenant(TENANT_ID);
     }
 
     @Test(expected = UpdateException.class)
@@ -300,15 +296,12 @@ public class TenantManagerTest {
     public void pause_should_update_tenant_state_on_activated_tenant() throws Exception {
         // Given
         whenTenantIsInState(STenant.ACTIVATED);
-        doNothing().when(platformService).updateTenant(any(STenant.class), any(EntityUpdateDescriptor.class));
 
         // When
         tenantManager.pause();
 
         // Then
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(STenantUpdateBuilderFactory.STATUS, STenant.PAUSED);
-        verify(platformService).updateTenant(argThat(t -> t.getId() == TENANT_ID), eq(entityUpdateDescriptor));
+        verify(platformService).pauseTenant(TENANT_ID);
     }
 
 

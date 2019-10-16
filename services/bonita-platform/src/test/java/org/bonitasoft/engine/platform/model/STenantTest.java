@@ -40,10 +40,10 @@ public class STenantTest {
     }
 
     @Test
-    public final void should_isTenantActivated_return_true_when_tenant_is_paused() {
+    public final void should_isTenantActivated_return_false_when_tenant_is_paused() {
         final STenant tenant = buildTenant("PAUSED");
 
-        assertTrue(tenant.isActivated());
+        assertFalse(tenant.isActivated());
     }
 
     private STenant buildTenant(final String status) {

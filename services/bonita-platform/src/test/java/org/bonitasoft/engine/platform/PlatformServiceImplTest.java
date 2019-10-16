@@ -54,12 +54,14 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -372,6 +374,39 @@ public class PlatformServiceImplTest {
         updateDescriptor.setName(tenantName);
 
         platformServiceImpl.updateTenant(tenant, updateDescriptor.done());
+    }
+
+    @Test
+    public void pause_should_update_tenant_state_to_PAUSED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.pauseTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.PAUSED, u)));
+    }
+
+    @Test
+    public void activateTenant_should_update_tenant_state_to_ACTIVATED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.activateTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.ACTIVATED, u)));
+    }
+
+    @Test
+    public void deactivateTenant_should_update_tenant_state_to_DEACTIVATED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.deactivateTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.DEACTIVATED, u)));
+    }
+
+    private boolean updateOnlyStatus(String status, UpdateDescriptor u) {
+        return u.getFields().size() == 1
+                && u.getFields().containsKey(STenant.STATUS)
+                && u.getFields().containsValue(status);
     }
 
     private STenant buildTenant(final long id, final String name) {

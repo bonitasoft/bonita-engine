@@ -42,8 +42,6 @@ public class StarterThreadTest {
 
     @Mock
     private PlatformServiceAccessor platformAccessor;
-    @Mock
-    private NodeConfiguration platformConfiguration;
     private final STenant tenant = createTenant();
 
     private STenant createTenant() {

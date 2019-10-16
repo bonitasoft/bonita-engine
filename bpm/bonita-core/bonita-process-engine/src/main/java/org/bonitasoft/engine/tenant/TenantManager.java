@@ -21,7 +21,6 @@ import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestarter;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.impl.STenantUpdateBuilderFactoryImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.BroadcastService;
@@ -188,7 +187,7 @@ public class TenantManager {
         pauseJobsOfTenant();
         sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
         changeStateOfServices(PAUSE);
-        platformService.updateTenant(tenant, new STenantUpdateBuilderFactoryImpl().createNewInstance().setStatus(STenant.PAUSED).done());
+        platformService.pauseTenant(tenantId);
     }
 
     private void pauseJobsOfTenant() throws UpdateException {
@@ -242,7 +241,7 @@ public class TenantManager {
         changeStateOfServices(RESUME);
 
         tenantRestarter.executeAfterServicesStart(tenantRestartHandlers);
-        platformService.updateTenant(tenant, new STenantUpdateBuilderFactoryImpl().createNewInstance().setStatus(STenant.ACTIVATED).done());
+        platformService.activateTenant(tenantId);
     }
 
 }

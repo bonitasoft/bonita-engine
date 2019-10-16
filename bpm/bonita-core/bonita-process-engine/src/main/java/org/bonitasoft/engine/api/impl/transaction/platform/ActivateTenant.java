@@ -17,6 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -43,9 +44,10 @@ public final class ActivateTenant implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        final boolean tenantWasActivated = platformService.activateTenant(tenantId);
+        String previousStatus = platformService.getTenant(tenantId).getStatus();
+        platformService.activateTenant(tenantId);
         // we execute that only if the tenant was not already activated
-        if (tenantWasActivated) {
+        if (!previousStatus.equals(STenant.ACTIVATED)) {
             workService.start();
             connectorExecutor.start();
             schedulerService.resumeJobs(tenantId);

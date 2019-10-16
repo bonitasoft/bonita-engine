@@ -419,12 +419,8 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public boolean activateTenant(final long tenantId) throws STenantNotFoundException, STenantActivationException {
+    public void activateTenant(final long tenantId) throws STenantNotFoundException, STenantActivationException {
         final STenant tenant = getTenant(tenantId);
-        if (tenant.isActivated()) {
-            return false;
-        }
-
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addField(STenant.STATUS, STenant.ACTIVATED);
         try {
@@ -432,11 +428,10 @@ public class PlatformServiceImpl implements PlatformService {
         } catch (final SPersistenceException e) {
             throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
         }
-        return true;
     }
 
     @Override
-    public void deactiveTenant(final long tenantId) throws STenantNotFoundException, STenantDeactivationException {
+    public void deactivateTenant(final long tenantId) throws STenantNotFoundException, STenantDeactivationException {
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addField(STenant.STATUS, STenant.DEACTIVATED);
@@ -444,6 +439,18 @@ public class PlatformServiceImpl implements PlatformService {
             platformPersistenceService.update(desc);
         } catch (final SPersistenceException e) {
             throw new STenantDeactivationException("Problem while deactivating tenant: " + tenant, e);
+        }
+    }
+
+    @Override
+    public void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException {
+        final STenant tenant = getTenant(tenantId);
+        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
+        desc.addField(STenant.STATUS, STenant.PAUSED);
+        try {
+            platformPersistenceService.update(desc);
+        } catch (final SPersistenceException e) {
+            throw new STenantUpdateException("Unable to update tenant status in database.", e);
         }
     }
 

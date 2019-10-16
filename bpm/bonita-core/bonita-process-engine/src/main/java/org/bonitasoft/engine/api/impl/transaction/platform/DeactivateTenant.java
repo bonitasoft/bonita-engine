@@ -38,7 +38,7 @@ public final class DeactivateTenant implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        platformService.deactiveTenant(tenantId);
+        platformService.deactivateTenant(tenantId);
         if (schedulerService.isStarted()) {
             schedulerService.pauseJobs(tenantId);
         }
