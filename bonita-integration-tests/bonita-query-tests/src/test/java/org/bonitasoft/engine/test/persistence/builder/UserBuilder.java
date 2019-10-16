@@ -38,6 +38,7 @@ public class UserBuilder extends PersistentObjectBuilder<SUser, UserBuilder> {
         user.setLastName("aLastName" + id);
         user.setUserName(userName);
         user.setManagerUserId(managerUserId);
+        user.setEnabled(true);
         return user;
     }
 
