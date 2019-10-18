@@ -9,8 +9,9 @@ import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.platform.exception.STenantActivationException;
+import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.tenant.TenantManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -28,15 +29,18 @@ public class PlatformManager {
 
     private PlatformState state = PlatformState.STOPPED;
     private NodeConfiguration nodeConfiguration;
-    private SchedulerService schedulerService;
     private UserTransactionService transactionService;
     private PlatformService platformService;
+    private List<PlatformLifecycleService> platformServices;
 
-    public PlatformManager(NodeConfiguration nodeConfiguration, SchedulerService schedulerService, UserTransactionService transactionService, PlatformService platformService) {
+    public PlatformManager(NodeConfiguration nodeConfiguration,
+                           UserTransactionService transactionService,
+                           PlatformService platformService,
+                           List<PlatformLifecycleService> platformServices) {
         this.nodeConfiguration = nodeConfiguration;
-        this.schedulerService = schedulerService;
         this.transactionService = transactionService;
         this.platformService = platformService;
+        this.platformServices = platformServices;
     }
 
     /**
@@ -50,7 +54,7 @@ public class PlatformManager {
      * Stop the platform and its tenants
      */
     public synchronized void stop() throws Exception {
-        logger.error("stopping platform: ");
+        logger.info("Stopping platform:");
         if (state == PlatformState.STOPPED) {
             logger.info("Platform already stopped, nothing to do.");
             return;
@@ -59,20 +63,21 @@ public class PlatformManager {
         for (TenantManager tenantManager : tenantManagers) {
             tenantManager.stop();
         }
-        schedulerService.stop();
-        //does not contain the scheduler
-        for (final PlatformLifecycleService serviceWithLifecycle : nodeConfiguration.getLifecycleServices()) {
-            logger.info("Stop service of platform: {}", serviceWithLifecycle.getClass().getName());
-            serviceWithLifecycle.stop();
+        for (final PlatformLifecycleService platformService : platformServices) {
+            logger.info("Stop service of platform: {}", platformService);
+            platformService.stop();
         }
         state = PlatformState.STOPPED;
+        logger.info("Platform stopped.");
     }
 
     /**
      * Start the platform and its tenants
      */
     public synchronized void start() throws Exception {
+        logger.info("Starting platform:");
         if (state == PlatformState.STARTED) {
+            logger.info("Platform already started.");
             return;
         }
         checkPlatformVersion();
@@ -82,25 +87,13 @@ public class PlatformManager {
         for (TenantManager tenantManager : tenantManagers) {
             tenantManager.start();
         }
-        startScheduler();
-        try {
+        restartHandlersOfPlatform();
+        state = PlatformState.STARTED;
+        logger.info("Platform started.");
+    }
 
-            restartHandlersOfPlatform();
-            state = PlatformState.STARTED;
-            for (TenantManager tenantManager : tenantManagers) {
-                tenantManager.afterStart();
-            }
-        } catch (Exception e) {
-            //FIXME should we also stop tenants/services of platform, state of platform to UNHEALTHY
-
-            // If an exception is thrown, stop the platform that was started.
-            try {
-                schedulerService.stop();
-            } catch (final Exception exp) {
-                throw new StartNodeException("Platform stopping failed : " + exp.getMessage(), e);
-            }
-            throw e;
-        }
+    TenantManager getTenantManager(STenant tenant) {
+        return TenantServiceSingleton.getInstance(tenant.getId()).getTenantManager();
     }
 
     private List<TenantManager> getTenantManagers() throws Exception {
@@ -122,12 +115,6 @@ public class PlatformManager {
         }
     }
 
-    private void startScheduler() throws SBonitaException {
-        if (!schedulerService.isStarted()) {
-            schedulerService.start();
-        }
-    }
-
     private void checkPlatformVersion() throws Exception {
         final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
         if (!transactionService.executeInTransaction(checkPlatformVersion)) {
@@ -137,16 +124,27 @@ public class PlatformManager {
 
 
     private void startPlatformServices() throws SBonitaException {
-        final List<PlatformLifecycleService> servicesToStart = nodeConfiguration.getLifecycleServices();
-        for (final PlatformLifecycleService serviceWithLifecycle : servicesToStart) {
-            logger.info("Start service of platform : {}", serviceWithLifecycle.getClass().getName());
-            // scheduler might be already running
-            // skip service start
-            if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
-                serviceWithLifecycle.start();
-            }
+        for (final PlatformLifecycleService platformService : platformServices) {
+            logger.info("Start service of platform : {}", platformService);
+            platformService.start();
         }
     }
 
+
+    public void activateTenant(long tenantId) throws Exception {
+        STenant tenant = platformService.getTenant(tenantId);
+        if (!STenant.DEACTIVATED.equals(tenant.getStatus())) {
+            throw new STenantActivationException("Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
+        }
+        getTenantManager(tenant).activate();
+    }
+
+    public void deactivateTenant(long tenantId) throws Exception {
+        final STenant tenant = platformService.getTenant(tenantId);
+        if (STenant.DEACTIVATED.equals(tenant.getStatus())) {
+            throw new STenantDeactivationException("Tenant deactivation failed. Tenant is already deactivated");
+        }
+        getTenantManager(tenant).deactivate();
+    }
 
 }

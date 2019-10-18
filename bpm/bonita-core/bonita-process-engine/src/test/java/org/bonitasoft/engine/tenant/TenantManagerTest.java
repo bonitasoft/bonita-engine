@@ -14,13 +14,14 @@
 package org.bonitasoft.engine.tenant;
 
 import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,20 +37,22 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -85,30 +88,42 @@ public class TenantManagerTest {
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private SessionService sessionService;
-    private TenantManager tenantManager;
-    private STenant tenant;
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
     private ClassLoaderService classloaderService;
+    private TenantConfiguration tenantConfiguration = new TenantConfiguration();
     @Mock
-    private TenantConfiguration tenantConfiguration;
+    private TenantLifecycleService tenantService1;
+    @Mock
+    private TenantLifecycleService tenantService2;
+    @Mock
+    private TenantRestartHandler tenantRestartHandler1;
+    @Mock
+    private TenantRestartHandler tenantRestartHandler2;
+
+    private TenantManager tenantManager;
+    private STenant tenant;
+    @Mock
+    private PlatformManager platformManager;
 
 
     @Before
     public void before() throws Exception {
+        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
+        tenantConfiguration.setLifecycleServices(Arrays.asList(tenantService1, tenantService2));
         when(userTransactionService.executeInTransaction(any())).thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         tenantManager = spy(new TenantManager(userTransactionService,
                 platformService, nodeConfiguration, sessionService, sessionAccessor,
                 TENANT_ID, classloaderService, tenantConfiguration,
-                schedulerService, broadcastService));
+                schedulerService, broadcastService, platformManager));
         doReturn(platformServiceAccessor).when(tenantManager).getPlatformAccessor();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(TENANT_ID);
         doReturn(nodeConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
+        doReturn(SSession.builder().id(123).build()).when(sessionService).createSession(anyLong(), any());
         tenant = new STenant();
         when(platformService.getTenant(TENANT_ID)).thenReturn(tenant);
-        doNothing().when(tenantManager).execute(any());
     }
 
     private static Map<String, TaskResult<String>> okFuture() {
@@ -122,7 +137,8 @@ public class TenantManagerTest {
         tenantManager.pause();
 
         verify(schedulerService).pauseJobs(TENANT_ID);
-        verify(tenantManager).changeStateOfServices(SetServiceState.ServiceAction.PAUSE);
+        verify(tenantService1).pause();
+        verify(tenantService2).pause();
         verify(platformService).pauseTenant(TENANT_ID);
     }
 
@@ -133,7 +149,8 @@ public class TenantManagerTest {
         tenantManager.resume();
 
         verify(schedulerService).resumeJobs(TENANT_ID);
-        verify(tenantManager).changeStateOfServices(SetServiceState.ServiceAction.RESUME);
+        verify(tenantService1).resume();
+        verify(tenantService2).resume();
         verify(platformService).activateTenant(TENANT_ID);
     }
 
@@ -183,16 +200,14 @@ public class TenantManagerTest {
         doReturn(true).when(transactionService).isTransactionActive();
         whenTenantIsInState(STenant.PAUSED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
-        final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
-        final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
+
 
         // When a tenant moved to available mode
         tenantManager.resume();
 
         // Then elements must be restarted
-        verify(tenantRestartHandler1, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
     }
 
     @Test(expected = UpdateException.class)
@@ -302,6 +317,73 @@ public class TenantManagerTest {
 
         // Then
         verify(platformService).pauseTenant(TENANT_ID);
+    }
+
+    @Test
+    public void deactivate_should_stop_services_and_deactivate_tenant_in_db() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+
+        tenantManager.deactivate();
+
+        verify(tenantService1).stop();
+        verify(tenantService2).stop();
+        verify(schedulerService).pauseJobs(TENANT_ID);
+        verify(platformService).deactivateTenant(TENANT_ID);
+    }
+
+    @Test
+    public void activate_should_start_services_and_activate_tenant_in_db() throws Exception {
+        whenTenantIsInState(STenant.DEACTIVATED);
+        when(platformManager.getState()).thenReturn(PlatformState.STARTED);
+
+        tenantManager.activate();
+
+        verify(tenantService1).start();
+        verify(tenantService2).start();
+        verify(schedulerService).resumeJobs(TENANT_ID);
+        verify(platformService).activateTenant(TENANT_ID);
+        assertThat(tenantManager.isStarted()).isTrue();
+    }
+
+    @Test
+    public void activate_should_not_start_services_when_platform_is_stopped() throws Exception {
+        whenTenantIsInState(STenant.DEACTIVATED);
+        when(platformManager.getState()).thenReturn(PlatformState.STOPPED);
+
+        tenantManager.activate();
+
+        verify(tenantService1, never()).start();
+        verify(tenantService2, never()).start();
+        verify(schedulerService, never()).resumeJobs(TENANT_ID);
+        verify(platformService).activateTenant(TENANT_ID);
+        assertThat(tenantManager.isStarted()).isFalse();
+    }
+
+    @Test
+    public void stop_should_stop_services_only() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+        tenantManager.start();
+
+        tenantManager.stop();
+
+        verify(tenantService1).stop();
+        verify(tenantService2).stop();
+        verify(schedulerService, never()).pauseJobs(TENANT_ID);
+        verify(platformService, never()).deactivateTenant(TENANT_ID);
+    }
+
+    @Test
+    public void start_should_start_services_only() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+        when(platformManager.getState()).thenReturn(PlatformState.STARTED);
+
+        tenantManager.start();
+
+        verify(tenantService1).start();
+        verify(tenantService2).start();
+        verify(schedulerService).resumeJobs(TENANT_ID);
+        verify(platformService, never()).activateTenant(TENANT_ID);
+        verify(schedulerService).resumeJobs(TENANT_ID);
     }
 
 

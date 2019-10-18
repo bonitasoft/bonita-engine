@@ -87,7 +87,7 @@ public class PlatformAPIImplTest {
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
-        doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServerInstance();
+        doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServer();
     }
 
     @Test
