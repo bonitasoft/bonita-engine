@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.bonitasoft.engine.api.impl.transaction.SetServiceState.ServiceAction.STOP;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +20,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
-import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
@@ -49,13 +45,11 @@ import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
 import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -166,15 +160,6 @@ public class PlatformAPIImpl implements PlatformAPI {
 
 
 
-    void startScheduler(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        if (!schedulerService.isStarted()) {
-            schedulerService.start();
-        }
-    }
-
-
-
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
@@ -208,6 +193,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             for (STenant sTenant : sTenants) {
                 deleteTenant(sTenant.getId());
             }
+        } catch (DeletionException e) {
+            throw e;
         } catch (Exception e) {
             throw new DeletionException(e);
         }
@@ -293,8 +280,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (tenantId != -1L) {
                 try {
                     deleteTenant(tenantId);
-                } catch (STenantDeletionException e1) {
-                    throw new STenantCreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", e1);
+                } catch (DeletionException ex) {
+                    throw new STenantCreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", ex);
                 }
             }
             throw e;
@@ -306,7 +293,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) {
-        getBonitaHomeServerInstance().createTenant(tenantId);
+        getBonitaHomeServer().createTenant(tenantId);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -318,14 +305,18 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    void deleteTenant(final long tenantId) throws STenantDeletionException {
-        // TODO : Reduce number of transactions
+    @CustomTransactions
+    protected void deleteTenant(final long tenantId) throws DeletionException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            tenantServiceAccessor.getTenantManager().stop();
+            tenantServiceAccessor.destroy();
 
             // delete tenant objects in database
             transactionService.executeInTransaction(() -> {
@@ -339,78 +330,33 @@ public class PlatformAPIImpl implements PlatformAPI {
                 return null;
             });
 
-            // stop tenant services and clear the spring context
-            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-
-            // stop the tenant services:
-            final SetServiceState stopService = new SetServiceState(tenantId, STOP);
-            platformAccessor.getTransactionService().executeInTransaction(stopService);
-
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
-            tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            getBonitaHomeServerInstance().deleteTenant(tenantId);
-        } catch (final STenantNotFoundException e) {
-            throw new STenantDeletionException(e);
+            getBonitaHomeServer().deleteTenant(tenantId);
         } catch (final SDeletingActivatedTenantException e) {
-            throw new STenantDeletionException("Unable to delete an activated tenant " + tenantId);
-        } catch (final STenantDeletionException e) {
+            throw new DeletionException("Unable to delete an activated tenant " + tenantId);
+        } catch (final DeletionException e) {
             throw e;
         } catch (final Exception e) {
-            throw new STenantDeletionException(e);
+            throw new DeletionException(e);
         }
     }
 
     private void activateDefaultTenant() throws STenantActivationException {
-        // TODO : Reduce number of transactions
-        SessionAccessor sessionAccessor = null;
-        long platformSessionId = -1;
         try {
-            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            sessionAccessor = createSessionAccessor();
-            STenant defaultTenant = getDefaultTenant();
-            final long tenantId = defaultTenant.getId();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
+            getPlatformAccessor()
+                        .getPlatformManager().activateTenant(getDefaultTenant().getId());
 
-            // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
-            // definitively in startNode method
-            startScheduler(platformAccessor);
-            // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
-            // startNode() method to start the scheduler, not ActivateTenant)
-            // schedulerStarted = true;
-
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-            final long sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-
-            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService,
-                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor());
-            activateTenant.execute();
-            sessionService.deleteSession(sessionId);
         } catch (final STenantActivationException e) {
             throw e;
         } catch (final Exception e) {
             throw new STenantActivationException(e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
     protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
         return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
-    }
-
-    private long createSessionAndMakeItActive(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final long tenantId)
-            throws SBonitaException {
-        final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-
-        final long sessionId = createSession(tenantId, sessionService);
-        sessionAccessor.setSessionInfo(sessionId, tenantId);
-        return sessionId;
     }
 
     @Override
@@ -484,7 +430,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public Map<String, byte[]> getClientPlatformConfigurations() {
-        return getBonitaHomeServerInstance().getClientPlatformConfigurations();
+        return getBonitaHomeServer().getClientPlatformConfigurations();
     }
 
     @Override
@@ -495,7 +441,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
             for (STenant tenant : tenants) {
                 conf.put(tenant.getId(),
-                        getBonitaHomeServerInstance().getClientTenantConfigurations(tenant.getId()));
+                        getBonitaHomeServer().getClientTenantConfigurations(tenant.getId()));
             }
             return conf;
         } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException | InstantiationException | STenantException e) {
@@ -505,15 +451,15 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public byte[] getClientTenantConfiguration(long tenantId, String file) {
-        return getBonitaHomeServerInstance().getTenantPortalConfiguration(tenantId, file);
+        return getBonitaHomeServer().getTenantPortalConfiguration(tenantId, file);
     }
 
-    BonitaHomeServer getBonitaHomeServerInstance() {
+    protected BonitaHomeServer getBonitaHomeServer() {
         return BonitaHomeServer.getInstance();
     }
 
     @Override
     public void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
-        getBonitaHomeServerInstance().updateTenantPortalConfigurationFile(tenantId, file, content);
+        getBonitaHomeServer().updateTenantPortalConfigurationFile(tenantId, file, content);
     }
 }
