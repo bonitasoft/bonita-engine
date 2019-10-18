@@ -1403,6 +1403,10 @@
                     <constructor-arg name="zipName" value="api-extension-viewer.zip" />
                     <constructor-arg name="hidden" value="false" />
                 </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="bonita-task-list-page.zip" />
+                    <constructor-arg name="hidden" value="false" />
+                </bean>
 
                 <!-- New web-pages -->
                 <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
