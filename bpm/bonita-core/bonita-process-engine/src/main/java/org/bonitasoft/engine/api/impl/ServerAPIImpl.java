@@ -18,8 +18,10 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.NoSessionRequired;
@@ -41,8 +43,6 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
@@ -60,6 +60,8 @@ import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -68,24 +70,16 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public class ServerAPIImpl implements ServerAPI {
 
+    private static Logger logger = LoggerFactory.getLogger(ServerAPIImpl.class);
+
     private static final String SESSION = "session";
-
-    private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
-
     private static final long serialVersionUID = -161775388604256321L;
-    private static final String IS_PAUSED = "isPaused";
 
-    protected final APIAccessResolver accessResolver;
+    private final APIAccessResolver accessResolver;
 
     private final boolean cleanSession;
 
-    private TechnicalLoggerService technicalLogger;
-
-    public ServerAPIImpl() {
-        this(true);
-    }
-
-    public ServerAPIImpl(final boolean cleanSession) {
+    public ServerAPIImpl(boolean cleanSession) {
         try {
             this.cleanSession = cleanSession;
             accessResolver = getServiceAccessorFactoryInstance().createAPIAccessResolver();
@@ -94,45 +88,45 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
+    public ServerAPIImpl() {
+        this(true);
+    }
+
     /**
      * For Test Mock usage
      */
-    public ServerAPIImpl(boolean cleanSession, APIAccessResolver accessResolver) {
-        this.cleanSession = cleanSession;
+    public ServerAPIImpl(APIAccessResolver accessResolver) {
+        this.cleanSession = true;
         this.accessResolver = accessResolver;
     }
 
-    void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
-        technicalLogger = technicalLoggerService;
-    }
-
-    private ServiceAccessorFactory getServiceAccessorFactoryInstance() {
+    ServiceAccessorFactory getServiceAccessorFactoryInstance() {
         return ServiceAccessorFactory.getInstance();
     }
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        technicalTraceLog("Starting ", apiInterfaceName, methodName);
+        logger.trace("Starting Server API call {} {}", apiInterfaceName, methodName);
+
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         SessionAccessor sessionAccessor = null;
         Session session = null;
         try {
+            final Object api = accessResolver.getAPIImplementation(Class.forName(apiInterfaceName));
             try {
                 session = (Session) options.get(SESSION);
-                sessionAccessor = beforeInvokeMethod(session, apiInterfaceName);
-                return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-            } catch (final ServerAPIRuntimeException sapire) {
-                throw sapire.getCause();
+                sessionAccessor = beforeInvokeMethod(session, api);
+                return invokeAPI(api, apiInterfaceName, methodName, classNameParameters, parametersValues, session);
+            } catch (final ServerAPIRuntimeException e) {
+                throw e.getCause();
             }
         } catch (final BonitaRuntimeException | BonitaException bre) {
             fillGlobalContextForException(session, bre);
             throw createServerWrappedException(bre);
         } catch (final UndeclaredThrowableException ute) {
-            technicalDebugLog(ute);
             throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
-            technicalDebugLog(cause);
             final BonitaRuntimeException throwableToWrap = wrapThrowable(cause);
             fillGlobalContextForException(session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
@@ -140,7 +134,7 @@ public class ServerAPIImpl implements ServerAPI {
             cleanSessionIfNeeded(sessionAccessor);
             // reset class loader
             Thread.currentThread().setContextClassLoader(baseClassLoader);
-            technicalTraceLog("End ", apiInterfaceName, methodName);
+            logger.trace("End Server API call {} {}", apiInterfaceName, methodName);
         }
     }
 
@@ -174,21 +168,9 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private void technicalDebugLog(final Throwable throwableToLog) {
-        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
-        }
-    }
-
-    private void technicalTraceLog(String prefix, String apiInterfaceName, String methodName) {
-        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            technicalLogger.log(this.getClass(), TechnicalLogSeverity.TRACE, prefix + "Server API call " + apiInterfaceName + " " + methodName);
-        }
-    }
-
-    SessionAccessor beforeInvokeMethod(final Session session, final String apiInterfaceName) throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
-            InvocationTargetException, SBonitaException {
+    private SessionAccessor beforeInvokeMethod(final Session session, final Object api) throws BonitaHomeNotSetException,
+            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException,
+            SBonitaException {
         SessionAccessor sessionAccessor = null;
 
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
@@ -204,34 +186,39 @@ public class ServerAPIImpl implements ServerAPI {
                     break;
 
                 case API:
-                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessorFactory, platformServiceAccessor, session);
+                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, platformServiceAccessor, session);
                     break;
 
                 default:
                     throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
             }
-        } else if (accessResolver.needSession(apiInterfaceName)) {
+        } else if (needSession(api)) {
             throw new InvalidSessionException("Session is null!");
         }
         if (serverClassLoader != null) {
             Thread.currentThread().setContextClassLoader(serverClassLoader);
         }
-
         return sessionAccessor;
     }
 
-    private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
-            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    private boolean needSession(Object api) {
+        //require a session if "NoSessionRequired" is not present
+        Class<?>[] interfaces = api.getClass().getInterfaces();
+        for (Class<?> anInterface : interfaces) {
+            if (anInterface.isAnnotationPresent(NoSessionRequired.class)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    private ClassLoader beforeInvokeMethodForAPISession(SessionAccessor sessionAccessor, PlatformServiceAccessor platformServiceAccessor, Session session) throws SBonitaException {
         checkTenantSession(platformServiceAccessor, session);
-        final long tenantId = ((APISession) session).getTenantId();
-        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
+        long tenantId = ((APISession) session).getTenantId();
+        SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
         sessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), tenantId);
-        final ClassLoader serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(tenantId).getTechnicalLoggerService());
-        return serverClassLoader;
+        return getTenantClassLoader(platformServiceAccessor, session);
     }
 
     private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor, final PlatformServiceAccessor platformServiceAccessor,
@@ -244,12 +231,10 @@ public class ServerAPIImpl implements ServerAPI {
         }
         platformSessionService.renewSession(session.getId());
         sessionAccessor.setSessionInfo(session.getId(), -1);
-        final ClassLoader serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
-        setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
-        return serverClassLoader;
+        return getPlatformClassLoader(platformServiceAccessor);
     }
 
-    protected SessionType getSessionType(final Session session) {
+    private SessionType getSessionType(final Session session) {
         SessionType sessionType = null;
         if (session instanceof PlatformSession) {
             sessionType = SessionType.PLATFORM;
@@ -259,21 +244,20 @@ public class ServerAPIImpl implements ServerAPI {
         return sessionType;
     }
 
-    Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues,
-            final Session session) throws Throwable {
+    private Object invokeAPI(Object api, String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues,
+                             final Session session) throws Throwable {
         final Class<?>[] parameterTypes = getParameterTypes(classNameParameters);
 
-        final Object apiImpl = accessResolver.getAPIImplementation(apiInterfaceName);
-        final Method method = ClassReflector.getMethod(apiImpl.getClass(), methodName, parameterTypes);
+        final Method method = ClassReflector.getMethod(api.getClass(), methodName, parameterTypes);
         // No session required means that there is no transaction
-        if (method.isAnnotationPresent(CustomTransactions.class) || method.isAnnotationPresent(NoSessionRequired.class)) {
-            return invokeAPIOutsideTransaction(parametersValues, apiImpl, method, apiInterfaceName, session);
+        if (method.isAnnotationPresent(CustomTransactions.class) || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
+            return invokeAPIOutsideTransaction(parametersValues, api, method, apiInterfaceName, session);
         } else {
-            return invokeAPIInTransaction(parametersValues, apiImpl, method, session, apiInterfaceName);
+            return invokeAPIInTransaction(parametersValues, api, method, session, apiInterfaceName);
         }
     }
 
-    protected Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session)
+    private Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session)
             throws Throwable {
         checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */false);
         return invokeAPI(method, apiImpl, parametersValues);
@@ -281,68 +265,63 @@ public class ServerAPIImpl implements ServerAPI {
 
     protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session,
             boolean isAlreadyInTransaction) {
-        warnIfDeprecated(method, apiInterfaceName);
-        if (!isNodeInAValidStateFor(method)) {
-            logNodeNotStartedMessage(apiInterfaceName, method);
+        final MethodAvailability methodAvailability = getMethodAvailability(apiImpl, method);
+        if (methodAvailability.isDeprecated) {
+            logger.warn("The API method {}.{} is deprecated. It will be deleted in a future release. " +
+                    "Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.", apiInterfaceName, method.getName());
+        }
+        if (!methodAvailability.isAvailableWhenPlatformIsStopped && !isNodeStarted()) {
+            logger.error("Node not started. Method '{}. {}' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: {}", apiInterfaceName, method.getName(), method.getDeclaringClass().getName());
             throw new NodeNotStartedException();
         }
         // we don't check if tenant is in pause mode at platform level and when there is no session
         // when there is no session means that we are trying to log in, in this case it is the LoginApiExt that check if the user is the technical user
         // For tenant level method call:
-        if (session instanceof APISession) {
-            final long tenantId = ((APISession) session).getTenantId();
-            checkTenantIsInAValidModeFor(apiImpl, method, apiInterfaceName, tenantId, session, isAlreadyInTransaction);
+        if (!(session instanceof APISession)) {
+            return;
+        }
+
+        final long tenantId = ((APISession) session).getTenantId();
+        if (methodAvailability.isAvailableOnPausedTenant && methodAvailability.isAvailableOnRunningTenant) {
+            //method can be called on paused and running tenant.
+            return;
+        }
+        boolean tenantIsPaused = isTenantPaused(tenantId, session, isAlreadyInTransaction);
+        if (tenantIsPaused && !methodAvailability.isAvailableOnPausedTenant) {
+            throw new TenantStatusException(MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is paused.", apiInterfaceName, method.getName(), tenantId));
+        }
+        if (!tenantIsPaused && !methodAvailability.isAvailableOnRunningTenant) {
+            throw new TenantStatusException(MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is running and this method can only be called when tenant is paused."
+                    , apiInterfaceName, method.getName(), tenantId));
         }
     }
 
-    protected void checkTenantIsInAValidModeFor(final Object apiImpl, final Method method, final String apiInterfaceName, final long tenantId,
-            final Session session, boolean isAlreadyInTransaction) {
-        final boolean tenantRunning = isTenantAvailable(tenantId, session, isAlreadyInTransaction);
-        final AvailableWhenTenantIsPaused methodAnnotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
-        AvailableWhenTenantIsPaused annotation;
-        if (methodAnnotation != null) {
-            annotation = methodAnnotation;
-        } else {
-            final Class<?> apiClass = apiImpl.getClass();
-            annotation = apiClass.getAnnotation(AvailableWhenTenantIsPaused.class);
+    private static class MethodAvailability {
+        boolean isDeprecated;
+        boolean isAvailableOnRunningTenant = true;
+        boolean isAvailableOnPausedTenant = true;
+        boolean isAvailableWhenPlatformIsStopped;
+    }
+
+    private MethodAvailability getMethodAvailability(Object apiInstance, Method method) {
+        AvailableWhenTenantIsPaused availableWhenTenantIsPaused = Optional.ofNullable(method.getAnnotation(AvailableWhenTenantIsPaused.class))
+                .orElseGet(() -> apiInstance.getClass().getAnnotation(AvailableWhenTenantIsPaused.class));
+        AvailableOnStoppedNode availableOnStoppedNode = method.getAnnotation(AvailableOnStoppedNode.class);
+        MethodAvailability methodAvailability = new MethodAvailability();
+        // Deprecation
+        methodAvailability.isDeprecated = method.isAnnotationPresent(Deprecated.class);
+
+        // Tenant status
+        if (availableWhenTenantIsPaused == null) {
+            methodAvailability.isAvailableOnPausedTenant = false;
+        } else if (availableWhenTenantIsPaused.onlyAvailableWhenPaused()) {
+            methodAvailability.isAvailableOnRunningTenant = false;
         }
-        checkIsValidModeFor(tenantRunning, annotation, tenantId, apiImpl, method, apiInterfaceName);
-    }
-
-    protected void checkIsValidModeFor(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation, final long tenantId, final Object apiImpl,
-            final Method method, final String apiInterfaceName) {
-        // On running tenant, annotation must not be present, or present without ONLY flag:
-        boolean okOnRunningTenant = isMethodAvailableOnRunningTenant(tenantRunning, annotation);
-        // On paused tenant, annotation must be present (without consideration on ONLY flag):
-        boolean okOnPausedTenant = isMethodAvailableOnPausedTenant(tenantRunning, annotation);
-        if (!(okOnRunningTenant || okOnPausedTenant)) {
-            if (tenantRunning) {
-                methodCannotBeCalledOnRunningTenant(apiImpl, apiInterfaceName, method, tenantId);
-            } else {
-                methodCannotBeCalledOnPausedTenant(apiImpl, apiInterfaceName, method, tenantId);
-            }
+        // Platform status
+        if (availableOnStoppedNode != null) {
+            methodAvailability.isAvailableWhenPlatformIsStopped = true;
         }
-    }
-
-    protected void methodCannotBeCalledOnRunningTenant(final Object apiImpl, final String apiInterfaceName, final Method method, final long tenantId) {
-        logTechnicalErrorMessage("Tenant is running. Method '" + apiInterfaceName + "." + method.getName() + "' on implementation '"
-                + apiImpl.getClass().getSimpleName() + "' can only be called when the tenant is PAUSED (call TenantManagementAPI.pause() first)");
-        throw new TenantStatusException("Tenant with ID " + tenantId + " is running, method '" + apiInterfaceName + "." + method.getName()
-                + "()' cannot be called.");
-    }
-
-    protected void methodCannotBeCalledOnPausedTenant(final Object apiImpl, final String apiInterfaceName, final Method method, final long tenantId) {
-        logTechnicalErrorMessage("Tenant in pause. Method '" + apiInterfaceName + "." + method.getName() + "' on implementation '"
-                + apiImpl.getClass().getSimpleName() + "' cannot be called until the tenant mode is RUNNING again (call TenantManagementAPI.resume() first)");
-        throw new TenantStatusException("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
-    }
-
-    protected boolean isMethodAvailableOnPausedTenant(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation) {
-        return !tenantRunning && annotation != null;
-    }
-
-    protected boolean isMethodAvailableOnRunningTenant(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation) {
-        return tenantRunning && (annotation == null || !annotation.only());
+        return methodAvailability;
     }
 
     /**
@@ -354,52 +333,18 @@ public class ServerAPIImpl implements ServerAPI {
      *        if the request is made in a transaction
      * @return true if the tenant is available, false otherwise (if the tenant is paused)
      */
-    protected boolean isTenantAvailable(final long tenantId, final Session session, boolean isAlreadyInTransaction) {
-        final Object apiImpl;
+    protected boolean isTenantPaused(final long tenantId, final Session session, boolean isAlreadyInTransaction) {
         try {
-            apiImpl = accessResolver.getAPIImplementation(TenantAdministrationAPI.class.getName());
-            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_PAUSED);
-            final Boolean paused;
+            TenantAdministrationAPI tenantAdministrationAPI = accessResolver.getAPIImplementation(TenantAdministrationAPI.class);
             if (isAlreadyInTransaction) {
-                paused = (Boolean) invokeAPI(method, apiImpl);
+                return tenantAdministrationAPI.isPaused();
             } else {
-                final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
-
-                final Callable<Object> callable = new Callable<Object>() {
-
-                    @Override
-                    public Object call() throws Exception {
-                        try {
-                            return invokeAPI(method, apiImpl);
-                        } catch (final Throwable cause) {
-                            throw new ServerAPIRuntimeException(cause);
-                        }
-                    }
-                };
-
-                paused = (Boolean) userTransactionService.executeInTransaction(callable);
+                return selectUserTransactionService(session, getSessionType(session))
+                        .executeInTransaction(tenantAdministrationAPI::isPaused);
             }
-            return !paused;
         } catch (final Throwable e) {
             throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible", e);
         }
-    }
-
-    protected void logNodeNotStartedMessage(final String apiInterfaceName, final Method method) {
-        logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + method.getName()
-                + "' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: " + method.getDeclaringClass().getName());
-    }
-
-    protected void logTechnicalErrorMessage(final String message) {
-        if (technicalLogger != null) {
-            technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, message);
-        } else {
-            System.err.println(message);
-        }
-    }
-
-    protected boolean isNodeInAValidStateFor(final Method method) {
-        return method.isAnnotationPresent(AvailableOnStoppedNode.class) || isNodeStarted();
     }
 
     /**
@@ -407,9 +352,7 @@ public class ServerAPIImpl implements ServerAPI {
      */
     private boolean isNodeStarted() {
         try {
-            final Object apiImpl = accessResolver.getAPIImplementation(PlatformAPI.class.getName());
-            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME);
-            return (Boolean) invokeAPI(method, apiImpl);
+            return accessResolver.getAPIImplementation(PlatformAPI.class).isNodeStarted();
         } catch (final Throwable e) {
             return false;
         }
@@ -422,23 +365,17 @@ public class ServerAPIImpl implements ServerAPI {
         }
         final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
 
-        final Callable<Object> callable = new Callable<Object>() {
-
-            @Override
-            public Object call() throws Exception {
-                try {
-                    checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Already in a transaction */true);
-                    return invokeAPI(method, apiImpl, parametersValues);
-                } catch (final Throwable cause) {
-                    throw new ServerAPIRuntimeException(cause);
-                }
+        return userTransactionService.executeInTransaction(() -> {
+            try {
+                checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Already in a transaction */true);
+                return invokeAPI(method, apiImpl, parametersValues);
+            } catch (final Throwable cause) {
+                throw new ServerAPIRuntimeException(cause);
             }
-        };
-
-        return userTransactionService.executeInTransaction(callable);
+        });
     }
 
-    protected UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
+    UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
             InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
@@ -465,14 +402,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private void warnIfDeprecated(Method method, String apiInterfaceName) {
-        if (technicalLogger != null && method.isAnnotationPresent(Deprecated.class)) {
-            technicalLogger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The API method " + apiInterfaceName + "." + method.getName()
-                    + " is deprecated. It will be deleted in a future release. Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.");
-        }
-    }
-
-    protected Class<?>[] getParameterTypes(final List<String> classNameParameters) throws ClassNotFoundException {
+    private Class<?>[] getParameterTypes(final List<String> classNameParameters) throws ClassNotFoundException {
         Class<?>[] parameterTypes = null;
         if (classNameParameters != null && !classNameParameters.isEmpty()) {
             parameterTypes = new Class<?>[classNameParameters.size()];
@@ -496,9 +426,8 @@ public class ServerAPIImpl implements ServerAPI {
 
     private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws SSchedulerException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-        if (!schedulerService.isStarted() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "The scheduler is not started!");
+        if (!schedulerService.isStarted()) {
+            logger.debug("The scheduler is not started!");
         }
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(apiSession.getTenantId());

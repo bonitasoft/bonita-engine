@@ -29,6 +29,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AvailableWhenTenantIsPaused {
 
-    boolean only() default false;
+    boolean onlyAvailableWhenPaused() default false;
 
 }

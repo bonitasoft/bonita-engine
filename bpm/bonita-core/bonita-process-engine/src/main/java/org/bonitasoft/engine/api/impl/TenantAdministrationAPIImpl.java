@@ -133,7 +133,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(only = true)
+    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final long userId;
@@ -153,7 +153,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(only = true)
+    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
@@ -165,7 +165,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused(only = true)
+    @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
     public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {

@@ -30,6 +30,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
  * @author Zhang Bole
  * @see APISession
  */
+@NoSessionRequired
 public interface LoginAPI {
 
     /**
@@ -45,7 +46,6 @@ public interface LoginAPI {
      * @throws UnknownUserException
      *             occurs when the user trying to login is unknown to the engine
      */
-    @NoSessionRequired
     APISession login(String userName, String password) throws LoginException, UnknownUserException;
 
     /**
@@ -57,7 +57,6 @@ public interface LoginAPI {
      * @throws LoginException
      *             occurs when an exception is thrown during login
      */
-    @NoSessionRequired
     APISession login(Map<String, Serializable> credentials) throws LoginException;
 
     /**
@@ -70,7 +69,6 @@ public interface LoginAPI {
      * @throws LogoutException
      *             occurs when an exception is thrown during the logout
      */
-    @NoSessionRequired
     void logout(APISession session) throws SessionNotFoundException, LogoutException;
 
 }

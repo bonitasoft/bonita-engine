@@ -76,12 +76,8 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
                 LOGGER.log(FINEST, "Calling method " + method.getName() + " on API " + this.api.getClass().getName());
             }
             Map<String, Serializable> options;
-            if (method.isAnnotationPresent(NoSessionRequired.class)) {
-                options = Collections.emptyMap();
-            } else {
-                options = new HashMap<>();
-                options.put("session", this.session);
-            }
+            options = new HashMap<>();
+            options.put("session", this.session);
             // invoke ServerAPI unique method
             final Object object = this.api.invokeMethod(options, this.interfaceName, method.getName(), classNameParameters, args);
             if (LOGGER.isLoggable(FINEST)) {
