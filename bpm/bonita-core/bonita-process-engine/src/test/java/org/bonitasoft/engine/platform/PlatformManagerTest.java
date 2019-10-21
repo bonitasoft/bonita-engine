@@ -1,13 +1,16 @@
 package org.bonitasoft.engine.platform;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -27,6 +30,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -37,6 +41,8 @@ public class PlatformManagerTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Mock
     private NodeConfiguration nodeConfiguration;
@@ -46,15 +52,18 @@ public class PlatformManagerTest {
     private PlatformService platformService;
     @Mock
     private TenantManager tenantManager;
-    public PlatformManager platformManager;
     @Mock
-    public PlatformLifecycleService platformLifecycleService1;
+    private PlatformLifecycleService platformLifecycleService1;
     @Mock
-    public PlatformLifecycleService platformLifecycleService2;
+    private PlatformLifecycleService platformLifecycleService2;
+    @Mock
+    private PlatformStateProvider platformStateProvider;
+
+    private PlatformManager platformManager;
 
     @Before
     public void before() throws Exception {
-        platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService, asList(platformLifecycleService1, platformLifecycleService2)));
+        platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService, asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider));
         when(transactionService.executeInTransaction(any())).thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         doReturn(tenantManager).when(platformManager).getTenantManager(any());
         doReturn(new SPlatform("1.3.0", "1.2.0", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
@@ -63,32 +72,52 @@ public class PlatformManagerTest {
 
     @Test
     public void should_start_scheduler_when_starting_node() throws Exception {
+        doReturn(true).when(platformStateProvider).initializeStart();
 
-        platformManager.start();
+        boolean started = platformManager.start();
 
         verify(platformLifecycleService1).start();
         verify(platformLifecycleService2).start();
+        verify(platformStateProvider).setStarted();
+        assertThat(started).isTrue();
     }
 
     @Test
     public void should_start_platform_only_once() throws Exception {
-        platformManager.start();
+        //doReturn(false).when(platformStateProvider).initializeStart();
 
-        platformManager.start();
+        boolean started = platformManager.start();
 
-        verify(platformLifecycleService1).start();
-        verify(platformLifecycleService2).start();
+        verifyZeroInteractions(platformLifecycleService1);
+        verifyZeroInteractions(platformLifecycleService2);
+        verify(platformStateProvider, never()).setStarted();
+        assertThat(started).isFalse();
     }
 
     @Test
     public void should_stop_services_when_stopping_platform() throws Exception {
-        platformManager.start();
+        doReturn(true).when(platformStateProvider).initializeStop();
 
-        platformManager.stop();
+        boolean stopped = platformManager.stop();
 
         verify(platformLifecycleService1).stop();
         verify(platformLifecycleService2).stop();
+        verify(platformStateProvider).setStopped();
+        assertThat(stopped).isTrue();
     }
+
+    @Test
+    public void should_stop_platform_only_once() throws Exception {
+        //doReturn(false).when(platformStateProvider).initializeStop();
+
+        boolean stopped = platformManager.stop();
+
+        verifyZeroInteractions(platformLifecycleService1);
+        verifyZeroInteractions(platformLifecycleService2);
+        verify(platformStateProvider, never()).setStopped();
+        assertThat(stopped).isFalse();
+    }
+
 
     @Test
     public void should_activate_tenant_using_tenantManager() throws Exception {
@@ -137,6 +166,8 @@ public class PlatformManagerTest {
 
         verify(tenantManager).deactivate();
     }
+
+
 
     private STenant deactivated(STenant tenant) {
         tenant.setStatus(STenant.DEACTIVATED);

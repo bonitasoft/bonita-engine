@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 2019 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ */
 package org.bonitasoft.engine.platform;
 
 import java.util.List;
@@ -27,37 +40,40 @@ public class PlatformManager {
 
     private static Logger logger = LoggerFactory.getLogger(PlatformManager.class);
 
-    private PlatformState state = PlatformState.STOPPED;
     private NodeConfiguration nodeConfiguration;
     private UserTransactionService transactionService;
     private PlatformService platformService;
     private List<PlatformLifecycleService> platformServices;
+    private PlatformStateProvider platformStateProvider;
 
     public PlatformManager(NodeConfiguration nodeConfiguration,
                            UserTransactionService transactionService,
                            PlatformService platformService,
-                           List<PlatformLifecycleService> platformServices) {
+                           List<PlatformLifecycleService> platformServices,
+                           PlatformStateProvider platformStateProvider
+        ) {
         this.nodeConfiguration = nodeConfiguration;
         this.transactionService = transactionService;
         this.platformService = platformService;
         this.platformServices = platformServices;
+        this.platformStateProvider = platformStateProvider;
     }
 
     /**
      * @return the current state of the platform
      */
     public PlatformState getState() {
-        return state;
+        return platformStateProvider.getState();
     }
 
     /**
      * Stop the platform and its tenants
+     * @return true if the node was stopped, false if it was not stoppable (already stopped, starting or stopping)
      */
-    public synchronized void stop() throws Exception {
+    public synchronized boolean stop() throws Exception {
         logger.info("Stopping platform:");
-        if (state == PlatformState.STOPPED) {
-            logger.info("Platform already stopped, nothing to do.");
-            return;
+        if (!platformStateProvider.initializeStop()) {
+            return false;
         }
         List<TenantManager> tenantManagers = getTenantManagers();
         for (TenantManager tenantManager : tenantManagers) {
@@ -67,18 +83,20 @@ public class PlatformManager {
             logger.info("Stop service of platform: {}", platformService);
             platformService.stop();
         }
-        state = PlatformState.STOPPED;
+        platformStateProvider.setStopped();
         logger.info("Platform stopped.");
+        return true;
     }
 
     /**
      * Start the platform and its tenants
+     * @return true if the node was started, false if it was not startable (already started, starting or stopping)
      */
-    public synchronized void start() throws Exception {
+    public synchronized boolean start() throws Exception {
         logger.info("Starting platform:");
-        if (state == PlatformState.STARTED) {
-            logger.info("Platform already started.");
-            return;
+        if (!platformStateProvider.initializeStart()) {
+            logger.info("Platform cannot be started, it is: {}", platformStateProvider.getState());
+            return false;
         }
         checkPlatformVersion();
         startPlatformServices();
@@ -88,8 +106,9 @@ public class PlatformManager {
             tenantManager.start();
         }
         restartHandlersOfPlatform();
-        state = PlatformState.STARTED;
+        platformStateProvider.setStarted();
         logger.info("Platform started.");
+        return true;
     }
 
     TenantManager getTenantManager(STenant tenant) {

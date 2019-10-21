@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,7 +33,9 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -77,6 +80,8 @@ public class PlatformAPIImplTest {
     @Mock
     private STenant sTenant;
     private TransactionService transactionService = new MockedTransactionService();
+    @Mock
+    private PlatformManager platformManager;
     @Spy
     @InjectMocks
     private PlatformAPIImpl platformAPI;
@@ -86,6 +91,7 @@ public class PlatformAPIImplTest {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
+        doReturn(platformManager).when(platformServiceAccessor).getPlatformManager();
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServer();
     }
@@ -150,6 +156,22 @@ public class PlatformAPIImplTest {
         verify(platformService).deactivateTenant(2L);
         verify(platformAPI).deleteTenant(1L);
         verify(platformAPI).deleteTenant(2L);
+    }
+
+    @Test(expected = StartNodeException.class)
+    public void startNode_should_throw_exception_when_platform_is_not_in_state_stopped() throws Exception {
+        doReturn(false).when(platformManager).start();
+
+        platformAPI.startNode();
+    }
+
+    @Test
+    public void startNode_should_call_start_on_platformManager() throws Exception {
+        doReturn(true).when(platformManager).start();
+
+        platformAPI.startNode();
+
+        verify(platformManager).start();
     }
 
     private static class MockedTransactionService implements TransactionService {

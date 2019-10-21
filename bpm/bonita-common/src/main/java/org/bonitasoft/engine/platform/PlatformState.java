@@ -14,19 +14,40 @@
 package org.bonitasoft.engine.platform;
 
 /**
- * Describes the possible states for the {@link Platform}
+ * Describes the possible states of the Platform.
  *
- * @author Yanyan Liu
- * @see Platform
+ *
  */
 public enum PlatformState {
+
     /**
-     * The {@link Platform} is started
+     * The Platform is started:
+     * - Services are running
+     * - Tenants that are Activated are STARTED or are STARTING
+     * - Calls can be made on platform APIs
      */
     STARTED,
 
     /**
-     * The {@link Platform} is stopped
+     * The Platform is transitioning from state STOPPED to state STARTED
+     * - Tenants are still STOPPED ( will be started once the Platform is STARTED)
+     * - No calls can be made on APIs
      */
-    STOPPED
+    STARTING,
+
+
+    /**
+     * The Platform is stopped:
+     * - Services are stopped
+     * - All Tenants are also STOPPED
+     * - No call to APIs can be made (except to login and start platform)
+     */
+    STOPPED,
+
+    /**
+     * The Platform is transitioning from state STARTED to state STOPPED
+     * - Tenants are STOPPED or STOPPING
+     * - No calls can be made on APIs
+     */
+    STOPPING,
 }

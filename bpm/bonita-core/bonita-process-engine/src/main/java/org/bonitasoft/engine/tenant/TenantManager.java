@@ -21,9 +21,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestarter;
-import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -57,7 +55,6 @@ public class TenantManager {
     private TenantConfiguration tenantConfiguration;
     private SchedulerService schedulerService;
     private BroadcastService broadcastService;
-    private PlatformManager platformManager;
 
     private State state = State.STOPPED;
 
@@ -65,8 +62,7 @@ public class TenantManager {
                          NodeConfiguration nodeConfiguration, SessionService sessionService,
                          SessionAccessor sessionAccessor, @Value("${tenantId}") long tenantId,
                          ClassLoaderService classLoaderService, TenantConfiguration tenantConfiguration,
-                         SchedulerService schedulerService, BroadcastService broadcastService,
-                         PlatformManager platformManager) {
+                         SchedulerService schedulerService, BroadcastService broadcastService) {
         this.transactionService = transactionService;
         this.platformService = platformService;
         this.nodeConfiguration = nodeConfiguration;
@@ -77,7 +73,6 @@ public class TenantManager {
         this.tenantConfiguration = tenantConfiguration;
         this.schedulerService = schedulerService;
         this.broadcastService = broadcastService;
-        this.platformManager = platformManager;
     }
 
     public long getTenantId() {
@@ -264,10 +259,6 @@ public class TenantManager {
             throw new STenantActivationException("Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
         }
         platformService.activateTenant(tenantId);
-        if (platformManager.getState() != PlatformState.STARTED) {
-            //not starting elements, node is not started
-            return;
-        }
         //TODO: set state to starting ?
         inTenantSession(() -> {
             prepareResumeOfElements();

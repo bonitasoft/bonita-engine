@@ -71,8 +71,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class PlatformAPIImpl implements PlatformAPI {
 
-    private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-
     public PlatformAPIImpl() {
         super();
     }
@@ -103,7 +101,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             try {
                 // inside new tx because we need sequence ids
                 createDefaultTenant(platformAccessor, platformService, transactionService);
-                activateDefaultTenant();
             } catch (final Exception e) {
                 if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
@@ -134,7 +131,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-
         final PlatformServiceAccessor platformAccessor;
         PlatformManager platformManager;
         try {
@@ -143,13 +139,14 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new StartNodeException(e);
         }
-        if (platformManager.getState() == PlatformState.STARTED) {
-            throw new StartNodeException("Node already started");
-        }
+        boolean isStarted;
         try {
-            platformManager.start();
+            isStarted = platformManager.start();
         } catch (final Exception e) {
             throw new StartNodeException("Platform starting failed.", e);
+        }
+        if (!isStarted) {
+            throw new StartNodeException("Platform is in state " + platformManager.getState() + " and cannot be started");
         }
     }
 
@@ -253,7 +250,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             // add tenant to database
             final String createdBy = "defaultUser";
-            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(true).description(description).build();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(System.currentTimeMillis()).status(STenant.ACTIVATED).defaultTenant(true).description(description).build();
             tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();
@@ -343,18 +340,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void activateDefaultTenant() throws STenantActivationException {
-        try {
-            getPlatformAccessor()
-                        .getPlatformManager().activateTenant(getDefaultTenant().getId());
-
-        } catch (final STenantActivationException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new STenantActivationException(e);
-        }
-    }
-
     protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
         return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
     }
@@ -394,18 +379,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             return getPlatformAccessor().getPlatformManager().getState();
         } catch (Exception e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    private STenant getDefaultTenant() throws STenantNotFoundException {
-        try {
-            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            return platformService.getDefaultTenant();
-        } catch (final STenantNotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new STenantNotFoundException("Unable to retrieve the defaultTenant.", e);
         }
     }
 
