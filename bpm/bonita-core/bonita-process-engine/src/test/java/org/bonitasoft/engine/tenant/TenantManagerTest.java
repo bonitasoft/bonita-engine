@@ -342,7 +342,7 @@ public class TenantManagerTest {
         verify(tenantService2).start();
         verify(schedulerService).resumeJobs(TENANT_ID);
         verify(platformService).activateTenant(TENANT_ID);
-        assertThat(tenantManager.isStarted()).isTrue();
+        assertThat(tenantManager.isTenantStarted()).isTrue();
     }
 
     @Test
@@ -356,7 +356,7 @@ public class TenantManagerTest {
         verify(tenantService2, never()).start();
         verify(schedulerService, never()).resumeJobs(TENANT_ID);
         verify(platformService).activateTenant(TENANT_ID);
-        assertThat(tenantManager.isStarted()).isFalse();
+        assertThat(tenantManager.isTenantStarted()).isFalse();
     }
 
     @Test

@@ -42,11 +42,6 @@ public interface NodeConfiguration {
     List<RestartHandler> getRestartHandlers();
 
     /**
-     * @return the platform services with a lifecycle
-     */
-    List<PlatformLifecycleService> getLifecycleServices();
-
-    /**
      * @return
      */
     List<TenantRestartHandler> getTenantRestartHandlers();

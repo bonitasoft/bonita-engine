@@ -264,20 +264,20 @@ public class TenantManager {
             throw new STenantActivationException("Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
         }
         platformService.activateTenant(tenantId);
-        if (platformManager.getState() == PlatformState.STARTED) {
-            inTenantSession(() -> {
-                prepareResumeOfElements();
-                startServicesInTx();
-                resumeElements();
-                startServicesOnOtherNodes();
-                schedulerService.resumeJobs(tenantId);
-            });
-            state = State.STARTED;
-            logger.info("Activated tenant {}", tenantId);
-        } else {
+        if (platformManager.getState() != PlatformState.STARTED) {
             //not starting elements, node is not started
             return;
         }
+        //TODO: set state to starting ?
+        inTenantSession(() -> {
+            prepareResumeOfElements();
+            startServicesInTx();
+            resumeElements();
+            startServicesOnOtherNodes();
+            schedulerService.resumeJobs(tenantId);
+        });
+        state = State.STARTED;
+        logger.info("Activated tenant {}", tenantId);
     }
 
     private void startServicesOnOtherNodes() {
@@ -299,16 +299,16 @@ public class TenantManager {
     private void executeOnOtherNodes(SetServiceState.ServiceAction action) {
         if (transactionService.isTransactionActive()) {
             try {
-                transactionService.registerBonitaSynchronization((txState -> doExecuteOnOhterNodes(action)));
+                transactionService.registerBonitaSynchronization((txState -> doExecuteOnOtherNodes(action)));
             } catch (STransactionNotFoundException e) {
                 throw new IllegalStateException("Unable to register synchronization to notify other node of services state change", e);
             }
         } else {
-            doExecuteOnOhterNodes(action);
+            doExecuteOnOtherNodes(action);
         }
     }
 
-    private void doExecuteOnOhterNodes(SetServiceState.ServiceAction action) {
+    private void doExecuteOnOtherNodes(SetServiceState.ServiceAction action) {
         Map<String, TaskResult<Void>> execute;
         try {
             //FIXME set the status of tenant manager on other NODES!!!
@@ -350,7 +350,7 @@ public class TenantManager {
         logger.info("Deactivated tenant {}", tenantId);
     }
 
-    public boolean isStarted() {
+    public boolean isTenantStarted() {
         return state == State.STARTED;
     }
 

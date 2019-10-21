@@ -150,13 +150,6 @@
                 <ref bean="schedulerServiceRestartHandler" />
             </list>
         </property>
-        <property name="lifecycleServices">
-            <list>
-                <ref bean="classLoaderService" />
-                <ref bean="platformCacheService" />
-                <ref bean="bonitaTaskExecutor" />
-            </list>
-        </property>
     </bean>
 
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">

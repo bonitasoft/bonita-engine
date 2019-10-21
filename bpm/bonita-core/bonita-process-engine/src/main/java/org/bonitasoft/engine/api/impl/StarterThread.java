@@ -57,7 +57,7 @@ public class StarterThread extends Thread {
             technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
                     "Restarting elements of tenant " + tenant.getId() + " that were not finished at the last shutdown");
             if (!tenant.isActivated()) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to restart elements of tenant " + tenant.getStatus());
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to restart elements of tenant because tenant is " + tenant.getStatus());
                 return;
             }
             executeHandlers(tenantId, sessionAccessor);
