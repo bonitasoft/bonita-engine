@@ -34,6 +34,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  */
+@NoSessionRequired
 public interface PlatformLoginAPI {
 
     /**
@@ -50,7 +51,6 @@ public interface PlatformLoginAPI {
      * @throws InvalidPlatformCredentialsException
      *             occurs when thr username or password is not valid
      */
-    @NoSessionRequired
     PlatformSession login(String userName, String password) throws PlatformLoginException, InvalidPlatformCredentialsException;
 
     /**
@@ -63,7 +63,6 @@ public interface PlatformLoginAPI {
      * @throws SessionNotFoundException
      *             if the session is not found on the server side. This may occurs when the session has expired.
      */
-    @NoSessionRequired
     void logout(PlatformSession session) throws PlatformLogoutException, SessionNotFoundException;
 
 }

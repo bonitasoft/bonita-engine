@@ -126,7 +126,7 @@ public class TenantAdministrationAPIImplTest {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("installBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
-        final boolean present = annotation != null && annotation.only();
+        final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
         assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
                 .isTrue();
     }
@@ -136,7 +136,7 @@ public class TenantAdministrationAPIImplTest {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("uninstallBusinessDataModel");
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
-        final boolean present = annotation != null && annotation.only();
+        final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
         assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'").isTrue();
     }
 
