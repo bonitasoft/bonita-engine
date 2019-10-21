@@ -44,6 +44,7 @@ import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.PlatformState;
+import org.bonitasoft.engine.platform.PlatformStateProvider;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -104,8 +105,6 @@ public class TenantManagerTest {
 
     private TenantManager tenantManager;
     private STenant tenant;
-    @Mock
-    private PlatformManager platformManager;
 
 
     @Before
@@ -116,7 +115,7 @@ public class TenantManagerTest {
         tenantManager = spy(new TenantManager(userTransactionService,
                 platformService, nodeConfiguration, sessionService, sessionAccessor,
                 TENANT_ID, classloaderService, tenantConfiguration,
-                schedulerService, broadcastService, platformManager));
+                schedulerService, broadcastService));
         doReturn(platformServiceAccessor).when(tenantManager).getPlatformAccessor();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(TENANT_ID);
         doReturn(nodeConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
@@ -334,7 +333,6 @@ public class TenantManagerTest {
     @Test
     public void activate_should_start_services_and_activate_tenant_in_db() throws Exception {
         whenTenantIsInState(STenant.DEACTIVATED);
-        when(platformManager.getState()).thenReturn(PlatformState.STARTED);
 
         tenantManager.activate();
 
@@ -343,20 +341,6 @@ public class TenantManagerTest {
         verify(schedulerService).resumeJobs(TENANT_ID);
         verify(platformService).activateTenant(TENANT_ID);
         assertThat(tenantManager.isTenantStarted()).isTrue();
-    }
-
-    @Test
-    public void activate_should_not_start_services_when_platform_is_stopped() throws Exception {
-        whenTenantIsInState(STenant.DEACTIVATED);
-        when(platformManager.getState()).thenReturn(PlatformState.STOPPED);
-
-        tenantManager.activate();
-
-        verify(tenantService1, never()).start();
-        verify(tenantService2, never()).start();
-        verify(schedulerService, never()).resumeJobs(TENANT_ID);
-        verify(platformService).activateTenant(TENANT_ID);
-        assertThat(tenantManager.isTenantStarted()).isFalse();
     }
 
     @Test
@@ -375,7 +359,6 @@ public class TenantManagerTest {
     @Test
     public void start_should_start_services_only() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
-        when(platformManager.getState()).thenReturn(PlatformState.STARTED);
 
         tenantManager.start();
 
