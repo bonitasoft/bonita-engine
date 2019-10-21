@@ -26,7 +26,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.tenant.TenantManager;
 
 /**
  * @author Baptiste Mesta
@@ -57,9 +57,9 @@ public class TriggerTimerEventJob extends InternalJob {
 
     private Long subProcessId;
 
-    private transient WorkService workService;
     private transient EventInstanceService eventInstanceService;
     private Long jobDescriptorId;
+    private TenantManager tenantManager;
 
     @Override
     public String getName() {
@@ -74,9 +74,8 @@ public class TriggerTimerEventJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException, SRetryableException {
         try {
-            //FIXME to be replaced by tenantManager.isStarted()
-            if (workService.isStopped()) {
-                throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId + "because the tenant is not started");
+            if (!tenantManager.isTenantStarted()) {
+                throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId + " because the tenant is not started");
             }
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
@@ -110,7 +109,7 @@ public class TriggerTimerEventJob extends InternalJob {
         isInterrupting = (Boolean) attributes.get("isInterrupting");
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         eventsHandler = tenantServiceAccessor.getEventsHandler();
-        workService = tenantServiceAccessor.getWorkService();
+        tenantManager = tenantServiceAccessor.getTenantManager();
         eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }

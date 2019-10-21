@@ -24,8 +24,6 @@ public class PlatformUtil {
 
     public static final String DEFAULT_CREATED_BY = "admin";
 
-    public static final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
-
     public static final String TENANT_STATUS_ACTIVATED = "ACTIVATED";
 
     public static long createTenant(final TransactionService transactionService, final PlatformService platformService,
@@ -35,22 +33,6 @@ public class PlatformUtil {
             final long created = System.currentTimeMillis();
 
             final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created).status(status).defaultTenant(false).build();
-            platformService.createTenant(tenant);
-            BonitaHomeServer.getInstance().createTenant(tenant.getId());
-            platformService.activateTenant(tenant.getId());
-            return tenant.getId();
-        } finally {
-            transactionService.complete();
-        }
-    }
-
-    public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService,
-            final String tenantName, final String createdBy, final String status) throws Exception {
-        try {
-            transactionService.begin();
-            final long created = System.currentTimeMillis();
-
-            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created).status(status).defaultTenant(true).build();
             platformService.createTenant(tenant);
             BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());

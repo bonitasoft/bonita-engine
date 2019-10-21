@@ -34,8 +34,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private List<TenantRestartHandler> tenantRestartHandlers;
 
-    private List<PlatformLifecycleService> lifecycleServices;
-
     @Override
     public boolean shouldResumeElements() {
         return shouldRestartElements;
@@ -68,13 +66,5 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         return true;
     }
 
-    @Override
-    public List<PlatformLifecycleService> getLifecycleServices() {
-        return lifecycleServices;
-    }
-
-    public void setLifecycleServices(final List<PlatformLifecycleService> lifecycleServices) {
-        this.lifecycleServices = lifecycleServices;
-    }
 
 }

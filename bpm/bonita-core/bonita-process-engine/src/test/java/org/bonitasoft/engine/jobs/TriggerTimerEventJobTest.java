@@ -21,7 +21,7 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.tenant.TenantManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class TriggerTimerEventJobTest {
     @Mock
     private EventsHandler eventsHandler;
     @Mock
-    private WorkService workService;
+    private TenantManager tenantManager;
     @Mock
     private JobService jobService;
     @Mock
@@ -69,11 +69,12 @@ public class TriggerTimerEventJobTest {
     @Before
     public void before() throws Exception {
         doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        doReturn(workService).when(tenantServiceAccessor).getWorkService();
+        doReturn(tenantManager).when(tenantServiceAccessor).getTenantManager();
         doReturn(jobService).when(tenantServiceAccessor).getJobService();
         doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
         doReturn(loggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
+        doReturn(true).when(tenantManager).isTenantStarted();
     }
 
     private void setAttributes() throws SJobConfigurationException {
@@ -96,7 +97,7 @@ public class TriggerTimerEventJobTest {
         SJobDescriptor jobDescriptor = SJobDescriptor.builder().id(jobDescriptorId).build();
         doReturn(jobDescriptor).when(jobService).getJobDescriptor(jobDescriptorId);
         setAttributes();
-        doReturn(true).when(workService).isStopped();
+        doReturn(false).when(tenantManager).isTenantStarted();
 
         triggerTimerEventJob.execute();
 
