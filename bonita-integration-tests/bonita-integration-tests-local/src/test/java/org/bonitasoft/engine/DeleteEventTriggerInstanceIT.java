@@ -56,7 +56,7 @@ public class DeleteEventTriggerInstanceIT extends TestWithUser {
         disableAndDeleteProcess(procWithTimers);
 
 
-        assertThat(query("SELECT * FROM event_trigger_instance")).isEmpty();
+        assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
     }
 
     @Test
@@ -84,12 +84,12 @@ public class DeleteEventTriggerInstanceIT extends TestWithUser {
         long afterBoundary = waitForUserTask("afterBoundary");
         getProcessAPI().assignAndExecuteUserTask(user.getId(), afterBoundary, Collections.emptyMap());
         waitForProcessToFinish(processInstance.getId());
-        assertThat(query("SELECT * FROM event_trigger_instance")).isEmpty();
+        assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
 
         disableAndDeleteProcess(procWithTimers);
 
 
-        assertThat(query("SELECT * FROM event_trigger_instance")).isEmpty();
+        assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
     }
 
     private List query(String query) throws Exception {
