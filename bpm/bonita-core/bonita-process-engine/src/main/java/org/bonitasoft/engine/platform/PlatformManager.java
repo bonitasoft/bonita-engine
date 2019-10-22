@@ -47,11 +47,10 @@ public class PlatformManager {
     private PlatformStateProvider platformStateProvider;
 
     public PlatformManager(NodeConfiguration nodeConfiguration,
-                           UserTransactionService transactionService,
-                           PlatformService platformService,
-                           List<PlatformLifecycleService> platformServices,
-                           PlatformStateProvider platformStateProvider
-        ) {
+            UserTransactionService transactionService,
+            PlatformService platformService,
+            List<PlatformLifecycleService> platformServices,
+            PlatformStateProvider platformStateProvider) {
         this.nodeConfiguration = nodeConfiguration;
         this.transactionService = transactionService;
         this.platformService = platformService;
@@ -68,6 +67,7 @@ public class PlatformManager {
 
     /**
      * Stop the platform and its tenants
+     * 
      * @return true if the node was stopped, false if it was not stoppable (already stopped, starting or stopping)
      */
     public synchronized boolean stop() throws Exception {
@@ -90,6 +90,7 @@ public class PlatformManager {
 
     /**
      * Start the platform and its tenants
+     * 
      * @return true if the node was started, false if it was not startable (already started, starting or stopping)
      */
     public synchronized boolean start() throws Exception {
@@ -100,13 +101,13 @@ public class PlatformManager {
         }
         checkPlatformVersion();
         startPlatformServices();
-        List<TenantManager> tenantManagers = getTenantManagers();
+        platformStateProvider.setStarted();
 
-        for (TenantManager tenantManager : tenantManagers) {
+        for (TenantManager tenantManager : getTenantManagers()) {
             tenantManager.start();
         }
+
         restartHandlersOfPlatform();
-        platformStateProvider.setStarted();
         logger.info("Platform started.");
         return true;
     }
@@ -116,13 +117,10 @@ public class PlatformManager {
     }
 
     private List<TenantManager> getTenantManagers() throws Exception {
-        List<STenant> sTenants = transactionService.executeInTransaction(() -> platformService.getTenants(QueryOptions.ALL_RESULTS));
-        return sTenants.stream()
-                .map(t ->
-                        TenantServiceSingleton.getInstance(t.getId()).getTenantManager()
-                ).collect(Collectors.toList());
+        List<STenant> sTenants = transactionService
+                .executeInTransaction(() -> platformService.getTenants(QueryOptions.ALL_RESULTS));
+        return sTenants.stream().map(this::getTenantManager).collect(Collectors.toList());
     }
-
 
     private void restartHandlersOfPlatform() throws Exception {
         for (final RestartHandler restartHandler : nodeConfiguration.getRestartHandlers()) {
@@ -141,7 +139,6 @@ public class PlatformManager {
         }
     }
 
-
     private void startPlatformServices() throws SBonitaException {
         for (final PlatformLifecycleService platformService : platformServices) {
             logger.info("Start service of platform : {}", platformService);
@@ -149,11 +146,11 @@ public class PlatformManager {
         }
     }
 
-
     public void activateTenant(long tenantId) throws Exception {
         STenant tenant = platformService.getTenant(tenantId);
         if (!STenant.DEACTIVATED.equals(tenant.getStatus())) {
-            throw new STenantActivationException("Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
+            throw new STenantActivationException(
+                    "Tenant activation failed. Tenant is not deactivated: current state " + tenant.getStatus());
         }
         getTenantManager(tenant).activate();
     }
