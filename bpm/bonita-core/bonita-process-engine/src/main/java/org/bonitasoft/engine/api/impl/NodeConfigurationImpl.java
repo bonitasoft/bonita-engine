@@ -16,8 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
-import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 
 /**
@@ -30,7 +29,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private boolean shouldRestartElements = true;
 
-    private List<RestartHandler> restartHandlers;
+    private List<PlatformRestartHandler> platformRestartHandlers;
 
     private List<TenantRestartHandler> tenantRestartHandlers;
 
@@ -40,12 +39,12 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     }
 
     @Override
-    public List<RestartHandler> getRestartHandlers() {
-        return CollectionUtil.emptyOrUnmodifiable(restartHandlers);
+    public List<PlatformRestartHandler> getPlatformRestartHandlers() {
+        return CollectionUtil.emptyOrUnmodifiable(platformRestartHandlers);
     }
 
-    public void setRestartHandlers(final List<RestartHandler> restartHandlers) {
-        this.restartHandlers = restartHandlers;
+    public void setPlatformRestartHandlers(final List<PlatformRestartHandler> platformRestartHandlers) {
+        this.platformRestartHandlers = platformRestartHandlers;
     }
 
     @Override

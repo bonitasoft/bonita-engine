@@ -145,7 +145,7 @@
                 <bean class="org.bonitasoft.engine.profile.ProfilesUpdaterRestartHandler" />
             </list>
         </property>
-        <property name="restartHandlers">
+        <property name="platformRestartHandlers">
             <list>
                 <ref bean="schedulerServiceRestartHandler" />
             </list>
@@ -165,6 +165,7 @@
     <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
         <constructor-arg name="schedulerService" ref="scheduler" />
         <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />

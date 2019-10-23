@@ -14,54 +14,69 @@
 package org.bonitasoft.engine.handler;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchedulerServiceRestartHandlerTest {
 
     @Mock
     private SchedulerService schedulerService;
-
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
+    private UserTransactionService userTransactionService;
 
-    @InjectMocks
     private SchedulerServiceRestartHandler handler;
 
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+
+    @Before
+    public void before() throws Exception{
+        handler = new SchedulerServiceRestartHandler(schedulerService, new TechnicalLoggerSLF4JImpl(), userTransactionService);
+        when(userTransactionService.executeInTransaction(any())).thenAnswer(invocation -> ((Callable) invocation.getArgument(0)).call());
+
+    }
+
     @Test
-    public void executeHandleCallsSchedulerServiceToRescheduleErroneousTriggers() throws SBonitaException {
+    public void should_call_rescheduleErroneousTriggers_in_transaction() throws Exception {
         handler.execute();
 
         verify(schedulerService).rescheduleErroneousTriggers();
+        verify(userTransactionService).executeInTransaction(any());
     }
 
     @Test
-    public void executeHandleShouldLogItsJob() throws SBonitaException {
-        handler.execute();
-
-        verify(technicalLoggerService).log(eq(SchedulerServiceRestartHandler.class), any(TechnicalLogSeverity.class), anyString());
-    }
-
-    @Test(expected = SBonitaException.class)
-    public void executeHandleThrowsExceptionIfSchedulerServiceThrowsException() throws SBonitaException {
+    public void should_log_when_rescheduleErroneousTriggers_fails() throws SBonitaException {
         doThrow(new SSchedulerException("failed")).when(schedulerService).rescheduleErroneousTriggers();
 
+        systemOutRule.clearLog();
         handler.execute();
+
+        assertThat(systemOutRule.getLog()).contains("Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry.");
     }
 
 }
