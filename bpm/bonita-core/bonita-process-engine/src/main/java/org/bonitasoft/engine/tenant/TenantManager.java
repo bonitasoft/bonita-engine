@@ -28,6 +28,7 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.RunnableWithException;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
@@ -360,9 +361,4 @@ public class TenantManager {
         }
     }
 
-    private interface RunnableWithException {
-
-        void run() throws Exception;
-
-    }
 }

@@ -29,10 +29,22 @@ public class BonitaTaskExecutor implements PlatformLifecycleService {
     private ExecutorService bonitaTaskExecutor;
 
 
-    public <T> Future<T> execute(Callable<T> callable) {
+    private void checkStarted() {
         if (bonitaTaskExecutor == null) {
             throw new IllegalStateException(this.getClass().getName() + " is not running");
         }
+    }
+
+    public Future<?> execute(RunnableWithException runnable) {
+        return execute(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
+
+    public <T> Future<T> execute(Callable<T> callable) {
+        checkStarted();
         return bonitaTaskExecutor.submit(callable);
     }
 
