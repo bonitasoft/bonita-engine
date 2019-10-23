@@ -19,12 +19,13 @@ import java.util.stream.Collectors;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.tenant.TenantManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -39,23 +40,25 @@ import org.springframework.stereotype.Component;
 public class PlatformManager {
 
     private static Logger logger = LoggerFactory.getLogger(PlatformManager.class);
-
-    private NodeConfiguration nodeConfiguration;
-    private UserTransactionService transactionService;
-    private PlatformService platformService;
-    private List<PlatformLifecycleService> platformServices;
-    private PlatformStateProvider platformStateProvider;
+    private final BonitaTaskExecutor bonitaTaskExecutor;
+    private final NodeConfiguration nodeConfiguration;
+    private final UserTransactionService transactionService;
+    private final PlatformService platformService;
+    private final List<PlatformLifecycleService> platformServices;
+    private final PlatformStateProvider platformStateProvider;
 
     public PlatformManager(NodeConfiguration nodeConfiguration,
             UserTransactionService transactionService,
             PlatformService platformService,
             List<PlatformLifecycleService> platformServices,
-            PlatformStateProvider platformStateProvider) {
+            PlatformStateProvider platformStateProvider,
+            BonitaTaskExecutor bonitaTaskExecutor) {
         this.nodeConfiguration = nodeConfiguration;
         this.transactionService = transactionService;
         this.platformService = platformService;
         this.platformServices = platformServices;
         this.platformStateProvider = platformStateProvider;
+        this.bonitaTaskExecutor = bonitaTaskExecutor;
     }
 
     /**
@@ -122,13 +125,9 @@ public class PlatformManager {
         return sTenants.stream().map(this::getTenantManager).collect(Collectors.toList());
     }
 
-    private void restartHandlersOfPlatform() throws Exception {
-        for (final RestartHandler restartHandler : nodeConfiguration.getRestartHandlers()) {
-
-            transactionService.executeInTransaction(() -> {
-                restartHandler.execute();
-                return null;
-            });
+    private void restartHandlersOfPlatform() {
+        for (final PlatformRestartHandler platformRestartHandler : nodeConfiguration.getPlatformRestartHandlers()) {
+            bonitaTaskExecutor.execute(platformRestartHandler::execute);
         }
     }
 

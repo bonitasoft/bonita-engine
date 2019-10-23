@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.NodeConfigurationImpl;
-import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -44,17 +44,17 @@ public class NodeConfigurationTest {
 
     @Test
     public void setRestartHandlers() {
-        List<RestartHandler> lRestartHandlers = new ArrayList<>();
-        RestartHandler rh = new RestartHandler() {
+        List<PlatformRestartHandler> lPlatformRestartHandlers = new ArrayList<>();
+        PlatformRestartHandler rh = new PlatformRestartHandler() {
 
             @Override
             public void execute() {
 
             }
         };
-        lRestartHandlers.add(rh);
-        ((NodeConfigurationImpl) nodeConfiguration).setRestartHandlers(lRestartHandlers);
-        assertEquals(1, nodeConfiguration.getRestartHandlers().size());
+        lPlatformRestartHandlers.add(rh);
+        ((NodeConfigurationImpl) nodeConfiguration).setPlatformRestartHandlers(lPlatformRestartHandlers);
+        assertEquals(1, nodeConfiguration.getPlatformRestartHandlers().size());
     }
 
     @Test

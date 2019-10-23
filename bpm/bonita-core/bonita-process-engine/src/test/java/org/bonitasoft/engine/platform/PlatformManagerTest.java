@@ -10,12 +10,15 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl;
+import org.bonitasoft.engine.service.BonitaTaskExecutor;
+import org.bonitasoft.engine.service.RunnableWithException;
 import org.bonitasoft.engine.tenant.TenantManager;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
@@ -53,17 +56,29 @@ public class PlatformManagerTest {
     private PlatformLifecycleService platformLifecycleService2;
     @Mock
     private PlatformStateProvider platformStateProvider;
+    @Mock
+    private BonitaTaskExecutor bonitaTaskExecutor;
 
     private PlatformManager platformManager;
     private STenant tenant1;
     private STenant tenant2;
+    @Mock
+    private PlatformRestartHandler platformRestartHandler1;
+    @Mock
+    private PlatformRestartHandler platformRestartHandler2;
 
     @Before
     public void before() throws Exception {
+        doReturn(asList(platformRestartHandler1, platformRestartHandler2)).when(nodeConfiguration).getPlatformRestartHandlers();
         platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService,
-                asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider));
+                asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider, bonitaTaskExecutor));
         when(transactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
+        when(bonitaTaskExecutor.execute(any(RunnableWithException.class)))
+                .thenAnswer(invocationOnMock -> {
+                    ((RunnableWithException) invocationOnMock.getArgument(0)).run();
+                    return null;
+                });
         doReturn(tenant1Manager).when(platformManager).getTenantManager(argThat(t -> t.getId() == TENANT_1));
         doReturn(tenant2Manager).when(platformManager).getTenantManager(argThat(t -> t.getId() == TENANT_2));
         doReturn(new SPlatform("1.3.0", "1.2.0", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
@@ -122,6 +137,18 @@ public class PlatformManagerTest {
         verify(platformStateProvider, never()).setStopped();
         assertThat(stopped).isFalse();
     }
+
+    @Test
+    public void start_should_execute_platform_restart_handlers_in_an_other_thread() throws Exception{
+        doReturn(true).when(platformStateProvider).initializeStart();
+
+        platformManager.start();
+
+        verify(platformRestartHandler1).execute();
+        verify(platformRestartHandler2).execute();
+        verify(bonitaTaskExecutor, times(2)).execute(any(RunnableWithException.class));
+    }
+
 
     @Test
     public void should_activate_tenant_using_tenantManager() throws Exception {
@@ -183,13 +210,15 @@ public class PlatformManagerTest {
 
         // then:
         InOrder inOrder = inOrder(platformStateProvider, tenant1Manager, tenant2Manager, platformLifecycleService1,
-                platformLifecycleService2);
+                platformLifecycleService2, platformRestartHandler1, platformRestartHandler2);
         inOrder.verify(platformStateProvider).initializeStart();
         inOrder.verify(platformLifecycleService1).start();
         inOrder.verify(platformLifecycleService2).start();
         inOrder.verify(platformStateProvider).setStarted();
         inOrder.verify(tenant1Manager).start();
         inOrder.verify(tenant2Manager).start();
+        inOrder.verify(platformRestartHandler1).execute();
+        inOrder.verify(platformRestartHandler2).execute();
     }
 
     private STenant deactivated(STenant tenant) {

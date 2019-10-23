@@ -18,7 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * @author Baptiste Mesta
  */
-public interface RestartHandler {
+public interface PlatformRestartHandler {
 
     void execute() throws SBonitaException;
 
