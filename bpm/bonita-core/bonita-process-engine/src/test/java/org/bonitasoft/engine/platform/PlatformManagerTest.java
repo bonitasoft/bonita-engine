@@ -19,7 +19,7 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl;
 import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.RunnableWithException;
-import org.bonitasoft.engine.tenant.TenantManager;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,9 +47,9 @@ public class PlatformManagerTest {
     @Mock
     private PlatformService platformService;
     @Mock
-    private TenantManager tenant1Manager;
+    private TenantStateManager tenant1Manager;
     @Mock
-    private TenantManager tenant2Manager;
+    private TenantStateManager tenant2Manager;
     @Mock
     private PlatformLifecycleService platformLifecycleService1;
     @Mock
@@ -79,8 +79,8 @@ public class PlatformManagerTest {
                     ((RunnableWithException) invocationOnMock.getArgument(0)).run();
                     return null;
                 });
-        doReturn(tenant1Manager).when(platformManager).getTenantManager(argThat(t -> t.getId() == TENANT_1));
-        doReturn(tenant2Manager).when(platformManager).getTenantManager(argThat(t -> t.getId() == TENANT_2));
+        doReturn(tenant1Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_1));
+        doReturn(tenant2Manager).when(platformManager).getTenantStateManager(argThat(t -> t.getId() == TENANT_2));
         doReturn(new SPlatform("1.3.0", "1.2.0", "1.1.0", "someUser", 123455)).when(platformService).getPlatform();
         doReturn(new SPlatformPropertiesImpl("1.3.0")).when(platformService).getSPlatformProperties();
         tenant1 = new STenant();

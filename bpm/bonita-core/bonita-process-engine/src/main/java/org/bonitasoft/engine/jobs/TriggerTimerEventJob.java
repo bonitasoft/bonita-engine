@@ -26,7 +26,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.tenant.TenantManager;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
 
 /**
  * @author Baptiste Mesta
@@ -59,7 +59,7 @@ public class TriggerTimerEventJob extends InternalJob {
 
     private transient EventInstanceService eventInstanceService;
     private Long jobDescriptorId;
-    private TenantManager tenantManager;
+    private TenantServicesManager tenantServicesManager;
 
     @Override
     public String getName() {
@@ -74,7 +74,7 @@ public class TriggerTimerEventJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException, SRetryableException {
         try {
-            if (!tenantManager.isTenantStarted()) {
+            if (!tenantServicesManager.isStarted()) {
                 throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId + " because the tenant is not started");
             }
             if (subProcessId == null) {
@@ -109,7 +109,7 @@ public class TriggerTimerEventJob extends InternalJob {
         isInterrupting = (Boolean) attributes.get("isInterrupting");
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         eventsHandler = tenantServiceAccessor.getEventsHandler();
-        tenantManager = tenantServiceAccessor.getTenantManager();
+        tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
         eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
