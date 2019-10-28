@@ -57,6 +57,12 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
     }
 
     @Override
+    public boolean isTenantSession() {
+        Long tenantId = tenantData.get();
+        return tenantId != null && tenantId > 0;
+    }
+
+    @Override
     public long getTenantId() throws STenantIdNotSetException {
         final Long tenantId = tenantData.get();
         if (tenantId == null) {

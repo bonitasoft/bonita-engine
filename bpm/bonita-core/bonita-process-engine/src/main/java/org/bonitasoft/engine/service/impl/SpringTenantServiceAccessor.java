@@ -89,7 +89,8 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
-import org.bonitasoft.engine.tenant.TenantManager;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -526,8 +527,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public TenantManager getTenantManager() {
-        return beanAccessor.getService(TenantManager.class);
+    public TenantStateManager getTenantStateManager() {
+        return beanAccessor.getService(TenantStateManager.class);
+    }
+
+    @Override
+    public TenantServicesManager getTenantServicesManager() {
+        return beanAccessor.getService(TenantServicesManager.class);
     }
 
 }

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -36,8 +38,9 @@ import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.tenant.TenantManager;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.tenant.TenantResource;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +64,9 @@ public class TenantAdministrationAPIImplTest {
     @Mock
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
     @Mock
-    private TenantManager tenantManager;
+    private TenantStateManager tenantStateManager;
+    @Mock
+    private UserTransactionService userTransactionService;
 
     @Spy
     @InjectMocks
@@ -73,11 +78,14 @@ public class TenantAdministrationAPIImplTest {
         doReturn(17L).when(tenantManagementAPI).getTenantId();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
         doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
+        doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
 
+
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService).executeInTransaction(any());
         when(platformServiceAccessor.getTenantServiceAccessor(17)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
-        when(tenantServiceAccessor.getTenantManager()).thenReturn(tenantManager);
+        when(tenantServiceAccessor.getTenantStateManager()).thenReturn(tenantStateManager);
     }
 
     @Test
