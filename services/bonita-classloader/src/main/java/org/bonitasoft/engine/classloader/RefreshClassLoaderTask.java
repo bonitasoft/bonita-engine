@@ -19,14 +19,17 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.InjectedService;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  */
 public class RefreshClassLoaderTask implements Callable<Void>, Serializable {
+
     private ScopeType scopeType;
     private long id;
     private ClassLoaderService classLoaderService;
+    private TransactionService transactionService;
 
     public RefreshClassLoaderTask(long id, ScopeType scopeType) {
         this.id = id;
@@ -35,7 +38,10 @@ public class RefreshClassLoaderTask implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
-        getClassLoaderService().refreshClassLoaderImmediately(scopeType, id);
+        transactionService.executeInTransaction(() -> {
+            getClassLoaderService().refreshClassLoaderImmediately(scopeType, id);
+            return null;
+        });
         return null;
     }
 
@@ -46,5 +52,10 @@ public class RefreshClassLoaderTask implements Callable<Void>, Serializable {
     @InjectedService
     public void setClassLoaderService(ClassLoaderService classLoaderService) {
         this.classLoaderService = classLoaderService;
+    }
+
+    @InjectedService
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 }

@@ -43,10 +43,8 @@ import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantException;
-import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
@@ -312,7 +310,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            tenantServiceAccessor.getTenantManager().stop();
+            tenantServiceAccessor.getTenantStateManager().stop();
             tenantServiceAccessor.destroy();
 
             // delete tenant objects in database
