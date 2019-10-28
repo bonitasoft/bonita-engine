@@ -14,37 +14,19 @@
 package org.bonitasoft.engine.tenant;
 
 import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.in;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.platform.PlatformStateProvider;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -54,18 +36,18 @@ import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class TenantManagerTest {
+public class TenantStateManagerTest {
 
     public static final long TENANT_ID = 12L;
     @Rule
@@ -90,33 +72,19 @@ public class TenantManagerTest {
     @Mock
     private SessionService sessionService;
     @Mock
-    private SessionAccessor sessionAccessor;
-    @Mock
-    private ClassLoaderService classloaderService;
-    private TenantConfiguration tenantConfiguration = new TenantConfiguration();
-    @Mock
-    private TenantLifecycleService tenantService1;
-    @Mock
-    private TenantLifecycleService tenantService2;
-    @Mock
-    private TenantRestartHandler tenantRestartHandler1;
-    @Mock
-    private TenantRestartHandler tenantRestartHandler2;
+    private TenantServicesManager tenantServicesManager;
 
-    private TenantManager tenantManager;
+    private TenantStateManager tenantStateManager;
     private STenant tenant;
-
 
     @Before
     public void before() throws Exception {
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-        tenantConfiguration.setLifecycleServices(Arrays.asList(tenantService1, tenantService2));
-        when(userTransactionService.executeInTransaction(any())).thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
-        tenantManager = spy(new TenantManager(userTransactionService,
-                platformService, nodeConfiguration, sessionService, sessionAccessor,
-                TENANT_ID, classloaderService, tenantConfiguration,
-                schedulerService, broadcastService));
-        doReturn(platformServiceAccessor).when(tenantManager).getPlatformAccessor();
+        when(userTransactionService.executeInTransaction(any()))
+                .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
+        tenantStateManager = spy(new TenantStateManager(userTransactionService,
+                platformService, nodeConfiguration, sessionService,
+                TENANT_ID, schedulerService, broadcastService, tenantServicesManager));
+        doReturn(platformServiceAccessor).when(tenantStateManager).getPlatformAccessor();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(TENANT_ID);
         doReturn(nodeConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
@@ -130,37 +98,34 @@ public class TenantManagerTest {
     }
 
     @Test
-    public void pause_should_pause_tenant() throws Exception {
+    public void pause_should_change_state_then_pause_tenant_and_jobs() throws Exception {
         tenant.setStatus(STenant.ACTIVATED);
 
-        tenantManager.pause();
+        tenantStateManager.pause();
 
-        verify(schedulerService).pauseJobs(TENANT_ID);
-        verify(tenantService1).pause();
-        verify(tenantService2).pause();
-        verify(platformService).pauseTenant(TENANT_ID);
+        InOrder inOrder = inOrder(schedulerService, tenantServicesManager, platformService);
+        inOrder.verify(platformService).pauseTenant(TENANT_ID);
+        inOrder.verify(schedulerService).pauseJobs(TENANT_ID);
+        inOrder.verify(tenantServicesManager).pause();
     }
 
     @Test
-    public void resume_should_resume_tenant() throws Exception {
+    public void resume_should_activate_tenant_resume_services_and_resume_jobs() throws Exception {
         tenant.setStatus(STenant.PAUSED);
 
-        tenantManager.resume();
+        tenantStateManager.resume();
 
-        verify(schedulerService).resumeJobs(TENANT_ID);
-        verify(tenantService1).resume();
-        verify(tenantService2).resume();
-        verify(platformService).activateTenant(TENANT_ID);
+        InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
+        inOrder.verify(platformService).activateTenant(TENANT_ID);
+        inOrder.verify(tenantServicesManager).resume();
+        inOrder.verify(schedulerService).resumeJobs(TENANT_ID);
     }
-
 
     @Test
     public void should_throw_exception_when_resuming_a_tenant_not_paused() {
         tenant.setStatus(STenant.ACTIVATED);
 
-        Assertions.assertThatThrownBy(() ->
-                tenantManager.resume()
-        )
+        assertThatThrownBy(() -> tenantStateManager.resume())
                 .isInstanceOf(UpdateException.class)
                 .hasMessage("Can't resume a tenant in state ACTIVATED");
     }
@@ -169,66 +134,40 @@ public class TenantManagerTest {
     public void should_throw_exception_when_pausing_a_tenant_already_paused() {
         tenant.setStatus(STenant.PAUSED);
 
-        Assertions.assertThatThrownBy(() ->
-                tenantManager.pause()
-        )
+        assertThatThrownBy(() -> tenantStateManager.pause())
                 .isInstanceOf(UpdateException.class)
                 .hasMessage("Can't pause a tenant in state PAUSED");
     }
 
     @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_a_lifecycle_timeout() throws Exception {
+    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_a_lifecycle_timeout()
+            throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(5L, TimeUnit.HOURS);
-        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+        doReturn(singletonMap("workService", taskResult)).when(broadcastService)
+                .executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
 
         // When a tenant moved to available mode
-        tenantManager.resume();
+        tenantStateManager.resume();
     }
 
     @Test(expected = STenantNotFoundException.class)
     public void pause_should_throw_STenantNotFoundException_on_a_non_existing_tenant() throws Exception {
         doThrow(STenantNotFoundException.class).when(platformService).getTenant(TENANT_ID);
 
-        tenantManager.pause();
-    }
-
-    @Test
-    public void resume_should_restart_tenant_handlers() throws Exception {
-        // Given
-        doReturn(true).when(transactionService).isTransactionActive();
-        whenTenantIsInState(STenant.PAUSED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
-
-
-        // When a tenant moved to available mode
-        tenantManager.resume();
-
-        // Then elements must be restarted
-        verify(tenantRestartHandler1).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        tenantStateManager.pause();
     }
 
     @Test(expected = UpdateException.class)
-    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail() throws Exception {
+    public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail()
+            throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
-        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
+        doReturn(singletonMap("workService", taskResult)).when(broadcastService)
+                .executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
 
         // When a tenant moved to available mode
-        tenantManager.resume();
-    }
-
-    @Test(expected = UpdateException.class)
-    public void resume_should_throw_exception_when_tenant_restart_handlers_fail() throws Exception {
-        // Given
-        final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
-        final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        doThrow(RestartException.class).when(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-
-        // When a tenant moved to available mode
-        tenantManager.resume();
+        tenantStateManager.resume();
     }
 
     @Test
@@ -236,7 +175,7 @@ public class TenantManagerTest {
         whenTenantIsInState(STenant.ACTIVATED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
 
-        tenantManager.pause();
+        tenantStateManager.pause();
 
         verify(platformService).pauseTenant(TENANT_ID);
     }
@@ -245,28 +184,28 @@ public class TenantManagerTest {
     public void pause_should_throw_UpdateException_on_a_paused_tenant() throws Exception {
         whenTenantIsInState(STenant.PAUSED);
 
-        tenantManager.pause();
+        tenantStateManager.pause();
     }
 
     @Test(expected = UpdateException.class)
     public void pause_should_throw_UpdateException_on_a_deactivated_tenant() throws Exception {
         whenTenantIsInState(STenant.DEACTIVATED);
 
-        tenantManager.pause();
+        tenantStateManager.pause();
     }
 
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_on_an_activated_tenant() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
-        tenantManager.resume();
+        tenantStateManager.resume();
     }
 
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_on_a_deactivated_tenant() throws Exception {
         whenTenantIsInState(STenant.DEACTIVATED);
 
-        tenantManager.resume();
+        tenantStateManager.resume();
     }
 
     @Test
@@ -274,7 +213,7 @@ public class TenantManagerTest {
         whenTenantIsInState(STenant.ACTIVATED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
 
-        tenantManager.pause();
+        tenantStateManager.pause();
 
         verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(TENANT_ID);
     }
@@ -284,19 +223,9 @@ public class TenantManagerTest {
         whenTenantIsInState(STenant.PAUSED);
         doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
 
-        tenantManager.resume();
+        tenantStateManager.resume();
 
         verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(TENANT_ID);
-    }
-
-    @Test
-    public void resume_should_resume_jobs() throws Exception {
-        whenTenantIsInState(STenant.PAUSED);
-        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(TENANT_ID));
-
-        tenantManager.resume();
-
-        verify(schedulerService).resumeJobs(TENANT_ID);
     }
 
     private void whenTenantIsInState(final String status) throws STenantNotFoundException {
@@ -305,69 +234,68 @@ public class TenantManagerTest {
         when(platformService.getTenant(TENANT_ID)).thenReturn(sTenant);
     }
 
-
     @Test
     public void pause_should_update_tenant_state_on_activated_tenant() throws Exception {
         // Given
         whenTenantIsInState(STenant.ACTIVATED);
 
         // When
-        tenantManager.pause();
+        tenantStateManager.pause();
 
         // Then
         verify(platformService).pauseTenant(TENANT_ID);
     }
 
     @Test
-    public void deactivate_should_stop_services_and_deactivate_tenant_in_db() throws Exception {
+    public void deactivate_should_stop_services_and_deactivate_tenant_in_db_and_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
-        tenantManager.deactivate();
+        tenantStateManager.deactivate();
 
-        verify(tenantService1).stop();
-        verify(tenantService2).stop();
-        verify(schedulerService).pauseJobs(TENANT_ID);
-        verify(platformService).deactivateTenant(TENANT_ID);
+        InOrder inOrder = inOrder(sessionService, platformService, tenantServicesManager, schedulerService);
+        inOrder.verify(sessionService).deleteSessionsOfTenant(TENANT_ID);
+        inOrder.verify(platformService).deactivateTenant(TENANT_ID);
+        inOrder.verify(schedulerService).pauseJobs(TENANT_ID);
+        inOrder.verify(tenantServicesManager).stop();
     }
 
     @Test
-    public void activate_should_start_services_and_activate_tenant_in_db() throws Exception {
+    public void activate_should_start_services_and_activate_tenant_in_db_and_resume_jobs() throws Exception {
         whenTenantIsInState(STenant.DEACTIVATED);
 
-        tenantManager.activate();
+        tenantStateManager.activate();
 
-        verify(tenantService1).start();
-        verify(tenantService2).start();
-        verify(schedulerService).resumeJobs(TENANT_ID);
-        verify(platformService).activateTenant(TENANT_ID);
-        assertThat(tenantManager.isTenantStarted()).isTrue();
+        InOrder inOrder = inOrder(platformService, tenantServicesManager, schedulerService);
+        inOrder.verify(platformService).activateTenant(TENANT_ID);
+        inOrder.verify(tenantServicesManager).start();
+        inOrder.verify(schedulerService).resumeJobs(TENANT_ID);
     }
 
     @Test
     public void stop_should_stop_services_only() throws Exception {
+        // given:
         whenTenantIsInState(STenant.ACTIVATED);
-        tenantManager.start();
+        tenantStateManager.start();
+        doReturn(true).when(nodeConfiguration).shouldClearSessions();
 
-        tenantManager.stop();
+        // when:
+        tenantStateManager.stop();
 
-        verify(tenantService1).stop();
-        verify(tenantService2).stop();
+        // then:
+        InOrder inOrder = inOrder(sessionService, tenantServicesManager);
+        inOrder.verify(sessionService).deleteSessions();
+        inOrder.verify(tenantServicesManager).stop();
         verify(schedulerService, never()).pauseJobs(TENANT_ID);
         verify(platformService, never()).deactivateTenant(TENANT_ID);
     }
 
     @Test
-    public void start_should_start_services_only() throws Exception {
+    public void start_should_call_start_on_TenantServicesManager() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
-        tenantManager.start();
+        tenantStateManager.start();
 
-        verify(tenantService1).start();
-        verify(tenantService2).start();
-        verify(schedulerService).resumeJobs(TENANT_ID);
-        verify(platformService, never()).activateTenant(TENANT_ID);
-        verify(schedulerService).resumeJobs(TENANT_ID);
+        verify(tenantServicesManager).start();
     }
-
 
 }

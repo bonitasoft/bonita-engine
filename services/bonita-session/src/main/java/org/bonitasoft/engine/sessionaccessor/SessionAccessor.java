@@ -26,4 +26,6 @@ public interface SessionAccessor extends ReadSessionAccessor {
     
     void deleteTenantId();
 
+    boolean isTenantSession();
+
 }

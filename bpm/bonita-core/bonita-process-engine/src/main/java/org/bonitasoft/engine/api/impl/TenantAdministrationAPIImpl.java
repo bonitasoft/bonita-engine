@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
@@ -76,10 +77,11 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     @Override
     @AvailableWhenTenantIsPaused
+    @CustomTransactions
     public void pause() throws UpdateException {
         TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException().getTenantServiceAccessor(getTenantId());
         try {
-            tenantServiceAccessor.getTenantManager().pause();
+            tenantServiceAccessor.getTenantStateManager().pause();
         } catch (Exception e) {
             throw new UpdateException(e);
         }
@@ -87,14 +89,18 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     @Override
     @AvailableWhenTenantIsPaused
+    @CustomTransactions
     public void resume() throws UpdateException {
         TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException().getTenantServiceAccessor(getTenantId());
         try {
-            tenantServiceAccessor.getTenantManager().resume();
+            tenantServiceAccessor.getTenantStateManager().resume();
+            tenantServiceAccessor.getUserTransactionService().executeInTransaction(() -> {
+                resolveDependenciesForAllProcesses();
+                return null;
+            });
         } catch (Exception e) {
             throw new UpdateException(e);
         }
-        resolveDependenciesForAllProcesses();
     }
 
     private void resolveDependenciesForAllProcesses() {

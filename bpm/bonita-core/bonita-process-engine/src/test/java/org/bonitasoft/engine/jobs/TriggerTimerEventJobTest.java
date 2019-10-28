@@ -21,7 +21,7 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.tenant.TenantManager;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,8 @@ public class TriggerTimerEventJobTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private TriggerTimerEventJob triggerTimerEventJob = new TriggerTimerEventJob(){
+    private TriggerTimerEventJob triggerTimerEventJob = new TriggerTimerEventJob() {
+
         @Override
         protected TenantServiceAccessor getTenantServiceAccessor() {
             return tenantServiceAccessor;
@@ -45,8 +46,6 @@ public class TriggerTimerEventJobTest {
     @Mock
     private EventsHandler eventsHandler;
     @Mock
-    private TenantManager tenantManager;
-    @Mock
     private JobService jobService;
     @Mock
     private SchedulerService schedulerService;
@@ -54,6 +53,9 @@ public class TriggerTimerEventJobTest {
     private TechnicalLoggerService loggerService;
     @Mock
     private EventInstanceService eventInstanceService;
+    @Mock
+    private TenantServicesManager tenantServicesManager;
+
     private Long processDefinitionId = 1234L;
     private Long targetSFlowNodeDefinitionId = 32497L;
     private Long flowNodeInstanceId = 43298L;
@@ -65,16 +67,15 @@ public class TriggerTimerEventJobTest {
     private Boolean isInterrupting = false;
     private Long jobDescriptorId = 3209494L;
 
-
     @Before
     public void before() throws Exception {
         doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        doReturn(tenantManager).when(tenantServiceAccessor).getTenantManager();
         doReturn(jobService).when(tenantServiceAccessor).getJobService();
         doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
         doReturn(loggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
-        doReturn(true).when(tenantManager).isTenantStarted();
+        doReturn(tenantServicesManager).when(tenantServiceAccessor).getTenantServicesManager();
+        doReturn(true).when(tenantServicesManager).isStarted();
     }
 
     private void setAttributes() throws SJobConfigurationException {
@@ -97,7 +98,7 @@ public class TriggerTimerEventJobTest {
         SJobDescriptor jobDescriptor = SJobDescriptor.builder().id(jobDescriptorId).build();
         doReturn(jobDescriptor).when(jobService).getJobDescriptor(jobDescriptorId);
         setAttributes();
-        doReturn(false).when(tenantManager).isTenantStarted();
+        doReturn(false).when(tenantServicesManager).isStarted();
 
         triggerTimerEventJob.execute();
 
@@ -111,7 +112,8 @@ public class TriggerTimerEventJobTest {
 
         triggerTimerEventJob.execute();
 
-        verify(eventsHandler).triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, targetSFlowNodeDefinitionId,
+        verify(eventsHandler).triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId,
+                targetSFlowNodeDefinitionId,
                 containerType, subProcessId, processInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
@@ -142,7 +144,8 @@ public class TriggerTimerEventJobTest {
         setAttributes();
         STimerEventTriggerInstance timerEventTriggerInstance = new STimerEventTriggerInstance();
         timerEventTriggerInstance.setId(32143L);
-        doReturn(Optional.of(timerEventTriggerInstance)).when(eventInstanceService).getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+        doReturn(Optional.of(timerEventTriggerInstance)).when(eventInstanceService)
+                .getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
 
         triggerTimerEventJob.execute();
 
