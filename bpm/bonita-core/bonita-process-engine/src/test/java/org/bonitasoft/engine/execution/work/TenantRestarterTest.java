@@ -14,23 +14,23 @@
 
 package org.bonitasoft.engine.execution.work;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tenant.TenantRestarter;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -41,25 +41,23 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class TenantRestarterTest {
 
     @Mock
-    private PlatformServiceAccessor platformServiceAccessor;
-    @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
-    @Mock
-    private NodeConfiguration nodeConfiguration;
-    @Mock
     private TenantRestartHandler tenantRestartHandler1;
     @Mock
     private TenantRestartHandler tenantRestartHandler2;
     @Mock
     private TransactionService transactionService;
-    @InjectMocks
+    @Mock
+    private SessionAccessor sessionAccessor;
+    @Mock
+    private SessionService sessionService;
+    @Mock
+    private PlatformService platformService;
     private TenantRestarter tenantRestarter;
 
     @Before
     public void before() throws Exception {
-        doReturn(nodeConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)).when(nodeConfiguration).getTenantRestartHandlers();
+        tenantRestarter = new TenantRestarter(1L, transactionService, sessionAccessor, sessionService, platformService,
+                asList(tenantRestartHandler1, tenantRestartHandler2));
     }
 
     @Test
@@ -68,8 +66,8 @@ public class TenantRestarterTest {
 
         tenantRestarter.executeBeforeServicesStart();
 
-        verify(tenantRestartHandler1).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1).beforeServicesStart();
+        verify(tenantRestartHandler2).beforeServicesStart();
     }
 
     @Test

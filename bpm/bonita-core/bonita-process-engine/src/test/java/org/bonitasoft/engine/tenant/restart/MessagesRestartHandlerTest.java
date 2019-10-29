@@ -11,51 +11,44 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessagesRestartHandlerTest {
 
     @Mock
-    TenantServiceAccessor tenantServiceAccessor;
+    private UserTransactionService userTransactionService;
     @Mock
-    UserTransactionService userTransactionService;
+    private EventInstanceRepository eventInstanceRepository;
     @Mock
-    PlatformServiceAccessor platformServiceAccessor;
+    private TechnicalLoggerService technicalLoggerService;
     @Mock
-    EventInstanceService eventInstanceService;
-    @Mock
-    TechnicalLoggerService technicalLoggerService;
-
+    private MessagesHandlingService messagesHandlingService;
+    @InjectMocks
+    @Spy
     private MessagesRestartHandler messagesRestartHandler;
 
-    @Before
-    public void initMocks() {
-        when(tenantServiceAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
-        when(tenantServiceAccessor.getUserTransactionService()).thenReturn(userTransactionService);
-        messagesRestartHandler = spy(new MessagesRestartHandler());
-    }
 
     @Test
     public void handleRestartShouldLog4Infos() throws Exception {
         // when:
-        messagesRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        messagesRestartHandler.beforeServicesStart();
 
         // then:
         verify(messagesRestartHandler, times(4)).logInfo(any(TechnicalLoggerService.class), anyString());
@@ -64,19 +57,19 @@ public class MessagesRestartHandlerTest {
     @Test
     public void handleRestartShouldResetMessageInstances() throws Exception {
         // when:
-        messagesRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        messagesRestartHandler.beforeServicesStart();
 
         // then:
-        verify(eventInstanceService).resetProgressMessageInstances();
+        verify(eventInstanceRepository).resetProgressMessageInstances();
     }
 
     @Test
     public void handleRestartShouldResetWaitingEvents() throws Exception {
         // when:
-        messagesRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        messagesRestartHandler.beforeServicesStart();
 
         // then:
-        verify(eventInstanceService).resetInProgressWaitingEvents();
+        verify(eventInstanceRepository).resetInProgressWaitingEvents();
     }
 
     @Test
@@ -84,7 +77,7 @@ public class MessagesRestartHandlerTest {
         //given
 
         //when
-        messagesRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        messagesRestartHandler.afterServicesStart();
         //then
         verify(userTransactionService).executeInTransaction(any());
     }

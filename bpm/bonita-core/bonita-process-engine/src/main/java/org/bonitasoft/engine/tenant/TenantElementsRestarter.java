@@ -1,37 +1,31 @@
 package org.bonitasoft.engine.tenant;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.execution.work.TenantRestarter;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles the restart of elements when the tenant is started (strategy is different in cluster)
  */
 @Component
-public class TenantElementsRestarter implements TenantLifecycleService {
+public class TenantElementsRestarter {
 
-    private NodeConfiguration nodeConfiguration;
-    private long tenantId;
-    //FIXME handle pause/resume activate/deactivate and in cluster
-    private boolean areTenantsElementsAlreadyRestarted;
+    private List<TenantRestartHandler> tenantRestartHandlers;
+    private TenantRestarter tenantRestarter;
+    private TenantElementsRestarterSupervisor tenantElementsRestarterSupervisor;
 
-    public TenantElementsRestarter(NodeConfiguration nodeConfiguration, @Value("${tenantId}") long tenantId) {
-        this.nodeConfiguration = nodeConfiguration;
-        this.tenantId = tenantId;
+    public TenantElementsRestarter(List<TenantRestartHandler> tenantRestartHandlers,
+                                   TenantRestarter tenantRestarter,
+                                   TenantElementsRestarterSupervisor tenantElementsRestarterSupervisor) {
+        this.tenantRestartHandlers = tenantRestartHandlers;
+        this.tenantRestarter = tenantRestarter;
+        this.tenantElementsRestarterSupervisor = tenantElementsRestarterSupervisor;
     }
 
     void prepareRestartOfElements() throws Exception {
-        if (areTenantsElementsAlreadyRestarted) {
+        if (!tenantElementsRestarterSupervisor.shouldRestartElements()) {
             return;
         }
         // Here get all elements that are not "finished"
@@ -40,9 +34,7 @@ public class TenantElementsRestarter implements TenantLifecycleService {
         // * transitions that are in state created: call execute on them
         // * flow node that are completed and not deleted : call execute to make it create transitions and so on
         // * all element that are in not stable state
-        PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-        new TenantRestarter(platformAccessor, platformAccessor.getTenantServiceAccessor(tenantId))
-                .executeBeforeServicesStart();
+        tenantRestarter.executeBeforeServicesStart();
     }
 
     // Here get all elements that are not "finished"
@@ -52,38 +44,10 @@ public class TenantElementsRestarter implements TenantLifecycleService {
     // * flow node that are completed and not deleted : call execute to make it create transitions and so on
     // * all element that are in not stable state
     void restartElements() throws Exception {
-        if (areTenantsElementsAlreadyRestarted) {
+        if (!tenantElementsRestarterSupervisor.shouldRestartElements()) {
             return;
         }
-        List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
-        PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-        new TenantRestarter(platformAccessor, platformAccessor.getTenantServiceAccessor(tenantId))
-                .executeAfterServicesStart(tenantRestartHandlers);
-        areTenantsElementsAlreadyRestarted = true;
+        tenantRestarter.executeAfterServicesStart(tenantRestartHandlers);
+        tenantElementsRestarterSupervisor.notifyElementsAreRestarted();
     }
-
-    protected PlatformServiceAccessor getPlatformAccessor()
-            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
-        areTenantsElementsAlreadyRestarted = false;
-    }
-
-    @Override
-    public void pause() {
-        areTenantsElementsAlreadyRestarted = false;
-    }
-
-    @Override
-    public void resume() {
-    }
-
 }
