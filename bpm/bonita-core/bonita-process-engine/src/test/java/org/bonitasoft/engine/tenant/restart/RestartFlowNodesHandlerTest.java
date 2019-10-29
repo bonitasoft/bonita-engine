@@ -11,25 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 import java.util.Collections;
 
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -38,34 +38,29 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RestartFlowNodesHandlerTest {
 
-    @InjectMocks
-    private RestartFlowNodesHandler restartFlowNodesHandler;
 
-    private PlatformServiceAccessor platformServiceAccessor;
-    private TenantServiceAccessor tenantServiceAccessor;
+    @Mock
     private TechnicalLoggerService logger;
-    private ActivityInstanceService activityInstanceService;
+    @Mock
+    private FlowNodeInstanceService flowNodeInstanceService;
+    @Mock
+    private UserTransactionService transactionService;
+    @Mock
+    private ExecuteFlowNodes executeFlowNodes;
+    private RestartFlowNodesHandler restartFlowNodesHandler;
 
     @Before
     public void before() {
-        platformServiceAccessor = mock(PlatformServiceAccessor.class);
-        tenantServiceAccessor = mock(TenantServiceAccessor.class);
-
-        logger = mock(TechnicalLoggerService.class);
-        doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
-        doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
-        activityInstanceService = mock(ActivityInstanceService.class);
-        doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
+        restartFlowNodesHandler = new RestartFlowNodesHandler(123L, logger, flowNodeInstanceService, transactionService, executeFlowNodes);
     }
 
     @Test
     public final void do_nothing_if_no_flownode() throws Exception {
         //given
-        doReturn(123l).when(tenantServiceAccessor).getTenantId();
-        doReturn(Collections.EMPTY_LIST).when(activityInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+        doReturn(Collections.EMPTY_LIST).when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
 
         //when
-        restartFlowNodesHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        restartFlowNodesHandler.beforeServicesStart();
 
         //then
         assertThat(restartFlowNodesHandler.flownodesToRestartByTenant.get(123l)).isEmpty();
@@ -74,9 +69,9 @@ public class RestartFlowNodesHandlerTest {
     @Test(expected = RestartException.class)
     public final void throw_exception_if_error_when_get_flownode() throws Exception {
         //given
-        doThrow(new SBonitaReadException("plop")).when(activityInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+        doThrow(new SBonitaReadException("plop")).when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
 
         //when
-        restartFlowNodesHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        restartFlowNodesHandler.beforeServicesStart();
     }
 }

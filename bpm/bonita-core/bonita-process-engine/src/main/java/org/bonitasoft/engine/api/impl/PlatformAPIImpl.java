@@ -266,7 +266,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
             // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
-            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute();
+            new DefaultProfilesUpdater(tenantServiceAccessor).execute();
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 

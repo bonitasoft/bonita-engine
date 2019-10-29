@@ -23,8 +23,8 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 
@@ -36,12 +36,22 @@ import org.bonitasoft.engine.session.SessionService;
  */
 public class DefaultProfilesUpdater {
 
-    protected PlatformServiceAccessor platformServiceAccessor;
-    protected TenantServiceAccessor tenantServiceAccessor;
 
-    public DefaultProfilesUpdater(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
-        this.platformServiceAccessor = platformServiceAccessor;
-        this.tenantServiceAccessor = tenantServiceAccessor;
+    private TechnicalLoggerService logger;
+    private ProfilesImporter profilesImporter;
+    private Long tenantId;
+
+    public DefaultProfilesUpdater(Long tenantId, TechnicalLoggerService logger,
+                                  ProfilesImporter profilesImporter) {
+        this.logger = logger;
+        this.profilesImporter = profilesImporter;
+        this.tenantId = tenantId;
+    }
+
+    public DefaultProfilesUpdater(final TenantServiceAccessor tenantServiceAccessor) {
+        this.logger = tenantServiceAccessor.getTechnicalLoggerService();
+        this.profilesImporter = tenantServiceAccessor.getProfilesImporter();
+        this.tenantId = tenantServiceAccessor.getTenantId();
     }
 
     /**
@@ -56,23 +66,23 @@ public class DefaultProfilesUpdater {
             final String defaultProfilesXml = getDefaultProfilesXml();
             if (shouldUpdateProfiles(md5File, defaultProfilesXml)) {
                 // Default profiles do not exist or are different
-                tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                         "Default profiles not up to date, updating them...");
                 final ProfilesNode defaultProfiles = getProfilesFromXML(defaultProfilesXml);
                 doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
                 return true;
             } else {
                 // No update required
-                tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+                logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                         "Default profiles are up to date");
                 return false;
             }
 
         } catch (IOException e) {
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
                     "Unable to read the read the default profile file to update them", e);
         } catch (Exception e) {
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
                     "Unable to update default profiles", e);
         }
         return false;
@@ -81,22 +91,21 @@ public class DefaultProfilesUpdater {
     Object doUpdateProfiles(final ProfilesNode defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
-            final ProfilesImporter profilesImporter = tenantServiceAccessor.getProfilesImporter();
             final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles, ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Updated default profiles " + importStatuses);
             if (md5File != null) {
                 IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
             }
         } catch (ExecutionException e) {
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
                     "Unable to update default profiles", e);
         }
         return null;
     }
 
     File getProfilesMD5File() throws BonitaHomeNotSetException, IOException {
-        return ProfilesImporter.getFileContainingMD5(tenantServiceAccessor.getTenantId());
+        return ProfilesImporter.getFileContainingMD5(tenantId);
     }
 
     /**
@@ -118,17 +127,17 @@ public class DefaultProfilesUpdater {
     String getDefaultProfilesXml() throws IOException {
         String profiles = IOUtil.readResource("profiles-sp.xml");
         if (profiles != null) {
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Loading profiles from file profiles-sp.xml");
         } else {
             profiles = IOUtil.readResource("profiles.xml");
-            tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
+            logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Loading profiles from file profiles.xml");
         }
         return profiles;
     }
 
     ProfilesNode getProfilesFromXML(final String defaultProfilesXml) throws IOException {
-        return tenantServiceAccessor.getProfilesImporter().convertFromXml(defaultProfilesXml);
+        return profilesImporter.convertFromXml(defaultProfilesXml);
     }
 }

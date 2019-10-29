@@ -16,18 +16,24 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,20 +46,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class StarterThreadTest {
 
-    @Mock
-    private PlatformServiceAccessor platformAccessor;
     private final STenant tenant = createTenant();
-
-    private STenant createTenant() {
-        STenant sTenant = new STenant("tenant1", "system", 12345, "ACTIVATED", true);
-        sTenant.setId(1L);
-        return sTenant;
-    }
-
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    private UserTransactionService transactionService;
+    @Mock
+    private PlatformService platformService;
+
     @Mock
     private TenantRestartHandler tenantRestartHandler1;
+
     @Mock
     private TenantRestartHandler tenantRestartHandler2;
     @Mock
@@ -62,19 +63,21 @@ public class StarterThreadTest {
     private SessionService sessionService;
     @Mock
     private TechnicalLoggerService technicalLoggerService;
-
     private StarterThread starterThread;
 
     @Before
     public void before() throws Exception {
-        starterThread = spy(new StarterThread(platformAccessor, tenantServiceAccessor, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
-        doReturn(tenantServiceAccessor).when(platformAccessor).getTenantServiceAccessor(1L);
-        doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService).executeInTransaction(any());
+        starterThread = spy(new StarterThread(1L, sessionAccessor, sessionService, transactionService,
+                platformService, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
         doReturn(SSession.builder().id(54L).tenantId(1).userName("SYSTEM").userId(12).build()).when(sessionService).createSession(anyLong(), anyString());
-        doReturn(tenant).when(starterThread).getTenant(1L);
-        doReturn(1L).when(tenantServiceAccessor).getTenantId();
-        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-        doReturn(sessionAccessor).when(tenantServiceAccessor).getSessionAccessor();
+        doReturn(tenant).when(platformService).getTenant(1L);
+    }
+
+    private STenant createTenant() {
+        STenant sTenant = new STenant("tenant1", "system", 12345, "ACTIVATED", true);
+        sTenant.setId(1L);
+        return sTenant;
     }
 
     @Test
@@ -84,8 +87,8 @@ public class StarterThreadTest {
         //when
         starterThread.run();
         //then
-        verify(tenantRestartHandler1).afterServicesStart(platformAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2).afterServicesStart(platformAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1).afterServicesStart();
+        verify(tenantRestartHandler2).afterServicesStart();
     }
 
     @Test
@@ -95,8 +98,8 @@ public class StarterThreadTest {
         //when
         starterThread.run();
         //then
-        verify(tenantRestartHandler1, never()).afterServicesStart(platformAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, never()).afterServicesStart(platformAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1, never()).afterServicesStart();
+        verify(tenantRestartHandler2, never()).afterServicesStart();
     }
 
     @Test
@@ -106,8 +109,8 @@ public class StarterThreadTest {
         //when
         starterThread.run();
         //then
-        verify(tenantRestartHandler1, never()).afterServicesStart(platformAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, never()).afterServicesStart(platformAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1, never()).afterServicesStart();
+        verify(tenantRestartHandler2, never()).afterServicesStart();
     }
 
 }
