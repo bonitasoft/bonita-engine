@@ -29,10 +29,8 @@ import org.springframework.core.io.Resource;
  */
 public class BonitaSpringContext extends AbstractXmlApplicationContext {
 
-
     private String name;
     private List<Resource> resources = new ArrayList<>();
-
 
     /**
      * Create a new XmlApplicationContext with the given parent,
@@ -40,7 +38,6 @@ public class BonitaSpringContext extends AbstractXmlApplicationContext {
      * refreshing the context.
      *
      * @param parent the parent context
-     * @param name
      * @throws BeansException if context creation failed
      */
     public BonitaSpringContext(ApplicationContext parent, String name) throws BeansException {

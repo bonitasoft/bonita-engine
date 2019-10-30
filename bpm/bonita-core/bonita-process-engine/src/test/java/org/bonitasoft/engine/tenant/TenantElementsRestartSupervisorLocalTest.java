@@ -17,43 +17,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class TenantElementsRestarterStatusLocalTest {
+public class TenantElementsRestartSupervisorLocalTest {
 
-    private TenantElementsRestarterStatusLocal tenantElementsRestarterStatusLocal = new TenantElementsRestarterStatusLocal();
+    private TenantElementsRestartSupervisorLocal tenantElementsRestarterSupervisorLocal = new TenantElementsRestartSupervisorLocal();
 
     @Test
     public void should_say_to_restart_elements_initially() {
 
-        boolean shouldRestartElements = tenantElementsRestarterStatusLocal.shouldRestartElements();
+        boolean shouldRestartElements = tenantElementsRestarterSupervisorLocal.shouldRestartElements();
 
         assertThat(shouldRestartElements).isTrue();
     }
 
     @Test
     public void should_say_to_not_restart_elements_after_restart_was_completed() {
-        tenantElementsRestarterStatusLocal.notifyElementsAreRestarted();
+        tenantElementsRestarterSupervisorLocal.willRestartElements();
 
-        boolean shouldRestartElements = tenantElementsRestarterStatusLocal.shouldRestartElements();
+        boolean shouldRestartElements = tenantElementsRestarterSupervisorLocal.shouldRestartElements();
 
         assertThat(shouldRestartElements).isFalse();
     }
 
     @Test
     public void should_say_to_restart_elements_after_restart_was_completed_but_tenant_was_stopped() {
-        tenantElementsRestarterStatusLocal.notifyElementsAreRestarted();
-        tenantElementsRestarterStatusLocal.stop();
+        tenantElementsRestarterSupervisorLocal.willRestartElements();
+        tenantElementsRestarterSupervisorLocal.stop();
 
-        boolean shouldRestartElements = tenantElementsRestarterStatusLocal.shouldRestartElements();
+        boolean shouldRestartElements = tenantElementsRestarterSupervisorLocal.shouldRestartElements();
 
         assertThat(shouldRestartElements).isTrue();
     }
 
     @Test
     public void should_say_to_restart_elements_after_restart_was_completed_but_tenant_was_paused() {
-        tenantElementsRestarterStatusLocal.notifyElementsAreRestarted();
-        tenantElementsRestarterStatusLocal.pause();
+        tenantElementsRestarterSupervisorLocal.willRestartElements();
+        tenantElementsRestarterSupervisorLocal.pause();
 
-        boolean shouldRestartElements = tenantElementsRestarterStatusLocal.shouldRestartElements();
+        boolean shouldRestartElements = tenantElementsRestarterSupervisorLocal.shouldRestartElements();
 
         assertThat(shouldRestartElements).isTrue();
     }
