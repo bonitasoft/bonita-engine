@@ -56,8 +56,4 @@ class Deps {
     public static String jettyVersion = "9.4.9.v20180320"
     public static String javaxAnnotationsVersion = "1.3.2"
 
-
-    //Build plugins
-    public static String bonitaPluginsVersion = "0.1.42"
-
 }
