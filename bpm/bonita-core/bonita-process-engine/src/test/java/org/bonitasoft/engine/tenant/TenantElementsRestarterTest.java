@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
@@ -35,7 +32,7 @@ public class TenantElementsRestarterTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private TenantElementsRestarterSupervisor tenantElementsRestarterSupervisor;
+    private TenantElementsRestartSupervisor tenantElementsRestartSupervisor;
     @Mock
     private TenantRestarter tenantRestarter;
     @Mock
@@ -46,43 +43,45 @@ public class TenantElementsRestarterTest {
 
     @Before
     public void before() {
-        tenantElementsRestarter = new TenantElementsRestarter(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2), tenantRestarter, tenantElementsRestarterSupervisor);
+        tenantElementsRestarter = new TenantElementsRestarter(
+                Arrays.asList(tenantRestartHandler1, tenantRestartHandler2),
+                tenantRestarter, tenantElementsRestartSupervisor, 41L);
     }
 
     @Test
     public void should_prepareRestartOfElements_when_the_supervisor_says_so() throws Exception {
-        doReturn(true).when(tenantElementsRestarterSupervisor).shouldRestartElements();
+        doReturn(true).when(tenantElementsRestartSupervisor).shouldRestartElements();
 
         tenantElementsRestarter.prepareRestartOfElements();
 
         verify(tenantRestarter).executeBeforeServicesStart();
     }
+
     @Test
     public void should_not_prepareRestartOfElements_when_the_supervisor_says_so() throws Exception {
-        doReturn(false).when(tenantElementsRestarterSupervisor).shouldRestartElements();
+        doReturn(false).when(tenantElementsRestartSupervisor).shouldRestartElements();
 
         tenantElementsRestarter.prepareRestartOfElements();
 
         verify(tenantRestarter, never()).executeBeforeServicesStart();
     }
+
     @Test
     public void should_restartElements_and_notify_when_supervisor_says_so() throws Exception {
-        doReturn(true).when(tenantElementsRestarterSupervisor).shouldRestartElements();
+        doReturn(true).when(tenantElementsRestartSupervisor).willRestartElements();
 
         tenantElementsRestarter.restartElements();
 
         verify(tenantRestarter).executeAfterServicesStart(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
-        verify(tenantElementsRestarterSupervisor).notifyElementsAreRestarted();
     }
 
     @Test
     public void should_not_restartElements_when_supervisor_says_so() throws Exception {
-        doReturn(false).when(tenantElementsRestarterSupervisor).shouldRestartElements();
+        doReturn(false).when(tenantElementsRestartSupervisor).willRestartElements();
 
         tenantElementsRestarter.restartElements();
 
         verify(tenantRestarter, never()).executeAfterServicesStart(anyList());
-        verify(tenantElementsRestarterSupervisor, never()).notifyElementsAreRestarted();
     }
 
 }

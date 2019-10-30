@@ -13,10 +13,9 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-public interface TenantElementsRestarterSupervisor {
+public interface TenantElementsRestartSupervisor {
 
     boolean shouldRestartElements();
 
-    void notifyElementsAreRestarted();
-
+    boolean willRestartElements();
 }

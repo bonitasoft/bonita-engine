@@ -18,13 +18,12 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TenantElementsRestarterStatusLocal implements TenantLifecycleService, TenantElementsRestarterSupervisor {
+public class TenantElementsRestartSupervisorLocal implements TenantLifecycleService, TenantElementsRestartSupervisor {
 
     private boolean areTenantsElementsAlreadyRestarted;
 
     @Override
     public void start() throws SBonitaException {
-
     }
 
     @Override
@@ -39,7 +38,6 @@ public class TenantElementsRestarterStatusLocal implements TenantLifecycleServic
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -47,11 +45,14 @@ public class TenantElementsRestarterStatusLocal implements TenantLifecycleServic
         return !areTenantsElementsAlreadyRestarted;
     }
 
-
     @Override
-    public void notifyElementsAreRestarted() {
-        areTenantsElementsAlreadyRestarted = true;
+    public boolean willRestartElements() {
+        if (!areTenantsElementsAlreadyRestarted) {
+            areTenantsElementsAlreadyRestarted = true;
+            return true;
+        } else {
+            return false;
+        }
     }
-
 
 }

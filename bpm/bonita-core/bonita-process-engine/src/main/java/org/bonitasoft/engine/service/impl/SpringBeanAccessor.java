@@ -98,7 +98,7 @@ public abstract class SpringBeanAccessor {
     }
 
     protected boolean isCluster() throws IOException {
-        return Boolean.valueOf(getPropertyWithPlaceholder(BONITA_HOME_SERVER.getPlatformProperties(), "bonita.cluster", "false"));
+        return Boolean.parseBoolean(getPropertyWithPlaceholder(BONITA_HOME_SERVER.getPlatformProperties(), "bonita.cluster", "false"));
     }
 
 }
