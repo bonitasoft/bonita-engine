@@ -46,4 +46,8 @@ a _Docker_ container, run one of the following commands:
 How to contribute
 -----------------
 
-In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD).
+In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD)
+
+Fix .... 
+TODO
+
