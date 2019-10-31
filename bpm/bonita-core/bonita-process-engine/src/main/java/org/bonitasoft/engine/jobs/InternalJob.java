@@ -26,7 +26,7 @@ public abstract class InternalJob implements StatelessJob {
 
     private static final long serialVersionUID = 5627886991070497312L;
 
-    protected final TenantServiceAccessor getTenantServiceAccessor() throws SJobConfigurationException {
+    protected TenantServiceAccessor getTenantServiceAccessor() throws SJobConfigurationException {
         long tenantId;
         try {
             tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();

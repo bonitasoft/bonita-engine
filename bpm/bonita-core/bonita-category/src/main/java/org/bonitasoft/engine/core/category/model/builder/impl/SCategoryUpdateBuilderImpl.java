@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.category.model.builder.impl;
 
+import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -35,13 +36,13 @@ public class SCategoryUpdateBuilderImpl implements SCategoryUpdateBuilder {
 
     @Override
     public SCategoryUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SCategoryBuilderFactoryImpl.NAME, name);
+        this.descriptor.addField(SCategory.NAME, name);
         return this;
     }
 
     @Override
     public SCategoryUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SCategoryBuilderFactoryImpl.DESCRIPTION, description);
+        this.descriptor.addField(SCategory.DESCRIPTION, description);
         return this;
     }
 

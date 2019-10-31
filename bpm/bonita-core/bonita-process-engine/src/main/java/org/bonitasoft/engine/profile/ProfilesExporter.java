@@ -31,9 +31,6 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
@@ -80,7 +77,7 @@ public class ProfilesExporter {
         List<SProfile> sProfiles;
         do {
             final QueryOptions queryOptions = new QueryOptions(from, 100, Collections.singletonList(new OrderByOption(
-                    SProfile.class, SProfileBuilderFactory.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+                    SProfile.class, SProfile.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
             sProfiles = profileService.searchProfiles(queryOptions);
             from += 100;
             profiles.addAll(sProfiles);
@@ -155,10 +152,10 @@ public class ProfilesExporter {
 
     protected List<SProfileEntry> searchProfileEntries(final long profileId, final long parentId) throws SBonitaReadException {
         final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, profileId));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, parentId));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PROFILE_ID, profileId));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PARENT_ID, parentId));
         final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE, orderByOptions, filters, null);//profiles entry of a profile will not have a lot of elements
         return profileService.searchProfileEntries(queryOptions);
     }
@@ -232,8 +229,8 @@ public class ProfilesExporter {
 
     private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
-                SProfileMember.class, SProfileMemberBuilderFactory.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
-                        SProfileEntryBuilderFactory.PROFILE_ID, profileId)),
+                SProfileMember.class, SProfileMember.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
+                        SProfileEntry.PROFILE_ID, profileId)),
                 null);
         return profileService.searchProfileMembers(querySuffix, queryOptions);
     }

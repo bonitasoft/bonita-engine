@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
@@ -51,6 +52,23 @@ public class ProcessInstanceRepository extends TestRepository {
         namedQuery.setParameter("humanTaskInstanceId", activityInstanceId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
+    @SuppressWarnings("unchecked")
+    public List<SUser> searchSUserWhoCanStartProcess(final long processId) {
+        final Query namedQuery = getNamedQuery("searchSUserWhoCanStartProcess");
+        namedQuery.setParameter("processId", processId);
+        namedQuery.setParameter("trueValue", true);
+        namedQuery.setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        return namedQuery.list();
+    }
+
+    public long getNumberOfSUserWhoCanStartProcess(final long processId) {
+        final Query namedQuery = getNamedQuery("getNumberOfSUserWhoCanStartProcess");
+        namedQuery.setParameter("processId", processId);
+        namedQuery.setParameter("trueValue", true);
+        namedQuery.setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
     public boolean isTaskPendingForUser(final long activityInstanceId, final long userId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         final Query namedQuery = getNamedQuery("isTaskPendingForUser");

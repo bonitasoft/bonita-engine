@@ -345,7 +345,9 @@ CREATE TABLE flownode_instance (
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
+CREATE INDEX idx_fni_loggroup3_terminal ON flownode_instance(logicalgroup3, terminal, tenantid);
 CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
+CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid BIGINT NOT NULL,
@@ -402,6 +404,7 @@ CREATE TABLE waiting_event (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
+CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
 	tenantid BIGINT NOT NULL,
@@ -418,9 +421,11 @@ CREATE TABLE message_instance (
   	correlation3 VARCHAR(128),
   	correlation4 VARCHAR(128),
   	correlation5 VARCHAR(128),
+  	creationDate BIGINT NOT NULL,
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
+CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
 	tenantid BIGINT NOT NULL,
@@ -572,7 +577,7 @@ CREATE TABLE command (
   name VARCHAR(50) NOT NULL,
   description LONGVARCHAR,
   IMPLEMENTATION VARCHAR(100) NOT NULL,
-  system BOOLEAN,
+  isSystem BOOLEAN,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
@@ -959,6 +964,8 @@ CREATE TABLE job_param (
   PRIMARY KEY (tenantid, id)
 );
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
+
 
 CREATE TABLE job_log (
   tenantid BIGINT NOT NULL,

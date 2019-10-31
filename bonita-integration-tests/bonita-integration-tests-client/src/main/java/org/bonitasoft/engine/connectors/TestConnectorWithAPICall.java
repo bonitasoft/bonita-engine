@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.connectors;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.connector.AbstractConnector;
 
@@ -33,17 +29,11 @@ public class TestConnectorWithAPICall extends AbstractConnector {
     protected void executeBusinessLogic() {
         final String name = (String) getInputParameter("processName");
         final String version = (String) getInputParameter("processVersion");
-        final String propValue = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
-        final String userTransactionJNDIName = System.getProperty("sysprop.bonita.transaction.manager", "java:comp/UserTransaction");
         long processId = -1;
         try {
-            final InitialContext ctx = new InitialContext();
-            ctx.lookup(userTransactionJNDIName);
             processId = getAPIAccessor().getProcessAPI().getProcessDefinitionId(name, version);
         } catch (ProcessDefinitionNotFoundException e) {
             throw new RuntimeException("Unable to get Process with name and version: " + name + ", " + version);
-        } catch (NamingException e) {
-            throw new RuntimeException("Unable to lookup for: " + propValue + " in JNDI");
         } finally {
             setOutputParameter("processId", processId);
         }

@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SSendTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SSendTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SSendTaskInstanceBuilder {
 
-    public SSendTaskInstanceBuilderImpl(final SSendTaskInstanceImpl activityInstanceImpl) {
+    public SSendTaskInstanceBuilderImpl(final SSendTaskInstance activityInstanceImpl) {
         super(activityInstanceImpl);
     }
 

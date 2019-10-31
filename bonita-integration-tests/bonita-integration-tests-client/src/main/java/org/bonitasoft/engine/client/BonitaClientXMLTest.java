@@ -35,9 +35,9 @@ import org.junit.rules.TestRule;
  */
 public class BonitaClientXMLTest {
 
-    private static final String BONITA_HOME_CLIENT_INVALID_API_TYPE = "target/bonita_home_client_invalidAPIType";
+    private static final String BONITA_HOME_CLIENT_INVALID_API_TYPE = "build/bonita_home_client_invalidAPIType";
 
-    private static final String BONITA_HOME_CLIENT_EJB3 = "target/bonita_home_client_EJB3";
+    private static final String BONITA_HOME_CLIENT_HTTP = "build/bonita_home_client_HTTP";
 
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
@@ -49,14 +49,8 @@ public class BonitaClientXMLTest {
 
     @Test
     public void testGetAPIType() throws Exception {
-
         ApiAccessType apiType = APITypeManager.getAPIType();
         assertEquals(ApiAccessType.LOCAL, apiType);
-
-        TenantAPIAccessor.refresh();
-        System.setProperty(BonitaHome.BONITA_HOME, BONITA_HOME_CLIENT_EJB3);
-        apiType = APITypeManager.getAPIType();
-        assertEquals(ApiAccessType.EJB3, apiType);
     }
 
     @Test
@@ -66,9 +60,10 @@ public class BonitaClientXMLTest {
         assertEquals(expectedParameters, parameters);
 
         TenantAPIAccessor.refresh();
-        System.setProperty(BonitaHome.BONITA_HOME, BONITA_HOME_CLIENT_EJB3);
+        System.setProperty(BonitaHome.BONITA_HOME, BONITA_HOME_CLIENT_HTTP);
         parameters = APITypeManager.getAPITypeParameters();
-        expectedParameters.put("java.naming.factory.url.pkgs", "org.jboss.ejb.client.naming");
+        expectedParameters.put("org.bonitasoft.engine.api-type.server.url", "127.255.0.123");
+        expectedParameters.put("org.bonitasoft.engine.api-type.application.name", "MyBonitaInstallation");
         assertEquals(expectedParameters, parameters);
     }
 

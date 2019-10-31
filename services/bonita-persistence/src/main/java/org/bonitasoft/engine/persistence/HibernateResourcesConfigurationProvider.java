@@ -24,6 +24,8 @@ public interface HibernateResourcesConfigurationProvider {
 
     void setHbmResources(final List<HibernateResourcesProvider> resources);
 
+    Set<Class> getEntities();
+
     Set<String> getResources();
 
     Map<String, String> getClassAliasMappings();

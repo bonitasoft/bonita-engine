@@ -1,0 +1,36 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile project(':services:bonita-commons')
+    compile "org.hibernate:hibernate-core:${Deps.hibernateVersion}"
+    compile "org.springframework:spring-core:${Deps.springVersion}"
+    compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${Deps.hibernateJpaVersion}"
+    compile project(':bpm:bonita-common')
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    compile "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}"
+    compile "org.javassist:javassist:${Deps.javassistVersion}"
+    compile "org.eclipse.jdt.core.compiler:ecj:${Deps.eclipseCompilerVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile project(':services:bonita-business-data:bonita-business-data-client-resources')
+    testCompile project(':bpm:bonita-util:bonita-common-util-test')
+    testCompile project(':services:bonita-business-data:bonita-business-data-api')
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
+
+group = 'org.bonitasoft.engine.data'
+
+
+sourceSets {
+    main {
+        resources { srcDirs "src/main/resources", "../bonita-business-data-client-resources/src/main/java" }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

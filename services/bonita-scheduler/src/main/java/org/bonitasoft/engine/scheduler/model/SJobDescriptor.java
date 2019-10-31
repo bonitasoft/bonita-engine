@@ -13,20 +13,47 @@
  **/
 package org.bonitasoft.engine.scheduler.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Baptiste Mesta
- * @author Celine Souchet
- */
-public interface SJobDescriptor extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SJobDescriptor implements PersistentObject {
 
-    String getJobClassName();
+    public static final String JOB_NAME = "jobName";
+    public static final String JOB_CLASS_NAME = "jobClassName";
+    public static final String ID = "id";
+    public static final String DESCRIPTION = "description";
+    private long id;
+    private long tenantId;
+    private String jobClassName;
+    private String jobName;
+    private String description;
+    private boolean disallowConcurrentExecution;
 
-    String getJobName();
+    public SJobDescriptor(final String jobClassName, final String jobName, final String description, final boolean disallowConcurrentExecution) {
+        super();
+        this.jobClassName = jobClassName;
+        this.jobName = jobName;
+        this.description = description;
+        this.disallowConcurrentExecution = disallowConcurrentExecution;
+    }
 
-    String getDescription();
+    public SJobDescriptor(final String jobClassName, final String jobName, final boolean disallowConcurrentExecution) {
+        super();
+        this.jobClassName = jobClassName;
+        this.jobName = jobName;
+        this.disallowConcurrentExecution = disallowConcurrentExecution;
+    }
 
-	boolean disallowConcurrentExecution();
+    public boolean disallowConcurrentExecution() {
+        return disallowConcurrentExecution;
+    }
+
 
 }

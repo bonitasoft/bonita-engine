@@ -13,38 +13,76 @@
  **/
 package org.bonitasoft.engine.page;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SPage extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SPage implements PersistentObject {
 
-    String getName();
+    private long tenantId;
+    private long id;
+    private String name;
+    private String description;
+    private String displayName;
+    private long installationDate;
+    private long installedBy;
+    private boolean provided;
+    private boolean hidden;
+    private long lastModificationDate;
+    private long lastUpdatedBy;
+    private String contentName;
+    private String contentType;
+    private long processDefinitionId;
 
-    String getDisplayName();
+    public SPage(final String name, final String description, final String displayName, final long installationDate,
+                     final long installedBy,
+                     final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
+                     final String contentName) {
+        this(name, installationDate, installedBy, provided, contentName);
+        setDescription(description);
+        setDisplayName(displayName);
+        setProvided(provided);
+        setLastModificationDate(lastModificationDate);
+        setLastUpdatedBy(lastUpdatedBy);
+    }
 
-    String getDescription();
-
-    long getInstallationDate();
-
-    long getInstalledBy();
-
-    boolean isProvided();
-
-    boolean isHidden();
+    public SPage(final String name, final String description, final String displayName, final long installationDate,
+                     final long installedBy,
+                     final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
+                     final String contentName) {
+        this(name, installationDate, installedBy, provided, contentName);
+        setDescription(description);
+        setDisplayName(displayName);
+        setProvided(provided);
+        setLastModificationDate(lastModificationDate);
+        setLastUpdatedBy(lastUpdatedBy);
+        setHidden(hidden);
+    }
 
     /**
-     * @return the date of the last modification of this report.
+     * @param sPage
      */
-    long getLastModificationDate();
+    public SPage(final SPage sPage) {
+        this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
+                sPage.getInstalledBy(), sPage.isProvided(), sPage.isHidden(), sPage
+                        .getLastModificationDate(),
+                sPage.getLastUpdatedBy(), sPage.getContentName());
+        setContentType(sPage.getContentType());
+        setProcessDefinitionId(sPage.getProcessDefinitionId());
+    }
 
-    long getLastUpdatedBy();
-
-    String getContentName();
-
-    String getContentType();
-
-    long getProcessDefinitionId();
-
+    public SPage(final String name, final long installationDate, final long installedBy, final boolean provided,
+                     final String contentName) {
+        setName(name);
+        setInstallationDate(installationDate);
+        setInstalledBy(installedBy);
+        setProvided(provided);
+        setContentName(contentName);
+        setContentType(SContentType.PAGE);
+    }
 }

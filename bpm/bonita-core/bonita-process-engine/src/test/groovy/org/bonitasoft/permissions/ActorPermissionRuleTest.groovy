@@ -62,15 +62,15 @@ public class ActorPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "process_id": "1"
+                    "process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -79,15 +79,15 @@ public class ActorPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(
                 [
-                        "process_id": "1"
+                    "process_id": "1"
                 ]
-        ).when(apiCallContext).getFilters()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+                ).when(apiCallContext).getFilters()
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -96,12 +96,12 @@ public class ActorPermissionRuleTest {
         doReturn("2").when(apiCallContext).getResourceId()
         doReturn(actor).when(processAPI).getActor(2l)
         doReturn(1l).when(actor).getProcessDefinitionId()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -111,12 +111,12 @@ public class ActorPermissionRuleTest {
         doReturn("2").when(apiCallContext).getResourceId()
         doReturn(actor).when(processAPI).getActor(2l)
         doReturn(1l).when(actor).getProcessDefinitionId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -125,12 +125,12 @@ public class ActorPermissionRuleTest {
         doReturn("2").when(apiCallContext).getResourceId()
         doReturn(actor).when(processAPI).getActor(2l)
         doReturn(1l).when(actor).getProcessDefinitionId()
-        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(false).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -139,11 +139,11 @@ public class ActorPermissionRuleTest {
         doReturn("2").when(apiCallContext).getResourceId()
         doReturn(actor).when(processAPI).getActor(2l)
         doReturn(1l).when(actor).getProcessDefinitionId()
-        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId);
+        doReturn(true).when(processAPI).isUserProcessSupervisor(1l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 }

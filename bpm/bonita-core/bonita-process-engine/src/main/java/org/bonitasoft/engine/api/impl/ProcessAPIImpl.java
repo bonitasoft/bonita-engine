@@ -49,7 +49,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
 import org.bonitasoft.engine.api.impl.connector.ResetAllFailedConnectorStrategy;
 import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
-import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactManager;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -214,7 +213,6 @@ import org.bonitasoft.engine.core.category.exception.SCategoryInProcessAlreadyEx
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderFactory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilder;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilderFactory;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
@@ -251,7 +249,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
@@ -275,6 +272,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -290,8 +288,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
@@ -359,6 +355,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -368,7 +365,6 @@ import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -386,6 +382,7 @@ import org.bonitasoft.engine.search.comment.SearchCommentsInvolvingUser;
 import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessSupervisorDescriptor;
@@ -428,13 +425,12 @@ import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
+import org.bonitasoft.engine.search.impl.SearchFilter;
 
 /**
  * @author Baptiste Mesta
@@ -466,8 +462,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI,
-            ProcessConfigurationAPIImpl processConfigurationAPI, TaskInvolvementDelegate taskInvolvementDelegate,
-            ProcessInvolvementDelegate processInvolvementDelegate) {
+                          ProcessConfigurationAPIImpl processConfigurationAPI, TaskInvolvementDelegate taskInvolvementDelegate,
+                          ProcessInvolvementDelegate processInvolvementDelegate) {
         this.processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
         this.processConfigurationAPI = processConfigurationAPI;
@@ -1576,18 +1572,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Category> getCategories(final int startIndex, final int maxResults, final CategoryCriterion sortCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SCategoryBuilderFactory fact = BuilderFactory.get(SCategoryBuilderFactory.class);
-
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         String field = null;
         OrderByType order = null;
         switch (sortCriterion) {
             case NAME_ASC:
-                field = fact.getNameKey();
+                field = SCategory.NAME;
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = fact.getNameKey();
+                field = SCategory.NAME;
                 order = OrderByType.DESC;
                 break;
             default:
@@ -1941,6 +1935,25 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @CustomTransactions
+    @Override
+    public void assignAndExecuteUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs)
+            throws UpdateException, UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException {
+        try {
+            inTx(() -> {
+                assignUserTask(userTaskInstanceId, userId);
+                executeFlowNode(userId, userTaskInstanceId, inputs, true);
+                return null;
+            });
+        } catch (final ContractViolationException e) {
+            throw e;
+        } catch (final SFlowNodeNotFoundException e) {
+            throw new UserTaskNotFoundException(String.format("User task %s is not found, it might already be executed", userTaskInstanceId));
+        } catch (final Exception e) {
+            verifyIfTheActivityWasInTheCorrectStateAndThrowException(userTaskInstanceId, e);
+        }
+    }
+
     @Override
     public void updateActorsOfUserTask(final long userTaskId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -2029,9 +2042,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void createPendingMappingForUser(final long humanTaskInstanceId, final Long userId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final SPendingActivityMappingBuilderFactory sPendingActivityMappingBuilderFactory = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class);
-        final SPendingActivityMapping mapping = sPendingActivityMappingBuilderFactory.createNewInstanceForUser(humanTaskInstanceId, userId)
-                .done();
+        final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(humanTaskInstanceId).userId(userId)
+                .build();
         activityInstanceService.addPendingActivityMappings(mapping);
     }
 
@@ -2783,8 +2795,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ProcessDeploymentInfoCriterion sortingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessDefinitionDeployInfoBuilderFactory builder = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
-
         try {
             final Set<Long> processDefIds = getIdOfStartableProcessDeploymentInfosForActors(actorIds);
 
@@ -2794,35 +2804,35 @@ public class ProcessAPIImpl implements ProcessAPI {
                 case DEFAULT:
                     break;
                 case NAME_ASC:
-                    field = builder.getNameKey();
+                    field = SProcessDefinitionDeployInfo.NAME_KEY;
                     order = OrderByType.ASC;
                     break;
                 case NAME_DESC:
-                    field = builder.getNameKey();
+                    field = SProcessDefinitionDeployInfo.NAME_KEY;
                     order = OrderByType.DESC;
                     break;
                 case ACTIVATION_STATE_ASC:
-                    field = builder.getActivationStateKey();
+                    field = SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY;
                     order = OrderByType.ASC;
                     break;
                 case ACTIVATION_STATE_DESC:
-                    field = builder.getActivationStateKey();
+                    field = SProcessDefinitionDeployInfo.ACTIVATION_STATE_KEY;
                     order = OrderByType.DESC;
                     break;
                 case CONFIGURATION_STATE_ASC:
-                    field = builder.getConfigurationStateKey();
+                    field = SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY;
                     order = OrderByType.ASC;
                     break;
                 case CONFIGURATION_STATE_DESC:
-                    field = builder.getConfigurationStateKey();
+                    field = SProcessDefinitionDeployInfo.CONFIGURATION_STATE_KEY;
                     order = OrderByType.DESC;
                     break;
                 case VERSION_ASC:
-                    field = builder.getVersionKey();
+                    field = SProcessDefinitionDeployInfo.VERSION_KEY;
                     order = OrderByType.ASC;
                     break;
                 case VERSION_DESC:
-                    field = builder.getVersionKey();
+                    field = SProcessDefinitionDeployInfo.VERSION_KEY;
                     order = OrderByType.DESC;
                     break;
                 default:
@@ -3404,11 +3414,16 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SCatchEventInstance sCatchEventInstance) {
         final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
         final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
-
+        EventInstanceService eventInstanceService = getTenantAccessor().getEventInstanceService();
         try {
             if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
                 final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sCatchEventInstance);
                 final boolean delete = schedulerService.delete(jobName);
+                try {
+                    eventInstanceService.deleteEventTriggerInstanceOfFlowNode(sCatchEventInstance.getId());
+                } catch (SEventTriggerInstanceDeletionException e) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Unable to delete event trigger of flow node instance " + sCatchEventInstance + " because: " + e.getMessage());
+                }
                 if (!delete && schedulerService.isExistingJob(jobName)) {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
@@ -3426,11 +3441,10 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
             final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaReadException {
-        final SProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
-        final FilterOption filterOption = new FilterOption(SProcessInstance.class, keyProvider.getProcessDefinitionIdKey(), processDefinitionId);
-        final OrderByOption order2 = new OrderByOption(SProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SProcessInstance.class, SProcessInstance.PROCESSDEF_ID_KEY, processDefinitionId);
+        final OrderByOption order2 = new OrderByOption(SProcessInstance.class, SProcessInstance.ID_KEY, OrderByType.ASC);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
-        final OrderByOption order = new OrderByOption(SProcessInstance.class, keyProvider.getCallerIdKey(), OrderByType.ASC);
+        final OrderByOption order = new OrderByOption(SProcessInstance.class, SProcessInstance.CALLER_ID, OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Arrays.asList(order, order2), Collections.singletonList(filterOption), null);
         return processInstanceService.searchProcessInstances(queryOptions);
     }
@@ -3894,39 +3908,25 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId)
             throws CreationException, AlreadyExistsException {
-        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
-        supervisorBuilder.setUserId(userId);
-        return createSupervisor(supervisorBuilder.done());
+        return createSupervisor(SProcessSupervisor.builder().processDefId(processDefinitionId).userId(userId).build());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId)
             throws CreationException, AlreadyExistsException {
-        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
-        supervisorBuilder.setRoleId(roleId);
-        return createSupervisor(supervisorBuilder.done());
+        return createSupervisor(SProcessSupervisor.builder().processDefId(processDefinitionId).roleId(roleId).build());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException,
             AlreadyExistsException {
-        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
-        supervisorBuilder.setGroupId(groupId);
-        return createSupervisor(supervisorBuilder.done());
+        return createSupervisor(SProcessSupervisor.builder().processDefId(processDefinitionId).groupId(groupId).build());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForMembership(final long processDefinitionId, final long groupId, final long roleId)
             throws CreationException, AlreadyExistsException {
-        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
-        supervisorBuilder.setGroupId(groupId);
-        supervisorBuilder.setRoleId(roleId);
-        return createSupervisor(supervisorBuilder.done());
-    }
-
-    private SProcessSupervisorBuilder buildSProcessSupervisor(final long processDefinitionId) {
-        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
-        return sProcessSupervisorBuilderFactory.createNewInstance(processDefinitionId);
+        return createSupervisor(SProcessSupervisor.builder().processDefId(processDefinitionId).groupId(groupId).roleId(roleId).build());
     }
 
     private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
@@ -3967,19 +3967,13 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SBonitaReadException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
 
-        final List<OrderByOption> oderByOptions = Collections.singletonList(new OrderByOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
-                .getUserIdKey(), OrderByType.DESC));
+        final List<OrderByOption> oderByOptions = Collections.singletonList(new OrderByOption(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY, OrderByType.DESC));
         final List<FilterOption> filterOptions = new ArrayList<>();
-        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
-                .getProcessDefIdKey(), processDefinitionId == null ? -1 : processDefinitionId));
-        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
-                .getUserIdKey(), userId == null ? -1 : userId));
-        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
-                .getGroupIdKey(), groupId == null ? -1 : groupId));
-        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
-                .getRoleIdKey(), roleId == null ? -1 : roleId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, SProcessSupervisor.PROCESS_DEF_ID_KEY, processDefinitionId == null ? -1 : processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY, userId == null ? -1 : userId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY, groupId == null ? -1 : groupId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY, roleId == null ? -1 : roleId));
 
         return supervisorService.searchProcessSupervisors(new QueryOptions(0, 1, oderByOptions, filterOptions, null));
     }
@@ -4865,6 +4859,36 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     }
 
+    @Override
+    public int deleteMessageByCreationDate(final long creationDate, SearchOptions searchOptions) throws ExecutionException {
+        try {
+            return getTenantAccessor().getEventInstanceService().deleteMessageAndDataInstanceOlderThanCreationDate(creationDate, buildQueryOptions(searchOptions, getTenantAccessor().getSearchEntitiesDescriptor().getSearchMessageInstanceDescriptor()));
+        } catch (SBonitaException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    /**
+     * Utility method to convert a SearchOptions into a QueryOptions
+     */
+    private <T extends PersistentObject> QueryOptions buildQueryOptions(SearchOptions searchOptions, SearchEntityDescriptor searchEntityDescriptor) {
+        if (searchOptions != null) {
+            final List<SearchFilter> filters = searchOptions.getFilters();
+
+            final List<FilterOption> filterOptions = new ArrayList<>(filters.size());
+            for (final SearchFilter filter : filters) {
+                final FilterOption option = searchEntityDescriptor.getEntityFilter(filter);
+                if (option != null) {// in case of a unknown filter on state
+                    filterOptions.add(option);
+                }
+            }
+
+            return new QueryOptions(searchOptions.getStartIndex(), searchOptions.getMaxResults(), Collections.emptyList(), filterOptions, null);
+        } else {
+            return QueryOptions.ALL_RESULTS;
+        }
+    }
+
     private void addMessageContent(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
             final ExpressionResolverService expressionResolverService, final Map<Expression, Expression> messageContent) throws SBonitaException {
         for (final Entry<Expression, Expression> entry : messageContent.entrySet()) {
@@ -5333,10 +5357,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
         try {
             if (parameters == null || parameters.isEmpty()) {
-                schedulerService.executeAgain(jobDescriptorId);
+                schedulerService.retryJobThatFailed(jobDescriptorId);
             } else {
                 final List<SJobParameter> jobParameters = getJobParameters(parameters);
-                schedulerService.executeAgain(jobDescriptorId, jobParameters);
+                schedulerService.retryJobThatFailed(jobDescriptorId, jobParameters);
             }
         } catch (final SSchedulerException sse) {
             throw new ExecutionException(sse);
@@ -5352,11 +5376,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected SJobParameter buildSJobParameter(final String parameterKey, final Serializable parameterValue) {
-        return getSJobParameterBuilderFactory().createNewInstance(parameterKey, parameterValue).done();
-    }
-
-    protected SJobParameterBuilderFactory getSJobParameterBuilderFactory() {
-        return BuilderFactory.get(SJobParameterBuilderFactory.class);
+        return SJobParameter.builder()
+                .key(parameterKey)
+                .value(parameterValue).build();
     }
 
     @Override
@@ -5734,14 +5756,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             WorkDescriptor work;
-            if (shouldBeReadyTask) {
-                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance.getProcessDefinitionId(),
-                        flowNodeInstance.getParentProcessInstanceId(),
-                        flowNodeInstanceId);
-            } else {
-                work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
-                        flowNodeInstanceId);
-            }
+            work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance);
             workService.registerWork(work);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
@@ -5997,4 +6012,5 @@ public class ProcessAPIImpl implements ProcessAPI {
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         return processConfigurationAPI.getFormMapping(formMappingId);
     }
+
 }

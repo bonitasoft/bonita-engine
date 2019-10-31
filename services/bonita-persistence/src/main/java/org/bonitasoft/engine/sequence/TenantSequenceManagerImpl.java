@@ -14,19 +14,21 @@
 package org.bonitasoft.engine.sequence;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.lock.SLockTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Charles Souillard
@@ -35,27 +37,13 @@ import org.bonitasoft.engine.lock.SLockTimeoutException;
  */
 public class TenantSequenceManagerImpl {
 
+    private static Logger logger = LoggerFactory.getLogger(TenantSequenceManagerImpl.class);
+
     static final String SEQUENCE = "SEQUENCE";
 
-    static final String NEXTID = "nextid";
-
-    static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE tenantid = ? AND id = ?";
-
-    static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE tenantid = ? AND id = ?";
-
     private final Long tenantId;
-
+    private final Map<Long, SequenceRange> sequences = new HashMap<>();
     private final Map<Long, Integer> sequenceIdToRangeSize;
-
-    // Map of available IDs: key=sequenceId, value = nextAvailableId to be assigned to a new entity of the given sequence
-    private final Map<Long, Long> nextAvailableIds = new HashMap<Long, Long>();
-
-    // Map of lastId that can be consumed for a given sequence
-    private final Map<Long, Long> lastIdInRanges = new HashMap<Long, Long>();
-
-    // Map of sequenceId, mutex
-    private static final Map<Long, Object> SEQUENCE_MUTEXS = new HashMap<Long, Object>();
-
     private final Map<String, Long> classNameToSequenceId;
 
     private final int retries;
@@ -69,8 +57,8 @@ public class TenantSequenceManagerImpl {
     private final LockService lockService;
 
     public TenantSequenceManagerImpl(final long tenantId, final LockService lockService, final Map<Long, Integer> sequenceIdToRangeSize,
-            final Map<String, Long> classNameToSequenceId,
-            final DataSource datasource, final int retries, final int delay, final int delayFactor) {
+                                     final Map<String, Long> classNameToSequenceId,
+                                     final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.tenantId = tenantId;
         this.lockService = lockService;
         this.sequenceIdToRangeSize = sequenceIdToRangeSize;
@@ -79,180 +67,143 @@ public class TenantSequenceManagerImpl {
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
-
-        for (final Long sequenceId : classNameToSequenceId.values()) {
-            SEQUENCE_MUTEXS.put(sequenceId, new TenantSequenceManagerImplMutex());
-            nextAvailableIds.put(sequenceId, 0L);
-            lastIdInRanges.put(sequenceId, -1L);
-        }
-    }
-
-    private static final class TenantSequenceManagerImplMutex {
-
     }
 
     public long getNextId(final String entityName) throws SObjectNotFoundException {
+        final Long sequenceId = getSeqenceId(entityName);
+        SequenceRange sequence = getSequence(sequenceId);
+        Optional<Long> nextAvailableId = sequence.getNextAvailableId();
+        if (nextAvailableId.isPresent()) {
+            return nextAvailableId.get();
+        }
+        //synchronize on the sequence object itself (we will read/update only on this one)
+        synchronized (sequence) {
+            nextAvailableId = sequence.getNextAvailableId();
+            if (!nextAvailableId.isPresent()) {
+                sequence.updateToNextRange(setNewRange(sequenceId));
+                nextAvailableId = sequence.getNextAvailableId();
+            }
+            return nextAvailableId.orElseThrow(() -> new IllegalStateException("No new available id found for sequence " + entityName));
+        }
+    }
+
+    private SequenceRange getSequence(Long sequenceId) {
+        if (!sequences.containsKey(sequenceId)) {
+            synchronized (this) {
+                if (!sequences.containsKey(sequenceId)) {
+                    sequences.put(sequenceId, new SequenceRange(sequenceIdToRangeSize.get(sequenceId)));
+                }
+            }
+        }
+        return sequences.get(sequenceId);
+    }
+
+    private Long getSeqenceId(String entityName) throws SObjectNotFoundException {
         final Long sequenceId = classNameToSequenceId.get(entityName);
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);
         }
-        final Object sequenceMutex = SEQUENCE_MUTEXS.get(sequenceId);
-        synchronized (sequenceMutex) {
-            Long nextAvailableId = nextAvailableIds.get(sequenceId);
-            final Long lastIdInRange = lastIdInRanges.get(sequenceId);
-            if (nextAvailableId > lastIdInRange) {
-                // No available IF in the range this sequence can consume, we need to get a new range and calculate a new nextAvailableId
-                setNewRange(sequenceId);
-                nextAvailableId = nextAvailableIds.get(sequenceId);
-            }
-            nextAvailableIds.put(sequenceId, nextAvailableId + 1);
+        return sequenceId;
+    }
 
-            return nextAvailableId;
+    /**
+     * get the next abailable id of a sequence and update in database its value
+     * @return the next available id of the sequence
+     */
+    private long setNewRange(final long sequenceId) throws SObjectNotFoundException {
+        BonitaLock lock = createLock(sequenceId);
+        Exception lastException = null;
+        try {
+            int attempt = 1;
+            long sleepTime = delay;
+            while (attempt <= retries) {
+                if (attempt > 1) {
+                    logger.info("Retry #{} to retrieve next sequence id of sequence {}", attempt, sequenceId);
+                }
+                Connection connection = getConnection();
+                try {
+                    connection.setAutoCommit(false);
+                    SequenceDAO sequenceDAO = createDao(connection, tenantId);
+                    long nextAvailableId = sequenceDAO.selectById(sequenceId);
+                    sequenceDAO.updateSequence(nextAvailableId + sequenceIdToRangeSize.get(sequenceId), sequenceId);
+                    connection.commit();
+                    return nextAvailableId;
+                } catch (final SObjectNotFoundException t) {
+                    rollback(connection);
+                    throw t;
+                } catch (final Exception t) {
+                    attempt++;
+                    rollback(connection);
+                    lastException = t;
+                    manageException(attempt, sleepTime, t);
+                    sleepTime *= delayFactor;
+                } finally {
+                    close(connection);
+                }
+            }
+        } finally {
+            unlock(lock);
+        }
+
+        throw new SObjectNotFoundException(
+                "Unable to get a sequence id for " + sequenceId, lastException);
+    }
+
+    private void unlock(BonitaLock lock) {
+        try {
+            lockService.unlock(lock, tenantId);
+        } catch (SLockException e) {
+            throw new SBonitaRuntimeException("Unable to unlock the lock require to get next id of sequences from database", e);
         }
     }
 
-    private void setNewRange(final long sequenceId) throws SObjectNotFoundException {
+    private BonitaLock createLock(long sequenceId) {
         BonitaLock lock;
         try {
             lock = lockService.lock(sequenceId, SEQUENCE, tenantId);
-
-            try {
-
-                int attempt = 1;
-                long sleepTime = delay;
-                while (attempt <= retries) {
-                    if (attempt > 1) {
-                        System.err.println("retrying... #" + attempt);
-                    }
-                    Connection connection = null;
-                    try {
-                        connection = datasource.getConnection();
-                        connection.setAutoCommit(false);
-
-                        // we have reach the maximum in this range
-                        final long nextAvailableId = selectById(connection, sequenceId, tenantId);
-                        nextAvailableIds.put(sequenceId, nextAvailableId);
-
-                        final long nextSequenceId = nextAvailableId + sequenceIdToRangeSize.get(sequenceId);
-                        updateSequence(connection, nextSequenceId, tenantId, sequenceId);
-                        lastIdInRanges.put(sequenceId, nextSequenceId - 1);
-
-                        connection.commit();
-                        return;
-                    } catch (final SObjectNotFoundException t) {
-                        // Not found needs no retry.
-                        attempt = retries + 1; // To exit the loop
-                        try {
-                            connection.rollback();
-                        } catch (final SQLException e) {
-                            e.printStackTrace();
-                            // do nothing
-                        }
-                        throw t;
-                    } catch (final Exception t) {
-                        attempt++;
-                        try {
-                            connection.rollback();
-                        } catch (final SQLException e) {
-                            e.printStackTrace();
-                            // do nothing
-                        }
-                        manageException(sleepTime, t);
-                        sleepTime *= delayFactor;
-                    } finally {
-                        if (connection != null) {
-                            try {
-                                connection.close();
-                            } catch (final SQLException e) {
-                                // Can't do anything...
-                            }
-                        }
-                    }
-                }
-            } finally {
-                lockService.unlock(lock, tenantId);
-            }
-        } catch (SLockException | SLockTimeoutException e1) {
-            throw new SObjectNotFoundException(
-                    "Unable to get a sequence id for " + sequenceId, e1);
+        } catch (SLockException | SLockTimeoutException e) {
+            throw new SBonitaRuntimeException("Unable to acquire lock in order to update get the next id from database of the sequence " + sequenceId, e);
         }
-        throw new SObjectNotFoundException(
-                "Unable to get a sequence id for " + sequenceId);
+        return lock;
     }
 
-    protected void updateSequence(final Connection connection, final long nextSequenceId, final long tenantId, final long id)
-            throws SQLException {
-        PreparedStatement updateSequencePreparedStatement = connection.prepareStatement(UPDATE_SEQUENCE);
+    private void close(Connection connection) {
         try {
-            updateSequencePreparedStatement.setObject(1, nextSequenceId);
-            updateSequencePreparedStatement.setObject(2, tenantId);
-            updateSequencePreparedStatement.setObject(3, id);
-            updateSequencePreparedStatement.executeUpdate();
-        } finally {
-            if (updateSequencePreparedStatement != null) {
-                updateSequencePreparedStatement.close();
-            }
-        }
-    }
-
-    protected long selectById(final Connection connection, final long id, final long tenantId) throws SQLException, SObjectNotFoundException {
-        PreparedStatement selectByIdPreparedStatement = null;
-        ResultSet resultSet = null;
-        try {
-            selectByIdPreparedStatement = connection.prepareStatement(SELECT_BY_ID);
-            selectByIdPreparedStatement.setLong(1, tenantId);
-            selectByIdPreparedStatement.setLong(2, id);
-            resultSet = selectByIdPreparedStatement.executeQuery();
-            return getNextId(id, tenantId, resultSet);
-        } finally {
-            if (selectByIdPreparedStatement != null) {
-                selectByIdPreparedStatement.close();
-            }
-            if (resultSet != null) {
-                resultSet.close();
-            }
-        }
-    }
-
-    private long getNextId(final long id, final long tenantId, final ResultSet resultSet) throws SQLException, SObjectNotFoundException {
-        try {
-            if (resultSet.next()) {
-                final long nextId = resultSet.getLong(NEXTID);
-
-                if (resultSet.wasNull()) {
-                    throw new SQLException("Did not expect a null value for the column " + NEXTID);
-                }
-
-                if (resultSet.next()) {
-                    throw new SQLException("Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
-                }
-
-                return nextId;
-            }
-        } finally {
-            closeResultSet(resultSet);
-        }
-        throw new SObjectNotFoundException("Found no row for tenantId:" + tenantId + " id: " + id);
-    }
-
-    private void closeResultSet(final ResultSet resultSet) {
-        try {
-            if (resultSet != null) {
-                resultSet.close();
-            }
+            connection.close();
         } catch (final SQLException e) {
-            // can't do anything
+            throw new SBonitaRuntimeException("Next id of sequence correctly updated, but unable to close the connection", e);
         }
     }
 
-    private static void manageException(final long sleepTime, final Exception t) {
-        t.printStackTrace();
-        System.err.println("Optimistic locking failed: " + t);
-        System.err.println("Waiting " + sleepTime + " millis");
+    private Connection getConnection() {
+        try {
+            return datasource.getConnection();
+        } catch (SQLException e) {
+            throw new SBonitaRuntimeException("Unable to acquire connection to retrieve next id of the sequence", e);
+        }
+    }
+
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (final SQLException e) {
+            throw new SBonitaRuntimeException("Unable to rollback the transaction that get/update next sequence id from database", e);
+        }
+    }
+
+    SequenceDAO createDao(Connection connection, Long tenantId) {
+        return new SequenceDAO(connection, tenantId);
+    }
+
+
+    private static void manageException(int attempt, final long sleepTime, final Exception t) {
+        logger.error("Unable to retrieve and update sequence in database because: {}." +
+                "( attempt #{} ). Will sleep {} millis before retrying. ", t.getMessage(), attempt, sleepTime);
+        logger.debug("Cause:", t);
         try {
             Thread.sleep(sleepTime);
-        } catch (final InterruptedException e) {
-            System.err.println("Retry sleeping got interrupted");
+        } catch (final InterruptedException ignored) {
+            logger.error("Interrupted while sleeping before retry");
         }
     }
 

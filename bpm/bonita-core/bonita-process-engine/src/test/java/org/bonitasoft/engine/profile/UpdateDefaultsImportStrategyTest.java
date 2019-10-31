@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -23,7 +23,6 @@ import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_update_if_default() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfileImpl sProfile = new SProfileImpl();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",true), sProfile);
 
@@ -52,7 +51,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_update_if_default2() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfileImpl sProfile = new SProfileImpl();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(true);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 
@@ -61,7 +60,7 @@ public class UpdateDefaultsImportStrategyTest {
     @Test
     public void should_whenProfileExists_not_update_if_custom() throws SProfileUpdateException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         //when
-        SProfileImpl sProfile = new SProfileImpl();
+        SProfile sProfile = SProfile.builder().build();
         sProfile.setDefault(false);
         updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 

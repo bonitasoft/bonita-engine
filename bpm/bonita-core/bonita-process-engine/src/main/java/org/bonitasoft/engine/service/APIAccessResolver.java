@@ -20,8 +20,6 @@ import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
  */
 public interface APIAccessResolver {
 
-    Object getAPIImplementation(String interfaceName) throws APIImplementationNotFoundException;
-
-    boolean needSession(String interfaceName);
+    <T> T getAPIImplementation(Class<T> apiInterface) throws APIImplementationNotFoundException;
 
 }

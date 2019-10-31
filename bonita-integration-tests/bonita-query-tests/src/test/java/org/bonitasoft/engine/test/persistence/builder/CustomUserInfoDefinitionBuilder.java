@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class CustomUserInfoDefinitionBuilder extends PersistentObjectBuilder<SCustomUserInfoDefinitionImpl, CustomUserInfoDefinitionBuilder> {
+public class CustomUserInfoDefinitionBuilder extends PersistentObjectBuilder<SCustomUserInfoDefinition, CustomUserInfoDefinitionBuilder> {
 
     private String name;
     
@@ -34,8 +35,8 @@ public class CustomUserInfoDefinitionBuilder extends PersistentObjectBuilder<SCu
     }
 
     @Override
-    SCustomUserInfoDefinitionImpl _build() {
-        SCustomUserInfoDefinitionImpl infoDef = new SCustomUserInfoDefinitionImpl();
+    SCustomUserInfoDefinition _build() {
+        SCustomUserInfoDefinition infoDef = new SCustomUserInfoDefinition();
         infoDef.setName(name);
         return infoDef;
     }

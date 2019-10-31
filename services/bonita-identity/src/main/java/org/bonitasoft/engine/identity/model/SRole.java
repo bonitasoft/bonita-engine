@@ -13,17 +13,63 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
 /**
  * @author Anthony Birembaut
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SRole extends SNamedElement, SHavingIcon {
 
-    long getCreatedBy();
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "role")
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
+public class SRole implements PersistentObject, SHavingIcon {
 
-    long getCreationDate();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String DISPLAY_NAME = "displayName";
+    public static final String ICON_PATH = "iconPath";
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String LAST_UPDATE = "lastUpdate";
 
-    long getLastUpdate();
+
+    @Id
+    private long id;
+    @Id
+    private long tenantId;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "displayName")
+    private String displayName;
+    @Column(name = "createdBy")
+    private long createdBy;
+    @Column(name = "creationDate")
+    private long creationDate;
+    @Column(name = "lastUpdate")
+    private long lastUpdate;
+    @Column(name = "iconid")
+    private Long iconId;
 
 }

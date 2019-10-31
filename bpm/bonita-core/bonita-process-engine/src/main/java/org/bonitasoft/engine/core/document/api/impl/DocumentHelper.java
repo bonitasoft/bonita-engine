@@ -22,7 +22,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -99,7 +98,7 @@ public class DocumentHelper {
     }
 
     public SDocument createDocumentObject(final DocumentValue documentValue, final long authorId) {
-        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance(documentValue.getFileName(),
+        final SDocumentBuilder processDocumentBuilder = new SDocumentBuilderFactory().createNewInstance(documentValue.getFileName(),
                 getMimeTypeOrGuessIt(documentValue), authorId);
         processDocumentBuilder.setHasContent(documentValue.hasContent());
         processDocumentBuilder.setURL(documentValue.getUrl());
@@ -247,7 +246,13 @@ public class DocumentHelper {
     }
 
     public DocumentValue toDocumentValue(FileInputValue fileInput) {
-        return new DocumentValue(fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        if (fileInput.getId() == null) {
+            return new DocumentValue(fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        } else if (fileInput.getContent() != null) {
+            return new DocumentValue(Long.valueOf(fileInput.getId()), fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
+        }else {
+            return new DocumentValue(Long.valueOf(fileInput.getId()));
+        }
     }
 
     public DocumentValue toDocumentValue(Document document) throws SOperationExecutionException {

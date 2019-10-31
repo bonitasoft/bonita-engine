@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SAUserTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAUserTaskInstanceBuilder {
 
-    public SAUserTaskInstanceBuilderImpl(final SAUserTaskInstanceImpl entity) {
+    public SAUserTaskInstanceBuilderImpl(final SAUserTaskInstance entity) {
         super(entity);
     }
 

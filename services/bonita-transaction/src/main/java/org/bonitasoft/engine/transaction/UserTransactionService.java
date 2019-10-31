@@ -49,4 +49,6 @@ public interface UserTransactionService {
 
     void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException;
 
+    boolean isTransactionActive();
+
 }

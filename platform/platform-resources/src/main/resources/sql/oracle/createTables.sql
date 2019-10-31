@@ -342,7 +342,9 @@ CREATE TABLE flownode_instance (
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
+CREATE INDEX idx_fni_loggroup3_terminal ON flownode_instance(logicalgroup3, terminal, tenantid);
 CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
+CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -399,6 +401,7 @@ CREATE TABLE waiting_event (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
+CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE message_instance (
 	tenantid NUMBER(19, 0) NOT NULL,
@@ -415,9 +418,11 @@ CREATE TABLE message_instance (
   	correlation3 VARCHAR2(128 CHAR),
   	correlation4 VARCHAR2(128 CHAR),
   	correlation5 VARCHAR2(128 CHAR),
+  	creationDate NUMBER(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
+CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5);
 
 CREATE TABLE pending_mapping (
 	tenantid NUMBER(19, 0) NOT NULL,
@@ -567,7 +572,7 @@ CREATE TABLE command (
   name VARCHAR2(50 CHAR) NOT NULL,
   description VARCHAR2(1024 CHAR),
   IMPLEMENTATION VARCHAR2(100 CHAR) NOT NULL,
-  system NUMBER(1),
+  isSystem NUMBER(1),
   CONSTRAINT UK_Command UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
@@ -950,6 +955,7 @@ CREATE TABLE job_param (
   value_ BLOB NOT NULL,
   PRIMARY KEY (tenantId, id)
 );
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId);
 
 CREATE TABLE job_log (
   tenantId NUMBER(19, 0) NOT NULL,

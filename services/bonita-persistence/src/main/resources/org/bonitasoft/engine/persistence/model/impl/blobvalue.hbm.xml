@@ -2,13 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field"
-	package="org.bonitasoft.engine.persistence.model.impl">
+	package="org.bonitasoft.engine.persistence.model">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long"/>
 	</filter-def>
 	
-	<class name="BlobValueImpl" table="blob_">
+	<class name="BlobValue" table="blob_">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long"/>
 			<key-property name="id" column="ID" type="long"/>

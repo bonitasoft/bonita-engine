@@ -15,9 +15,13 @@
 package org.bonitasoft.engine.operation;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,10 +33,9 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.junit.Rule;
 import org.junit.Test;
@@ -113,9 +116,9 @@ public class UpdateDataRefActionTest {
     }
 
     private SSimpleRefBusinessDataInstance createSimpleRefBusinessDataInstance(final Long dataId) {
-        final SSimpleRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SProcessSimpleRefBusinessDataInstanceImpl();
-        sRefBusinessDataInstanceImpl.setDataId(dataId);
-        return sRefBusinessDataInstanceImpl;
+        final SSimpleRefBusinessDataInstance sRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
+        sRefBusinessDataInstance.setDataId(dataId);
+        return sRefBusinessDataInstance;
     }
 
     @Test
@@ -168,9 +171,9 @@ public class UpdateDataRefActionTest {
     }
 
     private SMultiRefBusinessDataInstance createMultiRefBusinessDataInstance(final Long... dataIds) {
-        final SProcessMultiRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SProcessMultiRefBusinessDataInstanceImpl();
-        sRefBusinessDataInstanceImpl.setDataIds(Arrays.asList(dataIds));
-        return sRefBusinessDataInstanceImpl;
+        final SProcessMultiRefBusinessDataInstance sRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
+        sRefBusinessDataInstance.setDataIds(Arrays.asList(dataIds));
+        return sRefBusinessDataInstance;
     }
 
     @Test

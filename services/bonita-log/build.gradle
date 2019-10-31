@@ -1,0 +1,19 @@
+
+
+dependencies {
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-platform')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-transaction')
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

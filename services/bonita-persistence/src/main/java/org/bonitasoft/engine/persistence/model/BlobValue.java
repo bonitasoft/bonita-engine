@@ -15,6 +15,8 @@ package org.bonitasoft.engine.persistence.model;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -22,8 +24,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * 
  * @author Emmanuel Duchastenier
  */
-public interface BlobValue extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class BlobValue implements PersistentObject {
 
-    Serializable getValue();
-
+    private long id;
+    private Serializable value;
+    private long tenantId;
 }

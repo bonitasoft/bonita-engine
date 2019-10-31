@@ -4,100 +4,100 @@
 
 	<query name="getDeployInfoByProcessDefId">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId = :processId
 	</query>
 
 	<query name="getProcessDefinitionDeployInfosByName">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.name = :name
 		AND process_definition.activationState = 'ENABLED'
 	</query>
 
 	<query name="getProcessesWithActorOnlyForUser">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 		WHERE process_definition.processId = actor.scopeId
 		AND actor.id = actormember.actorId
 		AND actormember.userId = :userId
 		AND actormember.actorId NOT IN (
 			SELECT actorId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+			FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
 			WHERE am2.userId != actormember.userId
 		)
 	</query>
 
 	<query name="getProcessesWithActorOnlyForUsers">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 		WHERE process_definition.processId = actor.scopeId
 		AND actor.id = actormember.actorId
 		AND actormember.userId IN (:userIds)
 		AND actormember.actorId NOT IN (
 			SELECT actorId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+			FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
 			WHERE am2.userId NOT IN (:userIds)
 		)
 	</query>
 
 	<query name="getProcessesWithActorOnlyForRole">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actor_member,
-			 org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actor_member,
+			 org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE actor.scopeId = process_definition.processId
 		AND actor.id = actor_member.actorId
 		AND actor_member.roleId = :roleId
 		AND	actor_member.actorId NOT IN (
 				SELECT am2.actorId
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
 				WHERE am2.roleId != actor_member.roleId
 				)
 	</query>
 
 	<query name="getProcessesWithActorOnlyForRoles">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actor_member,
-			 org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actor_member,
+			 org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE actor.scopeId = process_definition.processId
 		AND actor.id = actor_member.actorId
 		AND actor_member.roleId IN :roleIds
 		AND	actor_member.actorId NOT IN (
 				SELECT am2.actorId
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
 				WHERE am2.roleId NOT IN (:roleIds)
 				)
 	</query>
 
 	<query name="getProcessesWithActorOnlyForGroup">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actor_member,
-			 org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actor_member,
+			 org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE actor.scopeId = process_definition.processId
 		AND actor.id = actor_member.actorId
 		AND actor_member.groupId IN (
 			SELECT groupe.id
-        	FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-        		 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+        	FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+        		 org.bonitasoft.engine.identity.model.SGroup AS group0
         	WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id = :groupId )
         	AND group0.id = :groupId
         	)
         AND actor_member.actorId NOT IN (
 			SELECT am2.actorId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+			FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
         	WHERE am2.groupId != actor_member.groupId
         	AND am2.groupId NOT IN (
             	SELECT groupe.id
-                FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-                org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+                FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+                org.bonitasoft.engine.identity.model.SGroup AS group0
                 WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id = :groupId )
         	AND group0.id = :groupId
@@ -107,27 +107,27 @@
 
 	<query name="getProcessesWithActorOnlyForGroups">
 		SELECT DISTINCT process_definition
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actor_member,
-			 org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+			 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actor_member,
+			 org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE actor.scopeId = process_definition.processId
 		AND actor.id = actor_member.actorId
 		AND actor_member.groupId IN (
 			SELECT groupe.id
-        	FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-        		 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+        	FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+        		 org.bonitasoft.engine.identity.model.SGroup AS group0
         	WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id IN (:groupIds) )
 			AND group0.id IN (:groupIds)
         	)
         AND actor_member.actorId NOT IN (
 			SELECT am2.actorId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am2
+			FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS am2
         	WHERE am2.groupId != actor_member.groupId
         	AND am2.groupId NOT IN (
             	SELECT groupe.id
-                FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-                org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+                FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+                org.bonitasoft.engine.identity.model.SGroup AS group0
                 WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 						OR groupe.id IN (:groupIds) )
                 AND group0.id IN (:groupIds)
@@ -137,148 +137,148 @@
 
 	<query name="getProcessDefinitionIdByNameAndVersion">
 		SELECT process_definition.processId
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.name = :name
 		AND process_definition.version = :version
 	</query>
 
 	<query name="getProcessDefinitionDeployInfos">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfProcessDefinitions">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfProcessDefinitionsInActivationState">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = :activationState
 	</query>
 
 	<query name="getProcessDefinitionsIds">
 		SELECT process_definition.processId
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getProcessDefinitionsIdsInActivationState">
 		SELECT process_definition.processId
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = :activationState
 	</query>
 
 	<query name="getSubSetOfProcessDefinitionDeployInfos">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId IN (:processIds)
 	</query>
 
 	<query name="searchSProcessDefinitionDeployInfoStartedBy">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = 'ENABLED'
 		AND (process_definition.processId IN (
 				SELECT aprocessInstance.processDefinitionId
-		        FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aprocessInstance
+		        FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS aprocessInstance
 		        WHERE aprocessInstance.startedBy = :startedBy)
 	        OR
 		    process_definition.processId IN (
 		        SELECT processInstance.processDefinitionId
-		        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS processInstance
+		        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS processInstance
 		        WHERE processInstance.startedBy = :startedBy)
 	        )
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoStartedBy">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = 'ENABLED'
 		AND (process_definition.processId IN (
 				SELECT aprocessInstance.processDefinitionId
-		        FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aprocessInstance
+		        FROM org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS aprocessInstance
 		        WHERE aprocessInstance.startedBy = :startedBy)
 	        OR
 		    process_definition.processId IN (
 		        SELECT processInstance.processDefinitionId
-		        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS processInstance
+		        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS processInstance
 		        WHERE processInstance.startedBy = :startedBy)
 	        )
 	</query>
 
 	<query name="searchSProcessDefinitionDeployInfo">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfo">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorized">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
 			SELECT categorymapping
-		    FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		    FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		    WHERE categorymapping.processId = process_definition.processId
 		)
 	</query>
 
 	<query name="searchSProcessDefinitionDeployInfoUncategorized">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
 			SELECT categorymapping
-			FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+			FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 			WHERE categorymapping.processId = process_definition.processId
 		)
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId NOT IN (
 				SELECT categorymapping.processId
-				FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+				FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 				WHERE categorymapping.categoryId = :categoryId
 		)
 	</query>
 
 	<query name="searchSProcessDefinitionDeployInfoUnrelatedToCategory">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId NOT IN (
 				SELECT categorymapping.processId
-				FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+				FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 				WHERE categorymapping.categoryId = :categoryId
 		)
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorizedUserCanStart">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
 			SELECT categorymapping
-			FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+			FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 			WHERE categorymapping.processId = process_definition.processId
 		)
 		AND activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 				AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-				org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+				org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -293,24 +293,24 @@
 
 	<query name="searchSProcessDefinitionDeployInfoUncategorizedUserCanStart">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE not exists (SELECT categorymapping
-		                  FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 				AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-				org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+				org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -325,21 +325,21 @@
 
 	<query name="searchSProcessDefinitionDeployInfoUserCanStart">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 				AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-				org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+				org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -354,21 +354,21 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUserCanStart">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 				AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-				org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+				org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -382,32 +382,32 @@
 
 	<query name="searchSProcessDefinitionDeployInfoUsersManagedByCanStart">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 			AND EXISTS (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND (
 					actormember.userId = :managerUserId
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+						FROM org.bonitasoft.engine.identity.model.SUser AS user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = :managerUserId
 					)
 					OR EXISTS (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE (
 							um.userId = :managerUserId
 							OR EXISTS (
 								SELECT user.id
-								FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+								FROM org.bonitasoft.engine.identity.model.SUser AS user
 								WHERE um.userId = user.id
 								AND user.managerUserId = :managerUserId
 							)
@@ -425,32 +425,32 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUsersManagedByCanStart">
 		SELECT COUNT(process_definition)
-				FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+				FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 			AND EXISTS (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND (
 					actormember.userId = :managerUserId
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+						FROM org.bonitasoft.engine.identity.model.SUser AS user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = :managerUserId
 					)
 					OR EXISTS (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE (
 							um.userId = :managerUserId
 							OR EXISTS (
 								SELECT user.id
-								FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+								FROM org.bonitasoft.engine.identity.model.SUser AS user
 								WHERE um.userId = user.id
 								AND user.managerUserId = :managerUserId
 							)
@@ -468,23 +468,23 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfowithSProcessCategoryMappingUserCanStart">
 		SELECT COUNT(process_definition.id)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE activationState = 'ENABLED'
 		AND categorymapping.processId = process_definition.processId
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 			AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-					 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+					 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 					OR actormember.id IN (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE um.userId = :userId
 						AND (
 							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -499,23 +499,23 @@
 
 	<query name="searchSProcessDefinitionDeployInfowithSProcessCategoryMappingUserCanStart">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE activationState = 'ENABLED'
 		AND categorymapping.processId = process_definition.processId
 		AND process_definition.processId IN (
 			SELECT actor.scopeId
-			FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+			FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor
 			WHERE actor.initiator = TRUE
 			AND actor.id IN (
 				SELECT actor.id
-				FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-					 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+				FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+					 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 				WHERE actor.id = actormember.actorId
 				AND ( actormember.userId = :userId
 					OR actormember.id IN (
 					 	SELECT actormember.id
-						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE um.userId = :userId
 						AND (
 							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -530,17 +530,17 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfowithSProcessCategoryMappingUserSupervised">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
 		AND process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -554,17 +554,17 @@
 
 	<query name="searchSProcessDefinitionDeployInfowithSProcessCategoryMappingUserSupervised">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
 		AND process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -578,15 +578,15 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUserSupervised">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -600,15 +600,15 @@
 
 	<query name="searchSProcessDefinitionDeployInfoUserSupervised">
 		SELECT process_definition
-				FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+				FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -622,18 +622,18 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorizedAndWithSupervisor">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE not exists (SELECT categorymapping
-		                  FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -647,18 +647,18 @@
 
 	<query name="searchSProcessDefinitionDeployInfoUncategorizedAndWithSupervisor">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE not exists (SELECT categorymapping
-		                  FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND process_definition.processId IN (
 			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 			WHERE supervisor.userId = :userId
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -673,8 +673,8 @@
 	<query name="getProcessDeploymentInfoFromProcessInstanceIds">
 		SELECT new map(p.id AS processInstanceId, process_definition.id AS id,process_definition.processId AS processId,process_definition.name AS name,process_definition.version AS version, process_definition.description AS description,process_definition.deploymentDate AS deploymentDate, process_definition.deployedBy AS deployedBy,
 		process_definition.activationState AS activationState, process_definition.configurationState AS configurationState, process_definition.displayName AS displayName,process_definition.lastUpdateDate AS lastUpdateDate, process_definition.iconPath AS iconPath, process_definition.displayDescription AS displayDescription)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE process_definition.processId = p.processDefinitionId
 		AND p.id IN (:processInstanceIds)
 	</query>
@@ -682,30 +682,30 @@
 	<query name="getProcessDeploymentInfoFromArchivedProcessInstanceIds">
 		SELECT new map(ap.id AS archivedProcessInstanceId, process_definition.id AS id,process_definition.processId AS processId,process_definition.name AS name,process_definition.version AS version, process_definition.description AS description,process_definition.deploymentDate AS deploymentDate, process_definition.deployedBy AS deployedBy,
 		process_definition.activationState AS activationState, process_definition.configurationState AS configurationState, process_definition.displayName AS displayName,process_definition.lastUpdateDate AS lastUpdateDate, process_definition.iconPath AS iconPath, process_definition.displayDescription AS displayDescription)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS ap
 		WHERE process_definition.processId = ap.processDefinitionId
 		AND ap.id IN (:archivedProcessInstanceIds)
 	</query>
 
 	<query name="searchSProcessDefinitionDeployInfowithSProcessCategoryMapping">
 		SELECT process_definition
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfowithSProcessCategoryMapping">
 		SELECT COUNT(process_definition)
-		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
 	</query>
 
     <query name="searchSProcessDeploymentInfosOfCategory">
         SELECT process_definition
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-             org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+             org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
         WHERE categorymapping.processId = process_definition.processId
         AND categorymapping.categoryId = :categoryId
     </query>
@@ -713,51 +713,52 @@
     <sql-query name="getNumberOfSUserWhoCanStartProcess">
         <return-scalar column="count" type="long" />
         SELECT count(distinct user_.id) as count
-        from
-        actormember
+        FROM actormember
         join actor on (
             actor.id = actormember.actorid
-            and actor.tenantid = actormember.tenantid
+            and actor.tenantid = :tenantId
+            and actormember.tenantid = :tenantId
             and actor.scopeid = :processId
             and actor.initiator = :trueValue
         ) left join user_membership on (
             user_membership.tenantid = actormember.tenantid
-            and actormember.groupId = user_membership.groupId
-            and actormember.roleId &lt;= 0
-            or actormember.roleId = user_membership.roleId
-            and actormember.groupId &lt;= 0
-            or actormember.groupId = user_membership.groupId
-            and actormember.roleId = user_membership.roleId
-        ) join user_ on (
-            actormember.tenantid=:tenantId
-            and user_.tenantid=:tenantId
             and (
-                user_membership.userid = user_.id or actormember.userid=user_.id
+                 (actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
+                  or
+                 (actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
+                  or
+                 (actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
+            )
+        ) join user_ on (
+           user_.tenantid=:tenantId
+            and (
+                user_membership.userid = user_.id
+                or actormember.userid=user_.id
             )
             and user_.enabled = :trueValue
         )
     </sql-query>
     <sql-query name="searchSUserWhoCanStartProcess">
-        <return alias="user_" class="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+        <return alias="user_" class="org.bonitasoft.engine.identity.model.SUser" />
         SELECT DISTINCT user_.*
-        from
-        actormember
+        FROM actormember
         join actor on (
             actor.id = actormember.actorid
-            and actor.tenantid = actormember.tenantid
+            and actor.tenantid = :tenantId
+            and actormember.tenantid = :tenantId
             and actor.scopeid = :processId
             and actor.initiator = :trueValue
         ) left join user_membership on (
             user_membership.tenantid = actormember.tenantid
-            and actormember.groupId = user_membership.groupId
-            and actormember.roleId &lt;= 0
-            or actormember.roleId = user_membership.roleId
-            and actormember.groupId &lt;= 0
-            or actormember.groupId = user_membership.groupId
-            and actormember.roleId = user_membership.roleId
+            and (
+                 (actormember.groupId = user_membership.groupId and actormember.roleId &lt;= 0)
+                  or
+                 (actormember.roleId = user_membership.roleId and actormember.groupId &lt;= 0)
+                  or
+                 (actormember.groupId = user_membership.groupId and actormember.roleId = user_membership.roleId)
+            )
         ) join user_ on (
-            actormember.tenantid=:tenantId
-            and user_.tenantid=:tenantId
+           user_.tenantid=:tenantId
             and (
                 user_membership.userid = user_.id
                 or actormember.userid=user_.id
@@ -769,9 +770,9 @@
 
     <query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor">
         SELECT COUNT(DISTINCT process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -783,21 +784,21 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = :userId
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND (
 								actormember.userId = :userId
 		 	  					OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -815,9 +816,9 @@
 
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor">
         SELECT DISTINCT(process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -829,21 +830,21 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = :userId
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND (
 								actormember.userId = :userId
 		 	  					OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -861,16 +862,16 @@
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy">
         SELECT COUNT(DISTINCT process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+        	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
 				SELECT supervisor.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 				WHERE um.userId = :userId
 				AND (
 					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -890,21 +891,21 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND (
 								actormember.userId = user.id
 			 	  				OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -922,16 +923,16 @@
 
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy">
         SELECT DISTINCT(process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a,
+        	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
 				SELECT supervisor.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 				WHERE um.userId = :userId
 				AND (
 					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -951,21 +952,21 @@
 				a.assigneeId = 0
 				AND EXISTS (
 					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+					FROM org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping AS mapping
 					WHERE mapping.activityId = a.id
 					AND (
 						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+							FROM org.bonitasoft.engine.actor.mapping.model.SActor AS actor,
+								 org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND (
 								actormember.userId = user.id
 			 	  				OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -983,8 +984,8 @@
 
  	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT COUNT(DISTINCT process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE process_definition.processId = a.logicalGroup1
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE
@@ -994,8 +995,8 @@
 
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT DISTINCT(process_definition)
-        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
+        	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
         WHERE process_definition.processId = a.logicalGroup1
         AND a.stable = TRUE
 		AND a.stateExecuting = FALSE

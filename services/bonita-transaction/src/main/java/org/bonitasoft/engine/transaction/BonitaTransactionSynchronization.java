@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+@FunctionalInterface
 public interface BonitaTransactionSynchronization {
 
-    void beforeCommit();
+    default void beforeCommit() {
+    }
 
     void afterCompletion(TransactionState txState);
 

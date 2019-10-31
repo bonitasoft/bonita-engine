@@ -18,12 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -68,8 +65,7 @@ public class UserImporter {
     }
 
     private boolean hasUserWithUserName(String userName) throws SBonitaReadException {
-        final SUserBuilderFactory keyProvider = BuilderFactory.get(SUserBuilderFactory.class);
-        final FilterOption filter = new FilterOption(SUser.class, keyProvider.getUserNameKey(), userName);
+        final FilterOption filter = new FilterOption(SUser.class, SUser.USER_NAME, userName);
         final QueryOptions queryOptions = new QueryOptions(Collections.singletonList(filter), null);
         final long numberOfUsers = identityService.getNumberOfUsers(queryOptions);
         return numberOfUsers > 0;
@@ -100,19 +96,19 @@ public class UserImporter {
     }
 
     private SUser constructSUser(final ExportedUser exportedUser) {
-        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
+        final SUser.SUserBuilder userBuilder = SUser.builder();
         final long now = System.currentTimeMillis();
-        userBuilder.setCreationDate(now);
-        userBuilder.setLastUpdate(now);
+        userBuilder.creationDate(now);
+        userBuilder.lastUpdate(now);
 
-        userBuilder.setUserName(exportedUser.getUserName());
-        userBuilder.setPassword(exportedUser.getPassword());
-        userBuilder.setFirstName(exportedUser.getFirstName());
-        userBuilder.setLastName(exportedUser.getLastName());
-        userBuilder.setJobTitle(exportedUser.getJobTitle());
-        userBuilder.setTitle(exportedUser.getTitle());
-        userBuilder.setCreatedBy(userIdFromSession);
-        userBuilder.setEnabled(exportedUser.isEnabled());
-        return userBuilder.done();
+        userBuilder.userName(exportedUser.getUserName());
+        userBuilder.password(exportedUser.getPassword());
+        userBuilder.firstName(exportedUser.getFirstName());
+        userBuilder.lastName(exportedUser.getLastName());
+        userBuilder.jobTitle(exportedUser.getJobTitle());
+        userBuilder.title(exportedUser.getTitle());
+        userBuilder.createdBy(userIdFromSession);
+        userBuilder.enabled(exportedUser.isEnabled());
+        return userBuilder.build();
     }
 }

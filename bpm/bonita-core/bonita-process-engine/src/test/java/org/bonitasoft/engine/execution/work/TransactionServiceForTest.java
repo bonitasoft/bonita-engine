@@ -36,4 +36,9 @@ public class TransactionServiceForTest implements UserTransactionService {
     public void registerBeforeCommitCallable(final Callable<Void> callable) {
     }
 
+    @Override
+    public boolean isTransactionActive() {
+        return false;
+    }
+
 }

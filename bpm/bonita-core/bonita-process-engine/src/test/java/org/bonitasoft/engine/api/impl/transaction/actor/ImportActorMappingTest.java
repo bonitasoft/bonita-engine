@@ -14,22 +14,24 @@
 
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -66,18 +68,18 @@ public class ImportActorMappingTest {
         ActorMapping actorMapping = new ActorMapping();
         actorMapping.setActors(actors);
         long ACTOR_ID = 12;
-        SActorImpl sActor = new SActorImpl("Lulu", 1458714L, true);
+        SActor sActor = SActor.builder().name("Lulu").scopeId(1458714L).initiator(true).build();
         sActor.setId(ACTOR_ID);
 
-        SUserImpl sUser = new SUserImpl();
+        SUser sUser = new SUser();
         final long userId = 111L;
         sUser.setId(userId);
 
-        SRoleImpl sRole = new SRoleImpl();
+        SRole sRole = new SRole();
         final long roleId = 222L;
         sRole.setId(roleId);
 
-        SGroupImpl sGroup = new SGroupImpl();
+        SGroup sGroup = new SGroup();
         final long groupId = 333L;
         sGroup.setId(groupId);
 

@@ -13,16 +13,41 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Hongwen Zang
- * 
- */
-public interface SAGatewayInstance extends SAFlowNodeInstance {
 
-    SGatewayType getGatewayType();
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAGatewayInstance extends SAFlowNodeInstance {
 
-    String getHitBys();
+    private SGatewayType gatewayType;
+    private String hitBys = "";
+
+    public SAGatewayInstance(final SGatewayInstance sGatewayInstance) {
+        super(sGatewayInstance);
+        gatewayType = sGatewayInstance.getGatewayType();
+        hitBys = sGatewayInstance.getHitBys();
+    }
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.GATEWAY;
+    }
+
+    @Override
+    public String getKind() {
+        return "gate";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SGatewayInstance.class;
+    }
 
 }

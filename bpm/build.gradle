@@ -1,0 +1,14 @@
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.bonitasoft.engine'
+            artifactId = 'bpm'
+            pom.withXml {
+                def parent = asNode().appendNode('parent')
+                parent.appendNode('groupId', 'org.bonitasoft.engine')
+                parent.appendNode('artifactId', 'bonita-engine')
+                parent.appendNode('version', version)
+            }
+        }
+    }
+}

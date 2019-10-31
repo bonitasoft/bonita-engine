@@ -26,8 +26,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
@@ -44,15 +42,15 @@ public class CustomUserInfoDefinitionAPIDelegate {
         this.service = service;
     }
 
-    public CustomUserInfoDefinition create(final SCustomUserInfoDefinitionBuilderFactory factory, final CustomUserInfoDefinitionCreator creator)
+    public CustomUserInfoDefinition create(final CustomUserInfoDefinitionCreator creator)
             throws CreationException {
         checkParameter(creator);
 
-        final SCustomUserInfoDefinitionBuilder builder = factory.createNewInstance();
-        builder.setName(creator.getName());
-        builder.setDescription(creator.getDescription());
+        final SCustomUserInfoDefinition.SCustomUserInfoDefinitionBuilder builder = SCustomUserInfoDefinition.builder();
+        builder.name(creator.getName());
+        builder.description(creator.getDescription());
         try {
-            return ModelConvertor.convert(service.createCustomUserInfoDefinition(builder.done()));
+            return ModelConvertor.convert(service.createCustomUserInfoDefinition(builder.build()));
         } catch (SCustomUserInfoDefinitionAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (SIdentityException e) {

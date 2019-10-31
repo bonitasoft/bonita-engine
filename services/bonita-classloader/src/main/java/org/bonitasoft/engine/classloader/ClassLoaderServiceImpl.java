@@ -20,18 +20,32 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.dependency.SDependencyException;
+import org.bonitasoft.engine.dependency.impl.PlatformDependencyService;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionState;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -40,6 +54,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
+    private final Object synchroLock = new Object();
+    private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
     private final TechnicalLoggerService logger;
@@ -56,16 +72,32 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final EventService eventService;
     private boolean traceEnabled;
+    private PlatformDependencyService platformDependencyService;
+    private Map<Long, TenantDependencyService> dependencyServicesByTenant = new HashMap<>();
+    private SessionAccessor sessionAccessor;
+    private UserTransactionService userTransactionService;
+    private BroadcastService broadcastService;
+    private ClassLoaderUpdater classLoaderUpdater;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger,
-                                  final EventService eventService) {
+                                  final EventService eventService, PlatformDependencyService platformDependencyService, SessionAccessor sessionAccessor,
+                                  UserTransactionService userTransactionService, BroadcastService broadcastService, ClassLoaderUpdater classLoaderUpdater) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
         traceEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
+        this.platformDependencyService = platformDependencyService;
+        this.sessionAccessor = sessionAccessor;
+        this.userTransactionService = userTransactionService;
+        this.broadcastService = broadcastService;
+        this.classLoaderUpdater = classLoaderUpdater;
         globalListeners.add(new ClassReflectorClearer());
         globalListeners.add(new JacksonCacheClearer());
-        // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
+    }
+
+    @Override
+    public void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService) {
+        dependencyServicesByTenant.put(tenantId, tenantDependencyService);
     }
 
     private static final class ClassLoaderServiceMutex {
@@ -110,6 +142,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private VirtualClassLoader getLocalClassLoader(ClassLoaderIdentifier key) {
         warnOnShuttingDown(key);
+        VirtualClassLoader virtualClassLoader = getVirtualClassLoaderWithoutInitializingIt(key);
+        if (!virtualClassLoader.isInitialized()) {
+            synchronized (mutex) {
+                // double check synchronization
+                if (!virtualClassLoader.isInitialized()) {
+                    classLoaderUpdater.initializeClassLoader(this, virtualClassLoader, key);
+                }
+            }
+        }
+        return virtualClassLoader;
+    }
+
+    private VirtualClassLoader getVirtualClassLoaderWithoutInitializingIt(ClassLoaderIdentifier key) {
         if (!localClassLoaders.containsKey(key)) {
             synchronized (mutex) {
                 // double check synchronization
@@ -127,6 +172,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         VirtualClassLoader parent = getParentClassLoader(identifier);
         final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(), parent);
+
+
         localClassLoaders.put(identifier, virtualClassLoader);
     }
 
@@ -171,7 +218,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    public void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException {
+    private void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException {
         logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing global classloader");
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         try {
@@ -183,11 +230,10 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    @Override
-    public void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException {
+    private void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException {
         final ClassLoaderIdentifier key = getKey(type, id);
         logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing classloader with key: " + key);
-        final VirtualClassLoader virtualClassloader = getLocalClassLoader(type, id);
+        final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
         try {
             refreshClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id),
                     getParentClassLoader(key));
@@ -199,7 +245,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    protected URI getLocalTemporaryFolder(String type, long id) throws BonitaHomeNotSetException, IOException {
+    URI getLocalTemporaryFolder(String type, long id) throws BonitaHomeNotSetException, IOException {
         return BonitaHomeServer.getInstance().getLocalTemporaryFolder(type, id);
     }
 
@@ -260,14 +306,14 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
         logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Added listener " + classLoaderListener + " on " + type + " " + id);
-        final VirtualClassLoader localClassLoader = getLocalClassLoader(type, id);
+        final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
         return localClassLoader.addListener(classLoaderListener);
     }
 
     @Override
     public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
         logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed listener " + classLoaderListener + " on " + type + " " + id);
-        VirtualClassLoader localClassLoader = getLocalClassLoader(type, id);
+        VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
         return localClassLoader.removeListener(classLoaderListener);
     }
 
@@ -282,4 +328,96 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed  global listener " + classLoaderListener);
         return globalListeners.remove(classLoaderListener);
     }
+
+    @Override
+    public void refreshClassLoaderImmediately(final ScopeType type, final long id) throws SClassLoaderException {
+        final Stream<BonitaResource> resources;
+        resources = getDependencies(type, id);
+        if (type == ScopeType.GLOBAL) {
+            refreshGlobalClassLoader(resources);
+        } else {
+            refreshLocalClassLoader(type.name(), id, resources);
+        }
+    }
+
+    Stream<BonitaResource> getDependencies(ScopeType type, long id) throws SClassLoaderException {
+        Stream<BonitaResource> resources;
+        try {
+            if (ScopeType.GLOBAL == type) {
+                resources = platformDependencyService.getDependenciesResources(type, id);
+            } else {
+                long tenantId = sessionAccessor.getTenantId();
+                TenantDependencyService tenantDependencyService = dependencyServicesByTenant.get(tenantId);
+                if (tenantDependencyService == null) {
+                    logger.log(getClass(), TechnicalLogSeverity.WARNING, "No dependency service is initialized on tenant {}. Initializing empty classloader", tenantId);
+                    return Stream.empty();
+                }
+                resources = tenantDependencyService.getDependenciesResources(type, id);
+            }
+        } catch (STenantIdNotSetException | SDependencyException e) {
+            throw new SClassLoaderException(e);
+        }
+        return resources;
+    }
+
+    @Override
+    public void refreshClassLoaderAfterUpdate(final ScopeType type, final long id) throws SClassLoaderException {
+        try {
+            registerRefreshOnAllNodes(type, id);
+        } catch (STransactionNotFoundException | STenantIdNotSetException e) {
+            throw new SClassLoaderException(e);
+        }
+    }
+
+    @Override
+    public void refreshClassLoaderOnOtherNodes(final ScopeType type, final long id) throws SClassLoaderException {
+        try {
+            userTransactionService.registerBonitaSynchronization((transactionState) -> {
+                if (transactionState != TransactionState.COMMITTED) {
+                    return;
+                }
+                Map<String, TaskResult<Void>> execute;
+                try {
+                    execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(id, type), getTenantId(type));
+                } catch (TimeoutException | STenantIdNotSetException | ExecutionException | InterruptedException e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
+                    if (resultEntry.getValue().isError()) {
+                        throw new IllegalStateException(resultEntry.getValue().getThrowable());
+                    }
+                }
+            });
+        } catch (STransactionNotFoundException e) {
+            throw new SClassLoaderException(e);
+        }
+    }
+
+    private void registerRefreshOnAllNodes(ScopeType type, long id) throws STransactionNotFoundException, STenantIdNotSetException {
+        synchronized (synchroLock) {
+            RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
+            if (refreshTaskSynchronization == null) {
+                RefreshClassLoaderTask callable = new RefreshClassLoaderTask(id, type);
+                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, broadcastService, callable, classLoaderUpdater, getTenantId(type), type, id);
+                userTransactionService.registerBonitaSynchronization(refreshTaskSynchronization);
+                currentRefreshTask.set(refreshTaskSynchronization);
+            } else {
+                refreshTaskSynchronization.addClassloaderToRefresh(type, id);
+            }
+        }
+    }
+
+    private Long getTenantId(ScopeType type) throws STenantIdNotSetException {
+        Long tenantId = null;
+        if (ScopeType.GLOBAL != type) {
+            tenantId = sessionAccessor.getTenantId();
+        }
+        return tenantId;
+    }
+
+    @Override
+    public void removeRefreshClassLoaderSynchronization() {
+        currentRefreshTask.remove();
+    }
+
 }

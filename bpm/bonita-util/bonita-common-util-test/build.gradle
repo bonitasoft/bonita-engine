@@ -1,0 +1,16 @@
+dependencies {
+    compile project(':bpm:bonita-common')
+    compile "junit:junit:${Deps.junit4Version}"
+    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    compile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+}
+
+// Used by Selenium tests:
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

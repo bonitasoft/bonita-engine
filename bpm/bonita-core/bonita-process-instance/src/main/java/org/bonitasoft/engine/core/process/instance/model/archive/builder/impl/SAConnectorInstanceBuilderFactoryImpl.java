@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -37,7 +37,7 @@ public class SAConnectorInstanceBuilderFactoryImpl extends SANamedElementBuilder
 
     @Override
     public SAConnectorInstanceBuilder createNewArchivedConnectorInstance(final SConnectorInstance connectorInstance) {
-        return new SAConnectorInstanceBuilderImpl(new SAConnectorInstanceImpl(connectorInstance));
+        return new SAConnectorInstanceBuilderImpl(new SAConnectorInstance(connectorInstance));
     }
 
     @Override

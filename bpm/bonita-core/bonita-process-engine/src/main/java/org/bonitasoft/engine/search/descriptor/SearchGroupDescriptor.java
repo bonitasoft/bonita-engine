@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.GroupSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,17 +33,17 @@ public class SearchGroupDescriptor extends SearchEntityDescriptor {
 
     SearchGroupDescriptor() {
         groupKeys = new HashMap<>(4);
-        groupKeys.put(GroupSearchDescriptor.ID, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getIdKey()));
-        groupKeys.put(GroupSearchDescriptor.NAME, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey()));
-        groupKeys.put(GroupSearchDescriptor.PARENT_PATH, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey()));
+        groupKeys.put(GroupSearchDescriptor.ID, new FieldDescriptor(SGroup.class, SGroup.ID));
+        groupKeys.put(GroupSearchDescriptor.NAME, new FieldDescriptor(SGroup.class, SGroup.NAME));
+        groupKeys.put(GroupSearchDescriptor.PARENT_PATH, new FieldDescriptor(SGroup.class, SGroup.PARENT_PATH));
         groupKeys.put(GroupSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey()));
+                new FieldDescriptor(SGroup.class, SGroup.DISPLAY_NAME));
 
         groupAllFields = new HashMap<>(1);
         final Set<String> groupFields = new HashSet<>(3);
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getNameKey());
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey());
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getDescriptionKey());
+        groupFields.add(SGroup.NAME);
+        groupFields.add(SGroup.DISPLAY_NAME);
+        groupFields.add(SGroup.DESCRIPTION);
         groupAllFields.put(SGroup.class, groupFields);
     }
 

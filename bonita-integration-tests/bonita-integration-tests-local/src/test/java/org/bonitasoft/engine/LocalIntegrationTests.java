@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.business.application.ApplicationIT;
-import org.bonitasoft.engine.business.application.ApplicationImportExportIT;
-import org.bonitasoft.engine.business.application.ApplicationMenuIT;
-import org.bonitasoft.engine.business.application.ApplicationPageIT;
+import org.bonitasoft.engine.application.ApplicationIT;
+import org.bonitasoft.engine.business.application.LivingApplicationIT;
+import org.bonitasoft.engine.business.application.LivingApplicationImportExportIT;
+import org.bonitasoft.engine.business.application.LivingApplicationMenuIT;
+import org.bonitasoft.engine.business.application.LivingApplicationPageIT;
 import org.bonitasoft.engine.business.data.BDRepositoryLocalIT;
 import org.bonitasoft.engine.form.FormMappingIT;
 import org.bonitasoft.engine.page.PageAPIIT;
@@ -35,14 +36,16 @@ import org.junit.runners.Suite.SuiteClasses;
         BPMRemoteTestsLocal.class,
         FormMappingIT.class,
         PageAPIIT.class,
+        LivingApplicationIT.class,
+        LivingApplicationPageIT.class,
+        LivingApplicationMenuIT.class,
+        LivingApplicationImportExportIT.class,
         ApplicationIT.class,
-        ApplicationPageIT.class,
-        ApplicationMenuIT.class,
-        ApplicationImportExportIT.class,
+        DeleteEventTriggerInstanceIT.class,
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,
-        //last test suite because it breaks the platform
+        // last test suite because it breaks the platform
         AllBPMTests.class,
 })
 @RunWith(Suite.class)

@@ -18,22 +18,52 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 /**
  * @author Baptiste Mesta
  */
-public interface SDocumentBuilder {
+public class SDocumentBuilder {
 
-    SDocumentBuilder setAuthor(long author);
 
-    SDocumentBuilder setCreationDate(long creationDate);
+    private final SDocument entity;
 
-    SDocumentBuilder setHasContent(boolean hasContent);
+    public SDocumentBuilder() {
+        entity = new SDocument();
+    }
 
-    SDocumentBuilder setFileName(String contentFileName);
+    public SDocumentBuilder setAuthor(final long author) {
+        entity.setAuthor(author);
+        return this;
+    }
 
-    SDocumentBuilder setMimeType(String contentMimeType);
+    public SDocumentBuilder setCreationDate(final long creationDate) {
+        entity.setCreationDate(creationDate);
+        return this;
+    }
 
-    SDocumentBuilder setContent(byte[] content);
+    public SDocumentBuilder setHasContent(final boolean hasContent) {
+        entity.setHasContent(hasContent);
+        return this;
+    }
 
-    SDocumentBuilder setURL(String generateURL);
+    public SDocumentBuilder setFileName(final String fileName) {
+        entity.setFileName(fileName);
+        return this;
+    }
 
-    SDocument done();
+    public SDocumentBuilder setMimeType(final String mimeType) {
+        entity.setMimeType(mimeType);
+        return this;
+    }
+
+    public SDocumentBuilder setContent(final byte[] content) {
+        entity.setContent(content);
+        return this;
+    }
+
+    public SDocumentBuilder setURL(final String url) {
+        entity.setUrl(url);
+        return this;
+    }
+
+    public SDocument done() {
+        return entity;
+    }
 
 }

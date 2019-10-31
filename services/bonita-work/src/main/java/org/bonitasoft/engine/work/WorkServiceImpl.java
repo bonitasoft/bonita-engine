@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.commons.time.EngineClock;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -34,45 +35,34 @@ public class WorkServiceImpl implements WorkService {
 
     private final ThreadLocal<WorkSynchronization> synchronizations = new ThreadLocal<>();
 
-    private final TechnicalLoggerService loggerService;
+    private final TechnicalLogger log;
 
     private final SessionAccessor sessionAccessor;
 
     private final WorkExecutorService workExecutorService;
-    private WorkFactory workFactory;
 
-    /**
-     * @param transactionService
-     * @param loggerService
-     * @param sessionAccessor
-     * @param workExecutorService
-     */
+    private final EngineClock engineClock;
+
     public WorkServiceImpl(final UserTransactionService transactionService,
-                           final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
-                           WorkExecutorService workExecutorService, WorkFactory workFactory) {
+            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
+            WorkExecutorService workExecutorService, final EngineClock engineClock) {
         this.transactionService = transactionService;
-        this.loggerService = loggerService;
+        this.log = loggerService.asLogger(WorkServiceImpl.class);
         this.sessionAccessor = sessionAccessor;
         this.workExecutorService = workExecutorService;
-        this.workFactory = workFactory;
+        this.engineClock = engineClock;
     }
 
     @Override
     public void registerWork(WorkDescriptor workDescriptor) throws SWorkRegisterException {
         if (isStopped()) {
-            logExecutorStateWarn(workDescriptor);
+            log.warn("Tried to register work {}, but the work service is stopped.", workDescriptor);
             return;
         }
-        final WorkSynchronization synchro = getContinuationSynchronization();
-        if (synchro != null) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Registered work " + workDescriptor);
-            synchro.addWork(workDescriptor);
-        }
-    }
-
-    private void logExecutorStateWarn(final WorkDescriptor work) {
-        loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work
-                + ", but the work service is stopped.");
+        workDescriptor.setRegistrationDate(engineClock.now());
+        log.debug("Registering work {}", workDescriptor);
+        getContinuationSynchronization().addWork(workDescriptor);
+        log.debug("Work registered");
     }
 
     private WorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {

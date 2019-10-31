@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventI
  */
 public class SStartEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SStartEventInstanceBuilder {
 
-    public SStartEventInstanceBuilderImpl(final SStartEventInstanceImpl entity) {
+    public SStartEventInstanceBuilderImpl(final SStartEventInstance entity) {
         super(entity);
     }
 

@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformManager;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -99,6 +100,11 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public NodeConfiguration getPlatformConfiguration() {
         return beanAccessor.getService(NodeConfiguration.class);
+    }
+
+    @Override
+    public PlatformManager getPlatformManager() {
+        return beanAccessor.getService(PlatformManager.class);
     }
 
     @Override

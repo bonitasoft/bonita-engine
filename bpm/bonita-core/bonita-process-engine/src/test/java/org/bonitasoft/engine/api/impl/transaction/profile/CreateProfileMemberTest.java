@@ -15,9 +15,9 @@ package org.bonitasoft.engine.api.impl.transaction.profile;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.identity.IdentityService;

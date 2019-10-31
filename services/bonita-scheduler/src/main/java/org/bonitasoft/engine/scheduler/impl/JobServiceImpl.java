@@ -17,9 +17,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -38,7 +40,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
@@ -54,9 +55,6 @@ import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 
 /**
@@ -90,7 +88,7 @@ public class JobServiceImpl implements JobService {
         }
 
         // Set the tenant manually on the object because it will be serialized
-        final SJobDescriptorImpl sJobDescriptorToRecord = new SJobDescriptorImpl(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
+        final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
                 sJobDescriptor.getDescription(), sJobDescriptor.disallowConcurrentExecution());
         sJobDescriptorToRecord.setTenantId(tenantId);
 
@@ -172,19 +170,9 @@ public class JobServiceImpl implements JobService {
 
     protected void deleteAllJobParameters(final long jobDescriptorId) throws SJobParameterCreationException {
         try {
-            final int limit = 100;
-            final List<FilterOption> filters = new ArrayList<FilterOption>(1);
-
-            filters.add(new FilterOption(SJobParameter.class, "jobDescriptorId", jobDescriptorId));
-            final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
-            final QueryOptions options = new QueryOptions(0, limit, orderByOptions, filters, null);
-            List<SJobParameter> jobParameters = null;
-            do {
-                jobParameters = searchJobParameters(options);
-                for (final SJobParameter jobParameter : jobParameters) {
-                    deleteJobParameter(jobParameter);
-                }
-            } while (jobParameters.size() == limit);
+            for (SJobParameter jobParameter : getJobParameters(jobDescriptorId)) {
+                deleteJobParameter(jobParameter);
+            }
         } catch (final SBonitaException sbe) {
             throw new SJobParameterCreationException(sbe);
         }
@@ -198,8 +186,9 @@ public class JobServiceImpl implements JobService {
         }
 
         // Set the tenant manually on the object because it will be serialized
-        final SJobParameterImpl sJobParameterToRecord = (SJobParameterImpl) BuilderFactory.get(SJobParameterBuilderFactory.class)
-                .createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(jobDescriptorId).done();
+        final SJobParameter sJobParameterToRecord = SJobParameter.builder()
+                .key(sJobParameter.getKey())
+                .value(sJobParameter.getValue()).jobDescriptorId(jobDescriptorId).build();
         sJobParameterToRecord.setTenantId(tenantId);
 
         try {
@@ -239,9 +228,11 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+
     @Override
-    public List<SJobParameter> searchJobParameters(final QueryOptions queryOptions) throws SBonitaReadException {
-        return readPersistenceService.searchEntity(SJobParameter.class, queryOptions, null);
+    public List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException {
+        Map<String, Object> parameters = Collections.<String, Object>singletonMap("jobDescriptorId", jobDescriptorId);
+        return readPersistenceService.selectList(new SelectListDescriptor<SJobParameter>("getJobParameters", parameters, SJobParameter.class, QueryOptions.countQueryOptions()));
     }
 
     @Override
@@ -368,7 +359,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void logJobError(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+    public void logJobError(final Throwable jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
             SJobLogCreationException, SJobDescriptorReadException {
         final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId, 0, 1);
         if (!jobLogs.isEmpty()) {
@@ -386,10 +377,10 @@ public class JobServiceImpl implements JobService {
     }
 
 
-    public void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
+    public void createJobLog(final Throwable jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
         SJobDescriptor jobDescriptor = getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null) {
-            final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
+            final SJobLog jobLog = new SJobLog(jobDescriptorId);
             jobLog.setLastMessage(getStackTrace(jobException));
             jobLog.setRetryNumber(0L);
             jobLog.setLastUpdateDate(System.currentTimeMillis());
@@ -402,7 +393,7 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private String getStackTrace(final Exception jobException) {
+    private String getStackTrace(final Throwable jobException) {
         final StringWriter exceptionWriter = new StringWriter();
         jobException.printStackTrace(new PrintWriter(exceptionWriter));
         return exceptionWriter.toString();

@@ -18,17 +18,13 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Baptiste Mesta
@@ -49,7 +45,7 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
+        processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }
 

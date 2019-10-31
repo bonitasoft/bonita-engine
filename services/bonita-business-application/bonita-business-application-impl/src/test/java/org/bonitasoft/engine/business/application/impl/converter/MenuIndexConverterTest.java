@@ -18,8 +18,8 @@ import static org.mockito.BDDMockito.given;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.MenuIndex;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,7 +38,7 @@ public class MenuIndexConverterTest {
     @Test
     public void toMenuIndex_should_return_a_MenuIndex_based_on_ApplicationMenu_and_set_lastUsedIndex() throws Exception {
         //given
-        SApplicationMenuImpl appMenu = new SApplicationMenuImpl("my menu", 1, null, 2);
+        SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
         given(applicationService.getLastUsedIndex(appMenu.getParentId())).willReturn(11);
 
@@ -55,7 +55,7 @@ public class MenuIndexConverterTest {
     @Test
     public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_parentId_when_parent_doesnt_change() throws Exception {
         //given
-        SApplicationMenuImpl appMenu = new SApplicationMenuImpl("my menu", 1, null, 2);
+        SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
 
         given(applicationService.getLastUsedIndex(appMenu.getParentId())).willReturn(11);
@@ -76,7 +76,7 @@ public class MenuIndexConverterTest {
     @Test
     public void toMenuIndex_with_updateDescriptor_should_use_new_parent_when_parent_changes() throws Exception {
         //given
-        SApplicationMenuImpl appMenu = new SApplicationMenuImpl("my menu", 1, null, 2);
+        SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
 
         SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();
@@ -98,7 +98,7 @@ public class MenuIndexConverterTest {
     @Test
     public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_index_when_index_and_parent_dont_change() throws Exception {
         //given
-        SApplicationMenuImpl appMenu = new SApplicationMenuImpl("my menu", 1, null, 2);
+        SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
 
         SApplicationMenuUpdateBuilderImpl builder = new SApplicationMenuUpdateBuilderImpl();

@@ -13,7 +13,9 @@
  */
 package org.bonitasoft.engine.page.impl;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +25,15 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,7 +64,6 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageContent;
 import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -89,6 +98,8 @@ public class PageServiceImplTest {
     private static final String INDEX_HTML = "index.html";
 
     private static final String INDEX_GROOVY = "Index.groovy";
+    
+    private static final String THEME_CSS = "resources/theme.css";
 
     private static final String CONTENT_NAME = "content.zip";
 
@@ -109,6 +120,7 @@ public class PageServiceImplTest {
     public static final String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
     public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
 
+
     @Mock
     private Recorder recorder;
 
@@ -125,7 +137,7 @@ public class PageServiceImplTest {
     private QueriableLoggerService queriableLoggerService;
 
     @Mock
-    private SPageContent sPageContent;
+    private SPageWithContent sPageContent;
 
     @Mock
     private SPageLogBuilder pageLogBuilder;
@@ -183,7 +195,7 @@ public class PageServiceImplTest {
     public void createPage_should_throw_exception_when_name_is_empty() throws SBonitaException, IOException {
 
         final long pageId = 15;
-        final SPageImpl pageWithEmptyName = new SPageImpl("", 123456, 45, true, CONTENT_NAME);
+        final SPage pageWithEmptyName = new SPage("", 123456, 45, true, CONTENT_NAME);
         pageWithEmptyName.setDisplayName("plop");
         pageWithEmptyName.setId(pageId);
         pageServiceImpl.addPage(pageWithEmptyName, validPageContent("plop"));
@@ -194,7 +206,7 @@ public class PageServiceImplTest {
     public void addPage_should_throw_exception_when_already_exist() throws Exception {
 
         // given
-        final SPageImpl newPage = new SPageImpl(PAGE_NAME, INSTALLATION_DATE_AS_LONG, INSTALLED_BY_ID, PROVIDED_TRUE, CONTENT_NAME);
+        final SPage newPage = new SPage(PAGE_NAME, INSTALLATION_DATE_AS_LONG, INSTALLED_BY_ID, PROVIDED_TRUE, CONTENT_NAME);
         newPage.setDisplayName("plop");
         // when
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
@@ -208,7 +220,7 @@ public class PageServiceImplTest {
     public void should_create_page_throw_exception_when_name_exists() throws Exception {
 
         // given
-        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        final SPage newPage = new SPage(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
         newPage.setDisplayName("display Name");
 
         // when
@@ -224,7 +236,7 @@ public class PageServiceImplTest {
     public void should_create_page_with_process_scope_when_name_exists() throws Exception {
 
         // given
-        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
+        final SPage newPage = new SPage(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
         newPage.setDisplayName("display Name");
         final byte[] validContent = validPageContent(PAGE_NAME);
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(null);
@@ -232,7 +244,7 @@ public class PageServiceImplTest {
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
 
         // when
-        final SPageImpl newProcessPage = new SPageImpl(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
+        final SPage newProcessPage = new SPage(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
         newProcessPage.setContentType(SContentType.FORM);
         newProcessPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
         newProcessPage.setDisplayName("display Name");
@@ -247,7 +259,7 @@ public class PageServiceImplTest {
     public void should_create_page_with_processDefinitionId_throw_exception_when_name_exists() throws Exception {
 
         // given
-        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        final SPage newPage = new SPage(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
         newPage.setContentType(SContentType.FORM);
         newPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
         newPage.setDisplayName("display Name");
@@ -270,7 +282,7 @@ public class PageServiceImplTest {
     @Test
     public void getPage() throws SBonitaException {
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId))).thenReturn(expected);
         // when
@@ -283,7 +295,7 @@ public class PageServiceImplTest {
     public void getPageThrowsPageNotFoundException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId))).thenReturn(null);
 
@@ -303,7 +315,7 @@ public class PageServiceImplTest {
     public void getPageThrowsException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId))).thenThrow(
                 new SBonitaReadException("ouch!"));
@@ -371,31 +383,31 @@ public class PageServiceImplTest {
     public void start_should_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentGroovyPage = new SPageImpl("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentGroovyPage = new SPage("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentGroovyPage.setId(12);
 
-        final SPageImpl currentHtmlPage = new SPageImpl("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentHtmlPage = new SPage("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentHtmlPage.setId(13);
 
-        final SPageImpl currentHomePage = new SPageImpl("custompage_home", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentHomePage = new SPage("custompage_home", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
-        final SPageImpl currentLayoutPage = new SPageImpl(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+        final SPage currentLayoutPage = new SPage(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
-        final SPageImpl currentThemePage = new SPageImpl(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+        final SPage currentThemePage = new SPage(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
@@ -439,7 +451,7 @@ public class PageServiceImplTest {
     @Test
     public void getPageContent_should_add_properties_in_the_zip() throws SBonitaException, IOException {
         // given: a zip without properties
-        final SPageWithContentImpl page = new SPageWithContentImpl();
+        final SPageWithContent page = new SPageWithContent();
         page.setName("mypage");
         page.setDescription("mypage description");
         page.setDisplayName("mypage display name");
@@ -461,11 +473,32 @@ public class PageServiceImplTest {
         assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
         assertThat(pageProperties.get("description")).isEqualTo("mypage description");
     }
+    @Test
+    public void getPageContent_should_add_properties_in_the_zip_with_non_mandatory_metadata() throws SBonitaException, IOException {
+        final SPageWithContent page = new SPageWithContent();
+        page.setName("mypage");
+        page.setDisplayName("mypage display name");
+        //no description
+        page.setId(12);
+        page.setContent(IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes())));
+        doReturn(page).when(readPersistenceService).selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, 12));
+
+        // when
+        final byte[] result = pageServiceImpl.getPageContent(12);
+
+        // then
+        final Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(IOUtil.unzip(result).get(PAGE_PROPERTIES)));
+
+        assertThat(pageProperties.get("name")).isEqualTo("mypage");
+        assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
+        assertThat(pageProperties.get("description")).isNull();
+    }
 
     @Test
     public void getPageContent_should_update_properties_in_the_zip_if_exists_and_keep_others() throws SBonitaException, IOException {
         // given: a zip with outdated properties
-        final SPageWithContentImpl page = new SPageWithContentImpl();
+        final SPageWithContent page = new SPageWithContent();
         page.setName("mypageUpdated");
         page.setDescription("mypageUpdated description");
         page.setDisplayName("mypageUpdated display name");
@@ -503,31 +536,31 @@ public class PageServiceImplTest {
     public void start_should_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentGroovyPage = new SPageImpl("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentGroovyPage = new SPage("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentGroovyPage.setId(12);
 
-        final SPageImpl currentHtmlPage = new SPageImpl("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentHtmlPage = new SPage("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentHtmlPage.setId(13);
 
-        final SPageImpl currentHomePage = new SPageImpl("custompage_home", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPage currentHomePage = new SPage("custompage_home", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
-        final SPageImpl currentLayoutPage = new SPageImpl(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+        final SPage currentLayoutPage = new SPage(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
-        final SPageImpl currentThemePage = new SPageImpl(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+        final SPage currentThemePage = new SPage(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
@@ -544,7 +577,7 @@ public class PageServiceImplTest {
     public void deletePage() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
 
         doAnswer(new Answer<Object>() {
@@ -568,7 +601,7 @@ public class PageServiceImplTest {
     public void deletePageThrowsPageNotFoundException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage expected = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
 
         doThrow(new SRecorderException("ouch !")).when(recorder).recordDelete(any(DeleteRecord.class),
@@ -582,7 +615,7 @@ public class PageServiceImplTest {
     public void updatePageContent_should_check_zip_content() throws Exception {
         // given
         final long pageId = 15;
-        final SPage sPage = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage sPage = new SPage("page1", 123456, 45, true, CONTENT_NAME);
 
         // when
         pageServiceImpl.updatePageContent(pageId, "aaa".getBytes(), CONTENT_NAME);
@@ -597,9 +630,9 @@ public class PageServiceImplTest {
         final long pageId1 = 15;
         final long pageId2 = 20;
 
-        final SPageImpl page1 = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage page1 = new SPage("page1", 123456, 45, true, CONTENT_NAME);
         page1.setDisplayName("displayName1");
-        final SPageImpl page2 = new SPageImpl("page2", 123456, 45, true, CONTENT_NAME);
+        final SPage page2 = new SPage("page2", 123456, 45, true, CONTENT_NAME);
         page2.setDisplayName("displayName2");
 
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
@@ -633,7 +666,7 @@ public class PageServiceImplTest {
         // given
         final long pageId = 15;
         final Map<String, Object> fields = new HashMap<>();
-        final SPage sPage = new SPageImpl("page1", 123456, 45, false, CONTENT_NAME);
+        final SPage sPage = new SPage("page1", 123456, 45, false, CONTENT_NAME);
         sPage.setId(pageId);
         final byte[] content = "invalid content".getBytes();
         fields.put(SPageContentFields.PAGE_CONTENT, content);
@@ -898,6 +931,18 @@ public class PageServiceImplTest {
         pageServiceImpl.readPageZip(content, false);
 
     }
+    
+    @Test
+    public void zipTest_valid_Theme() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(THEME_CSS, "h1 { font-size:14pt; }".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
+
+        // when then
+        pageServiceImpl.readPageZip(content, false);
+
+    }
 
     @Test
     public void zipTest_no_page_properties() throws Exception {
@@ -966,7 +1011,7 @@ public class PageServiceImplTest {
     @Test
     public void should_add_page_throw_exception_when_invalid_zip() throws Exception {
         //given
-        final SPage sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
+        final SPage sPage = new SPage("page", 123456, 45, true, CONTENT_NAME);
         final byte[] badContent = "not_a_zip".getBytes();
         doThrow(IOException.class).when(pageServiceImpl).unzip(badContent);
 
@@ -984,7 +1029,7 @@ public class PageServiceImplTest {
     @Test
     public void should_add_page_insertPage() throws Exception {
         //given
-        final SPageImpl sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
+        final SPage sPage = new SPage("page", 123456, 45, true, CONTENT_NAME);
         sPage.setDisplayName("displayName1");
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 getPagePropertiesContentPair());
@@ -1075,7 +1120,7 @@ public class PageServiceImplTest {
 
     @Test
     public void updatePage_should_not_execute_listener() throws Exception {
-        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
         when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
 
@@ -1086,10 +1131,10 @@ public class PageServiceImplTest {
 
     @Test
     public void updatePage_should_execute_listener() throws Exception {
-        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
         page.setId(45L);
-        final SPageContent pageContent = new SPageContentImpl();
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageContent.class, page.getId()))).thenReturn(pageContent);
+        final SPageWithContent pageContent = new SPageWithContent();
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, page.getId()))).thenReturn(pageContent);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, page.getId()))).thenReturn(page);
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
 
@@ -1110,10 +1155,10 @@ public class PageServiceImplTest {
 
     protected void verifyPageUpdateContent(Pair<String, byte[]> pagePropertiesContentPair, final String expectedContentType) throws Exception {
         //given
-        final SPageImpl sPage = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        final SPage sPage = new SPage("name", 10201983L, 2005L, false, "contentName");
         sPage.setId(45L);
-        final SPageContent pageContent = new SPageContentImpl();
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageContent.class, sPage.getId()))).thenReturn(pageContent);
+        final SPageWithContent pageContent = new SPageWithContent();
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPageWithContent.class, sPage.getId()))).thenReturn(pageContent);
         final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), pagePropertiesContentPair);
 
         //then
@@ -1139,7 +1184,7 @@ public class PageServiceImplTest {
 
     @Test
     public void deletePage_should_execute_listener() throws Exception {
-        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        final SPage page = new SPage("name", 10201983L, 2005L, false, "contentName");
         when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
 
         pageServiceImpl.deletePage(1983L);

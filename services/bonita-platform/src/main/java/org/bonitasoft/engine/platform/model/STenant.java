@@ -13,44 +13,67 @@
  **/
 package org.bonitasoft.engine.platform.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Charles Souillard
- */
-public interface STenant extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class STenant implements PersistentObject {
 
-    String PAUSED = "PAUSED";
+    public static final String PAUSED = "PAUSED";
+    public static final String DEACTIVATED = "DEACTIVATED";
+    public static final String ACTIVATED = "ACTIVATED";
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATED = "created";
+    public static final String DESCRIPTION = "description";
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String STATUS = "status";
+    public static final String ICON_NAME = "iconName";
+    public static final String ICON_PATH = "iconPath";
+    public static final String DEFAULT_TENANT = "defaultTenant";
 
-    String DEACTIVATED = "DEACTIVATED";
+    private long tenantId;
+    private long id;
+    private String name;
+    private String description;
+    private String iconName;
+    private String iconPath;
+    private String status;
+    private long created;
+    private String createdBy;
+    private boolean defaultTenant;
 
-    String ACTIVATED = "ACTIVATED";
+    public STenant(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
+        super();
+        this.name = name;
+        this.createdBy = createdBy;
+        this.created = created;
+        this.status = status;
+        this.defaultTenant = defaultTenant;
+    }
 
     /**
      * Return true if the tenant is activated else return false.
-     * 
-     * @param sTenant
+     *
      * @return true if the tenant is activated
      * @since 6.0
      */
-    boolean isActivated();
+    public boolean isActivated() {
+        return ACTIVATED.equals(status);
+    }
 
-    String getName();
+    public boolean isDeactivated() {
+        return DEACTIVATED.equals(status);
+    }
 
-    String getDescription();
-
-    String getIconName();
-
-    String getIconPath();
-
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getStatus();
-
-    boolean isDefaultTenant();
-
-    boolean isPaused();
+    public boolean isPaused() {
+        return PAUSED.equals(status);
+    }
 
 }

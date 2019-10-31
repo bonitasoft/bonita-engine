@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
 
-public class SupervisorBuilder extends PersistentObjectBuilder<SProcessSupervisorImpl, SupervisorBuilder> {
+public class SupervisorBuilder extends PersistentObjectBuilder<SProcessSupervisor, SupervisorBuilder> {
 
     private long processDefId;
 
@@ -36,8 +36,8 @@ public class SupervisorBuilder extends PersistentObjectBuilder<SProcessSuperviso
     }
 
     @Override
-    public SProcessSupervisorImpl _build() {
-        final SProcessSupervisorImpl user = new SProcessSupervisorImpl();
+    public SProcessSupervisor _build() {
+        final SProcessSupervisor user = new SProcessSupervisor();
         user.setId(id);
         user.setGroupId(groupId);
         user.setRoleId(roleId);

@@ -21,10 +21,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -88,17 +90,29 @@ public class PlatformSetupTestUtils {
     }
 
     public static void extractDistributionTo(File distFolder) throws IOException {
-        File target = new File("target");
-        Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
+        String distZipPath = System.getProperty("bonita.distribution.path");
         File dist = null;
-        for (File file : target.listFiles()) {
-            if (distribPattern.matcher(file.getName()).matches()) {
-                dist = file;
-                break;
+        if (distZipPath != null) {
+            dist = new File(distZipPath);
+        } else {
+
+            File target = Paths.get("build").resolve("distributions").toFile();
+            if (!target.isDirectory()) {
+                throw new IllegalStateException("No bonita.distribution.path set and no build folder exists");
+            }
+            Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
+            for (File file : Objects.requireNonNull(target.listFiles())) {
+                if (distribPattern.matcher(file.getName()).matches()) {
+                    dist = file;
+                    break;
+                }
             }
         }
         if (dist == null) {
             throw new IllegalStateException("Unable to locate the distribution");
+        }
+        if (!dist.isFile()) {
+            throw new IllegalStateException("Distribution is not a file: " + dist.getPath());
         }
 
         try (InputStream inputStream = new FileInputStream(dist)) {

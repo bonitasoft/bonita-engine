@@ -772,6 +772,13 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstance;
     }
 
+
+    public HumanTaskInstance waitForUserTaskAssignAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user, Map<String, Serializable> inputs) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
+        getProcessAPI().assignAndExecuteUserTask(user.getId(), humanTaskInstance.getId(), inputs);
+        return humanTaskInstance;
+    }
+
     public HumanTaskInstance waitForUserTaskAndGetIt(final ProcessInstance processInstance, final String taskName) throws Exception {
         return waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
     }
@@ -1277,8 +1284,12 @@ public class APITestUtil extends PlatformTestUtil {
         return getApiClient().getCustomPageAPI();
     }
 
-    public ApplicationAPI getApplicationAPI() {
+    public ApplicationAPI getLivingApplicationAPI() {
         return getApiClient().getLivingApplicationAPI();
+    }
+
+    public ApplicationAPI getApplicationAPI() {
+        return getApiClient().getApplicationAPI();
     }
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {
@@ -1471,7 +1482,7 @@ public class APITestUtil extends PlatformTestUtil {
         birthDate.setName("birthDate");
         birthDate.setType(FieldType.LOCALDATE);
         birthDate.setNullable(Boolean.TRUE);
-        
+
         final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);

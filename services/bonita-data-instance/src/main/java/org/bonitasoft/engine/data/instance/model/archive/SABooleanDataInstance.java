@@ -13,12 +13,33 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
-/**
- * @author Feng Hui
- */
-public interface SABooleanDataInstance extends SADataInstance {
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SABooleanDataInstance extends SADataInstance {
+    private Boolean value;
+
+
+    public SABooleanDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (Boolean) sDataInstance.getValue();
+    }
 
     @Override
-    Boolean getValue();
+    public Boolean getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (Boolean) value;
+    }
 
 }

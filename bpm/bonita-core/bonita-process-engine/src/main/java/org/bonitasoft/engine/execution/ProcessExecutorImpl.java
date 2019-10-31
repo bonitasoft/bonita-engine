@@ -93,8 +93,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
@@ -213,11 +211,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         containerRegistry.addContainerExecutor(this);
     }
-
     @Override
-    public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
-                                         final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return flowNodeExecutor.stepForward(flowNodeInstanceId, executerId, executerSubstituteId);
+    public FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return flowNodeExecutor.stepForward(flowNodeInstance, executerId, executerSubstituteId);
     }
 
     private SConnectorInstance getNextConnectorInstance(final SProcessInstance processInstance, final ConnectorEvent event)
@@ -270,10 +266,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private SProcessInstance createProcessInstance(final SProcessDefinition sDefinition, final long starterId, final long starterSubstituteId,
                                                    final long callerId, final SFlowNodeType callerType, final long rootProcessInstanceId) throws SProcessInstanceCreationException {
-        final SProcessInstanceBuilder processInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class).createNewInstance(sDefinition)
-                .setStartedBy(starterId).setStartedBySubstitute(starterSubstituteId).setCallerId(callerId, callerType)
-                .setRootProcessInstanceId(rootProcessInstanceId);
-        final SProcessInstance sProcessInstance = processInstanceBuilder.done();
+
+        SProcessInstance sProcessInstance = SProcessInstance.builder().name(sDefinition.getName())
+                .processDefinitionId(sDefinition.getId()).description(sDefinition.getDescription())
+                .startedBy(starterId).startedBySubstitute(starterSubstituteId).callerId(callerId).callerType(callerType)
+                .rootProcessInstanceId(rootProcessInstanceId).build();
         processInstanceService.createProcessInstance(sProcessInstance);
         return sProcessInstance;
     }
@@ -323,7 +320,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), null, null);
+                executeFlowNode(gatewayToExecute, null, null);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -419,8 +416,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // nothing to do
     }
 
-    private void initializeBusinessData(SFlowElementContainerDefinition processContainer, final SProcessInstance sInstance,
-            final SExpressionContext expressionContext)
+    protected void initializeBusinessData(SFlowElementContainerDefinition processContainer, SProcessInstance sInstance,
+                                          SExpressionContext expressionContext)
             throws SBonitaException {
         final List<SBusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
@@ -455,8 +452,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final List<Long> dataIds = new ArrayList<>();
         if (expression != null) {
             final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
-            for (final Entity entity : businessData) {
-                dataIds.add(saveBusinessData(entity));
+            if (businessData != null) {
+                for (final Entity entity : businessData) {
+                    dataIds.add(saveBusinessData(entity));
+                }
             }
         }
         return dataIds;
@@ -584,13 +583,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+
+        //this also delete the event (unless its the event that interrupted the process)
         final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
                 + sFlowNodeInstanceChild.getId() + "> of process instance <" + processInstanceId + "> finished");
         if (isEnd) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (sProcessInstance.getInterruptingEventId() > 0) {
-                ///the event is deleted by latter...
+                //it it's interrupted by an event (error event), the flow node is kept to be executed last and deleted in executePostThrowEventHandlers
                 numberOfFlowNode -= 1;
             }
             if (numberOfFlowNode > 0) {
@@ -601,13 +602,26 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                             + "> executed a branch that is finished but there is still <"
                             + numberOfFlowNode + "> to execute");
                     logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                            activityInstanceService.getFlowNodeInstances(processInstanceId, 0, numberOfFlowNode).toString());
+                            activityInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, numberOfFlowNode).toString());
                 }
                 return;
             }
             logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
                     + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
             boolean hasActionsToExecute = false;
+            // in case of interruption by error event:
+            // * the first time the last element (except the error event itself)  goes here, it put the process in aborting
+            // * the error event in thrown
+            //     * the catching flow node is executed IN THE SAME THREAD (I don't know why...)
+            //     * OR the catching event sub process is executed IN THE SAME THREAD and the process having this event sub process is interrupted (not locked!)
+            // * the throw error event is deleted
+            // * the waiting error event is deleted
+            // * the process is put in:
+            //     * ABORTING: if the process was in state category ABORTING (I don't know why...)
+            //         I'm not sure this case really happens because this would require that a last flow node trigger this method again and it's never the case
+            //     * COMPLETED: in 'normal' case
+            //         In that case if the process is called by a call activity, the calling activity have its token count decremented but is not executed (hasActionsToExecute==true)
+            //
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
                 // the process instance has maybe changed
@@ -721,7 +735,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), null, null);
+                //FIXME should be done in a work?
+                executeFlowNode(gatewayToExecute, null, null);
             }
 
         }
@@ -754,6 +769,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
         //FIXME we archive the flow node instance here because it was not archived before because the flow node was interrupting the parent.. we should change that because it's not very easy to see how it works
+        // * the flow node is archived only if its not the error event that triggered the interruption (unless if its in a sub process????)
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
@@ -939,8 +955,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
-                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
-                        sFlowNodeInstance.getId()));
+                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
             } catch (final SWorkRegisterException e) {
                 setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
                 throw new SFlowNodeExecutionException("Unable to trigger execution of the flow node.", e);
@@ -967,7 +982,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId()));
+                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
         }
     }
 

@@ -1,0 +1,4 @@
+plugins {
+    id "com.bonitasoft.gradle.bonita-release"
+}
+apply from: "common.gradle"

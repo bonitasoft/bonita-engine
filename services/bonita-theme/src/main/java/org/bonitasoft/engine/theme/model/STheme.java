@@ -13,45 +13,47 @@
  **/
 package org.bonitasoft.engine.theme.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Celine Souchet
  */
-public interface STheme extends PersistentObject {
 
-    /**
-     * @return The zip file associated with this theme, as a binary content.
-     */
-    byte[] getContent();
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class STheme implements PersistentObject {
 
-    /**
-     * @return The CSS file associated with this theme, as a binary content.
-     */
-    byte[] getCssContent();
+    public static final String ID = "id";
+    public static final String CONTENT = "content";
+    public static final String CSS_CONTENT = "cssContent";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    public static final String TYPE = "type";
+    public static final String IS_DEFAULT = "isDefault";
+    private long id;
+    private long tenantId;
+    private byte[] content;
+    private byte[] cssContent;
+    private boolean isDefault;
+    private long lastUpdateDate;
+    private SThemeType type;
 
-    /**
-     * This theme is default, or not.
-     * 
-     * @return True if this theme is default, false otherwise.
-     * @since 6.2
-     */
-    boolean isDefault();
+    public STheme(final byte[] content, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {
+        super();
+        this.content = content;
+        this.isDefault = isDefault;
+        lastUpdateDate = lastUpdatedDate;
+        this.type = type;
+    }
 
-    /**
-     * Get the date when this theme was last modified.
-     * 
-     * @return The date when this theme was last modified.
-     * @since 6.2
-     */
-    long getLastUpdateDate();
-
-    /**
-     * Get the type of this theme
-     * 
-     * @return The type of this theme
-     * @since 6.2
-     */
-    SThemeType getType();
+    public STheme(final STheme theme) {
+        this(theme.getContent(), theme.isDefault(), theme.getType(), theme.getLastUpdateDate());
+        cssContent = theme.getCssContent();
+    }
 
 }

@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAReceiveTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl;
 
 /**
  * @author Julien Molinaro
  */
 public class SAReceiveTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAReceiveTaskInstanceBuilder {
 
-    public SAReceiveTaskInstanceBuilderImpl(final SAReceiveTaskInstanceImpl entity) {
+    public SAReceiveTaskInstanceBuilderImpl(final SAReceiveTaskInstance entity) {
         super(entity);
     }
 

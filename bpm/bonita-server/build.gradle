@@ -1,0 +1,85 @@
+import org.bonitasoft.engine.gradle.ShadeDependency
+
+apply plugin: 'bonita-shade'
+
+dependencies {
+    compile project(':bpm:bonita-core:bonita-process-engine')
+    compile project(':services:bonita-builder')
+    compile project(':bpm:bonita-core:bonita-actor-mapping')
+    compile project(':bpm:bonita-api:bonita-server-api-http')
+    compile project(':services:bonita-archive')
+    compile project(':services:bonita-authentication')
+    compile project(':services:bonita-business-application:bonita-business-application-api')
+    compile project(':services:bonita-business-application:bonita-business-application-impl')
+    compile project(':services:bonita-business-data:bonita-business-data-impl')
+    compile project(':services:bonita-business-data:bonita-business-data-client-resources')
+    compile project(':services:bonita-business-data:bonita-business-data-generator')
+    compile project(':services:bonita-cache')
+    compile project(':bpm:bonita-core:bonita-category')
+    compile project(':services:bonita-classloader')
+    compile project(':services:bonita-command')
+    compile project(':bpm:bonita-core:bonita-contract-data')
+    compile project(':services:bonita-connector-executor')
+    compile project(':services:bonita-data-definition')
+    compile project(':services:bonita-data-instance')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-expression')
+    compile project(':services:bonita-external-identity-mapping')
+    compile project(':bpm:bonita-core:bonita-form-mapping')
+    compile project(':services:bonita-incident')
+    compile project(':services:bonita-identity')
+    compile project(':services:bonita-lock')
+    compile project(':bpm:bonita-core:bonita-login')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-page')
+    compile project(':bpm:bonita-core:bonita-parameter')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-platform')
+    compile project(':services:bonita-platform-authentication')
+    compile project(':services:bonita-platform-command')
+    compile project(':bpm:bonita-core:bonita-platform-login')
+    compile project(':services:bonita-platform-session')
+    compile project(':bpm:bonita-core:bonita-process-comment')
+    compile project(':bpm:bonita-core:bonita-process-definition')
+    compile project(':bpm:bonita-core:bonita-process-instance')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-scheduler')
+    compile project(':services:bonita-session')
+    compile project(':bpm:bonita-core:bonita-supervisor-mapping')
+    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service')
+    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service-impl')
+    compile project(':bpm:bonita-synchro-repository:bonita-synchro-register')
+    compile project(':services:bonita-time-tracker')
+    compile project(':services:bonita-transaction')
+    compile project(':bpm:bonita-core:bonita-core-data')
+    compile project(':services:bonita-log-technical')
+    compile project(':bpm:bonita-core:bonita-user-filter')
+    compile project(':services:bonita-work')
+    compile project(':bpm:bonita-external')
+    compile project(':services:bonita-profile')
+    compile project(':services:bonita-theme')
+    compile project(':bpm:bonita-common')
+}
+
+shade {
+    exclude project(':bpm:bonita-common')
+    exclude project(':platform:platform-resources')
+
+    excludeLibs('hibernate-core', new ShadeDependency(group: 'org.jboss.spec.javax.transaction', name: 'jboss-transaction-api_1.2_spec'))
+    excludeLibs('hibernate-entitymanager', new ShadeDependency(group: 'org.jboss.spec.javax.transaction', name: 'jboss-transaction-api_1.2_spec'))
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            shadow(MavenPublication) { publication ->
+                publication.getPom().with {
+                    name = "Bonita Server"
+                    description = "Bonita Server is the Server-side BPM Execution Engine"
+                }
+            }
+        }
+    }
+}
+
+task listDependencies(type: DependencyReportTask) {}

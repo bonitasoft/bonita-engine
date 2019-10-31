@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -36,73 +37,73 @@ public class SContactInfoUpdateBuilderImpl implements SContactInfoUpdateBuilder 
 
     @Override
     public SContactInfoUpdateBuilder updateEmail(final String email) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.EMAIL, email);
+        descriptor.addField(SContactInfo.EMAIL, email);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updatePhoneNumber(final String phoneNumber) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.PHONE_NUMBER, phoneNumber);
+        descriptor.addField(SContactInfo.PHONE_NUMBER, phoneNumber);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateMobileNumber(final String mobileNumber) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.MOBILE_NUMBER, mobileNumber);
+        descriptor.addField(SContactInfo.MOBILE_NUMBER, mobileNumber);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateFaxNumber(final String faxNumber) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.FAX_NUMBER, faxNumber);
+        descriptor.addField(SContactInfo.FAX_NUMBER, faxNumber);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateBuilding(final String building) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.BUILDING, building);
+        descriptor.addField(SContactInfo.BUILDING, building);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateRoom(final String room) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.ROOM, room);
+        descriptor.addField(SContactInfo.ROOM, room);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateAddress(final String address) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.ADDRESS, address);
+        descriptor.addField(SContactInfo.ADDRESS, address);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateZipCode(final String zipCode) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.ZIP_CODE, zipCode);
+        descriptor.addField(SContactInfo.ZIP_CODE, zipCode);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateCity(final String city) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.CITY, city);
+        descriptor.addField(SContactInfo.CITY, city);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateState(final String state) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.STATE, state);
+        descriptor.addField(SContactInfo.STATE, state);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateCountry(final String country) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.COUNTRY, country);
+        descriptor.addField(SContactInfo.COUNTRY, country);
         return this;
     }
 
     @Override
     public SContactInfoUpdateBuilder updateWebsite(final String website) {
-        descriptor.addField(SContactInfoBuilderFactoryImpl.WEBSITE, website);
+        descriptor.addField(SContactInfo.WEBSITE, website);
         return this;
     }
 

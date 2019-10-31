@@ -52,7 +52,12 @@ public class SpringBeanAccessorTest {
     private SpringBeanAccessor createSpringBeanAccessor() {
         FileSystemXmlApplicationContext parent = new FileSystemXmlApplicationContext();
         parent.refresh();
-        return new SpringBeanAccessor(parent) {
+        return new SpringBeanAccessor() {
+
+            @Override
+            protected BonitaSpringContext createContext() {
+                return new BonitaSpringContext(parent, "test");
+            }
 
             @Override
             protected Properties getProperties() {
@@ -125,6 +130,7 @@ public class SpringBeanAccessorTest {
 
         assertThat(context.getEnvironment().getProperty("myProperty")).isEqualTo("databaseValue");
     }
+
     @Test
     public void should_create_context_with_properties_from_database_that_override_system_properties() {
         contextProperties.setProperty("myProperty", "databaseValue");

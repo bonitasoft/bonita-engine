@@ -13,23 +13,41 @@
  **/
 package org.bonitasoft.engine.platform.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Charles Souillard
- */
-public interface SPlatform extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SPlatform implements PersistentObject {
 
-    String getVersion();
 
-    String getPreviousVersion();
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATED = "created";
+    public static final String ID = "id";
+    public static final String INITIAL_VERSION = "initialVersion";
+    public static final String PREVIOUS_VERSION = "previousVersion";
+    public static final String VERSION = "version";
+    public static final String INFORMATION = "information";
+    private long tenantId;
+    private long id;
+    private long created;
+    private String createdBy;
+    private String initialVersion;
+    private String previousVersion;
+    private String version;
+    private String information;
 
-    String getInitialVersion();
-
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getInformation();
+    public SPlatform(final String version, final String previousVersion, final String initialVersion, final String createdBy, final long created) {
+        this.version = version;
+        this.previousVersion = previousVersion;
+        this.initialVersion = initialVersion;
+        this.createdBy = createdBy;
+        this.created = created;
+    }
 
 }

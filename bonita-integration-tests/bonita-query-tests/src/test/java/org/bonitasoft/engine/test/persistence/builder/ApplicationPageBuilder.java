@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplicationPageImpl, ApplicationPageBuilder> {
+public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplicationPage, ApplicationPageBuilder> {
 
     private long applicationId;
     private long pageId;
@@ -29,8 +29,8 @@ public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplication
     }
 
     @Override
-    SApplicationPageImpl _build() {
-        return new SApplicationPageImpl(applicationId, pageId, token);
+    SApplicationPage _build() {
+        return new SApplicationPage(applicationId, pageId, token);
     }
 
     public ApplicationPageBuilder withApplicationId(final long applicationId) {

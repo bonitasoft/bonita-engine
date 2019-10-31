@@ -48,7 +48,6 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.theme.ThemeRetriever;
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.builder.impl.SThemeLogBuilderImpl;
 import org.bonitasoft.engine.theme.exception.SRestoreThemeException;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
@@ -138,8 +137,8 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public void restoreDefaultTheme(final SThemeType type) throws SRestoreThemeException {
         try {
-            final FilterOption defaultFilter = new FilterOption(STheme.class, SThemeBuilderFactory.IS_DEFAULT, false);
-            final FilterOption typeFilter = new FilterOption(STheme.class, SThemeBuilderFactory.TYPE, type.name());
+            final FilterOption defaultFilter = new FilterOption(STheme.class, STheme.IS_DEFAULT, false);
+            final FilterOption typeFilter = new FilterOption(STheme.class, STheme.TYPE, type.name());
             final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
             filterOptions.add(defaultFilter);
             filterOptions.add(typeFilter);
@@ -269,7 +268,7 @@ public class ThemeServiceImpl implements ThemeService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }

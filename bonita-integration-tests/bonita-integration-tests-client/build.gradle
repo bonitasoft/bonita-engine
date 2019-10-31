@@ -1,0 +1,48 @@
+dependencies {
+    compile project(':bonita-test-api')
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "junit:junit:${Deps.junit4Version}"
+    compile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+    compile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
+    compile "commons-dbcp:commons-dbcp:${Deps.commonsDbcpVersion}"
+    compile "commons-pool:commons-pool:${Deps.commonsPoolVersion}"
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    compile project(':bpm:bonita-common')
+    compile project(':bpm:bonita-client')
+    compile project(':bonita-integration-tests:bonita-test-utils:bonita-common-test-utils')
+    compile project(':bonita-integration-tests:bonita-test-utils:bonita-client-test-utils')
+    compile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    compile "net.javacrumbs.json-unit:json-unit-fluent:${Deps.jsonUnitVersion}"
+    compile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    compile project(':bpm:bonita-util:bonita-common-util-test')
+    compile "net.jodah:concurrentunit:${Deps.concurrentUnitVersion}"
+    runtime "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile project(':bpm:bonita-server')
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}
+
+integrationTest.doFirst {
+    def emptyFile = new File("$project.buildDir/bonita_home_client_HTTP/engine-client/conf/bonita-client-custom.properties")
+    emptyFile.getParentFile().mkdirs()
+    emptyFile.text = ""
+    copy {
+        from file("$projectDir/bonita-client-http.properties")
+        into file("$project.buildDir/bonita_home_client_HTTP/engine-client/work")
+        rename 'bonita-client-http.properties', 'bonita-client-community.properties'
+    }
+    def invalidFile = new File("$project.buildDir/bonita_home_client_invalidAPIType/engine-client/conf/bonita-client-custom.properties")
+    invalidFile.getParentFile().mkdirs()
+    invalidFile.text = ""
+    copy {
+        from file("$projectDir/bonita-client-invalid.properties")
+        into file("$project.buildDir/bonita_home_client_invalidAPIType/engine-client/work")
+        rename 'bonita-client-invalid.properties', 'bonita-client-community.properties'
+    }
+}
+group = 'org.bonitasoft.engine.test'
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

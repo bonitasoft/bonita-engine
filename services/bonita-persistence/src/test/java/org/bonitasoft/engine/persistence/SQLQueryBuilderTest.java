@@ -15,7 +15,7 @@
 package org.bonitasoft.engine.persistence;
 
 import static java.util.Collections.singletonMap;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -43,11 +43,9 @@ public class SQLQueryBuilderTest {
     private SQLQuery mockedQuery;
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
-    private Map<String, Class<? extends PersistentObject>> interfaceToClassMapping = Collections
-            .singletonMap(TestObject.class.getName(), TestObject.class);
 
     private QueryBuilder createQueryBuilder(String baseQuery, Vendor vendor) {
-        return new SQLQueryBuilder(baseQuery, vendor, TestObject.class, new DefaultOrderByBuilder(), classAliasMappings, interfaceToClassMapping,
+        return new SQLQueryBuilder(baseQuery, vendor, TestObject.class, new DefaultOrderByBuilder(), classAliasMappings,
                 LIKE_ESCAPE_CHARACTER);
     }
 

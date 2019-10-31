@@ -133,7 +133,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
@@ -219,7 +219,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     public void deleteArchivedRefBusinessDataInstance(long processInstanceId) throws SObjectModificationException {
         try {
             archiveService.deleteFromQuery("deleteArchivedRefBizDataForProcessInstance",
-                    Collections.<String, Object> singletonMap("processInstanceId", processInstanceId));
+                    Collections.singletonMap("processInstanceId", processInstanceId));
             //            archiveService.deleteFromQuery("deleteArchivedMultiRefBizDataForProcessInstance",
             //                    Collections.<String, Object> singletonMap("processInstanceId", processInstanceId));
         } catch (SRecorderException e) {
@@ -230,7 +230,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     public void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds) throws SObjectModificationException {
         try {
             archiveService.deleteFromQuery("deleteArchivedRefBizDataForProcessInstances",
-                    Collections.<String, Object> singletonMap("processInstanceIds", processInstanceIds));
+                    Collections.singletonMap("processInstanceIds", processInstanceIds));
         } catch (SRecorderException e) {
             throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceIds: " + processInstanceIds, e);
         }

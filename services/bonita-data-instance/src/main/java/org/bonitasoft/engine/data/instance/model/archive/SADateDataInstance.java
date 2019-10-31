@@ -13,14 +13,35 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive;
 
+import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @author Feng Hui
- */
-public interface SADateDataInstance extends SADataInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SADateDataInstance extends SADataInstance {
+
+    private Date value;
+
+
+    public SADateDataInstance(final SDataInstance sDataInstance) {
+        super(sDataInstance);
+        value = (Date) sDataInstance.getValue();
+    }
 
     @Override
-    Date getValue();
+    public Date getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(final Serializable value) {
+        this.value = (Date) value;
+    }
 
 }

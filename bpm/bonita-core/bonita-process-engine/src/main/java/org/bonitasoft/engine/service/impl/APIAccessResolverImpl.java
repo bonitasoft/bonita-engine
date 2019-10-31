@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
@@ -55,9 +53,7 @@ import org.bonitasoft.engine.service.APIAccessResolver;
  */
 public class APIAccessResolverImpl implements APIAccessResolver {
 
-    private static final Map<String, Object> apis = new HashMap<String, Object>(12);
-
-    private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName());
+    private static final Map<String, Object> apis = new HashMap<>();
 
     static {
         apis.put(PlatformAPI.class.getName(), new PlatformAPIImpl());
@@ -77,17 +73,16 @@ public class APIAccessResolverImpl implements APIAccessResolver {
     }
 
     @Override
-    public Object getAPIImplementation(final String interfaceName) throws APIImplementationNotFoundException {
-        final Object api = apis.get(interfaceName);
+    public <T> T getAPIImplementation(Class<T> apiInterface) throws APIImplementationNotFoundException {
+        final Object api = getApiImplementation(apiInterface);
         if (api == null) {
-            throw new APIImplementationNotFoundException("No API implementation was found for: " + interfaceName);
+            throw new APIImplementationNotFoundException("No API implementation was found for: " + apiInterface.getName());
         }
-        return api;
+        return apiInterface.cast(api);
     }
 
-    @Override
-    public boolean needSession(final String interfaceName) {
-        return !NO_SESSION_APIS.contains(interfaceName);
+    protected Object getApiImplementation(Class<?> apiInterface) {
+        return apis.get(apiInterface.getName());
     }
 
 }

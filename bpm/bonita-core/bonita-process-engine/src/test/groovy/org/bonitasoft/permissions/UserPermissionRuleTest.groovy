@@ -36,7 +36,7 @@ public class UserPermissionRuleTest {
     def APIAccessor apiAccessor
     @Mock
     def Logger logger
-    def PermissionRule rule = new UserPermissionRule();
+    def PermissionRule rule = new UserPermissionRule()
 
     @Test
     public void checkOnResourceWithCurrentUser() throws Exception {

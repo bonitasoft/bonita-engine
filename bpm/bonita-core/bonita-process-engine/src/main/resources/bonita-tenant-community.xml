@@ -3,10 +3,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:util="http://www.springframework.org/schema/util"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:task="http://www.springframework.org/schema/task"
         xsi:schemaLocation="
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
 
     <context:annotation-config />
 
@@ -38,7 +40,6 @@
     <bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
         <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
         <constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
-        <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
@@ -50,7 +51,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="workFactory" ref="workFactory" />
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
     </bean>
 
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -104,6 +104,7 @@
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
 
@@ -161,6 +162,7 @@
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workFactory" ref="workFactory" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
     </bean>
 
     <bean id="transitionConditionEvaluator"
@@ -799,6 +801,8 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
+        <constructor-arg name="tenantId" value="${tenantId}"/>
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
@@ -845,6 +849,13 @@
 
     <bean id="groovyScriptExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy">
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+    
+    <bean id="groovyScriptConditionExpressionExecutorStrategy"
+          class="org.bonitasoft.engine.expression.impl.GroovyScriptConditionExpressionExecutorStrategy">
         <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
@@ -925,13 +936,14 @@
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workExecutorService" ref="workExecutorService" />
-        <constructor-arg name="workFactory" ref="workFactory" />
+        <constructor-arg name="engineClock" ref="engineClock" />
     </bean>
 
     <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
         <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
+        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
     </bean>
 
     <bean id="operationsAnalyzer" class="org.bonitasoft.engine.core.operation.impl.OperationsAnalyzer" />
@@ -1067,6 +1079,31 @@
         <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
         <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
         <constructor-arg name="engineClock" ref="engineClock" />
+        <constructor-arg name="workExecutionAuditor" ref="workExecutionAuditor" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
+    </bean>
+
+    <bean id="workExecutionAuditor" class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor">
+        <property name="activated" value="${bonita.tenant.work.audit.activated:true}" />
+        <constructor-arg name="engineClock" ref="engineClock"/>
+        <constructor-arg name="executionCountCheckConfig">
+            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$ExecutionCountCheckConfig">
+                <constructor-arg name="executionCountThreshold"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count:10}"/>
+                <constructor-arg name="durationThresholdAmount"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_amount:10}"/>
+                <constructor-arg name="durationThresholdUnit"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.execution_count_duration_unit:MINUTES}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="registrationDurationElapsedCheckConfig">
+            <bean class="org.bonitasoft.engine.work.audit.WorkExecutionAuditor$RegistrationDurationElapsedCheckConfig">
+                <constructor-arg name="amount"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_amount:30}"/>
+                <constructor-arg name="unit"
+                                 value="${bonita.tenant.work.audit.abnormal.execution.threshold.elapsed_duration_since_registration_unit:MINUTES}"/>
+            </bean>
+        </constructor-arg>
     </bean>
 
     <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
@@ -1159,20 +1196,13 @@
         <constructor-arg name="themeRetriever" ref="themeRetriever" />
     </bean>
 
+    <task:scheduled-tasks scheduler="internalTasksScheduler">
+        <task:scheduled ref="sessionService" method="cleanInvalidSessions" cron="${org.bonitasoft.engine.clean.invalid.sessions.cron:0 0 */2 * * ?}"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="internalTasksScheduler"/>
 
     <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
-        <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
-        <property name="jobListeners">
-            <list>
-                <ref bean="timerEventTriggerJobListener" />
-            </list>
-        </property>
-    </bean>
-
-    <bean id="timerEventTriggerJobListener" class="org.bonitasoft.engine.jobs.TimerEventTriggerJobListener">
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
 
@@ -1245,14 +1275,22 @@
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
     </bean>
 
-    <bean id="eventInstanceService"
-          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
+    <bean id="eventInstanceRepository"
+          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
+
+    <bean id="eventInstanceService"
+          class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
+        <constructor-arg name="eventInstanceRepository" ref="eventInstanceRepository" />
+        <constructor-arg name="meterRegistry" ref="meterRegistry" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+    </bean>
+
 
     <bean id="refBusinessDataService"
           class="org.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
@@ -1267,11 +1305,9 @@
           class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
-        <constructor-arg name="dependencyService" ref="dependencyService" />
         <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
 
@@ -1334,6 +1370,10 @@
                     <constructor-arg name="hidden" value="false" />
                 </bean>
                 <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="bonita-theme.zip" />
+                    <constructor-arg name="hidden" value="false" />
+                </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
                     <constructor-arg name="zipName" value="task-autogenerated-form.zip" />
                     <constructor-arg name="hidden" value="false" />
                 </bean>
@@ -1363,6 +1403,10 @@
                     <constructor-arg name="zipName" value="api-extension-viewer.zip" />
                     <constructor-arg name="hidden" value="false" />
                 </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="bonita-task-list-page.zip" />
+                    <constructor-arg name="hidden" value="false" />
+                </bean>
 
                 <!-- New web-pages -->
                 <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
@@ -1372,6 +1416,14 @@
                 <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
                     <constructor-arg name="zipName" value="page-tenant-status.zip" />
                     <constructor-arg name="hidden" value="true" />
+                </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="page-install-export-organization.zip" />
+                    <constructor-arg name="hidden" value="false" />
+                </bean>
+                <bean class="org.bonitasoft.engine.page.impl.ImportPageDescriptor">
+                    <constructor-arg name="zipName" value="layout-bonita.zip" />
+                    <constructor-arg name="hidden" value="false" />
                 </bean>
             </list>
         </property>
@@ -1442,16 +1494,16 @@
         <constructor-arg name="servletUrl" value="${document.servlet.url}" />
     </bean>
 
-    <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl">
+    <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.TenantDependencyService">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.dependency.impl.DependencyServiceRegistrator" init-method="registerDependencyService">
+        <constructor-arg name="tenantDependencyService" ref="dependencyService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
-        <constructor-arg name="broadcastService" ref="broadcastService" />
-        <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="userTransactionService" ref="transactionService" />
-        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
@@ -1486,6 +1538,7 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
@@ -1515,7 +1568,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
-        <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
+        <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.${tenantId}.cache" />
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
@@ -1632,13 +1685,23 @@
         <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
     </bean>
 
+
+
+    <bean id="bdmDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${bdm.datasource.jndi.path}" />
+    </bean>
+
+    <bean id="bdmNonXaDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${bdm.notmanageddatasource.jndi.path}" />
+    </bean>
+
     <bean id="businessDataRepository" class="org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
         <constructor-arg name="configuration">
             <map>
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${bdm.datasource.jndi.path}" />
+                <entry key="hibernate.connection.datasource" value-ref="bdmDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.repository.show_sql}" />
                 <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.repository.format_sql}" />
                 <entry key="hibernate.transaction.jta.platform"
@@ -1660,6 +1723,7 @@
     <bean id="businessDataModelRepository"
           class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="schemaManager" ref="schemaManager" />
         <constructor-arg name="tenantResourcesService" ref="tenantResourcesService" />
         <constructor-arg name="tenantId" value="${tenantId}" />
@@ -1670,7 +1734,7 @@
         <constructor-arg name="configuration">
             <map>
                 <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${bdm.notmanageddatasource.jndi.path}" />
+                <entry key="hibernate.connection.datasource" value-ref="bdmNonXaDatasource" />
                 <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.schemamanager.show_sql}" />
                 <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.schemamanager.format_sql}" />
                 <entry key="hibernate.transaction.jta.platform"
@@ -1854,5 +1918,8 @@
     <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
 
     <bean id="engineClock" class="org.bonitasoft.engine.commons.time.DefaultEngineClock" />
+
+
+    <bean class="org.bonitasoft.engine.configuration.EngineTenantConfiguration" />
 
 </beans>

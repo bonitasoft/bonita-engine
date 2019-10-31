@@ -10,6 +10,11 @@
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
+        <property name="annotatedClasses">
+            <list>
+                <value>org.bonitasoft.engine.identity.model.SRole</value>
+            </list>
+        </property>
         <property name="mappingResources">
             <list>
                 <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
@@ -109,11 +114,14 @@
     <bean id="userMembershipRepository" class="org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
+    <bean id="roleRepository" class="org.bonitasoft.engine.test.persistence.repository.RoleRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
 
     <bean id="pageRepository" class="org.bonitasoft.engine.test.persistence.repository.PageRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
-    
+
    <bean id="applicationRepository" class="org.bonitasoft.engine.test.persistence.repository.ApplicationRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>

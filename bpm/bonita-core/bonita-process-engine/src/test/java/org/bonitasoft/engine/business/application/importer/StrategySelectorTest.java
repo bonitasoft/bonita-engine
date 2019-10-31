@@ -28,12 +28,21 @@ public class StrategySelectorTest {
     private StrategySelector selector;
 
     @Test
-    public void selectStrategy_should_return_instance_of_FailOnDuplicate_when_policy_is_FailOnDuplicate() throws Exception {
+    public void selectStrategy_should_return_instance_of_FailOnDuplicate_when_policy_is_FailOnDuplicate() {
         //when
         ApplicationImportStrategy strategy = selector.selectStrategy(ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(strategy).isInstanceOf(FailOnDuplicateApplicationImportStrategy.class);
+    }
+
+    @Test
+    public void selectStrategy_should_return_instance_of_ReplaceDuplicates_when_policy_is_ReplaceDuplicates() {
+        //when
+        ApplicationImportStrategy strategy = selector.selectStrategy(ApplicationImportPolicy.REPLACE_DUPLICATES);
+
+        //then
+        assertThat(strategy).isInstanceOf(ReplaceDuplicateApplicationImportStrategy.class);
     }
 
 }

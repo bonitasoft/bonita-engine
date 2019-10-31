@@ -43,7 +43,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -195,7 +194,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public void deleteAllPendingMappings() throws SActivityModificationException {
         try {
-            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.ACTOR_ID, -1);
+            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMapping.ACTOR_ID, -1);
             final DeleteAllRecord record = new DeleteAllRecord(SPendingActivityMapping.class, Collections.singletonList(filterOption));
             getRecorder().recordDeleteAll(record);
         } catch (final SRecorderException e) {
@@ -850,19 +849,4 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
              throws SBonitaReadException {
          return getPersistenceService().searchEntity(SHumanTaskInstance.class, ASSIGNED_AND_PENDING, queryOptions, Collections.emptyMap());
      }
-
-    @Override
-    public QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(final long parentActivityInstanceId, final int numberOfResults) {
-        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-
-        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-
-        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
-
-        return new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
-    }
-
 }

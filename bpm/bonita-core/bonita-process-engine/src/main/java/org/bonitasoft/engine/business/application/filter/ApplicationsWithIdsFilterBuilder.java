@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -37,10 +36,9 @@ public class ApplicationsWithIdsFilterBuilder {
     }
 
     public QueryOptions buildQueryOptions() {
-        final SApplicationBuilderFactory factory = BuilderFactory.get(SApplicationBuilderFactory.class);
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplication.class, factory.getIdKey(), OrderByType.ASC));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplication.class, SApplication.ID, OrderByType.ASC));
 
-        final FilterOption filterOption = new FilterOption(SApplication.class, factory.getIdKey());
+        final FilterOption filterOption = new FilterOption(SApplication.class, SApplication.ID);
         filterOption.in((Object[]) applicationIds);
 
         final List<FilterOption> filters = Collections.singletonList(filterOption);

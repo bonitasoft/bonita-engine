@@ -13,63 +13,35 @@
  **/
 package org.bonitasoft.engine.scheduler.model.impl;
 
+import lombok.Data;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
 public class SFailedJobImpl implements SFailedJob {
 
     private final long jobDescriptorId;
-
     private final String jobName;
-
     private final String description;
-
-    private final long retryNumber;
-
+    private final int retryNumber;
     private final long lastUpdateDate;
-
     private final String lastMessage;
 
-    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, final long retryNumber, final long lastUpdateDate,
-            final String lastMessage) {
+    public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, long retryNumber, final long lastUpdateDate,
+                          final String lastMessage) {
         this.jobDescriptorId = jobDescriptorId;
         this.jobName = jobName;
         this.description = description;
-        this.retryNumber = retryNumber;
+        this.retryNumber = (int) retryNumber;
         this.lastUpdateDate = lastUpdateDate;
         this.lastMessage = lastMessage;
     }
 
     @Override
-    public long getJobDescriptorId() {
-        return jobDescriptorId;
+    public int getNumberOfFailures() {
+        // we want the number of failures, not the number of retry
+        return retryNumber + 1;
     }
-
-    @Override
-    public String getJobName() {
-        return jobName;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    @Override
-    public long getRetryNumber() {
-        return retryNumber;
-    }
-
-    @Override
-    public long getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
 }

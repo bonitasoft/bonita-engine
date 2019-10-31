@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.search;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -27,12 +30,6 @@ import org.bonitasoft.engine.persistence.SearchFields;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Abstract class to allow to search server object and convert them to client object
@@ -83,7 +80,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
         final int numberOfResults = options.getMaxResults();
         final int fromIndex = options.getStartIndex();
         final List<SearchFilter> filters = options.getFilters();
-        final List<FilterOption> filterOptions = new ArrayList<FilterOption>(filters.size());
+        final List<FilterOption> filterOptions = new ArrayList<>(filters.size());
         for (final SearchFilter filter : filters) {
             final FilterOption option = searchDescriptor.getEntityFilter(filter);
             if (option != null) {// in case of a unknown filter on state
@@ -95,7 +92,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
         if (searchTerm != null) {
             userSearchTerm = searchDescriptor.getEntitySearchTerm(searchTerm);
         }
-        final List<OrderByOption> orderOptions = new ArrayList<OrderByOption>();
+        final List<OrderByOption> orderOptions = new ArrayList<>();
         final List<Sort> sorts = options.getSorts();
         for (final Sort sort : sorts) {
             final OrderByOption order = searchDescriptor.getEntityOrder(sort);
@@ -132,7 +129,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * @param queryOptions
      *        The query options to execute the count with
      * @return The number of result on the server
-     * @throws SBonitaReadException
+     * @throws SBonitaReadException when the search failed to retrieve the count number
      */
     public abstract long executeCount(QueryOptions queryOptions) throws SBonitaReadException;
 
@@ -142,7 +139,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * @param queryOptions
      *        The query options to execute the search with
      * @return The list of searched server objects
-     * @throws SBonitaReadException
+     * @throws SBonitaReadException when the search failed to retrieve the results
      */
     public abstract List<S> executeSearch(QueryOptions queryOptions) throws SBonitaReadException;
 

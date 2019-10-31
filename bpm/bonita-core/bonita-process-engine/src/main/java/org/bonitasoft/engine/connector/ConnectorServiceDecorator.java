@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -109,8 +110,8 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeConnector(final long processDefinitionId, final SConnectorInstance sConnectorInstance, SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
-                                            final Map<String, Object> inputParameters) throws SConnectorException {
+    public CompletableFuture<ConnectorResult> executeConnector(final long processDefinitionId, final SConnectorInstance sConnectorInstance, SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
+                                                                   final Map<String, Object> inputParameters) throws SConnectorException {
         return connectorService.executeConnector(processDefinitionId, sConnectorInstance, connectorImplementationDescriptor, classLoader, inputParameters);
     }
 

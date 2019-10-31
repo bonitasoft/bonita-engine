@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.form.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.page.AuthorizationRuleConstants.*;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -30,8 +30,8 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.page.impl.SPageImpl;
-import org.bonitasoft.engine.page.impl.SPageMappingImpl;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -93,7 +93,7 @@ public class FormMappingServiceImplTest {
         formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor, pageMappingService, pageService,
                 formMappingKeyGenerator, EXTERNAL, LEGACY, queriableLoggerService, authorizationRuleMapping);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
-        doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
+        doReturn(new SPage("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
     }
 
     @Test
@@ -214,9 +214,9 @@ public class FormMappingServiceImplTest {
     }
 
     private SFormMapping createFormMapping(long id) {
-        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setId(id);
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         sFormMapping.setPageMapping(pageMapping);
         return sFormMapping;
     }

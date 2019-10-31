@@ -13,7 +13,11 @@
  **/
 package org.bonitasoft.engine.job;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.awaitility.Awaitility;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -37,6 +42,8 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.hamcrest.core.IsCollectionContaining;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +98,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
             }
 
             //when
-            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
+            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), Collections.singletonMap("throwException", Boolean.FALSE));
 
             //then
             assertJobWasExecutedWithSucess("ThrowsExceptionJob");
@@ -159,16 +166,17 @@ public class JobExecutionIT extends CommonAPILocalIT {
         final Map<String, Serializable> parameters = new HashMap<>();
         try {
             getCommandAPI().execute("except", parameters);
-            FailedJob failedJob = waitForFailedJob("ThrowsExceptionJob", 0);
+            FailedJob failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
 
             //when
-            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), Collections.<String, Serializable> emptyMap());
+            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), emptyMap());
 
             //then
-            failedJob = waitForFailedJob("ThrowsExceptionJob", 1);
+            failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
             assertThat(failedJob.getJobName()).isEqualTo("ThrowsExceptionJob");
-            assertThat(failedJob.getRetryNumber()).isEqualTo(1);
             assertThat(failedJob.getDescription()).isEqualTo("Throw an exception when 'throwException'=true");
+            assertThat(failedJob.getLastMessage()).contains("org.bonitasoft.engine.scheduler.exception.SJobExecutionException: This job throws an arbitrary exception");
+            assertThat(failedJob.getNumberOfFailures()).isEqualTo(1);
         } finally {
             getCommandAPI().unregister("except");
         }

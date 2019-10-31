@@ -29,19 +29,19 @@ public class SCommandUpdateBuilderImpl implements SCommandUpdateBuilder {
 
     @Override
     public SCommandUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SCommandBuilderFactoryImpl.NAME, name);
+        this.descriptor.addField(SCommand.NAME, name);
         return this;
     }
 
     @Override
     public SCommandUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SCommandBuilderFactoryImpl.DESCRIPTION, description);
+        this.descriptor.addField(SCommand.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SCommandUpdateBuilder updateImplementation(final String implementation) {
-        descriptor.addField(SCommandBuilderFactoryImpl.IMPLEMENTATION, implementation);
+        descriptor.addField(SCommand.IMPLEMENTATION, implementation);
         return this;
     }
 

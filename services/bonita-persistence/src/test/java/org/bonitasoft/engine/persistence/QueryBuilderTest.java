@@ -34,8 +34,6 @@ public class QueryBuilderTest {
 
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     public Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
-    public Map<String, Class<? extends PersistentObject>> interfaceToClassMapping = Collections
-            .singletonMap(TestObject.class.getName(), TestObject.class);
 
     @Test
     public void should_hasChanged_return_false_if_query_has_not_changed() throws Exception {
@@ -47,7 +45,7 @@ public class QueryBuilderTest {
     }
 
     private QueryBuilder createQueryBuilder(String baseQuery) {
-        return new HQLQueryBuilder(baseQuery, new DefaultOrderByBuilder(), classAliasMappings, interfaceToClassMapping,
+        return new HQLQueryBuilder(baseQuery, new DefaultOrderByBuilder(), classAliasMappings,
                 LIKE_ESCAPE_CHARACTER);
     }
 

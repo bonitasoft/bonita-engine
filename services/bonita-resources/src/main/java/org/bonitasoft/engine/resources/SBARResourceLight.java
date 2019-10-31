@@ -14,63 +14,19 @@
 
 package org.bonitasoft.engine.resources;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
 public class SBARResourceLight implements PersistentObject {
     protected String name;
     protected BARResourceType type;
     protected long processDefinitionId;
     private long tenantId;
     private long id;
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BARResourceType getType() {
-        return type;
-    }
-
-    public void setType(BARResourceType type) {
-        this.type = type;
-    }
-
-    public long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
 }

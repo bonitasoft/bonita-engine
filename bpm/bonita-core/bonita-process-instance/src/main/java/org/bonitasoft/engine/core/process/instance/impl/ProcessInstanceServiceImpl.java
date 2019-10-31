@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -34,7 +35,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
+import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -60,7 +61,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -107,13 +107,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private static final int BATCH_SIZE = 100;
 
+    static final int IN_REQUEST_SIZE = 100;
+
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceRead;
 
     private final ActivityInstanceService activityService;
-
-    private final SProcessInstanceBuilderFactory processInstanceKeyProvider;
 
     private final EventInstanceService bpmEventInstanceService;
 
@@ -151,7 +151,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         this.commentService = commentService;
         this.refBusinessDataService = refBusinessDataService;
         this.contractDataService = contractDataService;
-        processInstanceKeyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         this.bpmEventInstanceService = bpmEventInstanceService;
         this.dataInstanceService = dataInstanceService;
         this.archiveService = archiveService;
@@ -228,6 +227,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
+    protected Iterable<List<Long>> getPartitionFromLargeList(Iterable<Long> allSourceObjectIds) {
+        return Iterables.partition(allSourceObjectIds, IN_REQUEST_SIZE);
+    }
 
     @Override
     public int deleteArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
@@ -239,10 +241,19 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         Set<Long> allSourceObjectIds = new HashSet<>();
         allSourceObjectIds.addAll(sourceProcessInstanceIds);
         allSourceObjectIds.addAll(archivedChildrenProcessInstances);
-        //delete all elements
-        deleteElementsOfArchivedProcessInstances(new ArrayList<>(allSourceObjectIds));
-        //delete all archive processes
-        return archiveService.deleteFromQuery("deleteArchiveProcessInstanceBySourceObjectId", Collections.<String,Object>singletonMap("sourceProcessInstanceIds", allSourceObjectIds));
+        int numberOfDeletedInstances = 0;
+        // Verify that the resulting IN statement in the request has a reasonable size, if not split in smaller requests
+        // See BS-19316
+        Iterable<List<Long>> sourceObjectIdsPartitions = getPartitionFromLargeList(allSourceObjectIds);
+        for (List<Long> sourceObjectIds2k : sourceObjectIdsPartitions) {
+            //delete all elements
+            deleteElementsOfArchivedProcessInstances(new ArrayList<>(sourceObjectIds2k));
+            //delete all archived processes
+            numberOfDeletedInstances = numberOfDeletedInstances
+                    + archiveService.deleteFromQuery("deleteArchiveProcessInstanceBySourceObjectId",
+                            Collections.singletonMap("sourceProcessInstanceIds", sourceObjectIds2k));
+        }
+        return numberOfDeletedInstances;
     }
 
     private void deleteElementsOfArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
@@ -255,14 +266,21 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedFlowNodeInstancesAndElements(List<Long> sourceProcessInstanceIds) throws SBonitaException {
-        List<Long> flowNodesSourceObjectIds = new ArrayList<>(activityService.getSourceObjectIdsOfArchivedFlowNodeInstances(sourceProcessInstanceIds));
-        if (flowNodesSourceObjectIds.isEmpty()) {
-            return;
+        List<Long> flowNodesSourceObjectIds = new ArrayList<>(
+                activityService.getSourceObjectIdsOfArchivedFlowNodeInstances(sourceProcessInstanceIds));
+        if (!flowNodesSourceObjectIds.isEmpty()) {
+            // Verify that the resulting IN statement in the request has a reasonable size, if not split it in smaller requests
+            // See BS-19316
+            Iterable<List<Long>> flowNodesSourceObjectIdsPartitions = getPartitionFromLargeList(flowNodesSourceObjectIds);
+            for (List<Long> flowNodesSourceObjectIds2k : flowNodesSourceObjectIdsPartitions) {
+                connectorInstanceService.deleteArchivedConnectorInstances(flowNodesSourceObjectIds2k,
+                        SConnectorInstance.FLOWNODE_TYPE);
+                dataInstanceService.deleteLocalArchivedDataInstances(flowNodesSourceObjectIds2k,
+                        DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                contractDataService.deleteArchivedUserTaskData(flowNodesSourceObjectIds2k);
+                activityService.deleteArchivedFlowNodeInstances(flowNodesSourceObjectIds2k);
+            }
         }
-        connectorInstanceService.deleteArchivedConnectorInstances(flowNodesSourceObjectIds, SConnectorInstance.FLOWNODE_TYPE);
-        dataInstanceService.deleteLocalArchivedDataInstances(flowNodesSourceObjectIds, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        contractDataService.deleteArchivedUserTaskData(flowNodesSourceObjectIds);
-        activityService.deleteArchivedFlowNodeInstances(flowNodesSourceObjectIds);
     }
 
     private Set<Long> getArchivedChildrenProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
@@ -287,7 +305,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public List<Long> getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(final long processDefinitionId, final int fromIndex, final int maxResults,
             final OrderByType sortingOrder) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final String saCommentSourceObjectId = BuilderFactory.get(SACommentBuilderFactory.class).getSourceObjectId();
+        final String saCommentSourceObjectId = SAComment.SOURCEOBJECTID_KEY;
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAProcessInstance.class, saCommentSourceObjectId, sortingOrder);
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId,
@@ -376,11 +394,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         dataInstanceService.deleteLocalDataInstances(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString(), dataPresent);
     }
 
-    private void deleteFlowNodeInstances(final long processInstanceId, final SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException {
+    private void deleteFlowNodeInstances(final long processInstanceId, final SProcessDefinition processDefinition) throws SProcessInstanceModificationException, SFlowNodeReadException, SBonitaReadException {
         List<SFlowNodeInstance> activityInstances;
         do {
-            activityInstances = activityService.getFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
+            activityInstances = activityService.getFlowNodeInstancesOfProcess(processInstanceId, 0, BATCH_SIZE);
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }
@@ -497,25 +514,25 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private void setProcessState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(processInstanceKeyProvider.getStateIdKey(), state.getId());
+        descriptor.addField(SProcessInstance.STATE_ID_KEY, state.getId());
         final long now = System.currentTimeMillis();
         switch (state) {
             case COMPLETED:
-                descriptor.addField(processInstanceKeyProvider.getEndDateKey(), now);
+                descriptor.addField(SProcessInstance.END_DATE_KEY, now);
                 break;
             case ABORTED:
-                descriptor.addField(processInstanceKeyProvider.getEndDateKey(), now);
+                descriptor.addField(SProcessInstance.END_DATE_KEY, now);
                 break;
             case CANCELLED:
-                descriptor.addField(processInstanceKeyProvider.getEndDateKey(), now);
+                descriptor.addField(SProcessInstance.END_DATE_KEY, now);
                 break;
             case STARTED:
-                descriptor.addField(processInstanceKeyProvider.getStartDateKey(), now);
+                descriptor.addField(SProcessInstance.START_DATE_KEY, now);
                 break;
             default:
                 break;
         }
-        descriptor.addField(processInstanceKeyProvider.getLastUpdateKey(), now);
+        descriptor.addField(SProcessInstance.LAST_UPDATE_KEY, now);
         updateProcessInstance(processInstance, descriptor, PROCESSINSTANCE_STATE);
     }
 
@@ -541,7 +558,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public void setStateCategory(final SProcessInstance processInstance, final SStateCategory stateCatetory) throws SProcessInstanceModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(processInstanceKeyProvider.getStateCategoryKey(), stateCatetory);
+        descriptor.addField(SProcessInstance.STATE_CATEGORY_KEY, stateCatetory);
         updateProcessInstance(processInstance, descriptor, PROCESS_INSTANCE_CATEGORY_STATE);
     }
 

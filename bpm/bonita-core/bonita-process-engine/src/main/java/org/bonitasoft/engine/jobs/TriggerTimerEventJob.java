@@ -15,19 +15,18 @@ package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
 
 /**
  * @author Baptiste Mesta
@@ -58,11 +57,9 @@ public class TriggerTimerEventJob extends InternalJob {
 
     private Long subProcessId;
 
-    private transient WorkService workService;
-    private transient JobService jobService;
-    private transient SchedulerService schedulerService;
-    private transient TechnicalLoggerService loggerService;
+    private transient EventInstanceService eventInstanceService;
     private Long jobDescriptorId;
+    private TenantServicesManager tenantServicesManager;
 
     @Override
     public String getName() {
@@ -75,22 +72,10 @@ public class TriggerTimerEventJob extends InternalJob {
     }
 
     @Override
-    public void execute() throws SJobExecutionException {
+    public void execute() throws SJobExecutionException, SRetryableException {
         try {
-            if (workService.isStopped()) {
-                loggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                        "Rescheduling Timer job " + jobDescriptorId + " because the work service was shutdown. the timer is in process definition "
-                                + processDefinitionId + " on definition element " + targetSFlowNodeDefinitionId);
-                try {
-                    final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-                    schedulerService.executeAgain(sJobDescriptor.getId());
-                } catch (final SBonitaException sbe) {
-                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                        loggerService
-                                .log(getClass(), TechnicalLogSeverity.WARNING, "Unable to reschedule the job: " + jobDescriptorId, sbe);
-                    }
-                }
-                return;
+            if (!tenantServicesManager.isStarted()) {
+                throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId + " because the tenant is not started");
             }
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
@@ -98,6 +83,14 @@ public class TriggerTimerEventJob extends InternalJob {
                 eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, targetSFlowNodeDefinitionId, containerType, subProcessId,
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
+            if (flowNodeInstanceId != null) {
+                Optional<STimerEventTriggerInstance> triggerInstance = eventInstanceService.getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+                if (triggerInstance.isPresent()) {
+                    eventInstanceService.deleteEventTriggerInstance(triggerInstance.get());
+                }
+
+            }
+
         } catch (final SBonitaException e) {
             throw new SJobExecutionException(e);
         }
@@ -116,10 +109,8 @@ public class TriggerTimerEventJob extends InternalJob {
         isInterrupting = (Boolean) attributes.get("isInterrupting");
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         eventsHandler = tenantServiceAccessor.getEventsHandler();
-        workService = tenantServiceAccessor.getWorkService();
-        jobService = tenantServiceAccessor.getJobService();
-        schedulerService = tenantServiceAccessor.getSchedulerService();
-        loggerService = tenantServiceAccessor.getTechnicalLoggerService();
+        tenantServicesManager = tenantServiceAccessor.getTenantServicesManager();
+        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
 }

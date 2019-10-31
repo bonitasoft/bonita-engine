@@ -98,21 +98,15 @@ public class BuildTestUtil {
                         definitionId + "-impl",
                         "generated", connectorClass.getName()));
     }
-    /*
-     * <?xml version="1.0" encoding="UTF-8"?>
-     * <implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
-     * <implementationId>plop-impl</implementationId>
-     * <implementationVersion>1.0.0</implementationVersion>
-     * <definitionId>plop</definitionId>
-     * <definitionVersion>1.0.0</definitionVersion>
-     * <implementationClassname>org.mycompany.connector.PlopImpl</implementationClassname>
-     * <hasSources>true</hasSources>
-     * <description></description>
-     * <jarDependencies>
-     * <jarDependency>plop-impl-1.0.0.jar</jarDependency>
-     * </jarDependencies>
-     * </implementation:connectorImplementation>
-     */
+    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, String className, String... dependencies) throws UnsupportedEncodingException {
+        return new BarResource(
+                className + ".impl",
+                BuildTestUtil.buildConnectorImplementationFile(definitionId,
+                        definitionVersion,
+                        definitionId + "-impl",
+                        "generated", className,
+                        dependencies));
+    }
 
     public static BusinessArchiveBuilder buildBusinessArchiveWithConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies, final List<BarResource> userFilters)

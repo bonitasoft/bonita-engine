@@ -13,7 +13,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.SWorkPreconditionException;
@@ -29,8 +29,6 @@ public class NotifyChildFinishedWorkTest {
 
     private static final int PROCESS_DEFINITION_ID = 123;
     private static final int FLOW_NODE_INSTANCE_ID = 345;
-    private static final int PARENT_ID = 456;
-    private static final String PARENT_TYPE = "parentType";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
@@ -51,7 +49,6 @@ public class NotifyChildFinishedWorkTest {
     public void before() throws SClassLoaderException {
         doReturn(this.getClass().getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         context = Collections.singletonMap(TenantAwareBonitaWork.TENANT_ACCESSOR, tenantServiceAccessor);
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, PARENT_ID, PARENT_TYPE);
 
         doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
         doReturn(flowNodeInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -59,6 +56,7 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_throw_precondition_exception_when_flownode_is_not_found() throws Exception {
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 4, false, false, false);
         doThrow(SFlowNodeNotFoundException.class).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
         expectedException.expect(SWorkPreconditionException.class);
@@ -69,8 +67,10 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_throw_precondition_exception_when_flownode_is_completed() throws Exception {
-        SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 1, false, false, false);
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(false);
+        flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
 
@@ -79,17 +79,35 @@ public class NotifyChildFinishedWorkTest {
 
         notifyChildFinishedWork.work(context);
     }
+    @Test
+    public void should_throw_precondition_exception_when_flownode_changed() throws Exception {
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 3, false, false, false);
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
+        flowNodeInstance.setTerminal(true);
+        flowNodeInstance.setStateId(2);
+        doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
+
+
+        expectedException.expect(SWorkPreconditionException.class);
+        expectedException.expectMessage("Unable to execute flow node "+FLOW_NODE_INSTANCE_ID+" because it is not in the expected state " +
+                "( expected state: 3, transitioning: false, aborting: false, canceling: false, but got  state: 2, transitioning: false, aborting: false, canceling: false)." +
+                " Someone probably already called execute on it.");
+
+        notifyChildFinishedWork.work(context);
+    }
 
     @Test
     public void should_notify_child_finished_if_flow_node_is_completed() throws Exception {
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 2, false, false, false);
         doReturn(containerRegistry).when(tenantServiceAccessor).getContainerRegistry();
-        SAutomaticTaskInstanceImpl flowNodeInstance = new SAutomaticTaskInstanceImpl();
+        SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(true);
+        flowNodeInstance.setStateId(2);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
         notifyChildFinishedWork.work(context);
 
-        verify(containerRegistry).nodeReachedState(PROCESS_DEFINITION_ID, flowNodeInstance, PARENT_ID, PARENT_TYPE);
+        verify(containerRegistry).nodeReachedState(flowNodeInstance);
     }
 
 }

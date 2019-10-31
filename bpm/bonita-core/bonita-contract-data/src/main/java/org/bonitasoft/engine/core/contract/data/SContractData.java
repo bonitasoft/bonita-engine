@@ -15,33 +15,23 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SContractData extends PersistentObjectId implements PersistentObject {
 
-    private static final long serialVersionUID = 4666337073276985147L;
-
     private String name;
-
-    Serializable value;
-
-    public long getScopeId() {
-        return scopeId;
-    }
-
-    public void setScopeId(long scopeId) {
-        this.scopeId = scopeId;
-    }
-
+    private Serializable value;
     private long scopeId;
-
-    public SContractData() {
-        super();
-    }
 
     public SContractData(final String name, final Serializable value, long scopeId) {
         super();
@@ -49,27 +39,4 @@ public abstract class SContractData extends PersistentObjectId implements Persis
         this.scopeId = scopeId;
         this.value = value;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public Serializable getValue() {
-        return value;
-    }
-
-    public void setValue(final Serializable value) {
-        this.value = value;
-    }
-
-
-    @Override
-    public String getDiscriminator() {
-        return SContractData.class.getName();
-    }
-
 }

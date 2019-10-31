@@ -385,7 +385,11 @@ CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
 GO
+CREATE INDEX idx_fni_loggroup3_terminal ON flownode_instance(logicalgroup3, terminal, tenantid)
+GO
 CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid)
+GO
+CREATE INDEX idx_fni_activity_instance_id_kind ON flownode_instance(activityInstanceId, kind, tenantid)
 GO
 
 CREATE TABLE connector_instance (
@@ -448,6 +452,8 @@ CREATE TABLE waiting_event (
 GO
 CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active)
 GO
+CREATE INDEX idx_waiting_event_correl ON waiting_event (correlation1, correlation2, correlation3, correlation4, correlation5)
+GO
 
 CREATE TABLE message_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -464,10 +470,13 @@ CREATE TABLE message_instance (
   	correlation3 NVARCHAR(128),
   	correlation4 NVARCHAR(128),
   	correlation5 NVARCHAR(128),
+  	creationDate NUMERIC(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
 )
 GO
 CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3)
+GO
+CREATE INDEX idx_message_instance_correl ON message_instance (correlation1, correlation2, correlation3, correlation4, correlation5)
 GO
 
 CREATE TABLE pending_mapping (
@@ -652,7 +661,7 @@ CREATE TABLE command (
   name NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   IMPLEMENTATION NVARCHAR(100) NOT NULL,
-  system BIT,
+  isSystem BIT,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 )
@@ -1090,6 +1099,9 @@ CREATE TABLE job_param (
   PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_job_param_tenant_jobid ON job_param (tenantid, jobDescriptorId)
+GO
+
 
 CREATE TABLE job_log (
   tenantid NUMERIC(19, 0) NOT NULL,

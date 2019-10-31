@@ -28,7 +28,6 @@ import org.bonitasoft.engine.core.category.exception.SCategoryInProcessAlreadyEx
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderFactory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryLogBuilder;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryLogBuilderFactory;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
@@ -105,7 +104,11 @@ public class CategoryServiceImpl implements CategoryService {
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new category with name " + name);
         final long creator;
         creator = getCreator();
-        final SCategory sCategory = BuilderFactory.get(SCategoryBuilderFactory.class).createNewInstance(name, creator).setDescription(description).done();
+        final long now = System.currentTimeMillis();
+        final SCategory sCategory = SCategory.builder().name(name)
+                .creator(creator)
+                .creationDate(now)
+                .lastUpdateDate(now).description(description).build();
         final InsertRecord insertRecord = new InsertRecord(sCategory);
         try {
             recorder.recordInsert(insertRecord, CATEGORY);
@@ -365,7 +368,7 @@ public class CategoryServiceImpl implements CategoryService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }

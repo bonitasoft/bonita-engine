@@ -6,7 +6,7 @@
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SDataInstanceImpl" abstract="true" table="data_instance">
+	<class name="org.bonitasoft.engine.data.instance.model.SDataInstance" abstract="true" table="data_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -21,49 +21,49 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<subclass name="SIntegerDataInstanceImpl" abstract="false" discriminator-value="SIntegerDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SIntegerDataInstance" abstract="false" discriminator-value="SIntegerDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="intValue" />
 	</subclass>
 
-	<subclass name="SLongDataInstanceImpl" abstract="false" discriminator-value="SLongDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SLongDataInstance" abstract="false" discriminator-value="SLongDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="longValue" />
 	</subclass>
 
-	<subclass name="SDoubleDataInstanceImpl" abstract="false" discriminator-value="SDoubleDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SDoubleDataInstance" abstract="false" discriminator-value="SDoubleDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="doubleValue" />
 	</subclass>
 
-	<subclass name="SFloatDataInstanceImpl" abstract="false" discriminator-value="SFloatDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SFloatDataInstance" abstract="false" discriminator-value="SFloatDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="floatValue" />
 	</subclass>
 
-	<subclass name="SShortTextDataInstanceImpl" abstract="false" discriminator-value="SShortTextDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SShortTextDataInstance" abstract="false" discriminator-value="SShortTextDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="shortTextValue" type="string" />
 	</subclass>
 
-	<subclass name="SBooleanDataInstanceImpl" discriminator-value="SBooleanDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SBooleanDataInstance" discriminator-value="SBooleanDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="booleanValue" />
 	</subclass>
 
-	<subclass name="SLongTextDataInstanceImpl" abstract="false" discriminator-value="SLongTextDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SLongTextDataInstance" abstract="false" discriminator-value="SLongTextDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="clobValue" type="materialized_clob"  />
 	</subclass>
 
-	<subclass name="SXMLDataInstanceImpl" abstract="false" discriminator-value="SXMLDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" abstract="false" discriminator-value="SXMLDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="clobValue" type="materialized_clob"  />
 		<property name="namespace" column="namespace" type="string" />
 		<property name="element" column="element" type="string" />
 	</subclass>
 
-	<subclass name="SBlobDataInstanceImpl" abstract="false" discriminator-value="SBlobDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" abstract="false" discriminator-value="SBlobDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="blobValue" type="materialized_blob" />
 	</subclass>
 
-	<subclass name="SXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SXMLObjectDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" abstract="false" discriminator-value="SXMLObjectDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="clobValue" type="materialized_clob" />
 	</subclass>
 
-	<subclass name="SDateDataInstanceImpl" abstract="false" discriminator-value="SDateDataInstanceImpl" extends="SDataInstanceImpl">
+	<subclass name="org.bonitasoft.engine.data.instance.model.SDateDataInstance" abstract="false" discriminator-value="SDateDataInstanceImpl" extends="org.bonitasoft.engine.data.instance.model.SDataInstance">
 		<property name="value" column="longValue">
 			<type name="org.bonitasoft.engine.persistence.DateStoredAsLongUserType" />
 		</property>

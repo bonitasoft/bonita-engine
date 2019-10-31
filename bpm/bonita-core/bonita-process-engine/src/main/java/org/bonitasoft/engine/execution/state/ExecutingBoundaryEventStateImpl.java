@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -23,8 +22,6 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 
@@ -73,21 +70,15 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
     private void abortRelatedActivity(final SBoundaryEventInstance boundaryEventInstance)
             throws SActivityStateExecutionException {
-        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory
-                .get(SUserTaskInstanceBuilderFactory.class);
         if (SStateCategory.NORMAL.equals(boundaryEventInstance.getStateCategory())) {
             try {
                 final SActivityInstance relatedActivityInst = activityInstanceService
                         .getActivityInstance(boundaryEventInstance.getActivityInstanceId());
+
                 activityInstanceService.setStateCategory(relatedActivityInst, SStateCategory.ABORTING);
                 activityInstanceService.setAbortedByBoundaryEvent(relatedActivityInst, boundaryEventInstance.getId());
-                if (relatedActivityInst.isStable() && !relatedActivityInst.isStateExecuting()) {
-                    containerRegistry
-                            .executeFlowNode(relatedActivityInst.getProcessDefinitionId(),
-                                    boundaryEventInstance
-                                            .getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()),
-                                    relatedActivityInst.getId());
-                }
+                containerRegistry
+                        .executeFlowNode(relatedActivityInst);
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
             }

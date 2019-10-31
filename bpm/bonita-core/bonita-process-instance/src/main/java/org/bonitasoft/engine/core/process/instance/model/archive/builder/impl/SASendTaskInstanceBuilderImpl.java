@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SASendTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SASendTaskInstanceBuilder {
 
-    public SASendTaskInstanceBuilderImpl(final SASendTaskInstanceImpl entity) {
+    public SASendTaskInstanceBuilderImpl(final SASendTaskInstance entity) {
         super(entity);
     }
 

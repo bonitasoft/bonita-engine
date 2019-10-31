@@ -13,16 +13,17 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static java.util.Collections.singletonList;
 import static java.util.stream.Stream.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.home.BonitaResource.resource;
+import static org.bonitasoft.engine.io.IOUtil.generateJar;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -228,5 +230,41 @@ public class VirtualClassLoaderTest {
     private BonitaClassLoader classloader(long id) {
         return new BonitaClassLoader(Stream.of(resource("test-1.jar", new byte[] { 1, 2, 3 })), "here", id, tempDir.toURI(),
                 BonitaClassLoader.class.getClassLoader());
+    }
+
+    @Test
+    public void should_be_able_to_replace_class_with_same_name_in_defferent_classloader() throws Exception{
+        temporaryFolder.create();
+        File jar1File = temporaryFolder.newFile("jar1.jar");
+        File jar2File = temporaryFolder.newFile("jar2.jar");
+        byte[] jar1 = generateJar("Hello",
+                "public class Hello{",
+                "public String there(){",
+                "return \"hello\";",
+                "}",
+                "}");
+        byte[] jar2 = generateJar("Hello",
+                "public class Hello{",
+                "public String there(){",
+                "return \"hello there\";",
+                "}",
+                "}");
+        Files.write(jar1File.toPath(), jar1);
+        Files.write(jar2File.toPath(), jar2);
+        VirtualClassLoader mainClassLoader = new VirtualClassLoader("type1", 1, Thread.currentThread().getContextClassLoader());
+
+        BonitaClassLoader classLoader1 = new BonitaClassLoader(singletonList(jar1File).stream().map(j -> new BonitaResource("jar1.jar", jar1)), "type1", 1, temporaryFolder.newFolder("cl1").toURI(), Thread.currentThread().getContextClassLoader());
+        BonitaClassLoader classLoader2 = new BonitaClassLoader(singletonList(jar1File).stream().map(j -> new BonitaResource("jar2.jar", jar2)), "type1", 1, temporaryFolder.newFolder("cl2").toURI(), Thread.currentThread().getContextClassLoader());
+        mainClassLoader.replaceClassLoader(classLoader1);
+
+        // Class.forName do not work, it keeps the class from the previous classloader
+        // Class<?> class1 = Class.forName("Hello", false, mainClassLoader);
+        Class<?> class1 = mainClassLoader.loadClass("Hello");
+        assertThat(class1.getMethod("there").invoke(class1.newInstance())).isEqualTo("hello");
+        mainClassLoader.replaceClassLoader(classLoader2);
+
+        //Class<?> class2 = Class.forName("Hello", false, mainClassLoader); KO
+        Class<?> class2 = mainClassLoader.loadClass("Hello");
+        assertThat(class2.getMethod("there").invoke(class2.newInstance())).isEqualTo("hello there");
     }
 }

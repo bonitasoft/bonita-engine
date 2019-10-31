@@ -1,17 +1,24 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Baptiste Mesta
  */
+@Slf4j
 public class TestEngineImpl implements TestEngine {
 
     private static TestEngineImpl INSTANCE = createTestEngine();
+    private BonitaDatabaseConfiguration bonitaDatabaseConfiguration;
+    private BonitaDatabaseConfiguration businessDataDatabaseConfiguration;
+    private TestDatabaseConfigurator testDatabaseConfigurator = new TestDatabaseConfigurator();
 
     private static TestEngineImpl createTestEngine() {
-        return new TestEngineImpl(new EngineStarter(), new EngineCommander());
+        return new TestEngineImpl(EngineStarter.create(), new EngineCommander());
     }
 
     private final EngineStarter engineStarter;
@@ -41,17 +48,31 @@ public class TestEngineImpl implements TestEngine {
     /**
      * start the engine and return if it was effectively started
      *
-     * @return
-     * @throws Exception
+     * @throws Exception if Engine cannot be started
      */
     @Override
     public boolean start() throws Exception {
+        initializeDatabaseConfigurations();
         if (!started) {
             doStart();
             started = true;
             return true;
         }
         return false;
+    }
+
+    private void initializeDatabaseConfigurations() {
+        if (bonitaDatabaseConfiguration == null || businessDataDatabaseConfiguration == null) {
+            BonitaDatabaseConfiguration configuration = testDatabaseConfigurator.getDatabaseConfiguration();
+            if (bonitaDatabaseConfiguration == null) {
+                bonitaDatabaseConfiguration = configuration;
+                engineStarter.setBonitaDatabaseConfiguration(bonitaDatabaseConfiguration);
+            }
+            if (businessDataDatabaseConfiguration == null) {
+                businessDataDatabaseConfiguration = configuration;
+                engineStarter.setBusinessDataDatabaseConfiguration(businessDataDatabaseConfiguration);
+            }
+        }
     }
 
     protected synchronized void doStart() throws Exception {
@@ -84,5 +105,23 @@ public class TestEngineImpl implements TestEngine {
     @Override
     public void setDropOnStop(boolean dropOnStop) {
         engineStarter.setDropOnStop(dropOnStop);
+    }
+
+    @Override
+    public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration configuration) {
+        bonitaDatabaseConfiguration = configuration;
+    }
+
+    @Override
+    public void setBusinessDataDatabaseProperties(BonitaDatabaseConfiguration database) {
+        this.businessDataDatabaseConfiguration = database;
+    }
+
+    public BonitaDatabaseConfiguration getBonitaDatabaseConfiguration() {
+        return bonitaDatabaseConfiguration;
+    }
+
+    public BonitaDatabaseConfiguration getBusinessDataDatabaseConfiguration() {
+        return businessDataDatabaseConfiguration;
     }
 }

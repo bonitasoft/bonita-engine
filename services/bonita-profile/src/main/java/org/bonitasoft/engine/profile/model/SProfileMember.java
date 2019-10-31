@@ -13,25 +13,37 @@
  **/
 package org.bonitasoft.engine.profile.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public interface SProfileMember extends PersistentObject {
 
-    long getProfileId();
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SProfileMember implements PersistentObject {
 
-    long getUserId();
-
-    long getGroupId();
-
-    long getRoleId();
-
-    String getDisplayNamePart1();
-
-    String getDisplayNamePart2();
-
-    String getDisplayNamePart3();
-
+    public static final String DISPLAY_NAME_PART3 = "displayNamePart3";
+    public static final String DISPLAY_NAME_PART2 = "displayNamePart2";
+    public static final String DISPLAY_NAME_PART1 = "displayNamePart1";
+    public static final String ROLE_ID = "roleId";
+    public static final String GROUP_ID = "groupId";
+    public static final String USER_ID = "userId";
+    public static final String PROFILE_ID = "profileId";
+    public static final String ID = "id";
+    private long id;
+    private long tenantId;
+    private long profileId;
+    @Builder.Default
+    private long userId = -1;
+    @Builder.Default
+    private long groupId = -1;
+    @Builder.Default
+    private long roleId = -1;
+    private transient String displayNamePart1;
+    private transient String displayNamePart2;
+    private transient String displayNamePart3;
 }

@@ -22,13 +22,11 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 /**
@@ -38,11 +36,9 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
 
     private CommandService commandService;
 
-    private SCommandBuilderFactory commandBuilderFactory;
 
     public CommandServiceIntegrationTest() {
         commandService = getTenantAccessor().getCommandService();
-        commandBuilderFactory = BuilderFactory.get(SCommandBuilderFactory.class);
     }
     @After
     public void restoreDefaultCommands() throws SBonitaException {
@@ -54,8 +50,11 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test(expected = SCommandAlreadyExistsException.class)
     public void testSCommandAlreadyExistsException() throws Exception {
         getTransactionService().begin();
-        final SCommand command = commandBuilderFactory.createNewInstance("createCommand", "this is a command", "command implementation")
-                .done();
+        final SCommand command = SCommand.builder()
+                .name("createCommand")
+                .description("this is a command")
+                .implementation("command implementation")
+                .build();
         commandService.create(command);
         try {
             commandService.create(command);
@@ -79,8 +78,11 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void testCreateCommand() throws Exception {
         getTransactionService().begin();
-        final SCommand command1 = commandBuilderFactory.createNewInstance("createCommand", "this is a command", "command implementation")
-                .done();
+        final SCommand command1 = SCommand.builder()
+                .name("createCommand")
+                .description("this is a command")
+                .implementation("command implementation")
+                .build();
         commandService.create(command1);
         final SCommand command2 = commandService.get("createCommand");
         assertNotNull("can't find the category after adding it", command2);
@@ -93,8 +95,10 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test(expected = SCommandNotFoundException.class)
     public void testDeleteCommand() throws Exception {
         getTransactionService().begin();
-        final SCommand command = commandBuilderFactory
-                .createNewInstance("testCommandDelete", "this is a command", "command implementation").done();
+        final SCommand command = SCommand.builder()
+                .name("testCommandDelete")
+                .description("this is a command")
+                .implementation("command implementation").build();
         commandService.create(command);
         commandService.delete("testCommandDelete");
         try {
@@ -109,12 +113,18 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final int initialNbOfCommands = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC).size();
 
-        final SCommand command1 = commandBuilderFactory
-                .createNewInstance("createCommand1", "this is a command", "command implementation").done();
-        final SCommand command2 = commandBuilderFactory
-                .createNewInstance("createCommand2", "this is a command", "command implementation").done();
-        final SCommand command3 = commandBuilderFactory
-                .createNewInstance("createCommand3", "this is a command", "command implementation").done();
+        final SCommand command1 = SCommand.builder()
+                .name("createCommand1")
+                .description("this is a command")
+                .implementation("command implementation").build();
+        final SCommand command2 = SCommand.builder()
+                .name("createCommand2")
+                .description("this is a command")
+                .implementation("command implementation").build();
+        final SCommand command3 = SCommand.builder()
+                .name("createCommand3")
+                .description("this is a command")
+                .implementation("command implementation").build();
         commandService.create(command1);
         commandService.create(command2);
         commandService.create(command3);
@@ -130,8 +140,11 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void testUpdateCommand() throws Exception {
         getTransactionService().begin();
-        final SCommand oldCommand = commandBuilderFactory.createNewInstance("old", "this is an old command", "command implementation")
-                .done();
+        final SCommand oldCommand = SCommand.builder()
+                .name("old")
+                .description("this is an old command")
+                .implementation("command implementation")
+                .build();
         commandService.create(oldCommand);
         assertEquals("old", oldCommand.getName());
         assertEquals("this is an old command", oldCommand.getDescription());
@@ -150,8 +163,11 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void testget() throws Exception {
         getTransactionService().begin();
-        final SCommand sCommand = commandBuilderFactory.createNewInstance("commandOne", "this is a command", "command implementation")
-                .done();
+        final SCommand sCommand = SCommand.builder()
+                .name("commandOne")
+                .description("this is a command")
+                .implementation("command implementation")
+                .build();
         commandService.create(sCommand);
         final SCommand command = commandService.get("commandOne");
         assertEquals("commandOne", command.getName());
@@ -165,12 +181,21 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final int initialNbOfCommands = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC).size();
 
-        final SCommand sCommand1 = commandBuilderFactory.createNewInstance("aaaaa", "this is command1", "command implementation")
-                .done();
-        final SCommand sCommand2 = commandBuilderFactory.createNewInstance("aaaab", "this is command2", "command implementation")
-                .done();
-        final SCommand sCommand3 = commandBuilderFactory.createNewInstance("aaaac", "this is command3", "command implementation")
-                .done();
+        final SCommand sCommand1 = SCommand.builder()
+                .name("aaaaa")
+                .description("this is command1")
+                .implementation("command implementation")
+                .build();
+        final SCommand sCommand2 = SCommand.builder()
+                .name("aaaab")
+                .description("this is command2")
+                .implementation("command implementation")
+                .build();
+        final SCommand sCommand3 = SCommand.builder()
+                .name("aaaac")
+                .description("this is command3")
+                .implementation("command implementation")
+                .build();
         commandService.create(sCommand1);
         commandService.create(sCommand2);
         commandService.create(sCommand3);

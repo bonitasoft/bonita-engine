@@ -15,6 +15,9 @@ package org.bonitasoft.engine.scheduler.model.impl;
 
 import java.util.Map.Entry;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 
 /**
@@ -22,12 +25,11 @@ import org.bonitasoft.engine.scheduler.model.SJobData;
  * @version 6.4.0
  * @since 6.4.0
  */
+@Data
 public class SJobDataImpl implements SJobData {
 
     private final String key;
-
     private final Object value;
-
     final String classOfValue;
 
     public SJobDataImpl(final Entry<String, Object> jobData) {
@@ -36,25 +38,4 @@ public class SJobDataImpl implements SJobData {
         classOfValue = value.getClass().getName();
     }
 
-    @Override
-    public String getKey() {
-        return key;
-    }
-
-    @Override
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public String getClassOfValue() {
-        return classOfValue;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder("{'");
-        builder.append(key).append("'='").append(value).append("', class='").append(classOfValue).append("'}");
-        return builder.toString();
-    }
 }

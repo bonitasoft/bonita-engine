@@ -50,7 +50,7 @@ import org.springframework.util.CollectionUtils;
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  */
-public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
+public class LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
@@ -160,7 +160,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     }
 
     protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser) throws LoginException {
-        if (!sTenant.isActivated()) {
+        if (sTenant.isDeactivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
         if (sTenant.isPaused()) {

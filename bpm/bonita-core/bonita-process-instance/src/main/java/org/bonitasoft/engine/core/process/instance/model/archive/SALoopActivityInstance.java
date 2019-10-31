@@ -13,12 +13,43 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SALoopActivityInstance extends SAActivityInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SALoopActivityInstance extends SAActivityInstance {
+    private int loopCounter;
+    private int loopMax;
 
-    int getLoopCounter();
+    public SALoopActivityInstance(final SLoopActivityInstance sLoopActivityInstance) {
+        super(sLoopActivityInstance);
+        loopMax = sLoopActivityInstance.getLoopMax();
+        loopCounter = sLoopActivityInstance.getLoopCounter();
+    }
 
-    int getLoopMax();
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.LOOP_ACTIVITY;
+    }
+
+    @Override
+    public String getKind() {
+        return "loop";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SLoopActivityInstance.class;
+    }
+
+
 }

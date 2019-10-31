@@ -1,52 +1,68 @@
-baaonita-engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
-=============
+bonita-engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
 
-What it does?
--------------
-This project builds Bonita Execution Engine (Community Edition)
+![Travis CI](https://img.shields.io/travis/bonitasoft/bonita-engine/master?label=Travis%20build&logo=travis)
+
+[![Github Actions status](https://github.com/bonitasoft/bonita-engine/workflows/Build%20Engine%20Community/badge.svg)](https://github.com/bonitasoft/bonita-engine/actions)
+
+Deploy, execute, manage applications made with Bonita Studio.
 
 
-Requirements
--------------
->     Java JDK 1.8 or higher
+## Using the Engine
 
-This project bundles the [Maven Wrapper](https://github.com/takari/maven-wrapper), so the `mvnw` script is available at
+The engine is included as part of either [Bonita Studio][downloads] or [Bonita Web Platform][downloads], and executes the BPMN process logic.
+The engine can however be included as a standalone dependency in a custom Application, as explained [here][standalone]
+
+## Running the Project
+
+### Prerequisites
+>     Java JDK 1.8 (to compile), and JVM 8 or 11 (to run)
+
+This project bundles the [Gradle Wrapper][wrapper], so the `gradlew` script is available at
 the project root.
 
+### Compiling
 
-Building the Engine
------------------
-Just run the following Maven command:
+Just run the following Gradle command:
 ```
-./mvnw install
-```
-
-To be able to successfully build the Bonita components that use the Engine, run:
-```
- ./mvnw install -Ppackage,javadoc
+./gradlew build
 ```
 
-The command above runs all unit tests. To skip them, add the `-DskipTests`
+To be able to successfully build other Bonita components that use the Engine, run:
+```
+ ./gradlew publishToMavenLocal
+```
+Among other things, it also generates the javadoc used by Bonita Studio.
+
+The command above runs all unit tests. To skip them, add the `-x test`
 option.
+
+### Running unit / integration tests
 
 To run all **unit + integration tests** (on the default embedded H2
 database), run the following command:
 ```
-./mvnw verify -Ptests
+./gradlew test integrationTest
 ```
 
-To run all **unit + integration tests** on mysql, postgres or oracle using
-a _Docker_ container, run one of the following commands:
-```
-./mvnw verify -Ptests,mysql
-./mvnw verify -Ptests,oracle
-./mvnw verify -Ptests,postgres
-```
+## Project Structure
+The project is composed of several modules. Unit tests are contained in the modules, integration tests are regrouped in bonita-integration-tests.
 
-How to contribute
------------------
+* `bonita-engine-spring-boot-starter` : Run the engine in standalone mode using Spring boot, see [documentation][standalone]
+* `bonita-engine-standalone` : Run the engine in standalone programmatically, see [documentation][standalone]
+* `bonita-test-api` : Junit Rule to include the engine in your tests
+* `bpm` : Services related to bpm process execution
+* `buildSrc` : Internal Gradle plugins used to build Bonita Engine
+* `platform` : Services that handle the platform creation/configuration
+* `services` : Generic services used by the engine
+ 
+## How to contribute
+In order to contribute to the project, read the [guide][guide].
+To report an issue use the official [bugtracker][bugtracker].
 
-In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD)
+
+
+
+
 
 Fix .... 
 TODO

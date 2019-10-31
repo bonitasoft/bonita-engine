@@ -13,13 +13,12 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl.*;
-
-import java.util.List;
-
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import java.util.List;
+
+import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
 
 /**
  * @author Emmanuel Duchastenier
@@ -54,5 +53,22 @@ public class BPMEventRepository extends TestRepository {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
         return namedQuery.executeUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
+    public int deleteMessageInstanceByIds(List<Long> ids) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("deleteMessageInstanceByIds");
+
+        namedQuery.setParameterList("ids", ids);
+        return namedQuery.executeUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getMessageInstanceIdOlderThanCreationDate");
+        namedQuery.setParameter("creationDate", creationDate);
+        return namedQuery.list();
     }
 }

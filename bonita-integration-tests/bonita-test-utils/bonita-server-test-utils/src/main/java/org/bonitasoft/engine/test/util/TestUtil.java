@@ -46,7 +46,6 @@ public class TestUtil {
 
     public static void startScheduler(final SchedulerService scheduler) throws Exception {
         if (!scheduler.isStarted()) {
-            scheduler.initializeScheduler();
             scheduler.start();
         }
     }
@@ -54,13 +53,15 @@ public class TestUtil {
     public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws Exception {
         if (scheduler.isStarted() && !scheduler.isStopped()) {
             try {
-                txService.executeInTransaction(new Callable<Void>() {
-
-                    @Override
-                    public Void call() throws Exception {
+                txService.executeInTransaction((Callable<Void>) () -> {
+                    try {
                         scheduler.deleteJobs();
-                        return null;
+                    } catch (SSchedulerException e) {
+                        if (!scheduler.getAllJobs().isEmpty()) {
+                            throw e;
+                        }
                     }
+                    return null;
                 });
             } catch (final STransactionException txException) {
                 throw new SSchedulerException(txException);

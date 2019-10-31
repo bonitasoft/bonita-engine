@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
 import org.junit.Test;
 
 public class SFlowNodeInstanceBuilderImplTest {
@@ -28,7 +27,7 @@ public class SFlowNodeInstanceBuilderImplTest {
     @Test
     public void setState_should_set_all_fields_related_to_state() throws Exception {
         //given
-        SAutomaticTaskInstanceBuilderImpl builder = new SAutomaticTaskInstanceBuilderImpl(new SAutomaticTaskInstanceImpl());
+        SAutomaticTaskInstanceBuilderImpl builder = new SAutomaticTaskInstanceBuilderImpl(new SAutomaticTaskInstance());
         int stateId = 100;
         String stateName = "mockState";
         FlowNodeState state = mock(FlowNodeState.class);

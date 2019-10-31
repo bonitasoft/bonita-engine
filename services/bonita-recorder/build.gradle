@@ -1,0 +1,11 @@
+
+
+dependencies {
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-log-technical')
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+}

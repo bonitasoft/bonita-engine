@@ -20,11 +20,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.repository.SupervisorRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,19 +53,19 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_user() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, userId, -1, -1));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, userId, -1, -1));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -75,19 +74,19 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, groupId, 0));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId, 0));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -96,19 +95,19 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_role() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, 0, roleId));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, 0, roleId));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
@@ -117,20 +116,20 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group_and_role() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, groupId,
+        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId,
                 roleId));
-        repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
+        repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 

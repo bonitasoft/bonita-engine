@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -25,8 +26,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Julien Reboul
@@ -34,29 +41,47 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
+    public static final String NUMBER_OF_WORKS_PENDING = "bonita.bpmengine.work.pending";
+    public static final String NUMBER_OF_WORKS_RUNNING = "bonita.bpmengine.work.running";
+    public static final String NUMBER_OF_WORKS_EXECUTED = "bonita.bpmengine.work.executed";
+
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
-    private final TechnicalLoggerService logger;
+    private final TechnicalLogger log;
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
+    private WorkExecutionAuditor workExecutionAuditor;
 
     private final AtomicLong runningWorks = new AtomicLong();
-    private final AtomicLong executedWorks = new AtomicLong();
+    private final Counter executedWorkCounter;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
-            final int maximumPoolSize,
-            final long keepAliveTime,
-            final TimeUnit unit,
-            final BlockingQueue<Runnable> workQueue,
-            final ThreadFactory threadFactory,
-            final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-            EngineClock engineClock, WorkExecutionCallback workExecutionCallback) {
+                                    final int maximumPoolSize,
+                                    final long keepAliveTime,
+                                    final TimeUnit unit,
+                                    final BlockingQueue<Runnable> workQueue,
+                                    final ThreadFactory threadFactory,
+                                    final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
+                                    EngineClock engineClock, WorkExecutionCallback workExecutionCallback,
+                                    WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry, long tenantId) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
-        this.logger = logger;
+        this.log = logger.asLogger(BonitaThreadPoolExecutor.class);
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
+        this.workExecutionAuditor = workExecutionAuditor;
+
+        Tags tags = Tags.of("tenant", String.valueOf(tenantId));
+        Gauge.builder(NUMBER_OF_WORKS_PENDING, workQueue, Collection::size)
+                .tags(tags).baseUnit("works").description("Works pending in the execution queue")
+                .register(meterRegistry);
+        Gauge.builder(NUMBER_OF_WORKS_RUNNING, runningWorks, AtomicLong::get)
+                .tags(tags).baseUnit("works").description("Works currently executing")
+                .register(meterRegistry);
+        executedWorkCounter = Counter.builder(NUMBER_OF_WORKS_EXECUTED)
+                .tags(tags).baseUnit("works").description("total works executed since last server start")
+                .register(meterRegistry);
     }
 
     @Override
@@ -76,20 +101,22 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     @Override
     public void shutdownAndEmptyQueue() {
         super.shutdown();
-        logger.log(getClass(), TechnicalLogSeverity.INFO,
-                "Clearing queue of work, had " + workQueue.size() + " elements");
+        log.info("Clearing queue of work, had {} elements", workQueue.size());
         workQueue.clear();
     }
 
     @Override
     public void submit(WorkDescriptor work) {
         submit(() -> {
-            if (work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now())) {
+            if (isRequiringDelayedExecution(work)) {
                 // Future implementation should use a real delay e.g. using a ScheduledThreadPoolExecutor
                 // Will be executed later
                 submit(work);
                 return;
             }
+            work.incrementExecutionCount();
+            workExecutionAuditor.detectAbnormalExecutionAndNotify(work);
+
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
             CompletableFuture<Void> asyncResult;
@@ -97,14 +124,14 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             try {
                 asyncResult = bonitaWork.work(context);
             } catch (Exception e) {
-                executedWorks.incrementAndGet();
+                executedWorkCounter.increment();
                 runningWorks.decrementAndGet();
                 workExecutionCallback.onFailure(work, bonitaWork, context, e);
                 return;
             }
 
             asyncResult.handle((result, error) -> {
-                executedWorks.incrementAndGet();
+                executedWorkCounter.increment();
                 runningWorks.decrementAndGet();
                 if (error != null) {
                     if (error instanceof CompletionException) {
@@ -119,18 +146,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         });
     }
 
-    @Override
-    public long getPendings() {
-        return workQueue.size();
-    }
-
-    @Override
-    public long getRunnings() {
-        return runningWorks.get();
-    }
-
-    @Override
-    public long getExecuted() {
-        return executedWorks.get();
+    private boolean isRequiringDelayedExecution(WorkDescriptor work) {
+        return work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now());
     }
 }

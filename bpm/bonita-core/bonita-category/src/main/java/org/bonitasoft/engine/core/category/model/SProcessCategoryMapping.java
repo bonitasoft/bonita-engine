@@ -13,15 +13,26 @@
  **/
 package org.bonitasoft.engine.core.category.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SProcessCategoryMapping extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SProcessCategoryMapping implements PersistentObject {
 
-    long getCategoryId();
+    private long tenantId;
+    private long id;
+    private long categoryId;
+    private long processId;
 
-    long getProcessId();
+
+    public SProcessCategoryMapping(final long categoryId, final long processId) {
+        this.categoryId = categoryId;
+        this.processId = processId;
+    }
 
 }

@@ -14,14 +14,14 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 
 
 /**
  * @author Julien Reboul
  *
  */
-public class GatewayInstanceBuilder extends FlowNodeInstanceBuilder<SGatewayInstanceImpl, GatewayInstanceBuilder> {
+public class GatewayInstanceBuilder extends FlowNodeInstanceBuilder<SGatewayInstance, GatewayInstanceBuilder> {
 
     private SGatewayType gatewayType;
 
@@ -40,12 +40,12 @@ public class GatewayInstanceBuilder extends FlowNodeInstanceBuilder<SGatewayInst
     }
 
     @Override
-    SGatewayInstanceImpl _build() {
-        return new SGatewayInstanceImpl();
+    SGatewayInstance _build() {
+        return new SGatewayInstance();
     }
     
     @Override
-    protected SGatewayInstanceImpl fill(SGatewayInstanceImpl persistent) {
+    protected SGatewayInstance fill(SGatewayInstance persistent) {
         super.fill(persistent);
         persistent.setHitBys(hitBys);
         persistent.setGatewayType(gatewayType);

@@ -1,0 +1,92 @@
+plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
+apply plugin: 'groovy'
+dependencies {
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':bpm:bonita-core:bonita-actor-mapping')
+    compile project(':bpm:bonita-core:bonita-category')
+    compile project(':bpm:bonita-core:bonita-process-instance')
+    compile project(':bpm:bonita-core:bonita-contract-data')
+    compile project(':bpm:bonita-core:bonita-user-filter')
+    compile project(':bpm:bonita-core:bonita-login')
+    compile project(':bpm:bonita-core:bonita-process-definition')
+    compile project(':bpm:bonita-core:bonita-process-comment')
+    compile project(':bpm:bonita-core:bonita-platform-login')
+    compile project(':bpm:bonita-core:bonita-core-data')
+    compile project(':bpm:bonita-core:bonita-supervisor-mapping')
+    compile project(':bpm:bonita-synchro-repository:bonita-synchro-service')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-archive')
+    compile project(':services:bonita-authentication')
+    compile project(':services:bonita-cache')
+    compile project(':services:bonita-classloader')
+    compile project(':services:bonita-command')
+    compile project(':services:bonita-connector-executor')
+    compile project(':services:bonita-data-definition')
+    compile project(':services:bonita-data-instance')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-expression')
+    compile project(':services:bonita-external-identity-mapping')
+    compile project(':services:bonita-identity')
+    compile project(':services:bonita-incident')
+    compile project(':services:bonita-lock')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-page')
+    compile project(':bpm:bonita-core:bonita-parameter')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-platform')
+    compile project(':services:bonita-platform-authentication')
+    compile project(':services:bonita-platform-command')
+    compile project(':services:bonita-platform-session')
+    compile project(':services:bonita-profile')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-scheduler')
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-theme')
+    compile project(':services:bonita-time-tracker')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-work')
+    compile project(':services:bonita-business-application:bonita-business-application-api')
+    compile project(':bpm:bonita-core:bonita-form-mapping')
+    compile project(':services:bonita-business-data:bonita-business-data-api')
+    compile project(':services:bonita-resources')
+    compile "com.fasterxml.jackson.core:jackson-databind:${Deps.jacksonDataBindingVersion}"
+    compile project(':platform:platform-resources')
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.codehaus.groovy:groovy-all:${Deps.groovyAllVersion}"
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    compile "io.micrometer:micrometer-registry-jmx:${Deps.micrometerVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+
+    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile project(':services:bonita-business-application:bonita-business-application-impl')
+    testCompile 'com.google.guava:guava:16.0.1'
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile "org.springframework:spring-test:${Deps.springVersion}"
+    compileOnly project(':bpm:bonita-common')
+    testCompile project(':bpm:bonita-common')
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "org.awaitility:awaitility:${Deps.awaitilityVersion}"
+}
+jaxb {
+    schemaGen {
+        organization {
+            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/identity/xml/**/*.java')
+            namespaceconfigs = ['http://documentation.bonitasoft.com/organization-xml-schema/1.1': 'organization.xsd']
+            outputDir = project.file("build/generated/jaxb/schemas")
+        }
+    }
+}
+
+processResources { from "$buildDir/generated/jaxb/schemas" }
+
+tasks.jaxbSchemaGenOrganization.outputs.cacheIf { true }
+tasks.processResources.dependsOn tasks.jaxbSchemaGenOrganization

@@ -328,4 +328,31 @@ public class JTATransactionServiceImplTest {
     private void in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(TransactionService txService) throws STransactionCreationException {
         txService.begin();
     }
+
+    @Test
+    public void isTransactionActive_should_return_true_when_there_is_an_active_transaction() throws Exception {
+        doReturn(Status.STATUS_ACTIVE).when(txManager).getStatus();
+
+        boolean active = txService.isTransactionActive();
+
+        assertThat(active).isTrue();
+    }
+
+    @Test
+    public void isTransactionActive_should_return_false_when_transaction_manager_throws_exception() throws Exception {
+        doThrow(SystemException.class).when(txManager).getStatus();
+
+        boolean active = txService.isTransactionActive();
+
+        assertThat(active).isFalse();
+    }
+
+    @Test
+    public void isTransactionActive_should_return_true_when_there_is_no_active_transaction() throws Exception {
+        doReturn(Status.STATUS_UNKNOWN).when(txManager).getStatus();
+
+        boolean active = txService.isTransactionActive();
+
+        assertThat(active).isFalse();
+    }
 }

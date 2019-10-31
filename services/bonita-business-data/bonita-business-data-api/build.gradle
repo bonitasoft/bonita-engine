@@ -1,0 +1,12 @@
+
+
+dependencies {
+    compile project(':services:bonita-commons')
+    compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${Deps.hibernateJpaVersion}"
+    compile "org.javassist:javassist:${Deps.javassistVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    compileOnly project(':bpm:bonita-common')
+    testCompile project(':bpm:bonita-common')
+}

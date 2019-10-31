@@ -18,12 +18,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
@@ -39,18 +36,18 @@ public class SearchProfileMemberGroupDescriptor extends SearchEntityDescriptor {
 
     public SearchProfileMemberGroupDescriptor() {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(7);
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.PROFILE_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.ROLE_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.USER_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.USER_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.GROUP_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey()));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey()));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMember.ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.PROFILE_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.ROLE_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.USER_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.USER_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SProfileMember.class, SProfileMember.GROUP_ID));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SGroup.class, SGroup.NAME));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, SGroup.PARENT_PATH));
 
         profileMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> groupFields = new HashSet<String>(2);
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getNameKey());
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey());
+        groupFields.add(SGroup.NAME);
+        groupFields.add(SGroup.PARENT_PATH);
         profileMemberAllFields.put(SGroup.class, groupFields);
     }
 

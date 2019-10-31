@@ -4,31 +4,31 @@
 
 	<query name="getNumberOfSTheme">
 		SELECT COUNT(theme)
-		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 	</query>
 
 	<query name="searchSTheme">
 		SELECT theme
-		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 	</query>
 	
 	<query name="getTheme">
 		SELECT theme
-		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 		WHERE isDefault = :isDefault
 			AND type = :type
 	</query>
 
 	<query name="getLastModifiedTheme">
 		SELECT theme
-		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 		WHERE type = :type
 		ORDER BY lastUpdateDate DESC
 	</query>
 
 	<query name="getLastUpdateDate">
 		SELECT theme.lastUpdateDate
-		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 		WHERE type = :type
 		ORDER BY lastUpdateDate DESC
 	</query>

@@ -19,9 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
-import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
-import org.bonitasoft.engine.core.document.model.archive.builder.SADocumentMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -36,40 +35,39 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
 
     SearchArchivedDocumentDescriptor() {
         searchEntityKeys = new HashMap<>(12);
-        final SADocumentMappingBuilderFactory fact = BuilderFactory.get(SADocumentMappingBuilderFactory.class);
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.ARCHIVE_DATE,
-                new FieldDescriptor(SAMappedDocument.class, fact.getArchiveDateKey()));
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.ARCHIVE_DATE));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_AUTHOR,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getAuthorKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.AUTHOR));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getFileNameKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.FILE_NAME));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getMimeTypeKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.MIME_TYPE));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CREATIONDATE,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getCreationDateKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.CREATION_DATE));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getHasContentKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.HAS_CONTENT));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME,
-                new FieldDescriptor(SAMappedDocument.class, fact.getNameKey()));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SAMappedDocument.class, fact.getDescriptionKey()));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SAMappedDocument.class, fact.getVersionKey()));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SAMappedDocument.class, fact.getIndexKey()));
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.NAME));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.DESCRIPTION));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.VERSION));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.INDEX));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_URL,
-                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getURLKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.URL));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID,
-                new FieldDescriptor(SAMappedDocument.class, fact.getProcessInstanceIdKey()));
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.PROCESS_INSTANCE_ID));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.SOURCEOBJECT_ID,
-                new FieldDescriptor(SAMappedDocument.class, fact.getSourceObjectIdKey()));
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.SOURCE_OBJECT_ID));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.CONTENT_STORAGE_ID,
-                new FieldDescriptor(SAMappedDocument.class, fact.getContentStorageIdKey()));
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.DOCUMENT_ID));
 
         documentAllFields = new HashMap<>(1);
         final Set<String> documentFields = new HashSet<String>(7);
-        documentFields.add(fact.getNameKey());
-        documentFields.add(fact.getDescriptionKey());
-        documentFields.add("document." + fact.getFileNameKey());
-        documentFields.add("document." + fact.getMimeTypeKey());
-        documentFields.add("document." + fact.getURLKey());
+        documentFields.add(SADocumentMapping.NAME);
+        documentFields.add(SADocumentMapping.DESCRIPTION);
+        documentFields.add("document." + SADocumentMapping.FILE_NAME);
+        documentFields.add("document." + SADocumentMapping.MIME_TYPE);
+        documentFields.add("document." + SADocumentMapping.URL);
         documentAllFields.put(SAMappedDocument.class, documentFields);
     }
 

@@ -821,12 +821,4 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(QueryOptions queryOptions) throws SBonitaReadException;
 
-    /**
-     * @param parentActivityInstanceId
-     * @param maxNumberOfResults
-     * @return
-     * @since 6.4.0
-     */
-    QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(long parentActivityInstanceId, int numberOfResults);
-
 }

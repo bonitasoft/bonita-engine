@@ -4,50 +4,50 @@
 
 	<query name="getExternalIdentityMappingWithoutDisplayNameById">
 		SELECT ext_ident_mapping
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping
 		WHERE ext_ident_mapping.id = :id
 	</query>
 
 
 	<query name="getExternalIdentityMappingByIdForUser">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, user.firstName, user.lastName, user.userName)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SUser as user
 		WHERE ext_ident_mapping.id = :id
 			AND user.id = ext_ident_mapping.userId
 	</query>
 
 	<query name="getExternalIdentityMappingByIdForGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, group_.name, group_.parentPath, '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE ext_ident_mapping.id = :id
 		AND ext_ident_mapping.groupId = group_.id
 		AND ext_ident_mapping.roleId &lt;= 0
 	</query>
 
 	<query name="getExternalIdentityMappingByIdForRole">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, '', '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.id = :id
 		AND ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId &lt;= 0
 	</query>
 
 	<query name="getExternalIdentityMappingByIdForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, group_.name, group_.parentPath)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.id = :id
 		AND ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
@@ -56,23 +56,23 @@
 	<!-- used to retrieve the elements before deletion: -->
 	<query name="searchSExternalIdentityMapping">
 		SELECT ext_ident_mapping
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping
 		WHERE kind = :kind
 		AND externalId = :externalId
 	</query>
 	
 	<query name="getNumberOfSExternalIdentityMappingInvolving">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+		org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE kind = :kind
 		AND externalId = :externalId 
 		AND (ext_ident_mapping.userId = :userId
 		AND user.id = ext_ident_mapping.userId
 			OR (ext_ident_mapping.id IN (
 					SELECT eim.id
-					FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS eim,
-						 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS eim,
+						 org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
 					AND um.userId = :userId
 					AND (
@@ -87,16 +87,16 @@
 	
 	<query name="searchSExternalIdentityMappingInvolving">
 		SELECT ext_ident_mapping
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+		org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE kind = :kind
 		AND externalId = :externalId 
 		AND (ext_ident_mapping.userId = :userId
 		AND user.id = ext_ident_mapping.userId
 			OR (ext_ident_mapping.id IN (
 					SELECT eim.id
-					FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS eim,
-						 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS eim,
+						 org.bonitasoft.engine.identity.model.SUserMembership AS um
 					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
 					AND um.userId = :userId
 					AND (
@@ -111,55 +111,55 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingForUser">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SUser as user
 		WHERE ext_ident_mapping.userId = user.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingForUser">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, user.firstName, user.lastName, user.userName)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SUser as user
 		WHERE ext_ident_mapping.userId = user.id
 		AND kind = :kind
 	</query>
 		
 	<query name="getNumberOfSExternalIdentityMappingwithSUserForUser">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SUser as user
 		WHERE ext_ident_mapping.userId = user.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSUserForUser">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, user.firstName, user.lastName, user.userName)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SUser as user
 		WHERE ext_ident_mapping.userId = user.id
 		AND kind = :kind
 	</query>
 		
 	<query name="getNumberOfSExternalIdentityMappingForGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE ext_ident_mapping.groupId = group_.id
 		AND ext_ident_mapping.roleId &lt;= 0
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingForGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, group_.name, group_.parentPath, '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE ext_ident_mapping.groupId = group_.id
 		AND ext_ident_mapping.roleId &lt;= 0
 		AND kind = :kind
@@ -167,19 +167,19 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingwithSGroupForGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE ext_ident_mapping.groupId = group_.id
 		AND ext_ident_mapping.roleId &lt;= 0
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSGroupForGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, group_.name, group_.parentPath, '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE ext_ident_mapping.groupId = group_.id
 		AND ext_ident_mapping.roleId &lt;= 0
 		AND kind = :kind
@@ -187,19 +187,19 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingForRole">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId &lt;= 0
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingForRole">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, '', '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId &lt;= 0
 		AND kind = :kind
@@ -207,19 +207,19 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingwithSRoleForRole">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId &lt;= 0
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSRoleForRole">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, '', '')
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId &lt;= 0
 		AND kind = :kind
@@ -227,21 +227,21 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingForRoleAndGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, group_.name, group_.parentPath)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
@@ -249,21 +249,21 @@
 	
 	<query name="getNumberOfSExternalIdentityMappingwithSGroupForRoleAndGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSGroupForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, group_.name, group_.parentPath)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
@@ -271,21 +271,21 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingwithSRoleForRoleAndGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSRoleForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, group_.name, group_.parentPath)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
@@ -293,21 +293,21 @@
 		
 	<query name="getNumberOfSExternalIdentityMappingwithSGroupSRoleForRoleAndGroup">
 		SELECT COUNT(*)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind
 	</query>
 	
 	<query name="searchSExternalIdentityMappingwithSGroupSRoleForRoleAndGroup">
-		SELECT new org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl(ext_ident_mapping.id,
+		SELECT new org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping(ext_ident_mapping.id,
 				ext_ident_mapping.tenantId, ext_ident_mapping.externalId, ext_ident_mapping.userId, ext_ident_mapping.groupId,
 				ext_ident_mapping.roleId, role.name, group_.name, group_.parentPath)
-		FROM org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl AS ext_ident_mapping,
-			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
-			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		FROM org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping AS ext_ident_mapping,
+			org.bonitasoft.engine.identity.model.SGroup AS group_,
+			org.bonitasoft.engine.identity.model.SRole AS role
 		WHERE ext_ident_mapping.roleId = role.id
 		AND ext_ident_mapping.groupId = group_.id
 		AND kind = :kind

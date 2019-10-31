@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.event;
 
-import java.util.List;
-
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
@@ -44,19 +41,16 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface EventInstanceService extends FlowNodeInstanceService {
+public interface EventInstanceService  {
 
-    String EVENT_INSTANCE = "EVENT_INSTANCE";
-
-    String EVENT_TRIGGER_INSTANCE = "EVENT_TRIGGER_INSTANCE";
-
-    String MESSAGE_INSTANCE = "MESSAGE_INSTANCE";
 
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;
 
@@ -132,7 +126,11 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(QueryOptions searchOptions) throws SBonitaReadException;
+    /**
+     * @param flowNodeInstanceId the flow node instance id
+     * @return the timer event trigger instance of this flow node if there is one
+     */
+    Optional<STimerEventTriggerInstance> getTimerEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException;
 
     SWaitingSignalEvent getWaitingSignalEvent(long id)
             throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException;
@@ -144,13 +142,17 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      */
     void deleteEventTriggerInstance(STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
 
+    void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException;
+
     /**
      * @param flowNodeInstance
      * @throws SWaitingEventModificationException
-     * @throws SFlowNodeReadException
+     * @throws SEventTriggerInstanceReadException
      * @since 6.1
      */
-    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaReadException;
+    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException,  SEventTriggerInstanceReadException;
+
+
 
     /**
      * Resets all Message Instances marked as handled, so that they are eligible to match Waiting Events again.
@@ -179,7 +181,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @return The number of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Search the list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
@@ -191,7 +193,14 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @return The list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
+                                                                      QueryOptions searchOptions) throws SBonitaReadException;
+
+    Integer deleteMessageAndDataInstanceOlderThanCreationDate(long creationDate,
+                                                              QueryOptions queryOptions) throws  SMessageModificationException;
+
+
+    List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions) throws SEventTriggerInstanceReadException, SMessageInstanceReadException;
 
     /**
      * Update an event trigger instance.
@@ -200,7 +209,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      *        The event trigger instance to update
      * @param descriptor
      *        The fields to update
-     * @throws SEventTriggerModificationException
+     * @throws SEventTriggerInstanceModificationException
      * @since 6.4.0
      */
     void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance, EntityUpdateDescriptor descriptor)

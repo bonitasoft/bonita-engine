@@ -16,7 +16,7 @@ package org.bonitasoft.engine.business.data.impl;
 import static com.company.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -28,14 +28,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Resource;
-import javax.naming.Context;
+
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
-import bitronix.tm.TransactionManagerServices;
-import com.company.pojo.Employee;
-import com.company.pojo.Person;
+import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -45,9 +42,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +51,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
+
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class JPABusinessDataRepositoryImplITest {
 
-    public static final long TENANT_ID = 54236235L;
+    private static final long TENANT_ID = 54236235L;
+
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
     private UserTransactionService transactionService;
@@ -73,28 +72,15 @@ public class JPABusinessDataRepositoryImplITest {
     @Qualifier("notManagedBizDataSource")
     private DataSource modelDatasource;
 
-    @Resource(name = "jpa-configuration")
-    private Map<String, Object> configuration;
-
-    @Resource(name = "jpa-model-configuration")
-    private Map<String, Object> modelConfiguration;
+    @Autowired
+    @Qualifier("jpa-test-configuration")
+    private JpaTestConfiguration configuration;
 
     private JdbcTemplate jdbcTemplate;
 
     private UserTransaction ut;
 
     private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
-
-    @BeforeClass
-    public static void initializeBitronix() {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
-        TransactionManagerServices.getConfiguration().setJournal(null);
-    }
-
-    @AfterClass
-    public static void shutdownTransactionManager() {
-        TransactionManagerServices.getTransactionManager().shutdown();
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -108,13 +94,13 @@ public class JPABusinessDataRepositoryImplITest {
         final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
 
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, loggerService);
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+                classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
-                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration.getJpaConfiguration(), classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
-        ut = TransactionManagerServices.getTransactionManager();
+        ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();
 
         final Set<String> classNames = new HashSet<>();

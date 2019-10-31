@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -27,7 +27,7 @@ public class SMultiInstanceActivityInstanceBuilderFactoryImpl extends SActivityI
     public SMultiInstanceActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
             final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId,
             final boolean isSequential) {
-        final SMultiInstanceActivityInstanceImpl entity = new SMultiInstanceActivityInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SMultiInstanceActivityInstance entity = new SMultiInstanceActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId, isSequential);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SMultiInstanceActivityInstanceBuilderImpl(entity);

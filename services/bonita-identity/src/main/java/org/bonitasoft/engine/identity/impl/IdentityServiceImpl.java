@@ -53,7 +53,6 @@ import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilder;
@@ -62,16 +61,10 @@ import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SIconImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -146,7 +139,7 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             if (iconFileName != null && iconContent != null) {
                 SIcon icon = createIcon(iconFileName, iconContent);
-                ((SGroupImpl) group).setIconId(icon.getId());
+                group.setIconId(icon.getId());
             }
             final InsertRecord insertRecord = new InsertRecord(group);
             recorder.recordInsert(insertRecord, GROUP);
@@ -206,7 +199,7 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             if (iconFilename != null && iconContent != null) {
                 SIcon icon = createIcon(iconFilename, iconContent);
-                (((SRoleImpl) role)).setIconId(icon.getId());
+                role.setIconId(icon.getId());
             }
             recorder.recordInsert(new InsertRecord(role), ROLE);
             log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -220,7 +213,7 @@ public class IdentityServiceImpl implements IdentityService {
     public SUser createUser(final SUser user) throws SUserCreationException {
         final String methodName = "createUser";
         final String hash = encrypter.hash(user.getPassword());
-        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).setPassword(hash).done();
+        final SUser hashedUser = new SUser(user).toBuilder().password(hash).build();
         return createUser(user, methodName, hashedUser);
     }
 
@@ -228,7 +221,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Deprecated
     public SUser createUserWithoutEncryptingPassword(final SUser user) throws SUserCreationException {
         final String methodName = "createUserWithoutEncryptingPassword";
-        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
+        final SUser hashedUser = new SUser(user).toBuilder().build();
         return createUser(user, methodName, hashedUser);
     }
 
@@ -247,11 +240,11 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void insertUserLogin(String methodName, SUser hashedUser, SUserLogBuilder logBuilder) throws SRecorderException {
-        SUserLoginImpl sUserLogin = new SUserLoginImpl();
-        ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
-        sUserLogin.setsUser(hashedUser);
+        SUserLogin sUserLogin = new SUserLogin();
+        hashedUser.setSUserLogin(sUserLogin);
+        sUserLogin.setSUser(hashedUser);
         sUserLogin.setId(hashedUser.getId());
-        sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
+        sUserLogin.setTenantId(hashedUser.getTenantId());
         recorder.recordInsert(new InsertRecord(sUserLogin), USER_LOGIN);
         log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
     }
@@ -1500,7 +1493,7 @@ public class IdentityServiceImpl implements IdentityService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), methodName, log);
         }
@@ -1537,7 +1530,7 @@ public class IdentityServiceImpl implements IdentityService {
         if (personalDataUpdateDescriptor != null && !personalDataUpdateDescriptor.getFields().isEmpty()) {
             SContactInfo persoContactInfo = getUserContactInfo(userId, true);
             if (persoContactInfo == null) {
-                persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
+                persoContactInfo = SContactInfo.builder().userId(userId).personal(true).build();
                 createUserContactInfo(persoContactInfo);
             }
             updateUserContactInfo(persoContactInfo, personalDataUpdateDescriptor);
@@ -1547,7 +1540,7 @@ public class IdentityServiceImpl implements IdentityService {
         if (professionalDataUpdateDescriptor != null && !professionalDataUpdateDescriptor.getFields().isEmpty()) {
             SContactInfo professContactInfo = getUserContactInfo(userId, false);
             if (professContactInfo == null) {
-                professContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, false).done();
+                professContactInfo = SContactInfo.builder().userId(userId).personal(false).build();
                 createUserContactInfo(professContactInfo);
             }
             updateUserContactInfo(professContactInfo, professionalDataUpdateDescriptor);
@@ -1591,23 +1584,27 @@ public class IdentityServiceImpl implements IdentityService {
         if (iconFilename != null && iconContent != null) {
             try {
                 SIcon icon = createIcon(iconFilename, iconContent);
-                ((SUserImpl) sUser).setIconId(icon.getId());
+                sUser.setIconId(icon.getId());
             } catch (SRecorderException e) {
                 throw new SUserCreationException(e);
             }
         }
         SUser user = createUser(sUser);
         if (personalContactInfo != null) {
-            createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(personalContactInfo).setUserId(user.getId()).done());
+            SContactInfo sContactInfo = new SContactInfo(personalContactInfo);
+            sContactInfo.setUserId(user.getId());
+            createUserContactInfo(sContactInfo);
         }
         if (proContactInfo != null) {
-            createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(proContactInfo).setUserId(user.getId()).done());
+            SContactInfo sContactInfo = new SContactInfo(proContactInfo);
+            sContactInfo.setUserId(user.getId());
+            createUserContactInfo(sContactInfo);
         }
         return user;
     }
 
     private SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
-        SIconImpl entity = new SIconImpl(getContentType(iconFilename), iconContent);
+        SIcon entity = new SIcon(getContentType(iconFilename), iconContent);
         recorder.recordInsert(new InsertRecord(entity), ICON);
         return entity;
     }

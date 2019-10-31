@@ -13,11 +13,17 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public interface SAEventInstance extends SAFlowNodeInstance {
-
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SAEventInstance extends SAFlowNodeInstance {
+    public SAEventInstance(final SEventInstance eventInstance) {
+        super(eventInstance);
+    }
 }

@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -58,7 +58,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -389,7 +389,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     //then
     public void getUserIdsWithCustomUserInfo_should_throw_SIdentityException_when_persistence_service_throws_exception() throws Exception {
         //given
-        given(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).willThrow(new SBonitaReadException(""));
+        given(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).willThrow(new SBonitaReadException(""));
 
         //when
         identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);

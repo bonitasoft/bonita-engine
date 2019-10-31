@@ -54,10 +54,11 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
             final char likeEscapeCharacter,
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder) throws SPersistenceException, ClassNotFoundException {
         super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
+        hibernateMetricsBinder.bindMetrics(getSessionFactory());
     }
 
     protected void updateTenantFilter(final Session session, final boolean useTenant) throws SPersistenceException {
@@ -175,7 +176,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             boolean hasFilters = filters != null && !filters.isEmpty();
             String baseQuery = "DELETE FROM " + entityClassName + " " + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
                     + " WHERE tenantId= :tenantId";
-            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(), interfaceToClassMapping, likeEscapeCharacter);
+            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(), likeEscapeCharacter);
             if (hasFilters) {
                 queryBuilder.appendFilters(filters, null, enableWordSearch);
             }

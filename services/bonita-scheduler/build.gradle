@@ -1,0 +1,23 @@
+
+
+dependencies {
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-incident')
+    compile "org.quartz-scheduler:quartz:${Deps.quartzVersion}"
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

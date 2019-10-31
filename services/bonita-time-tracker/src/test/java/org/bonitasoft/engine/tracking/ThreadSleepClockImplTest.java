@@ -26,7 +26,7 @@ public class ThreadSleepClockImplTest {
         final long startTime = System.currentTimeMillis();
         clock.sleep(millis);
         final long endTime = System.currentTimeMillis();
-        assertTrue((endTime - startTime) >= millis);
+        assertTrue(endTime - startTime >= millis);
     }
 
 }

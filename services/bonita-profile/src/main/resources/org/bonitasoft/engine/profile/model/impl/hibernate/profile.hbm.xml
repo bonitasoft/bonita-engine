@@ -6,7 +6,7 @@
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SProfileImpl" table="profile">
+	<class name="org.bonitasoft.engine.profile.model.SProfile" table="profile">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -21,7 +21,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileEntryImpl" table="profileentry">
+	<class name="org.bonitasoft.engine.profile.model.SProfileEntry" table="profileentry">
 		<composite-id  class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -37,7 +37,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileMemberImpl" table="profilemember">
+	<class name="org.bonitasoft.engine.profile.model.SProfileMember" table="profilemember">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />

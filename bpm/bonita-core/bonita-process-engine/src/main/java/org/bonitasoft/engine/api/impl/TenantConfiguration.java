@@ -15,10 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
  * Bean that returns configuration
@@ -28,39 +25,8 @@ import org.bonitasoft.engine.scheduler.JobRegister;
  */
 public class TenantConfiguration {
 
-    private String cleanInvalidSessionsJobCron = "0 0 */2 * * ?";
-
-    private List<JobRegister> jobsToRegister;
-
     private List<TenantLifecycleService> lifecycleServices;
 
-    private List<AbstractBonitaTenantJobListener> jobListeners;
-
-    public void setJobsToRegister(final List<JobRegister> jobsToRegister) {
-        this.jobsToRegister = jobsToRegister;
-    }
-
-    /**
-     * Give a list of job to register when the tenant is activated
-     * 
-     * @return
-     */
-    public List<JobRegister> getJobsToRegister() {
-        return CollectionUtil.emptyOrUnmodifiable(jobsToRegister);
-    }
-
-    /**
-     * Specify how often invalid sessions will be cleaned
-     * 
-     * @return a String representing a Unix Cron
-     */
-    public String getCleanInvalidSessionsJobCron() {
-        return cleanInvalidSessionsJobCron;
-    }
-
-    public void setCleanInvalidSessionsJobCron(final String cleanInvalidSessionsJobCron) {
-        this.cleanInvalidSessionsJobCron = cleanInvalidSessionsJobCron;
-    }
 
     public List<TenantLifecycleService> getLifecycleServices() {
         return lifecycleServices;
@@ -68,22 +34,6 @@ public class TenantConfiguration {
 
     public void setLifecycleServices(final List<TenantLifecycleService> lifecycleServices) {
         this.lifecycleServices = lifecycleServices;
-    }
-
-    /**
-     * @return The job listeners to add at the scheduler
-     * @since 6.4.0
-     */
-    public List<AbstractBonitaTenantJobListener> getJobListeners() {
-        return jobListeners;
-    }
-
-    /**
-     * @param jobListeners
-     * @since 6.4.0
-     */
-    public void setJobListeners(List<AbstractBonitaTenantJobListener> jobListeners) {
-        this.jobListeners = jobListeners;
     }
 
 }

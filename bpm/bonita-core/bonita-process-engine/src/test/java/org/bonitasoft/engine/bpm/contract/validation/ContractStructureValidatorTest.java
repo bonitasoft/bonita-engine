@@ -21,8 +21,8 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDef
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.*;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;

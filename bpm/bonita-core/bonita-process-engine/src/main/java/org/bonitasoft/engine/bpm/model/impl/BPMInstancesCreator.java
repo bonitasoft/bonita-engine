@@ -23,6 +23,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
+import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -76,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskI
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
@@ -115,7 +115,7 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -548,12 +548,15 @@ public class BPMInstancesCreator {
 
     SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition,
             int executionOrder) {
-        return BuilderFactory
-                .get(SConnectorInstanceBuilderFactory.class)
-                .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
-                        sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
-                        executionOrder)
-                .done();
+        return SConnectorInstance.builder().name(sConnectorDefinition.getName())
+                .containerId(container.getId())
+                .containerType(containerType)
+                .connectorId(sConnectorDefinition.getConnectorId())
+                .version(sConnectorDefinition.getVersion())
+                .activationEvent(sConnectorDefinition.getActivationEvent())
+                .state(ConnectorState.TO_BE_EXECUTED.name())
+                .executionOrder(executionOrder)
+                .build();
     }
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
@@ -631,9 +634,7 @@ public class BPMInstancesCreator {
     SDataInstance createDataInstanceObject(SProcessInstance processInstance, SDataDefinition sDataDefinition, Serializable dataValue)
             throws SDataInstanceNotWellFormedException {
         try {
-            return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition)
-                    .setContainerId(processInstance.getId())
-                    .setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name()).setValue(dataValue).done();
+            return  SDataInstanceBuilder.createNewInstance(sDataDefinition, processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), dataValue);
         } catch (final ClassCastException e) {
             throw new SDataInstanceNotWellFormedException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: "
                     + e.getMessage());
@@ -727,8 +728,7 @@ public class BPMInstancesCreator {
 
     private SDataInstance buildDataInstance(final SDataDefinition dataDefinition, final long dataContainerId, final DataInstanceContainer dataContainerType,
             final Serializable dataValue) throws SDataInstanceNotWellFormedException {
-        return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition).setContainerId(dataContainerId)
-                .setContainerType(dataContainerType.name()).setValue(dataValue).done();
+        return  SDataInstanceBuilder.createNewInstance(dataDefinition, dataContainerId, dataContainerType.name(), dataValue);
     }
 
     public boolean createDataInstances(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {

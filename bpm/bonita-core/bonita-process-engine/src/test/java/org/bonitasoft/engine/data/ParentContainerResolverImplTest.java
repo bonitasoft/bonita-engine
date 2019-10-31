@@ -25,13 +25,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFo
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -58,7 +58,7 @@ public class ParentContainerResolverImplTest {
     @Test
     public void getContainerHierarchy_on_process_with_no_caller() throws Exception {
         //given
-        doReturn(new SProcessInstanceImpl()).when(processInstanceService).getProcessInstance(5L);
+        doReturn(SProcessInstance.builder().build()).when(processInstanceService).getProcessInstance(5L);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
                 .getContainerHierarchy(new DataContainer(5L, DataInstanceContainer.PROCESS_INSTANCE.name()));
@@ -93,7 +93,7 @@ public class ParentContainerResolverImplTest {
 
     private void activityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId, final long parentActivityInstanceId,
             final long parentContainerId, final long rootContainerId) throws SFlowNodeReadException, SFlowNodeNotFoundException {
-        SActivityInstanceImpl activity = new SUserTaskInstanceImpl() {
+        SActivityInstance activity = new SUserTaskInstance() {
 
             @Override
             public SFlowNodeType getType() {
@@ -109,7 +109,7 @@ public class ParentContainerResolverImplTest {
     }
 
     private void processWithCaller(long processInstanceId, long callerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
+        SProcessInstance processInstance = new SProcessInstance();
         processInstance.setCallerId(callerId);
         doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
     }
@@ -196,7 +196,7 @@ public class ParentContainerResolverImplTest {
 
     private void archivedActivityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId, final long parentActivityInstanceId,
             final long parentContainerId, final long rootContainerId) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
-        SAActivityInstanceImpl activity = new SAUserTaskInstanceImpl() {
+        SAActivityInstance activity = new SAUserTaskInstance() {
 
             @Override
             public SFlowNodeType getType() {
@@ -213,7 +213,7 @@ public class ParentContainerResolverImplTest {
 
     private void archivedProcessWithCaller(long processInstanceId, long callerId)
             throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
-        SAProcessInstanceImpl processInstance = new SAProcessInstanceImpl();
+        SAProcessInstance processInstance = new SAProcessInstance();
         processInstance.setCallerId(callerId);
         doReturn(processInstance).when(processInstanceService).getLastArchivedProcessInstance(processInstanceId);
     }

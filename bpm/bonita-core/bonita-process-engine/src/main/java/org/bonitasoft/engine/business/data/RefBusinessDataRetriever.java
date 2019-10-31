@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.BusinessDataContext;
@@ -71,7 +72,11 @@ public class RefBusinessDataRetriever {
         try {
             return refBusinessDataService.getRefBusinessDataInstance(context.getName(), rootProcessInstanceId);
         } catch (SRefBusinessDataInstanceNotFoundException e) {
-            return refBusinessDataService.getSARefBusinessDataInstance(context.getName(), rootProcessInstanceId);
+            SARefBusinessDataInstance saRefBusinessDataInstance = refBusinessDataService.getSARefBusinessDataInstance(context.getName(), rootProcessInstanceId);
+            if (saRefBusinessDataInstance == null) {
+                return null;
+            }
+            return saRefBusinessDataInstance.toSRefBusinessDataInstance();
         }
     }
 
@@ -101,7 +106,11 @@ public class RefBusinessDataRetriever {
             return refBusinessDataService.getFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
         } catch (final SRefBusinessDataInstanceNotFoundException sbe) {
             try {
-                return refBusinessDataService.getSAFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
+                SARefBusinessDataInstance saFlowNodeRefBusinessDataInstance = refBusinessDataService.getSAFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
+                if (saFlowNodeRefBusinessDataInstance == null) {
+                    return null;
+                }
+                return saFlowNodeRefBusinessDataInstance.toSRefBusinessDataInstance();
             } catch (SRefBusinessDataInstanceNotFoundException e) {
                 return null;
             }

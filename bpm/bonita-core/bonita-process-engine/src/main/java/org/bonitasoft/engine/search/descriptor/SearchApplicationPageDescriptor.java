@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,17 +34,16 @@ public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
     SearchApplicationPageDescriptor() {
-        final SApplicationPageBuilderFactory keyProvider = BuilderFactory.get(SApplicationPageBuilderFactory.class);
         keys = new HashMap<String, FieldDescriptor>(4);
-        keys.put(ApplicationPageSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getIdKey()));
-        keys.put(ApplicationPageSearchDescriptor.TOKEN, new FieldDescriptor(SApplicationPage.class, keyProvider.getTokenKey()));
-        keys.put(ApplicationPageSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getApplicationIdKey()));
-        keys.put(ApplicationPageSearchDescriptor.PAGE_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getPageIdKey()));
+        keys.put(ApplicationPageSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.ID));
+        keys.put(ApplicationPageSearchDescriptor.TOKEN, new FieldDescriptor(SApplicationPage.class, SApplicationPage.TOKEN));
+        keys.put(ApplicationPageSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.APPLICATION_ID));
+        keys.put(ApplicationPageSearchDescriptor.PAGE_ID, new FieldDescriptor(SApplicationPage.class, SApplicationPage.PAGE_ID));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 
         final Set<String> pageFields = new HashSet<String>(1);
-        pageFields.add(keyProvider.getTokenKey());
+        pageFields.add(SApplicationPage.TOKEN);
         allFields.put(SApplicationPage.class, pageFields);
     }
 

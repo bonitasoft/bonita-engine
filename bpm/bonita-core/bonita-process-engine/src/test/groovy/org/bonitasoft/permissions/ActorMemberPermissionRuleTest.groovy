@@ -69,13 +69,13 @@ public class ActorMemberPermissionRuleTest {
         ''').when(apiCallContext).getBody()
         def actor = mock(ActorInstance.class)
         doReturn(154l).when(actor).getProcessDefinitionId()
-        doReturn(actor).when(processAPI).getActor(547l);
-        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(actor).when(processAPI).getActor(547l)
+        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -90,31 +90,31 @@ public class ActorMemberPermissionRuleTest {
 
         def actor = mock(ActorInstance.class)
         doReturn(154l).when(actor).getProcessDefinitionId()
-        doReturn(actor).when(processAPI).getActor(547l);
-        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(actor).when(processAPI).getActor(547l)
+        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_check_verify_get_is_true_when_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn([
-                "actor_id": "547",
-                "other"   : "sample"
+            "actor_id": "547",
+            "other"   : "sample"
         ]).when(apiCallContext).getFilters()
         def actor = mock(ActorInstance.class)
         doReturn(154l).when(actor).getProcessDefinitionId()
-        doReturn(actor).when(processAPI).getActor(547l);
-        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(actor).when(processAPI).getActor(547l)
+        doReturn(true).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
 
     }
 
@@ -122,18 +122,18 @@ public class ActorMemberPermissionRuleTest {
     public void should_check_verify_get_is_false_when_not_process_owner() {
         doReturn(true).when(apiCallContext).isGET()
         doReturn([
-                "actor_id": "547",
-                "other"   : "sample"
+            "actor_id": "547",
+            "other"   : "sample"
         ]).when(apiCallContext).getFilters()
         def actor = mock(ActorInstance.class)
         doReturn(154l).when(actor).getProcessDefinitionId()
-        doReturn(actor).when(processAPI).getActor(547l);
-        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId);
+        doReturn(actor).when(processAPI).getActor(547l)
+        doReturn(false).when(processAPI).isUserProcessSupervisor(154l, currentUserId)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ActorMemberPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
 
     }
 }

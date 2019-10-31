@@ -37,7 +37,7 @@ public interface ApplicationService {
 
     String APPLICATION_MENU = "APPLICATION_MENU";
 
-    String DEFAULT_LAYOUT_NAME="custompage_defaultlayout";
+    String DEFAULT_LAYOUT_NAME="custompage_layoutBonita";
 
     String DEFAULT_THEME_NAME="custompage_bootstrapdefaulttheme";
 

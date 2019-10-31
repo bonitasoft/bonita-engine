@@ -15,12 +15,14 @@
 package org.bonitasoft.engine.execution.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -33,8 +35,8 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -57,8 +59,8 @@ public class CancellingCallActivityStateImplTest {
     @InjectMocks
     private CancellingCallActivityStateImpl cancellingCallActivityState;
     private SProcessDefinition processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
-    private SProcessInstanceImpl processInstance = new SProcessInstanceImpl("myProcess", PROCESS_DEFINITION_ID);
-    private SCallActivityInstanceImpl callActivity = new SCallActivityInstanceImpl("callACtivity", 5342985348L, 4323264L, 65222L, 87686L, 2342L);
+    private SProcessInstance processInstance = new SProcessInstance("myProcess", PROCESS_DEFINITION_ID);
+    private SCallActivityInstance callActivity = new SCallActivityInstance("callACtivity", 5342985348L, 4323264L, 65222L, 87686L, 2342L);
     @Mock
     private ProcessInstanceService processInstanceService;
     @Mock

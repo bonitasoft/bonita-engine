@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.identity;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -70,8 +70,8 @@ public class UserImporterTest {
     private ExportedCustomUserInfoValue locationValue;
     @Captor
     private ArgumentCaptor<SUser> captor;
-    private SUserImpl manager;
-    private SUserImpl currentUser;
+    private SUser manager;
+    private SUser currentUser;
 
     @Before
     public void setUp() throws SUserCreationException {
@@ -82,10 +82,10 @@ public class UserImporterTest {
 
         skillsValue = new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE);
         locationValue = new ExportedCustomUserInfoValue(LOCATION_NAME, lOCATION_VALUE);
-        manager = new SUserImpl();
+        manager = new SUser();
         manager.setId(MANAGER_ID);
         manager.setUserName("manager");
-        currentUser = new SUserImpl();
+        currentUser = new SUser();
 
         userToImport = getUser(FIRST_USER, Arrays.asList(skillsValue, locationValue));
     }
@@ -122,6 +122,6 @@ public class UserImporterTest {
         importer.importUsers(Collections.singletonList(userToImport));
 
         // then
-        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(Matchers.<List<ExportedCustomUserInfoValue>>any(), anyLong());
+        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(ArgumentMatchers.<List<ExportedCustomUserInfoValue>>any(), anyLong());
     }
 }

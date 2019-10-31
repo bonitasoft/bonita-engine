@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+
+	<query name="getPlatformDependencyByName">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependency AS pdependency
+		WHERE pdependency.name = :name
+	</query>
+
+	<query name="getPlatformDependenciesById" read-only="true">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependency AS pdependency
+		WHERE pdependency.id IN (:ids)
+	</query>
+  
+	<query name="getPlatformDependencies" read-only="true">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependency AS pdependency
+	</query>
+
+	<query name="getPlatformDependencyContentOnly">
+		SELECT new org.bonitasoft.engine.dependency.model.DependencyContent(pdependency.fileName, pdependency.value_)
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependency AS pdependency
+		WHERE pdependency.id = :id
+	</query>
+	<query name="getPlatformDependencyMappings">
+		SELECT pdependencymapping
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping AS pdependencymapping
+	</query>
+
+	<query name="getPlatformDepencencyMappingsByArtifact">
+		SELECT pdependencymapping
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping AS pdependencymapping
+		WHERE pdependencymapping.artifactId = :artifactId
+		AND pdependencymapping.artifactType = :artifactType
+	</query>
+
+	<query name="getPlatformDependencyMappingsByDependency">
+    	SELECT pdependencymapping
+    	FROM org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping AS pdependencymapping
+    	WHERE pdependencymapping.dependencyId = :dependencyId
+	</query>
+
+	<query name="getPlatformDependencyIds">
+		SELECT pdependencymapping.dependencyId
+		FROM org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping AS pdependencymapping
+		WHERE pdependencymapping.artifactId = :artifactId
+		AND pdependencymapping.artifactType = :artifactType
+		ORDER BY pdependencymapping.id ASC
+	</query>
+
+</hibernate-mapping>

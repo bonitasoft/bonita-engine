@@ -13,13 +13,10 @@
  **/
 package org.bonitasoft.engine.services.impl;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 
 
@@ -42,8 +39,7 @@ public class QueriableLogUpdater {
     }
 
     public SQueriableLog buildFinalLog(final String callerClassName, final String callerMethodName, final SQueriableLog log) {
-        final SQueriableLogBuilderFactory fact = BuilderFactory.get(SQueriableLogBuilderFactory.class);
-        final SQueriableLogBuilder builder = fact.fromInstance(log);
+        final SQueriableLog.SQueriableLogBuilder builder = log.toBuilder();
 
         final String rawMessage = log.getRawMessage();
         if (rawMessage.length() > MAX_MESSAGE_LENGTH) {
@@ -64,7 +60,7 @@ public class QueriableLogUpdater {
         return builder.callerClassName(callerClassName).callerMethodName(callerMethodName)
                 .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode())
                 .productVersion(platformService.getSPlatformProperties().getPlatformVersion())
-                .done();
+                .build();
 
     }
 

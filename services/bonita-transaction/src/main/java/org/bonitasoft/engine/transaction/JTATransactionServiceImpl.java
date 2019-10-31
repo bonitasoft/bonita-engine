@@ -165,7 +165,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 if (isTraceLoggable) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                            "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
+                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
                 }
                 txManager.rollback();
             } else {
@@ -213,13 +213,13 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    @Deprecated
     @Override
-    public boolean isTransactionActive() throws STransactionException {
+    public boolean isTransactionActive() {
         try {
             return txManager.getStatus() == Status.STATUS_ACTIVE;
-        } catch (final SystemException e) {
-            throw new STransactionException(e);
+        } catch (final Throwable e) {
+            logger.log(JTATransactionServiceImpl.class, TechnicalLogSeverity.WARNING, "Unable to check if there is an active transaction {}", e.getMessage());
+            return false;
         }
     }
 

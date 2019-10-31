@@ -1,0 +1,50 @@
+plugins { id 'com.intershop.gradle.jaxb' version '2.0.0' }
+
+dependencies {
+    compile project(':bpm:bonita-common')
+    compile project(':services:bonita-recorder')
+    compile project(':bpm:bonita-core:bonita-process-definition')
+    compile project(':services:bonita-identity')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-log')
+    compile project(':services:bonita-events')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-archive')
+    compile project(':services:bonita-data-instance')
+    compile project(':services:bonita-classloader')
+    compile project(':bpm:bonita-core:bonita-process-comment')
+    compile project(':services:bonita-builder')
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':services:bonita-session')
+    compile project(':services:bonita-connector-executor')
+    compile project(':services:bonita-resources')
+    compile project(':services:bonita-time-tracker')
+    compile project(':services:bonita-expression')
+    compile project(':services:bonita-cache')
+    compile project(':bpm:bonita-core:bonita-contract-data')
+    compile group: 'com.google.guava', name: "guava", version: Deps.guavaVersion
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}
+jaxb {
+    //generates schema from java code
+    schemaGen {
+        //generates java code for project from project schema
+        connectors {
+            javaFiles = fileTree(dir: 'src/main/java', include: 'org/bonitasoft/engine/core/connector/parser/*.java')
+            namespaceconfigs = ['http://www.bonitasoft.org/ns/connector/implementation/6.0': 'connectors-impl.xsd']
+        }
+    }
+}
+
+processResources { from "$buildDir/generated/jaxb/schema/connectors" }
+
+tasks.jaxbSchemaGenConnectors.outputs.cacheIf { true }
+tasks.processResources.dependsOn tasks.jaxbSchemaGenConnectors

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.actor.mapping.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -88,14 +88,14 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorById() throws SActorNotFoundException, SBonitaReadException {
         final SActor actor = mock(SActor.class);
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SActor>> any())).thenReturn(actor);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SActor>> any())).thenReturn(actor);
 
         Assert.assertEquals(actor, actorMappingServiceImpl.getActor(456L));
     }
 
     @Test(expected = SActorNotFoundException.class)
     public final void getActorByIdNotExists() throws SBonitaReadException, SActorNotFoundException {
-        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SActor>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SActor>> any())).thenReturn(null);
 
         actorMappingServiceImpl.getActor(456L);
     }
@@ -109,7 +109,7 @@ public class ActorMappingServiceImplTest {
     public final void getNumberOfActorMembers() throws SBonitaReadException {
         final long actorId = 456L;
         final long numberOfActorMemebers = 1L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(numberOfActorMemebers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(numberOfActorMemebers);
 
         Assert.assertEquals(numberOfActorMemebers, actorMappingServiceImpl.getNumberOfActorMembers(actorId));
     }
@@ -122,14 +122,14 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getNumberOfUsersOfActor() throws SBonitaReadException {
         final long numberOfUsersOfActor = 155L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfUsersOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfUsersOfActor);
 
         Assert.assertEquals(numberOfUsersOfActor, actorMappingServiceImpl.getNumberOfUsersOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfUsersOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfUsersOfActor(456L);
     }
@@ -142,14 +142,14 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getNumberOfRolesOfActor() throws SBonitaReadException {
         final long numberOfRolesOfActor = 155L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfRolesOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfRolesOfActor);
 
         Assert.assertEquals(numberOfRolesOfActor, actorMappingServiceImpl.getNumberOfRolesOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfRolesOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfRolesOfActor(456L);
     }
@@ -162,14 +162,14 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getNumberOfGroupsOfActor() throws SBonitaReadException {
         final long numberOfGroupsOfActor = 155L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
 
         Assert.assertEquals(numberOfGroupsOfActor, actorMappingServiceImpl.getNumberOfGroupsOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfGroupsOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfGroupsOfActor(456L);
     }
@@ -182,14 +182,14 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getNumberOfMembershipsOfActor() throws SBonitaReadException {
         final long numberOfGroupsOfActor = 155L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
 
         Assert.assertEquals(numberOfGroupsOfActor, actorMappingServiceImpl.getNumberOfMembershipsOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfMembershipsOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfMembershipsOfActor(456L);
     }
@@ -203,21 +203,21 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorByNameAndScopeId() throws SActorNotFoundException, SBonitaReadException {
         final SActor actor = mock(SActor.class);
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenReturn(actor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenReturn(actor);
 
         Assert.assertEquals(actor, actorMappingServiceImpl.getActor("actorName", 69L));
     }
 
     @Test(expected = SActorNotFoundException.class)
     public final void getActorByNameAndScopeIdNotExists() throws SActorNotFoundException, SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenReturn(null);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenReturn(null);
 
         actorMappingServiceImpl.getActor("actorName", 69L);
     }
 
     @Test(expected = SActorNotFoundException.class)
     public final void getActorByNameAndScopeIdThrowException() throws SActorNotFoundException, SBonitaReadException {
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getActor("actorName", 69L);
     }
@@ -230,7 +230,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorMembersByActorPaginated() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>();
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActorMember>>any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>>any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembers(4115L, 0, 1));
     }
@@ -243,7 +243,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorMembersOfGroup() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>(6);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembersOfGroup(41L, 0, 1));
     }
@@ -256,7 +256,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorMembersOfRole() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>(3);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembersOfRole(41L, 0, 1));
     }
@@ -303,7 +303,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorsByListOfIds() throws SBonitaReadException {
         final List<SActor> actors = new ArrayList<SActor>(3);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
 
         final List<Long> actorIds = new ArrayList<Long>(1);
         actorIds.add(589L);
@@ -330,7 +330,7 @@ public class ActorMappingServiceImplTest {
     public final void getActors() throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
         final List<SActor> actors = new ArrayList<SActor>(3);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActors(41564L, queryOptions));
     }
@@ -344,8 +344,8 @@ public class ActorMappingServiceImplTest {
     public final void shouldBeAllowedToStartProcessDefinition() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(1);
         actorMembers.add(123L);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(3L);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(3L);
 
         Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should be allowed to start Process").isTrue();
     }
@@ -353,7 +353,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void shouldNotBeAllowedToStartProcessDefinitionIfNoActorMembers() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(0);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
 
         Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
     }
@@ -363,8 +363,8 @@ public class ActorMappingServiceImplTest {
     public final void shouldNotBeAllowedToStartProcessDefinitionIfNoUserMemberships() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(1);
         actorMembers.add(123L);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(0L);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(0L);
 
         Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
     }
@@ -377,7 +377,7 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorsByScopeIdsAndUserId() throws SBonitaReadException {
         final List<SActor> actors = new ArrayList<SActor>(3);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActors(new HashSet<Long>(), 5484L));
     }
@@ -466,7 +466,7 @@ public class ActorMappingServiceImplTest {
         sActorUpdateBuilder.updateDescription("newDescription");
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
-        doReturn(sActor).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
+        doReturn(sActor).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SActor>> any());
 
         final SActor result = actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
         assertNotNull(result);
@@ -476,7 +476,7 @@ public class ActorMappingServiceImplTest {
     @Test(expected = SActorNotFoundException.class)
     public final void updateActorNotExists() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
         final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
-        doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
+        doReturn(null).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());
     }
@@ -512,7 +512,7 @@ public class ActorMappingServiceImplTest {
         sActorMembers.add(sActorMember);
 
         doReturn(Arrays.asList(sActor)).doReturn(new ArrayList<SActor>()).when(persistenceService)
-                .selectList(Matchers.<SelectListDescriptor<SActorMember>> any());
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
         doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
 
         actorMappingServiceImpl.deleteActors(scopeId);
@@ -527,7 +527,7 @@ public class ActorMappingServiceImplTest {
         final List<SActorMember> sActorMembers = new ArrayList<SActorMember>();
 
         doReturn(Arrays.asList(sActor)).doReturn(new ArrayList<SActor>()).when(persistenceService)
-                .selectList(Matchers.<SelectListDescriptor<SActorMember>> any());
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
         doReturn(sActorMembers).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
 
         actorMappingServiceImpl.deleteActors(scopeId);
@@ -537,7 +537,7 @@ public class ActorMappingServiceImplTest {
     public final void deleteNoActors() throws SBonitaReadException, SRecorderException, SActorDeletionException {
         final int scopeId = 9;
 
-        doReturn(new ArrayList<SActor>()).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SActorMember>> any());
+        doReturn(new ArrayList<SActor>()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
 
         actorMappingServiceImpl.deleteActors(scopeId);
     }

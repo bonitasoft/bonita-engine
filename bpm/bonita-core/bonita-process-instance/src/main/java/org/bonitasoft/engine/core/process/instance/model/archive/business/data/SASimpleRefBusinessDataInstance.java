@@ -13,11 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
-import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public interface SASimpleRefBusinessDataInstance extends SARefBusinessDataInstance, SSimpleRefBusinessDataInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SASimpleRefBusinessDataInstance extends SARefBusinessDataInstance {
+
+    private Long dataId;
 
 }

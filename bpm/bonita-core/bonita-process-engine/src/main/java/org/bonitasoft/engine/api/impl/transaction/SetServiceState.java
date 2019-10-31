@@ -15,15 +15,13 @@ package org.bonitasoft.engine.api.impl.transaction;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -33,52 +31,67 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SetServiceState implements Callable<Void>, Serializable {
 
+    private static Logger logger = LoggerFactory.getLogger(SetServiceState.class);
+
+    public enum ServiceAction {START, STOP, PAUSE, RESUME}
+
     private static final long serialVersionUID = 7880459346729952396L;
 
     private final long tenantId;
+    private ServiceAction action;
 
-    private final ServiceStrategy serviceStrategy;
-
-    public SetServiceState(final long tenantId, final ServiceStrategy serviceStrategy) {
+    public SetServiceState(long tenantId, ServiceAction action) {
         this.tenantId = tenantId;
-        this.serviceStrategy = serviceStrategy;
+        this.action = action;
     }
 
     @Override
     public Void call() throws Exception {
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
+        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
+        final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
+        return changeServiceState(classLoaderService, tenantConfiguration);
+    }
+
+    public Void changeServiceState(ClassLoaderService classLoaderService, TenantConfiguration tenantConfiguration) throws SClassLoaderException, UpdateException {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
-            final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
 
-            if (serviceStrategy.shouldRefreshClassLoaders()) {
-                // refresh the tenant classloader:
-                tenantServiceAccessor.getDependencyService().refreshClassLoader(ScopeType.TENANT, tenantId);
-                refreshClassloaderOfProcessDefinitions(tenantServiceAccessor);
+            // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
+            if (action == ServiceAction.START || action == ServiceAction.RESUME) {
+                final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
+                Thread.currentThread().setContextClassLoader(serverClassLoader);
             }
 
-            // Set the right classloader:
-            final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
-            final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
-            Thread.currentThread().setContextClassLoader(serverClassLoader);
-
-            final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, serviceStrategy.getStateName() + " tenant-level service "
-                            + tenantService.getClass().getName() + " on tenant with ID " + tenantId);
-                }
+                logger.info("{} tenant-level service {} on tenant with ID {}", action, tenantService.getClass().getName(), tenantId);
+
                 try {
-                    serviceStrategy.changeState(tenantService);
+                    switch (action) {
+                        case START:
+                            tenantService.start();
+                            break;
+                        case STOP:
+                            tenantService.stop();
+                            break;
+                        case PAUSE:
+                            tenantService.pause();
+                            break;
+                        case RESUME:
+                            tenantService.resume();
+                            break;
+                    }
                 } catch (final SBonitaException sbe) {
-                    throw new UpdateException("Unable to " + serviceStrategy.getStateName() + " service: " + tenantService.getClass().getName(), sbe);
+                    throw new UpdateException("Unable to " + action + " service: " + tenantService.getClass().getName(), sbe);
                 }
             }
             return null;
@@ -86,21 +99,6 @@ public class SetServiceState implements Callable<Void>, Serializable {
             // reset previous class loader:
             Thread.currentThread().setContextClassLoader(baseClassLoader);
         }
-    }
-
-    protected void refreshClassloaderOfProcessDefinitions(final TenantServiceAccessor tenantServiceAccessor) throws SBonitaException {
-        final DependencyService dependencyService = tenantServiceAccessor.getDependencyService();
-        final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        List<Long> processDefinitionIds;
-        final int maxResults = 100;
-        int startIndex = 0;
-        do {
-            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(startIndex, maxResults);
-            for (final Long id : processDefinitionIds) {
-                dependencyService.refreshClassLoader(ScopeType.PROCESS, id);
-            }
-            startIndex += maxResults;
-        } while (processDefinitionIds.size() == maxResults);
     }
 
     public PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,

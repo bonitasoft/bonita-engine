@@ -14,7 +14,7 @@
 
 package org.bonitasoft.permissions
 
-import static org.mockito.Matchers.eq
+import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.mock
 
@@ -70,7 +70,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -92,7 +92,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -124,7 +124,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -134,7 +134,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -144,7 +144,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     def havingFilters(Map filters) {
@@ -160,7 +160,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -171,7 +171,7 @@ public class ProcessPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     def havingResourceId(long deployedBy) {
@@ -181,7 +181,6 @@ public class ProcessPermissionRuleTest {
 
         def info = mock(ProcessDeploymentInfo.class)
         doReturn(deployedBy).when(info).getDeployedBy()
-        doReturn(info).when(processAPI).getProcessDeploymentInfo(45l);
+        doReturn(info).when(processAPI).getProcessDeploymentInfo(45l)
     }
-
 }

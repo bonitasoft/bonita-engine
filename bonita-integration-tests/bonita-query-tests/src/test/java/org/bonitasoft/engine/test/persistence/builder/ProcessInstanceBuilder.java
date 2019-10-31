@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 
 
-public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInstanceImpl, ProcessInstanceBuilder> {
+public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInstance, ProcessInstanceBuilder> {
 
     private long processDefinitionId;
 
@@ -60,8 +60,8 @@ public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInst
     }
     
     @Override
-    SProcessInstanceImpl _build() {
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl(name, processDefinitionId);
+    SProcessInstance _build() {
+        SProcessInstance processInstance = new SProcessInstance(name, processDefinitionId);
         processInstance.setCallerId(this.callerId);
         processInstance.setCallerType(this.callerType);
         processInstance.setContainerId(this.containerId);

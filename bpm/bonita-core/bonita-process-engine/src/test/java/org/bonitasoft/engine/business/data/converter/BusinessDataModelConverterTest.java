@@ -21,16 +21,16 @@ import java.util.List;
 
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.junit.Test;
 
 public class BusinessDataModelConverterTest {
 
     @Test
     public void convertSSimpleBusinessDataReferencetoClientObject() throws Exception {
-        final SSimpleRefBusinessDataInstanceImpl sReference = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SSimpleRefBusinessDataInstance sReference = new SProcessSimpleRefBusinessDataInstance();
         sReference.setName("employee");
         sReference.setDataClassName("com.bonitasoft.Employee");
         sReference.setId(465L);
@@ -50,7 +50,7 @@ public class BusinessDataModelConverterTest {
         dataIDs.add(25L);
         dataIDs.add(null);
         dataIDs.add(3L);
-        final SProcessMultiRefBusinessDataInstanceImpl sReference = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance sReference = new SProcessMultiRefBusinessDataInstance();
         sReference.setDataIds(dataIDs);
         
         //when
@@ -64,7 +64,7 @@ public class BusinessDataModelConverterTest {
     
     @Test
     public void convertSMultiBusinessDataReferencetoClientObject() throws Exception {
-        final SProcessMultiRefBusinessDataInstanceImpl sReference = new SProcessMultiRefBusinessDataInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance sReference = new SProcessMultiRefBusinessDataInstance();
         sReference.setName("employees");
         sReference.setDataClassName("com.bonitasoft.Employee");
         sReference.setId(465L);

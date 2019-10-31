@@ -31,7 +31,7 @@ public class ConfigurationFolderUtilTest {
         //then
         final File expectedFolder = setupFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve("h2").toFile();
         assertThat(expectedFolder).exists().isDirectory();
-        assertThat(expectedFolder.listFiles()).extracting("name").hasSize(10).containsOnly(ALL_SQL_FILES);
+        assertThat(expectedFolder.listFiles()).extracting("name").hasSize(10).containsOnly((Object[]) ALL_SQL_FILES);
     }
 
     @Test

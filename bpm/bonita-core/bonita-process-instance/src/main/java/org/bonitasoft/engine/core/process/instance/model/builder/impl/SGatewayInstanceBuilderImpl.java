@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 
 /**
  * @author Feng Hui
@@ -24,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceIm
  */
 public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SGatewayInstanceBuilder {
 
-    public SGatewayInstanceBuilderImpl(final SGatewayInstanceImpl entity) {
+    public SGatewayInstanceBuilderImpl(final SGatewayInstance entity) {
         super(entity);
     }
 
@@ -36,13 +35,13 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
 
     @Override
     public SGatewayInstanceBuilder setGatewayType(final SGatewayType gatewayType) {
-        ((SGatewayInstanceImpl) entity).setGatewayType(gatewayType);
+        ((SGatewayInstance) entity).setGatewayType(gatewayType);
         return this;
     }
 
     @Override
     public SGatewayInstanceBuilder setHitBys(final String hitBys) {
-        ((SGatewayInstanceImpl) entity).setHitBys(hitBys);
+        ((SGatewayInstance) entity).setHitBys(hitBys);
         return this;
     }
 

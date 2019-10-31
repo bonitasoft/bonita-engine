@@ -23,7 +23,7 @@ import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaException
 import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.search.SearchOptionsBuilder
 import org.bonitasoft.engine.session.APISession
@@ -46,7 +46,7 @@ class CommentPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         if (apiCallContext.isGET()) {
             return checkGetMethod(apiCallContext, apiAccessor, currentUserId)
         } else if (apiCallContext.isPOST()) {
@@ -57,16 +57,16 @@ class CommentPermissionRule implements PermissionRule {
 
     private boolean checkPostMethod(APICallContext apiCallContext, APIAccessor apiAccessor, long currentUserId, Logger logger) {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
         def map = mapper.readValue(apiCallContext.getBody(), Map.class)
 
         def string = map.get("processInstanceId")
         if (string == null || string.toString().isEmpty()) {
-            return true;
+            return true
         }
         def processInstanceId = Long.valueOf(string.toString())
         if (processInstanceId <= 0) {
-            return true;
+            return true
         }
         def processAPI = apiAccessor.getProcessAPI()
         return isInvolved(processAPI, currentUserId, processInstanceId) || isSupervisor(processAPI, processInstanceId, currentUserId)

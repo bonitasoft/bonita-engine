@@ -16,8 +16,8 @@ package org.bonitasoft.engine.bpm.contract.validation;
 import static java.util.Arrays.asList;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;

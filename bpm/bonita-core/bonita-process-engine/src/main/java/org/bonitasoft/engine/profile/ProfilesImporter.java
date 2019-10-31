@@ -36,8 +36,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
@@ -239,20 +237,25 @@ public class ProfilesImporter {
     SProfile createSProfile(final ProfileNode profileNode, final long importerId) {
         final boolean isDefault = profileNode.isDefault();
         final long creationDate = System.currentTimeMillis();
-        return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(profileNode.getName(),
-                isDefault, creationDate, importerId, creationDate, importerId).setDescription(profileNode.getDescription()).done();
+        return SProfile.builder()
+                .name(profileNode.getName())
+                .isDefault(isDefault)
+                .creationDate(creationDate)
+                .createdBy(importerId)
+                .lastUpdateDate(creationDate)
+                .lastUpdatedBy(importerId).description(profileNode.getDescription()).build();
     }
 
     protected SProfileEntry createProfileEntry(final ParentProfileEntryNode parentEntry, final long profileId, final long parentId) {
-        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentEntry.getName(), profileId)
-                .setDescription(parentEntry.getDescription()).setIndex(parentEntry.getIndex()).setPage(parentEntry.getPage())
-                .setParentId(parentId).setType(parentEntry.getType()).setCustom(parentEntry.isCustom()).done();
+        return SProfileEntry.builder().name(parentEntry.getName()).profileId(profileId)
+                .description(parentEntry.getDescription()).index(parentEntry.getIndex()).page(parentEntry.getPage())
+                .parentId(parentId).type(parentEntry.getType()).custom(parentEntry.isCustom()).build();
     }
 
     protected SProfileEntry createProfileEntry(final ProfileEntryNode childEntry, final long profileId, final long parentId) {
-        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childEntry.getName(), profileId)
-                .setDescription(childEntry.getDescription()).setIndex(childEntry.getIndex()).setPage(childEntry.getPage())
-                .setParentId(parentId).setType(childEntry.getType()).setCustom(childEntry.isCustom()).done();
+        return SProfileEntry.builder().name(childEntry.getName()).profileId(profileId)
+                .description(childEntry.getDescription()).index(childEntry.getIndex())
+                .page(childEntry.getPage()).parentId(parentId).type(childEntry.getType()).custom(childEntry.isCustom()).build();
     }
 
     public List<String> toWarnings(final List<ImportStatus> importProfiles) {

@@ -29,10 +29,6 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  */
 public interface SchedulerService extends PlatformLifecycleService {
 
-    String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
-
-    String JOB_PARAMETER = "JOB_PARAMETER";
-
     /**
      * This service will fire the following events :
      * <ul>
@@ -85,27 +81,31 @@ public interface SchedulerService extends PlatformLifecycleService {
      */
     void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
 
-    void executeAgain(long jobDescriptorId) throws SSchedulerException;
+    /**
+     * Execute a job again
+     * @param jobDescriptorId the job to re execute
+     * @param delayInMillis
+     */
+    void executeAgain(long jobDescriptorId, int delayInMillis) throws SSchedulerException;
 
     /**
-     * Schedules a job.
+     * Retry a job once
      *
-     * @param jobDescriptorId
-     * @param jobParameters
-     * @throws SSchedulerException
-     *         if an exception occurs.
+     * In addition to executing the job again, this will also delete failed job logs
+     *
+     * @param jobDescriptorId the job to retry
      */
-    void executeAgain(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
+    void retryJobThatFailed(long jobDescriptorId) throws SSchedulerException;
 
     /**
-     * execute a job.
+     * Change parameters of a job and retry it once
      *
-     * @param jobDescriptor
-     * @param jobParameters
-     * @throws SSchedulerException
-     *         if an exception occurs.
+     * In addition to executing the job again, this will also delete failed job logs
+     *
+     * @param jobDescriptorId the job to retry
+     * @param parameters the new parameters for the job
      */
-    void executeNow(SJobDescriptor jobDescriptor, List<SJobParameter> parameters) throws SSchedulerException;
+    void retryJobThatFailed(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * Deletes a job according to its name.
@@ -144,8 +144,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      *         if an exception occurs.
      */
     List<String> getAllJobs() throws SSchedulerException;
-
-    boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
 
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
@@ -187,41 +185,9 @@ public interface SchedulerService extends PlatformLifecycleService {
     Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
 
     /**
-     * Add the given <code>{@link AbstractBonitaTenantJobListener}s</code> to the <code>Scheduler</code>,
-     * and register it to receive events for Jobs that are matched by the group name.
-     *
-     * @param jobListeners
-     *        The job listeners to add to the scheduler
-     * @param groupName
-     *        The group name to filter
-     * @throws SSchedulerException
-     * @since 6.4.0
-     */
-    void addJobListener(List<AbstractBonitaTenantJobListener> jobListeners, String groupName) throws SSchedulerException;
-
-    /**
-     * Add the given <code>{@link AbstractBonitaPlatformJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
-     *
-     * @param jobListeners
-     *        The job listeners to add to the scheduler
-     * @throws SSchedulerException
-     * @since 6.4.0
-     */
-    void addJobListener(List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException;
-
-    /**
-     * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
-     *
-     * @throws SSchedulerException
-     * @since 6.4.0
-     */
-    void initializeScheduler() throws SSchedulerException;
-
-    /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     @Override
@@ -231,7 +197,6 @@ public interface SchedulerService extends PlatformLifecycleService {
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
      *
      * @throws SSchedulerException
-     * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     @Override
@@ -247,5 +212,7 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @since 6.4.0
      */
     boolean isExistingJob(String jobName) throws SSchedulerException;
+
+    boolean mayFireAgain(String groupName, String jobName) throws SSchedulerException;
 
 }

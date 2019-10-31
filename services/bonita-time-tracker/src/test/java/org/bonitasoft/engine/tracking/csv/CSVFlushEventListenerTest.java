@@ -51,38 +51,40 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_work_if_output_folder_is_a_folder() throws Exception {
-        new CSVFlushEventListener(true, logger, temporaryFolder.newFolder().getAbsolutePath(), ";");
+        new CSVFlushEventListener(true, this.logger, this.temporaryFolder.newFolder().getAbsolutePath(), ";");
     }
 
     @Test
     public void should_fail_if_output_folder_unknown() {
         //then
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Output folder does not exist");
+        this.expectedException.expect(RuntimeException.class);
+        this.expectedException.expectMessage("Output folder does not exist");
 
         //when
-        new CSVFlushEventListener(true, logger, "unknownFolder", ";");
+        new CSVFlushEventListener(true, this.logger, "unknownFolder", ";");
     }
 
     @Test
     public void should_fail_if_outputfolder_is_a_file() throws Exception {
         //then
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Output folder is not a directory");
+        this.expectedException.expect(RuntimeException.class);
+        this.expectedException.expectMessage("Output folder is not a directory");
 
         //when
-        new CSVFlushEventListener(true, logger, temporaryFolder.newFile().getAbsolutePath(), ";");
+        new CSVFlushEventListener(true, this.logger, this.temporaryFolder.newFile().getAbsolutePath(), ";");
     }
 
     @Test
     public void flushedCsv() throws Exception {
         //given
-        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, logger, temporaryFolder.newFolder().getAbsolutePath(), ";");
+        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, this.logger,
+                this.temporaryFolder.newFolder().getAbsolutePath(), ";");
         final Record rec1 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec2Desc", 200);
 
         //when
-        final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener.flush(new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
+        final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener
+                .flush(new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
         final File csvFile = csvFlushResult.getOutputFile();
 
         //then

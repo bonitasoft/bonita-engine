@@ -13,25 +13,18 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.mockito.Mockito.doReturn;
-
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Laurent Leseigneur
  */
-@RunWith(MockitoJUnitRunner.class)
 public class LoginAPIImplTest {
 
-    @Mock
-    private STenant sTenant;
+    private STenant sTenant = new STenant();
 
     private LoginAPIImpl loginAPI = new LoginAPIImpl();
 
@@ -39,8 +32,7 @@ public class LoginAPIImplTest {
     @Test
     public void checkThatWeCanLogin_should_allow_technical_user() throws Exception {
         //given
-        doReturn(true).when(sTenant).isActivated();
-        doReturn(true).when(sTenant).isPaused();
+        sTenant.setStatus(STenant.PAUSED);
 
         //expected no exception
         loginAPI.checkThatWeCanLogin("install", sTenant, new TechnicalUser("install", "install"));
@@ -50,7 +42,7 @@ public class LoginAPIImplTest {
     @Test(expected = LoginException.class)
     public void checkThatWeCanLogin_should_throw_exception_when_tenant_is_not_activated() throws Exception {
         //given
-        doReturn(false).when(sTenant).isActivated();
+        sTenant.setStatus(STenant.DEACTIVATED);
 
         //expected LoginException
         loginAPI.checkThatWeCanLogin("joe", sTenant, new TechnicalUser("techUser", "techPass"));
@@ -60,8 +52,7 @@ public class LoginAPIImplTest {
     @Test(expected = TenantStatusException.class)
     public void checkThatWeCanLogin_should_refuse_non_technical_user() throws Exception {
         //given
-        doReturn(true).when(sTenant).isActivated();
-        doReturn(true).when(sTenant).isPaused();
+        sTenant.setStatus(STenant.PAUSED);
 
         LoginAPIImpl loginAPI = new LoginAPIImpl();
 

@@ -13,9 +13,36 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SAManualTaskInstance extends SAHumanTaskInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAManualTaskInstance extends SAHumanTaskInstance {
+    public SAManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {
+        super(sManualTaskInstance);
+    }
 
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.MANUAL_TASK;
+    }
+
+    @Override
+    public String getKind() {
+        return "manual";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SManualTaskInstance.class;
+    }
 }

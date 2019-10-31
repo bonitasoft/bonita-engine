@@ -1,0 +1,30 @@
+dependencies {
+    compile(group: 'commons-beanutils', name: 'commons-beanutils', version: Deps.commonsBeanutilsVersion) {
+        exclude(module: 'commons-collections')
+    }
+    compile "commons-collections:commons-collections:${Deps.commonsCollectionsVersion}"
+    compile "org.springframework:spring-context:${Deps.springVersion}"
+    compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
+    compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
+    compile(group: 'com.thoughtworks.xstream', name: 'xstream', version: Deps.xstreamVersion)
+    compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.junit.jupiter:junit-jupiter-api:${Deps.junit5Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: Deps.junit5Version
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: Deps.junit5Version
+    testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: Deps.junit5Version
+}
+
+description = 'Bonita Engine Util Classes'
+
+test {
+    useJUnitPlatform { includeEngines 'junit-jupiter', 'junit-vintage' }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { from project.components.java }
+    }
+}

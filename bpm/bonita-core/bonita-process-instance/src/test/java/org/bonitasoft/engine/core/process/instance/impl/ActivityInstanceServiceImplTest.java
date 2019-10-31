@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.process.instance.impl;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -80,7 +80,7 @@ public class ActivityInstanceServiceImplTest {
     public void getPossibleUserIdsOfPendingTasks() throws Exception {
         final List<Long> sUserIds = new ArrayList<Long>();
         Collections.addAll(sUserIds, 78l, 2l, 5l, 486l);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(sUserIds);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(sUserIds);
 
         final List<Long> userIds = activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
         assertEquals(sUserIds, userIds);
@@ -88,13 +88,13 @@ public class ActivityInstanceServiceImplTest {
 
     @Test(expected = SActivityReadException.class)
     public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws Exception {
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenThrow(new SBonitaReadException("database out"));
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenThrow(new SBonitaReadException("database out"));
         activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
     }
 
     @Test
     public void getEmptyPossibleUserIdsOfPendingTasks() throws Exception {
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(Collections.<Long> emptyList());
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(Collections.<Long> emptyList());
 
         final List<Long> userIds = activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
         assertEquals(Collections.emptyList(), userIds);
@@ -315,7 +315,7 @@ public class ActivityInstanceServiceImplTest {
 
     @Test
     public void getNumberOfFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
         final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInAllStates(2L);
@@ -324,7 +324,7 @@ public class ActivityInstanceServiceImplTest {
 
     @Test
     public void getNumberOfArchivedFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
         final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);

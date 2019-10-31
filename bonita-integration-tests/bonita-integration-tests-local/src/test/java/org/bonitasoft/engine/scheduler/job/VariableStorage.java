@@ -42,8 +42,12 @@ public class VariableStorage implements Serializable {
     }
 
     public Object getVariableValue(final String name) {
+        return getVariableValue(name, null);
+    }
+
+    public <T> T getVariableValue(final String name, T defaultValue) {
         synchronized (lock) {
-            return variables.get(name);
+            return ((T) variables.getOrDefault(name, defaultValue));
         }
     }
 

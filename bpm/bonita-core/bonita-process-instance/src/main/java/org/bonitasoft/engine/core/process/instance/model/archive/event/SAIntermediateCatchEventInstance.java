@@ -13,9 +13,35 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Celine Souchet
- */
-public interface SAIntermediateCatchEventInstance extends SACatchEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAIntermediateCatchEventInstance extends SACatchEventInstance {
+
+    public SAIntermediateCatchEventInstance(final SIntermediateCatchEventInstance sIntermediateCatchEventInstance) {
+        super(sIntermediateCatchEventInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.INTERMEDIATE_CATCH_EVENT;
+    }
+
+    @Override
+    public String getKind() {
+        return "intermediateCatchEvent";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SIntermediateCatchEventInstance.class;
+    }
 
 }

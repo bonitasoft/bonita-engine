@@ -34,7 +34,6 @@ public class SAProcessContractDataTest {
         assertThat(saProcessContractData.getTenantId()).isEqualTo(0L); // not set yet by Persistence service
         assertThat(saProcessContractData.getId()).isEqualTo(0L);
         assertThat(saProcessContractData.getName()).isEqualTo(some_name);
-        assertThat(saProcessContractData.getProcessInstanceId()).isEqualTo(processInstanceId);
         assertThat(saProcessContractData.getScopeId()).isEqualTo(processInstanceId);
         assertThat(saProcessContractData.getArchiveDate()).isEqualTo(0L);
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);

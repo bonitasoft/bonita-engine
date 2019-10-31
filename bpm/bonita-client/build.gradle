@@ -1,0 +1,52 @@
+import org.bonitasoft.engine.gradle.PomUtils
+
+dependencies {
+    compile project(':bpm:bonita-common')
+    compile "org.apache.httpcomponents:httpclient:${Deps.httpComponentsVersion}"
+    compile "com.thoughtworks.xstream:xstream:${Deps.xstreamVersion}"
+    compile "org.apache.httpcomponents:httpmime:${Deps.httpComponentsVersion}"
+    compile "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
+    runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
+    runtime "com.sun.xml.bind:jaxb-impl:${Deps.jaxbVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testCompile 'org.eclipse.jetty:jetty-server:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-jndi:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-webapp:8.1.14.v20131031'
+    testCompile 'org.eclipse.jetty:jetty-plus:8.1.14.v20131031'
+}
+
+task testsJar(type: Jar) {
+    classifier = 'tests'
+    from(sourceSets.test.output)
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+task listDependencies(type: DependencyReportTask) {}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
+            artifact project.sourcesJar
+            artifact project.javadocJar
+            artifact project.testsJar
+            pom { pom ->
+                name = "Bonita Client"
+                description = "Bonita Client is the Jar used to interact with a running Bonita Engine"
+                PomUtils.pomCommunityPublication(pom)
+            }
+        }
+    }
+}

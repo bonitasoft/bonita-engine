@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -20,34 +24,59 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * 
  * @author Emmanuel Duchastenier
  */
-public interface SContactInfo extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SContactInfo implements PersistentObject {
 
-    Long getUserId();
+    public static final String ID = "id";
+    public static final String WEBSITE = "website";
+    public static final String COUNTRY = "country";
+    public static final String STATE = "state";
+    public static final String CITY = "city";
+    public static final String ZIP_CODE = "zipCode";
+    public static final String ADDRESS = "address";
+    public static final String ROOM = "room";
+    public static final String BUILDING = "building";
+    public static final String FAX_NUMBER = "faxNumber";
+    public static final String MOBILE_NUMBER = "mobileNumber";
+    public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String EMAIL = "email";
+    public static final String IS_PERSONAL = "personal";
+    private long id;
+    private long tenantId;
+    private Long userId;
+    private String email;
+    private String phoneNumber;
+    private String mobileNumber;
+    private String faxNumber;
+    private String building;
+    private String room;
+    private String address;
+    private String zipCode;
+    private String city;
+    private String state;
+    private String country;
+    private String website;
+    private boolean personal;
 
-    String getEmail();
-
-    String getPhoneNumber();
-
-    String getMobileNumber();
-
-    String getFaxNumber();
-
-    String getBuilding();
-
-    String getRoom();
-
-    String getAddress();
-
-    String getZipCode();
-
-    String getCity();
-
-    String getState();
-
-    String getCountry();
-
-    String getWebsite();
-
-    boolean isPersonal();
+    public SContactInfo(final SContactInfo contactInfo) {
+        this();
+        userId = contactInfo.getUserId();
+        personal = contactInfo.isPersonal();
+        address = contactInfo.getAddress();
+        building = contactInfo.getBuilding();
+        city = contactInfo.getCity();
+        country = contactInfo.getCountry();
+        email = contactInfo.getEmail();
+        faxNumber = contactInfo.getFaxNumber();
+        mobileNumber = contactInfo.getMobileNumber();
+        phoneNumber = contactInfo.getPhoneNumber();
+        room = contactInfo.getRoom();
+        state = contactInfo.getState();
+        website = contactInfo.getWebsite();
+        zipCode = contactInfo.getZipCode();
+    }
 
 }

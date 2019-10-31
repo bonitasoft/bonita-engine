@@ -13,45 +13,117 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
- * @author Matthieu Chaffotte
- */
-public interface SAFlowNodeInstance extends SAFlowElementInstance {
+@Data
+@NoArgsConstructor
+public abstract class SAFlowNodeInstance implements ArchivedPersistentObject {
 
-    SFlowNodeType getType();
+    private long id;
+    private long tenantId;
+    private long archiveDate;
+    private long sourceObjectId;
+    private String name;
+    private long rootContainerId;
+    private long parentContainerId;
+    private boolean aborting;
+    private long logicalGroup1;
+    private long logicalGroup2;
+    private long logicalGroup3;
+    private long logicalGroup4;
+    private int stateId;
+    private String stateName;
+    private boolean terminal;
+    private boolean stable;
+    private long reachedStateDate;
+    private long lastUpdateDate;
+    private String displayDescription;
+    private String displayName;
+    private String description;
+    private long executedBy;
+    private long executedBySubstitute;
+    private String kind;
+    private long flowNodeDefinitionId;
 
-    int getStateId();
 
-    String getStateName();
+    public SAFlowNodeInstance(final SFlowNodeInstance flowNodeInstance) {
+        sourceObjectId = flowNodeInstance.getId();
+        name = flowNodeInstance.getName();
+        rootContainerId = flowNodeInstance.getRootContainerId();
+        parentContainerId = flowNodeInstance.getParentContainerId();
+        logicalGroup1 = flowNodeInstance.getLogicalGroup(0);
+        logicalGroup2 = flowNodeInstance.getLogicalGroup(1);
+        logicalGroup3 = flowNodeInstance.getLogicalGroup(2);
+        logicalGroup4 = flowNodeInstance.getLogicalGroup(3);
+        stateId = flowNodeInstance.getStateId();
+        stateName = flowNodeInstance.getStateName();
+        reachedStateDate = flowNodeInstance.getReachedStateDate();
+        lastUpdateDate = flowNodeInstance.getLastUpdateDate();
+        terminal = flowNodeInstance.isTerminal();
+        stable = flowNodeInstance.isStable();
+        displayName = flowNodeInstance.getDisplayName();
+        displayDescription = flowNodeInstance.getDisplayDescription();
+        description = flowNodeInstance.getDescription();
+        executedBy = flowNodeInstance.getExecutedBy();
+        executedBySubstitute = flowNodeInstance.getExecutedBySubstitute();
+        flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
+    }
 
-    long getReachedStateDate();
 
-    long getLastUpdateDate();
+    public long getProcessDefinitionId() {
+        return logicalGroup1;
+    }
 
-    String getDisplayName();
+    public long getRootProcessInstanceId() {
+        return logicalGroup2;
+    }
 
-    String getDisplayDescription();
+    public long getParentActivityInstanceId() {
+        return logicalGroup3;
+    }
 
-    String getDescription();
+    public long getParentProcessInstanceId() {
+        return logicalGroup4;
+    }
 
-    /**
-     * @return id of the user who originally executed the flownode
-     * @since 6.0.1
-     */
-    long getExecutedBy();
+    public void setLogicalGroup(final int index, final long id) {
+        switch (index) {
+            case 0:
+                logicalGroup1 = id;
+                break;
+            case 1:
+                logicalGroup2 = id;
+                break;
+            case 2:
+                logicalGroup3 = id;
+                break;
+            case 3:
+                logicalGroup4 = id;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("Index out of range for setLogicalGroup: " + index);
+        }
+    }
 
-    /**
-     * @return id of the user (delegate) who executed the flow node for the original executer
-     * @since 6.0.1
-     */
-    long getExecutedBySubstitute();
+    public long getLogicalGroup(final int index) {
+        switch (index) {
+            case 0:
+                return logicalGroup1;
+            case 1:
+                return logicalGroup2;
+            case 2:
+                return logicalGroup3;
+            case 3:
+                return logicalGroup4;
+            default:
+                throw new IllegalArgumentException("Invalid index: must be 0, 1, 2 or 3");
+        }
+    }
 
-    String getKind();
-
-    long getFlowNodeDefinitionId();
+    abstract public SFlowNodeType getType();
 
 }

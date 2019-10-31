@@ -15,7 +15,7 @@
 package org.bonitasoft.platform.setup.command;
 
 import static org.bonitasoft.platform.setup.command.CommandTestUtils.buildCommandLine;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 

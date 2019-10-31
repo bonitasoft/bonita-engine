@@ -6,7 +6,7 @@
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SThemeImpl" table="theme">
+	<class name="org.bonitasoft.engine.theme.model.STheme" table="theme">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />

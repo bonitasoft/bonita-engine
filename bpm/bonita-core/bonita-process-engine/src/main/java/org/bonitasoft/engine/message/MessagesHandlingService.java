@@ -20,8 +20,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
+import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -41,7 +41,6 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -51,13 +50,18 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+
 /**
  * @author Baptiste Mesta
  */
-public class MessagesHandlingService implements TenantLifecycleService, ObservableExecutor {
+public class MessagesHandlingService implements TenantLifecycleService {
 
-    private static final int MAX_COUPLES = 1000;
+    private static final int MAX_COUPLES = 100;
     private static final String LOCK_TYPE = "EVENTS";
+    public static final String NUMBER_OF_MESSAGES_EXECUTED = "bonita.bpmengine.message.executed";
     private ThreadPoolExecutor threadPoolExecutor;
     private EventInstanceService eventInstanceService;
     private WorkService workService;
@@ -68,11 +72,11 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
     private SessionAccessor sessionAccessor;
     private BPMWorkFactory workFactory;
 
-    private AtomicLong executedMessages = new AtomicLong();
+    private final Counter executedMessagesCounter;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
-            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-            SessionAccessor sessionAccessor, BPMWorkFactory workFactory) {
+                                   LockService lockService, Long tenantId, UserTransactionService userTransactionService,
+                                   SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;
@@ -81,6 +85,11 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
         this.workFactory = workFactory;
+        executedMessagesCounter = Counter.builder(NUMBER_OF_MESSAGES_EXECUTED)
+                .tags(Tags.of("tenant", String.valueOf(tenantId)))
+                .baseUnit("messages")
+                .description("BPMN message couples executed")
+                .register(meterRegistry);
     }
 
     @Override
@@ -144,7 +153,8 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
             }
             if (potentialMessageCouples.size() == MAX_COUPLES) {
                 log(TechnicalLogSeverity.DEBUG,
-                        "There is more than " + MAX_COUPLES + " event to match. will retrigger the execution now.");
+                        "There are more than " + MAX_COUPLES + " event to match. " +
+                                "Will trigger the execution again now, to match more event couples.");
                 triggerMatchingOfMessages();
             }
             return null;
@@ -161,6 +171,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         }
     }
 
+    @VisibleForTesting
     void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
             SMessageModificationException, SWaitingEventModificationException, SWorkRegisterException {
 
@@ -173,7 +184,7 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         if (!SBPMEventType.START_EVENT.equals(waitingMsg.getEventType())) {
             markWaitingMessageAsInProgress(waitingMsg);
         }
-        executedMessages.incrementAndGet();
+        executedMessagesCounter.increment();
         workService.registerWork(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMsg));
     }
 
@@ -247,21 +258,6 @@ public class MessagesHandlingService implements TenantLifecycleService, Observab
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
-    }
-
-    @Override
-    public long getPendings() {
-        return 0;
-    }
-
-    @Override
-    public long getRunnings() {
-        return 0;
-    }
-
-    @Override
-    public long getExecuted() {
-        return executedMessages.get();
     }
 
     private class MatchEventCallable implements Callable<Void> {

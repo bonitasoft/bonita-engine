@@ -14,10 +14,11 @@
 
 package org.bonitasoft.engine.test.internal;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import org.bonitasoft.engine.BonitaEngine;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -40,11 +41,13 @@ public class EngineStarterTest {
     private PlatformAPI platformAPI;
     @Mock
     private PlatformLoginAPI platformLoginAPI;
-    @Spy
+    @Mock
+    private BonitaEngine bonitaEngine;
     private EngineStarter engineStarter;
 
     @Before
     public void before() throws Exception {
+        engineStarter = spy(EngineStarter.create(bonitaEngine));
         doReturn(platformSession).when(platformLoginAPI).login(anyString(), anyString());
         doReturn(platformLoginAPI).when(engineStarter).getPlatformLoginAPI();
         doReturn(platformAPI).when(engineStarter).getPlatformAPI(any(PlatformSession.class));
@@ -63,6 +66,7 @@ public class EngineStarterTest {
         //then
         verify(platformAPI, never()).cleanPlatform();
         verify(platformAPI).stopNode();
+        verify(bonitaEngine).stop();
     }
 
     @Test
@@ -75,5 +79,6 @@ public class EngineStarterTest {
         //then
         verify(platformAPI).cleanPlatform();
         verify(platformAPI).stopNode();
+        verify(bonitaEngine).stop();
     }
 }

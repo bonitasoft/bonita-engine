@@ -13,21 +13,24 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.SupervisorBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.process.ProcessInstanceState.STARTED;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
+import static org.bonitasoft.engine.test.persistence.builder.SupervisorBuilder.aSupervisor;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -35,13 +38,9 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
+import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -427,14 +426,14 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSingleChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -444,8 +443,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchOnlyChildrenSProcessInstanceOfProcessInstance_return_processInstancesIdsFromCallActivity() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
@@ -454,10 +453,10 @@ public class ProcessInstanceQueriesTest {
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withCallerId(gatewayActivity.getId()).withCallerType(SFlowNodeType.GATEWAY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -467,15 +466,15 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchChildProcessInstanceOfProcessInstance_return_processInstancesIdsNotGrandChildren() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(childPI.getId())
                 .withName("call Activity")
                 .build());
@@ -491,15 +490,15 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchGrandChildProcessInstanceOfChildProcessInstance_return_processInstancesIdsNotChild() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(childPI.getId())
                 .withName("call Activity")
                 .build());
@@ -515,14 +514,14 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+                .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI1 = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         final SProcessInstance childPI2 = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
                 .withStateId(ProcessInstanceState.COMPLETED.getId()).build());
@@ -538,20 +537,20 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchChildSProcessInstanceOfProcessInstance_return_processInstancesIdsFromParentPIOnly() {
         final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Started")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Completed")
                 .withStateId(ProcessInstanceState.COMPLETED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Cancelled")
                 .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
-        final SCallActivityInstance callActivity = (SCallActivityInstanceImpl) repository.add(aCallActivityInstanceBuilder()
+        final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
         final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
                 .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -601,13 +600,13 @@ public class ProcessInstanceQueriesTest {
         // Given
         repository.add(buildFailedProcessInstance(1));
 
-        final SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
 
-        final SProcessInstanceImpl failedProcessInstanceWithFailedFlowNode = repository.add(buildFailedProcessInstance(3));
+        final SProcessInstance failedProcessInstanceWithFailedFlowNode = repository.add(buildFailedProcessInstance(3));
         repository.add(buildFailedGateway(56, failedProcessInstanceWithFailedFlowNode.getId()));
 
         // When
@@ -632,9 +631,9 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getNumberOfSProcessInstanceFailed_should_return_number_of_process_instances_with_failed_flow_nodes() {
         // Given
-        final SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
 
@@ -648,31 +647,30 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSProcessInstanceFailed_return_distinct_process_instances() {
         // Given
-        final SProcessInstanceImpl failedProcessInstance = repository.add(buildFailedProcessInstance(1));
+        final SProcessInstance failedProcessInstance = repository.add(buildFailedProcessInstance(1));
 
-        final SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
-        processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final SProcessInstance processInstanceWithFailedFlowNode = SProcessInstance.builder().name("process2")
+                .processDefinitionId(10L)
+                .id(2)
+                .tenantId(DEFAULT_TENANT_ID)
+                .build();
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
 
-        final SProcessInstanceImpl failedProcessInstanceWithFailedFlowNode = repository.add(buildFailedProcessInstance(3));
+        final SProcessInstance failedProcessInstanceWithFailedFlowNode = repository.add(buildFailedProcessInstance(3));
         repository.add(buildFailedGateway(2, failedProcessInstanceWithFailedFlowNode.getId()));
 
         // When
         final List<SProcessInstance> failedSProcessInstance = repository.searchSProcessInstanceFailed();
 
         // Then
-        assertEquals(3, failedSProcessInstance.size());
-        assertEquals(failedProcessInstance, failedSProcessInstance.get(0));
-        assertEquals(failedProcessInstanceWithFailedFlowNode, failedSProcessInstance.get(1));
-        assertEquals(processInstanceWithFailedFlowNode, failedSProcessInstance.get(2));
+        assertThat(failedSProcessInstance).containsOnly(failedProcessInstance, failedProcessInstanceWithFailedFlowNode, processInstanceWithFailedFlowNode);
     }
 
     @Test
     public void searchSProcessInstanceFailed_return_failed_process_instances() {
         // Given
-        final SProcessInstanceImpl failedProcessInstance = repository.add(buildFailedProcessInstance(1));
+        final SProcessInstance failedProcessInstance = repository.add(buildFailedProcessInstance(1));
 
         // When
         final List<SProcessInstance> failedSProcessInstance = repository.searchSProcessInstanceFailed();
@@ -685,9 +683,9 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSProcessInstanceFailed_return_process_instances_with_failed_flow_nodes() {
         // Given
-        final SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        final SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(1, processInstanceWithFailedFlowNode.getId()));
 
@@ -707,19 +705,19 @@ public class ProcessInstanceQueriesTest {
         repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
 
         repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
 
-        SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildFailedProcessInstance(3, 11L));
 
-        processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 15L);
+        processInstanceWithFailedFlowNode = new SProcessInstance("process2", 15L);
         processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildStartedProcessInstance(5, 15L));
@@ -740,19 +738,19 @@ public class ProcessInstanceQueriesTest {
         repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
 
         repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
+                .withStateId(STARTED.getId()).build());
         repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
 
-        SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        SProcessInstance processInstanceWithFailedFlowNode = new SProcessInstance("process2", 10L);
         processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildFailedProcessInstance(3, 11L));
 
-        processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 15L);
+        processInstanceWithFailedFlowNode = new SProcessInstance("process2", 15L);
         processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        processInstanceWithFailedFlowNode.setTenantId(DEFAULT_TENANT_ID);
         repository.add(processInstanceWithFailedFlowNode);
         repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
         repository.add(buildStartedProcessInstance(5, 15L));
@@ -766,33 +764,31 @@ public class ProcessInstanceQueriesTest {
 
     }
 
-    private SGatewayInstanceImpl buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {
-        final SGatewayInstanceImpl sGatewayInstanceImpl = new SGatewayInstanceImpl();
-        sGatewayInstanceImpl.setId(gatewayId);
-        sGatewayInstanceImpl.setStateId(3);
-        sGatewayInstanceImpl.setLogicalGroup(3, parentProcessInstanceId);
-        sGatewayInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sGatewayInstanceImpl;
+    private SGatewayInstance buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {
+        final SGatewayInstance sGatewayInstance = new SGatewayInstance();
+        sGatewayInstance.setId(gatewayId);
+        sGatewayInstance.setStateId(3);
+        sGatewayInstance.setLogicalGroup(3, parentProcessInstanceId);
+        sGatewayInstance.setTenantId(DEFAULT_TENANT_ID);
+        return sGatewayInstance;
     }
 
-    private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId) {
+    private SProcessInstance buildFailedProcessInstance(final long processInstanceId) {
         return buildFailedProcessInstance(processInstanceId, 9L);
     }
 
-    private SProcessInstanceImpl buildStartedProcessInstance(final long processInstanceId, final long processDefinitionId) {
-        final SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("process" + processInstanceId, processDefinitionId);
-        sProcessInstance.setId(processInstanceId);
-        sProcessInstance.setStateId(ProcessInstanceState.STARTED.getId());
-        sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sProcessInstance;
+    private SProcessInstance buildStartedProcessInstance(final long processInstanceId, final long processDefinitionId) {
+        return SProcessInstance.builder().name("process" + processInstanceId).processDefinitionId(processDefinitionId)
+                .id(processInstanceId)
+                .stateId(STARTED.getId())
+                .tenantId(DEFAULT_TENANT_ID).build();
     }
 
-    private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId, final long processDefinitionId) {
-        final SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("process" + processInstanceId, processDefinitionId);
-        sProcessInstance.setId(processInstanceId);
-        sProcessInstance.setStateId(7);
-        sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sProcessInstance;
+    private SProcessInstance buildFailedProcessInstance(final long processInstanceId, final long processDefinitionId) {
+        return SProcessInstance.builder().name("process" + processInstanceId).processDefinitionId(processDefinitionId)
+                .id(processInstanceId)
+                .stateId(7)
+                .tenantId(DEFAULT_TENANT_ID).build();
     }
 
     @Test
@@ -821,13 +817,13 @@ public class ProcessInstanceQueriesTest {
         assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
     }
 
-    private SAProcessInstanceImpl buildSAProcessInstance(final long id) {
-        final SAProcessInstanceImpl saProcessInstanceImpl = new SAProcessInstanceImpl();
-        saProcessInstanceImpl.setId(id);
-        saProcessInstanceImpl.setSourceObjectId(id);
-        saProcessInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        saProcessInstanceImpl.setName("process" + id);
-        return saProcessInstanceImpl;
+    private SAProcessInstance buildSAProcessInstance(final long id) {
+        final SAProcessInstance saProcessInstance = new SAProcessInstance();
+        saProcessInstance.setId(id);
+        saProcessInstance.setSourceObjectId(id);
+        saProcessInstance.setTenantId(DEFAULT_TENANT_ID);
+        saProcessInstance.setName("process" + id);
+        return saProcessInstance;
     }
 
 }

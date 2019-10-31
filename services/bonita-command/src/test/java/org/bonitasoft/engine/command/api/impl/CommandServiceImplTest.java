@@ -15,7 +15,7 @@ package org.bonitasoft.engine.command.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ import org.bonitasoft.engine.command.api.record.SelectDescriptorBuilder;
 import org.bonitasoft.engine.command.comparator.CommandComparator;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
-import org.bonitasoft.engine.command.model.SCommandImpl;
 import org.bonitasoft.engine.command.model.SCommandLogBuilder;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderImpl;
 import org.bonitasoft.engine.events.EventService;
@@ -317,12 +316,12 @@ public class CommandServiceImplTest {
         CommandDeployment fifthDeploy = new CommandDeployment("fifth", "the fifth command", "com.company.FifthCommand");
         CommandDeployment sixthDeploy = new CommandDeployment("sixth", "the sixth command", "com.company.sixthCommand");
 
-        SCommand first = new SCommandImpl("first", "the first command", "com.company.FirstCommand");
-        SCommand second = new SCommandImpl("second", "the second command", "com.company.SecondCommand");
-        SCommand third = new SCommandImpl("third", "the third command", "com.company.ThirdCommand");
-        SCommand fourth = new SCommandImpl("fourth", "the fourth command", "com.company.FourthCommand");
-        SCommand fifth = new SCommandImpl("fifth", "the fifth command", "com.company.FifthCommand");
-        SCommand sixth = new SCommandImpl("sixth", "the sixth command", "com.company.sixthCommand");
+        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
+        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command").implementation("com.company.FourthCommand").build();
+        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command").implementation("com.company.FifthCommand").build();
+        SCommand sixth = SCommand.builder().name("sixth").description("the sixth command").implementation("com.company.sixthCommand").build();
         given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(firstDeploy, secondDeploy, thirdDeploy, fourthDeploy, fifthDeploy, sixthDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
@@ -346,11 +345,11 @@ public class CommandServiceImplTest {
         CommandDeployment secondDeploy = new CommandDeployment("second", "the second command", "com.company.SecondCommand");
         CommandDeployment fifthDeploy = new CommandDeployment("fifth", "the fifth command", "com.company.FifthCommand");
 
-        SCommand first = new SCommandImpl("first", "the first command", "com.company.FirstCommand");
-        SCommand second = new SCommandImpl("second", "the second command", "com.company.SecondCommand");
-        SCommand third = new SCommandImpl("third", "the third command", "com.company.ThirdCommand");
-        SCommand fourth = new SCommandImpl("fourth", "the fourth command", "com.company.FourthCommand");
-        SCommand fifth = new SCommandImpl("fifth", "the fifth command", "com.company.FifthCommand");
+        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
+        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command").implementation("com.company.FourthCommand").build();
+        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command").implementation("com.company.FifthCommand").build();
         given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(secondDeploy, fifthDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
@@ -376,9 +375,9 @@ public class CommandServiceImplTest {
         CommandDeployment secondDeploy = new CommandDeployment("second", "the second command", "com.company.SecondCommand");
         CommandDeployment thirdDeploy = new CommandDeployment("third", "the third command", "com.company.ThirdCommandModified");
 
-        SCommand first = new SCommandImpl("first", "the first command", "com.company.FirstCommand");
-        SCommand second = new SCommandImpl("second", "the second command", "com.company.SecondCommand");
-        SCommand third = new SCommandImpl("third", "the third command", "com.company.ThirdCommand");
+        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
         given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(firstDeploy, secondDeploy, thirdDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
@@ -402,6 +401,6 @@ public class CommandServiceImplTest {
 
     private QueryOptions getQueryOptions(final int fromIndex, int maxResults) {
         return new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, "id", OrderByType.ASC)),
-                Collections.singletonList(new FilterOption(SCommand.class, "system", true)), null);
+                Collections.singletonList(new FilterOption(SCommand.class, "isSystem", true)), null);
     }
 }

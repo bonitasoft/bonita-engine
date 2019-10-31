@@ -13,9 +13,37 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SASendTaskInstance extends SATaskInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SASendTaskInstance extends SAActivityInstance {
+    public SASendTaskInstance(final SSendTaskInstance sSendTaskInstance) {
+        super(sSendTaskInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.SEND_TASK;
+    }
+
+    @Override
+    public String getKind() {
+        return "send";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SSendTaskInstance.class;
+    }
 
 }

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -31,11 +31,9 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -48,9 +46,6 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     @Mock
     private IdentityService service;
 
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private SCustomUserInfoDefinitionBuilderFactory factory;
-
     private CustomUserInfoDefinitionAPIDelegate api;
 
     @Before
@@ -61,9 +56,9 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     @Test
     public void create_should_call_service_to_retrieve_the_item_and_return_result_as_a_CustomUserDefinition() throws Exception {
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class)))
-                .willReturn(new DummySCustomUserInfoDefinition(1L));
+                .willReturn(SCustomUserInfoDefinition.builder().id(1).build());
 
-        CustomUserInfoDefinition definition = api.create(factory, new CustomUserInfoDefinitionCreator("skill"));
+        CustomUserInfoDefinition definition = api.create(new CustomUserInfoDefinitionCreator("skill"));
 
         assertThat(definition.getId()).isEqualTo(1L);
     }
@@ -77,7 +72,7 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
 
         try {
             // when
-            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            api.create(new CustomUserInfoDefinitionCreator(name));
             fail("Expected AlreadyExistsException");
         } catch (AlreadyExistsException e) {
             // then
@@ -88,7 +83,7 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void create_should_throws_CreationException_if_name_is_null() throws Exception {
 
-        api.create(factory, new CustomUserInfoDefinitionCreator(null));
+        api.create(new CustomUserInfoDefinitionCreator(null));
     }
 
     @Test
@@ -98,7 +93,7 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
 
         try {
             // when
-            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            api.create(new CustomUserInfoDefinitionCreator(name));
             fail("Expected CreationException");
         } catch (CreationException e) {
             // then
@@ -112,7 +107,7 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
         String name = "123456789:123456789:123456789:123456789:123456789:123456789:123456789:123456";
         try {
             // when
-            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            api.create(new CustomUserInfoDefinitionCreator(name));
             fail("Expected CreationException");
         } catch (CreationException e) {
             // then
@@ -123,10 +118,10 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     @Test
     public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
-                Arrays.<SCustomUserInfoDefinition> asList(
-                        new DummySCustomUserInfoDefinition(1L),
-                        new DummySCustomUserInfoDefinition(2L),
-                        new DummySCustomUserInfoDefinition(3L)));
+                Arrays.asList(
+                        SCustomUserInfoDefinition.builder().id(1).build(),
+                        SCustomUserInfoDefinition.builder().id(2).build(),
+                        SCustomUserInfoDefinition.builder().id(3).build()));
 
         List<CustomUserInfoDefinition> definitions = api.list(0, 3);
 

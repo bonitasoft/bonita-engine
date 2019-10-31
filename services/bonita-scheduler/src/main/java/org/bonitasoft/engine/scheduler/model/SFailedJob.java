@@ -26,7 +26,7 @@ public interface SFailedJob {
 
     String getLastMessage();
 
-    long getRetryNumber();
+    int getNumberOfFailures();
 
     long getLastUpdateDate();
 

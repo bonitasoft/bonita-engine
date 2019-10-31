@@ -29,8 +29,6 @@ import org.bonitasoft.engine.business.application.ApplicationState;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
-import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
@@ -140,7 +138,7 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID, state, LAYOUT_ID, THEME_ID);
+        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID, state, LAYOUT_ID, THEME_ID);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -173,9 +171,9 @@ public class ApplicationModelConverterTest {
     @Test
     public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
-        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+        final SApplication sApp1 = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
                 SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
-        final SApplicationImpl sApp2 = new SApplicationImpl(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+        final SApplication sApp2 = new SApplication(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
                 SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
 
         //when
@@ -205,15 +203,15 @@ public class ApplicationModelConverterTest {
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
         assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
-        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
-        assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
-        assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
-        assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("Up description");
-        assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/newIcon.jpg");
-        assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(10L);
-        assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
-        assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(11L);
+        assertThat(fields.get(SApplication.TOKEN)).isEqualTo("My-updated-app");
+        assertThat(fields.get(SApplication.DISPLAY_NAME)).isEqualTo("Updated display name");
+        assertThat(fields.get(SApplication.VERSION)).isEqualTo("1.1");
+        assertThat(fields.get(SApplication.DESCRIPTION)).isEqualTo("Up description");
+        assertThat(fields.get(SApplication.ICON_PATH)).isEqualTo("/newIcon.jpg");
+        assertThat(fields.get(SApplication.PROFILE_ID)).isEqualTo(10L);
+        assertThat(fields.get(SApplication.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(fields.get(SApplication.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
+        assertThat(fields.get(SApplication.HOME_PAGE_ID)).isEqualTo(11L);
     }
 
     @Test

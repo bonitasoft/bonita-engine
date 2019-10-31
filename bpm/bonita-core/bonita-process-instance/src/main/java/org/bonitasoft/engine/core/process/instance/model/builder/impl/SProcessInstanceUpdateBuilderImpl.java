@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -30,13 +31,13 @@ public class SProcessInstanceUpdateBuilderImpl implements SProcessInstanceUpdate
 
     @Override
     public SProcessInstanceUpdateBuilder updateLastUpdate(final long lastUpdate) {
-        descriptor.addField(SProcessInstanceBuilderFactoryImpl.LAST_UPDATE_KEY, lastUpdate);
+        descriptor.addField(SProcessInstance.LAST_UPDATE_KEY, lastUpdate);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateInterruptingEventId(final long interruptingEventId) {
-        descriptor.addField(SProcessInstanceBuilderFactoryImpl.INTERRUPTING_EVENT_ID_KEY, interruptingEventId);
+        descriptor.addField(SProcessInstance.INTERRUPTING_EVENT_ID_KEY, interruptingEventId);
         return this;
     }
 

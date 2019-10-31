@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Julien Mege
@@ -70,11 +69,11 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, new FieldDescriptor(SHumanTaskInstance.class,
                 keyProvider.getReachStateDateKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.USER_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.USER_ID_KEY));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.GROUP_ID_KEY));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ROLE_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, SProcessSupervisor.ROLE_ID_KEY));
 
         humanTaskInstanceDescriptorAllFields = new HashMap<>(1);
         final Set<String> tasksInstanceFields = new HashSet<>(3);

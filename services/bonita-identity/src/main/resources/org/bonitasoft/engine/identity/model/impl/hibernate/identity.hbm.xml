@@ -2,13 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field"
-                   package="org.bonitasoft.engine.identity.model.impl">
+                   package="org.bonitasoft.engine.identity.model">
 
     <filter-def name="tenantFilter" condition=":tenantId = tenantid">
         <filter-param name="tenantId" type="long" />
     </filter-def>
 
-    <class name="SGroupImpl" table="group_">
+    <class name="SGroup" table="group_">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -24,22 +24,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SRoleImpl" table="role">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantid" type="long" />
-            <key-property name="id" column="ID" type="long" />
-        </composite-id>
-        <property name="name" type="java.lang.String" column="name" />
-        <property name="displayName" type="java.lang.String" column="displayName" />
-        <property name="description" type="java.lang.String" column="description" />
-        <property name="createdBy" type="long" column="createdBy" />
-        <property name="creationDate" type="long" column="creationDate" />
-        <property name="lastUpdate" type="long" column="lastUpdate" />
-        <property name="iconId" type="long" column="iconid" />
-        <filter name="tenantFilter" />
-    </class>
-
-    <class name="SUserImpl" table="user_">
+    <class name="SUser" table="user_">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -57,22 +42,22 @@
         <property name="creationDate" type="long" column="creationDate" />
         <property name="lastUpdate" type="long" column="lastUpdate" />
         <property name="iconId" type="long" column="iconid" />
-        <one-to-one name="sUserLogin" class="SUserLoginImpl" cascade="all" />
+        <one-to-one name="sUserLogin" class="SUserLogin" cascade="all" />
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SUserLoginImpl" table="user_login">
+    <class name="SUserLogin" table="user_login">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
         </composite-id>
         <property name="lastConnection" type="long" column="lastConnection" />
-        <one-to-one name="sUser" class="SUserImpl" constrained="true" />
+        <one-to-one name="sUser" class="SUser" constrained="true" />
         <filter name="tenantFilter" />
     </class>
 
 
-    <class name="SContactInfoImpl" table="user_contactinfo">
+    <class name="SContactInfo" table="user_contactinfo">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -94,7 +79,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SCustomUserInfoDefinitionImpl" table="custom_usr_inf_def">
+    <class name="SCustomUserInfoDefinition" table="custom_usr_inf_def">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -104,7 +89,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SCustomUserInfoValueImpl" table="custom_usr_inf_val">
+    <class name="SCustomUserInfoValue" table="custom_usr_inf_val">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -115,7 +100,7 @@
         <filter name="tenantFilter" />
     </class>
 
-    <class name="SUserMembershipImpl" table="user_membership">
+    <class name="SUserMembership" table="user_membership">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="ID" type="long" />
@@ -129,7 +114,7 @@
     </class>
 
 
-    <class name="SIconImpl" table="icon">
+    <class name="SIcon" table="icon">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />

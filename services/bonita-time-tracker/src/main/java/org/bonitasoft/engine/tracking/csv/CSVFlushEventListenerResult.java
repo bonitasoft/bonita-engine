@@ -28,7 +28,7 @@ public class CSVFlushEventListenerResult extends FlushEventListenerResult {
     }
 
     public File getOutputFile() {
-        return outputFile;
+        return this.outputFile;
     }
 
 }

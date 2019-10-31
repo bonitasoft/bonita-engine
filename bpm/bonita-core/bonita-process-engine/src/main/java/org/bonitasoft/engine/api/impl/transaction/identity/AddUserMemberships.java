@@ -15,12 +15,10 @@ package org.bonitasoft.engine.api.impl.transaction.identity;
 
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 
 /**
  * @author Lu Kai
@@ -51,8 +49,8 @@ public class AddUserMemberships implements TransactionContent {
     public void execute() throws SBonitaException {
 
         for (final long userId : userIds) {
-            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(userId, groupId, roleId)
-                    .setAssignedBy(currentUserId).done();
+            final SUserMembership userMembership = SUserMembership.builder().userId(userId).groupId(groupId).roleId(roleId)
+                    .assignedBy(currentUserId).build();
             identityService.createUserMembership(userMembership);
         }
     }

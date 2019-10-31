@@ -22,7 +22,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
@@ -87,7 +86,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     private void createOrUpdateProfessionalContactInfo(final ExportedUser user, final long userId) throws SIdentityException, SUserCreationException {
         SContactInfo professContactInfo = identityService.getUserContactInfo(userId, false);
         if (professContactInfo == null) {
-            professContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, false).done();
+            professContactInfo = SContactInfo.builder().userId(userId).personal(false).build();
             identityService.createUserContactInfo(professContactInfo);
         }
         final EntityUpdateDescriptor professionalDataDesc = getUserContactInfoDescriptor(user, false);
@@ -97,7 +96,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     private void createOrUpdatePersonalContactInfo(final ExportedUser user, final long userId) throws SIdentityException, SUserCreationException {
         SContactInfo persoContactInfo = identityService.getUserContactInfo(userId, true);
         if (persoContactInfo == null) {
-            persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
+            persoContactInfo = SContactInfo.builder().userId(userId).personal(true).build();
             identityService.createUserContactInfo(persoContactInfo);
         }
         final EntityUpdateDescriptor personalDataDesc = getUserContactInfoDescriptor(user, true);

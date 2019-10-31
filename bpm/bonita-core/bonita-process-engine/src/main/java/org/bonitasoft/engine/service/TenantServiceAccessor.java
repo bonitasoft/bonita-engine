@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -85,6 +86,8 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
+import org.bonitasoft.engine.tenant.TenantServicesManager;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -149,6 +152,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DependencyService getDependencyService();
 
     EventInstanceService getEventInstanceService();
+
+    EventInstanceRepository getEventInstanceRepository();
 
     ConnectorService getConnectorService();
 
@@ -261,4 +266,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BPMWorkFactory getBPMWorkFactory();
 
     TechnicalUser getTechnicalUser();
+
+    TenantStateManager getTenantStateManager();
+
+    TenantServicesManager getTenantServicesManager();
 }

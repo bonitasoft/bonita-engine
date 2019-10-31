@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -23,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInsta
  */
 public class SLoopActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SLoopActivityInstanceBuilder {
 
-    public SLoopActivityInstanceBuilderImpl(final SLoopActivityInstanceImpl activityInstanceImpl) {
+    public SLoopActivityInstanceBuilderImpl(final SLoopActivityInstance activityInstanceImpl) {
         super(activityInstanceImpl);
     }
 

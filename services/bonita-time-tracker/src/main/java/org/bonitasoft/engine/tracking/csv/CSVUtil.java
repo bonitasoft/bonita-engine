@@ -21,14 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
 
 public class CSVUtil {
 
-    public static List<List<String>> readCSV(final boolean excludeHeader, final File csvFile, final String csvSeparator) throws FileNotFoundException {
+    public static List<List<String>> readCSV(final boolean excludeHeader, final File csvFile, final String csvSeparator)
+            throws FileNotFoundException {
         final List<List<String>> array = new ArrayList<List<String>>();
         final InputStream inputStream = new FileInputStream(csvFile);
         final Scanner scanner = new Scanner(inputStream);
@@ -43,7 +42,7 @@ public class CSVUtil {
             scanner.close();
             try {
                 inputStream.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -54,7 +53,8 @@ public class CSVUtil {
         return array;
     }
 
-    public static void writeCSVRow(final FileWriter writer, final List<String> row, final String csvSeparator) throws IOException {
+    public static void writeCSVRow(final FileWriter writer, final List<String> row, final String csvSeparator)
+            throws IOException {
         boolean first = true;
         for (final String value : row) {
             if (first) {
@@ -69,13 +69,15 @@ public class CSVUtil {
         writer.flush();
     }
 
-    public static void writeCSVRow(final File file, final List<String> row, final String csvSeparator) throws IOException {
+    public static void writeCSVRow(final File file, final List<String> row, final String csvSeparator)
+            throws IOException {
         final FileWriter writer = new FileWriter(file, true);
         writeCSVRow(writer, row, csvSeparator);
         writer.close();
     }
 
-    public static void writeCSVRows(final File file, final List<List<String>> array, final String csvSeparator) throws IOException {
+    public static void writeCSVRows(final File file, final List<List<String>> array, final String csvSeparator)
+            throws IOException {
         final FileWriter writer = new FileWriter(file, true);
         for (final List<String> row : array) {
             writeCSVRow(writer, row, csvSeparator);

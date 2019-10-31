@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2016 Bonitasoft S.A.
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,11 +10,10 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 package org.bonitasoft.platform.configuration.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.jdbc.datasource.init.ScriptUtils.*;
 
 import java.io.File;
@@ -31,6 +30,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.util.FolderComparator;
 import org.bonitasoft.platform.setup.PlatformSetupApplication;
@@ -111,7 +111,7 @@ public class ConfigurationServiceImplIT {
         configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
 
         //then
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should insert row").isEqualTo(2);
+        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should insert row").isEqualTo(2);
 
     }
 
@@ -129,16 +129,16 @@ public class ConfigurationServiceImplIT {
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_12), TENANT_ID_12);
 
         //then
-        assertThat(configurationService.getPlatformInitEngineConf()).containsExactly(
+        Assertions.assertThat(configurationService.getPlatformInitEngineConf()).containsExactly(
                 new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes(UTF_8)),
                 new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes(UTF_8)));
-        assertThat(configurationService.getPlatformEngineConf()).containsExactly(
+        Assertions.assertThat(configurationService.getPlatformEngineConf()).containsExactly(
                 new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8)));
-        assertThat(configurationService.getTenantTemplateEngineConf()).containsExactly(
+        Assertions.assertThat(configurationService.getTenantTemplateEngineConf()).containsExactly(
                 new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes(UTF_8)));
-        assertThat(configurationService.getTenantEngineConf(TENANT_ID_1)).containsExactly(
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_1)).containsExactly(
                 new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1".getBytes(UTF_8)));
-        assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).containsExactly(
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).containsExactly(
                 new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 12".getBytes(UTF_8)));
     }
 
@@ -150,7 +150,7 @@ public class ConfigurationServiceImplIT {
         configurationService.storeTenantEngineConf(Collections.singletonList(
                 new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8))), 1L);
         //then
-        assertThat(configurationService.getTenantEngineConf(1L)).containsExactly(
+        Assertions.assertThat(configurationService.getTenantEngineConf(1L)).containsExactly(
                 new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8)));
     }
 
@@ -163,7 +163,7 @@ public class ConfigurationServiceImplIT {
         configurationService.storePlatformConfiguration(configFolder.toFile());
 
         //then
-        assertThat(configurationService.getPlatformEngineConf()).as("should retrieve configuration")
+        Assertions.assertThat(configurationService.getPlatformEngineConf()).as("should retrieve configuration")
                 .extracting("resourceName")
                 .containsOnly("bonita-platform-community.properties", "bonita-platform-custom.xml");
     }
@@ -181,7 +181,7 @@ public class ConfigurationServiceImplIT {
         configurationService.writeAllConfigurationToFolder(destFolder, licFolder);
 
         //then
-        assertThat(destFolder).as("should retrieve config files")
+        Assertions.assertThat(destFolder).as("should retrieve config files")
                 .exists()
                 .isDirectory();
         new FolderComparator().compare(configFolder.toFile(), destFolder);
@@ -199,7 +199,7 @@ public class ConfigurationServiceImplIT {
         //then
         BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes(UTF_8));
         BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic", "license 2 content".getBytes(UTF_8));
-        assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(expectedLicense1, expectedLicense2);
+        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(expectedLicense1, expectedLicense2);
 
     }
 
@@ -214,7 +214,7 @@ public class ConfigurationServiceImplIT {
         //then
         BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic", "new license 2 content".getBytes(UTF_8));
         BonitaConfiguration newLicense3 = new BonitaConfiguration("license3.lic", "license 3 content".getBytes(UTF_8));
-        assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(newLicense2, newLicense3);
+        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(newLicense2, newLicense3);
 
     }
 
@@ -228,13 +228,13 @@ public class ConfigurationServiceImplIT {
         configurationService.deleteTenantConfiguration(TENANT_ID_12);
 
         //then
-        assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
-        assertThat(configurationService.getTenantEngineConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
-        assertThat(configurationService.getTenantPortalConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
 
-        assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
-        assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
-        assertThat(configurationService.getTenantPortalConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
 
     }
 
@@ -250,7 +250,7 @@ public class ConfigurationServiceImplIT {
         configurationService.deleteAllConfiguration();
 
         //then
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should delete all").isEqualTo(0);
+        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should delete all").isEqualTo(0);
 
     }
 

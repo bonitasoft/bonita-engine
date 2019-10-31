@@ -15,27 +15,45 @@ package org.bonitasoft.engine.data.instance.model.archive;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Feng Hui
- */
-public interface SADataInstance extends ArchivedPersistentObject {
+@Data
+@NoArgsConstructor
+public abstract class SADataInstance implements ArchivedPersistentObject {
 
-    long getTenantId();
+    private long tenantId;
+    private long id;
+    private String name;
+    private String description;
+    private boolean transientData;
+    private String className;
+    private long containerId;
+    private String containerType;
+    private long archiveDate;
+    private long sourceObjectId;
 
-    String getName();
 
-    String getDescription();
+    public SADataInstance(final SDataInstance sDataInstance) {
+        name = sDataInstance.getName();
+        description = sDataInstance.getDescription();
+        transientData = sDataInstance.isTransientData();
+        className = sDataInstance.getClassName();
+        containerId = sDataInstance.getContainerId();
+        containerType = sDataInstance.getContainerType();
+        sourceObjectId = sDataInstance.getId();
+    }
 
-    String getClassName();
+    public abstract Serializable getValue();
 
-    long getContainerId();
+    public abstract void setValue(Serializable value);
 
-    String getContainerType();
-
-    boolean isTransientData();
-
-    Serializable getValue();
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SDataInstance.class;
+    }
 
 }

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
@@ -120,11 +121,16 @@ public class WaitingEventsInterrupter {
     }
 
     private void interruptTimerEvent(final SProcessDefinition processDefinition, final SCatchEventInstance catchEventInstance,
-                                     final SCatchEventDefinition catchEventDef) throws SSchedulerException {
+                                     final SCatchEventDefinition catchEventDef) throws SSchedulerException, SBonitaReadException {
         // FIXME to support multiple events change this code
         if (!catchEventDef.getTimerEventTriggerDefinitions().isEmpty()) {
             final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), catchEventDef, catchEventInstance);
             final boolean delete = schedulerService.delete(jobName);
+            try {
+                eventInstanceService.deleteEventTriggerInstanceOfFlowNode(catchEventInstance.getId());
+            } catch (SEventTriggerInstanceDeletionException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Unable to delete event trigger of flow node instance " + catchEventInstance + " because: " + e.getMessage());
+            }
             if (!delete) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName

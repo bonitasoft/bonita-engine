@@ -31,50 +31,18 @@ import org.hibernate.mapping.PersistentClass;
  */
 public class HibernateConfigurationProviderImpl implements HibernateConfigurationProvider {
 
-    protected final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider;
-
+    private final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider;
     protected final Properties properties;
-
-    protected final Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
-
-    protected final List<String> mappingExclusions;
-
+    private final List<String> mappingExclusions;
     protected final Configuration configuration;
 
     public HibernateConfigurationProviderImpl(final Properties properties,
-            final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider, final Map<String, String> interfaceToClassMapping,
-            final List<String> mappingExclusions) throws SPersistenceException {
+            final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
+            final List<String> mappingExclusions) {
         this.properties = properties;
         this.hibernateResourcesConfigurationProvider = hibernateResourcesConfigurationProvider;
 
         configuration = buildConfiguration(properties, hibernateResourcesConfigurationProvider);
-        final Iterator<PersistentClass> it = configuration.getClassMappings();
-
-        final StringBuilder sb = new StringBuilder();
-        sb.append("\n\nFOUND MAPPING FOR CLASS: \n");
-        while (it.hasNext()) {
-            sb.append(it.next().getEntityName());
-            sb.append("\n");
-        }
-        sb.append("\n");
-
-        this.interfaceToClassMapping = new HashMap<String, Class<? extends PersistentObject>>();
-        for (final Map.Entry<String, String> entry : interfaceToClassMapping.entrySet()) {
-            final String interfaceClassName = entry.getKey();
-            final String mappedClassName = entry.getValue();
-
-            PersistentClass persistentClass = configuration.getClassMapping(mappedClassName);
-            if (persistentClass == null) {
-                // try to keep only the simpleName if the class which is sometimes used as "entity-name" in the mapping file
-                final String classSimpleName = mappedClassName.substring(mappedClassName.lastIndexOf('.') + 1);
-                persistentClass = configuration.getClassMapping(classSimpleName);
-                if (persistentClass == null) {
-                    throw new SPersistenceException("Unable to locate an hibernate mapping file for class: " + mappedClassName + ", found mappings are: " + sb.toString());
-                }
-            }
-            final Class<? extends PersistentObject> mappedClass = persistentClass.getMappedClass();
-            this.interfaceToClassMapping.put(interfaceClassName, mappedClass);
-        }
         this.mappingExclusions = mappingExclusions;
     }
 
@@ -83,6 +51,9 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         configuration.addProperties(properties);
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
             configuration.addResource(resource);
+        }
+        for (Class entity : hibernateResourcesConfigurationProvider.getEntities()) {
+            configuration.addAnnotatedClass(entity);
         }
         configuration.buildMappings();
         return configuration;
@@ -101,11 +72,6 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     @Override
     public Map<String, String> getClassAliasMappings() {
         return hibernateResourcesConfigurationProvider.getClassAliasMappings();
-    }
-
-    @Override
-    public Map<String, Class<? extends PersistentObject>> getInterfaceToClassMapping() {
-        return Collections.unmodifiableMap(interfaceToClassMapping);
     }
 
     @Override

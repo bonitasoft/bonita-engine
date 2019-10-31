@@ -26,15 +26,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TimeTrackerTest extends AbstractTimeTrackerTest {
+
     private TimeTracker tracker;
 
     @Mock
@@ -51,64 +54,67 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @After
     public void tearDown() {
         // Make sure to clean tracker threads by stopping tracker.
-        if (tracker != null) {
-            tracker.stop();
+        if (this.tracker != null) {
+            this.tracker.stop();
         }
     }
 
-    TimeTracker createTimeTracker(TechnicalLoggerService logger, Clock clock, List<FlushEventListener> listeners, boolean enabled, int maxSize,
-                                  int flushIntervalInSeconds, TimeTrackerRecords rec) {
+    TimeTracker createTimeTracker(final TechnicalLoggerService logger, final Clock clock,
+            final List<FlushEventListener> listeners, final boolean enabled, final int maxSize,
+            final int flushIntervalInSeconds, final TimeTrackerRecords rec) {
         return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec.name()) {
 
             @Override
             FlushThread createFlushThread() {
-                return flushThread;
+                return TimeTrackerTest.this.flushThread;
             }
         };
     }
 
-    TimeTracker createTimeTracker(boolean enabled, List<FlushEventListener> flushEventListeners, int maxSize,
-                                  int flushIntervalInSeconds, TimeTrackerRecords... records) {
+    TimeTracker createTimeTracker(final boolean enabled, final List<FlushEventListener> flushEventListeners,
+            final int maxSize,
+            final int flushIntervalInSeconds, final TimeTrackerRecords... records) {
         final List<String> recordsAsString = new ArrayList<>();
-        for (TimeTrackerRecords record : records) {
+        for (final TimeTrackerRecords record : records) {
             recordsAsString.add(record.name());
         }
-        return new TimeTracker(logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds, recordsAsString.toArray(new String[records.length])) {
+        return new TimeTracker(this.logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds,
+                recordsAsString.toArray(new String[records.length])) {
 
             @Override
             FlushThread createFlushThread() {
-                return flushThread;
+                return TimeTrackerTest.this.flushThread;
             }
         };
     }
 
     @Test
     public void should_isTrackable_returns_false_if_not_started() {
-        tracker = createTimeTracker(true, null, 10, 2, REC);
-        assertFalse(tracker.isTrackable(REC));
+        this.tracker = createTimeTracker(true, null, 10, 2, REC);
+        assertFalse(this.tracker.isTrackable(REC));
     }
 
     @Test
     public void isTrackable() {
-        when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
-        tracker.start();
-        assertTrue(tracker.isTrackable(REC1));
-        assertTrue(tracker.isTrackable(REC2));
-        assertFalse(tracker.isTrackable(REC3));
-        tracker.stop();
+        when(this.flushThread.isStarted()).thenReturn(true);
+        this.tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
+        this.tracker.start();
+        assertTrue(this.tracker.isTrackable(REC1));
+        assertTrue(this.tracker.isTrackable(REC2));
+        assertFalse(this.tracker.isTrackable(REC3));
+        this.tracker.stop();
     }
 
     @Test
     public void trackRecords() {
-        when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
-        tracker.start();
-        tracker.track(REC1, "rec11Desc", 100);
-        tracker.track(REC1, "rec12Desc", 200);
-        tracker.track(REC2, "rec2Desc", 300);
-        tracker.track(INACTIVATED_REC, "blabla", 1000);
-        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(tracker.getRecordsCopy());
+        when(this.flushThread.isStarted()).thenReturn(true);
+        this.tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
+        this.tracker.start();
+        this.tracker.track(REC1, "rec11Desc", 100);
+        this.tracker.track(REC1, "rec12Desc", 200);
+        this.tracker.track(REC2, "rec2Desc", 300);
+        this.tracker.track(INACTIVATED_REC, "blabla", 1000);
+        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(this.tracker.getRecordsCopy());
         assertEquals(2, records.size());
         assertEquals(2, records.get(REC1).size());
         assertEquals(1, records.get(REC2).size());
@@ -130,37 +136,37 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         assertEquals(REC2, rec2.getName());
         assertEquals("rec2Desc", rec2.getDescription());
         assertEquals(300L, rec2.getDuration());
-        tracker.stop();
+        this.tracker.stop();
     }
 
     @Test
     public void should_not_track_when_not_enabled() {
-        tracker = createTimeTracker(false, null, 10, 2, REC1, REC2);
-        tracker.start();
-        tracker.track(REC1, "rec11Desc", 100);
-        tracker.track(REC1, "rec12Desc", 200);
-        tracker.track(REC2, "rec2Desc", 300);
-        tracker.track(INACTIVATED_REC, "blabla", 1000);
+        this.tracker = createTimeTracker(false, null, 10, 2, REC1, REC2);
+        this.tracker.start();
+        this.tracker.track(REC1, "rec11Desc", 100);
+        this.tracker.track(REC1, "rec12Desc", 200);
+        this.tracker.track(REC2, "rec2Desc", 300);
+        this.tracker.track(INACTIVATED_REC, "blabla", 1000);
 
-        assertTrue(tracker.getRecordsCopy().isEmpty());
+        assertTrue(this.tracker.getRecordsCopy().isEmpty());
     }
 
     @Test
     public void timestamp() throws Exception {
-        when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, REC1);
-        tracker.start();
-        tracker.track(REC1, "desc2", 100);
+        when(this.flushThread.isStarted()).thenReturn(true);
+        this.tracker = createTimeTracker(true, null, 10, 2, REC1);
+        this.tracker.start();
+        this.tracker.track(REC1, "desc2", 100);
         Thread.sleep(2);
-        tracker.track(REC1, "desc2", 200);
-        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(tracker.getRecordsCopy());
+        this.tracker.track(REC1, "desc2", 200);
+        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(this.tracker.getRecordsCopy());
         assertEquals(1, records.size());
         assertEquals(2, records.get(REC1).size());
 
         final List<Record> rec1s = records.get(REC1);
 
         assertTrue(rec1s.get(0).getTimestamp() < rec1s.get(1).getTimestamp());
-        tracker.stop();
+        this.tracker.stop();
     }
 
     private Map<TimeTrackerRecords, List<Record>> mapRecords(final List<Record> records) {
@@ -169,7 +175,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
             for (final Record record : records) {
                 final TimeTrackerRecords name = record.getName();
                 if (!result.containsKey(name)) {
-                    result.put(name, new ArrayList<Record>());
+                    result.put(name, new ArrayList<>());
                 }
                 result.get(name).add(record);
             }
@@ -179,32 +185,32 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_build_do_not_start_tracking() {
-        tracker = createTimeTracker(true, null, 10, 2);
-        assertFalse(flushThread.isStarted());
+        this.tracker = createTimeTracker(true, null, 10, 2);
+        assertFalse(this.flushThread.isStarted());
     }
 
     @Test
     public void should_start_flush_thread_if_thread_is_stopped() {
-        doReturn(false).when(flushThread).isStarted();
-        tracker = createTimeTracker(true, null, 10, 2);
-        tracker.start();
-        verify(flushThread).start();
+        doReturn(false).when(this.flushThread).isStarted();
+        this.tracker = createTimeTracker(true, null, 10, 2);
+        this.tracker.start();
+        verify(this.flushThread).start();
     }
 
     @Test
     public void should_stop_flush_thread_is_running() {
-        when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2);
-        tracker.start();
-        tracker.stop();
-        verify(flushThread).interrupt();
+        when(this.flushThread.isStarted()).thenReturn(true);
+        this.tracker = createTimeTracker(true, null, 10, 2);
+        this.tracker.start();
+        this.tracker.stop();
+        verify(this.flushThread).interrupt();
     }
 
     @Test
     public void should_not_stop_flush_thread_is_running() {
-        tracker = createTimeTracker(true, null, 10, 2);
-        tracker.stop();
-        verify(flushThread, never()).interrupt();
+        this.tracker = createTimeTracker(true, null, 10, 2);
+        this.tracker.stop();
+        verify(this.flushThread, never()).interrupt();
     }
 
     @Test
@@ -221,22 +227,22 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         when(listener3.getName()).thenReturn("listener3");
         when(listener3.isActive()).thenReturn(true);
 
-        Mockito.when(listener2.flush(Mockito.any(FlushEvent.class))).thenThrow(new Exception());
+        Mockito.when(listener2.flush(ArgumentMatchers.any(FlushEvent.class))).thenThrow(new Exception());
 
         final List<FlushEventListener> listeners = new ArrayList<>();
         listeners.add(listener1);
         listeners.add(listener2);
         listeners.add(listener3);
 
-        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, REC);
+        this.tracker = createTimeTracker(this.logger, clock, listeners, true, 10, 1, REC);
 
-        tracker.track(REC, "desc", 10);
+        this.tracker.track(REC, "desc", 10);
 
-        tracker.flush();
+        this.tracker.flush();
 
-        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener3, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener1, times(1)).flush(ArgumentMatchers.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(ArgumentMatchers.any(FlushEvent.class));
+        verify(listener3, times(1)).flush(ArgumentMatchers.any(FlushEvent.class));
     }
 
     @Test
@@ -254,30 +260,30 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener1);
         listeners.add(listener2);
 
-        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, REC);
+        this.tracker = createTimeTracker(this.logger, clock, listeners, true, 10, 1, REC);
 
-        tracker.track(REC, "desc", 10);
+        this.tracker.track(REC, "desc", 10);
 
-        tracker.flush();
+        this.tracker.flush();
 
-        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener1, times(1)).flush(ArgumentMatchers.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(ArgumentMatchers.any(FlushEvent.class));
     }
 
     @Test
     public void rollingRecords() {
-        when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 2, 2, REC);
-        tracker.start();
-        tracker.track(REC, "rec1", 100);
-        assertEquals(1, tracker.getRecordsCopy().size());
-        tracker.track(REC, "rec2", 100);
-        assertEquals(2, tracker.getRecordsCopy().size());
-        tracker.track(REC, "rec3", 100);
-        assertEquals(2, tracker.getRecordsCopy().size());
-        assertEquals("rec2", tracker.getRecordsCopy().get(0).getDescription());
-        assertEquals("rec3", tracker.getRecordsCopy().get(1).getDescription());
-        tracker.stop();
+        when(this.flushThread.isStarted()).thenReturn(true);
+        this.tracker = createTimeTracker(true, null, 2, 2, REC);
+        this.tracker.start();
+        this.tracker.track(REC, "rec1", 100);
+        assertEquals(1, this.tracker.getRecordsCopy().size());
+        this.tracker.track(REC, "rec2", 100);
+        assertEquals(2, this.tracker.getRecordsCopy().size());
+        this.tracker.track(REC, "rec3", 100);
+        assertEquals(2, this.tracker.getRecordsCopy().size());
+        assertEquals("rec2", this.tracker.getRecordsCopy().get(0).getDescription());
+        assertEquals("rec3", this.tracker.getRecordsCopy().get(1).getDescription());
+        this.tracker.stop();
     }
 
     @Test
@@ -293,9 +299,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         flushEventListeners.add(listener1);
         flushEventListeners.add(listener2);
 
-        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        this.tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
 
-        assertEquals(1, tracker.getActiveFlushEventListeners().size());
+        assertEquals(1, this.tracker.getActiveFlushEventListeners().size());
     }
 
     @Test
@@ -309,9 +315,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         flushEventListeners.add(listener1);
         flushEventListeners.add(listener2);
 
-        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        this.tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
 
-        tracker.activateFlushEventListener("listener2");
+        this.tracker.activateFlushEventListener("listener2");
         verify(listener2, times(1)).activate();
     }
 
@@ -323,40 +329,40 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         final List<FlushEventListener> flushEventListeners = new ArrayList<>();
         flushEventListeners.add(listener1);
 
-        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        this.tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
 
-        tracker.deactivateFlushEventListener("listener1");
+        this.tracker.deactivateFlushEventListener("listener1");
         verify(listener1, times(1)).deactivate();
     }
 
     @Test
     public void testActivatedRecords() {
-        tracker = createTimeTracker(true, null, 2, 2, REC);
+        this.tracker = createTimeTracker(true, null, 2, 2, REC);
 
-        assertEquals(1, tracker.getActivatedRecords().size());
+        assertEquals(1, this.tracker.getActivatedRecords().size());
 
-        tracker.activateRecord(REC2);
-        assertEquals(2, tracker.getActivatedRecords().size());
+        this.tracker.activateRecord(REC2);
+        assertEquals(2, this.tracker.getActivatedRecords().size());
 
         //no duplicate
-        tracker.activateRecord(REC2);
-        assertEquals(2, tracker.getActivatedRecords().size());
+        this.tracker.activateRecord(REC2);
+        assertEquals(2, this.tracker.getActivatedRecords().size());
 
-        tracker.deactivatedRecord(REC);
-        assertEquals(1, tracker.getActivatedRecords().size());
+        this.tracker.deactivatedRecord(REC);
+        assertEquals(1, this.tracker.getActivatedRecords().size());
     }
 
     @Test
     public void testFlushInterval() {
-        tracker = createTimeTracker(true, null, 2, 1, REC);
+        this.tracker = createTimeTracker(true, null, 2, 1, REC);
 
-        assertEquals(1000, tracker.getFlushIntervalInMS());
+        assertEquals(1000, this.tracker.getFlushIntervalInMS());
 
-        tracker.setFlushIntervalInMS(111);
-        assertEquals(111, tracker.getFlushIntervalInMS());
+        this.tracker.setFlushIntervalInMS(111);
+        assertEquals(111, this.tracker.getFlushIntervalInMS());
 
-        tracker.setFlushIntervalInSeconds(10);
-        assertEquals(10000, tracker.getFlushIntervalInMS());
+        this.tracker.setFlushIntervalInSeconds(10);
+        assertEquals(10000, this.tracker.getFlushIntervalInMS());
     }
 
     @Test
@@ -372,12 +378,12 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         flushEventListeners.add(listener1);
         flushEventListeners.add(listener2);
 
-        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
-        tracker.start();
+        this.tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        this.tracker.start();
         when(this.flushThread.isStarted()).thenReturn(true);
 
-        tracker.stopTracking();
-        verify(flushThread, times(1)).interrupt();
+        this.tracker.stopTracking();
+        verify(this.flushThread, times(1)).interrupt();
         verify(listener1, times(1)).notifyStopTracking();
         verify(listener2, times(1)).notifyStopTracking();
     }
@@ -395,13 +401,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         flushEventListeners.add(listener1);
         flushEventListeners.add(listener2);
 
-        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        this.tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
         when(this.flushThread.isStarted()).thenReturn(false);
-        tracker.start();
+        this.tracker.start();
 
-        tracker.startTracking();
+        this.tracker.startTracking();
 
-        verify(flushThread, times(2)).start();
+        verify(this.flushThread, times(2)).start();
         verify(listener1, times(2)).notifyStartTracking();
         verify(listener2, times(2)).notifyStartTracking();
     }
@@ -410,10 +416,10 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_pause_resume_without_error() {
 
         //given
-        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
 
         //when
-        tracker.start();
+        this.tracker.start();
         int i = 0;
         try {
             // Error may not occur on the first execution. I did reproduce it in 4 to 8 executions.
@@ -421,13 +427,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
             // Current implementation is deterministic, but previous one was not. Hence the loop in the test.
             while (i < 100) {
                 i++;
-                tracker.pause();
-                tracker.resume();
+                this.tracker.pause();
+                this.tracker.resume();
                 //No errors expected
             }
         } finally {
             System.err.println("Test ended after iteration: " + i);
-            tracker.stop();
+            this.tracker.stop();
         }
     }
 
@@ -435,63 +441,96 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void should_start_method_be_reentrant() {
 
         //given
-        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
-        Set<Thread> initialThreadSet = Thread.getAllStackTraces().keySet();
-        tracker.start();
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        final Set<Thread> initialThreadSet = Thread.getAllStackTraces().keySet();
+        this.tracker.start();
         //expect
-        Set<Thread> runningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
+        final Set<Thread> runningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
         assertThat(initialThreadSet.size() + 1).isEqualTo(runningTimeTrackerThreadSet.size());
 
         //when
-        tracker.start();
+        this.tracker.start();
 
         //then
-        Set<Thread> stillRunningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
+        final Set<Thread> stillRunningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
         assertThat(runningTimeTrackerThreadSet).isEqualTo(stillRunningTimeTrackerThreadSet);
     }
 
     @Test
-    public void isTracking_should_be_false_if_tracking_not_started() throws Exception {
+    public void isTracking_should_be_false_if_tracking_not_started() {
         //given
-        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         //when
-        boolean trackingStatus = tracker.isTracking();
+        final boolean trackingStatus = this.tracker.isTracking();
         //then
         assertThat(trackingStatus).as("Tracking status must be FALSE if tracker has not yet been started.").isFalse();
     }
 
     @Test
-    public void isTracking_should_be_true_if_tracking_is_started() throws Exception {
+    public void isTracking_should_be_true_if_tracking_is_started() {
         //given
-        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
         try {
-            tracker.start();
+            this.tracker.start();
 
             //when
-            boolean trackingStatus = tracker.isTracking();
+            final boolean trackingStatus = this.tracker.isTracking();
 
             //then
             assertThat(trackingStatus).as("Tracking status must be TRUE after start method has been called.").isTrue();
         } finally {
-            tracker.stop();
+            this.tracker.stop();
         }
     }
 
     @Test
-    public void should_not_leave_unused_threads_when_stopped() throws Exception {
+    public void should_not_leave_unused_threads_when_stopped() {
         //given
-        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
-        Set<Thread> beforeTimeTrackerStartedThreadSet = Thread.getAllStackTraces().keySet();
-        tracker.start();
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1, (String[]) null);
+        final Set<Thread> beforeTimeTrackerStartedThreadSet = Thread.getAllStackTraces().keySet();
+        this.tracker.start();
 
         //when
-        tracker.stop();
+        this.tracker.stop();
 
         //then
-        Set<Thread> afterTimeTrackerStoppedThreadSet = Thread.getAllStackTraces().keySet();
+        final Set<Thread> afterTimeTrackerStoppedThreadSet = Thread.getAllStackTraces().keySet();
         afterTimeTrackerStoppedThreadSet.removeAll(beforeTimeTrackerStartedThreadSet);
-        
+
         //There should be no more threads than the ones existing prior to tracker startup
         assertThat(afterTimeTrackerStoppedThreadSet).isEqualTo(Collections.emptySet());
+    }
+
+    @Test
+    public void should_add_remove_listeners() {
+        // create a tracker
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
+
+        // no active listener
+        assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
+
+        // add a new listener
+        final FlushEventListener flushEvent = new MemoryFlushEventListener(true, this.logger, 10);
+
+        this.tracker.addFlushEventListener(flushEvent);
+        assertThat(this.tracker.getActiveFlushEventListeners()).containsOnly(flushEvent);
+
+        // remove the same listener
+        this.tracker.removeFlushEventListener(flushEvent.getName());
+        assertThat(this.tracker.getActiveFlushEventListeners()).isEmpty();
+    }
+
+    @Test
+    public void should_have_one_listener_based_on_listener_name() {
+        // create a tracker
+        this.tracker = new TimeTracker(this.logger, true, new LinkedList<>(), 500, 1);
+        // add a new listener
+        final FlushEventListener flushEvent1 = new MemoryFlushEventListener(true, this.logger, 10);
+        final FlushEventListener flushEvent2 = new MemoryFlushEventListener(true, this.logger, 10);
+
+        this.tracker.addFlushEventListener(flushEvent1);
+        this.tracker.addFlushEventListener(flushEvent2);
+        // must have only one time
+        assertThat(this.tracker.getActiveFlushEventListeners()).containsOnlyOnce(flushEvent2);
     }
 }

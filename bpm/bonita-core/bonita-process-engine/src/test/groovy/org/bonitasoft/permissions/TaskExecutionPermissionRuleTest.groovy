@@ -15,8 +15,8 @@
 package org.bonitasoft.permissions
 
 import static org.assertj.core.api.Assertions.assertThat
-import static org.mockito.Matchers.any
-import static org.mockito.Matchers.eq
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.*
 
 import org.bonitasoft.engine.api.APIAccessor
@@ -72,7 +72,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -97,7 +97,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
 
@@ -112,7 +112,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -137,7 +137,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
 
@@ -153,7 +153,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isTrue();
+        assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -168,7 +168,7 @@ public class TaskExecutionPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        assertThat(isAuthorized).isFalse();
+        assertThat(isAuthorized).isFalse()
     }
 
     def havingResource(String resourceName) {

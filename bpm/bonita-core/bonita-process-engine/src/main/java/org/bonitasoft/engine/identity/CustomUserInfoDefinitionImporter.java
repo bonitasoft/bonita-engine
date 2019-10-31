@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -56,10 +53,10 @@ public class CustomUserInfoDefinitionImporter {
     }
 
     private SCustomUserInfoDefinition addCustomUserInfoDefinition(ExportedCustomUserInfoDefinition creator) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException {
-        final SCustomUserInfoDefinitionBuilder userInfoBuilder = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance();
-        userInfoBuilder.setName(creator.getName());
-        userInfoBuilder.setDescription(creator.getDescription());
-        return identityService.createCustomUserInfoDefinition(userInfoBuilder.done());
+        final SCustomUserInfoDefinition.SCustomUserInfoDefinitionBuilder userInfoBuilder = SCustomUserInfoDefinition.builder();
+        userInfoBuilder.name(creator.getName());
+        userInfoBuilder.description(creator.getDescription());
+        return identityService.createCustomUserInfoDefinition(userInfoBuilder.build());
     }
 
 }

@@ -13,13 +13,58 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive.builder;
 
+import java.util.Date;
+
+import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
+import org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance;
 
-/**
- * @author Feng Hui
- */
-public interface SADataInstanceBuilder {
+public class SADataInstanceBuilder {
 
-    SADataInstance done();
+    public SADataInstance createNewInstance(final SDataInstance sDataInstance) {
+        final String className = sDataInstance.getClassName();
+        SADataInstance saDataInstance = null;
+        if (sDataInstance instanceof SShortTextDataInstance) {
+            saDataInstance = new SAShortTextDataInstance(sDataInstance);
+        } else if (sDataInstance instanceof SLongTextDataInstance) {
+            saDataInstance = new SALongTextDataInstance(sDataInstance);
+        } else if (sDataInstance instanceof SXMLDataInstance) {
+            saDataInstance = new SAXMLDataInstance(sDataInstance);
+        } else if (sDataInstance instanceof SBlobDataInstance) {
+            saDataInstance = new SABlobDataInstance(sDataInstance);
+        } else if (sDataInstance instanceof SXMLObjectDataInstance) {
+            saDataInstance = new SAXMLObjectDataInstance(sDataInstance);
+        } else {
+            if (Integer.class.getName().equals(className)) {
+                saDataInstance = new SAIntegerDataInstance(sDataInstance);
+            } else if (Long.class.getName().equals(className)) {
+                saDataInstance = new SALongDataInstance(sDataInstance);
+            } else if (Boolean.class.getName().equals(className)) {
+                saDataInstance = new SABooleanDataInstance(sDataInstance);
+            } else if (Date.class.getName().equals(className)) {
+                saDataInstance = new SADateDataInstance(sDataInstance);
+            } else if (Double.class.getName().equals(className)) {
+                saDataInstance = new SADoubleDataInstance(sDataInstance);
+            } else if (Float.class.getName().equals(className)) {
+                saDataInstance = new SAFloatDataInstance(sDataInstance);
+            }
+        }
+        return saDataInstance;
+    }
 
 }

@@ -41,6 +41,6 @@ public interface SLogBuilder {
 
     SLogBuilder callerMethodName(String callerMethodName);
 
-    SQueriableLog done();
+    SQueriableLog build();
 
 }

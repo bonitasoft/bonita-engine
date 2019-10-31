@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.document.DocumentCriterion;
 import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -149,11 +148,11 @@ public class DocumentAPIImpl implements DocumentAPI {
     }
 
     private SDocument buildExternalProcessDocumentReference(final String fileName, final String mimeType, final long authorId, final String url) {
-        return BuilderFactory.get(SDocumentBuilderFactory.class).createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
+        return new SDocumentBuilderFactory().createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
     }
 
     private SDocument buildProcessDocument(final String fileName, final String mimeType, final long authorId, final byte[] content) {
-        return BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, content).done();
+        return new SDocumentBuilderFactory().createNewProcessDocument(fileName, mimeType, authorId, content).done();
     }
 
     @Override

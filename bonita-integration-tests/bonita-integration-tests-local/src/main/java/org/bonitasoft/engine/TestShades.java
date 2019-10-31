@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.BPMLocalIT;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +38,11 @@ public class TestShades {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestShades.class);
 
-    private static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
+    protected static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
     protected static final String ORG_BONITASOFT_PLATFORM = "org.bonitasoft.platform";
 
     @Test
+    @Ignore
     public void testShades() throws Exception {
         String mvn = getMavenExecutable();
         LOG.info("Used mvn path: {}", mvn);

@@ -13,27 +13,47 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public interface SAConnectorInstance extends SANamedElement {
+
+@Data
+@NoArgsConstructor
+public class SAConnectorInstance implements ArchivedPersistentObject {
 
     String FLOWNODE_TYPE = "flowNode";
 
     String PROCESS_TYPE = "process";
+    private long id;
+    private long tenantId;
+    private long archiveDate;
+    private long sourceObjectId;
+    private String name;
+    private long containerId;
+    private String connectorId;
+    private String version;
+    private ConnectorEvent activationEvent;
+    private String state;
+    private String containerType;
 
-    long getContainerId();
+    public SAConnectorInstance(final SConnectorInstance connectorInstance) {
+        sourceObjectId = connectorInstance.getId();
+        name = connectorInstance.getName();
+        containerId = connectorInstance.getContainerId();
+        connectorId = connectorInstance.getConnectorId();
+        version = connectorInstance.getVersion();
+        activationEvent = connectorInstance.getActivationEvent();
+        state = connectorInstance.getState();
+        containerType = connectorInstance.getContainerType();
+    }
 
-    String getContainerType();
-
-    String getConnectorId();
-
-    String getVersion();
-
-    ConnectorEvent getActivationEvent();
-
-    String getState();
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SConnectorInstance.class;
+    }
 
 }

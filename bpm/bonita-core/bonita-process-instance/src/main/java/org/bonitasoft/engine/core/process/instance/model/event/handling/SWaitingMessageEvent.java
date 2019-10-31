@@ -13,25 +13,37 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SWaitingMessageEvent extends SWaitingEvent {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SWaitingMessageEvent extends SWaitingEvent {
 
-    String getMessageName();
+    private String messageName;
+    private boolean locked = false;
+    private int progress = 0;
+    private String correlation1;
+    private String correlation2;
+    private String correlation3;
+    private String correlation4;
+    private String correlation5;
 
-    boolean isLocked();
+    public SWaitingMessageEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+                                    final String flowNodeName, final String messageName) {
+        super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
+        this.messageName = messageName;
+    }
 
-    String getCorrelation1();
-
-    String getCorrelation2();
-
-    String getCorrelation3();
-
-    String getCorrelation4();
-
-    String getCorrelation5();
-
-    int getProgress();
+    @Override
+    public SEventTriggerType getEventTriggerType() {
+        return SEventTriggerType.MESSAGE;
+    }
 
 }

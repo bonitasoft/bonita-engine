@@ -1,0 +1,23 @@
+
+
+dependencies {
+    compile project(':services:bonita-commons')
+    compile project(':services:bonita-events')
+    compile project(':bpm:bonita-core:bonita-home-server')
+    compile project(':services:bonita-log-technical')
+    compile project(':services:bonita-transaction')
+    compile project(':services:bonita-builder')
+    compile project(':services:bonita-persistence')
+    compile project(':services:bonita-recorder')
+    compile project(':services:bonita-log')
+    compile "org.apache.xbean:xbean-classloader:${Deps.xbeanClassloaderVersion}"
+    compile "commons-io:commons-io:${Deps.commonsIOVersion}"
+
+    testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
+    testCompile "junit:junit:${Deps.junit4Version}"
+    testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
+    testCompile "org.slf4j:slf4j-jdk14:${Deps.slf4jVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
+}

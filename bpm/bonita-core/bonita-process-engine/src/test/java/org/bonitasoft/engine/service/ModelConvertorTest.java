@@ -17,8 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -26,8 +34,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
-import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
@@ -46,7 +52,6 @@ import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
@@ -55,20 +60,17 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinit
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -78,10 +80,11 @@ import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
-import org.bonitasoft.engine.page.impl.SPageMappingImpl;
+import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
@@ -156,7 +159,7 @@ public class ModelConvertorTest {
 
     @Test
     public void toArchivedUserTaskInstance_sould_return_the_right_identifiers() {
-        final SAUserTaskInstanceImpl sInstance = new SAUserTaskInstanceImpl();
+        final SAUserTaskInstance sInstance = new SAUserTaskInstance();
         sInstance.setRootContainerId(1L);
         sInstance.setParentContainerId(2L);
         sInstance.setLogicalGroup(0, 456789456798L);
@@ -206,7 +209,7 @@ public class ModelConvertorTest {
     @Test
     public void should_convert_server_definition_into_client_definition() {
         final CustomUserInfoDefinitionImpl definition = ModelConvertor.convert(
-                new DummySCustomUserInfoDefinition(1L, "name", "description"));
+                SCustomUserInfoDefinition.builder().name("name").id(1).description("description").build());
 
         assertThat(definition.getId()).isEqualTo(1L);
         assertThat(definition.getName()).isEqualTo("name");
@@ -216,7 +219,7 @@ public class ModelConvertorTest {
     @Test
     public void should_convert_server_value_into_client_value() {
         final CustomUserInfoValue value = ModelConvertor.convert(
-                new DummySCustomUserInfoValue(2L, 2L, 1L, "value"));
+                SCustomUserInfoValue.builder().definitionId(2).userId(1).value("value").build());
 
         assertThat(value.getDefinitionId()).isEqualTo(2L);
         assertThat(value.getValue()).isEqualTo("value");
@@ -233,7 +236,7 @@ public class ModelConvertorTest {
     @Test
     public void toEventTriggerInstance_can_convert_TIMER_Type() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
 
         // Then
         final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);
@@ -249,7 +252,7 @@ public class ModelConvertorTest {
     @Test
     public void toTimerEventTriggerInstance_can_convert() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
         sTimerEventTriggerInstance.setId(9);
 
         // Then
@@ -266,7 +269,7 @@ public class ModelConvertorTest {
     @Test
     public void toArchivedProcessInstance_can_convert() {
         // Given
-        final SAProcessInstanceImpl saProcessInstance = new SAProcessInstanceImpl();
+        final SAProcessInstance saProcessInstance = new SAProcessInstance();
         saProcessInstance.setCallerId(-1L);
         saProcessInstance.setDescription("description");
         saProcessInstance.setEndDate(1345646L);
@@ -327,13 +330,13 @@ public class ModelConvertorTest {
     @Test
     public void toFormMapping_can_convert() {
         // Given
-        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setId(555l);
         //        sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
-        sFormMapping.setPageMapping(new SPageMappingImpl());
+        sFormMapping.setPageMapping(new SPageMapping());
 
         // Then
         FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping, formRequiredAnalyzer);
@@ -352,13 +355,13 @@ public class ModelConvertorTest {
     @Test
     public void toFormMappings_can_convert() {
         // Given
-        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        SFormMapping sFormMapping = new SFormMapping();
         sFormMapping.setId(555l);
         //        sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
-        sFormMapping.setPageMapping(new SPageMappingImpl());
+        sFormMapping.setPageMapping(new SPageMapping());
 
         // Then
         List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping), formRequiredAnalyzer);
@@ -453,7 +456,7 @@ public class ModelConvertorTest {
     }
 
     SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {
-        SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
+        SProcessSimpleRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
@@ -462,7 +465,7 @@ public class ModelConvertorTest {
     }
 
     SProcessMultiRefBusinessDataInstance createProcessMultipleDataReference(String name, long processInstanceId, String type, List<Long> dataIds) {
-        SProcessMultiRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstanceImpl();
+        SProcessMultiRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
@@ -498,7 +501,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SAGatewayInstanceImpl saFlowNode = new SAGatewayInstanceImpl();
+        final SAGatewayInstance saFlowNode = new SAGatewayInstance();
         final long reachedStateDate = 4534311114L;
         saFlowNode.setReachedStateDate(reachedStateDate);
         assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isEqualTo(new Date(reachedStateDate));
@@ -509,7 +512,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SAReceiveTaskInstanceImpl receiveTaskInstance = new SAReceiveTaskInstanceImpl();
+        final SAReceiveTaskInstance receiveTaskInstance = new SAReceiveTaskInstance();
         assertThat(ModelConvertor.toArchivedFlowNodeInstance(receiveTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
     }
 
@@ -518,7 +521,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SASendTaskInstanceImpl sendTaskInstance = new SASendTaskInstanceImpl();
+        final SASendTaskInstance sendTaskInstance = new SASendTaskInstance();
         assertThat(ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
     }
 
@@ -527,7 +530,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SAUserTaskInstanceImpl saFlowNode = new SAUserTaskInstanceImpl();
+        final SAUserTaskInstance saFlowNode = new SAUserTaskInstance();
         saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
     }
@@ -537,7 +540,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
     }
@@ -547,7 +550,7 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SAUserTaskInstanceImpl saFlowNode = new SAUserTaskInstanceImpl();
+        final SAUserTaskInstance saFlowNode = new SAUserTaskInstance();
         saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         final long lastUpdateDate = 5746354125555L;
         saFlowNode.setLastUpdateDate(lastUpdateDate);
@@ -559,10 +562,10 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
-        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstanceImpl(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
+        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstance(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
     }
 
     @Test
@@ -571,11 +574,11 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SUserTaskInstanceImpl urgentSTask = new SUserTaskInstanceImpl();
+        final SUserTaskInstance urgentSTask = new SUserTaskInstance();
         urgentSTask.setExpectedEndDate(15L);
         urgentSTask.setPriority(STaskPriority.UNDER_NORMAL);
 
-        final SUserTaskInstanceImpl takeYourTimeSTask = new SUserTaskInstanceImpl();
+        final SUserTaskInstance takeYourTimeSTask = new SUserTaskInstance();
         takeYourTimeSTask.setPriority(STaskPriority.UNDER_NORMAL);
 
         //when
@@ -593,11 +596,11 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        final SAUserTaskInstanceImpl urgentASTask = new SAUserTaskInstanceImpl();
+        final SAUserTaskInstance urgentASTask = new SAUserTaskInstance();
         urgentASTask.setExpectedEndDate(15L);
         urgentASTask.setPriority(STaskPriority.UNDER_NORMAL);
 
-        final SAUserTaskInstanceImpl takeYourTimeASTask = new SAUserTaskInstanceImpl();
+        final SAUserTaskInstance takeYourTimeASTask = new SAUserTaskInstance();
         takeYourTimeASTask.setPriority(STaskPriority.UNDER_NORMAL);
 
         //when
@@ -612,7 +615,7 @@ public class ModelConvertorTest {
     @Test
     public void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
-        SUserMembershipImpl sUserMembership = new SUserMembershipImpl(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
+        SUserMembership sUserMembership = new SUserMembership(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
         
         //when
         UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);

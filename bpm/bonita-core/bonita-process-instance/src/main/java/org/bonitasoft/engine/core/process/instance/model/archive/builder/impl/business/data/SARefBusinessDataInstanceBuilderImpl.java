@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl.b
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.business.data.SARefBusinessDataInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SARefBusinessDataInstanceImpl;
 
 /**
  * @author Emmanuel Duchastenier
  */
 public class SARefBusinessDataInstanceBuilderImpl implements SARefBusinessDataInstanceBuilder {
 
-    private final SARefBusinessDataInstanceImpl entity;
+    private final SARefBusinessDataInstance entity;
 
-    public SARefBusinessDataInstanceBuilderImpl(final SARefBusinessDataInstanceImpl entity) {
+    public SARefBusinessDataInstanceBuilderImpl(final SARefBusinessDataInstance entity) {
         super();
         this.entity = entity;
     }

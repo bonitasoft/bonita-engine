@@ -29,8 +29,6 @@ public interface HibernateConfigurationProvider {
 
     Map<String, String> getClassAliasMappings();
     
-    Map<String, Class<? extends PersistentObject>> getInterfaceToClassMapping();
-    
     List<String> getMappingExclusions();
 
     Map<String, String> getCacheQueries();

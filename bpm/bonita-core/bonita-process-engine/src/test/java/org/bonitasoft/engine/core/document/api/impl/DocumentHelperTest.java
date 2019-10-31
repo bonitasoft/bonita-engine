@@ -13,9 +13,16 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +37,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -164,7 +170,7 @@ public class DocumentHelperTest {
     private List<SMappedDocument> createList(int size) {
         List<SMappedDocument> sMappedDocuments = new ArrayList<SMappedDocument>(size);
         for (int i = 0; i < size; i++) {
-            SMappedDocumentImpl sMappedDocument = new SMappedDocumentImpl();
+            SMappedDocument sMappedDocument = new SMappedDocument();
             sMappedDocument.setId(size + (i * 1000));
             sMappedDocuments.add(sMappedDocument);
         }
@@ -210,7 +216,7 @@ public class DocumentHelperTest {
     @Test
     public void should_createOrUpdate_update_if_found() throws Exception {
         //given
-        SMappedDocumentImpl docToUpdate = new SMappedDocumentImpl();
+        SMappedDocument docToUpdate = new SMappedDocument();
         docToUpdate.setId(145);
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
@@ -234,12 +240,12 @@ public class DocumentHelperTest {
     @Test
     public void should_setDocumentList_set_the_list() throws Exception {
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = Arrays.<SMappedDocument>asList(new SMappedDocumentImpl());
+        List<SMappedDocument> existingList = Arrays.asList(new SMappedDocument());
         doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
 
         DocumentValue docValue1 = new DocumentValue("url1");
         DocumentValue docValue2 = new DocumentValue("url2");
-        documentHelperSpy.setDocumentList(Arrays.asList(docValue1, docValue2), "theList", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelperSpy.setDocumentList(asList(docValue1, docValue2), "theList", PROCESS_INSTANCE_ID, AUTHOR_ID);
 
         verify(documentHelperSpy).processDocumentOnIndex(docValue1, "theList", PROCESS_INSTANCE_ID, existingList, 0, AUTHOR_ID);
         verify(documentHelperSpy).processDocumentOnIndex(docValue2, "theList", PROCESS_INSTANCE_ID, existingList, 1, AUTHOR_ID);
@@ -320,7 +326,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_unmodified_content_update_only_index() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l);
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
@@ -332,7 +338,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_unmodified_content_and_index_do_nothing() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l);
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(2);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
@@ -344,7 +350,7 @@ public class DocumentHelperTest {
     public void should_updateExistingDocument_with_modified_content_update_everything() throws Exception {
         //given
         DocumentValue documentValue = new DocumentValue(125l, "the new url");
-        SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
+        SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when
         documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
@@ -451,7 +457,7 @@ public class DocumentHelperTest {
     public void should_toCheckedList_check_not_all_doc() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        documentHelper.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
+        documentHelper.toCheckedList(asList(new DocumentValue("theUrl"), new Object()));
     }
 
     @Test
@@ -461,6 +467,33 @@ public class DocumentHelperTest {
         assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
         assertThat(result.get(0).getMimeType()).isEqualTo("contentType");
+    }
+
+    @Test
+    public void should_convert_FileInputValue_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes());
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        assertThat(result).isEqualToComparingFieldByField(new DocumentValue("The report content".getBytes(), "contentType", "report.pdf"));
+    }
+    @Test
+    public void should_convert_FileInputValue_having_id_and_updated_content_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes(), "55");
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        DocumentValue expected = new DocumentValue(55L, "The report content".getBytes(), "contentType", "report.pdf");
+        assertThat(result).isEqualToComparingFieldByField(expected);
+    }
+    @Test
+    public void should_convert_FileInputValue_having_id_and_unchanged_content_to_DocumentValue() {
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", null, "55");
+
+        DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
+
+        DocumentValue expected = new DocumentValue(55L);
+        assertThat(result).isEqualToComparingFieldByField(expected);
     }
 
     @Test

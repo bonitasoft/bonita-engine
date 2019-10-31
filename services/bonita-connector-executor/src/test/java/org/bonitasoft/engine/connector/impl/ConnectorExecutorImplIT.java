@@ -22,8 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplIT {
@@ -47,16 +49,14 @@ public class ConnectorExecutorImplIT {
     private SessionService sessionService;
 
     @Mock
-    private SConnector connector;
-
-    @Mock
     private TimeTracker timeTracker;
 
     private ConnectorExecutorImpl connectorExecutor;
 
     @Before
     public void setUp() {
-        connectorExecutor = new ConnectorExecutorImpl(10, 5, loggerService, 100, 100, sessionAccessor, sessionService, timeTracker);
+        connectorExecutor = new ConnectorExecutorImpl(10, 5, loggerService, 100, 100, sessionAccessor, sessionService,
+                timeTracker, new SimpleMeterRegistry(), 12L, new DefaultExecutorServiceMeterBinderProvider());
         connectorExecutor.start();
     }
 
@@ -70,7 +70,6 @@ public class ConnectorExecutorImplIT {
         connectorExecutor.execute(new ResourceConnector("test2"), null, new ResourceClassLoader("test2"));
     }
 
-
     @Test
     public void should_execute_connectors_concurrently() throws Exception {
         final Callable<Void> task = buildConnectorExecutionCallable("test");
@@ -80,7 +79,7 @@ public class ConnectorExecutorImplIT {
         final List<Callable<Void>> tasks1 = Collections.nCopies(50, task);
         final List<Callable<Void>> tasks2 = Collections.nCopies(50, task2);
 
-        final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(tasks1);
+        final List<Callable<Void>> tasks = new ArrayList<>(tasks1);
         tasks.addAll(tasks2);
 
         final List<Future<Void>> all = service.invokeAll(tasks);
@@ -92,13 +91,9 @@ public class ConnectorExecutorImplIT {
     }
 
     private Callable<Void> buildConnectorExecutionCallable(final String resourceName) {
-        return new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                connectorExecutor.execute(new ResourceConnector(resourceName), null, new ResourceClassLoader(resourceName));
-                    return null;
-            }
+        return () -> {
+            connectorExecutor.execute(new ResourceConnector(resourceName), null, new ResourceClassLoader(resourceName));
+            return null;
         };
     }
 

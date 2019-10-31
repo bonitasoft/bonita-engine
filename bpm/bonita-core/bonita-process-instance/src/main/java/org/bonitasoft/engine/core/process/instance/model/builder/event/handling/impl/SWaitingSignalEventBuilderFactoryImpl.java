@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.handling
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 
 /**
  * @author Zhao Na
@@ -29,7 +29,7 @@ public class SWaitingSignalEventBuilderFactoryImpl extends SWaitingEventKeyProvi
     @Override
     public SWaitingSignalEventBuilder createNewWaitingSignalStartEventInstance(final long processdefinitionId, final String signalName,
             final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
-        final SWaitingSignalEventImpl entity = new SWaitingSignalEventImpl(SBPMEventType.START_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
+        final SWaitingSignalEvent entity = new SWaitingSignalEvent(SBPMEventType.START_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
         return new SWaitingSignalEventBuilderImpl(entity);
     }
 
@@ -37,7 +37,7 @@ public class SWaitingSignalEventBuilderFactoryImpl extends SWaitingEventKeyProvi
     public SWaitingSignalEventBuilder createNewWaitingSignalEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
             final long rootProcessInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
             final long subProcessId) {
-        final SWaitingSignalEventImpl entity = new SWaitingSignalEventImpl(SBPMEventType.EVENT_SUB_PROCESS, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
+        final SWaitingSignalEvent entity = new SWaitingSignalEvent(SBPMEventType.EVENT_SUB_PROCESS, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
         entity.setParentProcessInstanceId(parentProcessInstanceId);
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         entity.setSubProcessId(subProcessId);
@@ -53,7 +53,7 @@ public class SWaitingSignalEventBuilderFactoryImpl extends SWaitingEventKeyProvi
 
     protected SWaitingSignalEventBuilder createNonStartEvent(final long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId, final long flowNodeInstanceId, final String signalName,
             final String processName, final long flowNodeDefinitionId, final String flowNodeName, final SBPMEventType eventType) {
-        final SWaitingSignalEventImpl entity = new SWaitingSignalEventImpl(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
+        final SWaitingSignalEvent entity = new SWaitingSignalEvent(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, signalName);
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         entity.setParentProcessInstanceId(processInstanceId);

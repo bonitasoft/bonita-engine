@@ -26,13 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class contains the logic to determine if we are in the context of an application server that we must configure: Tomcat or Wildfly.
+ * This class contains the logic to determine if we are in the context of an application server that we must configure.
+ * Only Tomcat is supported.
  *
  * @author Emmanuel Duchastenier
  */
 class BundleResolver {
 
-    protected final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+
     private final Path rootPath;
 
     BundleResolver() {
@@ -52,7 +54,7 @@ class BundleResolver {
         return exists;
     }
 
-    protected Path getPath(String partialPath) throws PlatformException {
+    private Path getPath(String partialPath) {
         final String[] paths = partialPath.split("/");
         Path build = rootPath;
         for (String path : paths) {
@@ -61,22 +63,15 @@ class BundleResolver {
         return build;
     }
 
-    private boolean isTomcatEnvironment() throws PlatformException {
+    private boolean isTomcatEnvironment() {
         return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.sh")) || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.bat"));
-    }
-
-    private boolean isWildflyEnvironment() throws PlatformException {
-        return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/standalone.conf")) || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/standalone.conf.bat"));
     }
 
     BundleConfigurator getConfigurator() throws PlatformException {
         if (isTomcatEnvironment()) {
             return new TomcatBundleConfigurator(rootPath);
-        } else if (isWildflyEnvironment()) {
-            return new WildflyBundleConfigurator(rootPath);
         } else {
-            LOGGER.info(
-                    "No Application Server detected. You may need to manually configure the access to the database. Supported App Servers are: Tomcat 8, Wildfly 10");
+            LOGGER.info("No Application Server detected. You may need to manually configure the access to the database. Only Tomcat 8.x is supported");
             return null;
         }
     }

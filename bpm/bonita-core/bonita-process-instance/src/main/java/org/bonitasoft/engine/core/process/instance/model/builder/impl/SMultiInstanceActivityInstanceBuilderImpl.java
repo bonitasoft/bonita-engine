@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -23,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActi
  */
 public class SMultiInstanceActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SMultiInstanceActivityInstanceBuilder {
 
-    public SMultiInstanceActivityInstanceBuilderImpl(final SMultiInstanceActivityInstanceImpl entity) {
+    public SMultiInstanceActivityInstanceBuilderImpl(final SMultiInstanceActivityInstance entity) {
         super(entity);
     }
 
@@ -34,25 +33,25 @@ public class SMultiInstanceActivityInstanceBuilderImpl extends SActivityInstance
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setLoopDataInputRef(final String loopDataInputRef) {
-        ((SMultiInstanceActivityInstanceImpl) entity).setLoopDataInputRef(loopDataInputRef);
+        ((SMultiInstanceActivityInstance) entity).setLoopDataInputRef(loopDataInputRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setLoopDataOutputRef(final String loopDataOutputRef) {
-        ((SMultiInstanceActivityInstanceImpl) entity).setLoopDataOutputRef(loopDataOutputRef);
+        ((SMultiInstanceActivityInstance) entity).setLoopDataOutputRef(loopDataOutputRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setDataInputItemRef(final String dataInputItemRef) {
-        ((SMultiInstanceActivityInstanceImpl) entity).setDataInputItemRef(dataInputItemRef);
+        ((SMultiInstanceActivityInstance) entity).setDataInputItemRef(dataInputItemRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setDataOutputItemRef(final String dataOutputItemRef) {
-        ((SMultiInstanceActivityInstanceImpl) entity).setDataOutputItemRef(dataOutputItemRef);
+        ((SMultiInstanceActivityInstance) entity).setDataOutputItemRef(dataOutputItemRef);
         return this;
     }
 

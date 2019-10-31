@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.handling
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl;
 
 /**
  * @author Zhao Na
@@ -25,9 +24,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
  */
 public class SWaitingSignalEventBuilderImpl implements SWaitingSignalEventBuilder {
 
-    private final SWaitingSignalEventImpl entity;
+    private final SWaitingSignalEvent entity;
 
-    public SWaitingSignalEventBuilderImpl(final SWaitingSignalEventImpl entity) {
+    public SWaitingSignalEventBuilderImpl(final SWaitingSignalEvent entity) {
         super();
         this.entity = entity;
     }

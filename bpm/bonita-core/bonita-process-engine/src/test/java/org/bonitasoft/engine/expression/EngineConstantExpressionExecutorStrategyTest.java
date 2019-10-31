@@ -38,7 +38,6 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -71,7 +70,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     private ProcessInstanceService ProcessInstanceService;
     @Mock
     private SessionAccessor sessionAccessor;
-    private SUserTaskInstanceImpl taskInstance;
+    private SUserTaskInstance taskInstance;
     @InjectMocks
     private EngineConstantExpressionExecutorStrategy strategy;
     private SExpressionImpl expression = new SExpressionImpl();
@@ -82,7 +81,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
         dependencies = new HashMap<>(2);
         dependencies.put(SExpressionContext.CONTAINER_ID_KEY, CONTAINER_ID);
         dependencies.put(SExpressionContext.CONTAINER_TYPE_KEY, DataInstanceContainer.ACTIVITY_INSTANCE.name());
-        taskInstance = new SUserTaskInstanceImpl();
+        taskInstance = new SUserTaskInstance();
         when(activityInstanceService.getFlowNodeInstance(CONTAINER_ID)).thenReturn(taskInstance);
         taskInstance.setId(CONTAINER_ID);
         taskInstance.setParentContainerId(PARENT_PROCESS_INSTANCE_ID);

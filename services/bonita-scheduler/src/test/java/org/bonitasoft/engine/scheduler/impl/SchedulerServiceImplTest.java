@@ -13,16 +13,21 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -34,8 +39,6 @@ import java.util.Random;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -51,7 +54,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -59,6 +61,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SchedulerServiceImplTest {
 
     private static final long TENANT_ID = 1L;
+    private static final long JOB_DESCRIPTOR_ID = 32187L;
 
     private SchedulerServiceImpl schedulerService;
     @Mock
@@ -227,23 +230,6 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void executeNow_should_use_tenantId_on_jobDescriptor_jobParameters_and_call_executor_executeNow()
-            throws Exception {
-        // given
-        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
-        given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
-        final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
-
-        // when
-        schedulerService.executeNow(jobDescriptor, parameters);
-
-        // then
-        verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
-        verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), nullable(String.class), anyBoolean());
-    }
-
-    @Test
     public void should_delete_all_jobs_for_a_given_tenant() throws Exception {
         schedulerService.deleteJobs();
 
@@ -266,36 +252,49 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void addJobListener_for_TenantJobListener_should_call_addJobListener_for_TenantJobListener() throws SSchedulerException {
-        // Given
-        final String groupName = "groupName";
-        final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
+    public void should_execute_again_an_existing_job() throws Exception {
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
-        // When
-        schedulerService.addJobListener(jobListeners, groupName);
+        schedulerService.executeAgain(JOB_DESCRIPTOR_ID, 5000);
 
-        // Then
-        verify(schedulerExecutor).addJobListener(jobListeners, groupName);
+        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 5000);
+        verify(jobService, never()).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
     @Test
-    public void addJobListener_for_PlatormJobListener_should_call_addJobListener_for_PlatormJobListener() throws SSchedulerException {
-        // Given
-        final List<AbstractBonitaPlatformJobListener> jobListeners = Collections.emptyList();
+    public void should_retry_a_job_that_failed() throws Exception {
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
-        // When
-        schedulerService.addJobListener(jobListeners);
+        schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID);
 
-        // Then
-        verify(schedulerExecutor).addJobListener(jobListeners);
+        verify(jobService, never()).setJobParameters(anyLong(), anyLong(), any());
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
+        verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 
     @Test
-    public void initializeScheduler_should_call_initializeScheduler() throws Exception {
-        // When
-        schedulerService.initializeScheduler();
+    public void should_retry_a_job_that_failed_while_changing_parameters() throws Exception {
+        SJobDescriptor jobDescriptor = SJobDescriptor.builder().jobClassName("jobClassName")
+                .jobName("jobName")
+                .id(JOB_DESCRIPTOR_ID).build();
+        doReturn(jobDescriptor)
+                .when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        List<SJobParameter> parameters = asList(SJobParameter.builder().key("a").value(1).build(),
+                SJobParameter.builder().key("b").value(2).build());
 
-        // Then
-        verify(schedulerExecutor).initializeScheduler();
+        schedulerService.retryJobThatFailed(JOB_DESCRIPTOR_ID, parameters);
+
+        verify(jobService).setJobParameters(TENANT_ID, JOB_DESCRIPTOR_ID, parameters);
+        verify(schedulerExecutor).executeAgain(JOB_DESCRIPTOR_ID, String.valueOf(TENANT_ID), "jobName", false, 0);
+        verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
     }
 }

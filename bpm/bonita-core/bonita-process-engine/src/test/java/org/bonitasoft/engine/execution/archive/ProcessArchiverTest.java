@@ -13,9 +13,14 @@
  */
 package org.bonitasoft.engine.execution.archive;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,11 +38,9 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
@@ -83,13 +86,13 @@ public class ProcessArchiverTest {
 
     @Test
     public void archiveProcessInstance_should_archive_SRefBusinessDataInstances() throws Exception {
-        final SProcessSimpleRefBusinessDataInstanceImpl ref1 = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SProcessSimpleRefBusinessDataInstance ref1 = new SProcessSimpleRefBusinessDataInstance();
         ref1.setId(1L); // so that those 3 objects are not considered the same (in the verify)
-        final SProcessSimpleRefBusinessDataInstanceImpl ref2 = new SProcessSimpleRefBusinessDataInstanceImpl();
+        final SProcessSimpleRefBusinessDataInstance ref2 = new SProcessSimpleRefBusinessDataInstance();
         ref2.setId(2L);
-        final SProcessMultiRefBusinessDataInstanceImpl ref3 = new SProcessMultiRefBusinessDataInstanceImpl();
-        List<SRefBusinessDataInstanceImpl> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
-        SProcessInstance processInstance = new SProcessInstanceImpl();
+        final SProcessMultiRefBusinessDataInstance ref3 = new SProcessMultiRefBusinessDataInstance();
+        List<SRefBusinessDataInstance> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
+        SProcessInstance processInstance = new SProcessInstance();
         processInstance.setId(451L);
 
         doReturn(mock(SAProcessInstance.class)).when(processArchiver).buildArchiveProcessInstance(processInstance);

@@ -39,7 +39,7 @@ public class BonitaSpringContextTest implements ApplicationContextAware {
 
     @Before
     public void before() throws Exception {
-        bonitaSpringContext = new BonitaSpringContext(applicationContext);
+        bonitaSpringContext = new BonitaSpringContext(applicationContext, "test context");
         bonitaSpringContext.refresh();
     }
 

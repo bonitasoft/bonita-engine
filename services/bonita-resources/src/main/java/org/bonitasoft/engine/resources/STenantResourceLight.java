@@ -14,11 +14,15 @@
 
 package org.bonitasoft.engine.resources;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
 public class STenantResourceLight implements PersistentObject {
     protected String name;
     protected TenantResourceType type;
@@ -28,79 +32,12 @@ public class STenantResourceLight implements PersistentObject {
     protected long lastUpdateDate;
     protected STenantResourceState state;
 
-    public STenantResourceLight() {
-    }
-
     public STenantResourceLight(String name, TenantResourceType type, long lastUpdatedBy, long lastUpdateDate,
                                 STenantResourceState state) {
         this.name = name;
         this.type = type;
         this.lastUpdatedBy = lastUpdatedBy;
         this.lastUpdateDate = lastUpdateDate;
-        this.state = state;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public TenantResourceType getType() {
-        return type;
-    }
-
-    public void setType(TenantResourceType type) {
-        this.type = type;
-    }
-
-    public long getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
-
-    public void setLastUpdatedBy(long lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    public long getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(long lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public STenantResourceState getState() {
-        return state;
-    }
-
-    public void setState(STenantResourceState state) {
         this.state = state;
     }
 }

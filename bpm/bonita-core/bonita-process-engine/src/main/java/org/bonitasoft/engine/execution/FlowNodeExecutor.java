@@ -35,14 +35,13 @@ public interface FlowNodeExecutor extends ContainerExecutor {
 
     /**
      * 
-     * @param flowNodeInstanceId
+     * @param flowNodeInstance
      * @param executerId
      * @param executerSubstituteId
      * @return
      * @throws SFlowNodeExecutionException
-     * @since 6.0
      */
-    FlowNodeState stepForward(long flowNodeInstanceId,
+    FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance,
                               Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
 
     /**

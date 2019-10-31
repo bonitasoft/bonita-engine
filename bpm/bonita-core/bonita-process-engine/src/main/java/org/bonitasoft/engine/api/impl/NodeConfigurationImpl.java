@@ -16,10 +16,8 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
-import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 
 /**
  * @author Baptiste Mesta
@@ -29,24 +27,11 @@ import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
  */
 public class NodeConfigurationImpl implements NodeConfiguration {
 
-    private boolean shouldStartScheduler = true;
-
     private boolean shouldRestartElements = true;
 
-    private List<RestartHandler> restartHandlers;
-
-    private boolean shouldStartEventHandlingJob = true;
+    private List<PlatformRestartHandler> platformRestartHandlers;
 
     private List<TenantRestartHandler> tenantRestartHandlers;
-
-    private List<PlatformLifecycleService> lifecycleServices;
-
-    private List<AbstractBonitaPlatformJobListener> jobListeners;
-
-    @Override
-    public boolean shouldStartScheduler() {
-        return shouldStartScheduler;
-    }
 
     @Override
     public boolean shouldResumeElements() {
@@ -54,12 +39,12 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     }
 
     @Override
-    public List<RestartHandler> getRestartHandlers() {
-        return CollectionUtil.emptyOrUnmodifiable(restartHandlers);
+    public List<PlatformRestartHandler> getPlatformRestartHandlers() {
+        return CollectionUtil.emptyOrUnmodifiable(platformRestartHandlers);
     }
 
-    public void setRestartHandlers(final List<RestartHandler> restartHandlers) {
-        this.restartHandlers = restartHandlers;
+    public void setPlatformRestartHandlers(final List<PlatformRestartHandler> platformRestartHandlers) {
+        this.platformRestartHandlers = platformRestartHandlers;
     }
 
     @Override
@@ -71,21 +56,8 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         this.tenantRestartHandlers = tenantRestartHandlers;
     }
 
-    @Override
-    public boolean shouldStartEventHandlingJob() {
-        return shouldStartEventHandlingJob;
-    }
-
-    public void setShouldStartScheduler(final boolean shouldStartScheduler) {
-        this.shouldStartScheduler = shouldStartScheduler;
-    }
-
     public void setShouldRestartElements(final boolean shouldRestartElements) {
         this.shouldRestartElements = shouldRestartElements;
-    }
-
-    public void setShouldStartEventHandlingJob(final boolean shouldStartEventHandlingJob) {
-        this.shouldStartEventHandlingJob = shouldStartEventHandlingJob;
     }
 
     @Override
@@ -93,22 +65,5 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         return true;
     }
 
-    @Override
-    public List<PlatformLifecycleService> getLifecycleServices() {
-        return lifecycleServices;
-    }
-
-    public void setLifecycleServices(final List<PlatformLifecycleService> lifecycleServices) {
-        this.lifecycleServices = lifecycleServices;
-    }
-
-    @Override
-    public List<AbstractBonitaPlatformJobListener> getJobListeners() {
-        return jobListeners;
-    }
-
-    public void setJobListeners(final List<AbstractBonitaPlatformJobListener> jobListeners) {
-        this.jobListeners = jobListeners;
-    }
 
 }

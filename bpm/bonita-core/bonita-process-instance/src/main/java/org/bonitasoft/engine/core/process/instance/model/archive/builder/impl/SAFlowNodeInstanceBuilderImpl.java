@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -22,9 +22,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNode
  */
 public abstract class SAFlowNodeInstanceBuilderImpl implements SAFlowNodeInstanceBuilder {
 
-    protected final SAFlowNodeInstanceImpl entity;
+    protected final SAFlowNodeInstance entity;
 
-    protected SAFlowNodeInstanceBuilderImpl(final SAFlowNodeInstanceImpl entity) {
+    protected SAFlowNodeInstanceBuilderImpl(final SAFlowNodeInstance entity) {
         super();
         this.entity = entity;
     }

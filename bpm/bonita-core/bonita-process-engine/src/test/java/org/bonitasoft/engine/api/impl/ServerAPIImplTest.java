@@ -13,45 +13,63 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.api.NoSessionRequired;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
+import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.session.PlatformSessionService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.APIAccessResolver;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.hamcrest.CustomTypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -61,396 +79,327 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ServerAPIImplTest {
 
-    @Mock
-    private APIAccessResolver accessResolver;
-
+    private static final long TENANT_SESSION_ID = 54335453241L;
+    private static final long PLATFORM_SESSION_ID = 54335453241L;
+    private APISession tenantSession = new APISessionImpl(TENANT_SESSION_ID, new Date(), 10000, "john", 14L, "theTenant", 42L);
+    private PlatformSession platformSession = new PlatformSessionImpl(PLATFORM_SESSION_ID, new Date(), 10000, "john", 14L);
     @Mock
     private SessionAccessor sessionAccessor;
-
     @Mock
-    private Session session;
-
+    private UserTransactionService userTransactionService;
     @Mock
-    private TechnicalLoggerService technicalLoggerService;
-
+    private ServiceAccessorFactory serviceAccessorFactory;
     @Mock
-    private AvailableWhenTenantIsPaused annotation;
+    private PlatformServiceAccessor platformServiceAccessor;
+    @Mock
+    private TenantServiceAccessor tenantServiceAccessor;
+    @Mock
+    private LoginService tenantLoginService;
+    @Mock
+    private SchedulerService schedulerService;
+    @Mock
+    private SessionService sessionService;
+    @Mock
+    private ClassLoaderService classLoaderService;
+    @Mock
+    private PlatformLoginService platformLoginService;
+    @Mock
+    private PlatformSessionService platformSessionService;
+    @Mock
+    private PlatformService platformService;
+
+    @Rule
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     private ServerAPIImpl serverAPIImpl;
+    private MyApiImplementation myApi = new MyApiImplementation();
+    private MyApiWithNoSessionImpl myApiWithNoSession = new MyApiWithNoSessionImpl();
+    private ApiFullyAccessibleWhenTenantIsPausedImpl myApiFullyAccessibleWhenTenantIsPaused = new ApiFullyAccessibleWhenTenantIsPausedImpl();
+    private APIAccessResolver accessResolver;
+    @Mock
+    private PlatformAPI platformApi;
+    @Mock
+    private TenantAdministrationAPI tenantAdministrationApi;
+
+    private boolean isTenantPaused = false;
 
     @Before
-    public void createServerAPI() {
-        serverAPIImpl = new ServerAPIImpl(true, accessResolver);
-        serverAPIImpl.setTechnicalLogger(technicalLoggerService);
-    }
+    public void createServerAPI() throws Exception {
+        doReturn(true).when(platformApi).isNodeStarted();
+        when(userTransactionService.executeInTransaction(any())).thenAnswer(invocation -> ((Callable<?>) invocation.getArgument(0)).call());
+        doReturn(platformServiceAccessor).when(serviceAccessorFactory).createPlatformServiceAccessor();
+        doReturn(sessionAccessor).when(serviceAccessorFactory).createSessionAccessor();
+        doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
+        doReturn(platformLoginService).when(platformServiceAccessor).getPlatformLoginService();
+        doReturn(platformSessionService).when(platformServiceAccessor).getPlatformSessionService();
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
+        doReturn(tenantLoginService).when(tenantServiceAccessor).getLoginService();
+        doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
+        doReturn(classLoaderService).when(tenantServiceAccessor).getClassLoaderService();
 
-    @Test(expected = ServerWrappedException.class)
-    public void invokeMethodCatchThrowable() throws Throwable {
-        testCatchAndLogged();
-    }
+        doReturn(true).when(tenantLoginService).isValid(TENANT_SESSION_ID);
+        doReturn(true).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
 
-    private void testCatchAndLogged() throws Throwable {
-        final String apiInterfaceName = "apiInterfaceName";
-        final String methodName = "methodName";
-        final List<String> classNameParameters = new ArrayList<>();
-        final Object[] parametersValues = null;
+        doAnswer(invocation -> isTenantPaused).when(tenantAdministrationApi).isPaused();
 
-        ServerAPIImpl serverAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doReturn(sessionAccessor).when(serverAPIImpl).beforeInvokeMethod(session, apiInterfaceName);
-        final TechnicalLoggerService technicalLogger = mock(TechnicalLoggerService.class);
-        doReturn(true).when(technicalLogger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG));
-
-        serverAPIImpl.setTechnicalLogger(technicalLogger);
-        final Map<String, Serializable> options = new HashMap<>();
-        options.put("session", session);
-        try {
-            serverAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } finally {
-            verify(technicalLogger, VerificationModeFactory.atLeastOnce()).log(any(Class.class), eq(TechnicalLogSeverity.DEBUG), Mockito.any(Throwable.class));
-        }
-    }
-
-    @Test(expected = ServerAPIRuntimeException.class)
-    public void invokeAPIWithInvalidChecksShouldNotInvokeAnything() throws Throwable {
-        // given:
-        final String apiInterfaceName = "apiInterfaceName";
-        // must be an existing method name (on Object):
-        final String methodName = "toString";
-        final List<String> classNameParameters = new ArrayList<>();
-        final Object[] parametersValues = null;
-        Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
-
-        APIAccessResolver accessResolver = mock(APIAccessResolver.class);
-        when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(new Object());
-        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doReturn(new UserTransactionService() {
-
+        accessResolver = new APIAccessResolver() {
             @Override
-            public <T> T executeInTransaction(Callable<T> callable) throws Exception {
-                return callable.call();
+            public <T> T getAPIImplementation(Class<T> apiInterface) throws APIImplementationNotFoundException {
+                if (apiInterface.isAssignableFrom(MyApi.class)) {
+                    return (T) myApi;
+                } else if (apiInterface.equals(MyApiWithNoSession.class)) {
+                    return (T) myApiWithNoSession;
+                } else if (apiInterface.equals(ApiFullyAccessibleWhenTenantIsPaused.class)) {
+                    return (T) myApiFullyAccessibleWhenTenantIsPaused;
+                } else if (apiInterface.equals(PlatformAPI.class)) {
+                    return (T) platformApi;
+                } else if (apiInterface.equals(TenantAdministrationAPI.class)) {
+                    return (T) tenantAdministrationApi;
+                } else {
+                    throw new APIImplementationNotFoundException("not the FakeApi");
+                }
+
+            }
+        };
+        serverAPIImpl = new ServerAPIImpl(accessResolver) {
+            @Override
+            UserTransactionService selectUserTransactionService(Session session, SessionType sessionType) throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+                return userTransactionService;
             }
 
             @Override
-            public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) {
+            ServiceAccessorFactory getServiceAccessorFactoryInstance() {
+                return serviceAccessorFactory;
             }
-
-            @Override
-            public void registerBeforeCommitCallable(Callable<Void> callable) {
-            }
-        }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class), any(ServerAPIImpl.SessionType.class));
-        try {
-            // when:
-            mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-        } finally {
-            // then:
-            verify(mockedServerAPIImpl, never()).invokeAPI(any(Method.class), anyString(), any(Object[].class));
-        }
-    }
-
-    @Test
-    public void invokeAPIWithValidChecksAndCustomTransactionsShouldCallDirectInvokeAPI() throws Throwable {
-        // given:
-        final String apiInterfaceName = "apiInterfaceName";
-        final String methodName = "customTxAPIMethod";
-        final List<String> classNameParameters = new ArrayList<>();
-        final Object[] parametersValues = null;
-        Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
-
-        APIAccessResolver accessResolver = mock(APIAccessResolver.class);
-        FakeAPI apiImpl = new FakeAPI();
-        when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
-
-        try {
-            // when:
-            mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-        } finally {
-            // then:
-            verify(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
-            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
-        }
-    }
-
-    @Test
-    public void invokeAPIWithValidChecksAndNoSessionRequiredShouldCallDirectInvokeAPI() throws Throwable {
-        // given:
-        final String apiInterfaceName = "apiInterfaceName";
-        final String methodName = "noSessionRequiredMethod";
-        final List<String> classNameParameters = new ArrayList<>();
-        final Object[] parametersValues = null;
-        Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
-
-        APIAccessResolver accessResolver = mock(APIAccessResolver.class);
-        FakeAPI apiImpl = new FakeAPI();
-        when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
-        doReturn(null).when(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
-
-        try {
-            // when:
-            mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-        } finally {
-            // then:
-            verify(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
-            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
-        }
-    }
-
-    @Test
-    public void invokeAPIWithValidChecksAndNoAnnotationshouldCallTransactionalInvokeAPI() throws Throwable {
-        // given:
-        final String apiInterfaceName = "apiInterfaceName";
-        final String methodName = "notAnnotatedMethod";
-        final List<String> classNameParameters = new ArrayList<>();
-        final Object[] parametersValues = null;
-        Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
-
-        APIAccessResolver accessResolver = mock(APIAccessResolver.class);
-        FakeAPI apiImpl = new FakeAPI();
-        when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session,
-                apiInterfaceName);
-
-        try {
-            // when:
-            mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-        } finally {
-            // then:
-            verify(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session, apiInterfaceName);
-            verify(mockedServerAPIImpl, never()).invokeAPI(any(Method.class), anyString(), any(Object[].class));
-        }
-    }
-
-    @Test
-    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnAnnotatedMethods() throws Exception {
-        // Given:
-        final long tenantId = 54L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-
-        // When:
-        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant"), session, false);
-
-        // no TenantModeException must be thrown. If so, test would fail.
-    }
-
-    @Test
-    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnAnnotatedAPI() throws Exception {
-        // Given:
-        final long tenantId = 54L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-
-        // When:
-        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelFullyAccessibleAPI(), FakeTenantLevelFullyAccessibleAPI.class.getName(),
-                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod"), session, false);
-
-        // no TenantModeException must be thrown. If so, test would fail.
-    }
-
-    @Test
-    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnNOTAnnotatedMethodsIfNotInPause() throws Exception {
-        // Given:
-        final long tenantId = 54L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(true).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-
-        // When:
-        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
-
-        // no TenantModeException must be thrown. If so, test would fail.
-    }
-
-    @Test
-    public void tenantStatusExceptionShouldHaveGoodMessageOnPausedTenant() throws Exception {
-        // Given:
-        final long tenantId = 98744L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-
-        try {
-            // when:
-            serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
-            fail("Should have thrown TenantStatusException");
-        } catch (final TenantStatusException e) {
-            assertThat(e.getMessage()).isEqualTo("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
-        }
-    }
-
-    @Test
-    public void tenantStatusExceptionShouldHaveGoodMessageOnRunningTenant() throws Exception {
-        // Given:
-        final long tenantId = 98744L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(true).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-        doReturn(false).when(serverAPIImplSpy).isMethodAvailableOnRunningTenant(anyBoolean(), any(AvailableWhenTenantIsPaused.class));
-
-        try {
-            // when:
-            serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant"), session, false);
-            fail("Should have thrown TenantStatusException");
-        } catch (final TenantStatusException e) {
-            // then:
-            assertThat(e.getMessage()).isEqualTo(
-                    "Tenant with ID " + tenantId
-                            + " is running, method '" + FakeTenantLevelAPI.class.getName() + ".canOnlyBeCalledOnPausedTenant()' cannot be called.");
-        }
-    }
-
-    @Test(expected = TenantStatusException.class)
-    public void checkMethodAccessibilityOnTenantAPIShouldNotBePossibleOnNOTAnnotatedMethodsIfTenantInPause() throws Exception {
-        // Given:
-        final long tenantId = 54L;
-        final APISessionImpl session = buildSession(tenantId);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
-
-        // When:
-        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
-
-    }
-
-    @Test
-    public void checkMethodAccessibilityOnPlatformAPIShouldNotCheckTenantAvailability() throws Exception {
-        // Given:
-        final Session session = new PlatformSessionImpl(1L, new Date(), 120L, "userName", 5487L);
-        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
-
-        // When:
-        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("platformAPIMethod"), session, false);
-
-        // Then:
-        verify(serverAPIImplSpy, never()).isTenantAvailable(anyLong(), any(Session.class), eq(false));
-    }
-
-    @Test
-    public void isInAValidModeForAnActiveTenantWithAnnotationInOnlyIsInvalid() {
-        when(annotation.only()).thenReturn(true);
-
-        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, annotation);
-
-        assertThat(valid).isFalse();
-    }
-
-    @Test
-    public void isInAValidModeForAnActiveTenantWithAnnotationInNotOnlyIsValid() {
-        when(annotation.only()).thenReturn(false);
-
-        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, annotation);
-
-        assertThat(valid).isTrue();
-    }
-
-    @Test
-    public void isInAValidModeForAnActiveTenantWithoutAnnotationIsValid() {
-        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, null);
-
-        assertThat(valid).isTrue();
-    }
-
-    @Test
-    public void isInAValidModeForAPausedTenantWithAnnotationInOnlyIsValid() {
-        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
-
-        assertThat(valid).isTrue();
-    }
-
-    @Test
-    public void isInAValidModeForAPausedTenantWithAnnotationInNotOnlyIsValid() {
-        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
-
-        assertThat(valid).isTrue();
-    }
-
-    @Test
-    public void isInAValidModeForAPausedTenantWithoutAnnotationIsInvalid() {
-        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, null);
-
-        assertThat(valid).isFalse();
-    }
-
-    protected APISessionImpl buildSession(final long tenantId) {
-        return new APISessionImpl(415L, new Date(), 645646L, "userName", 7777L, "dummyTenant", tenantId);
-    }
-
-    protected APISessionImpl buildSession() {
-        return buildSession(14L);
-    }
-
-    @Test
-    public void should_checkMethodAccessibility_do_not_warn_user_when_method_is_not_deprecated() throws Throwable {
-        //given
-        final Method callMe = MyObjectImpl.class.getDeclaredMethod("callMeNew");
-
-        //when
-        serverAPIImpl.checkMethodAccessibility(new MyObjectImpl(), MyObject.class.getName(), callMe, null, true);
-
-        //then
-        verify(technicalLoggerService, never()).log(
-                any(Class.class),
-                eq(TechnicalLogSeverity.WARNING),
-                anyString());
-
-    }
-
-    @Test
-    public void should_checkMethodAccessibility_warn_user_when_method_is_deprecated() throws Throwable {
-        //given
-        final Method callMe = MyObjectImpl.class.getDeclaredMethod("callMeOld");
-
-        //when
-        serverAPIImpl.checkMethodAccessibility(new MyObjectImpl(), MyObject.class.getName(), callMe, null, true);
-
-        //then
-        verify(technicalLoggerService).log(
-                ServerAPIImpl.class,
-                TechnicalLogSeverity.WARNING,
-                "The API method " + this.getClass().getName()
-                        + "$MyObject.callMeOld is deprecated. It will be deleted in a future release. Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.");
-
+        };
     }
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void should_handle_BonitaRuntimeException() throws Throwable {
-        // given:
-        final String apiInterfaceName = "apiInterfaceName";
-        final String methodName = "methodName";
+    public void should_throw_ClassNotFoundException_when_api_is_not_known() throws Throwable {
 
-        ServerAPIImpl serverAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doReturn(sessionAccessor).when(serverAPIImpl).beforeInvokeMethod(session, apiInterfaceName);
-        final Map<String, Serializable> options = new HashMap<>();
-        options.put("session", session);
+        expectedException.expect(ServerWrappedException.class);
+        expectedException.expectCause(new CustomTypeSafeMatcher<Throwable>("should be a runtime caused by a ClassNotFoundException") {
+            @Override
+            protected boolean matchesSafely(Throwable throwable) {
+                return throwable instanceof BonitaRuntimeException && throwable.getCause() instanceof ClassNotFoundException;
+            }
+        });
 
-        final ArrayList<String> classNameParameters = new ArrayList<>();
-        doThrow(BonitaRuntimeException.class).when(serverAPIImpl).invokeAPI(apiInterfaceName, methodName,
-                classNameParameters, null, session);
+        serverAPIImpl.invokeMethod(options(tenantSession), "UnknownApi", "someMethod", emptyList(), null);
+    }
 
-        // then:
+    @Test
+    public void should_not_open_transaction_on_CustomTransaction_annotated_methods() throws Throwable {
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "customTxAPIMethod", emptyList(), null);
+
+        assertThat(myApi.customTxAPIMethodCalled).isTrue();
+        //only one call: "tenantAdministrationApi.isTenantPaused"
+        verify(userTransactionService, only()).executeInTransaction(any());
+    }
+
+    @Test
+    public void should_be_able_to_call_methods_that_dont_require_sessions_without_session() throws Throwable {
+
+        serverAPIImpl.invokeMethod(emptyMap(), MyApiWithNoSession.class.getName(), "someMethod", emptyList(), null);
+
+        assertThat(myApiWithNoSession.someMethodCalled).isTrue();
+    }
+
+    @Test
+    public void should_call_normal_method_in_transaction() throws Throwable {
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+
+        assertThat(myApi.notAnnotatedMethodCalled).isTrue();
+        verify(userTransactionService).executeInTransaction(any());
+    }
+
+    @Test
+    public void should_fail_when_calling_normal_method_without_session() throws Throwable {
+
+        expectedException.expectCause(instanceOf(InvalidSessionException.class));
+        serverAPIImpl.invokeMethod(options(null), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+    }
+
+    @Test
+    public void should_not_be_able_to_call_normal_method_when_tenant_is_paused() throws Exception {
+        isTenantPaused = true;
+
+        expectedException.expectCause(instanceOf(TenantStatusException.class));
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+    }
+
+    @Test
+    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_paused() throws Exception {
+        isTenantPaused = true;
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused", emptyList(), null);
+
+        assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
+    }
+
+    @Test
+    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_not_paused() throws Exception {
+        isTenantPaused = false;
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused", emptyList(), null);
+
+        assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
+    }
+
+    @Test
+    public void should_not_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_not_paused() throws Exception {
+        isTenantPaused = false;
+
+        expectedException.expectCause(instanceOf(TenantStatusException.class));
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused", emptyList(), null);
+    }
+
+    @Test
+    public void should_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_paused() throws Exception {
+        isTenantPaused = true;
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused", emptyList(), null);
+
+        assertThat(myApi.onlyAvailableWhenTenantIsPausedCalled).isTrue();
+    }
+
+    @Test
+    public void should_be_able_to_call_method_of_api_fully_available_when_tenant_is_paused() throws Exception {
+        isTenantPaused = true;
+
+        //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
+        serverAPIImpl.invokeMethod(options(tenantSession), ApiFullyAccessibleWhenTenantIsPaused.class.getName(), "aMethod", emptyList(), null);
+
+        assertThat(myApiFullyAccessibleWhenTenantIsPaused.aMethodCalled).isTrue();
+    }
+
+    @Test
+    public void should_be_able_to_call_platform_apis_when_tenant_is_paused() throws Exception {
+        isTenantPaused = true;
+
+        //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+
+        assertThat(myApi.notAnnotatedMethodCalled).isTrue();
+    }
+
+    @Test
+    public void should_fail_if_tenant_session_is_not_valid() throws Exception {
+        doReturn(false).when(tenantLoginService).isValid(TENANT_SESSION_ID);
+
+        expectedException.expectCause(instanceOf(InvalidSessionException.class));
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+    }
+
+    @Test
+    public void should_fail_if_platform_session_is_not_valid() throws Exception {
+        doReturn(false).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
+
+        expectedException.expectCause(instanceOf(InvalidSessionException.class));
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+    }
+
+    @Test
+    public void should_renew_tenant_session_when_call_is_ok() throws Exception {
+
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+
+        verify(sessionService).renewSession(TENANT_SESSION_ID);
+    }
+    @Test
+    public void should_renew_platform_session_when_call_is_ok() throws Exception {
+
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+
+        verify(platformSessionService).renewSession(PLATFORM_SESSION_ID);
+    }
+
+
+    @Test
+    public void should_checkMethodAccessibility_do_not_warn_user_when_method_is_not_deprecated() throws Throwable {
+        //given
+        final Method callMe = MyApiImplementation.class.getDeclaredMethod("callMeNew");
+        systemOutRule.clearLog();
+        //when
+        serverAPIImpl.checkMethodAccessibility(new MyApiImplementation(), MyApi.class.getName(), callMe, null, true);
+
+        //then
+        assertThat(systemOutRule.getLog()).doesNotContain("is deprecated");
+    }
+
+    @Test
+    public void should_checkMethodAccessibility_warn_user_when_method_is_deprecated() throws Throwable {
+        //given
+        final Method callMe = MyApiImplementation.class.getDeclaredMethod("callMeOld");
+        systemOutRule.clearLog();
+
+        //when
+        serverAPIImpl.checkMethodAccessibility(new MyApiImplementation(), MyApi.class.getName(), callMe, null, true);
+
+        //then
+
+        assertThat(systemOutRule.getLog()).contains("The API method " + this.getClass().getName() + "$MyApi.callMeOld is deprecated.");
+    }
+
+    @Test
+    public void should_throw_ServerWrappedException_when_some_exception_is_thrown() throws Throwable {
         expectedException.expect(ServerWrappedException.class);
         expectedException.expectCause(instanceOf(BonitaRuntimeException.class));
 
-        // when:
-        serverAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "methodThatThrowRuntimeException", emptyList(), null);
     }
 
-    interface MyObject {
+    private Map<String, Serializable> options(Session session) {
+        final Map<String, Serializable> options = new HashMap<>();
+        options.put("session", session);
+        return options;
+    }
+
+
+    // ----
+    // APIS for tests
+    // ----
+
+    interface ApiFullyAccessibleWhenTenantIsPaused {
+
+        void aMethod();
+    }
+
+    @AvailableWhenTenantIsPaused
+    static class ApiFullyAccessibleWhenTenantIsPausedImpl implements ApiFullyAccessibleWhenTenantIsPaused {
+
+        boolean aMethodCalled;
+
+        @Override
+        public void aMethod() {
+            aMethodCalled = true;
+        }
+    }
+
+    @NoSessionRequired
+    interface MyApiWithNoSession {
+
+        void someMethod();
+    }
+
+    static class MyApiWithNoSessionImpl implements MyApiWithNoSession {
+
+        boolean someMethodCalled;
+
+        @Override
+        public void someMethod() {
+            someMethodCalled = true;
+        }
+    }
+
+    interface MyApi {
 
         @Deprecated
         @AvailableOnStoppedNode
@@ -458,9 +407,24 @@ public class ServerAPIImplTest {
 
         @AvailableOnStoppedNode
         void callMeNew();
+
+        void availableWhenTenantIsPaused();
+
+        void onlyAvailableWhenTenantIsPaused();
+
+        void customTxAPIMethod();
+
+        void notAnnotatedMethod();
+
+        void methodThatThrowRuntimeException();
     }
 
-    class MyObjectImpl implements MyObject {
+    static class MyApiImplementation implements MyApi {
+
+        boolean customTxAPIMethodCalled;
+        boolean notAnnotatedMethodCalled;
+        boolean availableWhenTenantIsPausedCalled;
+        boolean onlyAvailableWhenTenantIsPausedCalled;
 
         @Deprecated
         @AvailableOnStoppedNode
@@ -471,6 +435,32 @@ public class ServerAPIImplTest {
         @AvailableOnStoppedNode
         public void callMeNew() {
 
+        }
+
+        @AvailableWhenTenantIsPaused
+        public void availableWhenTenantIsPaused() {
+            availableWhenTenantIsPausedCalled = true;
+        }
+        @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
+        public void onlyAvailableWhenTenantIsPaused() {
+            onlyAvailableWhenTenantIsPausedCalled = true;
+        }
+
+
+        @CustomTransactions
+        public void customTxAPIMethod() {
+            customTxAPIMethodCalled = true;
+        }
+
+
+        public void notAnnotatedMethod() {
+            notAnnotatedMethodCalled = true;
+
+        }
+
+        @Override
+        public void methodThatThrowRuntimeException() {
+            throw new BonitaRuntimeException("some exception");
         }
     }
 

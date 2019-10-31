@@ -15,16 +15,19 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Nicolas Tith
  * @author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class STaskContractData extends SContractData implements PersistentObject {
-
-    public STaskContractData() {
-    }
 
     public STaskContractData(final long userTaskId, final String name, final Serializable value) {
         super(name, value, userTaskId);

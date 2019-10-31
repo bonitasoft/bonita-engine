@@ -13,11 +13,38 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Celine Souchet
- */
-public interface SABoundaryEventInstance extends SACatchEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-    long getActivityInstanceId();
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SABoundaryEventInstance extends SACatchEventInstance {
+
+    private long activityInstanceId;
+
+    public SABoundaryEventInstance(final SBoundaryEventInstance sBoundaryEventInstance) {
+        super(sBoundaryEventInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.BOUNDARY_EVENT;
+    }
+
+    @Override
+    public String getKind() {
+        return "boundaryEvent";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SBoundaryEventInstance.class;
+    }
+
 
 }

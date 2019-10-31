@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
-
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 
 /**
  * @author Julien Reboul
  *
  */
-public abstract class ActivityInstanceBuilder<T extends SActivityInstanceImpl, B extends ActivityInstanceBuilder<T, B>>
+public abstract class ActivityInstanceBuilder<T extends SActivityInstance, B extends ActivityInstanceBuilder<T, B>>
         extends FlowNodeInstanceBuilder<T, B> {
 
     protected long abortedByBoundaryEventId = 0;

@@ -46,7 +46,6 @@ import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFo
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl;
 import org.bonitasoft.engine.profile.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -276,25 +275,24 @@ public class ProfileServiceImpl implements ProfileService {
         deleteProfileEntry(profileEntry);
     }
 
-    private SProfileMemberImpl buildProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
-            final String displayNamePart3) {
-        final SProfileMemberImpl profileMember = new SProfileMemberImpl(profileId);
-        profileMember.setDisplayNamePart1(displayNamePart1);
-        profileMember.setDisplayNamePart2(displayNamePart2);
-        profileMember.setDisplayNamePart1(displayNamePart3);
-        return profileMember;
+    private SProfileMember buildProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
+                                              final String displayNamePart3) {
+        return SProfileMember.builder().profileId(profileId)
+                .displayNamePart1(displayNamePart1)
+                .displayNamePart2(displayNamePart2)
+                .displayNamePart1(displayNamePart3).build();
     }
 
     @Override
     public SProfileMember addUserToProfile(final long profileId, final long userId, final String firstName, final String lastName, final String userName)
             throws SProfileMemberCreationException {
-        final SProfileMemberImpl profileMember = buildProfileMember(profileId, firstName, lastName, userName);
+        final SProfileMember profileMember = buildProfileMember(profileId, firstName, lastName, userName);
         profileMember.setUserId(userId);
         createProfileMember(profileMember);
         return profileMember;
     }
 
-    private void createProfileMember(final SProfileMemberImpl profileMember) throws SProfileMemberCreationException {
+    private void createProfileMember(final SProfileMember profileMember) throws SProfileMemberCreationException {
         final String message = "Adding a new profile member";
         final SProfileMemberLogBuilderImpl logBuilder = getProfileMemberLog(ActionType.CREATED, message);
         try {
@@ -309,7 +307,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileMember addGroupToProfile(final long profileId, final long groupId, final String groupName, final String parentPath)
             throws SProfileMemberCreationException {
-        final SProfileMemberImpl profileMember = buildProfileMember(profileId, groupName, parentPath, null);
+        final SProfileMember profileMember = buildProfileMember(profileId, groupName, parentPath, null);
         profileMember.setGroupId(groupId);
         createProfileMember(profileMember);
         return profileMember;
@@ -317,7 +315,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public SProfileMember addRoleToProfile(final long profileId, final long roleId, final String roleName) throws SProfileMemberCreationException {
-        final SProfileMemberImpl profileMember = buildProfileMember(profileId, roleName, null, null);
+        final SProfileMember profileMember = buildProfileMember(profileId, roleName, null, null);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);
         return profileMember;
@@ -326,7 +324,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileMember addRoleAndGroupToProfile(final long profileId, final long roleId, final long groupId, final String roleName, final String groupName,
             final String groupParentPath) throws SProfileMemberCreationException {
-        final SProfileMemberImpl profileMember = buildProfileMember(profileId, roleName, groupName, groupParentPath);
+        final SProfileMember profileMember = buildProfileMember(profileId, roleName, groupName, groupParentPath);
         profileMember.setGroupId(groupId);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);
@@ -444,7 +442,7 @@ public class ProfileServiceImpl implements ProfileService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }

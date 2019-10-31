@@ -29,9 +29,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
@@ -80,13 +79,13 @@ public class FlowNodeInstanceTest {
     }
 
     protected void buildAndCreateProcessDefinition(final long id, final long processDefinitionId, final String processName) {
-        final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
-        sProcessDefinitionDeployInfoImpl.setId(id);
-        sProcessDefinitionDeployInfoImpl.setName(processName);
-        sProcessDefinitionDeployInfoImpl.setVersion("version");
-        sProcessDefinitionDeployInfoImpl.setProcessId(processDefinitionId);
-        sProcessDefinitionDeployInfoImpl.setTenantId(1L);
-        repository.add(sProcessDefinitionDeployInfoImpl);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
+        sProcessDefinitionDeployInfo.setId(id);
+        sProcessDefinitionDeployInfo.setName(processName);
+        sProcessDefinitionDeployInfo.setVersion("version");
+        sProcessDefinitionDeployInfo.setProcessId(processDefinitionId);
+        sProcessDefinitionDeployInfo.setTenantId(1L);
+        repository.add(sProcessDefinitionDeployInfo);
     }
 
     @Test
@@ -403,7 +402,7 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_return_gateway_if_not_finished() {
         // Given
-        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false)
+        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false)
                 .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 
@@ -430,7 +429,7 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_not_return_gateway_if_wrong_name() {
         // Given
-        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false)
+        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false)
                 .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 

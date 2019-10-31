@@ -16,8 +16,8 @@ package org.bonitasoft.engine.platform;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -49,22 +48,20 @@ import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.impl.STenantUpdateBuilderImpl;
-import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
-import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -75,9 +72,6 @@ public class PlatformServiceImplTest {
 
     @Mock
     private PlatformRetriever platformRetriever;
-
-    @Mock
-    private STenantBuilder tenantBuilder;
 
     @Mock
     private TechnicalLoggerService logger;
@@ -213,7 +207,7 @@ public class PlatformServiceImplTest {
     @Test
     public final void getTenantByName() throws SBonitaException {
         final STenant sTenant = buildTenant(486, "name");
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(sTenant);
 
         assertEquals(sTenant, platformServiceImpl.getTenantByName("name"));
@@ -221,7 +215,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByNameNotExists() throws SBonitaException {
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(null);
 
         platformServiceImpl.getTenantByName("name");
@@ -229,7 +223,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByNameThrowException() throws SBonitaException {
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenThrow(
                 new SBonitaReadException(""));
 
@@ -249,7 +243,7 @@ public class PlatformServiceImplTest {
     }
 
     private QueryOptions getQueryOptions() {
-        return new QueryOptions(0, 10, Arrays.asList(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(),
+        return new QueryOptions(0, 10, Arrays.asList(new OrderByOption(STenant.class, STenant.ID,
                 OrderByType.DESC)));
     }
 
@@ -358,7 +352,7 @@ public class PlatformServiceImplTest {
         final EntityUpdateDescriptor descriptor = updateDescriptor.done();
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(tenant, descriptor);
 
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(tenant);
 
         // When
@@ -373,7 +367,7 @@ public class PlatformServiceImplTest {
         final String tenantName = "tenantName";
         final STenant tenant = buildTenant(15, tenantName);
         final STenant actual = buildTenant(45, tenantName);
-        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(actual);
 
         final STenantUpdateBuilder updateDescriptor = new STenantUpdateBuilderImpl(new EntityUpdateDescriptor());
@@ -382,18 +376,51 @@ public class PlatformServiceImplTest {
         platformServiceImpl.updateTenant(tenant, updateDescriptor.done());
     }
 
+    @Test
+    public void pause_should_update_tenant_state_to_PAUSED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.pauseTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.PAUSED, u)));
+    }
+
+    @Test
+    public void activateTenant_should_update_tenant_state_to_ACTIVATED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.activateTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.ACTIVATED, u)));
+    }
+
+    @Test
+    public void deactivateTenant_should_update_tenant_state_to_DEACTIVATED() throws SBonitaException {
+        doReturn(new STenant()).when(persistenceService).selectById(argThat(s -> s.getId() == 99 && s.getEntityType() == STenant.class));
+
+        platformServiceImpl.deactivateTenant(99L);
+
+        verify(persistenceService).update(Mockito.<UpdateDescriptor>argThat(u -> updateOnlyStatus(STenant.DEACTIVATED, u)));
+    }
+
+    private boolean updateOnlyStatus(String status, UpdateDescriptor u) {
+        return u.getFields().size() == 1
+                && u.getFields().containsKey(STenant.STATUS)
+                && u.getFields().containsValue(status);
+    }
+
     private STenant buildTenant(final long id, final String name) {
         return buildTenant(id, name, "me", 468786l, "ACTIVATED", true);
     }
 
     private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
-        final STenantImpl tenant = new STenantImpl(name, createdBy, created, status, defaultTenant);
+        final STenant tenant = new STenant(name, createdBy, created, status, defaultTenant);
         tenant.setId(id);
         return tenant;
     }
 
     private SPlatform buildPlatform() {
-        return new SPlatformImpl("1.0", "0.9", "0.5", "me", 654687344687645l);
+        return new SPlatform("1.0", "0.9", "0.5", "me", 654687344687645l);
     }
 
 }

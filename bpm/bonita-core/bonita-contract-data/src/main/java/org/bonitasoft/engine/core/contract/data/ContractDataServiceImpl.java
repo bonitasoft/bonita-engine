@@ -50,7 +50,7 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     private static final String PROCESS_CONTRACT_DATA = "PROCESS_CONTRACT_DATA";
     private static final String USERTASK_CONTRACT_DATA = "USERTASK_CONTRACT_DATA";
-    
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -62,7 +62,7 @@ public class ContractDataServiceImpl implements ContractDataService {
     private final ArchiveService archiveService;
 
     public ContractDataServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
+                                   final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
@@ -139,8 +139,10 @@ public class ContractDataServiceImpl implements ContractDataService {
         try {
             final List<STaskContractData> contractData = getContractDataOfUserTask(userTaskId);
             if (!contractData.isEmpty()) {
-                final ArchiveInsertRecord[] records = buildArchiveUserTaskRecords(contractData);
-                archiveService.recordInserts(archiveDate, records);
+                if (archiveService.isArchivable(SContractData.class)) {
+                    final ArchiveInsertRecord[] records = buildArchiveUserTaskRecords(contractData);
+                    archiveService.recordInserts(archiveDate, records);
+                }
                 for (STaskContractData taskContractData : contractData) {
                     deleteUserTaskData(taskContractData);
                 }
@@ -191,7 +193,7 @@ public class ContractDataServiceImpl implements ContractDataService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
@@ -281,8 +283,10 @@ public class ContractDataServiceImpl implements ContractDataService {
         try {
             final List<SProcessContractData> contractData = getContractDataOfProcess(processInstanceId);
             if (!contractData.isEmpty()) {
-                final ArchiveInsertRecord[] records = buildArchiveProcessRecords(contractData);
-                archiveService.recordInserts(archiveDate, records);
+                if (archiveService.isArchivable(SContractData.class)) {
+                    final ArchiveInsertRecord[] records = buildArchiveProcessRecords(contractData);
+                    archiveService.recordInserts(archiveDate, records);
+                }
                 for (SProcessContractData processContractData : contractData) {
                     deleteProcessData(processContractData);
                 }

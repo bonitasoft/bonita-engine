@@ -35,18 +35,10 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -95,7 +87,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testAddUser() throws Exception {
         getTransactionService().begin();
-        final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("john").setPassword("bpm").done();
+        final SUser user = SUser.builder().userName("john").password("bpm").build();
         identityService.createUser(user);
         getTransactionService().complete();
 
@@ -112,7 +104,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testAddUserWithId() throws Exception {
         getTransactionService().begin();
-        final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUserWithId").setPassword("bpm").done();
+        final SUser user = SUser.builder().userName("testAddUserWithId").password("bpm").build();
         assertEquals(0, user.getId());
         final SUser updatedUser = identityService.createUser(user);
         assertNotSame("The identifier must be set after adding a user", 0, updatedUser.getId());
@@ -122,16 +114,16 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testAddUsersWithoutIds() throws Exception {
         getTransactionService().begin();
-        final SUser user1 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds7").setPassword("bpm").done();
+        final SUser user1 = SUser.builder().userName("testAddUsersWithoutIds7").password("bpm").build();
         identityService.createUser(user1);
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final SUser user2 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds2").setPassword("bpm").done();
-        final SUser user3 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds3").setPassword("bpm").done();
-        final SUser user4 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds4").setPassword("bpm").done();
-        final SUser user5 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds5").setPassword("bpm").done();
-        final SUser user6 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testAddUsersWithoutIds6").setPassword("bpm").done();
+        final SUser user2 = SUser.builder().userName("testAddUsersWithoutIds2").password("bpm").build();
+        final SUser user3 = SUser.builder().userName("testAddUsersWithoutIds3").password("bpm").build();
+        final SUser user4 = SUser.builder().userName("testAddUsersWithoutIds4").password("bpm").build();
+        final SUser user5 = SUser.builder().userName("testAddUsersWithoutIds5").password("bpm").build();
+        final SUser user6 = SUser.builder().userName("testAddUsersWithoutIds6").password("bpm").build();
         identityService.createUser(user2);
         identityService.createUser(user3);
         identityService.createUser(user4);
@@ -144,7 +136,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUserByUserName() throws Exception {
         getTransactionService().begin();
         final String username = "myUser";
-        final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(username).done();
+        final SUser user = SUser.builder().userName(username).password(username).build();
         identityService.createUser(user);
         final SUser user2 = identityService.getUserByUserName(username);
         getTransactionService().complete();
@@ -164,7 +156,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRoleByName() throws Exception {
         getTransactionService().begin();
         final String roleName = "myRole";
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(roleName).done();
+        final SRole role = SRole.builder().name(roleName).build();
         identityService.createRole(role, null, null);
         final SRole role2 = identityService.getRoleByName(roleName);
         getTransactionService().complete();
@@ -176,7 +168,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetProfileMetadataByName() throws Exception {
         getTransactionService().begin();
         final String name = "MyProfileMetadata";
-        final SCustomUserInfoDefinition metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName(name).done();
+        final SCustomUserInfoDefinition metadata = SCustomUserInfoDefinition.builder().name(name).build();
         identityService.createCustomUserInfoDefinition(metadata);
         final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinitionByName(name);
         assertNotNull("can't find the profile metadata after adding it", metadata2);
@@ -191,8 +183,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetUser() throws Exception {
         getTransactionService().begin();
-        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("Seppo").setPassword("kikoo");
-        final SUser seppo = identityService.createUser(userBuilder.done());
+        final SUser.SUserBuilder userBuilder = SUser.builder().userName("Seppo").password("kikoo");
+        final SUser seppo = identityService.createUser(userBuilder.build());
         final SUser user2 = identityService.getUser(seppo.getId());
         getTransactionService().complete();
 
@@ -211,7 +203,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRole() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SRole testGetRole = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRole").setId(id).done();
+        final SRole testGetRole = SRole.builder().name("testGetRole").id(id).build();
         identityService.createRole(testGetRole, null, null);
         final SRole role2 = identityService.getRole(id);
         getTransactionService().complete();
@@ -224,7 +216,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetGroup() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SGroup testGetGroup = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroup").setId(id).done();
+        final SGroup testGetGroup = SGroup.builder().name("testGetGroup").id(id).build();
         identityService.createGroup(testGetGroup, null, null);
         getTransactionService().complete();
 
@@ -239,9 +231,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetGroupByPath() throws Exception {
         getTransactionService().begin();
-        final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("R&D").done();
+        final SGroup group = SGroup.builder().name("R&D").build();
         identityService.createGroup(group, null, null);
-        final SGroup subGroup = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setParentPath(group.getPath()).setName("R&D").done();
+        final SGroup subGroup = SGroup.builder().parentPath(group.getPath()).name("R&D").build();
         identityService.createGroup(subGroup, null, null);
         getTransactionService().complete();
 
@@ -259,8 +251,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetProfileMetadata() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SCustomUserInfoDefinition testGetProfileMetadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance()
-                .setName("testGetProfileMetadata").setId(id).done();
+        final SCustomUserInfoDefinition testGetProfileMetadata = SCustomUserInfoDefinition.builder()
+                .name("testGetProfileMetadata").id(id).build();
         identityService.createCustomUserInfoDefinition(testGetProfileMetadata);
         final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(id);
         getTransactionService().complete();
@@ -272,9 +264,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetUsers() throws Exception {
         getTransactionService().begin();
-        final SUser user1 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("Akseli").setPassword("kikoo").done();
+        final SUser user1 = SUser.builder().userName("Akseli").password("kikoo").build();
         final long id1 = identityService.createUser(user1).getId();
-        final SUser user2 = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("Anja").setPassword("kikoo").done();
+        final SUser user2 = SUser.builder().userName("Anja").password("kikoo").build();
         final long id2 = identityService.createUser(user2).getId();
 
         final List<SUser> retrievedUsers = identityService.getUsers(Arrays.asList(id1, id2));
@@ -288,8 +280,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testGetUsersFromNullListIds() throws Exception {
-        final SUser eetu = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("Eetu").setPassword("kikoo").done();
-        final SUser inkeri = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("Inkeri").setPassword("kikoo").done();
+        final SUser eetu = SUser.builder().userName("Eetu").password("kikoo").build();
+        final SUser inkeri = SUser.builder().userName("Inkeri").password("kikoo").build();
         getTransactionService().begin();
         identityService.createUser(eetu);
         identityService.createUser(inkeri);
@@ -301,8 +293,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testGetUsersFromEmptyListIds() throws Exception {
-        final SUser lauri = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("lauri").setPassword("kikoo").done();
-        final SUser mika = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("mika").setPassword("kikoo").done();
+        final SUser lauri = SUser.builder().userName("lauri").password("kikoo").build();
+        final SUser mika = SUser.builder().userName("mika").password("kikoo").build();
         getTransactionService().begin();
         identityService.createUser(lauri);
         identityService.createUser(mika);
@@ -316,10 +308,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRoles() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
+        final SRole role1 = SRole.builder().name("testGetRoles1").id(id1).build();
         identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
-        final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
+        final SRole role2 = SRole.builder().name("testGetRoles2").id(id2).build();
         identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(Arrays.asList(new Long[] { id1, id2 }));
@@ -335,10 +327,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRolesFromNullListids() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
+        final SRole role1 = SRole.builder().name("testGetRoles1").id(id1).build();
         identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
-        final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
+        final SRole role2 = SRole.builder().name("testGetRoles2").id(id2).build();
         identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(null);
@@ -351,10 +343,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRolesFromEmptyListIds() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
+        final SRole role1 = SRole.builder().name("testGetRoles1").id(id1).build();
         identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
-        final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
+        final SRole role2 = SRole.builder().name("testGetRoles2").id(id2).build();
         identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(Collections.<Long>emptyList());
@@ -367,10 +359,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetGroups() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
+        final SGroup group1 = SGroup.builder().name("testGetGroups1").id(id1).build();
         identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
-        final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
+        final SGroup group2 = SGroup.builder().name("testGetGroups2").id(id2).build();
         identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(Arrays.asList(new Long[] { id1, id2 }));
@@ -386,10 +378,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetGroupsFromNullListIds() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
+        final SGroup group1 = SGroup.builder().name("testGetGroups1").id(id1).build();
         identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
-        final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
+        final SGroup group2 = SGroup.builder().name("testGetGroups2").id(id2).build();
         identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(null);
@@ -402,10 +394,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetGroupsFromEmptyListIds() throws Exception {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
-        final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
+        final SGroup group1 = SGroup.builder().name("testGetGroups1").id(id1).build();
         identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
-        final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
+        final SGroup group2 = SGroup.builder().name("testGetGroups2").id(id2).build();
         identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(Collections.<Long>emptyList());
@@ -422,7 +414,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + i;
-            role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRolesPaginated" + i).setId(id).done();
+            role = SRole.builder().name("testGetRolesPaginated" + i).id(id).build();
             identityService.createRole(role, null, null);
         }
 
@@ -440,12 +432,12 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetRolesOrderByName() throws Exception {
         getTransactionService().begin();
         createRoles(10, "testGetRolesOrderByName_name", "testGetRolesOrderByName_label");
-        List<SRole> retrievedRoles = identityService.getRoles(5, 5, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey(), OrderByType.DESC);
+        List<SRole> retrievedRoles = identityService.getRoles(5, 5, SRole.NAME, OrderByType.DESC);
         assertNotNull("can't find the roles after adding them", retrievedRoles);
         assertEquals("bad number of retrieved roles", 5, retrievedRoles.size());
         assertTrue("not in descending order", retrievedRoles.get(1).getName().compareTo(retrievedRoles.get(2).getName()) > 0);
 
-        retrievedRoles = identityService.getRoles(5, 5, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        retrievedRoles = identityService.getRoles(5, 5, SRole.NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the roles after adding them", retrievedRoles);
         assertEquals("bad number of retrieved roles", 5, retrievedRoles.size());
@@ -459,12 +451,12 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         deleteUsers();
         deleteRoles();
         createRoles(10, "testGetRolesOrderByLabel_name", "testGetRolesOrderByLabel_label");
-        List<SRole> retrievedRoles = identityService.getRoles(5, 5, BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey(), OrderByType.DESC);
+        List<SRole> retrievedRoles = identityService.getRoles(5, 5, SRole.DISPLAY_NAME, OrderByType.DESC);
         assertNotNull("can't find the roles after adding them", retrievedRoles);
         assertEquals("bad number of retrieved roles", 5, retrievedRoles.size());
         assertTrue("not in descending order", retrievedRoles.get(1).getDisplayName().compareTo(retrievedRoles.get(2).getDisplayName()) > 0);
 
-        retrievedRoles = identityService.getRoles(5, 5, BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey(), OrderByType.ASC);
+        retrievedRoles = identityService.getRoles(5, 5, SRole.DISPLAY_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the roles after adding them", retrievedRoles);
         assertEquals("bad number of retrieved roles", 5, retrievedRoles.size());
@@ -474,7 +466,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     private List<SRole> createRoles(final int i, final String baseName, final String baseLabel) throws SIdentityException {
         final ArrayList<SRole> results = new ArrayList<>();
         for (int j = 0; j < i; j++) {
-            final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(baseName + j).setDisplayName(baseLabel + j).done();
+            final SRole role = SRole.builder().name(baseName + j).displayName(baseLabel + j).build();
             identityService.createRole(role, null, null);
             results.add(role);
         }
@@ -497,7 +489,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 5; i++) {
             id = time + i;
-            role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetNumberOfRoles" + i).setId(id).done();
+            role = SRole.builder().name("testGetNumberOfRoles" + i).id(id).build();
             identityService.createRole(role, null, null);
         }
         assertEquals("bad count of roles", numberOfRoles + 5, identityService.getNumberOfRoles());
@@ -515,7 +507,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + i;
-            group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroupsPaginated" + i).setId(id).done();
+            group = SGroup.builder().name("testGetGroupsPaginated" + i).id(id).build();
             identityService.createGroup(group, null, null);
         }
 
@@ -537,12 +529,12 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().complete();
 
         getTransactionService().begin();
-        List<SGroup> retrievedGroups = identityService.getGroups(5, 5, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(), OrderByType.DESC);
+        List<SGroup> retrievedGroups = identityService.getGroups(5, 5, SGroup.NAME, OrderByType.DESC);
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved roles", 5, retrievedGroups.size());
         assertTrue("not in descending order", retrievedGroups.get(1).getName().compareTo(retrievedGroups.get(2).getName()) > 0);
 
-        retrievedGroups = identityService.getGroups(5, 5, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        retrievedGroups = identityService.getGroups(5, 5, SGroup.NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 5, retrievedGroups.size());
@@ -554,12 +546,12 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         deleteGroups();
         createGroups(10, "testGetGroupsOrderByLabel_name", "testGetGroupsOrderByLabel_label", null);
-        List<SGroup> retrievedGroups = identityService.getGroups(5, 5, BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey(), OrderByType.DESC);
+        List<SGroup> retrievedGroups = identityService.getGroups(5, 5, SGroup.DISPLAY_NAME, OrderByType.DESC);
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved roles", 5, retrievedGroups.size());
         assertTrue("not in descending order", retrievedGroups.get(1).getName().compareTo(retrievedGroups.get(2).getName()) > 0);
 
-        retrievedGroups = identityService.getGroups(5, 5, BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey(), OrderByType.ASC);
+        retrievedGroups = identityService.getGroups(5, 5, SGroup.DISPLAY_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 5, retrievedGroups.size());
@@ -569,11 +561,11 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     private List<SGroup> createGroups(final int i, final String basename, final String baseLabel, final SGroup g) throws SIdentityException {
         final List<SGroup> groups = new ArrayList<>();
         for (int j = 0; j < i; j++) {
-            final SGroupBuilder inst = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName(basename + j).setDisplayName(baseLabel + j);
+            final SGroup.SGroupBuilder inst = SGroup.builder().name(basename + j).displayName(baseLabel + j);
             if (g != null) {
-                inst.setParentPath(g.getPath());
+                inst.parentPath(g.getPath());
             }
-            final SGroup group = inst.done();
+            final SGroup group = inst.build();
             identityService.createGroup(group, null, null);
             groups.add(group);
         }
@@ -596,7 +588,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 5; i++) {
             id = time + i;
-            group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetNumberOfGroups" + i).setId(id).done();
+            group = SGroup.builder().name("testGetNumberOfGroups" + i).id(id).build();
             identityService.createGroup(group, null, null);
         }
         assertEquals("bad count of groups", numberOfGroups + 5, identityService.getNumberOfGroups());
@@ -631,13 +623,13 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().complete();
 
         getTransactionService().begin();
-        List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(),
+        List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, SGroup.NAME,
                 OrderByType.DESC);
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 3, retrievedGroups.size());
         assertTrue("not in descending order", retrievedGroups.get(1).getName().compareTo(retrievedGroups.get(2).getName()) > 0);
 
-        retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(),
+        retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, SGroup.NAME,
                 OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedGroups);
@@ -672,8 +664,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + i;
-            metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetProfileMetadataPaginated" + i)
-                    .setId(id).done();
+            metadata = SCustomUserInfoDefinition.builder().name("testGetProfileMetadataPaginated" + i)
+                    .id(id).build();
             identityService.createCustomUserInfoDefinition(metadata);
         }
 
@@ -696,8 +688,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + 50L + i;
-            info = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetNumberOfCustomUserInfoDefinition" + i)
-                    .setId(id).done();
+            info = SCustomUserInfoDefinition.builder().name("testGetNumberOfCustomUserInfoDefinition" + i)
+                    .id(id).build();
             identityService.createCustomUserInfoDefinition(info);
         }
         assertEquals("bad count of custom user info definition", numberOfMetadata + 30, identityService.getNumberOfCustomUserInfoDefinition());
@@ -710,23 +702,21 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetUsersWithRolePaginated() throws Exception {
         getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersWithRole").done();
+        final SRole role = SRole.builder().name("testGetUsersWithRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersWithRoleGroup", "testGetUsersWithRoleGroup", null);
         for (int i = 0; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            final SUser user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            final SUser user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 20; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            final SUser user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            final SUser user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership2 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership2);
         }
 
@@ -739,32 +729,30 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUsersWithRoleWithCriterion() throws Exception {
         getTransactionService().begin();
 
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersWithRole").done();
+        final SRole role = SRole.builder().name("testGetUsersWithRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersWithRoleGroup", "testGetUsersWithRoleGroup", null);
         SUser user;
         for (int i = 0; i < 10; i++) {
-            user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo").done();
+            user = SUser.builder().userName("user" + i).password("kikoo").build();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user2.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user2.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 20; i++) {
-            user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo").done();
+            user = SUser.builder().userName("user" + i).password("kikoo").build();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user2.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUserMembership userMembership2 = SUserMembership.builder().userId(user2.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership2);
         }
 
-        List<SUser> usersWithRole = identityService.getUsersWithRole(role.getId(), 10, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+        List<SUser> usersWithRole = identityService.getUsersWithRole(role.getId(), 10, 10, SUser.USER_NAME,
                 OrderByType.DESC);
         assertEquals("not all user were retrieved", 10, usersWithRole.size());
         assertTrue("not in descending order", usersWithRole.get(1).getUserName().compareTo(usersWithRole.get(2).getUserName()) > 0);
-        usersWithRole = identityService.getUsersWithRole(role.getId(), 10, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.ASC);
+        usersWithRole = identityService.getUsersWithRole(role.getId(), 10, 10, SUser.USER_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertEquals("not all user were retrieved", 10, usersWithRole.size());
         assertTrue("not in asc order", usersWithRole.get(1).getUserName().compareTo(usersWithRole.get(2).getUserName()) < 0);
@@ -773,32 +761,30 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetActiveAndInactiveUsersWithRole() throws Exception {
         getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetActiveAndInactiveUsersWithRole").done();
+        final SRole role = SRole.builder().name("testGetActiveAndInactiveUsersWithRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersWithRoleGroup", "testGetUsersWithRoleGroup", null);
         SUser user;
         for (int i = 0; i < 10; i++) {
-            user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("inactive user" + i).setPassword("kikoo").setEnabled(false).done();
+            user = SUser.builder().userName("inactive user" + i).password("kikoo").enabled(false).build();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user2.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user2.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 20; i++) {
-            user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("active user" + i).setEnabled(true).setPassword("kikoo").done();
+            user = SUser.builder().userName("active user" + i).enabled(true).password("kikoo").build();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user2.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUserMembership userMembership2 = SUserMembership.builder().userId(user2.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership2);
         }
 
         List<SUser> activeUsersWithRole = identityService
-                .getActiveUsersWithRole(role.getId(), 0, 20, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+                .getActiveUsersWithRole(role.getId(), 0, 20, SUser.USER_NAME,
                         OrderByType.DESC);
         List<SUser> inactiveUsersByRole = identityService
-                .getInactiveUsersWithRole(role.getId(), 0, 20, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+                .getInactiveUsersWithRole(role.getId(), 0, 20, SUser.USER_NAME,
                         OrderByType.DESC);
         assertThat(inactiveUsersByRole.size()).isEqualTo(10);
         assertThat(activeUsersWithRole.size()).isEqualTo(10);
@@ -813,17 +799,16 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetNumberOfUsersByRole() throws Exception {
         getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetNumberOfUsersByRole").done();
+        final SRole role = SRole.builder().name("testGetNumberOfUsersByRole").build();
         identityService.createRole(role, null, null);
         final long numberOfUsersByRole = identityService.getNumberOfUsersByRole(role.getId());
-        final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetUsersByGroup").done();
+        final SGroup group = SGroup.builder().name("testGetUsersByGroup").build();
         identityService.createGroup(group, null, null);
         SUser user;
         for (int i = 0; i < 5; i++) {
-            user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testGetNumberOfUsersByRole" + i).setPassword("kikoo").done();
+            user = SUser.builder().userName("testGetNumberOfUsersByRole" + i).password("kikoo").build();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user2.getId(), group.getId(), role.getId()).done();
+            final SUserMembership userMembership = SUserMembership.builder().userId(user2.getId()).groupId(group.getId()).roleId(role.getId()).build();
             identityService.createUserMembership(userMembership);
         }
         assertEquals("not the good number of users by role", numberOfUsersByRole + 5, identityService.getNumberOfUsersByRole(role.getId()));
@@ -833,24 +818,22 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetUsersInGroupPaginated() throws Exception {
         getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
+        final SRole role = SRole.builder().name("testGetUsersByRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         final List<SUser> usersByGroup = identityService.getUsersInGroup(groups.get(0).getId(), 1, 2,"id",null);
@@ -862,32 +845,30 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUsersInGroupwithCriterion() throws Exception {
         getTransactionService().begin();
 
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
+        final SRole role = SRole.builder().name("testGetUsersByRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
 
-        List<SUser> usersByGroup = identityService.getUsersInGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+        List<SUser> usersByGroup = identityService.getUsersInGroup(groups.get(0).getId(), 1, 2, SUser.USER_NAME,
                 OrderByType.DESC);
         assertEquals("not the good number of user with the role", 2, usersByGroup.size());
         assertTrue("not in descending order", usersByGroup.get(0).getUserName().compareTo(usersByGroup.get(1).getUserName()) > 0);
-        usersByGroup = identityService.getUsersInGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+        usersByGroup = identityService.getUsersInGroup(groups.get(0).getId(), 1, 2, SUser.USER_NAME,
                 OrderByType.ASC);
         getTransactionService().complete();
         assertEquals("not all user were retrieved", 2, usersByGroup.size());
@@ -897,32 +878,29 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testGetActiveAndInactiveUsersInGroup() throws Exception {
         getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetActiveAndInactiveUsersByGroup").done();
+        final SRole role = SRole.builder().name("testGetActiveAndInactiveUsersByGroup").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetActiveAndInactiveUsersByGroup", "testGetActiveAndInactiveUsersByGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("inactive user" + i).setPassword("kikoo").setEnabled(false);
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("inactive user" + i).password("kikoo").enabled(false);
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("active user " + i).setPassword("kikoo").setEnabled(true);
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("active user " + i).password("kikoo").enabled(true);
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 15; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("active user " + i).setPassword("kikoo").setEnabled(true);
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("active user " + i).password("kikoo").enabled(true);
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         final List<SUser> activeUsersByGroup1 = identityService.getActiveUsersInGroup(groups.get(0).getId(), 0, 2,null,null);
@@ -948,24 +926,22 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetNumberOfUsersByGroup() throws Exception {
         getTransactionService().begin();
 
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
+        final SRole role = SRole.builder().name("testGetUsersByRole").build();
         identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(0).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
+            final SUser.SUserBuilder userBuilder = SUser.builder().userName("user" + i).password("kikoo");
+            user = identityService.createUser(userBuilder.build());
+            final SUserMembership userMembership1 = SUserMembership.builder().userId(user.getId()).groupId(groups.get(1).getId()).roleId(role.getId())
+                    .build();
             identityService.createUserMembership(userMembership1);
         }
         final long id = groups.get(0).getId();
@@ -981,8 +957,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final SRole role = createRoles(1, "testGetUserByMembership", "testGetUserByMembership").iterator().next();
         final List<SUser> users = createUsers(5, "getMembershipUsers");
         for (final SUser sUser : users) {
-            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                    .createNewInstance(sUser.getId(), group.getId(), role.getId()).done();
+            final SUserMembership userMembership = SUserMembership.builder().userId(sUser.getId()).groupId(group.getId()).roleId(role.getId()).build();
             identityService.createUserMembership(userMembership);
         }
         assertEquals("not the good number of user by membership", 5, identityService.getNumberOfUsersByMembership(group.getId(), role.getId()));
@@ -1008,9 +983,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUsersOrderByUserName() throws Exception {
         getTransactionService().begin();
         createUsers(10, "testGetUsersOrderByUserName");
-        List<SUser> users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.DESC);
+        List<SUser> users = identityService.getUsers(5, 10, SUser.USER_NAME, OrderByType.DESC);
         assertTrue("not in desc order", users.get(0).getUserName().compareTo(users.get(users.size() - 1).getUserName()) > 0);
-        users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.ASC);
+        users = identityService.getUsers(5, 10, SUser.USER_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertTrue("not in asc order", users.get(0).getUserName().compareTo(users.get(users.size() - 1).getUserName()) < 0);
     }
@@ -1020,9 +995,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         deleteUsers();
         createUsers(10, "testGetUsersOrderByFirstName");
-        List<SUser> users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey(), OrderByType.DESC);
+        List<SUser> users = identityService.getUsers(5, 10, SUser.FIRST_NAME, OrderByType.DESC);
         assertTrue("not in desc order", users.get(0).getFirstName().compareTo(users.get(users.size() - 1).getFirstName()) > 0);
-        users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey(), OrderByType.ASC);
+        users = identityService.getUsers(5, 10, SUser.FIRST_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertTrue("not in asc order", users.get(0).getFirstName().compareTo(users.get(users.size() - 1).getFirstName()) < 0);
     }
@@ -1032,9 +1007,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         deleteUsers();
         createUsers(10, "testGetUsersOrderByLastName");
-        List<SUser> users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey(), OrderByType.DESC);
+        List<SUser> users = identityService.getUsers(5, 10, SUser.LAST_NAME, OrderByType.DESC);
         assertTrue("not in desc order", users.get(0).getLastName().compareTo(users.get(users.size() - 1).getLastName()) > 0);
-        users = identityService.getUsers(5, 10, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey(), OrderByType.ASC);
+        users = identityService.getUsers(5, 10, SUser.LAST_NAME, OrderByType.ASC);
         getTransactionService().complete();
         assertTrue("not in asc order", users.get(0).getLastName().compareTo(users.get(users.size() - 1).getLastName()) < 0);
     }
@@ -1042,8 +1017,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     private List<SUser> createUsers(final int i, final String baseUsername) throws SIdentityException {
         final List<SUser> ids = new ArrayList<>();
         for (int j = 0; j < i; j++) {
-            final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(baseUsername + j).setFirstName("firstName" + j)
-                    .setLastName("lastName" + j).setPassword("password" + j).done();
+            final SUser user = SUser.builder().userName(baseUsername + j).firstName("firstName" + j)
+                    .lastName("lastName" + j).password("password" + j).build();
             ids.add(identityService.createUser(user));
         }
         return ids;
@@ -1060,7 +1035,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetNumberOfUsers() throws Exception {
         getTransactionService().begin();
         final long numberOfUsers = identityService.getNumberOfUsers();
-        final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testGetNumberOfUsers").setPassword("kikoo").done();
+        final SUser user = SUser.builder().userName("testGetNumberOfUsers").password("kikoo").build();
         identityService.createUser(user);
         assertEquals(numberOfUsers + 1, identityService.getNumberOfUsers());
         getTransactionService().complete();
@@ -1152,14 +1127,14 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void testUpdateUser() throws Exception {
         getTransactionService().begin();
-        SUserBuilder userBuilder = null;
-        userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testUpdateUser").setPassword("kikoo")
-                .setFirstName("Update").setLastName("User");
-        final SUser user = identityService.createUser(userBuilder.done());
+        SUser.SUserBuilder userBuilder = null;
+        userBuilder = SUser.builder().userName("testUpdateUser").password("kikoo")
+                .firstName("Update").lastName("User");
+        final SUser user = identityService.createUser(userBuilder.build());
         final String password = user.getPassword();
-        final SContactInfo contactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(user.getId(), true).setAddress("Somewhere")
-                .setBuilding("AA11")
-                .setCity("Taiwan").done();
+        final SContactInfo contactInfo = SContactInfo.builder().userId(user.getId()).personal(true).address("Somewhere")
+                .building("AA11")
+                .city("Taiwan").build();
         identityService.createUserContactInfo(contactInfo);
         final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
                 .updateUserName("testUpdateUser2").updatePassword("lol")
@@ -1209,8 +1184,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testAddProfileMetadata() throws Exception {
         getTransactionService().begin();
         final long metadataId = new Date().getTime();
-        final SCustomUserInfoDefinition metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setId(metadataId)
-                .setName("testAddProfileMetadata").done();
+        final SCustomUserInfoDefinition metadata = SCustomUserInfoDefinition.builder().id(metadataId)
+                .name("testAddProfileMetadata").build();
         identityService.createCustomUserInfoDefinition(metadata);
         final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(metadataId);
         getTransactionService().complete();
@@ -1238,7 +1213,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testAddRole() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setId(id).setName("testAddRole").done();
+        final SRole role = SRole.builder().id(id).name("testAddRole").build();
         identityService.createRole(role, null, null);
         final SRole role2 = identityService.getRole(id);
         getTransactionService().complete();
@@ -1265,7 +1240,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testAddGroup() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setId(id).setName("testAddGroup").done();
+        final SGroup group = SGroup.builder().id(id).name("testAddGroup").build();
         identityService.createGroup(group, null, null);
         final SGroup group2 = identityService.getGroup(id);
         getTransactionService().complete();
@@ -1305,8 +1280,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test(expected = SIdentityException.class)
     public void testDeleteProfileMetadata() throws Exception {
         getTransactionService().begin();
-        final SCustomUserInfoDefinition metadataDefinition = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance()
-                .setName("kikooMetadata").done();
+        final SCustomUserInfoDefinition metadataDefinition = SCustomUserInfoDefinition.builder()
+                .name("kikooMetadata").build();
         identityService.createCustomUserInfoDefinition(metadataDefinition);
         final long id = metadataDefinition.getId();
         identityService.deleteCustomUserInfoDefinition(metadataDefinition);
@@ -1359,8 +1334,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         user = identityService.getUserByUserName("testAddMembershipToUser0");
         final int size = identityService.getUserMembershipsOfUser(user.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS).size();
-        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                .createNewInstance(user.getId(), group.getId(), role.getId()).done();
+        final SUserMembership userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId()).build();
         identityService.createUserMembership(userMembership);
         getTransactionService().complete();
 
@@ -1387,8 +1361,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         user = identityService.getUserByUserName("testRemoveMembershipFromUser0");
-        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
-                .createNewInstance(user.getId(), group.getId(), role.getId()).done();
+        final SUserMembership userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId()).build();
         identityService.createUserMembership(userMembership);
         getTransactionService().complete();
 
@@ -1410,12 +1383,12 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     @Test
     public void searchUsersWithWildcards() throws Exception {
         getTransactionService().begin();
-        final SUser user1 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user1")
-                .setFirstName("firstname1")
-                .setLastName("lastname1").setPassword("lkh").done());
-        final SUser user2 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user2")
-                .setFirstName("firstname2")
-                .setLastName("lastname2").setPassword("mlbxcvjmsdkljf").done());
+        final SUser user1 = identityService.createUser(SUser.builder().userName("user1")
+                .firstName("firstname1")
+                .lastName("lastname1").password("lkh").build());
+        final SUser user2 = identityService.createUser(SUser.builder().userName("user2")
+                .firstName("firstname2")
+                .lastName("lastname2").password("mlbxcvjmsdkljf").build());
         getTransactionService().complete();
 
         final Map<Class<? extends PersistentObject>, Set<String>> userAllFields = new HashMap<>();

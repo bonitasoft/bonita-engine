@@ -16,7 +16,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 import java.util.List;
 
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageContent;
+import org.bonitasoft.engine.page.SPageWithContent;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
@@ -26,10 +26,10 @@ public class PageRepository extends TestRepository {
         super(sessionFactory);
     }
 
-    public SPageContent getPageContent(final long id) {
+    public SPageWithContent getPageContent(final long id) {
         final Query namedQuery = getNamedQuery("getPageContent");
         namedQuery.setParameter("id", id);
-        return (SPageContent) namedQuery.uniqueResult();
+        return (SPageWithContent) namedQuery.uniqueResult();
     }
 
     public SPage getPageByName(final String name) {

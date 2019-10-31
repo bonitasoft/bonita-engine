@@ -16,8 +16,17 @@ package org.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -148,7 +157,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void should_get_return_the_object() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setKey("myKey");
         doReturn(pageMapping).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
@@ -166,7 +175,7 @@ public class SPageMappingServiceImplTest {
     @Test
     public void should_delete_call_the_recorder() throws Exception {
         //given
-        SPageMappingImpl sPageMapping = new SPageMappingImpl();
+        SPageMapping sPageMapping = new SPageMapping();
 
         //when
         pageMappingService.delete(sPageMapping);
@@ -183,13 +192,13 @@ public class SPageMappingServiceImplTest {
         doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
         //when
         expectedException.expect(SDeletionException.class);
-        pageMappingService.delete(new SPageMappingImpl());
+        pageMappingService.delete(new SPageMapping());
     }
 
     @Test
     public void should_update_pageId_set_null_on_url() throws Exception {
         //given
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setKey("myKey");
 
         //when
@@ -207,7 +216,7 @@ public class SPageMappingServiceImplTest {
     @Test
     public void should_update_throw_exception() throws Exception {
         //given
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setKey("myKey");
         doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
         //when
@@ -218,7 +227,7 @@ public class SPageMappingServiceImplTest {
     @Test
     public void should_update_url_set_null_on_pageId() throws Exception {
         //given
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setKey("myKey");
 
         //when
@@ -234,7 +243,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void should_resolveUrl_return_page_id() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setPageId(56l);
 
         SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
@@ -245,7 +254,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void should_resolveUrl_return_url_with_no_adapter() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setUrl("theUrl");
 
         SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
@@ -256,7 +265,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void should_resolveUrl_return_call_adapter_with_no_url() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setUrl(null);
         pageMapping.setUrlAdapter("testAdapter");
 
@@ -268,7 +277,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void should_resolveUrl_return_url_should_execute_adapter() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("testAdapter");
 
@@ -280,7 +289,7 @@ public class SPageMappingServiceImplTest {
 
     @Test(expected = SExecutionException.class)
     public void should_resolveUrl_with_unknown_adapter() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("unknown");
 
@@ -327,7 +336,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void resolvePageURL_shouldExecuteAuthorizationRule() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         final String validRuleKey = "validRule";
         final List<String> rules = new ArrayList<>(1);
         rules.add(validRuleKey);
@@ -343,7 +352,7 @@ public class SPageMappingServiceImplTest {
     
     @Test
     public void resolvePageURL_shouldNotExecuteAuthorizationRule() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         final String validRuleKey = "validRule";
         final List<String> rules = new ArrayList<>(1);
         rules.add(validRuleKey);
@@ -359,7 +368,7 @@ public class SPageMappingServiceImplTest {
 
     @Test(expected = SAuthorizationException.class)
     public void resolvePageURL_shouldThrowExceptionIfAuthorizationRuleInvalid() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         final String invalidRuleKey = "invalidRuleKey";
         final List<String> rules = new ArrayList<>(1);
         rules.add(invalidRuleKey);
@@ -373,7 +382,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void resolvePageURL_shouldAllowAsSoonAsOneRuleIsValid() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         final String invalidRuleKey = "invalidRule";
         final String validKey = "validRule";
         final String invalidRuleKey2 = "invalidRule2";
@@ -396,7 +405,7 @@ public class SPageMappingServiceImplTest {
 
     @Test
     public void resolvePageURL_shouldThrowExecutionExceptionIfAuthorizationRuleIsNotKnown() throws Exception {
-        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        SPageMapping pageMapping = new SPageMapping();
         final String unknownRuleKey = "unknownRuleKey";
         final List<String> rules = new ArrayList<>(1);
         rules.add(unknownRuleKey);

@@ -15,16 +15,15 @@ package org.bonitasoft.engine.core.category.model.builder.impl;
 
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilder;
-import org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SProcessCategoryMappingBuilderImpl implements SProcessCategoryMappingBuilder {
 
-    private final SProcessCategoryMappingImpl entity;
+    private final SProcessCategoryMapping entity;
     
-    public SProcessCategoryMappingBuilderImpl(final SProcessCategoryMappingImpl entity) {
+    public SProcessCategoryMappingBuilderImpl(final SProcessCategoryMapping entity) {
         super();
         this.entity = entity;
     }

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInst
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -182,10 +180,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     }
 
     private void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class)
-                .getProcessInstanceIdKey(), processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(
-                SACommentBuilderFactory.class).getIdKey(), OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, SAComment.PROCESSINSTANCEID_KEY, processInstanceId));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, SAComment.ID_KEY, OrderByType.ASC));
         List<SAComment> searchArchivedComments;
         // fromIndex always will be zero because the elements will be deleted
         final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
@@ -323,7 +319,7 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaException{
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType);
-        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getIdKey(),
+        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, SConnectorInstance.ID_KEY,
                 OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
         List<SAConnectorInstance> connectorInstances;
@@ -345,23 +341,22 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
     private List<FilterOption> buildFiltersForConnectors(final long containerId, final String containerType) {
         final List<FilterOption> filters = new ArrayList<>(2);
-        filters.add(new FilterOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerIdKey(), containerId));
-        filters.add(new FilterOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerTypeKey(), containerType));
+        filters.add(new FilterOption(SAConnectorInstance.class, SConnectorInstance.CONTAINER_ID_KEY, containerId));
+        filters.add(new FilterOption(SAConnectorInstance.class, SConnectorInstance.CONTAINER_TYPE_KEY, containerType));
         return filters;
     }
 
 
     private void removeArchivedDocument(final SAMappedDocument mappedDocument) throws SRecorderException, SBonitaReadException, SObjectNotFoundException {
         // Delete document itself and the mapping
-        delete((SADocumentMapping) mappedDocument);
+        delete(mappedDocument);
         delete(documentService.getDocument(mappedDocument.getDocumentId()));
     }
 
     private void delete(final SLightDocument document) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(document), "SDocument");
     }
-
-    private void delete(final SADocumentMapping mappedDocument) throws SRecorderException {
+    private void delete(final SAMappedDocument mappedDocument) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(mappedDocument), "SADocumentMapping");
     }
 

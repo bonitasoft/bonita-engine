@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Laurent Leseigneur
  */
-public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInstanceImpl, MessageInstanceBuilder> {
+public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInstance, MessageInstanceBuilder> {
 
     public static MessageInstanceBuilder aMessageInstance() {
         return new MessageInstanceBuilder();
@@ -31,16 +31,23 @@ public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInst
     }
 
     private boolean handled;
+    private long creationDate;
 
     @Override
-    SMessageInstanceImpl _build() {
-        SMessageInstanceImpl messageInstance = new SMessageInstanceImpl();
+    SMessageInstance _build() {
+        SMessageInstance messageInstance = new SMessageInstance();
         messageInstance.setHandled(handled);
+        messageInstance.setCreationDate(creationDate);
         return messageInstance;
     }
 
     public MessageInstanceBuilder handled(final boolean handled) {
         this.handled = handled;
+        return this;
+    }
+
+    public MessageInstanceBuilder creationDate(final long creationDate) {
+        this.creationDate = creationDate;
         return this;
     }
 }

@@ -52,6 +52,5 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
         if (userId > 0) {
             stateBehaviors.addAssignmentSystemComment(activityInstance, userId);
         }
-
     }
 }

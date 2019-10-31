@@ -19,9 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,28 +32,26 @@ public class SearchConnectorInstanceDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> connectorInstanceAllFields;
 
     SearchConnectorInstanceDescriptor() {
-        final SConnectorInstanceBuilderFactory keyprovider = BuilderFactory.get(SConnectorInstanceBuilderFactory.class);
-
         searchEntityKeys = new HashMap<>(7);
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SConnectorInstance.class, keyprovider.getNameKey()));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.NAME_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.ACTIVATION_EVENT,
-                new FieldDescriptor(SConnectorInstance.class, keyprovider.getActivationEventKey()));
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.ACTIVATION_EVENT_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID, new FieldDescriptor(SConnectorInstance.class,
-                keyprovider.getConnectorIdKey()));
+                SConnectorInstance.CONNECTOR_ID_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_VERSION, new FieldDescriptor(SConnectorInstance.class,
-                keyprovider.getVersionKey()));
+                SConnectorInstance.VERSION_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONTAINER_ID,
-                new FieldDescriptor(SConnectorInstance.class, keyprovider.getContainerIdKey()));
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.CONTAINER_ID_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE,
-                new FieldDescriptor(SConnectorInstance.class, keyprovider.getContainerTypeKey()));
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.STATE, new FieldDescriptor(SConnectorInstance.class, keyprovider.getStateKey()));
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.CONTAINER_TYPE_KEY));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.STATE, new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.STATE_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.EXECUTION_ORDER,
-                new FieldDescriptor(SConnectorInstance.class, keyprovider.getExecutionOrderKey()));
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.EXECUTION_ORDER));
 
         connectorInstanceAllFields = new HashMap<>(1);
         final Set<String> connectorFields = new HashSet<String>(2);
-        connectorFields.add(keyprovider.getNameKey());
-        connectorFields.add(keyprovider.getConnectorIdKey());
+        connectorFields.add(SConnectorInstance.NAME_KEY);
+        connectorFields.add(SConnectorInstance.CONNECTOR_ID_KEY);
 
         connectorInstanceAllFields.put(SConnectorInstance.class, connectorFields);
     }

@@ -27,11 +27,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.test.persistence.repository.ProfileRepository;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
@@ -59,10 +58,10 @@ public class ProfilesTest {
     @Test
     public void profile_with_user_mapped_and_profile_entry_should_be_retrieved() throws Exception {
         // given:
-        final SUserImpl user = aUser().build();
+        final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -77,13 +76,13 @@ public class ProfilesTest {
     @Test
     public void profile_with_role_mapped_and_profile_entry_should_be_retrieved() throws Exception {
         // given:
-        final SRoleImpl role = aRole().build();
-        final SUserImpl user = aUser().build();
+        final SRole role = aRole().build();
+        final SUser user = aUser().build();
         userMembershipRepository.add(aUserMembership().forUser(user).memberOf(-1, role.getId()).build());
         repository.add(role);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -98,13 +97,13 @@ public class ProfilesTest {
     @Test
     public void profile_with_group_mapped_and_profile_entry_should_be_retrieved() throws Exception {
         // given:
-        final SGroupImpl group = aGroup().build();
-        final SUserImpl user = aUser().build();
+        final SGroup group = aGroup().build();
+        final SUser user = aUser().build();
         userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), -1).build());
         repository.add(group);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -119,15 +118,15 @@ public class ProfilesTest {
     @Test
     public void profile_with_membership_mapped_and_profile_entry_should_be_retrieved() throws Exception {
         // given:
-        final SGroupImpl group = aGroup().build();
-        final SRoleImpl role = aRole().build();
-        final SUserImpl user = aUser().build();
+        final SGroup group = aGroup().build();
+        final SRole role = aRole().build();
+        final SUser user = aUser().build();
         userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build());
         repository.add(group);
         repository.add(role);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId())
                 .withRoleId(role.getId()).build());
@@ -143,10 +142,10 @@ public class ProfilesTest {
     @Test
     public void profile_without_user_mapped_should_not_be_retrieved() throws Exception {
         // given:
-        final SUserImpl user = aUser().build();
+        final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
@@ -160,10 +159,10 @@ public class ProfilesTest {
     @Test
     public void profile_with_user_mapped_but_without_navigation_should_not_be_retrieved() throws Exception {
         // given:
-        final SUserImpl user = aUser().build();
+        final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
 
@@ -177,11 +176,11 @@ public class ProfilesTest {
     @Test
     public void profile_without_given_user_mapped_should_not_be_retrieved() throws Exception {
         // given:
-        final SUserImpl userMapped = aUser().build();
-        final SUserImpl userAsked = aUser().build();
+        final SUser userMapped = aUser().build();
+        final SUser userAsked = aUser().build();
         repository.add(userMapped);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(userMapped.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());

@@ -39,9 +39,8 @@ public class SQLQueryBuilder extends QueryBuilder {
     private Class<? extends PersistentObject> entityType;
 
     SQLQueryBuilder(String baseQuery, Vendor vendor, Class<? extends PersistentObject> entityType, OrderByBuilder orderByBuilder,
-            Map<String, String> classAliasMappings,
-            Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
-        super(baseQuery, orderByBuilder, classAliasMappings, interfaceToClassMapping, likeEscapeCharacter);
+            Map<String, String> classAliasMappings, char likeEscapeCharacter) {
+        super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
         this.vendor = vendor;
         this.entityType = entityType;
     }
@@ -71,8 +70,7 @@ public class SQLQueryBuilder extends QueryBuilder {
         } else {
             String hqlAlias = classAliasMappings.get(entityType.getName());
             String sqlAlias = hqlToSqlAlias.containsKey(hqlAlias) ? hqlAlias.replace("user", "user_") : hqlAlias;
-            Class<? extends PersistentObject> entityClass = interfaceToClassMapping.get(entityType.getName());
-            sqlQuery.addEntity(sqlAlias, entityClass.getName());
+            sqlQuery.addEntity(sqlAlias, entityType.getName());
         }
     }
 

@@ -30,12 +30,9 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
+import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
+import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
-import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
-import org.bonitasoft.engine.core.process.comment.model.builder.SSystemCommentBuilderFactory;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -77,7 +74,7 @@ public class SCommentServiceImpl implements SCommentService {
     private final ArchiveService archiveService;
 
     public SCommentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final ArchiveService archiveService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType) {
+                               final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType) {
         super();
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -119,7 +116,7 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final SComment sComment = BuilderFactory.get(SHumanCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, userId).done();
+            final SComment sComment = new SHumanComment(processInstanceId, comment, userId);
             recorder.recordInsert(new InsertRecord(sComment), COMMENT);
             return sComment;
         } catch (final SRecorderException e) {
@@ -132,7 +129,7 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
+            final SComment sComment = new SSystemComment(processInstanceId, comment);
             recorder.recordInsert(new InsertRecord(sComment), COMMENT);
             return sComment;
         } catch (final SRecorderException e) {
@@ -242,19 +239,16 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteArchivedComments(List<Long> processInstanceIds) throws SBonitaException {
-        archiveService.deleteFromQuery("deleteArchiveCommentsOfProcessInstances", Collections.<String,Object>singletonMap("processInstanceIds", processInstanceIds));
+        archiveService.deleteFromQuery("deleteArchiveCommentsOfProcessInstances", Collections.singletonMap("processInstanceIds", processInstanceIds));
     }
 
     @Override
     public void archive(final long archiveDate, final SComment sComment) throws SObjectModificationException {
-        final SAComment saComment = BuilderFactory.get(SACommentBuilderFactory.class).createNewInstance(sComment).done();
-        if (saComment != null) {
-            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
-            try {
-                archiveService.recordInsert(archiveDate, insertRecord);
-            } catch (final SRecorderException e) {
-                throw new SObjectModificationException("Unable to archive the comment with id = <" + sComment.getId() + ">", e);
-            }
+        final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(new SAComment(sComment));
+        try {
+            archiveService.recordInsert(archiveDate, insertRecord);
+        } catch (final SRecorderException e) {
+            throw new SObjectModificationException("Unable to archive the comment with id = <" + sComment.getId() + ">", e);
         }
     }
 

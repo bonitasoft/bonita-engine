@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.actor.mapping.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.actor.mapping.model">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
 
-	<class name="SActorImpl" table="actor">
+	<class name="SActor" table="actor">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -19,7 +19,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SActorMemberImpl" table="actormember">
+	<class name="SActorMember" table="actormember">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />

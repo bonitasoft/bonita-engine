@@ -177,7 +177,7 @@ public interface PlatformService {
      *         occurs when an exception is thrown during activating sTenant
      * @since 6.0
      */
-    boolean activateTenant(long tenantId) throws STenantNotFoundException, STenantActivationException;
+    void activateTenant(long tenantId) throws STenantNotFoundException, STenantActivationException;
 
     /**
      * Set status of the tenant into deactivated
@@ -189,7 +189,13 @@ public interface PlatformService {
      *         occurs when an exception is thrown during deactivating sTenant
      * @since 6.0
      */
-    void deactiveTenant(long tenantId) throws STenantNotFoundException, STenantDeactivationException;
+    void deactivateTenant(long tenantId) throws STenantNotFoundException, STenantDeactivationException;
+
+    /**
+     * update status of tenant object to PAUSED
+     * @param tenantId the id of the tenant to update
+     */
+    void pauseTenant(long tenantId) throws STenantUpdateException, STenantNotFoundException;
 
     /**
      * Get the total number of sTenants
@@ -244,5 +250,4 @@ public interface PlatformService {
      * @since 6.1
      */
     SPlatformProperties getSPlatformProperties();
-
 }

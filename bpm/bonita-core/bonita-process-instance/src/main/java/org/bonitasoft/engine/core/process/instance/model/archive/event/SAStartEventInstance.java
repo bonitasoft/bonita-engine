@@ -13,10 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
-/**
- * @author Elias Ricken de Medeiros
- * @author Celine Souchet
- */
-public interface SAStartEventInstance extends SACatchEventInstance {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAStartEventInstance extends SACatchEventInstance {
+    public SAStartEventInstance(final SStartEventInstance startEventInstance) {
+        super(startEventInstance);
+    }
+
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.START_EVENT;
+    }
+
+    @Override
+    public String getKind() {
+        return "startEvent";
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SStartEventInstance.class;
+    }
 
 }

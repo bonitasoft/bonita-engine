@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
@@ -110,11 +111,11 @@ public class JobWrapper implements StatelessJob {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Finished execution of " + statelessJob.getName());
             }
 
-        } catch (final SFireEventException | SJobExecutionException e) {
-            handleFailure(e);
+        } catch (final SRetryableException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Throwable e) {
             handleFailure(e);
+            //throw an exception: if it's a "one shot" timer it should delete the timer trigger only if job succeeded (see TimerEventTriggerJobListener)
             throw new SJobExecutionException(e);
         } finally {
             if (eventService.hasHandlers(JOB_COMPLETED, null)) {
@@ -124,7 +125,7 @@ public class JobWrapper implements StatelessJob {
         }
     }
 
-    void handleFailure(Exception e) {
+    void handleFailure(Throwable e) {
         logFailedJob(e);
         try {
             registerFailInAnOtherThread(e, jobIdentifier);
@@ -134,7 +135,7 @@ public class JobWrapper implements StatelessJob {
         }
     }
 
-    private void registerFailInAnOtherThread(final Exception jobException, final JobIdentifier jobIdentifier) throws STransactionNotFoundException {
+    private void registerFailInAnOtherThread(final Throwable jobException, final JobIdentifier jobIdentifier) throws STransactionNotFoundException {
         transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
             @Override
             public void beforeCommit() {
@@ -173,7 +174,7 @@ public class JobWrapper implements StatelessJob {
         });
     }
 
-    private void logFailedJob(final Exception e) {
+    private void logFailedJob(final Throwable e) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + jobIdentifier + " : " + e.getMessage(), e);
         }

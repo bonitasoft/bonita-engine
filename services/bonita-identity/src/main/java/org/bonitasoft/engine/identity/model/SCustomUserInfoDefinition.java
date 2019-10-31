@@ -13,10 +13,27 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Anthony Birembaut
  * @author Baptiste Mesta
  */
-public interface SCustomUserInfoDefinition extends SSingleNamedElement {
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SCustomUserInfoDefinition implements PersistentObject {
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String DISPLAY_NAME = "displayName";
+    private long id;
+    private long tenantId;
+    private String name;
+    private String description;
 }

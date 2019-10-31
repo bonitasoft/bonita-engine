@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -25,7 +25,7 @@ public class SASubProcessActivityInstanceBuilderFactoryImpl extends SAActivityIn
 
     @Override
     public SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(final SSubProcessActivityInstance subProcActInst) {
-        final SASubProcessActivityInstanceImpl entity = new SASubProcessActivityInstanceImpl(subProcActInst);
+        final SASubProcessActivityInstance entity = new SASubProcessActivityInstance(subProcActInst);
         return new SASubProcessActivityInstanceBuilderImpl(entity);
     }
 

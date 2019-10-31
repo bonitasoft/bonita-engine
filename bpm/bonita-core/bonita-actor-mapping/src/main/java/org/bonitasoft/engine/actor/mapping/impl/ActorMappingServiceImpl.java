@@ -32,7 +32,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorLogBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorLogBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
@@ -263,13 +262,13 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActorMember addUserToActor(final long actorId, final long userId) throws SActorMemberCreationException {
-        final SActorMemberImpl actorMember = new SActorMemberImpl();
+        final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setUserId(userId);
         return addActorMember(actorMember);
     }
 
-    private SActorMember addActorMember(final SActorMemberImpl actorMember) throws SActorMemberCreationException {
+    private SActorMember addActorMember(final SActorMember actorMember) throws SActorMemberCreationException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new actor member");
         try {
             recorder.recordInsert(new InsertRecord(actorMember), ACTOR_MEMBER);
@@ -306,7 +305,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     private SActorMember addOnlyThisGroupToActor(final long actorId, final long groupId) throws SActorMemberCreationException {
-        final SActorMemberImpl actorMember = new SActorMemberImpl();
+        final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setGroupId(groupId);
         return addActorMember(actorMember);
@@ -314,7 +313,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActorMember addRoleToActor(final long actorId, final long roleId) throws SActorMemberCreationException {
-        final SActorMemberImpl actorMember = new SActorMemberImpl();
+        final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setRoleId(roleId);
         return addActorMember(actorMember);
@@ -341,7 +340,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     private SActorMember addOnlyThisRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws SActorMemberCreationException {
-        final SActorMemberImpl actorMember = new SActorMemberImpl();
+        final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setRoleId(roleId);
         actorMember.setGroupId(groupId);
@@ -456,7 +455,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }

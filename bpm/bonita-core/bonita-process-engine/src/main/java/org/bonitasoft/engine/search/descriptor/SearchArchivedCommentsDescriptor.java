@@ -19,11 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -37,20 +34,19 @@ public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedCommentsAllFields;
 
     SearchArchivedCommentsDescriptor() {
-        SACommentBuilderFactory saCommentBuilderFact = BuilderFactory.get(SACommentBuilderFactory.class);
         searchEntityKeys = new HashMap<>(7);
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID,
-                new FieldDescriptor(SAComment.class, saCommentBuilderFact.getProcessInstanceIdKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTED_BY_ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getUserIdKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getIdKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getPostDateKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getSourceObjectId()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getContentKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
+                new FieldDescriptor(SAComment.class, SAComment.PROCESSINSTANCEID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTED_BY_ID, new FieldDescriptor(SAComment.class, SAComment.USERID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.ID, new FieldDescriptor(SAComment.class, SAComment.ID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE, new FieldDescriptor(SAComment.class, SAComment.POSTDATE_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAComment.class, SAComment.SOURCEOBJECTID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT, new FieldDescriptor(SAComment.class, SAComment.CONTENT_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
 
         archivedCommentsAllFields = new HashMap<>(1);
         final Set<String> archivedCommentFields = new HashSet<>(1);
-        archivedCommentFields.add(saCommentBuilderFact.getContentKey());
+        archivedCommentFields.add(SAComment.CONTENT_KEY);
         archivedCommentsAllFields.put(SAComment.class, archivedCommentFields);
     }
 

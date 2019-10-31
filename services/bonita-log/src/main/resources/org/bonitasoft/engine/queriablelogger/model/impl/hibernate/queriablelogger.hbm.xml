@@ -2,13 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field"
-	package="org.bonitasoft.engine.queriablelogger.model.impl">
+	package="org.bonitasoft.engine.queriablelogger.model">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long"/>
 	</filter-def>
 	
-	<class name="SQueriableLogImpl" table="queriable_log">
+	<class name="SQueriableLog" table="queriable_log">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long"/>
 			<key-property name="id" column="ID" type="long"/>
@@ -43,7 +43,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SQueriableLogParameterImpl" table="queriableLog_p">
+	<class name="SQueriableLogParameter" table="queriableLog_p">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long"/>
 			<key-property name="id" column="ID" type="long"/>
@@ -51,7 +51,7 @@
 		<property name="queriableLogId" column="B_LOG_ID" type="long"/>
 		<property name="name" column="PARAM_NAME" />
 		<property name="stringValue" column="stringValue" />
-<!-- 		<one-to-one name="blobValue" class="org.bonitasoft.engine.persistence.model.impl.BlobValueImpl" cascade="all" /> -->
+<!-- 		<one-to-one name="blobValue" class="org.bonitasoft.engine.persistence.model.BlobValue" cascade="all" /> -->
 		<property name="valueType" column="valueType" />
 		<filter name="tenantFilter"></filter>
 	</class>

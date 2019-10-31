@@ -5,4 +5,4 @@
 | |_) | (_) | | | | | || (_| |
 |____/ \___/|_| |_|_|\__\__,_|
 
-(Platform Setup ${project.version})
+(Platform Setup @version@)

@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.page.impl.SPageImpl;
-import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageWithContent;
 
-public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, PageBuilder> {
+public class PageBuilder extends PersistentObjectBuilder<SPageWithContent, PageBuilder> {
 
     private String name;
 
@@ -49,12 +49,12 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
     }
 
     @Override
-    public SPageWithContentImpl _build() {
-        final SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, hidden, lastModificationDate, lastUpdatedBy,
+    public SPageWithContent _build() {
+        final SPage sPage = new SPage(name, description, displayName, installationDate, installedBy, provided, hidden, lastModificationDate, lastUpdatedBy,
                 contentName);
-        sPageImpl.setProcessDefinitionId(processDefinitionId);
+        sPage.setProcessDefinitionId(processDefinitionId);
 
-        return new SPageWithContentImpl(sPageImpl, content);
+        return new SPageWithContent(sPage, content);
     }
 
     public PageBuilder withName(final String name) {

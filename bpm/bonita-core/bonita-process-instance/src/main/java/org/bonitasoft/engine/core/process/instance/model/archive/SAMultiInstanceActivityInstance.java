@@ -13,28 +13,61 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SAMultiInstanceActivityInstance extends SAActivityInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SAMultiInstanceActivityInstance extends SAActivityInstance {
 
-    boolean isSequential();
+    private boolean sequential;
+    private String loopDataInputRef;
+    private String loopDataOutputRef;
+    private String dataInputItemRef;
+    private String dataOutputItemRef;
+    private int numberOfActiveInstances;
+    private int numberOfCompletedInstances;
+    private int numberOfTerminatedInstances;
+    private int loopCardinality;
 
-    String getLoopDataInputRef();
+    public SAMultiInstanceActivityInstance(final SMultiInstanceActivityInstance activityInstance) {
+        super(activityInstance);
+        sequential = activityInstance.isSequential();
+        loopDataInputRef = activityInstance.getLoopDataInputRef();
+        loopDataOutputRef = activityInstance.getLoopDataOutputRef();
+        dataInputItemRef = activityInstance.getDataInputItemRef();
+        dataOutputItemRef = activityInstance.getDataOutputItemRef();
+        numberOfActiveInstances = activityInstance.getNumberOfActiveInstances();
+        numberOfCompletedInstances = activityInstance.getNumberOfCompletedInstances();
+        numberOfTerminatedInstances = activityInstance.getNumberOfTerminatedInstances();
+        loopCardinality = activityInstance.getLoopCardinality();
+    }
 
-    String getLoopDataOutputRef();
+    @Override
+    public SFlowNodeType getType() {
+        return SFlowNodeType.MULTI_INSTANCE_ACTIVITY;
+    }
 
-    String getDataInputItemRef();
+    public int getNumberOfInstances() {
+        return numberOfActiveInstances + numberOfCompletedInstances + numberOfTerminatedInstances;
+    }
 
-    String getDataOutputItemRef();
 
-    int getLoopCardinality();
+    @Override
+    public String getKind() {
+        return "multi";
+    }
 
-    int getNumberOfInstances();
-
-    int getNumberOfActiveInstances();
-
-    int getNumberOfCompletedInstances();
-
-    int getNumberOfTerminatedInstances();
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SMultiInstanceActivityInstance.class;
+    }
 }

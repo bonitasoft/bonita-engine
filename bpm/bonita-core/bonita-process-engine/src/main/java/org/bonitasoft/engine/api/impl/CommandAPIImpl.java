@@ -24,6 +24,8 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.command.DeleteSCommand;
 import org.bonitasoft.engine.api.impl.transaction.command.GetCommands;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -40,7 +42,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.SCommandUpdateException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderFactory;
@@ -82,12 +83,13 @@ public class CommandAPIImpl implements CommandAPI {
     public void addDependency(final String name, final byte[] jar) throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             dependencyService.createMappedDependency(name, jar, name + ".jar", tenantAccessor.getTenantId(), ScopeType.TENANT);
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
+            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
-        } catch (final SDependencyException sbe) {
+        } catch (final SDependencyException | SClassLoaderException sbe) {
             throw new CreationException(sbe);
         }
     }
@@ -96,9 +98,10 @@ public class CommandAPIImpl implements CommandAPI {
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             dependencyService.deleteDependency(name);
-            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
+            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantAccessor.getTenantId());
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -120,8 +123,10 @@ public class CommandAPIImpl implements CommandAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
-        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
-        final SCommand sCommand = fact.createNewInstance(name, description, implementation).setSystem(false).done();
+        final SCommand sCommand = SCommand.builder()
+                .name(name)
+                .description(description)
+                .implementation(implementation).isSystem(false).build();
         try {
             commandService.create(sCommand);
             return ModelConvertor.toCommandDescriptor(sCommand);

@@ -39,8 +39,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBui
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -106,7 +105,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
 
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
@@ -118,7 +117,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         initializeBuilderConstant(dataDefinitionBuilder, description, content, className, isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create datainstance
-        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
@@ -139,7 +138,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
         initializeBuilder(dataDefinitionBuilder, description, content, String.class.getName(), isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
-        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition)
                 .setContainerId(containerId).setContainerType(containerType);
         // create data instance
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
@@ -152,7 +151,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SDataDefinition dataDefinition = buildDataDefinition(instanceName, description, namespace, xmlElement, content, String.class.getName());
 
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
+        final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition)
                 .setContainerId(containerId).setContainerType(containerType);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.done();
@@ -232,9 +231,8 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
     private EntityUpdateDescriptor getUpdateDescriptor(final String description, final Serializable newValue) {
         // update data instance
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-        updateDescriptor.addField(fact.getValueKey(), newValue);
-        updateDescriptor.addField(fact.getDescriptionKey(), description);
+        updateDescriptor.addField(SDataInstance.VALUE, newValue);
+        updateDescriptor.addField(SDataInstance.DESCRIPTION, description);
 
         return updateDescriptor;
     }
@@ -903,7 +901,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final String containerType = "ActivityInstance";
 
         final SDataInstance dataInstance = buildXMLDataInstance("xmlVar", "This is a xml variable",
-                "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement", getStringForExpression(xmlContent), containerId,
+                "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement", getStringForExpression(xmlContent), containerId,
                 containerType);
         insertDataInstance(dataInstance);
 
@@ -911,7 +909,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SDataInstance dataInstanceRes = getDataInstance(dataInstance.getId());
         assertTrue(dataInstanceRes instanceof SXMLDataInstance);
         checkXMLDataInstance((SXMLDataInstance) dataInstanceRes, "xmlVar", "This is a xml variable", false, String.class.getName(), xmlContent, containerId,
-                containerType, "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement");
+                containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
 
         deleteDataInstance(dataInstanceRes);
     }
@@ -946,20 +944,20 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final long containerId = 15;
         final String containerType = "ActivityInstance";
         final SDataInstance dataInstance = buildXMLDataInstance("xmlVar", "This is a xml variable",
-                "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement", getStringForExpression(xmlContent), containerId,
+                "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement", getStringForExpression(xmlContent), containerId,
                 containerType);
         insertDataInstance(dataInstance);
         // get the data instance by several conditions
         SDataInstance dataInstanceRes = getDataInstance(dataInstance.getId());
         assertTrue(dataInstanceRes instanceof SXMLDataInstance);
         checkXMLDataInstance((SXMLDataInstance) dataInstanceRes, "xmlVar", "This is a xml variable", false, String.class.getName(), xmlContent, containerId,
-                containerType, "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement");
+                containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
         final String updatedContent = buildSimpleXML2();
         updateDataInstance(dataInstanceRes.getName(), dataInstanceRes.getContainerId(), dataInstanceRes.getContainerType(),
                 "This is a xml variable after update", updatedContent);
         dataInstanceRes = getDataInstance(dataInstance.getId());
         checkXMLDataInstance((SXMLDataInstance) dataInstanceRes, "xmlVar", "This is a xml variable after update", false, String.class.getName(),
-                updatedContent, containerId, containerType, "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement");
+                updatedContent, containerId, containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
         deleteDataInstance(dataInstanceRes);
     }
 
@@ -971,7 +969,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final String containerType = "ActivityInstance";
 
         final SDataInstance dataInstance = buildXMLDataInstance("xmlVar", "This is a xml variable",
-                "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement", getStringForExpression(xmlContent), containerId,
+                "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement", getStringForExpression(xmlContent), containerId,
                 containerType);
         insertDataInstance(dataInstance);
 
@@ -979,7 +977,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SDataInstance dataInstanceRes = getDataInstance(dataInstance.getId());
         assertTrue(dataInstanceRes instanceof SXMLDataInstance);
         checkXMLDataInstance((SXMLDataInstance) dataInstanceRes, "xmlVar", "This is a xml variable", false, String.class.getName(), xmlContent, containerId,
-                containerType, "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement");
+                containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
 
         deleteDataInstance(dataInstanceRes);
 
@@ -994,7 +992,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final String containerType = "ActivityInstance";
 
         final SDataInstance dataInstance = buildXMLDataInstance("xmlVar", "This is a xml variable",
-                "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement", getStringForExpression(xmlContent), containerId,
+                "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement", getStringForExpression(xmlContent), containerId,
                 containerType);
         insertDataInstance(dataInstance);
 
@@ -1002,7 +1000,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         final SDataInstance dataInstanceRes = getDataInstanceByNameAndContainer("xmlVar", containerId, containerType);
         assertTrue(dataInstanceRes instanceof SXMLDataInstance);
         checkXMLDataInstance((SXMLDataInstance) dataInstanceRes, "xmlVar", "This is a xml variable", false, String.class.getName(), xmlContent, containerId,
-                containerType, "org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl", "xmlElement");
+                containerType, "org.bonitasoft.engine.data.instance.model.SDataInstance", "xmlElement");
 
         deleteDataInstance(dataInstanceRes);
     }

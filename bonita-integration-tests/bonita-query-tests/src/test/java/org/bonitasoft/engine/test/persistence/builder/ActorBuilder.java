@@ -13,14 +13,27 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 
 
-public class ActorBuilder extends PersistentObjectBuilder<SActorImpl, ActorBuilder> {
+public class ActorBuilder extends PersistentObjectBuilder<SActor, ActorBuilder> {
+
+    private long scopeId;
+    private boolean initiator;
 
     @Override
     ActorBuilder getThisBuilder() {
 
+        return this;
+    }
+
+    public ActorBuilder withScopeId(long scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+
+    public ActorBuilder whoIsInitiator() {
+        this.initiator = true;
         return this;
     }
 
@@ -29,8 +42,11 @@ public class ActorBuilder extends PersistentObjectBuilder<SActorImpl, ActorBuild
     }
     
     @Override
-    SActorImpl _build() {
-        return new SActorImpl();
+    SActor _build() {
+        SActor sActor = new SActor();
+        sActor.setInitiator(initiator);
+        sActor.setScopeId(scopeId);
+        return sActor;
     }
 
 }

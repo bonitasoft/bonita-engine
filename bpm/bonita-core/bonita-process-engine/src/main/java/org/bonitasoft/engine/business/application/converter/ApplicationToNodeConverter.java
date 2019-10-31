@@ -21,7 +21,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -107,9 +106,8 @@ public class ApplicationToNodeConverter {
     }
 
     public QueryOptions buildApplicationPagesQueryOptions(final long applicationId, final int startIndex, final int pageSize) {
-        final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationPage.class, factory.getIdKey(), OrderByType.ASC));
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationPage.class, factory.getApplicationIdKey(), applicationId));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationPage.class, SApplicationPage.ID, OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationPage.class, SApplicationPage.APPLICATION_ID, applicationId));
         return new QueryOptions(startIndex, pageSize, orderByOptions, filters, null);
     }
 

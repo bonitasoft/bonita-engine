@@ -13,18 +13,29 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Baptiste Mesta
  */
-public interface SHumanTaskInstance extends STaskInstance {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SHumanTaskInstance extends SActivityInstance {
 
-    long getActorId();
+    private long actorId;
+    private long assigneeId;
+    private Long expectedEndDate;
+    private STaskPriority priority;
+    private long claimedDate;
 
-    long getAssigneeId();
 
-    STaskPriority getPriority();
-
-    Long getExpectedEndDate();
-
-    long getClaimedDate();
+    public SHumanTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
+                                  final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parenteContainerId, logicalGroup1, logicalGroup2);
+        this.actorId = actorId;
+        this.priority = priority;
+    }
 }

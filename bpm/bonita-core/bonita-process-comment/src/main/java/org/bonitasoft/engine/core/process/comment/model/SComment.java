@@ -13,23 +13,35 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SComment extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SComment implements PersistentObject {
+    public static final String ID_KEY = "id";
+    public static final String USERID_KEY = "userId";
+    public static final String PROCESSINSTANCEID_KEY = "processInstanceId";
+    public static final String POSTDATE_KEY = "postDate";
+    public static final String CONTENT_KEY = "content";
+    public static final String KIND_KEY = "kind";
+    private long id;
+    private long tenantId;
+    private Long userId;
+    private long processInstanceId;
+    private long postDate;
+    private String content;
+    private String kind;
 
-    long getTenantId();
-
-    Long getUserId();
-
-    long getProcessInstanceId();
-
-    long getPostDate();
-
-    String getContent();
-
-    String getKind();
+    public SComment(final long processInstanceId, final String content) {
+        super();
+        this.processInstanceId = processInstanceId;
+        this.content = content;
+        this.postDate = System.currentTimeMillis();
+    }
 
 }

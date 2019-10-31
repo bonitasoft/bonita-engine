@@ -18,6 +18,7 @@ import org.bonitasoft.engine.authentication.AuthenticationServiceTest;
 import org.bonitasoft.engine.bpm.ActorMappingServiceTest;
 import org.bonitasoft.engine.bpm.CategoryServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.DocumentServiceTest;
+import org.bonitasoft.engine.bpm.EventInstanceRepositoryIT;
 import org.bonitasoft.engine.bpm.GatewayInstanceServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.NodeConfigurationTest;
 import org.bonitasoft.engine.bpm.OperationServiceIntegrationTest;
@@ -28,7 +29,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstanceServiceIntegrationTe
 import org.bonitasoft.engine.bpm.event.EventInstanceServiceTest;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceServiceTest;
 import org.bonitasoft.engine.cache.CacheServiceTest;
-import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
+import org.bonitasoft.engine.classloader.ClassLoaderServiceIT;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
 import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
@@ -44,7 +45,7 @@ import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationT
 import org.bonitasoft.engine.platform.login.PlatformLoginServiceTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
-import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorITest;
+import org.bonitasoft.engine.scheduler.impl.SchedulerServiceIT;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
 import org.junit.runner.RunWith;
@@ -55,7 +56,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CacheServiceTest.class,
         PersistenceTest.class,
         ArchiveServiceTest.class,
-        ClassLoaderServiceTest.class,
+        ClassLoaderServiceIT.class,
         ExpressionServiceTest.class,
         IdentityServiceTest.class,
         AuthenticationServiceTest.class,
@@ -68,7 +69,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // -- SqlTest.class,
         // -- Tests using the scheduler
         RecorderTest.class,
-        QuartzSchedulerExecutorITest.class,
+        SchedulerServiceIT.class,
         // JobTest.class, ignored as this was the last test method in that class
         CommandServiceIntegrationTest.class,
         PlatformCommandServiceIntegrationTest.class,
@@ -88,7 +89,8 @@ import org.junit.runners.Suite.SuiteClasses;
         ConnectorInstanceServiceIntegrationTests.class,
         PlatformLoginServiceTest.class,
         FormMappingServiceIT.class,
-        PageMappingServiceIT.class
+        PageMappingServiceIT.class,
+        EventInstanceRepositoryIT.class
 })
 @RunWith(Suite.class)
 public class AllBPMTests {

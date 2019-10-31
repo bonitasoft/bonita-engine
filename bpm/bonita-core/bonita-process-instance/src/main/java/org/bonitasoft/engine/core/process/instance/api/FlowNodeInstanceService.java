@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -72,14 +71,29 @@ public interface FlowNodeInstanceService {
     SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
-     * @param parentContainerId
+     *
+     * get the flow node instances directly contained in the given process instance
+     *
+     * @param processInstanceId the parent process isntance
      * @param fromIndex
      * @param maxResults
      * @return
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    List<SFlowNodeInstance> getFlowNodeInstances(long parentContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
+    List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(long processInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
+    /**
+     *
+     * get the flow node instances directly contained in the given activity instance
+     *
+     * @param parentActivityInstanceId the parent process instance
+     * @param fromIndex
+     * @param maxResults
+     * @return
+     * @throws SFlowNodeReadException
+     * @since 7.8
+     */
+    List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
 
     /**
      * @param flowNodeInstance
@@ -119,7 +133,7 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void setStateCategory(SFlowElementInstance flowElementInstance, SStateCategory stateCategory) throws SFlowNodeModificationException;
+    void setStateCategory(SFlowNodeInstance flowElementInstance, SStateCategory stateCategory) throws SFlowNodeModificationException;
 
     /**
      * @param entityClass

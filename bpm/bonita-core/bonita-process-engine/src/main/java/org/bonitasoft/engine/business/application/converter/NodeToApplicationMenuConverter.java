@@ -15,14 +15,11 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -77,12 +74,11 @@ public class NodeToApplicationMenuConverter {
 
     private SApplicationMenu buildApplicationMenu(final ApplicationMenuNode applicationMenuNode, final SApplication application,
             final SApplicationMenu parentMenu, final Long appPageId, final int index) {
-        SApplicationMenuBuilderFactory factory = BuilderFactory.get(SApplicationMenuBuilderFactory.class);
-        SApplicationMenuBuilder builder = factory.createNewInstance(applicationMenuNode.getDisplayName(), application.getId(), appPageId, index);
+        SApplicationMenu.SApplicationMenuBuilder builder = SApplicationMenu.builder().displayName(applicationMenuNode.getDisplayName()).applicationId(application.getId()).applicationPageId(appPageId).index(index);
         if (parentMenu != null) {
-            builder.setParentId(parentMenu.getId());
+            builder.parentId(parentMenu.getId());
         }
-        return builder.done();
+        return builder.build();
     }
 
 }

@@ -46,12 +46,9 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageBuilderFactory;
-import org.bonitasoft.engine.page.SPageContent;
 import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import org.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -64,7 +61,6 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
@@ -112,6 +108,8 @@ public class PageServiceImpl implements PageService {
     private static final String API_EXTENSIONS = "apiExtensions";
 
     private static final String CLASS_FILENAME = "classFileName";
+
+    private static final String THEME_CSS = "resources/theme.css";
 
     private final ReadPersistenceService persistenceService;
 
@@ -248,7 +246,7 @@ public class PageServiceImpl implements PageService {
     SPage insertPage(final SPage page, final byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, "Adding a new page with name " + page.getName());
         try {
-            final SPageWithContent pageContent = new SPageWithContentImpl(page, content);
+            final SPageWithContent pageContent = new SPageWithContent(page, content);
             final SPage pageByName = checkIfPageAlreadyExists(page);
             if (null != pageByName) {
                 initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
@@ -298,7 +296,10 @@ public class PageServiceImpl implements PageService {
     void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingIndexException {
         final Set<String> entrySet = zipContent.keySet();
         for (final String entry : entrySet) {
-            if (INDEX_GROOVY.equals(entry) || INDEX_HTML.equalsIgnoreCase(entry) || RESOURCES_INDEX_HTML.equalsIgnoreCase(entry)) {
+            if (INDEX_GROOVY.equals(entry) 
+                    || INDEX_HTML.equalsIgnoreCase(entry) 
+                    || RESOURCES_INDEX_HTML.equalsIgnoreCase(entry)
+                    || THEME_CSS.equalsIgnoreCase(entry)) {
                 return;
             }
         }
@@ -370,10 +371,10 @@ public class PageServiceImpl implements PageService {
 
     private void deleteProfileEntry(final SPage sPage) throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PAGE, sPage.getName()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.CUSTOM, new Boolean(true)));
 
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
 
@@ -389,10 +390,10 @@ public class PageServiceImpl implements PageService {
     private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaReadException, SProfileEntryNotFoundException,
             SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, sProfileEntry.getProfileId()));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, sProfileEntry.getParentId()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PROFILE_ID, sProfileEntry.getProfileId()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PARENT_ID, sProfileEntry.getParentId()));
 
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
 
@@ -416,7 +417,7 @@ public class PageServiceImpl implements PageService {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
+        final SQueriableLog log = logBuilder.build();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), methodName, log);
         }
@@ -438,7 +439,9 @@ public class PageServiceImpl implements PageService {
             }
             pageProperties.put(PROPERTIES_NAME, page.getName());
             pageProperties.put(PROPERTIES_DISPLAY_NAME, page.getDisplayName());
-            pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
+            if (page.getDescription() != null) {
+                pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
+            }
             contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties, "The name must start with 'custompage_'"));
 
             return IOUtil.zip(contentAsMap);
@@ -514,14 +517,14 @@ public class PageServiceImpl implements PageService {
             return;
         }
         final List<FilterOption> filters = new ArrayList<>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, oldPageName));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PAGE, oldPageName));
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC)), filters, null);
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC)), filters, null);
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.NAME, sProfileEntry.getName());
-            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.PAGE, newPageName);
+            entityUpdateDescriptor.addField(SProfileEntry.NAME, sProfileEntry.getName());
+            entityUpdateDescriptor.addField(SProfileEntry.PAGE, newPageName);
             profileService.updateProfileEntry(sProfileEntry, entityUpdateDescriptor);
         }
     }
@@ -539,13 +542,12 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
         try {
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
-                    SPageContent.class, pageId));
-            final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
-                    .createNewInstance(new EntityUpdateDescriptor());
-            builder.updateContent(content);
+            final SPageWithContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
+                    SPageWithContent.class, pageId));
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField("content", content);
             recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent,
-                    builder.done()), PAGE);
+                    entityUpdateDescriptor), PAGE);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 

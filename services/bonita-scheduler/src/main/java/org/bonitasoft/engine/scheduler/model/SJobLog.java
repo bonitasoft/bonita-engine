@@ -13,19 +13,30 @@
  **/
 package org.bonitasoft.engine.scheduler.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Celine Souchet
  */
-public interface SJobLog extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SJobLog implements PersistentObject {
 
-    long getJobDescriptorId();
+    private long id;
+    private long tenantId;
+    private long jobDescriptorId;
+    private Long retryNumber = 0L;
+    private Long lastUpdateDate;
+    private String lastMessage;
 
-    Long getRetryNumber();
-
-    Long getLastUpdateDate();
-
-    String getLastMessage();
-
+    public SJobLog(final long jobDescriptorId) {
+        super();
+        this.jobDescriptorId = jobDescriptorId;
+    }
 }

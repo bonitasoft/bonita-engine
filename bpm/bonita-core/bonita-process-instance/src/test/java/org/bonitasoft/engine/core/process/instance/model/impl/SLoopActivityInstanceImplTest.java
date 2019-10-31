@@ -15,16 +15,17 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SLoopActivityInstanceImplTest {
 
-    private SLoopActivityInstanceImpl loop;
+    private SLoopActivityInstance loop;
 
     @Before
     public void setUp() {
-        loop = new SLoopActivityInstanceImpl();
+        loop = new SLoopActivityInstance();
     }
 
     @Test

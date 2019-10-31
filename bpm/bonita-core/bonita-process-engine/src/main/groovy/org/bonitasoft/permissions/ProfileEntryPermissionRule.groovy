@@ -41,7 +41,7 @@ class ProfileEntryPermissionRule implements PermissionRule {
 
     @Override
     boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-       if(apiCallContext.isGET()){
+        if(apiCallContext.isGET()){
             if(apiCallContext.getResourceId() != null){
                 return false
             }else{
@@ -62,5 +62,4 @@ class ProfileEntryPermissionRule implements PermissionRule {
         }
         return false
     }
-
 }

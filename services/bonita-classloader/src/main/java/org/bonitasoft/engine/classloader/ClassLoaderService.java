@@ -13,10 +13,9 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import java.util.stream.Stream;
-
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.home.BonitaResource;
+import org.bonitasoft.engine.dependency.impl.TenantDependencyService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -39,6 +38,8 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * @return type of global class loader
      */
     String getGlobalClassLoaderType();
+
+    void registerDependencyServiceOfTenant(Long tenantId, TenantDependencyService tenantDependencyService);
 
     /**
      * Get id of global class loader
@@ -66,10 +67,6 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * @throws SClassLoaderException if we can't remove the classloader because it contains children
      */
     void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException;
-
-    void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException;
-
-    void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException;
 
     /**
      * add listener on a classloader
@@ -104,4 +101,12 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * @return true if the listener was removed
      */
     boolean removeListener(ClassLoaderListener classLoaderListener);
+
+    void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SClassLoaderException;
+
+    void refreshClassLoaderOnOtherNodes(ScopeType type, long id) throws SClassLoaderException;
+
+    void refreshClassLoaderImmediately(ScopeType type, long id) throws SClassLoaderException;
+
+    void removeRefreshClassLoaderSynchronization();
 }

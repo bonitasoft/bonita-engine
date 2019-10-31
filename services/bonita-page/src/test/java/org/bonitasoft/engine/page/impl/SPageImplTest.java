@@ -28,7 +28,7 @@ public class SPageImplTest {
     @Test
     public void should_set_all_fields() {
         //given
-        final SPageImpl sPage = new SPageImpl(NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, CONTENT_ZIP);
+        final SPage sPage = new SPage(NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, CONTENT_ZIP);
         sPage.setTenantId(TENANT_ID);
         sPage.setId(ID);
         sPage.setDisplayName(DISPLAY_NAME);
@@ -49,7 +49,6 @@ public class SPageImplTest {
                 .hasLastUpdatedBy(LAST_UPDATED_BY)
                 .hasInstalledBy(INSTALLED_BY)
                 .hasId(ID)
-                .hasDiscriminator(SPage.class.getName())
                 .hasTenantId(TENANT_ID);
 
     }
@@ -57,12 +56,12 @@ public class SPageImplTest {
     @Test
     public void should_set_all_fields_from_sPage() {
         //given
-        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
 
         //when
-        SPageImpl sPage2 = new SPageImpl(sPage);
+        SPage sPage2 = new SPage(sPage);
 
         //then
         assertThat(sPage2).isEqualToComparingFieldByField(sPage);
@@ -71,7 +70,7 @@ public class SPageImplTest {
     @Test
     public void should_set_content_type_and_process_definition() {
         //given
-        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
 

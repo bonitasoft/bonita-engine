@@ -13,31 +13,43 @@
  **/
 package org.bonitasoft.engine.handler;
 
-import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.PlatformRestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SchedulerServiceRestartHandler implements RestartHandler {
+public class SchedulerServiceRestartHandler implements PlatformRestartHandler {
 
     private final SchedulerService schedulerService;
+    private final TechnicalLogger logger;
+    private UserTransactionService userTransactionService;
 
-    private final TechnicalLoggerService technicalLoggerService;
-
-    public SchedulerServiceRestartHandler(final SchedulerService schedulerService, final TechnicalLoggerService technicalLoggerService) {
+    public SchedulerServiceRestartHandler(SchedulerService schedulerService,
+                                          TechnicalLoggerService technicalLoggerService,
+                                          UserTransactionService userTransactionService) {
         super();
         this.schedulerService = schedulerService;
-        this.technicalLoggerService = technicalLoggerService;
+        this.logger = technicalLoggerService.asLogger(SchedulerServiceRestartHandler.class);
+        this.userTransactionService = userTransactionService;
     }
 
     @Override
-    public void execute() throws SBonitaException {
-        technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Rescheduling all scheduler Triggers in ERROR state");
-        schedulerService.rescheduleErroneousTriggers();
+    public void execute() {
+        logger.info("Rescheduling all scheduler Triggers in ERROR state");
+        try {
+            userTransactionService.executeInTransaction(() -> {
+                schedulerService.rescheduleErroneousTriggers();
+                return null;
+            });
+        } catch (Exception e) {
+            logger.warn("Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry. Cause is {}", e.getMessage());
+            logger.debug("Cause: ", e);
+        }
     }
 
 }

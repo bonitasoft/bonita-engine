@@ -15,11 +15,16 @@ package org.bonitasoft.engine.core.process.instance.model.business.data;
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Matthieu Chaffotte
  */
-public interface SMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
-
-    List<Long> getDataIds();
-
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class SMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
+    private List<Long> dataIds;
 }

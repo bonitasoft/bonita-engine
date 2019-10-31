@@ -16,44 +16,48 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.engine.work.SWorkPreconditionException;
 
 /**
  * Work that is responsible of executing a flow node.
  * If the execution fails it will put the flow node in failed state
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
 public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
-    private static final long serialVersionUID = -5873526992671300038L;
-
     public enum Type {
         PROCESS, FLOWNODE
     }
 
     private final long flowNodeInstanceId;
+    private final Integer stateId;
+    private final Boolean executing;
+    private final Boolean aborting;
+    private final Boolean canceling;
 
-    private boolean isReadyHumanTask = false;
-
-    ExecuteFlowNodeWork(final long flowNodeInstanceId) {
+    ExecuteFlowNodeWork(final long flowNodeInstanceId, Integer stateId, Boolean executing, Boolean aborting, Boolean canceling) {
         this.flowNodeInstanceId = flowNodeInstanceId;
-    }
-
-    public void setReadyHumanTask(boolean readyHumanTask) {
-        isReadyHumanTask = readyHumanTask;
+        this.stateId = stateId;
+        this.executing = executing;
+        this.aborting = aborting;
+        this.canceling = canceling;
     }
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": flowNodeInstanceId: " + flowNodeInstanceId;
+        return getClass().getSimpleName() + ": flowNodeInstanceId: " + flowNodeInstanceId + " (" + stateId + ", " + executing + ", " + aborting + ", " + canceling + ")";
     }
 
     @Override
@@ -64,27 +68,31 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        if (isReadyHumanTask) {
-            SHumanTaskInstance humanTaskInstance = tenantAccessor.getActivityInstanceService().getHumanTaskInstance(flowNodeInstanceId);
-            /*
-             * the stateExecuting flag must be set to true by the API
-             * however this do not completely avoid concurrency issue:
-             * if user a and user b call execute at the same time on a flow node with no contract input
-             * it can happen that both transactions are committed successfully so 2 works are registered
-             * the first work will find the task in state 4 with flag executing
-             * and the second will find it in the next state (so it is ok) unless there is an on-finish connector.
-             * In this last case it will try to execute that and may execute twice the same connector (not verified)
-             */
-            if (humanTaskInstance.getStateId() != 4 || !humanTaskInstance.isStateExecuting()) {
-                throw new SFlowNodeExecutionException(
-                        "Unable to execute flow node " + humanTaskInstance.getId()
-                                + " because it is in an incompatible state ("
-                                + (humanTaskInstance.isStateExecuting() ? "transitioning from state " : "on state ")
-                                + humanTaskInstance.getStateName() + "). Someone probably already called execute on it.");
-            }
-        }
-        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, null, null);
+
+        SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(tenantAccessor);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstance, null, null);
         return CompletableFuture.completedFuture(null);
+    }
+
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor) throws SFlowNodeReadException, SWorkPreconditionException {
+        SFlowNodeInstance flowNodeInstance;
+        try {
+            flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
+        } catch (SFlowNodeNotFoundException e) {
+            throw new SWorkPreconditionException(String.format("Flow node %d does not exists", flowNodeInstanceId), e);
+        }
+        if (stateId != flowNodeInstance.getStateId()
+                || executing != flowNodeInstance.isStateExecuting()
+                || aborting != flowNodeInstance.isAborting()
+                || canceling != flowNodeInstance.isCanceling()) {
+            throw new SWorkPreconditionException(
+                    String.format("Unable to execute flow node %d because it is not in the expected state " +
+                            "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)." +
+                            " Someone probably already called execute on it.",
+                            flowNodeInstance.getId(), stateId, executing, aborting, canceling, flowNodeInstance.getStateId(),
+                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(), flowNodeInstance.isCanceling()));
+        }
+        return flowNodeInstance;
     }
 
     @Override

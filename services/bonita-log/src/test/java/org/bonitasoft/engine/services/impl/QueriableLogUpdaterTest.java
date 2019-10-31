@@ -15,7 +15,7 @@ package org.bonitasoft.engine.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -24,13 +24,12 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -46,7 +45,7 @@ public class QueriableLogUpdaterTest {
     @Mock
     private TechnicalLoggerService logger;
 
-    private SQueriableLogImpl log;
+    private SQueriableLog log;
 
     @InjectMocks
     private QueriableLogUpdater updater;
@@ -60,13 +59,13 @@ public class QueriableLogUpdaterTest {
         given(platformService.getSPlatformProperties()).willReturn(properties);
         given(properties.getPlatformVersion()).willReturn("platform.version");
 
-        given(logger.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
+        given(logger.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
 
         log = getLogBuilderWithMandatoryFields();
     }
 
-    private SQueriableLogImpl getLogBuilderWithMandatoryFields() {
-        final SQueriableLogImpl log = new SQueriableLogImpl();
+    private SQueriableLog getLogBuilderWithMandatoryFields() {
+        final SQueriableLog log = SQueriableLog.builder().build();
         log.setSeverity(SQueriableLogSeverity.INTERNAL);
         log.setActionType("insert");
         log.setActionStatus(SQueriableLog.STATUS_OK);
@@ -96,7 +95,7 @@ public class QueriableLogUpdaterTest {
         while (stb.length() <= 255) {
             stb.append(base);
         }
-        final SQueriableLogImpl log = getLogBuilderWithMandatoryFields();
+        final SQueriableLog log = getLogBuilderWithMandatoryFields();
         log.setRawMessage(stb.toString());
 
         //when

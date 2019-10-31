@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,7 +25,7 @@ public class SAAutomaticTaskInstanceBuilderFactoryImpl extends SAActivityInstanc
 
     @Override
     public SAAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(final SAutomaticTaskInstance sAutomaticTaskInstance) {
-        final SAAutomaticTaskInstanceImpl entity = new SAAutomaticTaskInstanceImpl(sAutomaticTaskInstance);
+        final SAAutomaticTaskInstance entity = new SAAutomaticTaskInstance(sAutomaticTaskInstance);
         return new SAAutomaticTaskInstanceBuilderImpl(entity);
     }
 

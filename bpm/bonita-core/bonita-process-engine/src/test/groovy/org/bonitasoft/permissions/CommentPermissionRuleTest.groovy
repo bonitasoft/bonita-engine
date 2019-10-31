@@ -65,7 +65,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     def havingFilters(Map filters) {
@@ -80,7 +80,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -90,7 +90,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -110,7 +110,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -122,12 +122,12 @@ public class CommentPermissionRuleTest {
         doReturn(1024l).when(processInstance).getProcessDefinitionId()
         doReturn(processInstance).when(processAPI).getProcessInstance(154l)
         doReturn(false).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
-        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l);
-        doReturn(true).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 154l);
+        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
+        doReturn(true).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 154l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     def havingResourceId(boolean isInvolvedIn, boolean isInvolvedAsManager) {
@@ -135,11 +135,11 @@ public class CommentPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(["processInstanceId": "45"]).when(apiCallContext).getFilters()
         def instance = mock(ProcessInstance.class)
-        doReturn(instance).when(processAPI).getProcessInstance(45l);
+        doReturn(instance).when(processAPI).getProcessInstance(45l)
         doReturn(1024l).when(instance).getProcessDefinitionId()
         doReturn(false).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
-        doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l);
-        doReturn(isInvolvedAsManager).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 45l);
+        doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l)
+        doReturn(isInvolvedAsManager).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 45l)
     }
 
     @Test
@@ -149,7 +149,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -159,7 +159,7 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -169,18 +169,18 @@ public class CommentPermissionRuleTest {
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
     public void should_allow_if_isManager_throws_exception_on_get() {
         // given
         havingResourceId(false, false)
-        doThrow(new SearchException(new Exception())).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 45l);
+        doThrow(new SearchException(new Exception())).when(processAPI).isManagerOfUserInvolvedInProcessInstance(currentUserId, 45l)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -192,12 +192,12 @@ public class CommentPermissionRuleTest {
                 "other":"sample"
             }
         ''').when(apiCallContext).getBody()
-        doReturn(true).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l);
+        doReturn(true).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
 
     }
 
@@ -214,12 +214,12 @@ public class CommentPermissionRuleTest {
         doReturn(1024l).when(processInstance).getProcessDefinitionId()
         doReturn(processInstance).when(processAPI).getProcessInstance(154l)
         doReturn(false).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
-        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l);
+        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isFalse();
+        Assertions.assertThat(isAuthorized).isFalse()
     }
 
     @Test
@@ -235,12 +235,12 @@ public class CommentPermissionRuleTest {
         doReturn(1024l).when(processInstance).getProcessDefinitionId()
         doReturn(processInstance).when(processAPI).getProcessInstance(154l)
         doReturn(true).when(processAPI).isUserProcessSupervisor(1024l, currentUserId)
-        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l);
+        doReturn(false).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
     }
 
     @Test
@@ -252,14 +252,12 @@ public class CommentPermissionRuleTest {
                 "other":"sample"
             }
         ''').when(apiCallContext).getBody()
-        doReturn(true).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l);
+        doReturn(true).when(processAPI).isInvolvedInProcessInstance(currentUserId, 154l)
 
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
         //then
-        Assertions.assertThat(isAuthorized).isTrue();
+        Assertions.assertThat(isAuthorized).isTrue()
 
     }
-
-
 }

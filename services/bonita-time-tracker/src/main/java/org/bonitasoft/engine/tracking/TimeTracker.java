@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
@@ -30,7 +30,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class TimeTracker implements TenantLifecycleService {
-
 
     private final Set<TimeTrackerRecords> activatedRecords;
     private FlushThread flushThread;
@@ -45,7 +44,6 @@ public class TimeTracker implements TenantLifecycleService {
     private boolean serviceStarted;
     private long lastFlushTimestamp = 0L;
 
-
     public TimeTracker(
             final TechnicalLoggerService logger,
             final boolean startTracking,
@@ -53,7 +51,8 @@ public class TimeTracker implements TenantLifecycleService {
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
-        this(logger, new ThreadSleepClockImpl(), startTracking, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
+        this(logger, new ThreadSleepClockImpl(), startTracking, flushEventListeners, maxSize,
+                flushIntervalInSeconds * 1000, activatedRecords);
     }
 
     public TimeTracker(
@@ -68,12 +67,12 @@ public class TimeTracker implements TenantLifecycleService {
         this.startTracking = startTracking;
         this.clock = clock;
         this.flushIntervalInMS = flushIntervalInMS;
-        records = new CircularFifoQueue<>(maxSize);
-        serviceStarted = false;
+        this.records = new CircularFifoQueue<>(maxSize);
+        this.serviceStarted = false;
         this.logger = logger;
-        this.flushEventListeners = new HashMap<>();
+        this.flushEventListeners = new ConcurrentHashMap<>();
         if (flushEventListeners != null) {
-            for (FlushEventListener flushEventListener : flushEventListeners) {
+            for (final FlushEventListener flushEventListener : flushEventListeners) {
                 final String name = flushEventListener.getName();
                 if (this.flushEventListeners.containsKey(name)) {
                     log(TechnicalLogSeverity.ERROR, "Duplicate entry for flushEventListener with name: " + name);
@@ -86,7 +85,7 @@ public class TimeTracker implements TenantLifecycleService {
             this.activatedRecords = Collections.emptySet();
         } else {
             this.activatedRecords = new HashSet<>();
-            for (String activatedRecord : activatedRecords) {
+            for (final String activatedRecord : activatedRecords) {
                 this.activatedRecords.add(TimeTrackerRecords.valueOf(activatedRecord));
             }
         }
@@ -95,12 +94,29 @@ public class TimeTracker implements TenantLifecycleService {
 
     List<FlushEventListener> getActiveFlushEventListeners() {
         final List<FlushEventListener> active = new ArrayList<>();
-        for (FlushEventListener flushEventListener : flushEventListeners.values()) {
+        for (final FlushEventListener flushEventListener : this.flushEventListeners.values()) {
             if (flushEventListener.isActive()) {
                 active.add(flushEventListener);
             }
         }
         return active;
+    }
+
+    /**
+     * reference a new flushEventListener. The key of the reference is the flushEventListener.name().
+     * If a listener exist with this name, it will be replaced.
+     *
+     */
+    public void addFlushEventListener(final FlushEventListener flushEventListener) {
+        this.flushEventListeners.put(flushEventListener.getName(), flushEventListener);
+    }
+
+    /**
+     * remove a flush event listener
+     *
+     */
+    public void removeFlushEventListener(final String flushEventListenerName) {
+        this.flushEventListeners.remove(flushEventListenerName);
     }
 
     public boolean activateFlushEventListener(final String flushEventListenerName) {
@@ -134,16 +150,16 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public void startTracking() {
-        if (!serviceStarted) {
+        if (!this.serviceStarted) {
             log(TechnicalLogSeverity.WARNING, "Cannot start Time tracker tracking because service is not started.");
             return;
         }
-        startTracking = true;
+        this.startTracking = true;
         internalStartTracking();
     }
 
     public void stopTracking() {
-        startTracking = false;
+        this.startTracking = false;
         internalStopTracking();
     }
 
@@ -151,28 +167,28 @@ public class TimeTracker implements TenantLifecycleService {
         return new FlushThread(this);
     }
 
-
     private void internalStartTracking() {
-        if (startTracking) {
+        if (this.startTracking) {
             log(TechnicalLogSeverity.WARNING, "Starting Time tracker tracking...");
-            flushThread = createFlushThread();
-            flushThread.start();
+            this.flushThread = createFlushThread();
+            this.flushThread.start();
             for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStartTracking();
             }
-            log(TechnicalLogSeverity.WARNING, "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
+            log(TechnicalLogSeverity.WARNING,
+                    "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
         }
     }
 
     private void internalStopTracking() {
         if (isTracking()) {
             log(TechnicalLogSeverity.WARNING, "Stopping Time tracker tracking...");
-            if (flushThread.isStarted()) {
-                flushThread.interrupt();
+            if (this.flushThread.isStarted()) {
+                this.flushThread.interrupt();
                 try {
                     // Wait for the thread to die
-                    flushThread.join();
-                } catch (InterruptedException e) {
+                    this.flushThread.join();
+                } catch (final InterruptedException e) {
                     // We want this thread to be interrupted. No need to do extra work here, we are in the desired state.
                 }
             }
@@ -184,23 +200,23 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public boolean isTracking() {
-        return flushThread != null && flushThread.isStarted();
+        return this.flushThread != null && this.flushThread.isStarted();
     }
 
     public long getFlushIntervalInMS() {
-        return flushIntervalInMS;
+        return this.flushIntervalInMS;
     }
 
-    public void setFlushIntervalInSeconds(long flushIntervalInSeconds) {
+    public void setFlushIntervalInSeconds(final long flushIntervalInSeconds) {
         this.flushIntervalInMS = flushIntervalInSeconds * 1000;
     }
 
-    public void setFlushIntervalInMS(long flushIntervalInMS) {
+    public void setFlushIntervalInMS(final long flushIntervalInMS) {
         this.flushIntervalInMS = flushIntervalInMS;
     }
 
     public Clock getClock() {
-        return clock;
+        return this.clock;
     }
 
     public String getStatus() {
@@ -218,29 +234,29 @@ public class TimeTracker implements TenantLifecycleService {
         sb.append("\n");
 
         sb.append("  - flushIntervalInSeconds: ");
-        sb.append(flushIntervalInMS);
+        sb.append(this.flushIntervalInMS);
         sb.append("\n");
 
         sb.append("  - activatedRecords: ");
-        for (TimeTrackerRecords activatedRecord : activatedRecords) {
+        for (final TimeTrackerRecords activatedRecord : this.activatedRecords) {
             sb.append(activatedRecord.name());
             sb.append(" ");
         }
         sb.append("\n");
 
         sb.append("  - flushEventListeners: ");
-        for (FlushEventListener flushEventListener : this.flushEventListeners.values()) {
+        for (final FlushEventListener flushEventListener : this.flushEventListeners.values()) {
             sb.append(flushEventListener.getStatus());
             sb.append(" ");
         }
         sb.append("\n");
 
         sb.append("  - records.size: ");
-        sb.append(records.size());
+        sb.append(this.records.size());
         sb.append("\n");
 
         sb.append("  - last flush occurrence: ");
-        sb.append(new Date(lastFlushTimestamp).toString());
+        sb.append(new Date(this.lastFlushTimestamp).toString());
         sb.append("\n");
 
         sb.append("\n");
@@ -249,11 +265,11 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public boolean isTrackable(final TimeTrackerRecords recordName) {
-        return isTracking() && activatedRecords.contains(recordName);
+        return isTracking() && this.activatedRecords.contains(recordName);
     }
 
     public TechnicalLoggerService getLogger() {
-        return logger;
+        return this.logger;
     }
 
     public void track(final TimeTrackerRecords recordName, final String recordDescription, final long duration) {
@@ -264,35 +280,35 @@ public class TimeTracker implements TenantLifecycleService {
         final Record record = new Record(timestamp, recordName, recordDescription, duration);
         log(TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
         synchronized (this) {
-            records.add(record);
+            this.records.add(record);
         }
     }
 
-    void log(TechnicalLogSeverity severity, String message) {
-        if (logger.isLoggable(getClass(), severity)) {
-            logger.log(getClass(), severity, message);
+    void log(final TechnicalLogSeverity severity, final String message) {
+        if (this.logger.isLoggable(getClass(), severity)) {
+            this.logger.log(getClass(), severity, message);
         }
     }
 
     public FlushResult flush() {
         log(TechnicalLogSeverity.INFO, "Flushing...");
-        lastFlushTimestamp = System.currentTimeMillis();
+        this.lastFlushTimestamp = System.currentTimeMillis();
         final List<FlushEventListenerResult> flushEventListenerResults = new ArrayList<>();
-        final FlushResult flushResult = new FlushResult(lastFlushTimestamp, flushEventListenerResults);
+        final FlushResult flushResult = new FlushResult(this.lastFlushTimestamp, flushEventListenerResults);
         final List<Record> records;
         synchronized (this) {
             records = getRecordsCopy();
             clearRecords();
         }
-        final FlushEvent flushEvent = new FlushEvent(lastFlushTimestamp, records);
+        final FlushEvent flushEvent = new FlushEvent(this.lastFlushTimestamp, records);
 
         flushListeners(flushEvent, flushEventListenerResults);
         log(TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
         return flushResult;
     }
 
-    void flushListeners(FlushEvent flushEvent, List<FlushEventListenerResult> flushEventListenerResults) {
-        if (flushEventListeners == null) {
+    void flushListeners(final FlushEvent flushEvent, final List<FlushEventListenerResult> flushEventListenerResults) {
+        if (this.flushEventListeners == null) {
             return;
         }
         for (final FlushEventListener listener : getActiveFlushEventListeners()) {
@@ -300,38 +316,38 @@ public class TimeTracker implements TenantLifecycleService {
                 final FlushEventListenerResult flushEventListenerResult = listener.flush(flushEvent);
                 flushEventListenerResults.add(flushEventListenerResult);
             } catch (final Exception e) {
-                log(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+                log(TechnicalLogSeverity.WARNING,
+                        "Exception while flushing: " + flushEvent + " on listener " + listener);
             }
         }
     }
 
     public List<Record> getRecordsCopy() {
-        return Arrays.asList(records.toArray(new Record[records.size()]));
+        return Arrays.asList(this.records.toArray(new Record[this.records.size()]));
     }
 
     public void clearRecords() {
-        records.clear();
+        this.records.clear();
     }
 
     @Override
     public void start() {
-        if (serviceStarted) {
+        if (this.serviceStarted) {
             return;
         }
         log(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
-        serviceStarted = true;
+        this.serviceStarted = true;
         internalStartTracking();
         log(TechnicalLogSeverity.INFO, "TimeTracker started.");
     }
 
-
     @Override
     public void stop() {
-        if (!serviceStarted) {
+        if (!this.serviceStarted) {
             return;
         }
         log(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
-        serviceStarted = false;
+        this.serviceStarted = false;
         internalStopTracking();
         log(TechnicalLogSeverity.INFO, "TimeTracker stopped.");
     }

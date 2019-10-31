@@ -15,14 +15,13 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMultiInstanceActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SAMultiInstanceActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAMultiInstanceActivityInstanceBuilder {
 
-    public SAMultiInstanceActivityInstanceBuilderImpl(final SAMultiInstanceActivityInstanceImpl entity) {
+    public SAMultiInstanceActivityInstanceBuilderImpl(final SAMultiInstanceActivityInstance entity) {
         super(entity);
     }
 

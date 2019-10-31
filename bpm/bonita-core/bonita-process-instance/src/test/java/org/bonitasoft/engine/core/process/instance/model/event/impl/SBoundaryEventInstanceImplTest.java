@@ -15,16 +15,17 @@ package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
 import static org.junit.Assert.assertFalse;
 
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SBoundaryEventInstanceImplTest {
 
-    private SBoundaryEventInstanceImpl boundary;
+    private SBoundaryEventInstance boundary;
 
     @Before
     public void setUp() {
-        boundary = new SBoundaryEventInstanceImpl();
+        boundary = new SBoundaryEventInstance();
     }
 
     @Test

@@ -14,28 +14,31 @@
 package org.bonitasoft.engine.lock.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.lock.SLockTimeoutException;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
  */
-@RunWith(MockitoJUnitRunner.class)
 public class MemoryLockServiceTest {
 
     private final Long tenantId = 1L;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private final class LockThread extends Thread {
 
@@ -54,7 +57,7 @@ public class MemoryLockServiceTest {
         public void run() {
             try {
                 lock = memoryLockService.lock(id, type, tenantId);
-            } catch (final SLockException e) {
+            } catch (final SLockException | SLockTimeoutException e) {
                 // NOTHING
             }
         }
@@ -93,6 +96,8 @@ public class MemoryLockServiceTest {
                 lock = null;
             } catch (final InterruptedException e) {
                 e.printStackTrace();
+            } catch (SLockException e) {
+                e.printStackTrace();
             }
         }
 
@@ -108,13 +113,13 @@ public class MemoryLockServiceTest {
         }
     }
 
-    private final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+    private final TechnicalLoggerService logger = new TechnicalLoggerSLF4JImpl();
 
     private MemoryLockService memoryLockService;
 
     @Before
     public void before() {
-        memoryLockService = new MemoryLockService(logger, 1, 12);
+        memoryLockService = new MemoryLockService(logger, 1);
     }
 
     @Test
@@ -129,10 +134,26 @@ public class MemoryLockServiceTest {
         assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void lockOnSameThread_should_throw_IllegalStateException() throws Exception {
+    @Test
+    public void should_lock_multiple_times_on_the_same_thread() throws Exception {
+        BonitaLock bonitaLock = memoryLockService.lock(123, "abc", tenantId);
         memoryLockService.lock(123, "abc", tenantId);
-        memoryLockService.lock(123, "abc", tenantId);
+
+        //Unable to lock in an other thread
+        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+
+        //Unable to lock in an other thread: the lock is still hold once by the current thread
+        memoryLockService.unlock(bonitaLock,tenantId);
+        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNull();
+
+        //Able to unlock the thread release all holds
+        memoryLockService.unlock(bonitaLock,tenantId);
+        assertThat(tryLockInAnOtherThread(123, "abc", this.tenantId)).isNotNull();
+    }
+
+    private BonitaLock tryLockInAnOtherThread(int objectToLockId, String abc, Long tenantId) throws InterruptedException, java.util.concurrent.ExecutionException {
+        return executorService.submit(() ->
+                memoryLockService.tryLock(objectToLockId, abc, 10, TimeUnit.MILLISECONDS, tenantId)).get();
     }
 
     @Test
@@ -165,12 +186,13 @@ public class MemoryLockServiceTest {
      */
     @Test
     public void testRemoveLockFromMap() throws Exception {
+        int rd = new Random().nextInt();
         final Semaphore s1 = new Semaphore(1);
         final Semaphore s2 = new Semaphore(1);
         final Semaphore s3 = new Semaphore(1);
-        final TryLockThread t1 = new TryLockThread("t1", 1, "t", s1);
-        final TryLockThread t2 = new TryLockThread("t2", 1, "t", s2);
-        final TryLockThread t3 = new TryLockThread("t3", 1, "t", s3);
+        final TryLockThread t1 = new TryLockThread("t1", rd, "t", s1);
+        final TryLockThread t2 = new TryLockThread("t2", rd, "t", s2);
+        final TryLockThread t3 = new TryLockThread("t3", rd, "t", s3);
         s1.acquire();
         s2.acquire();
         s3.acquire();
@@ -203,25 +225,5 @@ public class MemoryLockServiceTest {
         t3.waitForLockToBeObtained(500);
         s3.release();
         // state : S1, S2, S3, BL
-    }
-
-    @Test
-    public void getDetailsOnLockShouldReturnLockingThreadOwnerName() {
-        // given:
-        final MemoryLockService spiedLockService = spy(memoryLockService);
-        final long objectToLockId = 151L;
-        final String lockKey = "objectType_" + objectToLockId + "_" + tenantId;
-        final ReentrantLock lock = spy(new ReentrantLock());
-        lock.lock();
-        doReturn(false).when(lock).isHeldByCurrentThread();
-        doReturn(lock).when(spiedLockService).getLockFromKey(lockKey);
-
-        // when:
-        final StringBuilder detailsOnLock = spiedLockService.getDetailsOnLock(objectToLockId, "objectType", tenantId);
-
-        // then:
-        String threadName = Thread.currentThread().getName();
-        long threadId = Thread.currentThread().getId();
-        assertThat(detailsOnLock).describedAs("detailsOnLock should contain 'held by thread main'").contains("held by thread " + threadName + " with id " + threadId);
     }
 }
