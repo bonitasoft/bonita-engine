@@ -34,6 +34,8 @@ public abstract class SpringBeanAccessor {
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private BonitaSpringContext context;
 
+    private boolean contextFinishedInitialized = false;
+
     public <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
     }
@@ -47,16 +49,24 @@ public abstract class SpringBeanAccessor {
     }
 
     public ApplicationContext getContext() {
-        if (context == null) {
-            try {
-                context = createContext();
-                configureContext(context);
-                context.refresh();
-            } catch (IOException e) {
-                throw new BonitaRuntimeException(e);
-            }
+        if (!contextFinishedInitialized) {
+            initializeContext();
         }
         return context;
+    }
+
+    private synchronized void initializeContext() {
+        if (contextFinishedInitialized) {
+            return;
+        }
+        try {
+            context = createContext();
+            configureContext(context);
+            context.refresh();
+            contextFinishedInitialized = true;
+        } catch (IOException e) {
+            throw new BonitaRuntimeException(e);
+        }
     }
 
     private void configureContext(BonitaSpringContext context) throws IOException {
@@ -98,7 +108,8 @@ public abstract class SpringBeanAccessor {
     }
 
     protected boolean isCluster() throws IOException {
-        return Boolean.parseBoolean(getPropertyWithPlaceholder(BONITA_HOME_SERVER.getPlatformProperties(), "bonita.cluster", "false"));
+        return Boolean.parseBoolean(
+                getPropertyWithPlaceholder(BONITA_HOME_SERVER.getPlatformProperties(), "bonita.cluster", "false"));
     }
 
 }
