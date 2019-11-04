@@ -15,10 +15,9 @@ package org.bonitasoft.engine.tenant.restart;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.execution.work.RestartException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,8 +48,7 @@ public class ProfilesUpdaterRestartHandler implements TenantRestartHandler {
 
 
     @Override
-    public void beforeServicesStart()
-            throws RestartException {
+    public void beforeServicesStart() {
     }
 
     @Override
