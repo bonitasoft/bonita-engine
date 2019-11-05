@@ -16,6 +16,8 @@ package org.bonitasoft.engine.core.process.instance.api.exceptions;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -35,8 +37,32 @@ public class SContractViolationExceptionTest {
     public void should_print_stack_trace_show_explanations() {
         final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
 
-        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: [issue1, issue2]");
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1, issue2");
 
+    }
+
+    @Test
+    public void should_print_stack_trace_show_one_explanation() {
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1"));
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1");
+
+    }
+
+    @Test
+    public void should_print_stack_trace_with_null_explanations() {
+        List<String> explanations = null;
+        @SuppressWarnings("ConstantConditions") final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
+    }
+
+    @Test
+    public void should_print_stack_trace_with_empty_explanations() {
+        List<String> explanations = Collections.emptyList();
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
     }
 
     @Test
