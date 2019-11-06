@@ -28,4 +28,6 @@ public interface BonitaExecutorServiceFactory {
      */
     BonitaExecutorService createExecutorService(WorkExecutionCallback workExecutionCallback);
 
+    default void unbind() {
+    }
 }
