@@ -7,7 +7,7 @@ public class SequenceRange {
 
     private AtomicLong nextAvailableId;
     private long lastIdInRange;
-    private int rangeSize;
+    private final int rangeSize;
 
     public SequenceRange(int rangeSize) {
         this.rangeSize = rangeSize;
@@ -15,11 +15,12 @@ public class SequenceRange {
 
     public Optional<Long> getNextAvailableId() {
         if (nextAvailableId == null) {
+            // Range is not initialized yet:
             return Optional.empty();
         }
         long nextId = nextAvailableId.getAndUpdate(current -> {
             if (current == -1 || current >= lastIdInRange) {
-                return -1;
+                return -1; // -1 means no more Id available
             } else {
                 return current + 1;
             }

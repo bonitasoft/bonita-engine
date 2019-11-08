@@ -51,9 +51,12 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
     private WorkExecutionAuditor workExecutionAuditor;
+    private MeterRegistry meterRegistry;
 
     private final AtomicLong runningWorks = new AtomicLong();
     private final Counter executedWorkCounter;
+    private final Gauge numberOfWorksPending;
+    private final Gauge numberOfWorksRunning;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
                                     final int maximumPoolSize,
@@ -71,12 +74,13 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         this.engineClock = engineClock;
         this.workExecutionCallback = workExecutionCallback;
         this.workExecutionAuditor = workExecutionAuditor;
+        this.meterRegistry = meterRegistry;
 
         Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-        Gauge.builder(NUMBER_OF_WORKS_PENDING, workQueue, Collection::size)
+        numberOfWorksPending = Gauge.builder(NUMBER_OF_WORKS_PENDING, workQueue, Collection::size)
                 .tags(tags).baseUnit("works").description("Works pending in the execution queue")
                 .register(meterRegistry);
-        Gauge.builder(NUMBER_OF_WORKS_RUNNING, runningWorks, AtomicLong::get)
+        numberOfWorksRunning = Gauge.builder(NUMBER_OF_WORKS_RUNNING, runningWorks, AtomicLong::get)
                 .tags(tags).baseUnit("works").description("Works currently executing")
                 .register(meterRegistry);
         executedWorkCounter = Counter.builder(NUMBER_OF_WORKS_EXECUTED)
@@ -103,6 +107,9 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
         super.shutdown();
         log.info("Clearing queue of work, had {} elements", workQueue.size());
         workQueue.clear();
+        meterRegistry.remove(numberOfWorksPending);
+        meterRegistry.remove(numberOfWorksRunning);
+        meterRegistry.remove(executedWorkCounter);
     }
 
     @Override

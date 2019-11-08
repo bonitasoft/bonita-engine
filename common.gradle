@@ -34,7 +34,6 @@ subprojects {
 
     repositories {
         mavenLocal()
-        maven { url 'http://repositories.rd.lan/maven/all/' }
         mavenCentral()
         jcenter()
 

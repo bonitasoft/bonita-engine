@@ -88,6 +88,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             if (isStopped()) {
                 return;
             }
+            bonitaExecutorServiceFactory.unbind();
             shutdownExecutor();
             awaitTermination();
         } catch (final SWorkException e) {
@@ -111,6 +112,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
         if (isStopped()) {
             return;
         }
+        bonitaExecutorServiceFactory.unbind();
         shutdownExecutor();
         // completely clear the queue because it's a global pause
         executor.clearAllQueues();
