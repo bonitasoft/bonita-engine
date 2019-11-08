@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
-import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
-import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
@@ -37,7 +37,7 @@ public class MonitoringConfigTest {
         protected MeterRegistry meterRegistry;
 
         @Autowired
-        protected ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider;
+        protected ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     }
 
@@ -57,7 +57,7 @@ public class MonitoringConfigTest {
 
         @Test
         public void should_have_no_executor_metrics_values_by_default() {
-            assertThat(executorServiceMeterBinderProvider).isInstanceOf(EmptyExecutorServiceMeterBinderProvider.class);
+            assertThat(executorServiceMetricsProvider).isInstanceOf(NoOpExecutorServiceMetricsProvider.class);
         }
 
         @Test
@@ -102,8 +102,8 @@ public class MonitoringConfigTest {
 
         @Test
         public void should_provide_ExecutorServiceMeterBinder() {
-            assertThat(executorServiceMeterBinderProvider)
-                    .isInstanceOf(DefaultExecutorServiceMeterBinderProvider.class);
+            assertThat(executorServiceMetricsProvider)
+                    .isInstanceOf(DefaultExecutorServiceMetricsProvider.class);
         }
 
         @Test

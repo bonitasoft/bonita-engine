@@ -35,7 +35,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -80,10 +80,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final TimeTracker timeTracker;
     private MeterRegistry meterRegistry;
     private long tenantId;
-    private ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider;
+    private ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     private final AtomicLong runningWorks = new AtomicLong();
     private Counter executedWorkCounter;
+    private Gauge numberOfConnectorsPending;
+    private Gauge numberOfConnectorsRunning;
 
     /**
      * The handling of threads relies on the JVM
@@ -110,7 +112,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService,
                                  final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor,
                                  final SessionService sessionService, final TimeTracker timeTracker, final MeterRegistry meterRegistry,
-                                 long tenantId, ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider) {
+                                 long tenantId, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
         this.loggerService = loggerService;
@@ -121,7 +123,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         this.timeTracker = timeTracker;
         this.meterRegistry = meterRegistry;
         this.tenantId = tenantId;
-        this.executorServiceMeterBinderProvider = executorServiceMeterBinderProvider;
+        this.executorServiceMetricsProvider = executorServiceMetricsProvider;
     }
 
     @Override
@@ -317,26 +319,20 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
             final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory(
                     "ConnectorExecutor");
-            setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
-                    workQueue, threadFactory, handler));
-            executorServiceMeterBinderProvider
-                    .createMeterBinder(executorService, "bonita-connector-executor", tenantId)
-                    .ifPresent(m -> m.bindTo(meterRegistry));
+            executorService = executorServiceMetricsProvider
+                    .bind(meterRegistry, new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
+                            workQueue, threadFactory, handler), "bonita-connector-executor", tenantId);
             Tags tags = Tags.of("tenant", String.valueOf(tenantId));
-            Gauge.builder(NUMBER_OF_CONNECTORS_PENDING, workQueue, Collection::size)
+            numberOfConnectorsPending = Gauge.builder(NUMBER_OF_CONNECTORS_PENDING, workQueue, Collection::size)
                     .tags(tags).baseUnit("connectors").description("Connectors pending in the execution queue")
                     .register(meterRegistry);
-            Gauge.builder(NUMBER_OF_CONNECTORS_RUNNING, runningWorks, AtomicLong::get)
+            numberOfConnectorsRunning = Gauge.builder(NUMBER_OF_CONNECTORS_RUNNING, runningWorks, AtomicLong::get)
                     .tags(tags).baseUnit("connectors").description("Connectors currently executing")
                     .register(meterRegistry);
             executedWorkCounter = Counter.builder(NUMBER_OF_CONNECTORS_EXECUTED)
                     .tags(tags).baseUnit("connectors").description("Total connectors executed since last server start")
                     .register(meterRegistry);
         }
-    }
-
-    void setExecutor(final ExecutorService executorService) {
-        this.executorService = executorService;
     }
 
     // For unit tests
@@ -347,6 +343,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     @Override
     public void stop() {
         if (executorService != null) {
+            meterRegistry.remove(executedWorkCounter);
+            meterRegistry.remove(numberOfConnectorsRunning);
+            meterRegistry.remove(numberOfConnectorsPending);
+            executorServiceMetricsProvider.unbind(meterRegistry, "bonita-connector-executor", tenantId);
+
             executorService.shutdown();
             try {
                 if (!executorService.awaitTermination(5000, TimeUnit.MILLISECONDS)) {

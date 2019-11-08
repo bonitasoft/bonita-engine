@@ -11,51 +11,54 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile;
+package org.bonitasoft.engine.tenant.restart;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.execution.TransactionServiceMock;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import java.util.concurrent.Callable;
+
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProfilesUpdaterRestartHandlerTest {
 
     @Mock
-    public PlatformServiceAccessor platformServiceAccessor;
-    @Mock
     public TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private DefaultProfilesUpdater defaultProfilesUpdater;
-    @Spy
+    @Mock
+    private ProfilesImporter profilesImporter;
+    @Mock
+    private TransactionService transactionService;
     private ProfilesUpdaterRestartHandler profilesUpdaterRestartHandler;
 
-    @Test
-    public void should_execute_default_profiles_update_after_service_start() throws Exception {
-        doReturn(new TransactionServiceMock()).when(platformServiceAccessor).getTransactionService();
-        doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getProfileUpdater(platformServiceAccessor, tenantServiceAccessor);
-
-        profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
-
-        verify(defaultProfilesUpdater).execute();
+    @Before
+    public void before() throws Exception {
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(transactionService).executeInTransaction(any());
     }
 
     @Test
-    public void should_execute_in_transaction() throws Exception {
-        TransactionService transactionService = mock(TransactionService.class);
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
+    public void should_execute_default_profiles_update_after_service_start() throws Exception {
+        profilesUpdaterRestartHandler = spy(new ProfilesUpdaterRestartHandler(1L, new TechnicalLoggerSLF4JImpl(), profilesImporter, transactionService));
+        doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getDefaultProfilesUpdater();
 
-        profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        profilesUpdaterRestartHandler.afterServicesStart();
 
         verify(transactionService).executeInTransaction(any());
+        verify(defaultProfilesUpdater).execute();
     }
 
 }

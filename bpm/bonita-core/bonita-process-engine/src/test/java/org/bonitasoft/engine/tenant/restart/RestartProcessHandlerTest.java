@@ -11,25 +11,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.state.FailedActivityStateImpl;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.WorkService;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RestartProcessHandlerTest {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     TechnicalLoggerService logger;
@@ -42,9 +49,13 @@ public class RestartProcessHandlerTest {
     @Mock
     FlowNodeStateManagerImpl flowNodeStateManager;
 
+    @InjectMocks
+    private RestartProcessHandler restartProcessHandler;
+
     @Test
     public void handleCompletionShouldDoNothingIfNoCallerId() throws Exception {
-        new RestartProcessHandler().handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+
+        restartProcessHandler.handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -56,7 +67,7 @@ public class RestartProcessHandlerTest {
         doReturn(callActivity).when(activityInstanceService).getActivityInstance(anyLong());
         SProcessInstance processInstance = mock(SProcessInstance.class);
         when(processInstance.getCallerId()).thenReturn(5L);
-        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -69,6 +80,6 @@ public class RestartProcessHandlerTest {
         SProcessInstance processInstance = mock(SProcessInstance.class);
         //        when(processInstance.getId()).thenReturn(1654534L);
         when(processInstance.getCallerId()).thenReturn(5L);
-        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 }

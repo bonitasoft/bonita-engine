@@ -31,7 +31,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -75,7 +75,7 @@ public class ConnectorExecutorImplTest {
                 Clock.SYSTEM);
         connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService,
                 timeTracker,
-                meterRegistry, TENANT_ID, new DefaultExecutorServiceMeterBinderProvider());
+                meterRegistry, TENANT_ID, new DefaultExecutorServiceMetricsProvider());
 
         connectorExecutorImpl.start();
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
@@ -204,9 +204,7 @@ public class ConnectorExecutorImplTest {
     public void should_update_connectors_counters_when_adding_a_connector_with_immediate_execution() throws Exception {
         //when:
         when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
-        connectorExecutorImpl
-                .execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader())
-                .get();
+        executeAConnector();
         TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
 
         //then:
@@ -216,6 +214,37 @@ public class ConnectorExecutorImplTest {
                 .as("Running connectors number").isEqualTo(0);
         assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).gauge().value())
                 .as("Pending connectors number").isEqualTo(0);
+    }
+
+    @Test
+    public void should_reset_and_have_counters_after_pause_and_resume() throws Exception {
+        //when:
+        when(loggerService.asLogger(any())).thenReturn(new TechnicalLoggerSLF4JImpl().asLogger(this.getClass()));
+        executeAConnector();
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).counter().count())
+                .as("Executed connectors number").isEqualTo(1);
+        assertThat(meterRegistry.find("executor.completed").functionCounter().count()).isEqualTo(1);
+        connectorExecutorImpl.pause();
+
+        assertThat(meterRegistry.getMeters()).hasSize(0);
+
+        connectorExecutorImpl.resume();
+        executeAConnector();
+        executeAConnector();
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to consider the connector to process
+
+        //then:
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).counter().count())
+                .as("Executed connectors number").isEqualTo(2);
+        assertThat(meterRegistry.find("executor.completed").functionCounter().count()).isEqualTo(2);
+
+    }
+
+    private void executeAConnector() throws InterruptedException, java.util.concurrent.ExecutionException, SConnectorException {
+        connectorExecutorImpl
+                .execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader())
+                .get();
     }
 
     @Test

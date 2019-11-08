@@ -25,7 +25,7 @@ public class TenantServicesManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenantServicesManager.class);
 
     public enum TenantServiceState {
-        STOPPED, STARTING, STARTED, STOPPING;
+        STOPPED, STARTING, STARTED, STOPPING
     }
     private SessionAccessor sessionAccessor;
 
@@ -78,7 +78,6 @@ public class TenantServicesManager {
             return;
         }
         tenantServiceState = TenantServiceState.STARTING;
-        //FIXME do not start services, if they are already started
         inTenantSession(() -> {
             tenantElementsRestarter.prepareRestartOfElements();
             changeServiceState(serviceAction);
