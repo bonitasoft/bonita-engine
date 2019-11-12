@@ -63,18 +63,29 @@ public class ProcessInstantiationPermissionRuleTest {
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
-    def havingResourceId(boolean isInvolvedIn) {
+    def havingResourceId() {
         doReturn(currentUserId).when(apiSession).getUserId()
         doReturn(true).when(apiCallContext).isPOST()
         doReturn("process").when(apiCallContext).getResourceName()
         doReturn("45/instantiation").when(apiCallContext).getResourceId()
         doReturn(Arrays.asList("45", "instantiation")).when(apiCallContext).getCompoundResourceId()
-        doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l)
+    }
+
+    def beingProcessSupervisor(isProcessSupervisor) {
+        doReturn(isProcessSupervisor).when(processAPI).isUserProcessSupervisor(45l, currentUserId)
+    }
+
+    def startingForUser(userId) {
+        String[] startingForUserId = [userId]
+        def parametersMap = [:]
+        parametersMap["user"] = startingForUserId
+        doReturn(parametersMap).when(apiCallContext).getParameters()
     }
 
     @Test
     public void should_check_verify_can_start_is_true() {
-        havingResourceId(true)
+        havingResourceId()
+        beingProcessSupervisor(false)
         doReturn(new SearchResultImpl<User>(1, [user])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
 
         //when
@@ -85,8 +96,49 @@ public class ProcessInstantiationPermissionRuleTest {
     }
 
     @Test
-    public void should_check_verify_can_start_on_post_is_false() {
-        havingResourceId(false)
+    public void should_check_verify_can_start_is_false() {
+        havingResourceId()
+        beingProcessSupervisor(false)
+        doReturn(new SearchResultImpl<User>(0, [])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
+
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void should_check_verify_can_start_is_false_with_user_param() {
+        havingResourceId()
+        beingProcessSupervisor(false)
+        startingForUser("3")
+        doReturn(new SearchResultImpl<User>(1, [user])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
+
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isFalse()
+    }
+
+    @Test
+    public void should_check_verify_can_start_is_true_for_process_supervisor() {
+        havingResourceId()
+        beingProcessSupervisor(true)
+        startingForUser("3")
+        doReturn(new SearchResultImpl<User>(1, [user])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
+
+        //when
+        def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+        //then
+        Assertions.assertThat(isAuthorized).isTrue()
+
+    }
+
+    @Test
+    public void should_check_verify_can_start_is_false_for_process_supervisor() {
+        havingResourceId()
+        beingProcessSupervisor(true)
+        startingForUser("3")
         doReturn(new SearchResultImpl<User>(0, [])).when(processAPI).searchUsersWhoCanStartProcessDefinition(eq(45l), any(SearchOptions.class))
 
         //when
