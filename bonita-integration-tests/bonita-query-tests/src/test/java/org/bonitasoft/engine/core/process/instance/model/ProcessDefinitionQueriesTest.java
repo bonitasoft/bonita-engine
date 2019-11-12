@@ -7,17 +7,11 @@ import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 
 import java.util.List;
-
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
-import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
-import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,30 +34,47 @@ public class ProcessDefinitionQueriesTest {
         searchSUserWhoCanStartProcess
      */
 
+    
+
+
     @Test
     public void searchSUserWhoCanStartProcess_should_return_users_having_the_right_user_membership() {
         long G1 = 333331L;
         long G2 = 333332L;
         long G3 = 333333L;
+        long G4 = 333334L;
+
+        long R2=222225L;
+        long R3=222226L;
+        long R4=222227L;
+
         final SUser john = repository.add(aUser().withUserName("john").withId(1L).build());
         final SUser paul = repository.add(aUser().withUserName("paul").withId(2L).build());
         final SUser walter = repository.add(aUser().withUserName("walter").withId(3L).build());
         final SUser marie = repository.add(aUser().withUserName("marie").withId(4L).build());
+        final SUser helen = repository.add(aUser().withUserName("helen").withId(5L).build());
+        final SUser jobs = repository.add(aUser().withUserName("jobs").withId(6L).build());
+
         final SActor actor = repository.add(anActor().withScopeId(PROCESS_ID).whoIsInitiator().build());
+
+        repository.add(anActorMember().forActor(actor).withUserId(helen.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(G1).withRoleId(ROLE_ID).build());
+        repository.add(anActorMember().forActor(actor).withRoleId(R3).build());
+        repository.add(anActorMember().forActor(actor).withGroupId(G3).build());
+
         repository.add(aUserMembership().forUser(john).memberOf(G1, ROLE_ID).build());
         repository.add(aUserMembership().forUser(paul).memberOf(G1, ROLE_ID).build());
-        repository.add(aUserMembership().forUser(walter).memberOf(G2, ROLE_ID).build());
-        repository.add(aUserMembership().forUser(marie).memberOf(G3, ROLE_ID).build());
-
+        repository.add(aUserMembership().forUser(walter).memberOf(G2, R3).build());
+        repository.add(aUserMembership().forUser(marie).memberOf(G3, R2).build());
+        repository.add(aUserMembership().forUser(jobs).memberOf(G4, R4).build());
 
         final List<SUser> users = repository.searchSUserWhoCanStartProcess(PROCESS_ID);
 
-        assertThat(users).hasSize(2).contains(john, paul);
+        assertThat(users).hasSize(5).containsOnly(john, paul, walter, marie, helen);
 
         long numberOfSUserWhoCanStartProcess = repository.getNumberOfSUserWhoCanStartProcess(PROCESS_ID);
 
-        assertThat(numberOfSUserWhoCanStartProcess).isEqualTo(2);
+        assertThat(numberOfSUserWhoCanStartProcess).isEqualTo(5);
     }
 
     @Test
