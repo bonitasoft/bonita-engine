@@ -23,3 +23,6 @@ rem Pass the JVM system properties to Tomcat JVM using CATALINA_OPTS variable
 set CATALINA_OPTS=%CATALINA_OPTS% %PLATFORM_SETUP% %H2_DATABASE_DIR% %DB_OPTS% %BDM_DB_OPTS% %ARJUNA_OPTS% %INCIDENT_LOG_DIR% -Dfile.encoding=UTF-8 -Xshare:auto -Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError
 
 set CATALINA_PID=%CATALINA_BASE%\catalina.pid
+
+@rem extra lib at Tomcat startup (for instance bonita juli extensions)
+set CLASSPATH="%CATALINA_HOME%\lib\ext\*"

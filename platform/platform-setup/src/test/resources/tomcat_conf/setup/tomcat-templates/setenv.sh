@@ -28,3 +28,6 @@ if [ -z ${CATALINA_PID+x} ]; then
         CATALINA_PID=${CATALINA_BASE}/catalina.pid;
         export CATALINA_PID;
 fi
+
+# extra lib required at Tomcat startup (for instance bonita juli extensions)
+CLASSPATH="${CATALINA_HOME}/lib/ext/*"
