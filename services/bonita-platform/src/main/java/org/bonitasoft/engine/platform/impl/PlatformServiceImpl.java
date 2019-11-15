@@ -189,7 +189,9 @@ public class PlatformServiceImpl implements PlatformService {
             stmt.executeBatch();
             connection.commit();
         } catch (final SQLException e) {
-            logger.error("Error while executing sql batch: {}", e.getNextException().getMessage());
+            if (e.getNextException() != null) {
+                logger.error("Error while executing sql batch: {}", e.getNextException().getMessage());
+            }
             connection.rollback();
             throw e;
         } finally {
