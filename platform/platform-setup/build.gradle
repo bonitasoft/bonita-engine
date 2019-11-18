@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.bonitasoft.engine.gradle.PomUtils
 
-apply plugin: 'distribution'
+plugins { id 'distribution' }
 
 configurations {
     distributionZip
@@ -27,7 +27,9 @@ dependencies {
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
     testCompile "org.mockito:mockito-core:${Deps.mockitoVersion}"
     testCompile "com.github.stefanbirkner:system-rules:${Deps.systemRulesVersion}"
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) { exclude(module: 'json-path') }
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: Deps.springBootVersion) {
+        exclude(module: 'json-path')
+    }
     testCompile "xmlunit:xmlunit:${Deps.xmlunitVersion}"
     testCompile project(':platform:platform-setup-test')
 

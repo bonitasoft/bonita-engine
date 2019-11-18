@@ -1,6 +1,6 @@
 import org.bonitasoft.engine.gradle.ShadeDependency
 
-apply plugin: 'bonita-shade'
+plugins { id 'bonita-shade' }
 
 dependencies {
     compile project(':bpm:bonita-core:bonita-process-engine')

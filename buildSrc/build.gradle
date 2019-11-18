@@ -2,8 +2,6 @@ plugins {
     id("groovy")
     id("java-gradle-plugin")
 }
-apply plugin: 'groovy'
-apply plugin: 'java-gradle-plugin'
 
 repositories {
     mavenLocal()
