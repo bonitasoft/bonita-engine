@@ -19,11 +19,12 @@ import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.xml.sax.SAXException;
 
 public class Marshaller {
 
-    public static BusinessObjectModel marshallUnmarshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException {
+    public static BusinessObjectModel marshallUnmarshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException, InvalidBusinessDataModelException {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final byte[] marshall = convertor.marshall(bom);
         return convertor.unmarshall(marshall);

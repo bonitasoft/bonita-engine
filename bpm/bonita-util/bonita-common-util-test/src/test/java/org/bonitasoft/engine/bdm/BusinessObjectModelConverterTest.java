@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.io.IOUtils;
 import org.junit.Test;
 
@@ -70,7 +71,7 @@ public class BusinessObjectModelConverterTest {
         convertor.zip(bom);
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = InvalidBusinessDataModelException.class)
     public void unzipADifferentZipThrowAnException() throws Exception {
         final byte[] zip = IOUtils.zip("bonita", "bpm".getBytes());
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
@@ -116,6 +117,7 @@ public class BusinessObjectModelConverterTest {
         assertThat(bom.getProductVersion()).isNotNull().isNotEmpty();
     }
 
+    @Test
     public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithIndex() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BusinessObjectModelBuilder().buildBOMWithIndex();
