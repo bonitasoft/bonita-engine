@@ -91,6 +91,10 @@ public class Query {
         return List.class.getName().equals(returnType);
     }
 
+    public boolean isCountQuery(){
+        return Long.class.getName().equals(returnType);
+    }
+
     public void setReturnType(final String returnType) {
         this.returnType = returnType;
     }

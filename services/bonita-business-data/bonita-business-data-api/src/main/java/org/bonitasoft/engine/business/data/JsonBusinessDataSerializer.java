@@ -25,4 +25,5 @@ public interface JsonBusinessDataSerializer {
 
     String serializeEntities(List<? extends Entity> entities, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
 
+    String serializeCountResult(List<Long> list, String entityClassName) throws SBusinessDataRepositorySerializationException;
 }
