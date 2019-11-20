@@ -88,6 +88,13 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
     }
 
     @Override
+    public String serializeCountResult(List<Long> list, String entityClassName) {
+        String json = "[" + list.get(0).toString() + "]";
+        LOG.trace("Serialization result: {}", json);
+        return json;
+    }
+
+    @Override
     public void onUpdate(ClassLoader newClassLoader) {
     }
 

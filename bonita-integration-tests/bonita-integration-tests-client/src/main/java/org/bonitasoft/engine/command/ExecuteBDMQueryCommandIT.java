@@ -257,6 +257,14 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     @Test
+    public void should_return_count_result_when_executing_count_query() throws Exception {
+        //given
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("countForCustomQuery", 0, 1);
+
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo("[3]");
+    }
+
+    @Test
     public void should_have_query_metadata_on_custom_queries_with_related_count() throws Exception {
         //given
         int startIndex = 2;
