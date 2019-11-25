@@ -58,6 +58,6 @@ class Deps {
 
 
     //Build plugins
-    public static String bonitaPluginsVersion = "0.1.42"
+    public static String bonitaPluginsVersion = "0.1.47"
 
 }
