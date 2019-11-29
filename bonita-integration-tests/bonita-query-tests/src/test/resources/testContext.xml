@@ -21,6 +21,8 @@
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -34,7 +36,6 @@
                 <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
                 <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                 <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
