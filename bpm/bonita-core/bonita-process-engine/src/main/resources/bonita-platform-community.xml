@@ -781,7 +781,6 @@
         <property name="resources">
             <set>
                 <!-- actor -->
-                <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
                 <!-- bar resources -->
                 <value>org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
@@ -1015,6 +1014,8 @@
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
+                <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
             </set>
         </property>
     </bean>
