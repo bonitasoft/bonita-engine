@@ -36,6 +36,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
@@ -78,12 +79,20 @@ public class TestRepository {
         return getSession().getNamedQuery(queryName);
     }
 
+    public void flush() {
+        getSession().flush();
+    }
+
     /**
      * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
      */
     public SUser add(final SUser user) {
         getSession().save(user);
         return (SUser) getSession().get(user.getClass(), new PersistentObjectId(user.getId(), user.getTenantId()));
+    }
+    public SUserLogin add(final SUserLogin userLogin) {
+        getSession().save(userLogin);
+        return (SUserLogin) getSession().get(userLogin.getClass(), new PersistentObjectId(userLogin.getId(), userLogin.getTenantId()));
     }
 
     public SRole add(final SRole role) {

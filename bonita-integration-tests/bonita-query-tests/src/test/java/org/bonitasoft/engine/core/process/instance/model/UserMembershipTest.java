@@ -108,8 +108,7 @@ public class UserMembershipTest {
     }
 
     @Test
-    public void getUserMemberships_should_fill_in_groupParentPath() {
-
+    public void getUserMemberships_should_fill_transient_fields() {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
@@ -119,7 +118,9 @@ public class UserMembershipTest {
         assertThat(userMemberships).hasSize(1);
         SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
-
+        assertThat(userMembership.getRoleName()).isEqualTo("dummy roleName");
+        assertThat(userMembership.getGroupName()).isEqualTo("dummy groupName");
+        assertThat(userMembership.getUsername()).isEqualTo("dummy username");
     }
 
     @Test

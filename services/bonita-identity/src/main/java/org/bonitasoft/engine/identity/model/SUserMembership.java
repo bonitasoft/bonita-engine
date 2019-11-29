@@ -13,11 +13,19 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Anthony Birembaut
@@ -28,6 +36,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "user_membership")
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
 public class SUserMembership implements PersistentObject {
 
     public static final String ID = "id";
@@ -36,14 +48,21 @@ public class SUserMembership implements PersistentObject {
     public static final String GROUP_ID = "groupId";
     public static final String ASSIGNED_BY = "assignedBy";
     public static final String ASSIGNED_DATE = "assignedDate";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private long roleId;
+    @Column
     private long groupId;
+    @Column
     private long userId;
+    @Column
     private long assignedBy;
+    @Column
     private long assignedDate;
-    private String groupParentPath;
+    private transient String groupParentPath;
     private transient String roleName;
     private transient String groupName;
     private transient String username;

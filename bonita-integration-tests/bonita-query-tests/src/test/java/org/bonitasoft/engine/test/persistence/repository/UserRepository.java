@@ -14,23 +14,25 @@
 package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 /**
  * author Emmanuel Duchastenier
  */
-public class RoleRepository extends TestRepository {
+public class UserRepository extends TestRepository {
 
-    public RoleRepository(SessionFactory sessionFactory) {
+    public UserRepository(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
-    public SRole getRoleByName(long tenantId, String name) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
-        Query namedQuery = getNamedQuery("getRoleByName");
-        namedQuery.setParameter("name", name);
-        return ((SRole) namedQuery.uniqueResult());
+    public SUser getUserByName(String userName) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserByUserName");
+        namedQuery.setParameter("userName", userName);
+        return ((SUser) namedQuery.uniqueResult());
     }
 
 

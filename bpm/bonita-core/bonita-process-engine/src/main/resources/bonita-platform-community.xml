@@ -826,7 +826,6 @@
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
                 <!-- identity -->
-                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
                 <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
                 <!-- external identity -->
                 <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
@@ -1006,7 +1005,16 @@
         </property>
         <property name="entities">
             <set>
+                <value>org.bonitasoft.engine.identity.model.SContactInfo</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>
+                <value>org.bonitasoft.engine.identity.model.SGroup</value>
+                <value>org.bonitasoft.engine.identity.model.SHavingIcon</value>
+                <value>org.bonitasoft.engine.identity.model.SIcon</value>
                 <value>org.bonitasoft.engine.identity.model.SRole</value>
+                <value>org.bonitasoft.engine.identity.model.SUser</value>
+                <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
+                <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
             </set>
         </property>
     </bean>
