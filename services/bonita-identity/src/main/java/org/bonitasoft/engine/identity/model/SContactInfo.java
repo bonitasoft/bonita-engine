@@ -13,11 +13,19 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * User contact info: can be personal or professional contact information.
@@ -28,6 +36,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "user_contactinfo")
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
 public class SContactInfo implements PersistentObject {
 
     public static final String ID = "id";
@@ -44,21 +56,37 @@ public class SContactInfo implements PersistentObject {
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String EMAIL = "email";
     public static final String IS_PERSONAL = "personal";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private Long userId;
+    @Column
     private String email;
+    @Column(name = "phone")
     private String phoneNumber;
+    @Column(name = "mobile")
     private String mobileNumber;
+    @Column(name = "fax")
     private String faxNumber;
+    @Column
     private String building;
+    @Column
     private String room;
+    @Column
     private String address;
+    @Column
     private String zipCode;
+    @Column
     private String city;
+    @Column
     private String state;
+    @Column
     private String country;
+    @Column
     private String website;
+    @Column
     private boolean personal;
 
     public SContactInfo(final SContactInfo contactInfo) {

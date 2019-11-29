@@ -13,12 +13,23 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Anthony Birembaut
@@ -32,6 +43,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "user_")
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
 public class SUser implements PersistentObject, SHavingIcon {
 
     public static final String ID = "id";
@@ -47,20 +62,36 @@ public class SUser implements PersistentObject, SHavingIcon {
     public static final String CREATED_BY = "createdBy";
     public static final String CREATION_DATE = "creationDate";
     public static final String ENABLED = "enabled";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private String firstName;
+    @Column
     private String lastName;
+    @Column
     private String password;
+    @Column
     private String userName;
+    @Column
     private long managerUserId;
+    @Column
     private String title;
+    @Column
     private String jobTitle;
+    @Column
     private long creationDate;
+    @Column
     private long createdBy;
+    @Column
     private long lastUpdate;
+    @Column
     private boolean enabled;
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private SUserLogin sUserLogin;
+    @Column(name = "iconid")
     private Long iconId;
 
     public SUser(final SUser user) {

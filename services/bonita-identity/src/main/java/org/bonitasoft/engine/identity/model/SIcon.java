@@ -14,20 +14,38 @@
 
 package org.bonitasoft.engine.identity.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 /**
  * @author Baptiste Mesta
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "icon")
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
 public class SIcon implements PersistentObject {
 
+    @Id
     private long tenantId;
+    @Id
     private long id;
+    @Column(name = "mimetype")
     private String mimeType;
+    @Type(type = "materialized_blob")
+    @Column(name = "content")
     private byte[] content;
 
     public SIcon(String mimeType, byte[] content) {

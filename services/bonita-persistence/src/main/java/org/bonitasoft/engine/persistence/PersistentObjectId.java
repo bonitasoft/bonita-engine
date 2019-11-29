@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PersistentObjectId implements Serializable {
 
-    @Column(name = "id")
+    @Column
     private long id;
     @Column(name = "tenantid")
     private long tenantId;

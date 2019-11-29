@@ -7,12 +7,20 @@
             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
     <jdbc:embedded-database id="dataSource" type="H2" />
-
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses">
             <list>
+                <value>org.bonitasoft.engine.identity.model.SContactInfo</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition</value>
+                <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>
+                <value>org.bonitasoft.engine.identity.model.SGroup</value>
+                <value>org.bonitasoft.engine.identity.model.SHavingIcon</value>
+                <value>org.bonitasoft.engine.identity.model.SIcon</value>
                 <value>org.bonitasoft.engine.identity.model.SRole</value>
+                <value>org.bonitasoft.engine.identity.model.SUser</value>
+                <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
+                <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -31,7 +39,6 @@
 
                 <value>/org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
                 <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
@@ -115,6 +122,9 @@
         <constructor-arg ref="sessionFactory" />
     </bean>
     <bean id="roleRepository" class="org.bonitasoft.engine.test.persistence.repository.RoleRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
+    <bean id="userRepository" class="org.bonitasoft.engine.test.persistence.repository.UserRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
 
