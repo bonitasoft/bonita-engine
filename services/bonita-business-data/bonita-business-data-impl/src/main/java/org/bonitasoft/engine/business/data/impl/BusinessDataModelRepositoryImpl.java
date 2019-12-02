@@ -29,7 +29,6 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.SchemaManager;
@@ -131,7 +130,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                 // This is not a problem of BDM not deployed, let exception go up:
                 throw e;
             }
-        } catch (IOException | InvalidBusinessDataModelException e) {
+        } catch (IOException e) {
             throw new SBusinessDataRepositoryException(e);
         }
         return null;
@@ -149,7 +148,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     @Override
     public String install(final byte[] bdmZip, final long tenantId, long userId)
-            throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
+            throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createAndDeployClientBDMZip(model, userId);
@@ -201,9 +200,13 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     protected BusinessObjectModel getBusinessObjectModel(final byte[] bdmZip)
-            throws InvalidBusinessDataModelException {
+            throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        try {
             return converter.unzip(bdmZip);
+        } catch (final Exception e) {
+            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
+        }
     }
 
     protected byte[] generateServerBDMJar(final BusinessObjectModel model)
