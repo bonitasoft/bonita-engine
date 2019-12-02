@@ -15,9 +15,18 @@ package org.bonitasoft.engine.persistence.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 /**
  * Represent a Blob value store in the persistence layer.
@@ -25,10 +34,19 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Emmanuel Duchastenier
  */
 @Data
-@NoArgsConstructor
+@NoArgsConstructor@Entity
+@Table(name = "blob_")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class BlobValue implements PersistentObject {
 
+    //FIXME: this class is not used: delete and remove table in migration
+
+    @Id
     private long id;
+    @Column(name = "blobValue")
+    @Type(type = "materialized_blob")
     private Serializable value;
+    @Column
     private long tenantId;
 }
