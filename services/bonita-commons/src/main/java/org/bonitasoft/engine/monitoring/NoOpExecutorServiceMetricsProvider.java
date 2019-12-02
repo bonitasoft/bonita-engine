@@ -13,19 +13,30 @@
  **/
 package org.bonitasoft.engine.monitoring;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
-import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class EmptyExecutorServiceMeterBinderProvider implements ExecutorServiceMeterBinderProvider {
+public class NoOpExecutorServiceMetricsProvider implements ExecutorServiceMetricsProvider {
+
 
     @Override
-    public Optional<MeterBinder> createMeterBinder(ExecutorService executorService, String executorServiceName, long tenantId) {
-        return Optional.empty();
+    public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId) {
+        return executorService;
+
     }
 
+    @Override
+    public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId) {
+
+    }
+
+    @Override
+    public void unbind(MeterRegistry meterRegistry, String executorServiceName, long tenantId) {
+
+    }
 }

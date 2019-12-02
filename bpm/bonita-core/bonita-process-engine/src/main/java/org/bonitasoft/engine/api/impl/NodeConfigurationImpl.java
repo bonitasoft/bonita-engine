@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 
 /**
  * @author Baptiste Mesta
@@ -31,8 +31,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private List<PlatformRestartHandler> platformRestartHandlers;
 
-    private List<TenantRestartHandler> tenantRestartHandlers;
-
     @Override
     public boolean shouldResumeElements() {
         return shouldRestartElements;
@@ -45,15 +43,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     public void setPlatformRestartHandlers(final List<PlatformRestartHandler> platformRestartHandlers) {
         this.platformRestartHandlers = platformRestartHandlers;
-    }
-
-    @Override
-    public List<TenantRestartHandler> getTenantRestartHandlers() {
-        return CollectionUtil.emptyOrUnmodifiable(tenantRestartHandlers);
-    }
-
-    public void setTenantRestartHandlers(final List<TenantRestartHandler> tenantRestartHandlers) {
-        this.tenantRestartHandlers = tenantRestartHandlers;
     }
 
     public void setShouldRestartElements(final boolean shouldRestartElements) {

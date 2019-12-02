@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,16 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
-
-import java.util.concurrent.Callable;
+package org.bonitasoft.engine.tenant.restart;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
+import org.bonitasoft.engine.execution.work.ExecuteMessageCoupleWork;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.message.MessagesHandlingService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Resets all "In Progress" BPMN Message couples so that they can be triggered again on next cron.
@@ -28,27 +30,40 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  *
  * @author Emmanuel Duchastenier
  */
+@Component
 public class MessagesRestartHandler implements TenantRestartHandler {
 
+    private TechnicalLoggerService technicalLoggerService;
+    private EventInstanceRepository eventInstanceRepository;
+    private UserTransactionService userTransactionService;
+    private MessagesHandlingService messagesHandlingService;
+
+    public MessagesRestartHandler(@Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService technicalLoggerService,
+                                  EventInstanceRepository eventInstanceRepository, UserTransactionService userTransactionService,
+                                  MessagesHandlingService messagesHandlingService) {
+        this.technicalLoggerService = technicalLoggerService;
+        this.eventInstanceRepository = eventInstanceRepository;
+        this.userTransactionService = userTransactionService;
+        this.messagesHandlingService = messagesHandlingService;
+    }
+
     @Override
-    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+    public void beforeServicesStart()
             throws RestartException {
-        final EventInstanceService eventInstanceService = tenantServiceAccessor.getEventInstanceService();
-        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
         try {
             // Reset of all SMessageInstance:
             logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by MessagesHandlingService");
-            final int nbMessagesReset = eventInstanceService.resetProgressMessageInstances();
+            final int nbMessagesReset = eventInstanceRepository.resetProgressMessageInstances();
             logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
             logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by MessagesHandlingService");
-            final int nbWaitingEventsReset = eventInstanceService.resetInProgressWaitingEvents();
+            final int nbWaitingEventsReset = eventInstanceRepository.resetInProgressWaitingEvents();
             logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
 
         } catch (final SBonitaException e) {
-            handleException("Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped", e);
+            throw new RestartException("Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped", e);
         }
     }
 
@@ -56,23 +71,15 @@ public class MessagesRestartHandler implements TenantRestartHandler {
         technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.INFO, msg);
     }
 
-    private void handleException(final String message, final Exception e) throws RestartException {
-        throw new RestartException(message, e);
-    }
-
     @Override
-    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
+    public void afterServicesStart() {
         try {
-            tenantServiceAccessor.getUserTransactionService().executeInTransaction(new Callable<Object>() {
-
-                @Override
-                public Object call() throws Exception {
-                    tenantServiceAccessor.getMessagesHandlingService().triggerMatchingOfMessages();
-                    return null;
-                }
+            userTransactionService.executeInTransaction(() -> {
+                messagesHandlingService.triggerMatchingOfMessages();
+                return null;
             });
         } catch (Exception e) {
-            tenantServiceAccessor.getTechnicalLoggerService().log(MessagesRestartHandler.class, TechnicalLogSeverity.ERROR,
+            technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.ERROR,
                     "Unable to register work to handle message events on startup, work will be triggered on next message event update", e);
         }
     }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2019 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -42,6 +42,7 @@ import io.micrometer.core.instrument.MeterRegistry;
  */
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
+
     private final int corePoolSize;
     private final int queueCapacity;
     private final int maximumPoolSize;
@@ -52,12 +53,12 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     private final long tenantId;
     private final WorkExecutionAuditor workExecutionAuditor;
     private MeterRegistry meterRegistry;
-    private ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider;
+    private ExecutorServiceMetricsProvider executorServiceMetricsProvider;
 
     public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, WorkFactory workFactory,
             final long tenantId, final int corePoolSize, final int queueCapacity, final int maximumPoolSize,
             final long keepAliveTimeSeconds, EngineClock engineClock, WorkExecutionAuditor workExecutionAuditor,
-            MeterRegistry meterRegistry, ExecutorServiceMeterBinderProvider executorServiceMeterBinderProvider) {
+            MeterRegistry meterRegistry, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
         this.logger = logger;
         this.workFactory = workFactory;
         this.tenantId = tenantId;
@@ -68,7 +69,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         this.engineClock = engineClock;
         this.workExecutionAuditor = workExecutionAuditor;
         this.meterRegistry = meterRegistry;
-        this.executorServiceMeterBinderProvider = executorServiceMeterBinderProvider;
+        this.executorServiceMetricsProvider = executorServiceMetricsProvider;
     }
 
     @Override
@@ -76,14 +77,22 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
+
         final BonitaThreadPoolExecutor bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(corePoolSize,
                 maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                 workQueue, threadFactory, handler, workFactory, logger, engineClock, workExecutionCallback,
                 workExecutionAuditor, meterRegistry, tenantId);
-        executorServiceMeterBinderProvider
-                .createMeterBinder(bonitaThreadPoolExecutor, "bonita-work-executor", tenantId)
-                .ifPresent(meterBinder -> meterBinder.bindTo(meterRegistry));
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Creating a new Thread pool to handle works: " + bonitaThreadPoolExecutor);
+
+        //TODO this returns the timed executor service, this should be used instead of the BonitaExecutorService but we should change it everywhere
+        executorServiceMetricsProvider
+                .bindMetricsOnly(meterRegistry, bonitaThreadPoolExecutor, "bonita-work-executor", tenantId);
         return bonitaThreadPoolExecutor;
+    }
+
+    @Override
+    public void unbind() {
+        executorServiceMetricsProvider.unbind(meterRegistry, "bonita-work-executor", tenantId);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

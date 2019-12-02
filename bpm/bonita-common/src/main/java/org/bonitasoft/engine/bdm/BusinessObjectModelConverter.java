@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.io.IOUtils;
 import org.xml.sax.SAXException;
 
@@ -54,17 +55,26 @@ public class BusinessObjectModelConverter {
         return IOUtils.marshallObjectToXML(bom, xsdUrl);
     }
 
-    public BusinessObjectModel unzip(final byte[] zippedBOM) throws IOException, JAXBException, SAXException {
-        final Map<String, byte[]> files = IOUtils.unzip(zippedBOM);
+    public BusinessObjectModel unzip(final byte[] zippedBOM) throws InvalidBusinessDataModelException {
+        final Map<String, byte[]> files;
+        try {
+            files = IOUtils.unzip(zippedBOM);
+        } catch (IOException e) {
+            throw new InvalidBusinessDataModelException("Unable to unzip the content of the bdm.zip file", e);
+        }
         final byte[] bomXML = files.get(BOM_XML);
         if (bomXML == null) {
-            throw new IOException("the file " + BOM_XML + " is missing in the zip");
+            throw new InvalidBusinessDataModelException("the file " + BOM_XML + " is missing in the zip");
         }
         return unmarshall(bomXML);
     }
 
-    public BusinessObjectModel unmarshall(final byte[] bomXML) throws JAXBException, IOException, SAXException {
-        return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, xsdUrl);
+    public BusinessObjectModel unmarshall(final byte[] bomXML) throws InvalidBusinessDataModelException {
+        try {
+            return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, xsdUrl);
+        } catch (Exception e) {
+            throw new InvalidBusinessDataModelException("Unable to unmarshal businees object model", e);
+        }
     }
 
 }

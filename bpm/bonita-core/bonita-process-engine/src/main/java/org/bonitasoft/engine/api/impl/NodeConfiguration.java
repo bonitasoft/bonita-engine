@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 
 /**
  * This class allow to provide a configuration for the current node
@@ -39,11 +39,6 @@ public interface NodeConfiguration {
      * Handlers called on restart of the platform
      */
     List<PlatformRestartHandler> getPlatformRestartHandlers();
-
-    /**
-     * @return
-     */
-    List<TenantRestartHandler> getTenantRestartHandlers();
 
     /**
      * @return

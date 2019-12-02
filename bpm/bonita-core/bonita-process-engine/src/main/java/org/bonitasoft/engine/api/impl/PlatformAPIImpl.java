@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -266,7 +266,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
             // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
-            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute();
+            new DefaultProfilesUpdater(tenantServiceAccessor).execute();
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 

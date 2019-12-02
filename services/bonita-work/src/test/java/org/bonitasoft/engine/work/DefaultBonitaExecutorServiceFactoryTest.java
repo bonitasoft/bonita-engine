@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2019 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
-import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
                 new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), new SimpleMeterRegistry(),
-                new DefaultExecutorServiceMeterBinderProvider());
+                new DefaultExecutorServiceMetricsProvider());
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory
                 .createExecutorService(workExecutionCallback);
@@ -62,7 +62,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
                 new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), meterRegistry,
-                new DefaultExecutorServiceMeterBinderProvider());
+                new DefaultExecutorServiceMetricsProvider());
 
         // when:
         defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
@@ -73,5 +73,27 @@ public class DefaultBonitaExecutorServiceFactoryTest {
                         .tag("name", "bonita-work-executor")
                         .tag("tenant", String.valueOf(tenantId))
                         .gauge()).isNotNull();
+    }
+
+    @Test
+    public void should_not_have_metrics_when_unbind_is_called() {
+        // given:
+        long tenantId = 97L;
+        final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(
+                new TechnicalLoggerSLF4JImpl(12L), workFactory, tenantId, 1,
+                20, 15, 10, new DefaultEngineClock(), mock(WorkExecutionAuditor.class), meterRegistry,
+                new DefaultExecutorServiceMetricsProvider());
+
+        // when:
+        defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
+        defaultBonitaExecutorServiceFactory.unbind();
+
+        // then:
+        assertThat(
+                meterRegistry.find("executor.pool.size")
+                        .tag("name", "bonita-work-executor")
+                        .tag("tenant", String.valueOf(tenantId))
+                        .gauge()).isNull();
     }
 }

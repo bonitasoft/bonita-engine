@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -189,7 +189,9 @@ public class PlatformServiceImpl implements PlatformService {
             stmt.executeBatch();
             connection.commit();
         } catch (final SQLException e) {
-            logger.error("Error while executing sql batch: {}", e.getNextException().getMessage());
+            if (e.getNextException() != null) {
+                logger.error("Error while executing sql batch: {}", e.getNextException().getMessage());
+            }
             connection.rollback();
             throw e;
         } finally {

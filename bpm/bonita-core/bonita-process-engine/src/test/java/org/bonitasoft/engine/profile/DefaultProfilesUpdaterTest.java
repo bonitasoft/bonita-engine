@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,8 +18,11 @@ import static org.assertj.core.api.Assertions.contentOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,49 +33,36 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultProfilesUpdaterTest {
 
-    public PlatformServiceAccessor platformServiceAccessor = Mockito.mock(PlatformServiceAccessor.class);
-    public TenantServiceAccessor tenantServiceAccessor = Mockito.mock(TenantServiceAccessor.class);
-    @Spy
-    public DefaultProfilesUpdater defaultProfilesUpdater = new DefaultProfilesUpdater(platformServiceAccessor, tenantServiceAccessor);
-    @Mock
-    public TransactionService transactionService;
-    @Mock
-    public ProfileService profileService;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
     @Mock
     public TechnicalLoggerService technicalLoggerService;
     @Mock
     public ProfilesImporter profilesImporter;
     @Mock
     public ProfilesNode defaultProfiles;
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private DefaultProfilesUpdater defaultProfilesUpdater;
     private File md5File;
 
     @Before
     public void before() throws IOException, BonitaHomeNotSetException, ExecutionException {
         md5File = temporaryFolder.newFile();
+        defaultProfilesUpdater = spy(new DefaultProfilesUpdater(1L, technicalLoggerService, profilesImporter));
         doReturn(md5File).when(defaultProfilesUpdater).getProfilesMD5File();
         doReturn("xml content").when(defaultProfilesUpdater).getDefaultProfilesXml();
         doReturn(defaultProfiles).when(defaultProfilesUpdater).getProfilesFromXML(anyString());
 
-        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-        doReturn(profilesImporter).when(tenantServiceAccessor).getProfilesImporter();
         doReturn(null).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());
     }
 

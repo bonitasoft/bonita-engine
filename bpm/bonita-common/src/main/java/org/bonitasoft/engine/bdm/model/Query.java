@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -89,6 +89,10 @@ public class Query {
 
     public boolean hasMultipleResults() {
         return List.class.getName().equals(returnType);
+    }
+
+    public boolean isCountQuery(){
+        return Long.class.getName().equals(returnType);
     }
 
     public void setReturnType(final String returnType) {

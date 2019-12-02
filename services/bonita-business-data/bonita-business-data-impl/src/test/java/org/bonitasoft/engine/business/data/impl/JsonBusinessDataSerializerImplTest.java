@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +62,16 @@ public class JsonBusinessDataSerializerImplTest {
 
         // then
         assertThatJson(jsonPerson).as("entity serialization").isEqualTo(getJsonContent("singlePerson.json"));
+    }
+
+    @Test
+    public void count_result_should_be_serialized() throws Exception {
+
+        // when
+        final String countJson = jsonBusinessDataSerializer.serializeCountResult(Collections.singletonList(59L), Person.class.getName());
+
+        // then
+        assertThatJson(countJson).isEqualTo("[59]");
     }
 
     @Test

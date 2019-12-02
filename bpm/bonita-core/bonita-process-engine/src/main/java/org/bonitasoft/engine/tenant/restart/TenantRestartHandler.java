@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,11 +11,10 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.execution.work.RestartException;
 
 /**
  * @author Baptiste Mesta
@@ -26,17 +25,14 @@ public interface TenantRestartHandler {
     /**
      * called in a transaction during {@link PlatformAPI#startNode()}
      *
-     * @param tenantServiceAccessor
      */
-    void beforeServicesStart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+    void beforeServicesStart() throws RestartException;
 
     /**
      * called outside of a transaction after {@link PlatformAPI#startNode()} in a separate thread than the api call
      *
-     * @param platformServiceAccessor
-     * @param tenantServiceAccessor
      * @throws RestartException
      */
-    void afterServicesStart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+    void afterServicesStart() throws RestartException;
 
 }

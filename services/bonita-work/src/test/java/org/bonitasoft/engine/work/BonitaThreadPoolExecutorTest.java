@@ -155,6 +155,16 @@ public class BonitaThreadPoolExecutorTest {
     }
 
     @Test
+    public void should_have_no_meters_after_shutdown() throws Exception {
+        bonitaThreadPoolExecutor.submit(WorkDescriptor.create("NORMAL"));
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+
+        bonitaThreadPoolExecutor.shutdownAndEmptyQueue();
+
+        assertThat(meterRegistry.getMeters()).hasSize(0);
+    }
+
+    @Test
     public void should_have_tenant_id_in_all_meters() {
         assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
         assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();

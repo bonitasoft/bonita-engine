@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -31,8 +31,10 @@ public interface BusinessDataModelRepository {
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
+     * @throws InvalidBusinessDataModelException
+     *         if the format of the bdm archive is not valid
      */
-    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException;
+    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
 
     /**
      * Undeploy Business Data Model from specified tenant

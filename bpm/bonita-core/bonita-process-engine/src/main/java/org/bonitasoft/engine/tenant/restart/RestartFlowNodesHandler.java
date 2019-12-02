@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,13 +20,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
+import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
+import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Restart flow nodes for works: {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity} {@link NotifyChildFinishedWork}
@@ -35,21 +40,36 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@Component
 public class RestartFlowNodesHandler implements TenantRestartHandler {
 
     //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
     //It should not be a singleton but have a factory to create it
     final Map<Long, List<Long>> flownodesToRestartByTenant = new HashMap<>();
+    private Long tenantId;
+    private TechnicalLoggerService logger;
+    private FlowNodeInstanceService flowNodeInstanceService;
+    private UserTransactionService transactionService;
+    private ExecuteFlowNodes executeFlowNodes;
+
+    public RestartFlowNodesHandler(@Value("${tenantId}") Long tenantId, @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+                                   FlowNodeInstanceService flowNodeInstanceService,
+                                   UserTransactionService transactionService,
+                                   ExecuteFlowNodes executeFlowNodes) {
+        this.tenantId = tenantId;
+        this.logger = logger;
+        this.flowNodeInstanceService = flowNodeInstanceService;
+        this.transactionService = transactionService;
+        this.executeFlowNodes = executeFlowNodes;
+    }
 
     @Override
-    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+    public void beforeServicesStart()
             throws RestartException {
+        flownodesToRestartByTenant.clear();
         try {
-            final long tenantId = tenantServiceAccessor.getTenantId();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final ArrayList<Long> flownodesToRestart = new ArrayList<>();
             flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
-            final FlowNodeInstanceService flowNodeInstanceService = tenantServiceAccessor.getActivityInstanceService();
 
             // using a to low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
             // As we retrieve only the id we can use a greater page size
@@ -76,19 +96,18 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     }
 
     @Override
-    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+    public void afterServicesStart()
             throws RestartException {
-        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        final long tenantId = tenantServiceAccessor.getTenantId();
         final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
 
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
         try {
             final Iterator<Long> iterator = flownodesIds.iterator();
             do {
-                final ExecuteFlowNodes callable = new ExecuteFlowNodes(tenantServiceAccessor, iterator);
-                transactionService.executeInTransaction(callable);
+                transactionService.executeInTransaction(() -> {
+                    executeFlowNodes.execute(iterator);
+                    return null;
+                });
             } while (iterator.hasNext());
         } catch (final Exception e) {
             throw new RestartException("Unable to restart elements", e);

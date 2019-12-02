@@ -21,6 +21,7 @@ import com.bmuschko.gradle.docker.tasks.container.extras.DockerWaitHealthyContai
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
 
 /**
@@ -182,6 +183,13 @@ class DockerDatabaseContainerTasksCreator {
                     systemProperties(dbValues)
                 }
             }
+
+            Task zipReport = project.tasks.create("zip${vendor.name}DatabaseTestReport" as String, Zip) {
+                archiveFileName = databaseTestTask.reports.html.destination.name + ".zip"
+                destinationDirectory = databaseTestTask.reports.html.destination.parentFile
+                from databaseTestTask.reports.html.destination
+            }
+            databaseTestTask.finalizedBy zipReport
             project.afterEvaluate {
                 databaseTestTask.includes = extension.includes
             }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -77,7 +77,7 @@ public class BusinessDataServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
+        final String[] datePatterns = new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS"};
         typeConverterUtil = new TypeConverterUtil(datePatterns);
         businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil,
                 businessDataReloader, countQueryProvider));
@@ -296,7 +296,7 @@ public class BusinessDataServiceImplTest {
         // expect
         expectedException.expect(SBusinessDataNotFoundException.class);
         expectedException.expectMessage("Forbidden instance of org.bonitasoft.engine.business.data.impl.EntityPojo found. It is only possible to reference persisted instances in an aggregation relation.");
-        
+
         //when
         businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
     }
@@ -469,7 +469,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void getJsonQueryEntities_should_return_json() throws Exception {
+    public void getJsonQueryEntities_should_return_list_of_entities_as_json() throws Exception {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<>();
@@ -493,6 +493,22 @@ public class BusinessDataServiceImplTest {
 
         //then
         verify(jsonEntitySerializer).serializeEntities(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_return_count_result_as_json() throws Exception {
+
+        //given
+        doReturn(EntityPojo.class).when(businessDataService).loadClass(EntityPojo.class.getName());
+        doReturn(Collections.singletonList(5L)).when(businessDataRepository).findListByNamedQuery(anyString(), any(), anyMap(), anyInt(), anyInt());
+        doReturn(getBusinessObjectModel(new EntityPojo(1562L))).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when
+        businessDataService.getJsonQueryEntities(EntityPojo.class.getName(), "countForFind", new HashMap<>(), 0, 1,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //then
+        verify(jsonEntitySerializer).serializeCountResult(Collections.singletonList(5L), EntityPojo.class.getName());
     }
 
     @Test

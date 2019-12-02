@@ -1,4 +1,4 @@
-apply plugin: 'bonita-docker-database'
+plugins { id 'bonita-docker-database' }
 
 dependencies {
     compile "junit:junit:${Deps.junit4Version}"

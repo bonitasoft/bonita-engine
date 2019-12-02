@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2019 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -20,9 +20,9 @@ import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 import java.util.List;
 
 import org.bonitasoft.engine.configuration.ConditionalOnProperty;
-import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMeterBinderProvider;
-import org.bonitasoft.engine.monitoring.EmptyExecutorServiceMeterBinderProvider;
-import org.bonitasoft.engine.monitoring.ExecutorServiceMeterBinderProvider;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -112,15 +112,15 @@ public class MonitoringConfiguration {
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX
             + METRICS + "executors.enable" /* , havingValue=true */, enableIfMissing = false)
-    public ExecutorServiceMeterBinderProvider meterBinder() {
-        return new DefaultExecutorServiceMeterBinderProvider();
+    public ExecutorServiceMetricsProvider meterBinder() {
+        return new DefaultExecutorServiceMetricsProvider();
     }
 
     @Bean
     @ConditionalOnProperty(value = MONITORING_PREFIX
             + METRICS + "executors.enable", havingValue = false, enableIfMissing = true)
-    public ExecutorServiceMeterBinderProvider emptyMeterBinder() {
-        return new EmptyExecutorServiceMeterBinderProvider();
+    public ExecutorServiceMetricsProvider emptyMeterBinder() {
+        return new NoOpExecutorServiceMetricsProvider();
     }
 
     @Bean

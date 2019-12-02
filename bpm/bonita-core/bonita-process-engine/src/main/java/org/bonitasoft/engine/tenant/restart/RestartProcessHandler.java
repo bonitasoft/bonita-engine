@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,20 +32,25 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
+import org.bonitasoft.engine.execution.work.ExecuteConnectorOfProcess;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Restart handler for work {@link ExecuteConnectorOfProcess}
  *
  * @author Baptiste Mesta
  */
+@Component
 public class RestartProcessHandler implements TenantRestartHandler {
 
     public class ExecuteProcesses implements Callable<Object> {
@@ -66,11 +71,12 @@ public class RestartProcessHandler implements TenantRestartHandler {
         private BPMWorkFactory workFactory;
         private final Iterator<Long> iterator;
 
-        public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
-                                final ProcessDefinitionService processDefinitionService,
-                                final ProcessInstanceService processInstanceService,
-                                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager,
-                                BPMWorkFactory workFactory, final Iterator<Long> iterator) {
+        public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger,
+                final ActivityInstanceService activityInstanceService,
+                final ProcessDefinitionService processDefinitionService,
+                final ProcessInstanceService processInstanceService,
+                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager,
+                BPMWorkFactory workFactory, final Iterator<Long> iterator) {
             this.workService = workService;
             this.logger = logger;
             this.activityInstanceService = activityInstanceService;
@@ -88,23 +94,29 @@ public class RestartProcessHandler implements TenantRestartHandler {
                 final Long processId = iterator.next();
                 try {
                     final SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
-                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+                    final SProcessDefinition processDefinition = processDefinitionService
+                            .getProcessDefinition(processInstance.getProcessDefinitionId());
                     final ProcessInstanceState state = getState(processInstance.getStateId());
                     switch (state) {
                         case ABORTED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService,
+                                    flowNodeStateManager, workFactory);
                             break;
                         case CANCELLED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService,
+                                    flowNodeStateManager, workFactory);
                             break;
                         case COMPLETED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService,
+                                    flowNodeStateManager, workFactory);
                             break;
                         case COMPLETING:
-                            restartConnector(processDefinition, processInstance, ConnectorEvent.ON_FINISH, processExecutor);
+                            restartConnector(processDefinition, processInstance, ConnectorEvent.ON_FINISH,
+                                    processExecutor);
                             break;
                         case INITIALIZING:
-                            restartConnector(processDefinition, processInstance, ConnectorEvent.ON_ENTER, processExecutor);
+                            restartConnector(processDefinition, processInstance, ConnectorEvent.ON_ENTER,
+                                    processExecutor);
                             break;
                         default:
                             break;
@@ -117,16 +129,45 @@ public class RestartProcessHandler implements TenantRestartHandler {
         }
     }
 
+    private Long tenantId;
+    private WorkService workService;
+    private ActivityInstanceService activityInstanceService;
+    private ProcessDefinitionService processDefinitionService;
+    private ProcessExecutor processExecutor;
+    private BPMWorkFactory workFactory;
+
+    private FlowNodeStateManager flowNodeStateManager;
+
+    private UserTransactionService transactionService;
+
+    public RestartProcessHandler(@Value("${tenantId}") Long tenantId, WorkService workService,
+            ActivityInstanceService activityInstanceService, ProcessDefinitionService processDefinitionService,
+            ProcessExecutor processExecutor, BPMWorkFactory workFactory,
+            FlowNodeStateManager flowNodeStateManager, UserTransactionService transactionService,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            ProcessInstanceService processInstanceService) {
+        this.tenantId = tenantId;
+        this.workService = workService;
+        this.activityInstanceService = activityInstanceService;
+        this.processDefinitionService = processDefinitionService;
+        this.processExecutor = processExecutor;
+        this.workFactory = workFactory;
+        this.flowNodeStateManager = flowNodeStateManager;
+        this.transactionService = transactionService;
+        this.logger = logger;
+        this.processInstanceService = processInstanceService;
+    }
+
+    private TechnicalLoggerService logger;
+    private ProcessInstanceService processInstanceService;
+
     //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
     //It should not be a singleton but have a factory to create it
     private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<Long, List<Long>>();
 
     @Override
-    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+    public void beforeServicesStart()
             throws RestartException {
-        final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
-        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        final long tenantId = tenantServiceAccessor.getTenantId();
 
         final List<Long> ids = new ArrayList<Long>();
         processInstancesByTenant.put(tenantId, ids);
@@ -134,7 +175,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
         try {
             List<SProcessInstance> processInstances;
             do {
-                processInstances = processInstanceService.getProcessInstancesInStates(queryOptions, ProcessInstanceState.INITIALIZING,
+                processInstances = processInstanceService.getProcessInstancesInStates(queryOptions,
+                        ProcessInstanceState.INITIALIZING,
                         ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
                         ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
@@ -164,30 +206,23 @@ public class RestartProcessHandler implements TenantRestartHandler {
     }
 
     @Override
-    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+    public void afterServicesStart()
             throws RestartException {
         // get all process in initializing
         // call executeConnectors on enter on them (only case they can be in initializing)
         // get all process in completing
         // call executeConnectors on finish on them (only case they can be in completing)
-        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        final long tenantId = tenantServiceAccessor.getTenantId();
-        final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
-        final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
-        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        final WorkService workService = tenantServiceAccessor.getWorkService();
-        final BPMWorkFactory workFactory = tenantServiceAccessor.getBPMWorkFactory();
 
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + list.size() + " processes for tenant " + tenantId);
+        logger.log(getClass(), TechnicalLogSeverity.INFO,
+                "Restarting " + list.size() + " processes for tenant " + tenantId);
         ExecuteProcesses exec;
         try {
             do {
-                exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService, processInstanceService, processExecutor,
-                        tenantServiceAccessor.getFlowNodeStateManager(), workFactory, iterator);
+                exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService,
+                        processInstanceService, processExecutor,
+                        flowNodeStateManager, workFactory, iterator);
                 transactionService.executeInTransaction(exec);
             } while (iterator.hasNext());
         } catch (final Exception e) {
@@ -197,7 +232,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
     }
 
     protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
-                                    final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory)
+            final ActivityInstanceService activityInstanceService, final WorkService workService,
+            FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory)
             throws SBonitaException {
         // Only Error events set interruptedByEvent on SProcessInstance:
         if (!processInstance.hasBeenInterruptedByEvent()) {
@@ -205,17 +241,21 @@ public class RestartProcessHandler implements TenantRestartHandler {
             final long callerId = processInstance.getCallerId();
             // Should always be in a CallActivity:
             if (callerId > 0) {
-                final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
+                final SActivityInstance callActivityInstance = activityInstanceService
+                        .getActivityInstance(processInstance.getCallerId());
                 if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
                     workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance));
-                    logInfo(logger, "Restarting notification of finished process '" + processInstance.getName() + "' with id " + processInstance.getId()
-                            + " in state " + getState(processInstance.getStateId()));
+                    logInfo(logger,
+                            "Restarting notification of finished process '" + processInstance.getName() + "' with id "
+                                    + processInstance.getId()
+                                    + " in state " + getState(processInstance.getStateId()));
                 }
             }
         }
     }
 
-    private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ConnectorEvent event,
+    private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final ConnectorEvent event,
             final ProcessExecutor processExecutor) throws SBonitaException {
         processExecutor.executeConnectors(processDefinition, processInstance, event, null);
     }

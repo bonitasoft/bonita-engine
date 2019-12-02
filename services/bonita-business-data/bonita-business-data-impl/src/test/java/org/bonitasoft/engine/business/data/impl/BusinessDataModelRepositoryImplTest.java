@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -14,13 +14,22 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.commons.io.IOUtil.zip;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.InputStream;
 
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -131,16 +140,15 @@ public class BusinessDataModelRepositoryImplTest {
 
     }
 
-    @Test(expected = SBusinessDataRepositoryDeploymentException.class)
+    @Test(expected = SBusinessDataRepositoryException.class)
     public void should_getBusinessObjectModel_throw_exception() throws Exception {
         //given
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
         final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
 
         doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
-        doThrow(SBusinessDataRepositoryDeploymentException.class).when(businessDataModelRepository)
+        doThrow(new InvalidBusinessDataModelException("error")).when(businessDataModelRepository)
                 .getBusinessObjectModel(any(clientBDMZip.getClass()));
-        doReturn(true).when(businessDataModelRepository).isBDMDeployed();
 
         //when then exception
         businessDataModelRepository.getBusinessObjectModel();
@@ -162,6 +170,24 @@ public class BusinessDataModelRepositoryImplTest {
 
         // then:
         verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM, bom, userId);
+    }
+
+    @Test(expected = InvalidBusinessDataModelException.class)
+    public void install_should_throw_an_SInvalidBusinessDataModelException_when_zip_is_invalid() throws Exception {
+        // given:
+        final byte[] bom = "some invalid context".getBytes();
+
+        // when:
+        businessDataModelRepository.install(bom, 3L, 47L);
+    }
+
+    @Test(expected = InvalidBusinessDataModelException.class)
+    public void install_should_throw_an_SInvalidBusinessDataModelException_when_bomxml_is_invalid() throws Exception {
+        // given:
+        final byte[] bom = zip(pair("bom.xml", "<xml></xml>".getBytes()));
+
+        // when:
+        businessDataModelRepository.install(bom, 3L, 47L);
     }
 
 }

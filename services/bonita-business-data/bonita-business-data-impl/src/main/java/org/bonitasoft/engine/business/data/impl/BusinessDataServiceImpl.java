@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2017 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -70,8 +70,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private final CountQueryProvider countQueryProvider;
 
     public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
-            final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
-            BusinessDataReloader businessDataReloader, CountQueryProvider countQueryProvider) {
+                                   final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
+                                   BusinessDataReloader businessDataReloader, CountQueryProvider countQueryProvider) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
         this.businessDataModelRepository = businessDataModelRepository;
@@ -92,8 +92,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (!List.class.isAssignableFrom(data.getClass())) {
             return false;
         }
-        @SuppressWarnings("rawtypes")
-        final List dataList = (List) data;
+        @SuppressWarnings("rawtypes") final List dataList = (List) data;
         if (dataList.isEmpty()) {
             return true;
         }
@@ -125,8 +124,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private Object callJavaOperationOnEntityList(final List<Entity> businessObject, final Object valueToSetObjectWith, final String methodName,
-            final String parameterType)
-                    throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
+                                                 final String parameterType)
+            throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
         try {
             invokeJavaMethod(businessObject, methodName, parameterType, valueToSetObjectWith);
             return businessObject;
@@ -136,8 +135,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName,
-            final String parameterType)
-                    throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
+                                             final String parameterType)
+            throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
         Entity jpaEntity = businessDataReloader.reloadEntitySoftly(businessObject);
         final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
         try {
@@ -177,7 +176,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
-                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.", 
+                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()));
             }
             primaryKeys.add(entity.getPersistenceId());
@@ -200,9 +199,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (Type.AGGREGATION.equals(type)) {
             try {
                 return businessDataReloader.reloadEntity(entity);
-            }catch (SBusinessDataNotFoundException e) {
-                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.", 
-                        businessDataReloader.getEntityRealClass(entity).getName()),e);
+            } catch (SBusinessDataNotFoundException e) {
+                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
+                        businessDataReloader.getEntityRealClass(entity).getName()), e);
             }
         } else {
             return entity;
@@ -269,8 +268,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     @SuppressWarnings("unchecked")
     @Override
     public Serializable getJsonChildEntity(final String entityClassName, final Long identifier, final String childFieldName,
-            final String businessDataURIPattern)
-                    throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
+                                           final String businessDataURIPattern)
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final Object entity = businessDataRepository.findById(entityClass, identifier);
 
@@ -301,7 +300,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     @Override
     public BusinessDataQueryResult getJsonQueryEntities(final String entityClassName, final String queryName, final Map<String, Serializable> parameters,
-            final Integer startIndex, final Integer maxResults, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
+                                                        final Integer startIndex, final Integer maxResults, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
         final Class<? extends Entity> businessDataClass = loadClass(entityClassName);
         BusinessObject businessObject = getBusinessObjectFromClassName(entityClassName);
         final Query queryDefinition = getQueryDefinition(businessObject, entityClassName, queryName);
@@ -320,7 +319,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 throw new SBusinessDataRepositoryException("unable to count results for query " + queryName);
             }
         }
-        Serializable jsonResults = jsonBusinessDataSerializer.serializeEntities((List<Entity>) list, businessDataURIPattern);
+        Serializable jsonResults;
+        if (queryDefinition.isCountQuery()) {
+            jsonResults = jsonBusinessDataSerializer.serializeCountResult((List<Long>) list, entityClassName);
+        } else {
+            jsonResults = jsonBusinessDataSerializer.serializeEntities((List<Entity>) list, businessDataURIPattern);
+        }
         return new BusinessDataQueryResultImpl(jsonResults, businessDataQueryMetadata);
     }
 
