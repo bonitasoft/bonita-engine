@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,14 +18,14 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.RestartException;
-import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
+import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread start when the engine is ready.
@@ -35,46 +35,48 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class StarterThread extends Thread {
 
-    private final PlatformServiceAccessor platformServiceAccessor;
-    private final TenantServiceAccessor tenantServiceAccessor;
-    private final List<TenantRestartHandler> tenantRestartHandlers;
+    private static Logger logger = LoggerFactory.getLogger(StarterThread.class);
 
-    public StarterThread(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor,
-            List<TenantRestartHandler> tenantRestartHandlers) {
-        super("Tenant " + tenantServiceAccessor.getTenantId() + " starter Thread");
-        this.platformServiceAccessor = platformServiceAccessor;
-        this.tenantServiceAccessor = tenantServiceAccessor;
+    private final List<TenantRestartHandler> tenantRestartHandlers;
+    private Long tenantId;
+    private SessionAccessor sessionAccessor;
+    private SessionService sessionService;
+    private UserTransactionService transactionService;
+    private PlatformService platformService;
+
+    public StarterThread(Long tenantId, SessionAccessor sessionAccessor, SessionService sessionService,
+                         UserTransactionService transactionService, PlatformService platformService,
+                         List<TenantRestartHandler> tenantRestartHandlers) {
+        super("Tenant " + tenantId + " starter Thread");
         this.tenantRestartHandlers = tenantRestartHandlers;
+        this.tenantId = tenantId;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
+        this.transactionService = transactionService;
+        this.platformService = platformService;
     }
 
     @Override
     public void run() {
-        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
         try {
-            final long tenantId = tenantServiceAccessor.getTenantId();
-            SessionAccessor sessionAccessor = tenantServiceAccessor.getSessionAccessor();
             STenant tenant = getTenant(tenantId);
-            technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
-                    "Restarting elements of tenant " + tenant.getId() + " that were not finished at the last shutdown");
+            logger.info("Restarting elements of tenant {} that were not finished at the last shutdown", tenant.getId());
             if (!tenant.isActivated()) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to restart elements of tenant because tenant is " + tenant.getStatus());
+                logger.warn("Unable to restart elements of tenant because tenant is {}", tenant.getStatus());
                 return;
             }
             executeHandlers(tenantId, sessionAccessor);
 
         } catch (Exception e) {
-            technicalLoggerService.log(StarterThread.class, TechnicalLogSeverity.ERROR, "Error while restarting elements", e);
+            logger.error("Error while restarting elements", e);
         }
     }
 
     private void executeHandlers(long tenantId, SessionAccessor sessionAccessor) throws SBonitaException, RestartException {
-        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-        long sessionId = createSessionAndMakeItActive(platformServiceAccessor, sessionAccessor, tenantId);
+        long sessionId = createSessionAndMakeItActive(sessionAccessor, tenantId);
         try {
-            final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-
             for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {
-                restartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
+                restartHandler.afterServicesStart();
 
             }
         } finally {
@@ -83,18 +85,11 @@ public class StarterThread extends Thread {
     }
 
     STenant getTenant(final long tenantId) throws Exception {
-        return platformServiceAccessor.getTransactionService().executeInTransaction(new Callable<STenant>() {
-
-            @Override
-            public STenant call() throws Exception {
-                return platformServiceAccessor.getPlatformService().getTenant(tenantId);
-            }
-        });
+        return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
     }
 
-    private long createSessionAndMakeItActive(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final long tenantId)
+    private long createSessionAndMakeItActive(final SessionAccessor sessionAccessor, final long tenantId)
             throws SBonitaException {
-        final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
 
         final long sessionId = sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
         sessionAccessor.setSessionInfo(sessionId, tenantId);

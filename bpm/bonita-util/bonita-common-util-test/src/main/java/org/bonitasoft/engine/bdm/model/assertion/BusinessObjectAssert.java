@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBException;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.xml.sax.SAXException;
 
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
@@ -63,7 +64,7 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
         return this;
     }
 
-    private BusinessObjectModel marshallUnmarshall(final BusinessObject bo) throws JAXBException, IOException, SAXException {
+    private BusinessObjectModel marshallUnmarshall(final BusinessObject bo) throws JAXBException, IOException, SAXException, InvalidBusinessDataModelException {
         final BusinessObjectModelBuilder bom = aBOM().withBO(bo);
         addReferencedBoToBom(bo, bom);
         return Marshaller.marshallUnmarshall(bom.build());

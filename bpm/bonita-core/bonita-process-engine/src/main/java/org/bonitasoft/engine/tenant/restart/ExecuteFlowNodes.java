@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,10 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.tenant.restart;
 
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -27,11 +26,14 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Restart flownodes that needs to be restarted in a single transaction, with a maximum of {@value #MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION}.
@@ -39,56 +41,53 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  */
-public class ExecuteFlowNodes implements Callable<Object> {
+@Component
+public class ExecuteFlowNodes {
 
     private static final int MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION = 20;
 
     private final WorkService workService;
     private final BPMWorkFactory workFactory;
-
     private final TechnicalLoggerService logger;
-
     private final ActivityInstanceService activityInstanceService;
-
     private final GatewayInstanceService gatewayInstanceService;
-
     private final ProcessDefinitionService processDefinitionService;
-
     private final FlowNodeStateManager flowNodeStateManager;
 
-    private final Iterator<Long> iterator;
-
-    public ExecuteFlowNodes(final TenantServiceAccessor tenantServiceAccessor, final Iterator<Long> iterator) {
-        workService = tenantServiceAccessor.getWorkService();
-        logger = tenantServiceAccessor.getTechnicalLoggerService();
-        activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        gatewayInstanceService = tenantServiceAccessor.getGatewayInstanceService();
-        processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
-        workFactory = tenantServiceAccessor.getBPMWorkFactory();
-        this.iterator = iterator;
+    public ExecuteFlowNodes(WorkService workService,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            ActivityInstanceService activityInstanceService, GatewayInstanceService gatewayInstanceService,
+            ProcessDefinitionService processDefinitionService,
+            FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory) {
+        this.workService = workService;
+        this.logger = logger;
+        this.activityInstanceService = activityInstanceService;
+        this.gatewayInstanceService = gatewayInstanceService;
+        this.processDefinitionService = processDefinitionService;
+        this.flowNodeStateManager = flowNodeStateManager;
+        this.workFactory = workFactory;
     }
 
-    @Override
-    public Object call() throws Exception {
+    public void execute(Iterator<Long> flownodeIds) throws Exception {
         try {
-            for (int i = 0; i < MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION && iterator.hasNext(); i++) {
-                SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(iterator.next());
+            for (int i = 0; i < MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION && flownodeIds.hasNext(); i++) {
+                SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeIds.next());
                 if (flowNodeInstance.isTerminal()) {
-                    createNotifyChildFinishedWork(workService, logger, flowNodeInstance);
+                    createNotifyChildFinishedWork(flowNodeInstance);
                 } else {
                     if (shouldExecuteFlownode(flowNodeInstance)) {
-                        createExecuteFlowNodeWork(workService, logger, flowNodeInstance);
+                        createExecuteFlowNodeWork(flowNodeInstance);
                     } else {
                         if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
-                            logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, "Flownode with name = <" + flowNodeInstance.getName()
-                                    + ">, and id = <" + flowNodeInstance.getId() + "> in state = <" + flowNodeInstance.getStateName()
-                                    + "> does not fulfill the restart conditions.");
+                            logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO,
+                                    "Flownode with name = <" + flowNodeInstance.getName()
+                                            + ">, and id = <" + flowNodeInstance.getId() + "> in state = <"
+                                            + flowNodeInstance.getStateName()
+                                            + "> does not fulfill the restart conditions.");
                         }
                     }
                 }
             }
-            return null;
         } catch (final SWorkRegisterException e) {
             throw new RestartException("Unable to restart flowNodes: can't register work", e);
         } catch (final SBonitaException e) {
@@ -96,18 +95,22 @@ public class ExecuteFlowNodes implements Callable<Object> {
         }
     }
 
-    void createExecuteFlowNodeWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
+    private void createExecuteFlowNodeWork(final SFlowNodeInstance sFlowNodeInstance)
             throws SWorkRegisterException {
-        logInfo(logger, "Restarting flow node (Execute ...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
-                + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
+        logInfo(logger,
+                "Restarting flow node (Execute ...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <"
+                        + sFlowNodeInstance.getId()
+                        + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
         workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
     }
 
-    void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
+    private void createNotifyChildFinishedWork(final SFlowNodeInstance sFlowNodeInstance)
             throws SWorkRegisterException {
-        logInfo(logger, "Restarting flow node (Notify finished...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
-                + " in state = <" + sFlowNodeInstance.getStateName() + ">");
+        logInfo(logger,
+                "Restarting flow node (Notify finished...) with name = <" + sFlowNodeInstance.getName()
+                        + ">, and id = <" + sFlowNodeInstance.getId()
+                        + " in state = <" + sFlowNodeInstance.getStateName() + ">");
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
         workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance));
     }
@@ -130,22 +133,25 @@ public class ExecuteFlowNodes implements Callable<Object> {
      * @return true if the flownode should be relaunched because it has not finished its work in progress, false otherwise.
      * @throws SBonitaException in case of error.
      */
-    protected boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+    private boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         try {
             //when state category is cancelling but the state is 'stable' (e.g. boundary event in waiting but that has been cancelled)
             if ((sFlowNodeInstance.getStateCategory().equals(SStateCategory.CANCELLING)
-                    || sFlowNodeInstance.getStateCategory().equals(SStateCategory.ABORTING)) && !sFlowNodeInstance.isTerminal()
+                    || sFlowNodeInstance.getStateCategory().equals(SStateCategory.ABORTING))
+                    && !sFlowNodeInstance.isTerminal()
                     && sFlowNodeInstance.isStable()) {
                 FlowNodeState state = flowNodeStateManager.getState(sFlowNodeInstance.getStateId());
                 //in this case we restart it only if the state is not in this cancelling of aborting category
-                //this can happened when we abort a process with a call activity:
+                //this can happen when we abort a process with a call activity:
                 //the call activity is put in aborting state and wait for its children to finish, in that case we do not call execute on it
                 return !state.getStateCategory().equals(sFlowNodeInstance.getStateCategory());
             }
             if (SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType())) {
-                SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
+                SProcessDefinition processDefinition = processDefinitionService
+                        .getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
                 return sFlowNodeInstance.isAborting() || sFlowNodeInstance.isCanceling() ||
-                        gatewayInstanceService.checkMergingCondition(processDefinition, (SGatewayInstance) sFlowNodeInstance);
+                        gatewayInstanceService.checkMergingCondition(processDefinition,
+                                (SGatewayInstance) sFlowNodeInstance);
             }
             return true;
         } catch (final SBonitaException e) {

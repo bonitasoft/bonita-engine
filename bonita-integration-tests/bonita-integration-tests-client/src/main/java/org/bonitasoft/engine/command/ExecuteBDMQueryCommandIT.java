@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -254,6 +254,14 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(2);
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getMaxResults()).isEqualTo(1);
 
+    }
+
+    @Test
+    public void should_return_count_result_when_executing_count_query() throws Exception {
+        //given
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("countForCustomQuery", 0, 1);
+
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo("[3]");
     }
 
     @Test

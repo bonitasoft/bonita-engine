@@ -11,17 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.monitoring;
+package org.bonitasoft.engine.tenant;
 
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
+public interface TenantElementsRestartSupervisor {
 
-import io.micrometer.core.instrument.binder.MeterBinder;
+    boolean shouldRestartElements();
 
-/**
- * @author Emmanuel Duchastenier
- */
-public interface ExecutorServiceMeterBinderProvider {
-
-    Optional<MeterBinder> createMeterBinder(ExecutorService executorService, String executorServiceName, long tenantId);
+    boolean willRestartElements();
 }

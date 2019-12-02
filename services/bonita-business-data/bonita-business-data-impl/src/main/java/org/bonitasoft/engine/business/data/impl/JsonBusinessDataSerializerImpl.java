@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2017 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -85,6 +85,13 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
         } catch (IOException e) {
             throw new SBusinessDataRepositorySerializationException("Unable to serialize list of Entity", e);
         }
+    }
+
+    @Override
+    public String serializeCountResult(List<Long> list, String entityClassName) {
+        String json = "[" + list.get(0).toString() + "]";
+        LOG.trace("Serialization result: {}", json);
+        return json;
     }
 
     @Override

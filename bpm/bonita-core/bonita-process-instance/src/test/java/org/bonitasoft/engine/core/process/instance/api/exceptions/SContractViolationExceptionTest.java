@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 Bonitasoft S.A.
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,12 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -35,8 +37,32 @@ public class SContractViolationExceptionTest {
     public void should_print_stack_trace_show_explanations() {
         final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
 
-        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: [issue1, issue2]");
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1, issue2");
 
+    }
+
+    @Test
+    public void should_print_stack_trace_show_one_explanation() {
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1"));
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1");
+
+    }
+
+    @Test
+    public void should_print_stack_trace_with_null_explanations() {
+        List<String> explanations = null;
+        @SuppressWarnings("ConstantConditions") final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
+    }
+
+    @Test
+    public void should_print_stack_trace_with_empty_explanations() {
+        List<String> explanations = Collections.emptyList();
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+
+        assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
     }
 
     @Test

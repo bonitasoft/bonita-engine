@@ -57,8 +57,18 @@ class ProcessInstantiationPermissionRule implements PermissionRule {
             def processAPI = apiAccessor.getProcessAPI()
             def identityAPI = apiAccessor.getIdentityAPI()
             User user = identityAPI.getUser(currentUserId)
-            SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 10)
-            searchOptionBuilder.filter(UserSearchDescriptor.USER_NAME, user.getUserName())
+            SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 1)
+
+            if(apiCallContext.getParameters().get("user") != null
+                    && apiCallContext.getParameters().get("user").length > 0) {
+                if (!processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)) {
+                    return false
+                }
+                searchOptionBuilder.filter(UserSearchDescriptor.ID, apiCallContext.getParameters().get("user")[0])
+            } else {
+                searchOptionBuilder.filter(UserSearchDescriptor.ID, user.getId())
+            }
+
             SearchResult<User> listUsers = processAPI.searchUsersWhoCanStartProcessDefinition(processDefinitionId, searchOptionBuilder.done())
             logger.debug("RuleCase : nb Result [" + listUsers.getCount() + "] ?")
             def canStart = listUsers.getCount() == 1
