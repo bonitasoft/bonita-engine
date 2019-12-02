@@ -31,10 +31,8 @@ public interface BusinessDataModelRepository {
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
-     * @throws InvalidBusinessDataModelException
-     *         if the format of the bdm archive is not valid
      */
-    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
+    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException;
 
     /**
      * Undeploy Business Data Model from specified tenant
