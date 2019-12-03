@@ -13,20 +13,37 @@
  **/
 package org.bonitasoft.engine.theme.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import lombok.ToString;
 
 /**
  * @author Celine Souchet
  */
-
 @Data
+@ToString(exclude = { "content", "cssContent" })
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "theme")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class STheme implements PersistentObject {
 
     public static final String ID = "id";
@@ -35,12 +52,26 @@ public class STheme implements PersistentObject {
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
     public static final String TYPE = "type";
     public static final String IS_DEFAULT = "isDefault";
+
+    @Id
     private long id;
+    @Id
     private long tenantId;
+
+    @Type(type = "materialized_blob")
+    @Column(name = "content")
     private byte[] content;
+
+    @Type(type = "materialized_blob")
+    @Column(name = "cssContent")
     private byte[] cssContent;
+
+    @Column
     private boolean isDefault;
+    @Column
     private long lastUpdateDate;
+    @Column
+    @Enumerated(EnumType.STRING) // to store the String value of this enum to database
     private SThemeType type;
 
     public STheme(final byte[] content, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {

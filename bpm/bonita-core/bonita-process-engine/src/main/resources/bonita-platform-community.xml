@@ -778,7 +778,6 @@
                 <value>org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
                 <value>org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
                 <!-- theme -->
-                <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.hbm.xml</value>
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
                 <!-- supervisor -->
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
@@ -1010,6 +1009,7 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplication</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
+                <value>org.bonitasoft.engine.theme.model.STheme</value>
             </set>
         </property>
     </bean>

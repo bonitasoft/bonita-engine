@@ -11,27 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.persistence.repository;
+@FilterDef(name="tenantFilter",   parameters = {@ParamDef(name="tenantId", type="long")},
+        defaultCondition = "tenantid = :tenantId")
+package org.bonitasoft.engine.theme.model;
 
-import org.bonitasoft.engine.identity.model.SRole;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
-
-/**
- * @author Emmanuel Duchastenier
- */
-public class RoleRepository extends TestRepository {
-
-    public RoleRepository(SessionFactory sessionFactory) {
-        super(sessionFactory);
-    }
-
-    public SRole getRoleByName(long tenantId, String name) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
-        Query namedQuery = getNamedQuery("getRoleByName");
-        namedQuery.setParameter("name", name);
-        return ((SRole) namedQuery.uniqueResult());
-    }
-
-
-}
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;

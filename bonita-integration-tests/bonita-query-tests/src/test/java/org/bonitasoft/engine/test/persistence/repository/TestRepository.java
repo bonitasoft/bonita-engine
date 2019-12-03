@@ -49,6 +49,7 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
+import org.bonitasoft.engine.theme.model.STheme;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -278,6 +279,11 @@ public class TestRepository {
         getSession().save(dependencyMapping);
         return (SDependencyMapping) getSession().get(dependencyMapping.getClass(),
                 new PersistentObjectId(dependencyMapping.getId(), dependencyMapping.getTenantId()));
+    }
+
+    public STheme add(STheme theme) {
+        getSession().save(theme);
+        return (STheme) getSession().get(theme.getClass(), new PersistentObjectId(theme.getId(), theme.getTenantId()));
     }
 
 }
