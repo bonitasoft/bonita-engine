@@ -13,39 +13,32 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NamedQuery(name = "getAllBooks",
+        query = "SELECT book FROM org.bonitasoft.engine.persistence.Book AS book")
+
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "book")
 public class Book implements PersistentObject {
 
     private static final long serialVersionUID = 1L;
 
+    @Column
     String title;
+    @Column
     String author;
+    @Id
     long id;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(final String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(final String author) {
-        this.author = author;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
-    }
 
     @Override
     public void setTenantId(final long id) {

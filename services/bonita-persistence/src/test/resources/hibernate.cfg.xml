@@ -21,6 +21,6 @@
         <property name="hibernate.show_sql">false</property>
         <!-- Drop and re-create the database schema on startup -->
         <property name="hibernate.hbm2ddl.auto">create</property>
-        <mapping resource="org/bonitasoft/engine/persistence/Book.hbm.xml" />
+        <mapping class="org.bonitasoft.engine.persistence.Book"/>
     </session-factory>
 </hibernate-configuration>
