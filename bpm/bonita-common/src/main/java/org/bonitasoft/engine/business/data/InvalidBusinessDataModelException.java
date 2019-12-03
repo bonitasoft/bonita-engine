@@ -33,11 +33,4 @@ public class InvalidBusinessDataModelException extends BusinessDataRepositoryExc
         super(cause);
     }
 
-    public InvalidBusinessDataModelException(String message, Exception cause) {
-        super(message, cause);
-    }
-
-    public InvalidBusinessDataModelException(String message) {
-        super(message);
-    }
 }

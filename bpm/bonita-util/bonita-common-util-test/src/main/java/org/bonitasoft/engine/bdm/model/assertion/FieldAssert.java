@@ -22,7 +22,6 @@ import javax.xml.bind.JAXBException;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.xml.sax.SAXException;
 
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
@@ -62,7 +61,7 @@ public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
         return this;
     }
 
-    private BusinessObjectModel marshallUnmarshall(final Field field) throws JAXBException, IOException, SAXException, InvalidBusinessDataModelException {
+    private BusinessObjectModel marshallUnmarshall(final Field field) throws JAXBException, IOException, SAXException {
         final BusinessObjectModelBuilder bom = aBOM().withBO(aBO("someUglyNameMightNotAppear").withField(field).build());
         addReferencedBoToBom(field, bom);
         return Marshaller.marshallUnmarshall(bom.build());

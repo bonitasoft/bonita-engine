@@ -151,6 +151,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
             return bdmRepository.install(zip, tenantAccessor.getTenantId(), userId);
+        } catch (final IllegalStateException e) {
+            throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
             throw new BusinessDataRepositoryDeploymentException(e);
         }
