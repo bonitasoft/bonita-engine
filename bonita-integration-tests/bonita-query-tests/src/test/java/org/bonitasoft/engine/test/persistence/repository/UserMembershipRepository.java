@@ -22,7 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 public class UserMembershipRepository extends TestRepository {
 

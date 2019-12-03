@@ -1,6 +1,6 @@
-/*
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/**
+ * Copyright (C) 2019 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,28 +10,29 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
+import org.bonitasoft.engine.theme.model.STheme;
+import org.bonitasoft.engine.theme.model.SThemeType;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class UserRepository extends TestRepository {
+public class ThemeRepository extends TestRepository {
 
-    public UserRepository(SessionFactory sessionFactory) {
+    public ThemeRepository(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
-    public SUser getUserByName(String userName) {
-        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        Query namedQuery = getNamedQuery("getUserByUserName");
-        namedQuery.setParameter("userName", userName);
-        return ((SUser) namedQuery.uniqueResult());
+    public STheme getThemeByType(long tenantId, SThemeType type) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+        Query namedQuery = getNamedQuery("getTheme");
+        namedQuery.setParameter("type", type);
+        namedQuery.setParameter("isDefault", true);
+        return ((STheme) namedQuery.uniqueResult());
     }
 
 }
