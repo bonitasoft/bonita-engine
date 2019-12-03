@@ -17,4 +17,6 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${Deps.lombokVersion}"
     testCompile "javax.transaction:jta:${Deps.javaxJtaVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${Deps.lombokVersion}"
+    testCompile "org.projectlombok:lombok:${Deps.lombokVersion}"
 }
