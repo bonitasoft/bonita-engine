@@ -13,16 +13,28 @@
  **/
 package org.bonitasoft.engine.command.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "command")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SCommand implements PersistentObject {
 
     public static final String ID = "id";
@@ -30,10 +42,16 @@ public class SCommand implements PersistentObject {
     public static final String DESCRIPTION = "description";
     public static final String IMPLEMENTATION = "implementation";
     public static final String SYSTEM = "isSystem";
+    @Id
     private long tenantId;
+    @Id
     private long id;
+    @Column
     private boolean isSystem;
+    @Column
     private String name;
+    @Column
     private String description;
+    @Column
     private String implementation;
 }
