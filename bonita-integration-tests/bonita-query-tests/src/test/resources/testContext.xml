@@ -34,6 +34,9 @@
                 <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -75,6 +78,8 @@
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
 
+
+                <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
             </list>
         </property>
@@ -162,6 +167,10 @@
     </bean>
 
     <bean id="themeRepository" class="org.bonitasoft.engine.test.persistence.repository.ThemeRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
+
+    <bean id="commentRepository" class="org.bonitasoft.engine.test.persistence.repository.CommentRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
 

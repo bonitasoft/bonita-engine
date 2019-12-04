@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,6 +23,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("human")
 public class SHumanComment extends SComment {
     public SHumanComment(long processInstanceId, String content, Long userId) {
         super(processInstanceId, content);

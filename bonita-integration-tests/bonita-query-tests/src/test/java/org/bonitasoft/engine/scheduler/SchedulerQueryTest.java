@@ -42,8 +42,8 @@ public class SchedulerQueryTest {
     @Test
     public void getFailedJobsShouldRetrieveAFailedJobIfThereIsAJobLogAndAJobDescriptor() {
         // given:
-        SJobDescriptor addJobDescriptor = jobRepository.addJobDescriptor(aJobDescriptor().build());
-        jobRepository.addJobLog(aJobLog().withJobDescriptorId(addJobDescriptor.getId()).build());
+        SJobDescriptor addJobDescriptor = jobRepository.add(aJobDescriptor().build());
+        jobRepository.add(aJobLog().withJobDescriptorId(addJobDescriptor.getId()).build());
 
         // when:
         List<SFailedJob> failedJobs = jobRepository.getFailedJobs(new QueryOptions(0, 10));
@@ -55,7 +55,7 @@ public class SchedulerQueryTest {
     @Test
     public void getFailedJobsShouldRetrieveZeroFailedJobIfThereIsNoJobLog() {
         // given:
-        jobRepository.addJobDescriptor(aJobDescriptor().build());
+        jobRepository.add(aJobDescriptor().build());
 
         // when:
         List<SFailedJob> failedJobs = jobRepository.getFailedJobs(new QueryOptions(0, 10));
@@ -67,7 +67,7 @@ public class SchedulerQueryTest {
     @Test
     public void getFailedJobsShouldRetrieveZeroFailedJobIfThereIsNoJobDescriptor() {
         // given:
-        jobRepository.addJobLog(aJobLog().withJobDescriptorId(1234566789L).build());
+        jobRepository.add(aJobLog().withJobDescriptorId(1234566789L).build());
 
         // when:
         List<SFailedJob> failedJobs = jobRepository.getFailedJobs(new QueryOptions(0, 10));

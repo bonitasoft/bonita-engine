@@ -26,6 +26,7 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.Id;
 
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.test.persistence.repository.ProfileRepository;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,9 +80,9 @@ public class ProfilesTest {
         // given:
         final SRole role = aRole().build();
         final SUser user = aUser().build();
-        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(-1, role.getId()).build());
         repository.add(role);
         repository.add(user);
+        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(-1, role.getId()).build());
         final String profileName = "retrieved";
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
@@ -99,9 +101,9 @@ public class ProfilesTest {
         // given:
         final SGroup group = aGroup().build();
         final SUser user = aUser().build();
-        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), -1).build());
         repository.add(group);
         repository.add(user);
+        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), -1).build());
         final String profileName = "retrieved";
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
@@ -121,10 +123,10 @@ public class ProfilesTest {
         final SGroup group = aGroup().build();
         final SRole role = aRole().build();
         final SUser user = aUser().build();
-        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build());
         repository.add(group);
         repository.add(role);
         repository.add(user);
+        userMembershipRepository.add(aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build());
         final String profileName = "retrieved";
         final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);

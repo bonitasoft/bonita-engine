@@ -798,7 +798,6 @@
                 <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
                 <!-- comment -->
-                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <!-- archived comment -->
                 <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
@@ -1011,6 +1010,9 @@
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
                 <value>org.bonitasoft.engine.command.model.SCommand</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
             </set>
         </property>
     </bean>

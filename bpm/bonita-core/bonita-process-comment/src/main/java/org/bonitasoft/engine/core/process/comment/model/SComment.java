@@ -13,15 +13,33 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "kind")
+@Table(name = "process_comment")
 public class SComment implements PersistentObject {
     public static final String ID_KEY = "id";
     public static final String USERID_KEY = "userId";
@@ -29,13 +47,18 @@ public class SComment implements PersistentObject {
     public static final String POSTDATE_KEY = "postDate";
     public static final String CONTENT_KEY = "content";
     public static final String KIND_KEY = "kind";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private Long userId;
+    @Column
     private long processInstanceId;
+    @Column
     private long postDate;
+    @Column
     private String content;
-    private String kind;
 
     public SComment(final long processInstanceId, final String content) {
         super();
