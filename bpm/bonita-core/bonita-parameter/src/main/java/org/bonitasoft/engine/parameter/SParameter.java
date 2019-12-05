@@ -16,19 +16,33 @@ package org.bonitasoft.engine.parameter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "proc_parameter")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SParameter implements PersistentObject {
 
-    private String name;
-    private String value;
-    private long processDefinitionId;
+    @Id
     private long id;
+    @Id
     private long tenantId;
+
+    @Column
+    private String name;
+    @Column(columnDefinition = "materialized_clob")
+    private String value;
+    @Column(name = "process_id")
+    private long processDefinitionId;
 
     public SParameter(String name, String value, long processDefinitionId) {
         this.name = name;

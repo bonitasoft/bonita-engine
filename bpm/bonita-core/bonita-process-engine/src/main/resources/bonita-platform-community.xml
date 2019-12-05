@@ -847,7 +847,6 @@
                 <!-- contract -->
                 <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
                 <!-- parameters -->
-                <value>org/bonitasoft/engine/parameter/parameter.hbm.xml</value>
                 <value>org/bonitasoft/engine/parameter/parameter.queries.hbm.xml</value>
             </set>
         </property>
@@ -1031,6 +1030,7 @@
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
+                <value>org.bonitasoft.engine.parameter.SParameter</value>
             </set>
         </property>
     </bean>
