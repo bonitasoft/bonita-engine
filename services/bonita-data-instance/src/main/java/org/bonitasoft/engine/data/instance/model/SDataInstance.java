@@ -15,17 +15,32 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
-/**
- * @author Zhao Na
- */
 @Data
 @NoArgsConstructor
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "DISCRIMINANT")
+@Table(name = "data_instance")
 public abstract class SDataInstance implements PersistentObject {
 
     public static final String ID = "id";
@@ -34,13 +49,21 @@ public abstract class SDataInstance implements PersistentObject {
     public static final String VALUE = "value";
     public static final String CONTAINER_ID = "containerId";
     public static final String CONTAINER_TYPE = "containerType";
+    @Id
     private long tenantId;
+    @Id
     private long id;
+    @Column
     private String name;
+    @Column
     private String description;
+    @Column
     private boolean transientData;
+    @Column
     private String className;
+    @Column
     private long containerId;
+    @Column
     private String containerType;
 
     public SDataInstance(final SDataDefinition dataDefinition) {

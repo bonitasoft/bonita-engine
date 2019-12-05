@@ -15,11 +15,16 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.hibernate.annotations.Type;
 
 /**
  * @author Zhao Na
@@ -28,8 +33,12 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("SLongTextDataInstanceImpl")
 public class SLongTextDataInstance extends SDataInstance {
 
+    @Column(name = "clobValue")
+    @Type(type = "materialized_clob")
     private String value;
 
     public SLongTextDataInstance(final SDataDefinition dataDefinition) {
