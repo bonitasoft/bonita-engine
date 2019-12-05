@@ -18,12 +18,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "profilemember")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SProfileMember implements PersistentObject {
 
     public static final String DISPLAY_NAME_PART3 = "displayNamePart3";
@@ -34,13 +42,19 @@ public class SProfileMember implements PersistentObject {
     public static final String USER_ID = "userId";
     public static final String PROFILE_ID = "profileId";
     public static final String ID = "id";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private long profileId;
+    @Column
     @Builder.Default
     private long userId = -1;
+    @Column
     @Builder.Default
     private long groupId = -1;
+    @Column
     @Builder.Default
     private long roleId = -1;
     private transient String displayNamePart1;
