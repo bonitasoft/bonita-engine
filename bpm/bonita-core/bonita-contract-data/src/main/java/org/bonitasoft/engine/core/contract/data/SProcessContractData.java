@@ -15,6 +15,9 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,6 +28,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("PROCESS")
 public class SProcessContractData extends SContractData {
 
     public SProcessContractData(final long processInstanceId, final String name, final Serializable value) {

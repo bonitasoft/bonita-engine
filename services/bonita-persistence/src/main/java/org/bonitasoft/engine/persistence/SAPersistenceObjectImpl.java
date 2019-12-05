@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,11 +26,16 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@MappedSuperclass
 public abstract class SAPersistenceObjectImpl implements ArchivedPersistentObject {
 
+    @Id
     protected long id;
+    @Id
     protected long tenantId;
+    @Column
     protected long archiveDate;
+    @Column
     protected long sourceObjectId;
 
     public SAPersistenceObjectImpl(final long sourceObjectId) {
