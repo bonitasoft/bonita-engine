@@ -15,11 +15,22 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.IdClass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 /**
  * author Emmanuel Duchastenier
@@ -27,10 +38,20 @@ import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "kind")
+@Table(name = "arch_contract_data")
 public abstract class SAContractData extends SAPersistenceObjectImpl {
 
+    @Column
     protected String name;
+    @Column(name = "val")
+    @Type(type = "xml_blob")
     protected Serializable value;
+    @Column
     protected long scopeId;
 
     public SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
@@ -48,6 +69,4 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SContractData.class;
     }
-
-
 }

@@ -847,7 +847,6 @@
                 <value>org/bonitasoft/engine/core/form/impl/form-mapping.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
                 <!-- contract -->
-                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
                 <!-- parameters -->
                 <value>org/bonitasoft/engine/parameter/parameter.hbm.xml</value>
@@ -1013,6 +1012,12 @@
                 <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
+                <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
             </set>
         </property>
     </bean>

@@ -15,22 +15,39 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class SContractData extends PersistentObjectId implements PersistentObject {
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "kind")
+@Table(name = "contract_data")
+public abstract class SContractData implements PersistentObject {
 
+    @Id
+    private long id;
+    @Id
+    private long tenantId;
+    @Column
     private String name;
+    @Column(name = "val")
+    @Type(type = "xml_blob")
     private Serializable value;
+    @Column
     private long scopeId;
 
     public SContractData(final String name, final Serializable value, long scopeId) {
