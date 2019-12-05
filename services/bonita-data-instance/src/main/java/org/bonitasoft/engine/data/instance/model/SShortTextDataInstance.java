@@ -15,6 +15,10 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,9 +33,12 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("SShortTextDataInstanceImpl")
 public class SShortTextDataInstance extends SDataInstance {
 
     public static final int MAX_LENGTH = 255;
+    @Column(name = "shortTextValue")
     private String value;
 
     public SShortTextDataInstance(final SDataDefinition dataDefinition) {

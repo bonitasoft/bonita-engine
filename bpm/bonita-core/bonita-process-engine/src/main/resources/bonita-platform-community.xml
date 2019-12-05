@@ -832,7 +832,6 @@
                 <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
                 <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
                 <!-- data instance -->
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.hbm.xml</value>
                 <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
                 <!-- archived data instance -->
                 <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
@@ -1018,6 +1017,18 @@
                 <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SShortTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance</value>
             </set>
         </property>
     </bean>

@@ -15,10 +15,15 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
+import org.hibernate.annotations.Type;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -26,11 +31,17 @@ import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("SXMLDataInstanceImpl")
 public class SXMLDataInstance extends SDataInstance {
 
 
+    @Column(name = "clobValue")
+    @Type(type = "materialized_clob")
     private String value;
+	@Column
     private String namespace;
+	@Column
     private String element;
 
     public SXMLDataInstance(final SXMLDataDefinition dataDefinition) {
