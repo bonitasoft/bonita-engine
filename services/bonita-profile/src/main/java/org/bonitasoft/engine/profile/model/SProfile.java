@@ -18,11 +18,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "profile")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SProfile implements PersistentObject {
 
     public static final String PROFILE_IDS = "profileIds";
@@ -35,14 +43,23 @@ public class SProfile implements PersistentObject {
     public static final String CREATED_BY = "createdBy";
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
     public static final String LAST_UPDATED_BY = "lastUpdatedBy";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private boolean isDefault;
+    @Column
     private String name;
+    @Column
     private String description;
+    @Column
     private long creationDate;
+    @Column
     private long createdBy;
+    @Column
     private long lastUpdateDate;
+    @Column
     private long lastUpdatedBy;
 
     public SProfile(final SProfile profile) {

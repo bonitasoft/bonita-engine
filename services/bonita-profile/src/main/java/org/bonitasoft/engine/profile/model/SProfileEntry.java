@@ -18,11 +18,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "profileentry")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SProfileEntry implements PersistentObject {
 
     public static final String ID = "id";
@@ -34,15 +42,25 @@ public class SProfileEntry implements PersistentObject {
     public static final String INDEX = "index";
     public static final String TYPE = "type";
     public static final String CUSTOM = "custom";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private long profileId;
+    @Column
     private long parentId;
+    @Column
     private String name;
+    @Column
     private String description;
+    @Column(name = "index_")
     private long index;
+    @Column
     private String type;
+    @Column
     private String page;
+    @Column
     private boolean custom;
 
     public SProfileEntry(final String name, final long profileId) {

@@ -37,6 +37,9 @@
                 <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
+                <value>org.bonitasoft.engine.profile.model.SProfile</value>
+                <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
+                <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -60,7 +63,6 @@
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
                 <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>

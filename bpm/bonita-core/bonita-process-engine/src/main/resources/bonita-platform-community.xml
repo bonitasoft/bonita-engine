@@ -786,7 +786,6 @@
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
                 <!-- profile -->
-                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
                 <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
                 <!-- process instance -->
                 <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
@@ -1029,6 +1028,9 @@
                 <value>org.bonitasoft.engine.data.instance.model.SShortTextDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SXMLDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.profile.model.SProfile</value>
+                <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
+                <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
             </set>
         </property>
     </bean>
