@@ -780,7 +780,6 @@
                 <!-- theme -->
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
                 <!-- supervisor -->
-                <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                 <!-- scheduler -->
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
@@ -1031,6 +1030,7 @@
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.parameter.SParameter</value>
+                <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
             </set>
         </property>
     </bean>

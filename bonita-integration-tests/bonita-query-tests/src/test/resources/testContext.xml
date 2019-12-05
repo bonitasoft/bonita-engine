@@ -40,6 +40,7 @@
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
+                <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -50,7 +51,6 @@
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
                 <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>

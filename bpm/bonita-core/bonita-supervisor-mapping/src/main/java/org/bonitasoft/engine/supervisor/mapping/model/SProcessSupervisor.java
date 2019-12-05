@@ -18,12 +18,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "processsupervisor")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SProcessSupervisor implements PersistentObject {
 
     public static final String ID_KEY = "id";
@@ -31,14 +39,20 @@ public class SProcessSupervisor implements PersistentObject {
     public static final String GROUP_ID_KEY = "groupId";
     public static final String ROLE_ID_KEY = "roleId";
     public static final String PROCESS_DEF_ID_KEY = "processDefId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private long processDefId;
     @Builder.Default
+    @Column
     private long userId = -1;
     @Builder.Default
+    @Column
     private long groupId = -1;
     @Builder.Default
+    @Column
     private long roleId = -1;
 
     public SProcessSupervisor(final long processDefId) {
