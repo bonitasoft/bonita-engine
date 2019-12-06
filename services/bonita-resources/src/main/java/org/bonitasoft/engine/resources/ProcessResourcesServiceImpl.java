@@ -49,7 +49,7 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
     }
 
     @Override
-    public void update(SBARResourceLight resource, byte[] content) throws SRecorderException {
+    public void update(AbstractSBARResource resource, byte[] content) throws SRecorderException {
         recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.singletonMap("content", content)), BAR_RESOURCE);
     }
 
@@ -98,7 +98,7 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
     }
 
     @Override
-    public void remove(SBARResourceLight resource) throws SRecorderException {
+    public void remove(AbstractSBARResource resource) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(resource), BAR_RESOURCE);
     }
 

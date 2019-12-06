@@ -11,37 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+@FilterDef(name = "tenantFilter", parameters = {
+        @ParamDef(name = "tenantId", type = "long") }, defaultCondition = "tenantid = :tenantId")
 package org.bonitasoft.engine.resources;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Type;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-/**
- * @author Baptiste Mesta
- */
-@Data
-@ToString(callSuper = true, exclude = { "content" })
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "bar_resource")
-public class SBARResource extends AbstractSBARResource {
-
-    @Type(type = "materialized_blob")
-    private byte[] content;
-
-    public SBARResource(String name, BARResourceType type, long processDefinitionId, byte[] content) {
-        this.name = name;
-        this.type = type;
-        this.processDefinitionId = processDefinitionId;
-        this.content = content;
-    }
-
-}
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;

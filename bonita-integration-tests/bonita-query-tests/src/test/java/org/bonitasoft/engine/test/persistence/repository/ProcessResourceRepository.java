@@ -21,6 +21,7 @@ import org.bonitasoft.engine.resources.SBARResourceLight;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
+@SuppressWarnings("unchecked")
 public class ProcessResourceRepository extends TestRepository {
 
     public ProcessResourceRepository(final SessionFactory sessionFactory) {
@@ -40,6 +41,7 @@ public class ProcessResourceRepository extends TestRepository {
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public List<SBARResourceLight> getBARResourcesLightOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getBARResourcesLightOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);

@@ -18,11 +18,13 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.test.persistence.builder.TenantResourceBuilder.aTenantResource;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.TenantResourceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,14 +37,24 @@ public class TenantResourceServiceQueriesTest {
     @Inject
     private TenantResourceRepository repository;
 
+    @Inject
+    private JdbcTemplate jdbcTemplate;
+
     @Test
     public void getTenantResource_should_get_one_resource() {
         // given
         STenantResource resource = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).withState(STenantResourceState.INSTALLED).lastUpdatedBy(135L).withLastUpdateDate(1973L).build());
         repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
 
+        // This check is to ensure we added the annotation @Enumerated(EnumType.STRING) on field 'state',
+        // because by default Hibernate converts ENUMs with their ordinal value when storing to Database:
+        repository.flush();
+        assertThat(jdbcTemplate.queryForObject("select state from tenant_resource where name = 'MyResource'", String.class)).isEqualTo("INSTALLED");
+        assertThat(jdbcTemplate.queryForObject("select type from tenant_resource where name = 'MyResource'", String.class)).isEqualTo("BDM");
+
         //when
         STenantResource myResource = repository.getTenantResource(TenantResourceType.BDM, "MyResource");
+
         // //then
         assertThat(myResource.getContent()).isEqualTo("The content".getBytes());
         assertThat(myResource.lastUpdateDate).isEqualTo(1973L);
@@ -76,6 +88,9 @@ public class TenantResourceServiceQueriesTest {
         repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
         repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
 
+        // This resources should be excluded by the tenantID filter:
+        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes()).withType(TenantResourceType.BDM).build());
+
         //when
         long myResources = repository.getNumberOfTenantResourcesOfType(TenantResourceType.BDM);
         // //then
@@ -86,6 +101,10 @@ public class TenantResourceServiceQueriesTest {
     public void getTenantResourceLightOfType_should_get_all_resource_of_type_without_content() {
         // given
         STenantResource resource1 = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+
+        // This resources should be excluded by the tenantID filter:
+        repository.add(aTenantResource().withTenantId(987123L).withName("excluded").withContent("binary".getBytes()).withType(TenantResourceType.BDM).build());
+
         STenantResource resource2 = repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
         STenantResource resource3 = repository.add(aTenantResource().withName("MyResource3").withContent("The content3".getBytes()).withType(TenantResourceType.BDM).build());
         STenantResource resource4 = repository.add(aTenantResource().withName("MyConnector").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());

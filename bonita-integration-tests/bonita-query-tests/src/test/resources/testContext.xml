@@ -41,6 +41,10 @@
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
+                <value>org.bonitasoft.engine.resources.SBARResourceLight</value>
+                <value>org.bonitasoft.engine.resources.SBARResource</value>
+                <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
+                <value>org.bonitasoft.engine.resources.STenantResource</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -77,9 +81,7 @@
 
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
-
 
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
@@ -91,6 +93,7 @@
                 <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.use_sql_comments">false</prop>
             </props>
         </property>
     </bean>

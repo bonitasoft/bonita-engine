@@ -13,19 +13,22 @@
  **/
 package org.bonitasoft.engine.resources;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import lombok.ToString;
 
 /**
  * @author Baptiste Mesta
  */
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class SBARResourceLight implements PersistentObject {
-    protected String name;
-    protected BARResourceType type;
-    protected long processDefinitionId;
-    private long tenantId;
-    private long id;
+@Entity
+@Table(name = "bar_resource")
+public class SBARResourceLight extends AbstractSBARResource {
 }

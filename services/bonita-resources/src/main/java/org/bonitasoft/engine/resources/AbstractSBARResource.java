@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2019 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,34 +13,39 @@
  **/
 package org.bonitasoft.engine.resources;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Type;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * @author Baptiste Mesta
  */
 @Data
-@ToString(callSuper = true, exclude = { "content" })
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "tenant_resource")
-public class STenantResource extends AbstractSTenantResource {
+@MappedSuperclass
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+public class AbstractSBARResource implements PersistentObject {
+    @Id
+    private long id;
+    @Id
+    private long tenantId;
 
-    @Type(type = "materialized_blob")
-    private byte[] content;
+    protected String name;
 
-    public STenantResource(String name, TenantResourceType type, byte[] content, long lastUpdatedBy,
-            long lastUpdateDate, STenantResourceState state) {
-        super(name, type, lastUpdatedBy, lastUpdateDate, state);
-        this.content = content;
-    }
+    @Enumerated(EnumType.STRING)
+    protected BARResourceType type;
 
+    @Column(name = "process_id")
+    protected long processDefinitionId;
 }

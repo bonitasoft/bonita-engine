@@ -48,5 +48,5 @@ public interface TenantResourcesService {
      */
     STenantResourceLight getSingleLightResource(TenantResourceType type) throws SBonitaReadException;
 
-    void remove(STenantResourceLight resource) throws SRecorderException;
+    void remove(AbstractSTenantResource resource) throws SRecorderException;
 }

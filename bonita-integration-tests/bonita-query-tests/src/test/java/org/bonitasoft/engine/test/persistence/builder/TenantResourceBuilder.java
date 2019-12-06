@@ -34,7 +34,16 @@ public class TenantResourceBuilder extends PersistentObjectBuilder<STenantResour
 
     @Override
     public STenantResource _build() {
-        return new STenantResource(name, type, content, lastUpdatedBy, lastUpdateDate, state);
+        final STenantResource resource = new STenantResource(name, type, content, lastUpdatedBy, lastUpdateDate, state);
+        if (tenantId != 0) {
+            resource.setTenantId(tenantId);
+        }
+        return resource;
+    }
+
+    public TenantResourceBuilder withTenantId(final long tenantId) {
+        this.tenantId = tenantId;
+        return this;
     }
 
     public TenantResourceBuilder withName(final String name) {

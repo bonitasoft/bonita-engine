@@ -28,22 +28,29 @@ public class TenantResourceRepository extends TestRepository {
     }
 
     public STenantResource getTenantResource(TenantResourceType type, String name) {
+        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getTenantResource");
         namedQuery.setParameter("type", type);
         namedQuery.setParameter("name", name);
         return (STenantResource) namedQuery.uniqueResult();
     }
+
     public List<STenantResource> getTenantResourcesOfType(TenantResourceType type) {
+        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getTenantResourcesOfType");
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public List<STenantResourceLight> getTenantResourcesLightOfType(TenantResourceType type) {
+        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getTenantResourcesLightOfType");
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public long getNumberOfTenantResourcesOfType(TenantResourceType type) {
+        getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getNumberOfTenantResourcesOfType");
         namedQuery.setParameter("type", type);
         return (long) namedQuery.uniqueResult();

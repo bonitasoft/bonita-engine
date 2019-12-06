@@ -774,8 +774,7 @@
             <set>
                 <!-- actor -->
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
-                <!-- bar resources -->
-                <value>org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
+                <!-- bar/tenant resources -->
                 <value>org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
                 <!-- theme -->
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
@@ -1030,6 +1029,10 @@
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.parameter.SParameter</value>
+                <value>org.bonitasoft.engine.resources.SBARResourceLight</value>
+                <value>org.bonitasoft.engine.resources.SBARResource</value>
+                <value>org.bonitasoft.engine.resources.STenantResource</value>
+                <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
             </set>
         </property>

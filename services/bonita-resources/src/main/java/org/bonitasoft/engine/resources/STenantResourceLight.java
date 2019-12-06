@@ -13,30 +13,25 @@
  **/
 package org.bonitasoft.engine.resources;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class STenantResourceLight implements PersistentObject {
-    protected String name;
-    protected TenantResourceType type;
-    private long tenantId;
-    private long id;
-    protected long lastUpdatedBy;
-    protected long lastUpdateDate;
-    protected STenantResourceState state;
+@Entity
+@Table(name = "tenant_resource")
+public class STenantResourceLight extends AbstractSTenantResource {
 
     public STenantResourceLight(String name, TenantResourceType type, long lastUpdatedBy, long lastUpdateDate,
                                 STenantResourceState state) {
-        this.name = name;
-        this.type = type;
-        this.lastUpdatedBy = lastUpdatedBy;
-        this.lastUpdateDate = lastUpdateDate;
-        this.state = state;
+        super(name, type, lastUpdatedBy, lastUpdateDate, state);
     }
 }
