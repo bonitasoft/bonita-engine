@@ -73,7 +73,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService
-                .selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
+                .selectList(new SelectListDescriptor<>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
                         new QueryOptions(from, numberOfElements)));
     }
 
@@ -82,7 +82,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService.selectList(
-                new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters, STenantResource.class,
+                new SelectListDescriptor<>("getTenantResourcesOfType", inputParameters, STenantResource.class,
                         new QueryOptions(from, numberOfElements)));
     }
 
@@ -90,7 +90,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     public long count(TenantResourceType type) throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
-        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfType", inputParameters, STenantResource.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfTenantResourcesOfType", inputParameters, STenantResource.class));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         inputParameters.put("name", name);
-        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfTypeAndName",
+        return persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfTenantResourcesOfTypeAndName",
                 inputParameters, STenantResource.class));
     }
 
@@ -107,19 +107,19 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         inputParameters.put("name", name);
-        return persistenceService.selectOne(new SelectOneDescriptor<STenantResource>("getTenantResource", inputParameters, STenantResource.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<>("getTenantResource", inputParameters, STenantResource.class));
     }
 
     @Override
     public STenantResourceLight getSingleLightResource(TenantResourceType type) throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
-        return persistenceService.selectOne(new SelectOneDescriptor<STenantResourceLight>(
+        return persistenceService.selectOne(new SelectOneDescriptor<>(
                 "getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class));
     }
 
     @Override
-    public void remove(STenantResourceLight resource) throws SRecorderException {
+    public void remove(AbstractSTenantResource resource) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(resource), TENANT_RESOURCE);
     }
 

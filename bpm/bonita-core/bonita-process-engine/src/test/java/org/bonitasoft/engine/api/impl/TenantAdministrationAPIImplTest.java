@@ -17,12 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -32,14 +27,14 @@ import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.tenant.TenantResource;
+import org.bonitasoft.engine.tenant.TenantStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -175,8 +170,8 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void getTenantResource_should_retrieve_resource_from_tenantResourceService() throws Exception {
         // Given
-        final STenantResource toBeReturned = new STenantResource("some name",
-                TenantResourceType.BDM, null, 111L, 222L, STenantResourceState.INSTALLED);
+        final STenantResourceLight toBeReturned = new STenantResourceLight("some name",
+                TenantResourceType.BDM, 111L, 222L, STenantResourceState.INSTALLED);
         doReturn(toBeReturned).when(tenantResourcesService).getSingleLightResource(TenantResourceType.BDM);
 
         // When

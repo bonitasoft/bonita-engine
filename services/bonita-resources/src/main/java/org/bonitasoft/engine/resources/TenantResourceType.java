@@ -18,6 +18,6 @@ package org.bonitasoft.engine.resources;
  */
 public enum TenantResourceType {
     //max 16 chars (DB)
-    BDM, BDM_ACCESS_CTRL;
+    BDM, BDM_ACCESS_CTRL
 
 }

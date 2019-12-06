@@ -27,7 +27,7 @@ public interface ProcessResourcesService {
 
     void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException;
 
-    void update(SBARResourceLight resource, byte[] content) throws SRecorderException;
+    void update(AbstractSBARResource resource, byte[] content) throws SRecorderException;
 
     void removeAll(long processDefinitionId, BARResourceType external) throws SBonitaReadException, SRecorderException;
 
@@ -37,5 +37,5 @@ public interface ProcessResourcesService {
 
     SBARResource get(long processDefinitionId, BARResourceType type, String name) throws SBonitaReadException;
 
-    void remove(SBARResourceLight resource) throws SRecorderException;
+    void remove(AbstractSBARResource resource) throws SRecorderException;
 }
