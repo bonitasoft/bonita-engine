@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
             http://www.springframework.org/schema/jdbc 
             http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
             http://www.springframework.org/schema/beans 
-            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
     <jdbc:embedded-database id="dataSource" type="H2" />
+    <context:component-scan base-package="org.bonitasoft.engine.test.persistence" />
 
     <bean class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <bean id="sessionFactory" class="org.bonitasoft.engine.test.persistence.TestLocalSessionFactoryBuilder">
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses">
             <list>
@@ -45,6 +51,12 @@
                 <value>org.bonitasoft.engine.resources.SBARResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
                 <value>org.bonitasoft.engine.resources.STenantResource</value>
+                <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -85,6 +97,8 @@
 
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -100,83 +114,6 @@
 
     <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory" />
-    </bean>
-
-    <bean id="processInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="processDeploymentInfoRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="bpmEventRepository" class="org.bonitasoft.engine.test.persistence.repository.BPMEventRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="supervisorRepository" class="org.bonitasoft.engine.test.persistence.repository.SupervisorRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="connectorInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="userInfoRepository" class="org.bonitasoft.engine.test.persistence.repository.CustomUserInfoRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="flowNodeInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="jobRepository" class="org.bonitasoft.engine.test.persistence.repository.JobRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="saDataInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.SADataInstanceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-
-    <bean id="userMembershipRepository" class="org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-    <bean id="roleRepository" class="org.bonitasoft.engine.test.persistence.repository.RoleRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-    <bean id="userRepository" class="org.bonitasoft.engine.test.persistence.repository.UserRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="pageRepository" class="org.bonitasoft.engine.test.persistence.repository.PageRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-   <bean id="applicationRepository" class="org.bonitasoft.engine.test.persistence.repository.ApplicationRepository">
-        <constructor-arg ref="sessionFactory" />
-   </bean>
-    <bean id="barResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessResourceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-    <bean id="tenantResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.TenantResourceRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="dependencyRepository" class="org.bonitasoft.engine.test.persistence.repository.DependencyRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="profileRepository" class="org.bonitasoft.engine.test.persistence.repository.ProfileRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="themeRepository" class="org.bonitasoft.engine.test.persistence.repository.ThemeRepository">
-        <constructor-arg ref="sessionFactory" />
-    </bean>
-
-    <bean id="commentRepository" class="org.bonitasoft.engine.test.persistence.repository.CommentRepository">
-        <constructor-arg ref="sessionFactory" />
     </bean>
 
 </beans>

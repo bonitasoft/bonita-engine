@@ -19,7 +19,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class ProcessDeploymentInfoRepository extends TestRepository {
 
     public ProcessDeploymentInfoRepository(SessionFactory sessionFactory) {

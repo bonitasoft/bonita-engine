@@ -18,10 +18,12 @@ import java.util.List;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class ProfileRepository extends TestRepository {
 
     public ProfileRepository(SessionFactory sessionFactory) {

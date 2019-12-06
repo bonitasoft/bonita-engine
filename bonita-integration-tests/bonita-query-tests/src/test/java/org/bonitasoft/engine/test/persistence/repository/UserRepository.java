@@ -17,10 +17,12 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class UserRepository extends TestRepository {
 
     public UserRepository(SessionFactory sessionFactory) {

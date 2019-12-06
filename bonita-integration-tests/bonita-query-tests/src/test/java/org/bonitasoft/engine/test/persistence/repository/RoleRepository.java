@@ -16,10 +16,12 @@ package org.bonitasoft.engine.test.persistence.repository;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class RoleRepository extends TestRepository {
 
     public RoleRepository(SessionFactory sessionFactory) {

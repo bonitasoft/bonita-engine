@@ -20,7 +20,9 @@ import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.SBARResourceLight;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+@Repository
 @SuppressWarnings("unchecked")
 public class ProcessResourceRepository extends TestRepository {
 

@@ -19,10 +19,12 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class JobRepository extends TestRepository {
 
     public JobRepository(final SessionFactory sessionFactory) {

@@ -20,6 +20,7 @@ import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
@@ -36,6 +37,7 @@ import org.hibernate.annotations.Type;
 @Filter(name = "tenantFilter")
 @DiscriminatorColumn(name = "kind")
 @Table(name = "contract_data")
+@SuperBuilder
 public abstract class SContractData implements PersistentObject {
 
     @Id

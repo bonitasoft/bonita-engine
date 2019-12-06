@@ -20,10 +20,12 @@ import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class UserMembershipRepository extends TestRepository {
 
     public UserMembershipRepository(SessionFactory sessionFactory) {

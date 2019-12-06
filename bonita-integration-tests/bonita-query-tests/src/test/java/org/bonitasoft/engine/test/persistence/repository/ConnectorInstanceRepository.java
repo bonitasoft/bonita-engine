@@ -20,7 +20,9 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class ConnectorInstanceRepository extends TestRepository {
 
     public ConnectorInstanceRepository(SessionFactory sessionFactory) {

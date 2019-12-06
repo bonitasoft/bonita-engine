@@ -16,6 +16,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
@@ -23,6 +25,7 @@ import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstan
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class BPMEventRepository extends TestRepository {
 
     public BPMEventRepository(final SessionFactory sessionFactory) {
