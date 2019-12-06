@@ -19,10 +19,12 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class CommentRepository extends TestRepository {
 
     public CommentRepository(SessionFactory sessionFactory) {

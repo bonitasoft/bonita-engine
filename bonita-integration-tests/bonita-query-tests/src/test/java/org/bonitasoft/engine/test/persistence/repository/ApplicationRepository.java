@@ -20,10 +20,12 @@ import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Repository
 public class ApplicationRepository extends TestRepository {
 
     public ApplicationRepository(final SessionFactory sessionFactory) {

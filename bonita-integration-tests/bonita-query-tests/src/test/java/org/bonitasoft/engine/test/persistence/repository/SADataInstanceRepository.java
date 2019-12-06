@@ -18,7 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class SADataInstanceRepository extends TestRepository {
 
     public SADataInstanceRepository(final SessionFactory sessionFactory) {

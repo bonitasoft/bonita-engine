@@ -17,10 +17,12 @@ import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Danila Mazour
  */
+@Repository
 public class DependencyRepository extends TestRepository {
 
     public DependencyRepository(final SessionFactory sessionFactory) {

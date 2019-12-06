@@ -23,6 +23,7 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -103,6 +104,14 @@ public class TestRepository {
             //not set
         }
         return tenantId;
+    }
+
+    public PersistentObject selectOne(String queryName, Pair...parameters){
+        Query namedQuery = getSessionWithTenantFilter().getNamedQuery(queryName);
+        for (Pair parameter : parameters) {
+            namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
+        }
+        return ((PersistentObject) namedQuery.uniqueResult());
     }
 
     public <T extends PersistentObject> T add(T entity) {

@@ -19,7 +19,10 @@ import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+
+@Repository
 public class PageRepository extends TestRepository {
 
     public PageRepository(final SessionFactory sessionFactory) {

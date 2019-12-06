@@ -17,10 +17,12 @@ import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Repository
 public class ThemeRepository extends TestRepository {
 
     public ThemeRepository(SessionFactory sessionFactory) {

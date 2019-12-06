@@ -11,33 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.contract.data;
+package org.bonitasoft.engine.test.persistence.repository;
 
-import java.io.Serializable;
+import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+@Repository
+public class ContractDataRepository extends TestRepository {
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.bonitasoft.engine.persistence.PersistentObject;
-
-/**
- * @author Nicolas Tith
- * @author Emmanuel Duchastenier
- */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@DiscriminatorValue("TASK")
-@SuperBuilder
-public class STaskContractData extends SContractData implements PersistentObject {
-
-    public STaskContractData(final long userTaskId, final String name, final Serializable value) {
-        super(name, value, userTaskId);
+    public ContractDataRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
+
+
 
 }

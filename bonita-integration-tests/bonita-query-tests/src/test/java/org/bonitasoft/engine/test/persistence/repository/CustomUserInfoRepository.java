@@ -17,10 +17,12 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Repository
 public class CustomUserInfoRepository extends TestRepository {
 
     public CustomUserInfoRepository(SessionFactory sessionFactory) {

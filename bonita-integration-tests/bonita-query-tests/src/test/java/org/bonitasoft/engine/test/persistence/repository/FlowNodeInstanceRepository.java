@@ -21,10 +21,12 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Repository
 public class FlowNodeInstanceRepository extends TestRepository {
 
     public FlowNodeInstanceRepository(final SessionFactory sessionFactory) {

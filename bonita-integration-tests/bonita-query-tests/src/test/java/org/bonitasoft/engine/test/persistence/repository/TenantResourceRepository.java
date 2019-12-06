@@ -20,7 +20,10 @@ import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
+
+@Repository
 public class TenantResourceRepository extends TestRepository {
 
     public TenantResourceRepository(final SessionFactory sessionFactory) {

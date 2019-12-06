@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * author Emmanuel Duchastenier
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("PROCESS")
+@SuperBuilder
 public class SProcessContractData extends SContractData {
 
     public SProcessContractData(final long processInstanceId, final String name, final Serializable value) {
