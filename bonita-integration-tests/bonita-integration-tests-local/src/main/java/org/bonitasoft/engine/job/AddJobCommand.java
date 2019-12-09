@@ -39,7 +39,7 @@ public class AddJobCommand extends TenantCommand {
         final SJobDescriptor jobDescriptor = SJobDescriptor.builder()
                 .jobClassName(ThrowsExceptionJob.class.getName())
                 .jobName("ThrowsExceptionJob")
-                .disallowConcurrentExecution(false).description("Throw an exception when 'throwException'=true")
+                .description("Throw an exception when 'throwException'=true")
                 .build();
         Boolean throwException = Boolean.TRUE;
         final Serializable exception = parameters.get("throwException");

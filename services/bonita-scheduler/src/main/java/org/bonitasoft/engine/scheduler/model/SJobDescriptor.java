@@ -34,26 +34,17 @@ public class SJobDescriptor implements PersistentObject {
     private String jobClassName;
     private String jobName;
     private String description;
-    private boolean disallowConcurrentExecution;
 
-    public SJobDescriptor(final String jobClassName, final String jobName, final String description, final boolean disallowConcurrentExecution) {
+    public SJobDescriptor(final String jobClassName, final String jobName, final String description) {
         super();
         this.jobClassName = jobClassName;
         this.jobName = jobName;
         this.description = description;
-        this.disallowConcurrentExecution = disallowConcurrentExecution;
     }
 
-    public SJobDescriptor(final String jobClassName, final String jobName, final boolean disallowConcurrentExecution) {
+    public SJobDescriptor(final String jobClassName, final String jobName) {
         super();
         this.jobClassName = jobClassName;
         this.jobName = jobName;
-        this.disallowConcurrentExecution = disallowConcurrentExecution;
     }
-
-    public boolean disallowConcurrentExecution() {
-        return disallowConcurrentExecution;
-    }
-
-
 }

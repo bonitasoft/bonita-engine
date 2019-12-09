@@ -113,14 +113,14 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void executeAgain(final long jobDescriptorId, int delayInMillis) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), delayInMillis);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, delayInMillis);
     }
 
     @Override
     public void retryJobThatFailed(long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), 0);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, 0);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution(), 0);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, 0);
     }
 
     private void deleteFailedJobs(long jobDescriptorId) throws SSchedulerException {
@@ -153,7 +153,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
         final String tenantId = getTenantIdAsString();
         try {
-            schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, jobDescriptor.disallowConcurrentExecution());
+            schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, false);
         } catch (final Throwable e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             try {
