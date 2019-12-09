@@ -57,11 +57,12 @@
                 <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
             </list>
         </property>
         <property name="mappingResources">
             <list>
-                <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>

@@ -78,8 +78,13 @@ public class TestRepository {
     }
 
     protected Session getSessionWithTenantFilter() {
+        long tenantId = DEFAULT_TENANT_ID;
+        return getSessionWithTenantFilter(tenantId);
+    }
+
+    private Session getSessionWithTenantFilter(long tenantId) {
         final Session session = getSession();
-        session.enableFilter("tenantFilter").setParameter("tenantId", DEFAULT_TENANT_ID);
+        session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         return session;
     }
 
@@ -107,7 +112,10 @@ public class TestRepository {
     }
 
     public PersistentObject selectOne(String queryName, Pair...parameters){
-        Query namedQuery = getSessionWithTenantFilter().getNamedQuery(queryName);
+        return selectOne(DEFAULT_TENANT_ID, queryName, parameters);
+    }
+    public PersistentObject selectOne(long tenantId, String queryName, Pair...parameters){
+        Query namedQuery = getSessionWithTenantFilter(tenantId).getNamedQuery(queryName);
         for (Pair parameter : parameters) {
             namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
         }
@@ -124,27 +132,9 @@ public class TestRepository {
         getSession().save(entity);
         return (T) getSession().get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId(entity)));
     }
-
-    public SConnectorInstance add(final SConnectorInstance sConnectorInstance) {
-        getSession().save(sConnectorInstance);
-        return (SConnectorInstance) getSession().get(sConnectorInstance.getClass(),
-                new PersistentObjectId(sConnectorInstance.getId(), sConnectorInstance.getTenantId()));
-    }
-
-    public SPendingActivityMapping add(final SPendingActivityMapping pendingActivityMapping) {
-        getSession().save(pendingActivityMapping);
-        return (SPendingActivityMapping) getSession().get(pendingActivityMapping.getClass(),
-                new PersistentObjectId(pendingActivityMapping.getId(), pendingActivityMapping.getTenantId()));
-    }
-
     public void update(final SApplication application) {
         getSession().update(application);
     }
 
-
-    public STheme add(STheme theme) {
-        getSession().save(theme);
-        return (STheme) getSession().get(theme.getClass(), new PersistentObjectId(theme.getId(), theme.getTenantId()));
-    }
 
 }
