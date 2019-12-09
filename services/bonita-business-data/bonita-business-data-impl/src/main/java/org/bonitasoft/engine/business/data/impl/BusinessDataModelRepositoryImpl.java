@@ -29,6 +29,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.SchemaManager;
@@ -132,6 +133,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             }
         } catch (IOException e) {
             throw new SBusinessDataRepositoryException(e);
+        } catch (InvalidBusinessDataModelException e) {
+            throw new SBusinessDataRepositoryDeploymentException("BDM zip file is invalid in database.", e);
         }
         return null;
     }
@@ -148,7 +151,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     @Override
     public String install(final byte[] bdmZip, final long tenantId, long userId)
-            throws SBusinessDataRepositoryDeploymentException {
+            throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createAndDeployClientBDMZip(model, userId);
@@ -200,12 +203,12 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     protected BusinessObjectModel getBusinessObjectModel(final byte[] bdmZip)
-            throws SBusinessDataRepositoryDeploymentException {
+            throws InvalidBusinessDataModelException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {
             return converter.unzip(bdmZip);
-        } catch (final Exception e) {
-            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
+        } catch (IOException | SAXException | JAXBException e) {
+            throw new InvalidBusinessDataModelException(e);
         }
     }
 
