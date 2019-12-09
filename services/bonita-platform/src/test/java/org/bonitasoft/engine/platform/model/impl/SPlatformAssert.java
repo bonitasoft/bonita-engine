@@ -87,29 +87,6 @@ public class SPlatformAssert extends AbstractAssert<SPlatformAssert, SPlatform> 
   }
 
   /**
-   * Verifies that the actual SPlatformImpl's id is equal to the given one.
-   * @param id the given id to compare the actual SPlatformImpl's id to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's id is not equal to the given one.
-   */
-  public SPlatformAssert hasId(long id) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected id of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualId = actual.getId();
-    if (actualId != id) {
-      failWithMessage(assertjErrorMessage, actual, id, actualId);
-    }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
    * Verifies that the actual SPlatformImpl's information is equal to the given one.
    * @param information the given information to compare the actual SPlatformImpl's information to.
    * @return this assertion object.
@@ -172,29 +149,6 @@ public class SPlatformAssert extends AbstractAssert<SPlatformAssert, SPlatform> 
     String actualPreviousVersion = actual.getPreviousVersion();
     if (!Objects.areEqual(actualPreviousVersion, previousVersion)) {
       failWithMessage(assertjErrorMessage, actual, previousVersion, actualPreviousVersion);
-    }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
-   * Verifies that the actual SPlatformImpl's tenantId is equal to the given one.
-   * @param tenantId the given tenantId to compare the actual SPlatformImpl's tenantId to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's tenantId is not equal to the given one.
-   */
-  public SPlatformAssert hasTenantId(long tenantId) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected tenantId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualTenantId = actual.getTenantId();
-    if (actualTenantId != tenantId) {
-      failWithMessage(assertjErrorMessage, actual, tenantId, actualTenantId);
     }
 
     // return the current assertion for method chaining

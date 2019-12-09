@@ -799,7 +799,6 @@
                 <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
                 <!-- platform -->
-                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.hbm.xml</value>
                 <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
                 <!-- platform command -->
                 <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.hbm.xml</value>
@@ -1001,6 +1000,8 @@
                 <value>org.bonitasoft.engine.business.application.model.SApplication</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationPage</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplicationMenu</value>
+                <value>org.bonitasoft.engine.platform.model.SPlatform</value>
+                <value>org.bonitasoft.engine.platform.model.STenant</value>
                 <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>

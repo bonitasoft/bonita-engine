@@ -13,16 +13,23 @@
  **/
 package org.bonitasoft.engine.platform.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "platform")
 public class SPlatform implements PersistentObject {
 
 
@@ -33,13 +40,14 @@ public class SPlatform implements PersistentObject {
     public static final String PREVIOUS_VERSION = "previousVersion";
     public static final String VERSION = "version";
     public static final String INFORMATION = "information";
-    private long tenantId;
+    @Id
     private long id;
     private long created;
     private String createdBy;
     private String initialVersion;
     private String previousVersion;
     private String version;
+    @Type(type = "materialized_clob")
     private String information;
 
     public SPlatform(final String version, final String previousVersion, final String initialVersion, final String createdBy, final long created) {
@@ -50,4 +58,8 @@ public class SPlatform implements PersistentObject {
         this.created = created;
     }
 
+    @Override
+    public void setTenantId(long id) {
+        //no tenant id
+    }
 }

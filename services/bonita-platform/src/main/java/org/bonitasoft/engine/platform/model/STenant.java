@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.platform.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +27,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "tenant")
 public class STenant implements PersistentObject {
 
     public static final String PAUSED = "PAUSED";
@@ -37,8 +43,7 @@ public class STenant implements PersistentObject {
     public static final String ICON_NAME = "iconName";
     public static final String ICON_PATH = "iconPath";
     public static final String DEFAULT_TENANT = "defaultTenant";
-
-    private long tenantId;
+    @Id
     private long id;
     private String name;
     private String description;
@@ -76,4 +81,9 @@ public class STenant implements PersistentObject {
         return PAUSED.equals(status);
     }
 
+
+    @Override
+    public void setTenantId(long id) {
+        //no tenant id
+    }
 }
