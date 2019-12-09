@@ -231,7 +231,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         return SJobDescriptor.builder()
                 .jobClassName(TriggerTimerEventJob.class.getName())
                 .jobName(jobName)
-                .disallowConcurrentExecution(false).build();
+                .build();
     }
 
     @Override

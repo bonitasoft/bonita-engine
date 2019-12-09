@@ -211,11 +211,9 @@ public class SchedulerServiceImplTest {
         // given
         final long jogDescriptorId = 7L;
         final String jobName = "myJob";
-        final boolean disallowConcurrency = true;
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
         given(jobDescriptor.getId()).willReturn(jogDescriptorId);
         given(jobDescriptor.getJobName()).willReturn(jobName);
-        given(jobDescriptor.disallowConcurrentExecution()).willReturn(disallowConcurrency);
         given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
         final Trigger trigger = mock(Trigger.class);
         final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
@@ -226,7 +224,7 @@ public class SchedulerServiceImplTest {
         // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
         verify(jobService, times(1)).createJobParameters(parameters, TENANT_ID, jogDescriptorId);
-        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger, disallowConcurrency);
+        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger, false);
     }
 
     @Test

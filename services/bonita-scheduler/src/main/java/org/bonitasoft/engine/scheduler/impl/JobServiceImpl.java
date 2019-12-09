@@ -89,7 +89,7 @@ public class JobServiceImpl implements JobService {
 
         // Set the tenant manually on the object because it will be serialized
         final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
-                sJobDescriptor.getDescription(), sJobDescriptor.disallowConcurrentExecution());
+                sJobDescriptor.getDescription());
         sJobDescriptorToRecord.setTenantId(tenantId);
 
         try {
