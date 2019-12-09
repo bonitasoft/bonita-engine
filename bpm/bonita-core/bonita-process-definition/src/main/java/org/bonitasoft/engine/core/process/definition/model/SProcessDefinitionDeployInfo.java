@@ -13,16 +13,30 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "process_definition")
 public class SProcessDefinitionDeployInfo implements PersistentObject {
 
     public static final String DESCRIPTION = "description";
@@ -40,7 +54,9 @@ public class SProcessDefinitionDeployInfo implements PersistentObject {
     public static final String ICON_PATH = "iconPath";
     public static final String DESIGN_CONTENT = "designContent.content";
     public static final String LABEL = "label";
+
     private String name;
+    @Id
     private long id;
     private long deploymentDate;
     private long deployedBy;
@@ -48,12 +64,16 @@ public class SProcessDefinitionDeployInfo implements PersistentObject {
     private String description;
     private String configurationState;
     private String activationState;
+    @Id
     private long tenantId;
     private long processId;
-    private long supervisorId;
     private String displayName;
     private long lastUpdateDate;
     private String iconPath;
     private String displayDescription;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "content_tenantid", referencedColumnName = "tenantid"),
+            @JoinColumn(name = "content_id", referencedColumnName = "id")})
     private SProcessDefinitionDesignContent designContent;
 }

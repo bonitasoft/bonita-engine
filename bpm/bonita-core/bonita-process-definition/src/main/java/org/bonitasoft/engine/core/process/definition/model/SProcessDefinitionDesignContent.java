@@ -13,14 +13,31 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "process_content")
+@Builder
 public class SProcessDefinitionDesignContent implements PersistentObject {
+    @Id
     private long tenantId;
+    @Id
     private long id;
     private String content;
 }

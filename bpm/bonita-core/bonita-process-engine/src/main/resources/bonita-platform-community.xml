@@ -792,7 +792,6 @@
                 <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
                 <!-- process definition -->
-                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
                 <!-- comment -->
                 <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
@@ -985,6 +984,8 @@
         </property>
         <property name="entities">
             <set>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
+                <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
                 <value>org.bonitasoft.engine.identity.model.SContactInfo</value>
                 <value>org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition</value>
                 <value>org.bonitasoft.engine.identity.model.SCustomUserInfoValue</value>

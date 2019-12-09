@@ -14,25 +14,30 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
 import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
 import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBuilder.aUserTask;
 
 import java.util.List;
-
+import java.util.Map;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +81,8 @@ public class ProcessDeploymentInfoQueriesTest {
 
     @Inject
     private ProcessDeploymentInfoRepository repository;
+    @Inject
+    private JdbcTemplate jdbcTemplate;
 
     @Before
     public void before() {
@@ -743,4 +750,66 @@ public class ProcessDeploymentInfoQueriesTest {
         assertThat(processes.get(0).getVersion()).isEqualTo("1.0");
     }
 
+
+    @Test
+    public void should_save_and_retrieve_process_definition_content() {
+        SProcessDefinitionDesignContent content = repository.add(SProcessDefinitionDesignContent.builder().content("<xml>content</xml>").build());
+        SProcessDefinitionDeployInfo processDefinition = repository.add(SProcessDefinitionDeployInfo.builder()
+                .name("MyProcessWithContent")
+                .processId(123456L)
+                .version("1.12")
+                .description("a normal process")
+                .displayName("My process with content")
+                .displayDescription("A normal process display description")
+                .configurationState("OK")
+                .activationState("ACTIVATED")
+                .designContent(content).build());
+
+        PersistentObject persistentObject = repository.selectOne("getDeployInfoByProcessDefId", pair("processId", 123456L));
+
+        assertThat(persistentObject).isEqualTo(processDefinition);
+        assertThat(((SProcessDefinitionDeployInfo) persistentObject).getDesignContent().getContent()).isEqualTo("<xml>content</xml>");
+
+    }
+
+    @Test
+    public void should_reference_design_content_using_tenantid_and_id() {
+        SProcessDefinitionDesignContent content = repository.add(SProcessDefinitionDesignContent.builder().content("<xml>content</xml>").build());
+        repository.add(SProcessDefinitionDeployInfo.builder()
+                .name("MyProcessWithContent")
+                .processId(123456L)
+                .version("1.12")
+                .description("a normal process")
+                .displayName("My process with content")
+                .displayDescription("A normal process display description")
+                .configurationState("OK")
+                .activationState("ACTIVATED")
+                .designContent(content).build());
+        repository.flush();
+
+        Map<String, Object> processDefinitionMap = jdbcTemplate.queryForMap("SELECT * FROM process_definition WHERE tenantID=" + DEFAULT_TENANT_ID + " AND processId=123456");
+        Map<String, Object> processContentMap = jdbcTemplate.queryForMap("SELECT * FROM process_content ");
+
+        assertThat(processDefinitionMap.get("name")).isEqualTo("MyProcessWithContent");
+        assertThat(processDefinitionMap.get("CONTENT_TENANTID")).isEqualTo(DEFAULT_TENANT_ID);
+        assertThat(processDefinitionMap.get("CONTENT_ID")).isEqualTo(content.getId());
+        assertThat(processContentMap.get("TENANTID")).isEqualTo(DEFAULT_TENANT_ID) ;
+        assertThat(processContentMap.get("ID")).isEqualTo(content.getId());
+    }
+
+
+    @Test
+    public void should_filter_processes_by_tenant() {
+        SProcessDefinitionDeployInfo processTenantDefault =
+                repository.add(SProcessDefinitionDeployInfo.builder().name("MyProcessWithContent").processId(1234567L).tenantId(DEFAULT_TENANT_ID).build());
+        SProcessDefinitionDeployInfo processTenant13 =
+                repository.add(SProcessDefinitionDeployInfo.builder().name("MyProcessWithContent").processId(1234567L).tenantId(13).build());
+
+
+        PersistentObject persistentObjectTenantDefault = repository.selectOne("getDeployInfoByProcessDefId", pair("processId", 1234567L));
+        PersistentObject persistentObjectTenant13 = repository.selectOne(13, "getDeployInfoByProcessDefId", pair("processId", 1234567L));
+
+        assertThat(persistentObjectTenantDefault.getId()).isEqualTo(processTenantDefault.getId());
+        assertThat(persistentObjectTenant13.getId()).isEqualTo(processTenant13.getId());
+    }
 }
