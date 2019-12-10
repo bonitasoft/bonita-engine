@@ -13,24 +13,33 @@
  **/
 package org.bonitasoft.engine.platform.command.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Zhang Bole
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "platformCommand")
 public class SPlatformCommand implements PersistentObject {
 
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
     public static final String IMPLEMENTATION = "implementation";
+    @Id
     private long id;
-    private long tenantId;
     private String name;
     private String description;
     private String implementation;
@@ -42,4 +51,8 @@ public class SPlatformCommand implements PersistentObject {
         this.implementation = implementation;
     }
 
+    @Override
+    public void setTenantId(long id) {
+        // no tenant id
+    }
 }
