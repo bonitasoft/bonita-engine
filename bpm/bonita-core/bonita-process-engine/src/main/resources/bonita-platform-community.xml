@@ -781,7 +781,6 @@
                 <!-- supervisor -->
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                 <!-- scheduler -->
-                <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
                 <!-- profile -->
                 <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
@@ -1001,6 +1000,9 @@
                 <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobDescriptor</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobParameter</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobLog</value>
                 <value>org.bonitasoft.engine.command.model.SCommand</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
