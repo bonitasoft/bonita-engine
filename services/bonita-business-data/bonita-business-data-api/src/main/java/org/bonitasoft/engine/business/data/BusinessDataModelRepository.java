@@ -32,7 +32,7 @@ public interface BusinessDataModelRepository {
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
      */
-    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException;
+    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
 
     /**
      * Undeploy Business Data Model from specified tenant
