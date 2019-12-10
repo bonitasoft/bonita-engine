@@ -19,10 +19,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,24 +33,23 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> pageAllFields;
 
     SearchPageDescriptor() {
-        final SPageBuilderFactory keyProvider = BuilderFactory.get(SPageBuilderFactory.class);
         pageKeys = new HashMap<>();
-        pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, keyProvider.getIdKey()));
-        pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
-        pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
-        pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, keyProvider.getHiddenKey()));
-        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
-        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
-        pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
-        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
-        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE, new FieldDescriptor(SPage.class, keyProvider.getContentTypeKey()));
-        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SPage.class, keyProvider.getProcessDefinitionIdKey()));
+        pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, SPage.ID));
+        pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, SPage.NAME));
+        pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, SPage.PROVIDED));
+        pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, SPage.HIDDEN));
+        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, SPage.INSTALLATION_DATE));
+        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, SPage.LAST_MODIFICATION_DATE));
+        pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, SPage.INSTALLED_BY));
+        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, SPage.DISPLAY_NAME));
+        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE, new FieldDescriptor(SPage.class, SPage.CONTENT_TYPE));
+        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SPage.class, SPage.PROCESS_DEFINITION_ID));
 
-        pageAllFields = new HashMap<>(1);
+        pageAllFields = new HashMap<>();
 
-        final Set<String> pageFields = new HashSet<>(2);
-        pageFields.add(keyProvider.getNameKey());
-        pageFields.add(keyProvider.getDisplayNameKey());
+        final Set<String> pageFields = new HashSet<>();
+        pageFields.add(SPage.NAME);
+        pageFields.add(SPage.DISPLAY_NAME);
         pageAllFields.put(SPage.class, pageFields);
     }
 

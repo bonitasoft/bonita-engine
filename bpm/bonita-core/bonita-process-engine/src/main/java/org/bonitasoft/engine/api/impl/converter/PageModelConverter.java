@@ -18,13 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageBuilder;
-import org.bonitasoft.engine.page.SPageBuilderFactory;
 import org.bonitasoft.engine.page.impl.PageImpl;
 
 /**
@@ -64,11 +61,14 @@ public class PageModelConverter {
 
     private SPage buildSPage(long creatorUserId, String name, String description, String displayName, String contentName, String contentType,
             Long processDefinitionId, boolean hidden) {
-        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, false, hidden, contentName);
-        newSPageBuilder.setContentType(contentType);
-        newSPageBuilder.setProcessDefinitionId(processDefinitionId);
-        return newSPageBuilder.done();
+        return SPage.builder().name(name).description(description).displayName(displayName)
+                .installationDate(System.currentTimeMillis()).lastModificationDate(System.currentTimeMillis())
+                .installedBy(creatorUserId).lastUpdatedBy(creatorUserId)
+                .provided(false).hidden(hidden)
+                .contentName(contentName)
+                .contentType(contentType)
+                .processDefinitionId(processDefinitionId != null ? processDefinitionId : 0)
+                .build();
     }
 
     public Page toPage(final SPage sPage) {

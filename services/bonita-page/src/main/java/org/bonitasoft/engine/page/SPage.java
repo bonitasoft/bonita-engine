@@ -13,37 +13,45 @@
  **/
 package org.bonitasoft.engine.page;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
  * @author Matthieu Chaffotte
  */
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
-public class SPage implements PersistentObject {
+@Entity
+@Table(name = "page")
+public class SPage extends AbstractSPage {
 
-    private long tenantId;
-    private long id;
-    private String name;
-    private String description;
-    private String displayName;
-    private long installationDate;
-    private long installedBy;
-    private boolean provided;
-    private boolean hidden;
-    private long lastModificationDate;
-    private long lastUpdatedBy;
-    private String contentName;
-    private String contentType;
-    private long processDefinitionId;
+    public static final String NAME = "name";
+    public static final String DESCRIPTION =  "description";
+    public static final String INSTALLATION_DATE =  "installationDate";
+    public static final String INSTALLED_BY =  "installedBy";
+    public static final String CONTENT_TYPE =  "contentType";
+    public static final String PROCESS_DEFINITION_ID =  "processDefinitionId";
+    public static final String ID = "id";
+    public static final String PROVIDED = "provided";
+    public static final String HIDDEN = "hidden";
+    public static final String DISPLAY_NAME = "displayName";
+    public static final String LAST_MODIFICATION_DATE = "lastModificationDate";
+    public static final String LAST_UPDATE_BY = "lastUpdateBy";
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
                      final long installedBy,
                      final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
                      final String contentName) {
-        this(name, installationDate, installedBy, provided, contentName);
+        super(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
         setProvided(provided);
@@ -64,9 +72,6 @@ public class SPage implements PersistentObject {
         setHidden(hidden);
     }
 
-    /**
-     * @param sPage
-     */
     public SPage(final SPage sPage) {
         this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
                 sPage.getInstalledBy(), sPage.isProvided(), sPage.isHidden(), sPage

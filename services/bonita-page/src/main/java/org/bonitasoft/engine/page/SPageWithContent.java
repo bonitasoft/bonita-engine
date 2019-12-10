@@ -13,14 +13,27 @@
  **/
 package org.bonitasoft.engine.page;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@NoArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class SPageWithContent extends SPage {
+@ToString(callSuper = true, exclude = "content")
+@NoArgsConstructor
+@Entity
+@Table(name = "page")
+public class SPageWithContent extends AbstractSPage {
+
+    @Type(type = "materialized_blob")
     private byte[] content;
 
     public SPageWithContent(final SPage sPage, final byte[] pagContent) {

@@ -16,8 +16,9 @@ package org.bonitasoft.engine.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.PageRepository;
@@ -38,7 +39,8 @@ public class PageQueriesTest {
     @Test
     public void getPageContent_should_return_the_content_of_the_page() {
         // given
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository
+                .add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
 
         //when
         final SPageWithContent pageContent = repository.getPageContent(page.getId());
@@ -51,10 +53,11 @@ public class PageQueriesTest {
     public void getPageByName_should_return_the_page_having_the_name() {
         // given
         repository.add(aPage().withName("MyPage1").withContent("The content".getBytes()).build());
-        final SPage page2 = repository.add(aPage().withName("MyPage2").withContent("The content".getBytes()).build());
+        final AbstractSPage page2 = repository
+                .add(aPage().withName("MyPage2").withContent("The content".getBytes()).build());
 
         //when
-        final SPage pageByName = repository.getPageByName("MyPage2");
+        final AbstractSPage pageByName = repository.getPageByName("MyPage2");
 
         // //then
         assertThat(pageByName.getId()).isEqualTo(page2.getId());
@@ -64,22 +67,27 @@ public class PageQueriesTest {
     public void should_getPageByName_return_the_page_without_processDefinitionId() throws Exception {
         //given
         repository.add(aPage().withName("aPage").withContent("content of the global page".getBytes()).build());
-        repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes()).withProcessDefinitionId(123L).build());
-        repository.add(aPage().withName("anOtherPage").withContent("content of the process page 2".getBytes()).withProcessDefinitionId(123L).build());
+        repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes())
+                .withProcessDefinitionId(123L).build());
+        repository.add(aPage().withName("anOtherPage").withContent("content of the process page 2".getBytes())
+                .withProcessDefinitionId(123L).build());
         //when
         SPage globalPage = repository.getPageByName("aPage");
         SPage processPage1 = repository.getPageByNameAndProcessDefinitionId("aPage", 123L);
         SPage processPage2 = repository.getPageByNameAndProcessDefinitionId("anOtherPage", 123L);
         //then
-        assertThat(new String(repository.getPageContent(globalPage.getId()).getContent())).isEqualTo("content of the global page");
-        assertThat(new String(repository.getPageContent(processPage1.getId()).getContent())).isEqualTo("content of the process page 1");
-        assertThat(new String(repository.getPageContent(processPage2.getId()).getContent())).isEqualTo("content of the process page 2");
+        assertThat(new String(repository.getPageContent(globalPage.getId()).getContent()))
+                .isEqualTo("content of the global page");
+        assertThat(new String(repository.getPageContent(processPage1.getId()).getContent()))
+                .isEqualTo("content of the process page 1");
+        assertThat(new String(repository.getPageContent(processPage2.getId()).getContent()))
+                .isEqualTo("content of the process page 2");
     }
 
     @Test
     public void getPageByNameAndProcessDefinition_should_return_the_page_having_the_name() {
         // given
-        final SPageWithContent myPage1 = repository.add(aPage()
+        final AbstractSPage myPage1 = repository.add(aPage()
                 .withName("MyPage1")
                 .withProcessDefinitionId(1L)
                 .build());
@@ -95,12 +103,12 @@ public class PageQueriesTest {
     @Test
     public void getPageByProcessDefinition_should_filter_results() {
         // given
-        final SPageWithContent myPage1 = repository.add(aPage()
+        final AbstractSPage myPage1 = repository.add(aPage()
                 .withName("MyPage1")
                 .withProcessDefinitionId(1L)
                 .withContentType(ContentType.FORM)
                 .build());
-        final SPageWithContent myPage2 = repository.add(aPage()
+        final AbstractSPage myPage2 = repository.add(aPage()
                 .withName("MyPage2")
                 .withProcessDefinitionId(2L)
                 .withContentType(ContentType.FORM)
@@ -113,8 +121,25 @@ public class PageQueriesTest {
 
         // //then
         assertThat(results).as("should retrieve the page").hasSize(1);
-        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name", "processDefinitionId", "contentType");
-
+        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name",
+                "processDefinitionId", "contentType");
     }
 
+    @Test
+    public void should_retrieve_SPageMapping_previously_saved() {
+        // given:
+        final List<String> authorizationRules = new ArrayList<>(Arrays.asList("rule1", "rule2", "rule3"));
+        SPageMapping pageMapping = SPageMapping.builder().pageId(2L).key("myKey").url("http://www/example.com")
+                .urlAdapter("legacy").build();
+        pageMapping.setPageAuthorizationRules(authorizationRules);
+        repository.add(pageMapping);
+
+        // when:
+        final SPageMapping mapping = repository.getPageMappingByKey("myKey");
+
+        // then:
+        assertThat(mapping).extracting("pageId", "key", "url", "urlAdapter")
+                .containsOnly(2L, "myKey", "http://www/example.com", "legacy");
+        assertThat(mapping.getPageAuthorizationRules()).isEqualTo(authorizationRules);
+    }
 }

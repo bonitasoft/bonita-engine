@@ -17,54 +17,23 @@ import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBui
 
 import java.util.Random;
 
-import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserLogin;
-import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.resources.SBARResource;
-import org.bonitasoft.engine.resources.STenantResource;
-import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
-import org.bonitasoft.engine.theme.model.STheme;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * Test Repository
  * Need to be used in a transactional context
  */
+@Repository
 public class TestRepository {
 
     private final SessionFactory sessionFactory;
@@ -126,7 +95,7 @@ public class TestRepository {
         if (!isTenantIdSet(entity)) {
             entity.setTenantId(DEFAULT_TENANT_ID);
         }
-        if (entity.getId()<=0) {
+        if (entity.getId() <= 0) {
             entity.setId(new Random().nextLong());
         }
         getSession().save(entity);

@@ -43,6 +43,12 @@
                 <value>org.bonitasoft.engine.theme.model.STheme</value>
                 <value>org.bonitasoft.engine.core.category.model.SCategory</value>
                 <value>org.bonitasoft.engine.core.category.model.SProcessCategoryMapping</value>
+                <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
@@ -58,10 +64,14 @@
                 <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
+                <value>org.bonitasoft.engine.core.form.SFormMapping</value>
                 <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
+                <value>org.bonitasoft.engine.page.SPage</value>
+                <value>org.bonitasoft.engine.page.SPageWithContent</value>
+                <value>org.bonitasoft.engine.page.SPageMapping</value>
             </list>
         </property>
         <property name="mappingResources">
@@ -95,7 +105,6 @@
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
                 <value>/org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
@@ -106,6 +115,8 @@
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

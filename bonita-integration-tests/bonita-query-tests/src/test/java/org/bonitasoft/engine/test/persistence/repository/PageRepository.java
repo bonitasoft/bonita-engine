@@ -16,6 +16,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 import java.util.List;
 
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -52,6 +53,17 @@ public class PageRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getPageByProcessDefinitionId");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         return namedQuery.list();
+    }
 
+    public SPageMapping getPageMappingByKey(final String key) {
+        final Query namedQuery = getNamedQuery("getPageMappingByKey");
+        namedQuery.setParameter("key", key);
+        return (SPageMapping) namedQuery.uniqueResult();
+    }
+
+    public SPageMapping getPageMappingByPageId(final long pageId) {
+        final Query namedQuery = getNamedQuery("getPageMappingByPageId");
+        namedQuery.setParameter("pageId", pageId);
+        return (SPageMapping) namedQuery.uniqueResult();
     }
 }
