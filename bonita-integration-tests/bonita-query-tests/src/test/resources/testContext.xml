@@ -15,7 +15,7 @@
     <context:component-scan base-package="org.bonitasoft.engine.test.persistence" />
 
     <bean class="org.springframework.jdbc.core.JdbcTemplate">
-        <constructor-arg name="dataSource" ref="dataSource"/>
+        <constructor-arg name="dataSource" ref="dataSource" />
     </bean>
 
     <bean id="sessionFactory" class="org.bonitasoft.engine.test.persistence.TestLocalSessionFactoryBuilder">
@@ -69,6 +69,12 @@
                 <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo</value>
                 <value>org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent</value>
+                <value>org.bonitasoft.engine.core.document.model.SLightDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocumentMapping</value>
+                <value>org.bonitasoft.engine.core.document.model.SMappedDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SAMappedDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SADocumentMapping</value>
                 <value>org.bonitasoft.engine.page.SPage</value>
                 <value>org.bonitasoft.engine.page.SPageWithContent</value>
                 <value>org.bonitasoft.engine.page.SPageMapping</value>
@@ -115,6 +121,9 @@
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
+
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
             </list>

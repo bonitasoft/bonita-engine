@@ -15,9 +15,7 @@ package org.bonitasoft.engine.core.document.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,10 +24,10 @@ import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -55,8 +53,6 @@ public class DocumentServiceImplTest {
     @Mock
     private SDocumentDownloadURLProvider urlProvider;
     @Mock
-    private TechnicalLoggerService technicalLogger;
-    @Mock
     private ArchiveService archiveService;
 
     private DocumentServiceImpl documentService;
@@ -78,7 +74,7 @@ public class DocumentServiceImplTest {
         final List<SMappedDocument> documentList = Arrays.asList(new SMappedDocument(), new SMappedDocument());
         doReturn(documentList).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
-        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45L, 0, 100);
         //then
         assertThat(theList).isEqualTo(documentList);
     }
@@ -90,7 +86,7 @@ public class DocumentServiceImplTest {
         final List<SMappedDocument> documentList2 = constructList(50);
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
-        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45L, 0, 100);
         //then
         documentList1.addAll(documentList2);
         assertThat(theList).isEqualTo(documentList1);
@@ -103,13 +99,13 @@ public class DocumentServiceImplTest {
         final List<SMappedDocument> documentList2 = constructList(0);
         when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
-        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45L, 0, 100);
         //then
         assertThat(theList).isEqualTo(documentList1);
     }
 
     private List<SMappedDocument> constructList(final int size) {
-        final ArrayList<SMappedDocument> list = new ArrayList<SMappedDocument>();
+        final ArrayList<SMappedDocument> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             list.add(new SMappedDocument());
         }
@@ -121,7 +117,7 @@ public class DocumentServiceImplTest {
         //given
         doReturn(Collections.emptyList()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
-        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45L, 0, 100);
         //then
         assertThat(theList).isEmpty();
     }
@@ -132,15 +128,15 @@ public class DocumentServiceImplTest {
         final List<SMappedDocument> sMappedDocuments = Arrays.asList(new SMappedDocument(), new SMappedDocument());
         final List<SAMappedDocument> saMappedDocuments = Arrays.asList(new SAMappedDocument(), new SAMappedDocument());
         doReturn(saMappedDocuments).when(persistenceService).selectList(
-                SelectDescriptorBuilder.getArchivedDocumentList("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
+                SelectDescriptorBuilder.getArchivedDocumentList("theList", 45L, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789L));
         doReturn(sMappedDocuments).when(persistenceService)
                 .selectList(
-                        SelectDescriptorBuilder.getDocumentListCreatedBefore("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS),
-                                123456789l));
+                        SelectDescriptorBuilder.getDocumentListCreatedBefore("theList", 45L, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS),
+                                123456789L));
         //when
-        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 123456789l);
+        final List<AbstractSMappedDocument> theList = documentService.getDocumentList("theList", 45L, 123456789L);
         //then
-        final ArrayList<SMappedDocument> expected = new ArrayList<SMappedDocument>(saMappedDocuments);
+        final ArrayList<AbstractSMappedDocument> expected = new ArrayList<>(saMappedDocuments);
         expected.addAll(sMappedDocuments);
         assertThat(theList).isEqualTo(expected);
     }
@@ -148,7 +144,7 @@ public class DocumentServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void should_get_throw_not_found_exceptions() throws Exception {
         //when
-        documentService.getDocument(123456l);
+        documentService.getDocument(123456L);
         //then exception
     }
 

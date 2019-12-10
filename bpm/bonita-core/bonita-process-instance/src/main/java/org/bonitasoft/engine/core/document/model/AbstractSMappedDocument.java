@@ -13,9 +13,13 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,13 +30,19 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "document_mapping")
-public class SMappedDocument extends AbstractSMappedDocument {
+@MappedSuperclass
+public abstract class AbstractSMappedDocument extends AbstractSDocumentMapping {
 
-    public SMappedDocument(AbstractSDocumentMapping documentMapping, SDocument document) {
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns({
+            @JoinColumn(name = "tenantid", referencedColumnName = "tenantid", insertable = false, updatable = false),
+            @JoinColumn(name = "documentid", referencedColumnName = "id", insertable = false, updatable = false) })
+    protected SLightDocument document;
+
+    public AbstractSMappedDocument(AbstractSDocumentMapping documentMapping, SDocument document) {
         this.setId(documentMapping.getId());
         this.setName(documentMapping.getName());
         this.setDescription(documentMapping.getDescription());

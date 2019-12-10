@@ -16,16 +16,9 @@ package org.bonitasoft.engine.core.document.api.impl;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +28,7 @@ import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -102,7 +96,7 @@ public class DocumentHelperTest {
     @Test
     public void should_isDefinedInDefinition_throw_not_found_when_not_existing_definition() throws Exception {
         initDefinition("list1", "list2");
-        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getProcessDefinition(154l);
+        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getProcessDefinition(154L);
         exception.expect(org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException.class);
         exception.expectMessage("Unable to find the list theList on process instance 45, nothing in database and the process definition is not found");
         //when
@@ -120,7 +114,7 @@ public class DocumentHelperTest {
     @Test
     public void should_isDefinedInDefinition_throw_read_ex_when_not_existing_definition() throws Exception {
         initDefinition("list1", "list2");
-        doThrow(SBonitaReadException.class).when(processDefinitionService).getProcessDefinition(154l);
+        doThrow(SBonitaReadException.class).when(processDefinitionService).getProcessDefinition(154L);
         exception.expect(SBonitaReadException.class);
         documentHelper.isListDefinedInDefinition("theList", 45);
     }
@@ -136,14 +130,14 @@ public class DocumentHelperTest {
     private void initDefinition(String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SProcessDefinitionNotFoundException,
             SBonitaReadException {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
-        doReturn(154l).when(processInstance).getProcessDefinitionId();
-        doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
+        doReturn(154L).when(processInstance).getProcessDefinitionId();
+        doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154L);
         doReturn(flowElementContainerDefinition).when(processDefinition).getProcessContainer();
         doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition).getDocumentListDefinitions();
     }
 
     private List<SDocumentListDefinition> createListOfDocumentListDefinition(String... names) {
-        List<SDocumentListDefinition> list = new ArrayList<SDocumentListDefinition>();
+        List<SDocumentListDefinition> list = new ArrayList<>();
         for (String name : names) {
             list.add(new SDocumentListDefinitionImpl(name));
         }
@@ -153,22 +147,22 @@ public class DocumentHelperTest {
     @Test
     public void should_getAllDocumentOfTheList_return_all_the_elements() throws Exception {
         //given
-        List<SMappedDocument> list = createList(100);
+        List<AbstractSMappedDocument> list = createList(100);
         doReturn(list).when(documentService).getDocumentList("theList", PROCESS_INSTANCE_ID, 0, 100);
-        List<SMappedDocument> list2 = createList(50);
+        List<AbstractSMappedDocument> list2 = createList(50);
         doReturn(list2).when(documentService).getDocumentList("theList", PROCESS_INSTANCE_ID, 100, 100);
         //when
-        List<SMappedDocument> theList = documentHelper.getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
+        List<AbstractSMappedDocument> theList = documentHelper.getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
 
         //then
-        ArrayList<SMappedDocument> expected = new ArrayList<SMappedDocument>(list);
+        ArrayList<AbstractSMappedDocument> expected = new ArrayList<>(list);
         expected.addAll(list2);
         assertThat(theList).hasSize(150);
         assertThat(theList).isEqualTo(expected);
     }
 
-    private List<SMappedDocument> createList(int size) {
-        List<SMappedDocument> sMappedDocuments = new ArrayList<SMappedDocument>(size);
+    private List<AbstractSMappedDocument> createList(int size) {
+        List<AbstractSMappedDocument> sMappedDocuments = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             SMappedDocument sMappedDocument = new SMappedDocument();
             sMappedDocument.setId(size + (i * 1000));
@@ -240,7 +234,7 @@ public class DocumentHelperTest {
     @Test
     public void should_setDocumentList_set_the_list() throws Exception {
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = Arrays.asList(new SMappedDocument());
+        List<AbstractSMappedDocument> existingList = Collections.singletonList(new SMappedDocument());
         doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
 
         DocumentValue docValue1 = new DocumentValue("url1");
@@ -256,10 +250,10 @@ public class DocumentHelperTest {
     public void should_getExistingDocumentList_return_the_list() throws Exception {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = createList(5);
+        List<AbstractSMappedDocument> existingList = createList(5);
         doReturn(existingList).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
         //when
-        List<SMappedDocument> theList = documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
+        List<AbstractSMappedDocument> theList = documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
         //then
         assertThat(theList).isEqualTo(existingList);
     }
@@ -271,7 +265,7 @@ public class DocumentHelperTest {
         doReturn(Collections.emptyList()).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
         doReturn(true).when(documentHelperSpy).isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
         //when
-        List<SMappedDocument> theList = documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
+        List<AbstractSMappedDocument> theList = documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
         //then
         assertThat(theList).isEmpty();
     }
@@ -290,7 +284,7 @@ public class DocumentHelperTest {
     @Test
     public void should_processDocumentOnIndex_create_new() throws Exception {
         //given
-        List<SMappedDocument> list = createList(5);
+        List<AbstractSMappedDocument> list = createList(5);
         DocumentValue documentValue = new DocumentValue("new url");
         //when
         documentHelper.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
@@ -302,8 +296,8 @@ public class DocumentHelperTest {
     public void should_processDocumentOnIndex_update_index() throws Exception {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> list = createList(5);
-        SMappedDocument documentToUpdate = list.get(list.size() - 1);
+        List<AbstractSMappedDocument> list = createList(5);
+        AbstractSMappedDocument documentToUpdate = list.get(list.size() - 1);
         DocumentValue documentValue = new DocumentValue(documentToUpdate.getId(), "new url");
         //when
         documentHelperSpy.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
@@ -312,11 +306,11 @@ public class DocumentHelperTest {
     }
 
     @Test(expected = SObjectNotFoundException.class)
-    public void should_processDocumentOnIndex_update_index_of_unexisting_doc() throws Exception {
+    public void should_processDocumentOnIndex_update_index_of_non_existing_doc() throws Exception {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> list = createList(5);
-        DocumentValue documentValue = new DocumentValue(125l, "new url");
+        List<AbstractSMappedDocument> list = createList(5);
+        DocumentValue documentValue = new DocumentValue(125L, "new url");
         //when
         documentHelperSpy.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
         //then exception
@@ -325,7 +319,7 @@ public class DocumentHelperTest {
     @Test
     public void should_updateExistingDocument_with_unmodified_content_update_only_index() throws Exception {
         //given
-        DocumentValue documentValue = new DocumentValue(125l);
+        DocumentValue documentValue = new DocumentValue(125L);
         SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when
@@ -337,7 +331,7 @@ public class DocumentHelperTest {
     @Test
     public void should_updateExistingDocument_with_unmodified_content_and_index_do_nothing() throws Exception {
         //given
-        DocumentValue documentValue = new DocumentValue(125l);
+        DocumentValue documentValue = new DocumentValue(125L);
         SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(2);
         //when
@@ -349,7 +343,7 @@ public class DocumentHelperTest {
     @Test
     public void should_updateExistingDocument_with_modified_content_update_everything() throws Exception {
         //given
-        DocumentValue documentValue = new DocumentValue(125l, "the new url");
+        DocumentValue documentValue = new DocumentValue(125L, "the new url");
         SMappedDocument documentToUpdate = new SMappedDocument();
         documentToUpdate.setIndex(1);
         //when

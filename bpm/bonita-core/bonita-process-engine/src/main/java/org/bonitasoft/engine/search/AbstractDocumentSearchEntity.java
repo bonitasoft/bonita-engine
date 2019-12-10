@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.search;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.Document;
@@ -35,7 +36,7 @@ public abstract class AbstractDocumentSearchEntity extends AbstractSearchEntity<
 
     @Override
     public List<Document> convertToClientObjects(final List<SMappedDocument> serverObjects) {
-        return ModelConvertor.toDocuments(serverObjects, documentService);
+        return ModelConvertor.toDocuments(new ArrayList<>(serverObjects), documentService);
     }
 
 }

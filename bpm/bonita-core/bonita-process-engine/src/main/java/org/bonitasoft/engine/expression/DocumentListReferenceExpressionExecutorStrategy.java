@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -97,7 +98,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
 
     // Visible for Testing
     List<Document> getDocumentList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
-        final List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
+        final List<AbstractSMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
         try {
             if (documentList.isEmpty()
                     && !documentHelper.isListDefinedInDefinition(name, processInstanceId)) {
@@ -109,13 +110,13 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         return ModelConvertor.toDocuments(documentList, documentService);
     }
 
-    private List<SMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
+    private List<AbstractSMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
         if (time != null) {
             return documentService.getDocumentList(name, processInstanceId, time);
         }
         QueryOptions queryOptions = new QueryOptions(0, 100);
         List<SMappedDocument> mappedDocuments;
-        final List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        final List<AbstractSMappedDocument> result = new ArrayList<>();
         do {
             mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
             result.addAll(mappedDocuments);

@@ -32,6 +32,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
@@ -95,7 +96,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         int index = documentValue.getIndex();
         try {
             if (documentHelper.isListDefinedInDefinition(documentName, processInstanceId)) {
-                final List<SMappedDocument> allDocumentOfTheList = documentHelper.getAllDocumentOfTheList(processInstanceId, documentName);
+                final List<AbstractSMappedDocument> allDocumentOfTheList = documentHelper.getAllDocumentOfTheList(processInstanceId, documentName);
                 if (index == -1) {
                     index = allDocumentOfTheList.size();
                 } else {
@@ -274,7 +275,7 @@ public class DocumentAPIImpl implements DocumentAPI {
             final GetDocumentByNameAtProcessInstantiation transactionContent = new GetDocumentByNameAtProcessInstantiation(documentService,
                     processInstanceService, tenantAccessor.getProcessDefinitionService(), searchEntitiesDescriptor, processInstanceId, documentName);
             transactionContent.execute();
-            final SMappedDocument attachment = transactionContent.getResult();
+            final AbstractSMappedDocument attachment = transactionContent.getResult();
             return ModelConvertor.toDocument(attachment, documentService);
         } catch (final SBonitaException sbe) {
             throw new DocumentNotFoundException(sbe);
@@ -288,7 +289,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             final SAActivityInstance instance = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
-            final SMappedDocument document = documentService.getMappedDocument(instance.getRootContainerId(), documentName, instance.getArchiveDate());
+            final AbstractSMappedDocument document = documentService.getMappedDocument(instance.getRootContainerId(), documentName, instance.getArchiveDate());
             return ModelConvertor.toDocument(document, documentService);
         } catch (final SBonitaException sbe) {
             throw new DocumentNotFoundException(sbe);
@@ -395,7 +396,7 @@ public class DocumentAPIImpl implements DocumentAPI {
             final int index = document.getIndex();
             if (index != -1) {
                 //document is in list
-                final List<SMappedDocument> allDocumentOfTheList = documentHelper.getAllDocumentOfTheList(document.getProcessInstanceId(), document.getName());
+                final List<AbstractSMappedDocument> allDocumentOfTheList = documentHelper.getAllDocumentOfTheList(document.getProcessInstanceId(), document.getName());
 
                 for (int i = index + 1; i < allDocumentOfTheList.size(); i++) {
                     documentService.updateDocumentIndex(allDocumentOfTheList.get(i), i - 1);
@@ -425,7 +426,7 @@ public class DocumentAPIImpl implements DocumentAPI {
                     && !documentHelper.isListDefinedInDefinition(name, processInstanceId)) {
                 throw new DocumentNotFoundException("doc not found");
             }
-            return ModelConvertor.toDocuments(documentList, documentService);
+            return ModelConvertor.toDocuments(new ArrayList<>(documentList), documentService);
         } catch (final org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException e) {
             throw new DocumentNotFoundException(e);
         } catch (final SBonitaReadException e) {

@@ -13,26 +13,24 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
+/**
+ * @author Emmanuel Duchastenier
+ */
+@AllArgsConstructor
 @Data
-@NoArgsConstructor
-public class SLightDocument implements PersistentObject {
-
-
-    private long id;
-    private long tenantId;
-    private long author;
-    private long creationDate;
-    private boolean hasContent;
-    private String fileName;
-    private String mimeType;
-    private String url;
-
-    public boolean hasContent() {
-        return hasContent;
-    }
-
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@SuperBuilder
+@Entity
+@Table(name = "document")
+public class SLightDocument extends AbstractSDocument {
 }

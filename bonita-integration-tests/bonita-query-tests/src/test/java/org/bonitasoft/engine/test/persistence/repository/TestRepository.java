@@ -20,8 +20,6 @@ import java.util.Random;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.Query;
@@ -80,7 +78,12 @@ public class TestRepository {
         return tenantId;
     }
 
-    public PersistentObject selectOne(String queryName, Pair...parameters){
+    @SuppressWarnings("unchecked")
+    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id, long tenantId) {
+        return (T) getSession().get(clazz, new PersistentObjectId(id, tenantId));
+    }
+
+    public PersistentObject selectOne(String queryName, Pair... parameters) {
         return selectOne(DEFAULT_TENANT_ID, queryName, parameters);
     }
     public PersistentObject selectOne(long tenantId, String queryName, Pair...parameters){
@@ -101,9 +104,9 @@ public class TestRepository {
         getSession().save(entity);
         return (T) getSession().get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId(entity)));
     }
+
     public void update(final SApplication application) {
         getSession().update(application);
     }
-
 
 }

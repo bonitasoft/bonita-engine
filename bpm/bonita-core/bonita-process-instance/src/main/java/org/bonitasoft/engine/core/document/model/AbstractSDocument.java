@@ -13,40 +13,54 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Type;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Data
+/**
+ * @author Emmanuel Duchastenier
+ */
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = "content")
-@ToString(exclude = { "content" })
+@Data
 @SuperBuilder
-@Entity
-@Table(name = "document")
-public class SDocument extends AbstractSDocument {
+@MappedSuperclass
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+public class AbstractSDocument implements PersistentObject {
 
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String AUTHOR = "author";
-    public static final String CREATION_DATE = "creationDate";
-    public static final String HAS_CONTENT = "hasContent";
-    public static final String FILENAME = "fileName";
-    public static final String MIMETYPE = "mimeType";
-    public static final String URL = "url";
-    public static final String VERSION = "version";
-    public static final String DESCRIPTION = "description";
-    public static final String INDEX = "index";
+    @Id
+    private long tenantId;
+    @Id
+    private long id;
 
-    @Type(type = "materialized_blob")
-    private byte[] content;
+    private long author;
+    private String url;
+
+    @Column(name = "creationdate")
+    private long creationDate;
+
+    @Column(name = "hascontent")
+    private boolean hasContent;
+
+    @Column(name = "filename")
+    private String fileName;
+
+    @Column(name = "mimeType")
+    private String mimeType;
+
+    public boolean hasContent() {
+        return hasContent;
+    }
+
 }

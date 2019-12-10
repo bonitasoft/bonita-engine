@@ -155,7 +155,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -1614,16 +1614,16 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments, final DocumentService documentService) {
+    public static List<Document> toDocuments(final Collection<AbstractSMappedDocument> mappedDocuments, final DocumentService documentService) {
         final List<Document> documents = new ArrayList<>();
-        for (final SMappedDocument mappedDocument : mappedDocuments) {
+        for (final AbstractSMappedDocument mappedDocument : mappedDocuments) {
             final Document document = toDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static Document toDocument(final SMappedDocument mappedDocument, final DocumentService documentService) {
+    public static Document toDocument(final AbstractSMappedDocument mappedDocument, final DocumentService documentService) {
 
         final DocumentImpl documentImpl = new DocumentImpl();
         if (mappedDocument instanceof SAMappedDocument) {
@@ -1635,7 +1635,7 @@ public class ModelConvertor {
         return documentImpl;
     }
 
-    private static void setDocumentFields(final SMappedDocument mappedDocument, final DocumentService documentService, final DocumentImpl documentImpl) {
+    private static void setDocumentFields(final AbstractSMappedDocument mappedDocument, final DocumentService documentService, final DocumentImpl documentImpl) {
         documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
         documentImpl.setName(mappedDocument.getName());
         documentImpl.setDescription(mappedDocument.getDescription());
