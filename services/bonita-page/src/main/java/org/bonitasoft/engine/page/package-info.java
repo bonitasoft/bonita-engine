@@ -11,19 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+@FilterDef(name = "tenantFilter", parameters = {
+        @ParamDef(name = "tenantId", type = "long") }, defaultCondition = "tenantid = :tenantId")
 package org.bonitasoft.engine.page;
 
-/**
- * @author Baptiste Mesta
- */
-public interface SPageBuilder {
-
-    SPage done();
-
-    SPageBuilder setDescription(final String description);
-
-    SPageBuilder setContentType(final String pageContent);
-
-    SPageBuilder setProcessDefinitionId(final Long  processDefinitionId);
-
-}
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;

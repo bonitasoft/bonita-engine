@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
+import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageWithContent;
 
-public class PageBuilder extends PersistentObjectBuilder<SPageWithContent, PageBuilder> {
+public class PageBuilder extends PersistentObjectBuilder<AbstractSPage, PageBuilder> {
 
     private String name;
 

@@ -48,7 +48,7 @@ public class PageModelConverterTest {
     public static final long ID = 6L;
 
     @Test
-    public void should_construct_SPage_with_pageCreator() throws Exception {
+    public void should_construct_SPage_with_pageCreator() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDisplayName(DISPLAY_NAME)
@@ -70,7 +70,7 @@ public class PageModelConverterTest {
     }
 
     @Test
-    public void should_construct_SPage_with_pageUpdater() throws Exception {
+    public void should_construct_SPage_with_pageUpdater() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
@@ -93,7 +93,7 @@ public class PageModelConverterTest {
     }
 
     @Test
-    public void should_constructSPage_with_null_processDefinitionId_set_it_to_0() throws Exception {
+    public void should_constructSPage_with_null_processDefinitionId_set_it_to_0() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
@@ -107,7 +107,7 @@ public class PageModelConverterTest {
     }
 
     @Test
-    public void should_construct_Page_with_SPage() throws Exception {
+    public void should_construct_Page_with_SPage() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
@@ -133,7 +133,7 @@ public class PageModelConverterTest {
     }
 
     @Test
-    public void should_construct_Page_with_SPage_with_no_processDefinitionId() throws Exception {
+    public void should_construct_Page_with_SPage_with_no_processDefinitionId() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
@@ -146,7 +146,7 @@ public class PageModelConverterTest {
     }
 
     @Test
-    public void should_construct_Page_with_SPage_list() throws Exception {
+    public void should_construct_Page_with_SPage_list() {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
         final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,

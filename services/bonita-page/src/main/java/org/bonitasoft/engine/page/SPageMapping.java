@@ -16,36 +16,66 @@ package org.bonitasoft.engine.page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
+@Entity
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(exclude = "authorizationRules")
+@Table(name = "page_mapping")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SPageMapping implements PersistentObject {
 
-    public static final String COMMA_DELIM = ",";
-    private long id;
+    public static final String COMMA_DELIMITER = ",";
+
+    @Id
     private long tenantId;
+    @Id
+    private long id;
+
+    @Column(name = "key_")
     private String key;
+    @Column(name = "pageid")
     private Long pageId;
     private String url;
+    @Column(name = "urladapter")
     private String urlAdapter;
-    private String pageAuthorizRules;
-    private List<String> authorizationRules = new ArrayList<>();
+    @Column(name = "lastupdatedate")
     private long lastUpdateDate;
+    @Column(name = "lastupdatedby")
     private long lastUpdatedBy;
+
+    @Column(name = "page_authoriz_rules")
+    private String pageAuthorizRules;
+
+    @Transient
+    private List<String> authorizationRules = new ArrayList<>();
 
     private void parseRules() {
         if (pageAuthorizRules != null) {
             authorizationRules.clear();
-            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIM, false); stringTk.hasMoreTokens();) {
+            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIMITER, false); stringTk.hasMoreTokens();) {
                 String rule = stringTk.nextToken();
                 authorizationRules.add(rule);
             }
@@ -57,7 +87,7 @@ public class SPageMapping implements PersistentObject {
         if (authorizationRules != null && !authorizationRules.isEmpty()) {
             pageAuthorizRules = "";
             for (String authorizationRule : authorizationRules) {
-                pageAuthorizRules += (authorizationRule + COMMA_DELIM);
+                pageAuthorizRules += (authorizationRule + COMMA_DELIMITER);
             }
         }
     }

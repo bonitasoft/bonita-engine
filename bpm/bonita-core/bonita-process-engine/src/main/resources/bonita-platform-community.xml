@@ -803,7 +803,6 @@
                 <!-- platform command -->
                 <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
                 <!-- page -->
-                <value>org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
                 <value>org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
                 <!-- queriable log -->
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
@@ -837,7 +836,6 @@
                 <!-- application -->
                 <value>org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
                 <!-- form mapping -->
-                <value>org/bonitasoft/engine/core/form/impl/form-mapping.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
                 <!-- contract -->
                 <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
@@ -1027,6 +1025,9 @@
                 <value>org.bonitasoft.engine.data.instance.model.SShortTextDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SXMLDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.page.SPage</value>
+                <value>org.bonitasoft.engine.page.SPageWithContent</value>
+                <value>org.bonitasoft.engine.page.SPageMapping</value>
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
@@ -1036,6 +1037,7 @@
                 <value>org.bonitasoft.engine.resources.STenantResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
+                <value>org.bonitasoft.engine.core.form.SFormMapping</value>
             </set>
         </property>
     </bean>

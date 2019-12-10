@@ -26,8 +26,7 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageWithContent;
+import org.bonitasoft.engine.page.AbstractSPage;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.test.persistence.repository.ApplicationRepository;
 import org.junit.Test;
@@ -83,7 +82,7 @@ public class ApplicationQueriesTest {
         //given
         final SApplication application1 = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app1").build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
         final SApplicationPage secondPageApp = repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application1.getId())
                 .withPageId(page.getId()).build());
@@ -105,7 +104,7 @@ public class ApplicationQueriesTest {
         final SApplication application2 = repository.add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app2")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
         final SApplicationPage secondPageApp1 = repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application1.getId())
                 .withPageId(page.getId()).build());
@@ -128,7 +127,7 @@ public class ApplicationQueriesTest {
         final SApplication application2 = repository.add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app2")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
         final SApplicationPage secondPageApp1 = repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application1.getId())
                 .withPageId(page.getId()).build());
@@ -154,10 +153,10 @@ public class ApplicationQueriesTest {
         //not used
         SProfile thirdProfile = repository.add(aProfile().withName("thirdProfile").build());
 
-        SPageWithContent layoutApp1 = repository.add(aPage().withName("layoutApp1").withContent("The content".getBytes()).build());
-        SPageWithContent themeApp2 = repository.add(aPage().withName("themeApp2").withContent("The content".getBytes()).build());
-        SPageWithContent layoutApp4 = repository.add(aPage().withName("layoutApp4").withContent("The content".getBytes()).build());
-        SPageWithContent themeApp4 = repository.add(aPage().withName("themeApp4").withContent("The content".getBytes()).build());
+        AbstractSPage layoutApp1 = repository.add(aPage().withName("layoutApp1").withContent("The content".getBytes()).build());
+        AbstractSPage themeApp2 = repository.add(aPage().withName("themeApp2").withContent("The content".getBytes()).build());
+        AbstractSPage layoutApp4 = repository.add(aPage().withName("layoutApp4").withContent("The content".getBytes()).build());
+        AbstractSPage themeApp4 = repository.add(aPage().withName("themeApp4").withContent("The content".getBytes()).build());
         final SApplication application1 = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
                 .withVersion("1.0").withPath("/app1").withProfile(firstProfile.getId()).withLayout(layoutApp1.getId())
                 .build());
@@ -171,12 +170,12 @@ public class ApplicationQueriesTest {
                 .withVersion("1.0").withPath("/app4").withLayout(layoutApp4.getId()).withTheme(themeApp4.getId())
                 .build());
 
-        final SPage page1 = repository.add(aPage().withName("page1").withContent("The content".getBytes()).build());
-        final SPage page2 = repository.add(aPage().withName("page2").withContent("The content".getBytes()).build());
-        final SPage page3 = repository.add(aPage().withName("page3").withContent("The content".getBytes()).build());
-        final SPage page4 = repository.add(aPage().withName("page4").withContent("The content".getBytes()).build());
-        final SPage page5 = repository.add(aPage().withName("page5").withContent("The content".getBytes()).build());
-        final SPage page6 = repository.add(aPage().withName("page6").withContent("The content".getBytes()).build());
+        final AbstractSPage page1 = repository.add(aPage().withName("page1").withContent("The content".getBytes()).build());
+        final AbstractSPage page2 = repository.add(aPage().withName("page2").withContent("The content".getBytes()).build());
+        final AbstractSPage page3 = repository.add(aPage().withName("page3").withContent("The content".getBytes()).build());
+        final AbstractSPage page4 = repository.add(aPage().withName("page4").withContent("The content".getBytes()).build());
+        final AbstractSPage page5 = repository.add(aPage().withName("page5").withContent("The content".getBytes()).build());
+        final AbstractSPage page6 = repository.add(aPage().withName("page6").withContent("The content".getBytes()).build());
 
         //app1 has layout layoutApp1 and references page1 and page2
         repository.add(anApplicationPage().withToken("FirstPageApp1").withApplicationId(application1.getId()).withPageId(page1.getId()).build());
@@ -221,7 +220,7 @@ public class ApplicationQueriesTest {
         final SApplication application = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         final SApplicationPage firstPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
         repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application.getId())
@@ -243,7 +242,7 @@ public class ApplicationQueriesTest {
         final SApplication application = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
         final SApplicationMenu menu = repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId())
@@ -263,7 +262,7 @@ public class ApplicationQueriesTest {
         final SApplication application = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
         repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId()).withDisplayName("menu app1")
@@ -283,7 +282,7 @@ public class ApplicationQueriesTest {
         final SApplication application = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final AbstractSPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
         final SApplicationMenu parentMenu = repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId())

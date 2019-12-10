@@ -409,15 +409,6 @@ public class DocumentHelperTest {
         );
     }
 
-    @Test
-    public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
-        //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
-        //when
-        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
-        //then
-        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/octet-stream")).as("mimetype should be application/octet-stream or null on mac").isTrue();
-    }
 
     @Test
     public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {

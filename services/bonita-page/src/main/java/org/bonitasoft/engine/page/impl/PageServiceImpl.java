@@ -45,7 +45,6 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.page.SPageBuilderFactory;
 import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
@@ -308,8 +307,11 @@ public class PageServiceImpl implements PageService {
 
     private SPage buildPage(final String name, final String displayName, final String description, final String contentName, final long creatorUserId,
             final boolean provided, boolean hidden, final String contentType) {
-        return BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, provided, hidden, contentName).setContentType(contentType).done();
+        return SPage.builder().name(name).description(description).displayName(displayName)
+                .installationDate(System.currentTimeMillis()).installedBy(creatorUserId).provided(provided).hidden(hidden)
+                .contentName(contentName)
+                .contentType(contentType)
+                .build();
     }
 
     SPageLogBuilder getPageLog(final ActionType actionType, final String message) {

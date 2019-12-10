@@ -13,14 +13,34 @@
  **/
 package org.bonitasoft.engine.core.form;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Filter(name = "tenantFilter")
+@Table(name="form_mapping")
+@IdClass(PersistentObjectId.class)
 public class SFormMapping implements PersistentObject {
 
     public static final String TARGET_INTERNAL = "INTERNAL";
@@ -28,17 +48,25 @@ public class SFormMapping implements PersistentObject {
     public static final String TARGET_LEGACY = "LEGACY";
     public static final String TARGET_UNDEFINED = "UNDEFINED";
     public static final String TARGET_NONE = "NONE";
-
     public static final int TYPE_PROCESS_START = 1;
     public static final int TYPE_PROCESS_OVERVIEW = 2;
     public static final int TYPE_TASK = 3;
+
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column(name = "process")
     private long processDefinitionId;
     private String task;
     private String target;
+    @ManyToOne
+    @JoinColumns( {
+            @JoinColumn(name = "page_mapping_tenant_id",referencedColumnName = "tenantId"),
+            @JoinColumn(name = "page_mapping_id",referencedColumnName = "id")
+    })
     private SPageMapping pageMapping;
-    private Integer type = null;
+    private Integer type;
     private long lastUpdateDate;
     private long lastUpdatedBy;
 
