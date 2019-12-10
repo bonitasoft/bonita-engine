@@ -13,11 +13,17 @@
  **/
 package org.bonitasoft.engine.core.document.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.MappedSuperclass;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -31,13 +37,34 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "document_mapping")
-public class SDocumentMapping extends AbstractSDocumentMapping {
+@MappedSuperclass
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+public class AbstractSDocumentMapping implements PersistentObject {
 
-    public SDocumentMapping(long documentId, long processInstanceId, String name) {
-        super(documentId, processInstanceId, name);
+    @Id
+    private long id;
+    @Id
+    private long tenantId;
+
+    @Column(name = "processinstanceid")
+    private long processInstanceId;
+
+    @Column(name = "documentid")
+    private long documentId;
+
+    private String name;
+    private String description;
+    private String version;
+
+    @Column(name = "index_")
+    private int index;
+
+    protected AbstractSDocumentMapping(long documentId, long processInstanceId, String name) {
+        this.documentId = documentId;
+        this.processInstanceId = processInstanceId;
+        this.name = name;
     }
 }

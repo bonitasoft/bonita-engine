@@ -13,17 +13,28 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.bonitasoft.engine.core.document.model.AbstractSDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class SADocumentMapping extends SDocumentMapping implements ArchivedPersistentObject {
+@Entity
+@Table(name = "arch_document_mapping")
+public class SADocumentMapping extends AbstractSDocumentMapping implements ArchivedPersistentObject {
 
     public static final String ID = "id";
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -40,6 +51,7 @@ public class SADocumentMapping extends SDocumentMapping implements ArchivedPersi
     public static final String DESCRIPTION = "description";
     public static final String VERSION = "version";
     public static final String INDEX = "index";
+
     private long archiveDate;
     private long sourceObjectId;
 

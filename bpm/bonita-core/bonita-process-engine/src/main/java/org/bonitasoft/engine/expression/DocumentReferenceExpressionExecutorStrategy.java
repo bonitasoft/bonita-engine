@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -90,7 +90,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) throws SBonitaReadException {
         try {
-            SMappedDocument document;
+            AbstractSMappedDocument document;
             if (time != null) {
                 document = documentService.getMappedDocument(processInstanceId, expression.getContent(), time);
             } else {

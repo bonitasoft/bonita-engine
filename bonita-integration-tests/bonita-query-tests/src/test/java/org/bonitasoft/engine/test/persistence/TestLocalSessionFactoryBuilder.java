@@ -26,7 +26,6 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 
 public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
 
-
     @Override
     protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
         Vendor vendor = Vendor.fromHibernateConfiguration(sfb);

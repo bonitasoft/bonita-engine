@@ -813,10 +813,8 @@
                 <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
                 <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
                 <!-- document -->
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
                 <!-- archived document -->
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.hbm.xml</value>
                 <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
                 <!-- platform dependency -->
                 <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.hbm.xml</value>
@@ -1013,6 +1011,12 @@
                 <value>org.bonitasoft.engine.core.contract.data.SAContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.core.document.model.SLightDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.SDocumentMapping</value>
+                <value>org.bonitasoft.engine.core.document.model.SMappedDocument</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SADocumentMapping</value>
+                <value>org.bonitasoft.engine.core.document.model.archive.SAMappedDocument</value>
                 <value>org.bonitasoft.engine.data.instance.model.SBlobDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SBooleanDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SDataInstance</value>

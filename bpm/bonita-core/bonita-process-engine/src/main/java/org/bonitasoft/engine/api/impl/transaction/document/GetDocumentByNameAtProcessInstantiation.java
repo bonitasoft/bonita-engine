@@ -21,7 +21,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -32,7 +32,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class GetDocumentByNameAtProcessInstantiation implements TransactionContentWithResult<SMappedDocument> {
+public class GetDocumentByNameAtProcessInstantiation implements TransactionContentWithResult<AbstractSMappedDocument> {
 
     private final DocumentService documentService;
 
@@ -42,7 +42,7 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final long processInstanceId;
 
-    private SMappedDocument result;
+    private AbstractSMappedDocument result;
 
     private final String documentName;
 
@@ -72,7 +72,7 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
     }
 
     @Override
-    public SMappedDocument getResult() {
+    public AbstractSMappedDocument getResult() {
         return result;
     }
 

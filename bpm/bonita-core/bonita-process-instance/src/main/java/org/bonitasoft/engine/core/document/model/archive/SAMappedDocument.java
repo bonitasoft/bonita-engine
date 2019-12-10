@@ -13,24 +13,34 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * @author Baptiste Mesta
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class SAMappedDocument extends SMappedDocument implements ArchivedPersistentObject {
+@Entity
+@Table(name = "arch_document_mapping")
+public class SAMappedDocument extends AbstractSMappedDocument implements ArchivedPersistentObject {
 
     private long archiveDate;
     private long sourceObjectId;
-
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {

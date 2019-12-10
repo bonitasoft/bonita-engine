@@ -28,6 +28,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
@@ -62,10 +63,10 @@ public class DocumentHelper {
         this.processInstanceService = processInstanceService;
     }
 
-    public List<SMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name) throws SBonitaReadException {
+    public List<AbstractSMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name) throws SBonitaReadException {
         QueryOptions queryOptions = new QueryOptions(0, 100);
         List<SMappedDocument> mappedDocuments;
-        final List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        final List<AbstractSMappedDocument> result = new ArrayList<>();
         do {
             mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
             result.addAll(mappedDocuments);
@@ -159,7 +160,7 @@ public class DocumentHelper {
     public void setDocumentList(final List<DocumentValue> documentList, final String documentName, final long processInstanceId, final long authorId)
             throws SBonitaReadException, SObjectCreationException, SObjectNotFoundException, SObjectModificationException, SObjectAlreadyExistsException {
         // get the list having the name
-        final List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
+        final List<AbstractSMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
         int index;
         for (index = 0; index < documentList.size(); index++) {
@@ -170,7 +171,7 @@ public class DocumentHelper {
         removeOthersDocuments(currentList);
     }
 
-    void updateExistingDocument(final SMappedDocument documentToUpdate, final int index, final DocumentValue documentValue, final long authorId)
+    void updateExistingDocument(final AbstractSMappedDocument documentToUpdate, final int index, final DocumentValue documentValue, final long authorId)
             throws SObjectModificationException {
         if (documentValue.hasChanged()) {
             documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue, authorId), index);
@@ -182,11 +183,11 @@ public class DocumentHelper {
         }
     }
 
-    SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<SMappedDocument> currentList, final Long documentId, final String documentName,
+    AbstractSMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<AbstractSMappedDocument> currentList, final Long documentId, final String documentName,
                                                                  final Long processInstanceId) throws SObjectNotFoundException {
-        final Iterator<SMappedDocument> iterator = currentList.iterator();
+        final Iterator<AbstractSMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
-            final SMappedDocument next = iterator.next();
+            final AbstractSMappedDocument next = iterator.next();
             if (next.getId() == documentId) {
                 iterator.remove();
                 return next;
@@ -196,9 +197,9 @@ public class DocumentHelper {
                 + processInstanceId);
     }
 
-    List<SMappedDocument> getExistingDocumentList(final String documentName, final long processInstanceId) throws SBonitaReadException,
+    List<AbstractSMappedDocument> getExistingDocumentList(final String documentName, final long processInstanceId) throws SBonitaReadException,
             SObjectNotFoundException {
-        List<SMappedDocument> currentList;
+        List<AbstractSMappedDocument> currentList;
         currentList = getAllDocumentOfTheList(processInstanceId, documentName);
         // if it's not a list it throws an exception
         if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId)) {
@@ -208,19 +209,19 @@ public class DocumentHelper {
         return currentList;
     }
 
-    void removeOthersDocuments(final List<SMappedDocument> currentList) throws SObjectModificationException {
-        for (final SMappedDocument mappedDocument : currentList) {
+    void removeOthersDocuments(final List<AbstractSMappedDocument> currentList) throws SObjectModificationException {
+        for (final AbstractSMappedDocument mappedDocument : currentList) {
             documentService.removeCurrentVersion(mappedDocument);
         }
 
     }
 
     void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-                                final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+                                final List<AbstractSMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update
-            final SMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName,
+            final AbstractSMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName,
                     processInstanceId);
             updateExistingDocument(documentToUpdate, index, documentValue, authorId);
         } else {
