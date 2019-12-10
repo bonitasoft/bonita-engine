@@ -60,6 +60,9 @@
                 <value>org.bonitasoft.engine.resources.SBARResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
                 <value>org.bonitasoft.engine.resources.STenantResource</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobDescriptor</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobParameter</value>
+                <value>org.bonitasoft.engine.scheduler.model.SJobLog</value>
                 <value>org.bonitasoft.engine.core.contract.data.SContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
                 <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
@@ -93,7 +96,6 @@
 
                 <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
                 <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>

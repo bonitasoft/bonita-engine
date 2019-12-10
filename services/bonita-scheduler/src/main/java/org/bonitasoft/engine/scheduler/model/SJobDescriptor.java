@@ -13,23 +13,36 @@
  **/
 package org.bonitasoft.engine.scheduler.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "job_desc")
 public class SJobDescriptor implements PersistentObject {
 
     public static final String JOB_NAME = "jobName";
     public static final String JOB_CLASS_NAME = "jobClassName";
     public static final String ID = "id";
     public static final String DESCRIPTION = "description";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private String jobClassName;
     private String jobName;

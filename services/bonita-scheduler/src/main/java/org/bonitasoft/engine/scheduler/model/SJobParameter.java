@@ -14,26 +14,43 @@
 package org.bonitasoft.engine.scheduler.model;
 
 import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "job_param")
 public class SJobParameter implements PersistentObject {
 
     public static final String JOB_DESCRIPTOR_ID = "jobDescriptorId";
     public static final String KEY = "key";
     public static final String VALUE = "value";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private long jobDescriptorId;
+    @Column(name = "key_")
     private String key;
+    @Column(name = "value_")
+    @Type(type = "serializable")
     private Serializable value;
 
     public SJobParameter(final String key, final Serializable value) {
