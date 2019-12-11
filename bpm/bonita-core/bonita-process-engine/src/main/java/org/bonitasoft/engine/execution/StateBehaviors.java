@@ -94,7 +94,7 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
@@ -243,7 +243,7 @@ public class StateBehaviors {
                 miLoop.getDataOutputItemRef(), flowNodeInstance.getId());
         final SRefBusinessDataInstance outputMILoopRef = refBusinessDataService.getRefBusinessDataInstance(
                 miLoop.getLoopDataOutputRef(), flowNodeInstance.getParentProcessInstanceId());
-        final SMultiRefBusinessDataInstance multiRefBusinessDataInstance = (SMultiRefBusinessDataInstance) outputMILoopRef;
+        final SProcessMultiRefBusinessDataInstance multiRefBusinessDataInstance = (SProcessMultiRefBusinessDataInstance) outputMILoopRef;
         List<Long> dataIds = multiRefBusinessDataInstance.getDataIds();
         if (dataIds == null) {
             dataIds = new ArrayList<>();
@@ -802,7 +802,7 @@ public class StateBehaviors {
         List<?> possibleValues;
         try {
             //FIXME find if a business data is used if instead of try catch
-            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
+            final SProcessMultiRefBusinessDataInstance multiRef = (SProcessMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
                     loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getParentProcessInstanceId());
             possibleValues = multiRef.getDataIds();
         } catch (final SBonitaException sbe) {

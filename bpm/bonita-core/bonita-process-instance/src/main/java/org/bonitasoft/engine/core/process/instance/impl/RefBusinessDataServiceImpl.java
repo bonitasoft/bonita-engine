@@ -31,7 +31,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.busines
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectBusinessDataDescriptorBuilder;
@@ -148,7 +148,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void updateRefBusinessDataInstance(final SMultiRefBusinessDataInstance refBusinessDataInstance, final List<Long> dataIds)
+    public void updateRefBusinessDataInstance(final SProcessMultiRefBusinessDataInstance refBusinessDataInstance, final List<Long> dataIds)
             throws SRefBusinessDataInstanceModificationException {
         final Map<String, Object> fields = new HashMap<>();
         fields.put("dataIds", dataIds);

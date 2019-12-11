@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 
@@ -65,7 +65,7 @@ public class UpdateDataRefAction implements EntityAction {
         try {
             final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
             checkThatIsMultiRef(reference);
-            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final SProcessMultiRefBusinessDataInstance multiRef = (SProcessMultiRefBusinessDataInstance) reference;
             final ArrayList<Long> dataIds = buildDataIdsList(entities);
             if (!multiRef.getDataIds().containsAll(dataIds) || multiRef.getDataIds().size() != dataIds.size()) {
                 refBusinessDataService.updateRefBusinessDataInstance(multiRef, dataIds);
@@ -77,7 +77,7 @@ public class UpdateDataRefAction implements EntityAction {
     }
 
     private void checkThatIsMultiRef(final SRefBusinessDataInstance reference) throws SEntityActionExecutionException {
-        if (!(reference instanceof SMultiRefBusinessDataInstance)) {
+        if (!(reference instanceof SProcessMultiRefBusinessDataInstance)) {
             throw new SEntityActionExecutionException(
                     "Incompatible types: the business data '"
                             + reference.getName()
@@ -108,7 +108,7 @@ public class UpdateDataRefAction implements EntityAction {
                 final SSimpleRefBusinessDataInstance simpleReference = (SSimpleRefBusinessDataInstance) reference;
                 refBusinessDataService.updateRefBusinessDataInstance(simpleReference, null);
             } else {
-                final SMultiRefBusinessDataInstance multiReference = (SMultiRefBusinessDataInstance) reference;
+                final SProcessMultiRefBusinessDataInstance multiReference = (SProcessMultiRefBusinessDataInstance) reference;
                 refBusinessDataService.updateRefBusinessDataInstance(multiReference, new ArrayList<Long>());
             }
         } catch (final SBonitaException sbe) {

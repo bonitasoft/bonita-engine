@@ -28,7 +28,7 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -88,7 +88,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                 }
                 return dataClass.newInstance();
             }
-            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final SProcessMultiRefBusinessDataInstance multiRef = (SProcessMultiRefBusinessDataInstance) reference;
             final List<Long> dataIds = multiRef.getDataIds();
             if (!dataIds.isEmpty()) {
                 return businessDataRepository.findByIds(dataClass, dataIds);
@@ -119,7 +119,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             final Entity entity = businessDataRepository.findById(dataClass, simpleRef.getDataId());
             businessDataRepository.remove(entity);
         } else {
-            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final SProcessMultiRefBusinessDataInstance multiRef = (SProcessMultiRefBusinessDataInstance) reference;
             for (final Long dataId : multiRef.getDataIds()) {
                 final Entity entity = businessDataRepository.findById(dataClass, dataId);
                 businessDataRepository.remove(entity);
@@ -131,7 +131,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         if (reference instanceof SSimpleRefBusinessDataInstance) {
             refBusinessDataService.updateRefBusinessDataInstance((SSimpleRefBusinessDataInstance) reference, null);
         } else {
-            refBusinessDataService.updateRefBusinessDataInstance((SMultiRefBusinessDataInstance) reference, new ArrayList<Long>());
+            refBusinessDataService.updateRefBusinessDataInstance((SProcessMultiRefBusinessDataInstance) reference, new ArrayList<>());
         }
     }
 
