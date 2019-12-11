@@ -66,6 +66,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
                 configuration.registerTypeOverride(PostgresXMLType.INSTANCE);
                 break;
         }
+        //define tenant filter
+        configuration.addPackage("org.bonitasoft.engine.persistence");
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
             configuration.addResource(resource);
         }

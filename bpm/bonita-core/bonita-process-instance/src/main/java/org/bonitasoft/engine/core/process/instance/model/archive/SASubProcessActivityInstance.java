@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,6 +29,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("subProc")
 public class SASubProcessActivityInstance extends SAActivityInstance {
 
     private boolean triggeredByEvent;
@@ -38,11 +43,6 @@ public class SASubProcessActivityInstance extends SAActivityInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.SUB_PROCESS;
-    }
-
-    @Override
-    public String getKind() {
-        return "subProc";
     }
 
     @Override

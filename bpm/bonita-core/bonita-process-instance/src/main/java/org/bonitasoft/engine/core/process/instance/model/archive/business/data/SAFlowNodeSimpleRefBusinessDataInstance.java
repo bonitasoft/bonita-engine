@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,14 +29,16 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("fn_simple_ref")
 public class SAFlowNodeSimpleRefBusinessDataInstance extends SASimpleRefBusinessDataInstance {
-
+    @Column(name = "orig_fn_inst_id")
     private long flowNodeInstanceId;
 
     @Override
     public SRefBusinessDataInstance toSRefBusinessDataInstance() {
         SFlowNodeSimpleRefBusinessDataInstance refBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstance();
-        refBusinessDataInstance.setId(sourceObjectId);
+        refBusinessDataInstance.setId(getSourceObjectId());
         refBusinessDataInstance.setTenantId(tenantId);
         refBusinessDataInstance.setName(getName());
         refBusinessDataInstance.setDataClassName(getDataClassName());

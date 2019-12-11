@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,6 +29,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("auto")
 public class SAAutomaticTaskInstance extends SAActivityInstance {
     public SAAutomaticTaskInstance(final SAutomaticTaskInstance sAutomaticTaskInstance) {
         super(sAutomaticTaskInstance);
@@ -34,11 +39,6 @@ public class SAAutomaticTaskInstance extends SAActivityInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.AUTOMATIC_TASK;
-    }
-
-    @Override
-    public String getKind() {
-        return "auto";
     }
 
     @Override

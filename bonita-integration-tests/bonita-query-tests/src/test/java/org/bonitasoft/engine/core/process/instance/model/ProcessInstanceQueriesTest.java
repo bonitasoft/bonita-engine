@@ -803,32 +803,6 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getArchivedProcessInstancesInAllStates_should_return_archived_process_instances_when_exist() {
-        // Given
-        final SAProcessInstance saProcessInstance1 = repository.add(buildSAProcessInstance(1L));
-        final SAProcessInstance saProcessInstance2 = repository.add(buildSAProcessInstance(2L));
-
-        // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
-
-        // Then
-        assertFalse("The list of archived process instance must not be empty !!", archivedProcessInstances.isEmpty());
-        assertEquals("The first element of the list must to have as id 1", saProcessInstance1, archivedProcessInstances.get(0));
-        assertEquals("The second element of the list must to have as id 2", saProcessInstance2, archivedProcessInstances.get(1));
-    }
-
-    @Test
-    public void getArchivedProcessInstancesInAllStates_should_return_empty_list_when_no_archived_process_instances_with_ids() {
-        // Given
-
-        // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
-
-        // Then
-        assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
-    }
-
-    @Test
     public void should_get_processInstances_by_callertype_and_stateCategory() {
         SProcessInstance sProcessInstance = buildStartedProcessInstance(12L, 102L);
         sProcessInstance.setCallerType(RECEIVE_TASK);
@@ -925,14 +899,4 @@ public class ProcessInstanceQueriesTest {
                 entry("FN_INST_ID", FLOW_NODE_INSTANCE_ID)
         );
     }
-
-    private SAProcessInstance buildSAProcessInstance(final long id) {
-        final SAProcessInstance saProcessInstance = new SAProcessInstance();
-        saProcessInstance.setId(id);
-        saProcessInstance.setSourceObjectId(id);
-        saProcessInstance.setTenantId(DEFAULT_TENANT_ID);
-        saProcessInstance.setName("process" + id);
-        return saProcessInstance;
-    }
-
 }

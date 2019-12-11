@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +26,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("boundaryEvent")
 public class SABoundaryEventInstance extends SACatchEventInstance {
 
     private long activityInstanceId;
@@ -34,11 +39,6 @@ public class SABoundaryEventInstance extends SACatchEventInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.BOUNDARY_EVENT;
-    }
-
-    @Override
-    public String getKind() {
-        return "boundaryEvent";
     }
 
     @Override

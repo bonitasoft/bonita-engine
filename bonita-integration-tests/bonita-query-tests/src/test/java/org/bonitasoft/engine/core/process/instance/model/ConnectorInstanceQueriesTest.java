@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.assertj.core.api.Condition;
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceRepository;
 import org.junit.Before;
@@ -207,6 +208,17 @@ public class ConnectorInstanceQueriesTest {
         final String activationEvent = jdbcTemplate.queryForObject("select activationEvent from connector_instance where id = " + connectorInstance.getId(), String.class);
         assertThat(activationEvent).isEqualTo("ON_ENTER");
         assertThat(connectorInstance.getActivationEvent()).isEqualTo(ON_ENTER);
+    }
+
+    @Test
+    public void should_store_ACTIVATION_EVENT_as_string_of_archived_connetor() {
+        SAConnectorInstance entity = new SAConnectorInstance();
+        entity.setActivationEvent(ON_FINISH);
+        final SAConnectorInstance connectorInstance = repository.add(entity);
+        repository.flush();
+        final String activationEvent = jdbcTemplate.queryForObject("select activationEvent from arch_connector_instance where id = " + connectorInstance.getId(), String.class);
+        assertThat(activationEvent).isEqualTo("ON_FINISH");
+        assertThat(connectorInstance.getActivationEvent()).isEqualTo(ON_FINISH);
     }
     @Test
     public void should_store_stack_trace_of_connector() {

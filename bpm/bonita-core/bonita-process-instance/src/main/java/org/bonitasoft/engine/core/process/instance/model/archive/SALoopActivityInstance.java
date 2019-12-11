@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,8 +30,12 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("loop")
 public class SALoopActivityInstance extends SAActivityInstance {
+    @Column(name = "loop_counter")
     private int loopCounter;
+    @Column(name = "loop_max")
     private int loopMax;
 
     public SALoopActivityInstance(final SLoopActivityInstance sLoopActivityInstance) {
@@ -39,11 +47,6 @@ public class SALoopActivityInstance extends SAActivityInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.LOOP_ACTIVITY;
-    }
-
-    @Override
-    public String getKind() {
-        return "loop";
     }
 
     @Override

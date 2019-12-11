@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -50,15 +51,43 @@ public class ArchiveFlowNodeInstanceTest {
 
     @Test
     public void should_save_and_get_SAAutomaticTaskInstance(){
-            SAFlowNodeInstance entity = new SAAutomaticTaskInstance();
-            SAFlowNodeInstance flowNode = repository.add(entity);
-            repository.flush();
+        SAFlowNodeInstance entity = new SAAutomaticTaskInstance();
+        SAFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
 
-            PersistentObject flowNodeFromQuery = repository.selectOne("getArchivedFlowNodeInstanceById", pair("id", flowNode.getId()));
-            Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_flownode_instance where id = " + flowNode.getId());
+        PersistentObject flowNodeFromQuery = repository.selectOne("getArchivedFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_flownode_instance where id = " + flowNode.getId());
 
-            assertThat(flowNodeFromQuery).isEqualTo(flowNode);
-            assertThat(flowNodeAsMap.get("KIND")).isEqualTo("auto");
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("auto");
+    }
+
+    @Test
+    public void should_save_and_get_SAUserTaskInstance_with_task_priority(){
+        SAUserTaskInstance entity = new SAUserTaskInstance();
+        entity.setPriority(STaskPriority.ABOVE_NORMAL);
+        SAUserTaskInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getArchivedFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("PRIORITY")).isEqualTo(3);
+    }
+
+    @Test
+    public void should_save_and_get_SAGatewayInstance_with_gateway_type(){
+        SAGatewayInstance entity = new SAGatewayInstance();
+        entity.setGatewayType(SGatewayType.INCLUSIVE);
+        SAFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getArchivedFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("GATEWAYTYPE")).isEqualTo("INCLUSIVE");
     }
 
 

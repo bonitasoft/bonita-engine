@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,8 +31,12 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("gate")
 public class SAGatewayInstance extends SAFlowNodeInstance {
 
+    @Column
+    @Enumerated(EnumType.STRING)
     private SGatewayType gatewayType;
     private String hitBys = "";
 
@@ -38,11 +48,6 @@ public class SAGatewayInstance extends SAFlowNodeInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.GATEWAY;
-    }
-
-    @Override
-    public String getKind() {
-        return "gate";
     }
 
     @Override

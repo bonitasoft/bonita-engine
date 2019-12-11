@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,6 +24,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SAEventInstance extends SAFlowNodeInstance {
     public SAEventInstance(final SEventInstance eventInstance) {
         super(eventInstance);

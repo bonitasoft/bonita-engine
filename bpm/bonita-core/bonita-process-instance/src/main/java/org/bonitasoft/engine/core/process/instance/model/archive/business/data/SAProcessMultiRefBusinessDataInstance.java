@@ -13,10 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
+import java.util.List;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OrderColumn;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 
@@ -26,14 +35,22 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SAProcessMultiRefBusinessDataInstance extends SAMultiRefBusinessDataInstance {
+@Entity
+@DiscriminatorValue("proc_multi_ref")
+public class SAProcessMultiRefBusinessDataInstance extends SARefBusinessDataInstance {
 
+    @Column(name = "orig_proc_inst_id")
     private long processInstanceId;
+    @ElementCollection
+    @CollectionTable(name = "arch_multi_biz_data", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id"), @JoinColumn(name = "tenantid", referencedColumnName = "tenantid")})
+    @OrderColumn(name = "idx")
+    @Column(name = "data_id")
+    private List<Long> dataIds;
 
     @Override
     public SRefBusinessDataInstance toSRefBusinessDataInstance() {
         SProcessMultiRefBusinessDataInstance refBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
-        refBusinessDataInstance.setId(sourceObjectId);
+        refBusinessDataInstance.setId(getSourceObjectId());
         refBusinessDataInstance.setTenantId(tenantId);
         refBusinessDataInstance.setName(getName());
         refBusinessDataInstance.setDataClassName(getDataClassName());

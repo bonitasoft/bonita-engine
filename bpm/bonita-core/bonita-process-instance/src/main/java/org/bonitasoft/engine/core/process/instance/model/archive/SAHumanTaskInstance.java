@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SAHumanTaskInstance extends SAActivityInstance {
 
     private long actorId;
