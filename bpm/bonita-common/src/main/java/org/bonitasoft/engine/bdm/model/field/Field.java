@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bdm.model.field;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -35,6 +36,12 @@ public abstract class Field {
     @XmlAttribute(required = true)
     private String name;
 
+    @XmlElement
+    private String displayName;
+
+    @XmlElement
+    private String description;
+
     @XmlAttribute
     private Boolean nullable = true;
 
@@ -47,6 +54,14 @@ public abstract class Field {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public Boolean isNullable() {
@@ -74,7 +89,9 @@ public abstract class Field {
     public boolean equals(final Object obj) {
         if (obj instanceof Field) {
             final Field other = (Field) obj;
-            return new EqualsBuilder().append(collection, other.collection).append(name, other.name).append(nullable, other.nullable).isEquals();
+            return new EqualsBuilder().append(collection, other.collection).append(name, other.name)
+                    .append(displayName, other.displayName).append(description, other.description)
+                    .append(nullable, other.nullable).isEquals();
         }
         return false;
     }
