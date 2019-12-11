@@ -15,15 +15,26 @@ package org.bonitasoft.engine.data.instance.model.archive;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Entity
+@DiscriminatorValue("SALongTextDataInstanceImpl")
 public class SALongTextDataInstance extends SADataInstance {
+    @Column(name = "clobValue")
+    @Type(type = "materialized_clob")
     private String value;
 
     public SALongTextDataInstance(final SDataInstance sDataInstance) {

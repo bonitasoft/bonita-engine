@@ -15,17 +15,37 @@ package org.bonitasoft.engine.data.instance.model.archive;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
+@SuperBuilder
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "DISCRIMINANT")
+@Table(name = "arch_data_instance")
 public abstract class SADataInstance implements ArchivedPersistentObject {
 
+    @Id
     private long tenantId;
+    @Id
     private long id;
     private String name;
     private String description;

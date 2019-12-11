@@ -22,6 +22,7 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Entity
 @DiscriminatorValue("SShortTextDataInstanceImpl")
 public class SShortTextDataInstance extends SDataInstance {

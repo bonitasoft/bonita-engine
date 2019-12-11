@@ -15,17 +15,26 @@ package org.bonitasoft.engine.data.instance.model.archive;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Entity
+@DiscriminatorValue("SADoubleDataInstanceImpl")
 public class SADoubleDataInstance extends SADataInstance {
 
 
+    @Column(name = "doubleValue")
     private Double value;
 
 

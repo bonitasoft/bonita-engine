@@ -62,6 +62,30 @@
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
                 <value>org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SLongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SBlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.SShortTextDataInstance</value>
                 <value>org.bonitasoft.engine.resources.SBARResourceLight</value>
                 <value>org.bonitasoft.engine.resources.SBARResource</value>
                 <value>org.bonitasoft.engine.resources.STenantResourceLight</value>
@@ -139,7 +163,8 @@
 
                 <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
+                <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
+
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>

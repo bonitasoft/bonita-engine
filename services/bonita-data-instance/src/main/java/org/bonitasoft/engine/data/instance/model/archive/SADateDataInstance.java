@@ -16,16 +16,27 @@ package org.bonitasoft.engine.data.instance.model.archive;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Entity
+@DiscriminatorValue("SADateDataInstanceImpl")
 public class SADateDataInstance extends SADataInstance {
 
+    @Column(name = "longValue")
+    @Type(type = "org.bonitasoft.engine.persistence.DateStoredAsLongUserType")
     private Date value;
 
 

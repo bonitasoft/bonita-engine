@@ -15,15 +15,24 @@ package org.bonitasoft.engine.data.instance.model.archive;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Entity
+@DiscriminatorValue("SAIntegerDataInstanceImpl")
 public class SAIntegerDataInstance extends SADataInstance {
+    @Column(name = "intValue")
     private Integer value;
 
     public SAIntegerDataInstance(final SDataInstance sDataInstance) {

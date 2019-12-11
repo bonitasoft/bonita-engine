@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -22,8 +21,8 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.hibernate.annotations.Type;
 
 /**
@@ -33,6 +32,7 @@ import org.hibernate.annotations.Type;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Entity
 @DiscriminatorValue("SBlobDataInstanceImpl")
 public final class SBlobDataInstance extends SDataInstance {
