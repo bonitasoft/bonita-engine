@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bdm.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Matthieu Chaffotte
@@ -26,6 +27,9 @@ public class QueryParameter {
 
     @XmlAttribute(required = true)
     private String name;
+
+    @XmlElement
+    private String description;
 
     @XmlAttribute(required = true)
     private String className;
@@ -47,6 +51,14 @@ public class QueryParameter {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -61,6 +73,7 @@ public class QueryParameter {
         int result = 1;
         result = prime * result + ((className == null) ? 0 : className.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
         return result;
     }
 
@@ -82,6 +95,11 @@ public class QueryParameter {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
             return false;
         return true;
     }

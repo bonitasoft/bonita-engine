@@ -30,6 +30,9 @@ public class Index implements NamedElement {
     @XmlAttribute(required = true)
     private String name;
 
+    @XmlElement
+    private String description;
+
     @XmlElementWrapper(name = "fieldNames", required = true)
     @XmlElement(name = "fieldName", required = true)
     private List<String> fieldNames;
@@ -41,6 +44,14 @@ public class Index implements NamedElement {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<String> getFieldNames() {
@@ -57,6 +68,7 @@ public class Index implements NamedElement {
         int result = 1;
         result = prime * result + (fieldNames == null ? 0 : fieldNames.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
         return result;
     }
 
@@ -86,6 +98,11 @@ public class Index implements NamedElement {
         } else if (!name.equals(other.name)) {
             return false;
         }
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
         return true;
     }
 

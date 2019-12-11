@@ -32,6 +32,9 @@ public class Query {
     @XmlAttribute(required = true)
     private String name;
 
+    @XmlElement
+    private String description;
+
     @XmlAttribute(required = true)
     private String content;
 
@@ -47,8 +50,13 @@ public class Query {
     }
 
     public Query(final String name, final String content, final String returnType) {
+        this(name, null, content, returnType);
+    }
+
+    public Query(final String name, final String description, final String content, final String returnType) {
         this();
         this.name = name;
+        this.description = description;
         this.content = content;
         this.returnType = returnType;
     }
@@ -59,6 +67,14 @@ public class Query {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public String getContent() {
@@ -129,6 +145,11 @@ public class Query {
                 return false;
         } else if (!name.equals(other.name))
             return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
         if (queryParameters == null) {
             if (other.queryParameters != null)
                 return false;
@@ -144,7 +165,8 @@ public class Query {
 
     @Override
     public String toString() {
-        return "Query [name=" + name + ", content=" + content + ", returnType=" + returnType + ", queryParameters=" + queryParameters + "]";
+        return "Query [name=" + name + ", content=" + content + ", returnType=" + returnType + ", queryParameters="
+                + queryParameters + "]";
     }
 
 }

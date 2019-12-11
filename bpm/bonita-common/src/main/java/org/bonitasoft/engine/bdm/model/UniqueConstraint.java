@@ -21,6 +21,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -29,6 +32,9 @@ public class UniqueConstraint implements NamedElement {
 
     @XmlAttribute(required = true)
     private String name;
+
+    @XmlElement
+    private String description;
 
     @XmlElementWrapper(name = "fieldNames", required = true)
     @XmlElement(name = "fieldName", required = true)
@@ -41,6 +47,14 @@ public class UniqueConstraint implements NamedElement {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<String> getFieldNames() {
@@ -58,7 +72,17 @@ public class UniqueConstraint implements NamedElement {
         result = prime * result
                 + ((fieldNames == null) ? 0 : fieldNames.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("name", name)
+                .append("description", description)
+                .append("fieldNames", fieldNames)
+                .toString();
     }
 
     @Override
@@ -79,6 +103,11 @@ public class UniqueConstraint implements NamedElement {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
             return false;
         return true;
     }

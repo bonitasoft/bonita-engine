@@ -21,9 +21,9 @@ import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.junit.Test;
@@ -59,7 +59,8 @@ public class BusinessObjectTest {
         final BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName("aQualifiedName");
         businessObject.addField(aBooleanField("aSimpleField"));
-        businessObject.addField(anAggregationField("aggregationField", aBO("boName").withField(aBooleanField("aField")).build()));
+        businessObject
+                .addField(anAggregationField("aggregationField", aBO("boName").withField(aBooleanField("aField")).build()));
 
         assertThat(businessObject).canBeMarshalled();
     }
@@ -96,7 +97,8 @@ public class BusinessObjectTest {
     public void should_addQuery() {
         final BusinessObject businessObject = new BusinessObject();
 
-        final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
+        final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'",
+                List.class.getName());
 
         assertThat(businessObject.getQueries()).containsExactly(query);
     }
@@ -109,7 +111,8 @@ public class BusinessObjectTest {
     }
 
     @Test
-    public void isARelationField_should_be_false_with_an_object_without_relation_field_but_with_the_right_name() throws Exception {
+    public void isARelationField_should_be_false_with_an_object_without_relation_field_but_with_the_right_name()
+            throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.addField(aBooleanField("bool"));
 
@@ -127,7 +130,8 @@ public class BusinessObjectTest {
     @Test
     public void isARelationField_should_be_true_with_an_object_with_relation_field() throws Exception {
         final BusinessObject bo = new BusinessObject();
-        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation().referencing(addressBO())
+                .build();
         bo.addField(aggregationMultiple);
 
         assertThat(bo.isARelationField("address")).isTrue();
@@ -150,25 +154,29 @@ public class BusinessObjectTest {
     @Test
     public void should_to_string_return_return_all_field() {
         //given
-        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
-        businessObject.addUniqueConstraint("const", "field1");
-        businessObject.addUniqueConstraint("const2", "field2");
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1"))
+                .withField(aBooleanField("field2")).build();
+        UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        uniqueConstraint.setName("const");
+        uniqueConstraint.setDescription("desc");
+        uniqueConstraint.setFieldNames(Arrays.asList("field1"));
+        businessObject.addUniqueConstraint(uniqueConstraint);
         businessObject.setDescription("description");
         businessObject.addQuery("queryName", "select * from Employee", String.class.getName());
 
         businessObject.setQualifiedName("com.company.model.Employee");
-
         //when then
         assertThat(businessObject.toString())
                 .as("should return simple name")
                 .isEqualTo(
-                        "BusinessObject[description=description,fields=[SimpleField[name=field1,nullable=true,collection=false,length=<null>,type=BOOLEAN], SimpleField[name=field2,nullable=true,collection=false,length=<null>,type=BOOLEAN]],indexes=[],qualifiedName=com.company.model.Employee,queries=[Query [name=queryName, content=select * from Employee, returnType=java.lang.String, queryParameters=[]]],uniqueConstraints=[org.bonitasoft.engine.bdm.model.UniqueConstraint@d2518f4e, org.bonitasoft.engine.bdm.model.UniqueConstraint@7bea0d39]]");
+                        "BusinessObject[description=description,fields=[SimpleField[name=field1,nullable=true,collection=false,length=<null>,type=BOOLEAN], SimpleField[name=field2,nullable=true,collection=false,length=<null>,type=BOOLEAN]],indexes=[],qualifiedName=com.company.model.Employee,queries=[Query [name=queryName, content=select * from Employee, returnType=java.lang.String, queryParameters=[]]],uniqueConstraints=[UniqueConstraint[name=const,description=desc,fieldNames=[field1]]]]");
     }
 
     @Test
     public void getField_should_return_field_matching_the_given_name() throws Exception {
         //given
-        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).withField(aBooleanField("field3")).build();
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1"))
+                .withField(aBooleanField("field2")).withField(aBooleanField("field3")).build();
         businessObject.setQualifiedName("com.company.model.Employee");
 
         //when
