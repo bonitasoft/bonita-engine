@@ -13,25 +13,47 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.persistence.model.BlobValue;
+import org.hibernate.annotations.Filter;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.model.BlobValue;
 
 /**
  * @author Nicolas Chabanoles
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Entity
 @Data
+@Builder(toBuilder = true)
 @NoArgsConstructor
+@AllArgsConstructor
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name="queriableLog_p")
 public class SQueriableLogParameter implements PersistentObject {
-
+    @Id
     private long tenantId;
+    @Id
     private long id = -1;
+    @Column(name="B_LOG_ID")
     private long queriableLogId;
+    @Column(name="PARAM_NAME")
     private String name;
     private String stringValue;
+    @Transient
     private BlobValue blobValue;
     private String valueType;
 

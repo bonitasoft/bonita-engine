@@ -147,6 +147,8 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
             </list>
         </property>
         <property name="mappingResources">

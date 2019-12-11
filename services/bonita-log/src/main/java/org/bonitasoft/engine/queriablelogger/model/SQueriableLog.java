@@ -16,16 +16,30 @@ package org.bonitasoft.engine.queriablelogger.model;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
-
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name="queriable_log")
 public class SQueriableLog implements PersistentObject {
 
     public static final int STATUS_FAIL = 0;
@@ -51,10 +65,16 @@ public class SQueriableLog implements PersistentObject {
     public static final String NUMERIC_INDEX3 = "numericIndex3";
     public static final String NUMERIC_INDEX4 = "numericIndex4";
     public static final String NUMERIC_INDEX5 = "numericIndex5";
+
+    @Id
     private long tenantId;
+    @Id
     private long id;
+    @Column(name = "log_timestamp")
     private long timeStamp;
+    @Column(name = "whatYear")
     private int year;
+    @Column(name = "whatMonth")
     private int month;
     private int dayOfYear;
     private int weekOfYear;
@@ -63,11 +83,13 @@ public class SQueriableLog implements PersistentObject {
     private long threadNumber = Thread.currentThread().getId();
     private String clusterNode;
     private String productVersion;
+    @Enumerated(EnumType.STRING)
     private SQueriableLogSeverity severity;
     private String actionType;
     private String actionScope;
     @Builder.Default
     private int actionStatus = -1;
+    @Column(name = "RAWMESSAGE")
     private String rawMessage;
     private String callerClassName;
     private String callerMethodName;

@@ -802,7 +802,6 @@
                 <!-- page -->
                 <value>org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
                 <!-- queriable log -->
-                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
                 <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
                 <!-- identity -->
                 <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
@@ -1092,6 +1091,8 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLog</value>
+                <value>org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter</value>
             </set>
         </property>
     </bean>

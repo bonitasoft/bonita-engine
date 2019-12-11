@@ -101,6 +101,7 @@ public class TestRepository {
         return ((PersistentObject) namedQuery.uniqueResult());
     }
 
+
     public <T extends PersistentObject> T add(T entity) {
         if (!isTenantIdSet(entity)) {
             entity.setTenantId(DEFAULT_TENANT_ID);
