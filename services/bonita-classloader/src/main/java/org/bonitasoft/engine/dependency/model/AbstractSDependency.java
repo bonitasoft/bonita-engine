@@ -13,14 +13,23 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
-public class AbstractSDependency implements PersistentObject {
+@AllArgsConstructor
+@SuperBuilder
+@MappedSuperclass
+public abstract class AbstractSDependency implements PersistentObject {
 
     public static final String DESCRIPTION = "description";
     public static final String FILE_NAME = "fileName";
@@ -28,11 +37,13 @@ public class AbstractSDependency implements PersistentObject {
     public static final String NAME = "name";
     public static final String VALUE = "value_";
 
-    private long tenantId;
+    @Id
     private long id;
     private String name;
     private String fileName;
     private String description;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private byte[] value_;
 
     public AbstractSDependency(final String name, final String fileName, final byte[] value) {

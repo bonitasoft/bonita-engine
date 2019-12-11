@@ -54,6 +54,10 @@
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.archive.SAComment</value>
+                <value>org.bonitasoft.engine.dependency.model.SDependency</value>
+                <value>org.bonitasoft.engine.dependency.model.SDependencyMapping</value>
+                <value>org.bonitasoft.engine.dependency.model.SPlatformDependency</value>
+                <value>org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping</value>
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
@@ -140,8 +144,8 @@
 
                 <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
                 <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
                 <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>

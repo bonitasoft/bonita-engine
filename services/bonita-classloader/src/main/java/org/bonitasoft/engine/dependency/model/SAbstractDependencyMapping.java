@@ -13,18 +13,31 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
+
 
 @Data
 @NoArgsConstructor
-public class SAbstractDependencyMapping implements PersistentObject {
+@AllArgsConstructor
+@SuperBuilder
+@MappedSuperclass
+public abstract class SAbstractDependencyMapping implements PersistentObject {
+
+    @Id
     private long id;
     private long artifactId;
+    @Enumerated(EnumType.STRING)
     private ScopeType artifactType;
     private long dependencyId;
-    private long tenantId;
 
     public SAbstractDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
