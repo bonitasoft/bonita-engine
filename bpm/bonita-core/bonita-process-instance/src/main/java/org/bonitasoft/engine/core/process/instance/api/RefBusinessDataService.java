@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -48,7 +48,7 @@ public interface RefBusinessDataService {
     void updateRefBusinessDataInstance(SSimpleRefBusinessDataInstance refBusinessDataInstance, Long dataId)
             throws SRefBusinessDataInstanceModificationException;
 
-    void updateRefBusinessDataInstance(SMultiRefBusinessDataInstance refBusinessDataInstance, List<Long> dataIds)
+    void updateRefBusinessDataInstance(SProcessMultiRefBusinessDataInstance refBusinessDataInstance, List<Long> dataIds)
             throws SRefBusinessDataInstanceModificationException;
 
     int getNumberOfDataOfMultiRefBusinessData(String name, long processInstanceId) throws SBonitaReadException;

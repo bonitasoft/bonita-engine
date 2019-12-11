@@ -1078,7 +1078,6 @@
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance</value>
-                <value>org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance</value>
             </set>
         </property>

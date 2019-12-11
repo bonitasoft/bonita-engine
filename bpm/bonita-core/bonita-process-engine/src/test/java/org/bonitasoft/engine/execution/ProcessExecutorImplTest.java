@@ -70,7 +70,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -79,10 +79,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.lock.LockService;
@@ -378,7 +374,7 @@ public class ProcessExecutorImplTest {
 
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
-        verify(refBusinessDataService).addRefBusinessDataInstance(any(SMultiRefBusinessDataInstance.class));
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SProcessMultiRefBusinessDataInstance.class));
     }
 
     @Test
@@ -392,7 +388,7 @@ public class ProcessExecutorImplTest {
 
         processExecutorImpl.initializeBusinessData(processContainer, new SProcessInstance(), new SExpressionContext());
 
-        verify(refBusinessDataService).addRefBusinessDataInstance(any(SMultiRefBusinessDataInstance.class));
+        verify(refBusinessDataService).addRefBusinessDataInstance(any(SProcessMultiRefBusinessDataInstance.class));
     }
 
     @Test

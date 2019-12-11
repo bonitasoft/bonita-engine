@@ -28,7 +28,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("proc_multi_ref")
-public class SProcessMultiRefBusinessDataInstance extends SMultiRefBusinessDataInstance {
+public class SProcessMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
 
     @ElementCollection
     @CollectionTable(name = "multi_biz_data", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id"), @JoinColumn(name = "tenantid", referencedColumnName = "tenantid")})

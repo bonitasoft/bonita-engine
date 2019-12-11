@@ -31,7 +31,6 @@ import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
@@ -143,7 +142,7 @@ public class UpdateDataRefActionTest {
         //given
         final String dataName = "address";
         final BusinessDataContext businessDataContext = buildContext(dataName);
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
 
         //then
@@ -159,7 +158,7 @@ public class UpdateDataRefActionTest {
         //given
         final String dataName = "addresses";
         final BusinessDataContext businessDataContext = buildContext(dataName);
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
 
         //when
@@ -169,7 +168,7 @@ public class UpdateDataRefActionTest {
         verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance, Arrays.asList(45L, 46L));
     }
 
-    private SMultiRefBusinessDataInstance createMultiRefBusinessDataInstance(final Long... dataIds) {
+    private SProcessMultiRefBusinessDataInstance createMultiRefBusinessDataInstance(final Long... dataIds) {
         final SProcessMultiRefBusinessDataInstance sRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
         sRefBusinessDataInstance.setDataIds(Arrays.asList(dataIds));
         return sRefBusinessDataInstance;
@@ -183,7 +182,7 @@ public class UpdateDataRefActionTest {
 
         final long persistenceId1 = 45L;
         final long persistenceId2 = 46L;
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, persistenceId2);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, persistenceId2);
 
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
 
@@ -202,7 +201,7 @@ public class UpdateDataRefActionTest {
 
         final long persistenceId1 = 45L;
         final long persistenceId2 = 46L;
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, 34L);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, 34L);
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
 
         //when
@@ -216,7 +215,7 @@ public class UpdateDataRefActionTest {
     public void execute_should_throws_exception_when_service_throws_exception() throws Exception {
         //given
         final String dataName = "addresses";
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(34L);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(34L);
 
         final BusinessDataContext businessDataContext = buildContext(dataName);
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
@@ -252,7 +251,7 @@ public class UpdateDataRefActionTest {
         //given
         final String dataName = "addresses";
         final BusinessDataContext businessDataContext = buildContext(dataName);
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
 
         //then
@@ -280,13 +279,13 @@ public class UpdateDataRefActionTest {
 
     @Test
     public void handleNull_delete_references_to_the_business_data() throws Exception {
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refBusinessDataInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         final BusinessDataContext context = buildContext("employee");
         when(refBusinessDataRetriever.getRefBusinessDataInstance(context)).thenReturn(refBusinessDataInstance);
 
         updateDataRefAction.handleNull(context);
 
-        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance, new ArrayList<Long>());
+        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance, new ArrayList<>());
     }
 
 }

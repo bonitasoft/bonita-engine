@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -54,14 +54,14 @@ public class BusinessDataRetriever {
     }
 
     /**
-     * Retrieves the list of Business Data related to the given {@link SMultiRefBusinessDataInstance}. If the {@code SMultiRefBusinessDataInstance} does not
+     * Retrieves the list of Business Data related to the given {@link SProcessMultiRefBusinessDataInstance}. If the {@code SMultiRefBusinessDataInstance} does not
      * references any Business Data the result will em empty list.
      *
      * @param dataRef the multi business data reference
      * @param bizClass the business data class
      * @return the list of Business Data related to the given {@code SMultiRefBusinessDataInstance} or empty list if no Business Data is referenced.
      */
-    public List<Entity> getMultiBusinessData(SMultiRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass) {
+    public List<Entity> getMultiBusinessData(SProcessMultiRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass) {
         if (dataRef.getDataIds() == null || dataRef.getDataIds().isEmpty()) {
             return new ArrayList<>();
         }
@@ -76,9 +76,9 @@ public class BusinessDataRetriever {
 
     /**
      * Retrieves a Business Data or a List of Business Data related to the given {@link SRefBusinessDataInstance} depending on its type (single {@link Entity}
-     * if it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a {@link SMultiRefBusinessDataInstance}.
+     * if it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a {@link SProcessMultiRefBusinessDataInstance}.
      * This method will use {@link #getSimpleBusinessData(SSimpleRefBusinessDataInstance, Class)} or
-     * {@link #getMultiBusinessData(SMultiRefBusinessDataInstance, Class)} based on the data reference type
+     * {@link #getMultiBusinessData(SProcessMultiRefBusinessDataInstance, Class)} based on the data reference type
      *
      * @param refBusinessDataInstance the business data reference
      * @return The {@code Entity} or {@code List<Entity>} if the business data reference is a {@code SSimpleRefBusinessDataInstance} or a
@@ -93,7 +93,7 @@ public class BusinessDataRetriever {
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 return getSimpleBusinessData((SSimpleRefBusinessDataInstance) refBusinessDataInstance, bizClass);
             }
-            final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
+            final SProcessMultiRefBusinessDataInstance reference = (SProcessMultiRefBusinessDataInstance) refBusinessDataInstance;
             return getMultiBusinessData(reference, bizClass);
         } catch (final ClassNotFoundException e) {
             throw new SExpressionEvaluationException("Unable to load class for the business data having reference '" + refBusinessDataInstance.getName() + "'",

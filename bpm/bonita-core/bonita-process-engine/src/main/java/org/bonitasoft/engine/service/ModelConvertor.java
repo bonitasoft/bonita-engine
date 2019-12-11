@@ -205,7 +205,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskIn
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -2156,8 +2156,8 @@ public class ModelConvertor {
         if (sRefBusinessDataInstance == null) {
             return null;
         }
-        if (sRefBusinessDataInstance instanceof SMultiRefBusinessDataInstance) {
-            final SMultiRefBusinessDataInstance multi = (SMultiRefBusinessDataInstance) sRefBusinessDataInstance;
+        if (sRefBusinessDataInstance instanceof SProcessMultiRefBusinessDataInstance) {
+            final SProcessMultiRefBusinessDataInstance multi = (SProcessMultiRefBusinessDataInstance) sRefBusinessDataInstance;
             return new MultipleBusinessDataReferenceImpl(multi.getName(), multi.getDataClassName(), multi.getDataIds());
         }
         final SSimpleRefBusinessDataInstance simple = (SSimpleRefBusinessDataInstance) sRefBusinessDataInstance;

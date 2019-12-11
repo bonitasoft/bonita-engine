@@ -34,7 +34,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.pojo.Employee;
@@ -169,7 +169,7 @@ public class BusinessDataLeftOperandHandlerTest {
     public void removeAndDereferenceAMultiBusinessData() throws Exception {
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
-        final SMultiRefBusinessDataInstance ref = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance ref = mock(SProcessMultiRefBusinessDataInstance.class);
         doReturn(ref).when(refBusinessDataRetriever).getRefBusinessDataInstance(any());
         when(ref.getDataClassName()).thenReturn(Address.class.getName());
         when(ref.getDataIds()).thenReturn(Arrays.asList(486L));
@@ -182,7 +182,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
     @Test
     public void getMultiBusinessDataReturnTheBusinessData() throws Exception {
-        final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
@@ -197,7 +197,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
     @Test
     public void getMultiBusinessDataCreateAnInstanceIfNoReferenceExists() throws Exception {
-        final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
+        final SProcessMultiRefBusinessDataInstance refInstance = mock(SProcessMultiRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final long processInstanceId = 457;
         BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId,

@@ -105,7 +105,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermed
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -788,7 +788,7 @@ public class BPMInstancesCreator {
         final SBusinessDataDefinition inputBusinessData = activityDefinition.getBusinessDataDefinition(miLoop.getDataInputItemRef());
         if (inputBusinessData != null) {
             try {
-                final SMultiRefBusinessDataInstance loopDataRefInstance = (SMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
+                final SProcessMultiRefBusinessDataInstance loopDataRefInstance = (SProcessMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
                         miLoop.getLoopDataInputRef(), flowNodeInstance.getParentProcessInstanceId());
                 final List<Long> dataIds = loopDataRefInstance.getDataIds();
                 final SRefBusinessDataInstance inputRefInstance = instanceFactory.createNewInstanceForFlowNode(inputBusinessData.getName(),

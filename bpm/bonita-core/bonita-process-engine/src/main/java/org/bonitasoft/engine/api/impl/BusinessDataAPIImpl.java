@@ -22,7 +22,7 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.business.data.converter.BusinessDataModelConverter;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -48,7 +48,7 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
             if (sReference instanceof SSimpleRefBusinessDataInstance) {
                 return BusinessDataModelConverter.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
             } else {
-                return BusinessDataModelConverter.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference);
+                return BusinessDataModelConverter.toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference);
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
             throw new DataNotFoundException(srbdnfe);
@@ -68,7 +68,7 @@ public class BusinessDataAPIImpl implements BusinessDataAPI {
                 if (sReference instanceof SSimpleRefBusinessDataInstance) {
                     references.add(BusinessDataModelConverter.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
                 } else {
-                    references.add(BusinessDataModelConverter.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
+                    references.add(BusinessDataModelConverter.toMultipleBusinessDataReference((SProcessMultiRefBusinessDataInstance) sReference));
                 }
             }
             return references;
