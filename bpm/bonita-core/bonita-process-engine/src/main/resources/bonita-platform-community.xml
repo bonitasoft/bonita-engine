@@ -819,7 +819,6 @@
                 <!-- data instance -->
                 <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
                 <!-- archived data instance -->
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
                 <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
                 <!-- command -->
                 <value>org/bonitasoft/engine/command/model/impl/hibernate/command.queries.hbm.xml</value>
@@ -1020,6 +1019,18 @@
                 <value>org.bonitasoft.engine.core.document.model.SMappedDocument</value>
                 <value>org.bonitasoft.engine.core.document.model.archive.SADocumentMapping</value>
                 <value>org.bonitasoft.engine.core.document.model.archive.SAMappedDocument</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance</value>
+                <value>org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SBlobDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SBooleanDataInstance</value>
                 <value>org.bonitasoft.engine.data.instance.model.SDataInstance</value>

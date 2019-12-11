@@ -26,6 +26,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -34,7 +35,7 @@ import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
-
+@SuperBuilder
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @IdClass(PersistentObjectId.class)
@@ -53,17 +54,11 @@ public abstract class SDataInstance implements PersistentObject {
     private long tenantId;
     @Id
     private long id;
-    @Column
     private String name;
-    @Column
     private String description;
-    @Column
     private boolean transientData;
-    @Column
     private String className;
-    @Column
     private long containerId;
-    @Column
     private String containerType;
 
     public SDataInstance(final SDataDefinition dataDefinition) {

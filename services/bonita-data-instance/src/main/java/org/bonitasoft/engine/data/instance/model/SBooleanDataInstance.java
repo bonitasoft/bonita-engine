@@ -22,6 +22,7 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Entity
 @DiscriminatorValue("SBooleanDataInstanceImpl")
 public class SBooleanDataInstance extends SDataInstance {

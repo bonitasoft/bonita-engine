@@ -21,19 +21,30 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Entity
+@DiscriminatorValue("SABlobDataInstanceImpl")
 public class SABlobDataInstance extends SADataInstance {
 
 
+    @Column(name = "blobValue")
+    @Type(type = "materialized_blob")
     private byte[] value;
 
 
