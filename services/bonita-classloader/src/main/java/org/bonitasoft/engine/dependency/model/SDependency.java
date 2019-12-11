@@ -13,10 +13,30 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import lombok.NoArgsConstructor;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@SuperBuilder
+@Entity
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
+@Table(name = "dependency")
 public class SDependency extends AbstractSDependency {
+
+    @Id
+    private long tenantId;
 
     public SDependency(final String name, final String fileName, final byte[] value) {
         super(name, fileName, value);

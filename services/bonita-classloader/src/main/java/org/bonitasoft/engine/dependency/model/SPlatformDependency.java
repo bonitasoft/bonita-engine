@@ -13,17 +13,30 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@SuperBuilder
+@Entity
+@Table(name = "pdependency")
 public class SPlatformDependency extends AbstractSDependency {
 
     public SPlatformDependency(final String name, final String fileName, final byte[] value) {
         super(name, fileName, value);
     }
 
+    @Override
+    public void setTenantId(long id) {
+        //no tenantId
+    }
 }

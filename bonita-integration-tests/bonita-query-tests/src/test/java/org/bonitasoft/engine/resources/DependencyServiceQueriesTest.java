@@ -14,18 +14,29 @@
 package org.bonitasoft.engine.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
+import static org.bonitasoft.engine.dependency.model.ScopeType.TENANT;
+import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 import static org.junit.Assert.fail;
 
+import java.util.Map;
 import java.util.Random;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.SPlatformDependency;
+import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.DependencyRepository;
+import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,19 +51,10 @@ public class DependencyServiceQueriesTest {
 
     @Inject
     private DependencyRepository repository;
-
-    private static SDependency createDependency(final String fileName, Long tenantId) {
-        SDependency dependency = new SDependency(getSaltString(), fileName, "toutou".getBytes());
-        dependency.setId(new Random().nextLong());
-        dependency.setTenantId(tenantId);
-        return dependency;
-    }
-
-    private static SDependencyMapping createDependencyMapping(Long artifactId, Long id, Long tenantId) {
-        SDependencyMapping dependencyMapping = new SDependencyMapping(artifactId, ScopeType.TENANT, id);
-        dependencyMapping.setTenantId(tenantId);
-        return dependencyMapping;
-    }
+    @Inject
+    private PlatformRepository platformRepository;
+    @Inject
+    private JdbcTemplate jdbcTemplate;
 
     private static String getSaltString() {
         String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -67,57 +69,57 @@ public class DependencyServiceQueriesTest {
 
     @Test
     public void should_retrieve_the_correct_dependencyId_from_tenant_and_filename() {
+        SDependency resource_to_retrieve = repository.add(SDependency.builder()
+                .name(getSaltString())
+                .fileName("aFileName.zip")
+                .value_("toutou".getBytes()).build());
+        repository.add(SDependency.builder()
+                .name(getSaltString())
+                .fileName("file.lst")
+                .value_("toutou".getBytes()).build());
+        repository.add(SDependencyMapping.builder()
+                .artifactId(666L)
+                .artifactType(TENANT)
+                .dependencyId(resource_to_retrieve.getId()).build());
 
-        //given
-        SDependency resource_to_retrieve = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
+        Long dependencyId = repository.getDependencyIdFromArtifact(666L, TENANT, "aFileName.zip");
 
-        repository.add(createDependency("file.lst", 1L));
-
-        repository.add(createDependencyMapping(666L, resource_to_retrieve.getId(), 1L));
-
-        //when
-        Long dependencyId = repository.getDependencyIdFromArtifact(666L, ScopeType.TENANT, "aFileName.zip");
-
-        //then
         assertThat(dependencyId).as("dependency id").isEqualTo(resource_to_retrieve.getId());
     }
 
     @Test
     public void should_retrieve_nothing_when_BDM_not_deployed() {
+        SDependency resource_to_not_retrieve = repository.add(SDependency.builder()
+                .name(getSaltString())
+                .fileName("aFileName.zip")
+                .value_("toutou".getBytes())
+                .build());
+        repository.add(SDependencyMapping.builder()
+                .artifactId(666L)
+                .artifactType(TENANT)
+                .dependencyId(resource_to_not_retrieve.getId()).build());
 
-        //given
-        SDependency resource_to_not_retrieve = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
+        Long dependencyId = repository.getDependencyIdFromArtifact(666L, TENANT, "anotherFileName.zip");
 
-        repository.add(createDependencyMapping(666L, resource_to_not_retrieve.getId(), 1L));
-
-        //when
-        Long dependencyId = repository.getDependencyIdFromArtifact(666L, ScopeType.TENANT, "anotherFileName.zip");
-
-        //then
         assertThat(dependencyId).as("dependency id").isNull();
     }
 
     @Test
     public void should_retrieve_nothing_when_the_DB_isEmpty() {
+        Long dependencyId = repository.getDependencyIdFromArtifact(666L, TENANT, "aFileName.zip");
 
-        //given
-
-        //when
-        Long dependencyId = repository.getDependencyIdFromArtifact(666L, ScopeType.TENANT, "aFileName.zip");
-
-        //then
         assertThat(dependencyId).as("dependency id").isNull();
     }
 
     @Test
     public void should_retrieve_dependency_content_only_using_disconnected_objects() throws Exception {
-        // given:
-        SDependency aDependency = (SDependency) repository.add(createDependency("aFileName.zip", 1L));
+        SDependency aDependency = repository.add(SDependency.builder()
+                .name(getSaltString())
+                .fileName("aFileName.zip")
+                .value_("toutou".getBytes()).build());
 
-        // when:
         DependencyContent dependencyContentOnly = repository.getDependencyContentOnly(aDependency.getId());
 
-        //then:
         assertThat(dependencyContentOnly.getContent()).isEqualTo("toutou".getBytes());
         assertThat(dependencyContentOnly.getFileName()).isEqualTo("aFileName.zip");
         assertThat(repository.getSession().getIdentifier(aDependency)).isNotNull();
@@ -126,5 +128,93 @@ public class DependencyServiceQueriesTest {
             fail("should fail because the object should not be in the hibernate session");
         } catch (Exception ignored) {
         }
+    }
+
+    @Test
+    public void should_save_and_get_dependency() {
+        SDependency aDependency = repository.add(SDependency.builder()
+                .name("dependencyName")
+                .fileName("aFileName.jar")
+                .description("description of the jar")
+                .value_("jarContent".getBytes()).build());
+
+        PersistentObject dependencyFromQuery = repository.selectOne("getDependencyByName", pair("name", "dependencyName"));
+        Map<String, Object> dependencyAsMap = jdbcTemplate.queryForMap("SELECT * FROM dependency");
+
+        assertThat(dependencyFromQuery).isEqualTo(aDependency);
+        assertThat(dependencyAsMap).containsOnly(
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("ID", aDependency.getId()),
+                entry("NAME", "dependencyName"),
+                entry("DESCRIPTION", "description of the jar"),
+                entry("FILENAME", "aFileName.jar"),
+                entry("VALUE_", "jarContent".getBytes()));
+    }
+
+    @Test
+    public void should_save_and_get_dependency_mapping() {
+        SDependency aDependency = repository.add(SDependency.builder()
+                .name("dependencyName")
+                .fileName("aFileName.jar")
+                .description("description of the jar")
+                .value_("jarContent".getBytes()).build());
+        SDependencyMapping dependencyMapping = repository.add(SDependencyMapping.builder()
+                .artifactId(567L)
+                .artifactType(PROCESS)
+                .dependencyId(aDependency.getId()).build());
+
+        PersistentObject dependencyMappingFromQuery = repository.selectOne("getDependencyMappingsByDependency", pair("dependencyId", aDependency.getId()));
+        Map<String, Object> dependencyMappingAsMap = jdbcTemplate.queryForMap("SELECT * FROM dependencymapping WHERE dependencyId=" + aDependency.getId());
+
+        assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
+        assertThat(dependencyMappingAsMap).containsOnly(
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("ID", dependencyMapping.getId()),
+                entry("ARTIFACTID", 567L),
+                entry("ARTIFACTTYPE", "PROCESS"),
+                entry("DEPENDENCYID", aDependency.getId()));
+    }
+
+    @Test
+    public void should_save_and_get_platform_dependency() {
+        SPlatformDependency aDependency = platformRepository.add(SPlatformDependency.builder()
+                .name("dependencyName")
+                .fileName("aFileName.jar")
+                .description("description of the jar")
+                .value_("jarContent".getBytes()).build());
+
+        PersistentObject dependencyFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyByName", pair("name", "dependencyName"));
+        Map<String, Object> dependencyAsMap = jdbcTemplate.queryForMap("SELECT * FROM pdependency");
+
+        assertThat(dependencyFromQuery).isEqualTo(aDependency);
+        assertThat(dependencyAsMap).containsOnly(
+                entry("ID", aDependency.getId()),
+                entry("NAME", "dependencyName"),
+                entry("DESCRIPTION", "description of the jar"),
+                entry("FILENAME", "aFileName.jar"),
+                entry("VALUE_", "jarContent".getBytes()));
+    }
+
+    @Test
+    public void should_save_and_get_platform_dependency_mapping() {
+        SPlatformDependency aDependency = platformRepository.add(SPlatformDependency.builder()
+                .name("dependencyName")
+                .fileName("aFileName.jar")
+                .description("description of the jar")
+                .value_("jarContent".getBytes()).build());
+        SPlatformDependencyMapping dependencyMapping = platformRepository.add(SPlatformDependencyMapping.builder()
+                .artifactId(567L)
+                .artifactType(PROCESS)
+                .dependencyId(aDependency.getId()).build());
+
+        PersistentObject dependencyMappingFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyMappingsByDependency", pair("dependencyId", aDependency.getId()));
+        Map<String, Object> dependencyMappingAsMap = jdbcTemplate.queryForMap("SELECT * FROM pdependencymapping WHERE dependencyId=" + aDependency.getId());
+
+        assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
+        assertThat(dependencyMappingAsMap).containsOnly(
+                entry("ID", dependencyMapping.getId()),
+                entry("ARTIFACTID", 567L),
+                entry("ARTIFACTTYPE", "PROCESS"),
+                entry("DEPENDENCYID", aDependency.getId()));
     }
 }
