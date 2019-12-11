@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_THROW_EVENT;
 import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
 import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
 
@@ -40,6 +43,10 @@ public class BPMEventQueriesTest {
 
     @Inject
     private BPMEventRepository bPMEventRepository;
+
+    @Inject
+    private JdbcTemplate jdbcTemplate;
+
 
     @Test
     public void getInProgressMessageInstancesShouldOnlyConsiderHandledMessages() {
@@ -160,6 +167,16 @@ public class BPMEventQueriesTest {
 
         // then:
         assertThat(messageInstanceIds).containsExactly(messageInstance2.getId());
+    }
+
+     @Test
+    public void should_get_waitingEvents_by_eventType() {
+        // Given
+        final SWaitingEvent sWaitingEvent = bPMEventRepository.add(aWaitingEvent().withEventType(INTERMEDIATE_THROW_EVENT).build());
+        bPMEventRepository.flush();
+        final String eventType = jdbcTemplate.queryForObject("select eventType from waiting_event", String.class);
+        assertThat(eventType).isEqualTo("INTERMEDIATE_THROW_EVENT");
+        assertThat(sWaitingEvent.getEventType()).isEqualTo(INTERMEDIATE_THROW_EVENT);
     }
 
 }

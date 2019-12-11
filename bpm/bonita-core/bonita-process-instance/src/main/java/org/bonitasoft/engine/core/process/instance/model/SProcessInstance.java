@@ -22,6 +22,10 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,6 +38,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "process_instance")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SProcessInstance implements PersistentObject {
 
     private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
@@ -55,12 +63,13 @@ public class SProcessInstance implements PersistentObject {
     public static final String STARTED_BY_SUBSTITUTE_KEY = "startedBySubstitute";
     public static final String START_DATE_KEY = "startDate";
     public static final String CALLER_ID = "callerId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private String name;
     private long processDefinitionId;
     private String description;
-    private int stateId;
     @Builder.Default
     private long startDate = new Date().getTime();
     /**
@@ -72,28 +81,37 @@ public class SProcessInstance implements PersistentObject {
      */
     private long startedBySubstitute;
     private long endDate;
+    private int stateId;
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private SStateCategory stateCategory = SStateCategory.NORMAL;
     private long lastUpdate;
     private long containerId;
     @Builder.Default
     private long rootProcessInstanceId = -1;
     @Builder.Default
     private long callerId = -1;
-
     /**
      * The caller's SFlowNodeType if the it's called by a call activity or sub-process, null otherwise
      */
+    @Column
+    @Enumerated(EnumType.STRING)
     private SFlowNodeType callerType;
     /**
      * Id of the end error event that interrupted the process instance or -1 if the process was not interrupted by a end error event
      */
     @Builder.Default
+    @Column
     private long interruptingEventId = DEFAULT_INTERRUPTING_EVENT_ID;
-    @Builder.Default
-    private SStateCategory stateCategory = SStateCategory.NORMAL;
+    @Column
     private String stringIndex1;
+    @Column
     private String stringIndex2;
+    @Column
     private String stringIndex3;
+    @Column
     private String stringIndex4;
+    @Column
     private String stringIndex5;
 
 

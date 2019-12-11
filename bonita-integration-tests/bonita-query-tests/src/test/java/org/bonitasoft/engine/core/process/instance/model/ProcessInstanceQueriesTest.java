@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.bpm.process.ProcessInstanceState.STARTED;
+import static org.bonitasoft.engine.commons.Pair.mapOf;
+import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.core.process.definition.model.SFlowNodeType.RECEIVE_TASK;
 import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
 import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
 import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
@@ -31,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -38,11 +43,15 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
-import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,15 +62,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProcessInstanceQueriesTest {
 
     private static final long aGroupId = 654L;
-
     private static final long anotherGroupId = 9875L;
-
     private static final long aRoleId = 1235L;
-
     private static final long anotherRoleId = 956L;
+    private static final long PROCESS_INSTANCE_ID = 43578923425L;
+    private static final long FLOW_NODE_INSTANCE_ID = 342678L;
 
     @Inject
     private ProcessInstanceRepository repository;
+
+    @Inject
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_user_filters() {
@@ -815,6 +826,104 @@ public class ProcessInstanceQueriesTest {
 
         // Then
         assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
+    }
+
+    @Test
+    public void should_get_processInstances_by_callertype_and_stateCategory() {
+        SProcessInstance sProcessInstance = buildStartedProcessInstance(12L, 102L);
+        sProcessInstance.setCallerType(RECEIVE_TASK);
+        repository.add(sProcessInstance);
+        repository.flush();
+        final String stateCategory = jdbcTemplate.queryForObject("select stateCategory from process_instance", String.class);
+        final String callerType = jdbcTemplate.queryForObject("select callerType from process_instance", String.class);
+        assertThat(stateCategory).isEqualTo("NORMAL");
+        assertThat(callerType).isEqualTo("RECEIVE_TASK");
+    }
+
+    @Test
+    public void should_save_and_get_multi_business_data_reference_for_process() {
+        SProcessMultiRefBusinessDataInstance multiRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
+        multiRefBusinessDataInstance.setDataIds(Arrays.asList(23L, 25L, 27L));
+        multiRefBusinessDataInstance.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        multiRefBusinessDataInstance.setName("myMultiProcData");
+        multiRefBusinessDataInstance.setDataClassName("someDataClassName");
+        multiRefBusinessDataInstance = repository.add(multiRefBusinessDataInstance);
+        repository.flush();
+
+
+        PersistentObject multiRefBusinessData = repository.selectOne("getSRefBusinessDataInstance", pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "myMultiProcData"));
+        Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate.queryForMap("SELECT * FROM ref_biz_data_inst WHERE proc_inst_id=" + PROCESS_INSTANCE_ID + " AND name='myMultiProcData'");
+        List<Map<String, Object>> dataIds = jdbcTemplate.queryForList("SELECT * FROM multi_biz_data WHERE tenantId=" + DEFAULT_TENANT_ID + " AND id=" + multiRefBusinessDataInstance.getId());
+
+        assertThat(((SProcessMultiRefBusinessDataInstance) multiRefBusinessData).getDataIds()).isEqualTo(Arrays.asList(23L, 25L, 27L));
+        assertThat(multiRefBusinessData).isEqualTo(multiRefBusinessDataInstance);
+        assertThat(multiRefBusinessDataAsMap).containsOnly(
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("ID", multiRefBusinessDataInstance.getId()),
+                entry("KIND", "proc_multi_ref"),
+                entry("NAME", "myMultiProcData"),
+                entry("DATA_CLASSNAME", "someDataClassName"),
+                entry("DATA_ID", null),
+                entry("PROC_INST_ID", PROCESS_INSTANCE_ID),
+                entry("FN_INST_ID", null)
+        );
+        assertThat(dataIds).containsExactly(
+                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 0), pair("DATA_ID", 23L)),
+                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 1), pair("DATA_ID", 25L)),
+                mapOf(pair("TENANTID", DEFAULT_TENANT_ID), pair("ID", multiRefBusinessDataInstance.getId()), pair("IDX", 2), pair("DATA_ID", 27L))
+        );
+    }
+
+    @Test
+    public void should_save_and_get_single_business_data_reference_for_process() {
+        SProcessSimpleRefBusinessDataInstance singleRef = new SProcessSimpleRefBusinessDataInstance();
+        singleRef.setDataId(43L);
+        singleRef.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        singleRef.setName("mySingleData");
+        singleRef.setDataClassName("someDataClassName");
+        singleRef = repository.add(singleRef);
+        repository.flush();
+
+
+        PersistentObject singleRefFromQuery = repository.selectOne("getSRefBusinessDataInstance", pair("processInstanceId", PROCESS_INSTANCE_ID), pair("name", "mySingleData"));
+        Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate.queryForMap("SELECT * FROM ref_biz_data_inst WHERE proc_inst_id=" + PROCESS_INSTANCE_ID + " AND name='mySingleData'");
+        assertThat(singleRefFromQuery).isEqualTo(singleRef);
+        assertThat(multiRefBusinessDataAsMap).containsOnly(
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("ID", singleRef.getId()),
+                entry("KIND", "proc_simple_ref"),
+                entry("NAME", "mySingleData"),
+                entry("DATA_CLASSNAME", "someDataClassName"),
+                entry("DATA_ID", 43L),
+                entry("PROC_INST_ID", PROCESS_INSTANCE_ID),
+                entry("FN_INST_ID", null)
+        );
+    }
+
+    @Test
+    public void should_save_and_get_single_business_data_reference_for_flow_node() {
+        SFlowNodeSimpleRefBusinessDataInstance singleRef = new SFlowNodeSimpleRefBusinessDataInstance();
+        singleRef.setDataId(43L);
+        singleRef.setFlowNodeInstanceId(FLOW_NODE_INSTANCE_ID);
+        singleRef.setName("mySingleData");
+        singleRef.setDataClassName("someDataClassName");
+        singleRef = repository.add(singleRef);
+        repository.flush();
+
+
+        PersistentObject singleRefFromQuery = repository.selectOne("getSFlowNodeRefBusinessDataInstance", pair("flowNodeInstanceId", FLOW_NODE_INSTANCE_ID), pair("name", "mySingleData"));
+        Map<String, Object> multiRefBusinessDataAsMap = jdbcTemplate.queryForMap("SELECT * FROM ref_biz_data_inst WHERE fn_inst_id=" + FLOW_NODE_INSTANCE_ID + " AND name='mySingleData'");
+        assertThat(singleRefFromQuery).isEqualTo(singleRef);
+        assertThat(multiRefBusinessDataAsMap).containsOnly(
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("ID", singleRef.getId()),
+                entry("KIND", "fn_simple_ref"),
+                entry("NAME", "mySingleData"),
+                entry("DATA_CLASSNAME", "someDataClassName"),
+                entry("DATA_ID", 43L),
+                entry("PROC_INST_ID", null),
+                entry("FN_INST_ID", FLOW_NODE_INSTANCE_ID)
+        );
     }
 
     private SAProcessInstance buildSAProcessInstance(final long id) {

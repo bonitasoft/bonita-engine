@@ -14,21 +14,22 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.connector.ConnectorEvent.ON_ENTER;
+import static org.bonitasoft.engine.bpm.connector.ConnectorEvent.ON_FINISH;
 import static org.bonitasoft.engine.test.persistence.builder.ConnectorInstanceBuilder.aConnectorInstance;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.assertj.core.api.Condition;
 import org.assertj.core.util.Lists;
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,20 +44,24 @@ public class ConnectorInstanceQueriesTest {
 
     @Inject
     private ConnectorInstanceRepository repository;
-    private SConnectorInstance expectedConnector1;
-    private SConnectorInstance expectedConnector2;
+
+    @Inject
+    private JdbcTemplate jdbcTemplate;
+
+    private SAbstractConnectorInstance expectedConnector1;
+    private SAbstractConnectorInstance expectedConnector2;
     private String containerType;
     private long containerId;
 
-    private SConnectorInstance expectedConnector3;
+    private SAbstractConnectorInstance expectedConnector3;
 
-    private SConnectorInstance expectedConnector4;
+    private SAbstractConnectorInstance expectedConnector4;
 
-    private SConnectorInstance expectedConnector5;
+    private SAbstractConnectorInstance expectedConnector5;
 
-    private SConnectorInstance connectorInstanceOfDifferentContainer;
+    private SAbstractConnectorInstance connectorInstanceOfDifferentContainer;
 
-    private SConnectorInstance expectedConnector6;
+    private SAbstractConnectorInstance expectedConnector6;
 
     /**
      * 
@@ -67,22 +72,22 @@ public class ConnectorInstanceQueriesTest {
         containerId = 1L;
         long differentContainerId = 5L;
         long tenantId = 100L;
-        expectedConnector1 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_FINISH)
+        expectedConnector1 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ON_FINISH)
                 .withFailureInfo(false).setState(ConnectorState.EXECUTING.toString()).build();
-        expectedConnector2 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector2 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ON_ENTER)
                 .setState(ConnectorState.EXECUTING.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector3 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector3 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ON_ENTER)
                 .setState(ConnectorState.DONE.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector4 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector4 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ON_ENTER)
                 .setState(ConnectorState.TO_BE_EXECUTED.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ON_ENTER)
                 .setState(ConnectorState.FAILED.toString()).withFailureInfo(false)
                 .build();
         expectedConnector6 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
-                .setActivationEvent(ConnectorEvent.ON_FINISH)
+                .setActivationEvent(ON_FINISH)
                 .setState(ConnectorState.FAILED.toString()).withFailureInfo(false)
                 .build();
         expectedConnector1.setId(10L);
@@ -98,10 +103,10 @@ public class ConnectorInstanceQueriesTest {
         repository.add(expectedConnector5);
         repository.add(expectedConnector6);
         connectorInstanceOfDifferentContainer = repository.add(aConnectorInstance().setContainerId(differentContainerId).setContainerType(containerType)
-                .setActivationEvent(ConnectorEvent.ON_ENTER)
+                .setActivationEvent(ON_ENTER)
                 .withFailureInfo(false).build());// unexpected connector on different container
-        SConnectorInstance differentTenantConnector = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
-                .setActivationEvent(ConnectorEvent.ON_FINISH)
+        SAbstractConnectorInstance differentTenantConnector = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ON_FINISH)
                 .withFailureInfo(false).build();
         differentTenantConnector.setTenantId(tenantId);
         differentTenantConnector.setId(differentContainerId);
@@ -110,7 +115,7 @@ public class ConnectorInstanceQueriesTest {
 
     @Test
     public void getConnectorInstances() {
-        List<SConnectorInstance> connectors = repository.getConnectorInstances(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        List<SAbstractConnectorInstance> connectors = repository.getConnectorInstances(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector6, expectedConnector3, expectedConnector4,
                 expectedConnector5);
@@ -119,7 +124,7 @@ public class ConnectorInstanceQueriesTest {
     @Test
     public void getConnectorInstancesOrderedById() {
 
-        List<SConnectorInstance> connectors = repository
+        List<SAbstractConnectorInstance> connectors = repository
                 .getConnectorInstancesOrderedById(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).containsExactly(expectedConnector5, expectedConnector2, expectedConnector6, expectedConnector3, expectedConnector1,
@@ -136,14 +141,14 @@ public class ConnectorInstanceQueriesTest {
     @Test
     public void getNextExecutableConnectorInstance() {
         SConnectorInstance connectors = repository
-                .getNextExecutableConnectorInstance(containerId, containerType, ConnectorEvent.ON_ENTER, PersistentObjectBuilder.DEFAULT_TENANT_ID);
+                .getNextExecutableConnectorInstance(containerId, containerType, ON_ENTER, PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).isSameAs(expectedConnector2);
     }
 
     @Test
     public void searchSConnectorInstance() {
-        List<SConnectorInstance> connectors = repository
+        List<SAbstractConnectorInstance> connectors = repository
                 .searchSConnectorInstance(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector3, expectedConnector4, expectedConnector5,
@@ -160,8 +165,8 @@ public class ConnectorInstanceQueriesTest {
 
     @Test
     public void getConnectorInstancesWithState() {
-        List<SConnectorInstance> connectors = repository
-                .getConnectorInstances(containerId, containerType, ConnectorEvent.ON_ENTER, ConnectorState.TO_BE_EXECUTED.toString(),
+        List<SAbstractConnectorInstance> connectors = repository
+                .getConnectorInstances(containerId, containerType, ON_ENTER, ConnectorState.TO_BE_EXECUTED.toString(),
                         PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).containsOnly(expectedConnector4);
@@ -193,6 +198,25 @@ public class ConnectorInstanceQueriesTest {
         assertThat(connectors).hasSize(2);
         assertThat(idsToFind).contains(connectors.get(0).getId());
         assertThat(idsToFind).contains(connectors.get(1).getId());
+    }
+
+    @Test
+    public void should_store_ACTIVATION_EVENT_as_string() {
+        final SAbstractConnectorInstance connectorInstance = repository.add(aConnectorInstance().setActivationEvent(ON_ENTER).build());
+        repository.flush();
+        final String activationEvent = jdbcTemplate.queryForObject("select activationEvent from connector_instance where id = " + connectorInstance.getId(), String.class);
+        assertThat(activationEvent).isEqualTo("ON_ENTER");
+        assertThat(connectorInstance.getActivationEvent()).isEqualTo(ON_ENTER);
+    }
+    @Test
+    public void should_store_stack_trace_of_connector() {
+        SConnectorInstanceWithFailureInfo sConnectorInstanceWithFailureInfo = new SConnectorInstanceWithFailureInfo();
+        sConnectorInstanceWithFailureInfo.setStackTrace("a stack trace");
+        final SConnectorInstanceWithFailureInfo connectorInstance = repository.add(sConnectorInstanceWithFailureInfo);
+        repository.flush();
+        final String stackTrace = jdbcTemplate.queryForObject("select stackTrace from connector_instance where id = " + connectorInstance.getId(), String.class);
+        assertThat(stackTrace).isEqualTo("a stack trace");
+        assertThat(connectorInstance.getStackTrace()).isEqualTo("a stack trace");
     }
 
 }

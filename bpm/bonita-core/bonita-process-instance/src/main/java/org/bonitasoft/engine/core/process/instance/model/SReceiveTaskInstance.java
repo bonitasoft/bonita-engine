@@ -18,12 +18,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Julien Molinaro
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("receive")
 public class SReceiveTaskInstance extends SActivityInstance {
 
     public SReceiveTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,

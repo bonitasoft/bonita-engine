@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event;
 
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SCatchEventInstance extends SEventInstance {
     private boolean interrupting = true;
 

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -72,6 +72,6 @@ public class SelectBusinessDataDescriptorBuilder {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", name);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectOneDescriptor<>("getNumberOfDataOfMultiRefBusinessData", parameters, SMultiRefBusinessDataInstance.class);
+        return new SelectOneDescriptor<>("getNumberOfDataOfMultiRefBusinessData", parameters, SProcessMultiRefBusinessDataInstance.class);
     }
 }

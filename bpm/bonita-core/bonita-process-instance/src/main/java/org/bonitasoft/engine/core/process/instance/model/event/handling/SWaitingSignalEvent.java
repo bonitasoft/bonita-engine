@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,8 +27,9 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("signal")
 public class SWaitingSignalEvent extends SWaitingEvent {
-
 
     private String signalName;
 

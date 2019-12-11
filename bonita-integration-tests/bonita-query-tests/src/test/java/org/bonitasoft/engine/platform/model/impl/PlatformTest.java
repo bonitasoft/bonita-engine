@@ -19,13 +19,11 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.Map;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
-import org.bonitasoft.engine.test.persistence.repository.TestRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;

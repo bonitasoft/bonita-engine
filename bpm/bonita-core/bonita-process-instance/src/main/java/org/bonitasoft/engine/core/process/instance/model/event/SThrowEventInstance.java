@@ -17,12 +17,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
+
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SThrowEventInstance extends SEventInstance {
     public SThrowEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
                                    final long logicalGroup1, final long logicalGroup2) {

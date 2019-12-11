@@ -14,13 +14,14 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.core.process.instance.model.SAbstractConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 
 /**
  * @author Julien Reboul
  */
-public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnectorInstance, ConnectorInstanceBuilder> {
+public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SAbstractConnectorInstance, ConnectorInstanceBuilder> {
 
     private boolean withFailureInfo = false;
 
@@ -57,8 +58,8 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnector
 
 
     @Override
-    SConnectorInstance _build() {
-        SConnectorInstance connectorInstance;
+    SAbstractConnectorInstance _build() {
+        SAbstractConnectorInstance connectorInstance;
         if (withFailureInfo) {
             connectorInstance = new SConnectorInstanceWithFailureInfo();
             ((SConnectorInstanceWithFailureInfo) connectorInstance).setExceptionMessage(exceptionMessage);

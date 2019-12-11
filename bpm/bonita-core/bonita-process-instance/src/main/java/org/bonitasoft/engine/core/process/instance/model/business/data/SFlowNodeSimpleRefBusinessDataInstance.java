@@ -17,14 +17,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("fn_simple_ref")
 public class SFlowNodeSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
-
+    @Column(name = "fn_inst_id")
     private long flowNodeInstanceId;
 
 }

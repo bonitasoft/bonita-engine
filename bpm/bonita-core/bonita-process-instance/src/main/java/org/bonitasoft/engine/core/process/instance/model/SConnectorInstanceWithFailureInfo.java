@@ -16,6 +16,12 @@ package org.bonitasoft.engine.core.process.instance.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,10 +29,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SConnectorInstanceWithFailureInfo extends SConnectorInstance {
+@SuperBuilder
+@Entity
+@Table(name = "connector_instance")
+public class SConnectorInstanceWithFailureInfo extends SAbstractConnectorInstance {
 
     public static final String EXCEPTION_MESSAGE = "exceptionMessage";
     public static final String STACK_TRACE = "stackTrace";
+    @Column
+    @Type(type = "materialized_clob")
     private String stackTrace;
     private String exceptionMessage;
 

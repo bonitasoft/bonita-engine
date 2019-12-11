@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.commons;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,6 +39,14 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
 
     public static <L, R> Pair<L, R> pair(final L left, final R right) {
         return of(left, right);
+    }
+
+    public static <L, R> Map<L, R> mapOf(Pair<L, R>... entries) {
+        Map<L, R> map = new HashMap<>();
+        for (Pair<L, R> entry : entries) {
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
     }
 
     public L getLeft() {

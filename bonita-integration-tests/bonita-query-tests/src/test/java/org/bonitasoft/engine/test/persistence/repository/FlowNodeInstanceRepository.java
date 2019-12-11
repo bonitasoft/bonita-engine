@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -32,6 +33,13 @@ public class FlowNodeInstanceRepository extends TestRepository {
     public FlowNodeInstanceRepository(final SessionFactory sessionFactory) {
         super(sessionFactory);
     }
+
+    public SFlowNodeInstance getById(long id){
+        final Query namedQuery = getNamedQuery("getSFlowNodeInstanceById");
+        namedQuery.setParameter("id", id);
+        return (SFlowNodeInstance) namedQuery.uniqueResult();
+    }
+
 
     @SuppressWarnings("unchecked")
     public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) {
