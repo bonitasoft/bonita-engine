@@ -52,6 +52,7 @@
                 <value>org.bonitasoft.engine.core.process.comment.model.SComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SHumanComment</value>
                 <value>org.bonitasoft.engine.core.process.comment.model.SSystemComment</value>
+                <value>org.bonitasoft.engine.core.process.comment.model.archive.SAComment</value>
                 <value>org.bonitasoft.engine.profile.model.SProfile</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileEntry</value>
                 <value>org.bonitasoft.engine.profile.model.SProfileMember</value>
@@ -120,6 +121,7 @@
                 <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
                 <value>/org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>

@@ -13,14 +13,25 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.archive;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "arch_process_comment")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SAComment implements ArchivedPersistentObject {
 
 
@@ -32,7 +43,9 @@ public class SAComment implements ArchivedPersistentObject {
     public static final String CONTENT_KEY = "content";
     public static final String ARCHIVEDATE_KEY = "archiveDate";
     public static final String SOURCEOBJECTID_KEY = "sourceObjectId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private Long userId;
     private long processInstanceId;
