@@ -13,11 +13,19 @@
  **/
 package org.bonitasoft.engine.external.identity.mapping.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Emmanuel Duchastenier
@@ -26,6 +34,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "external_identity_mapping")
 public class SExternalIdentityMapping implements PersistentObject {
 
     public static final String ID_KEY = "id";
@@ -34,15 +46,20 @@ public class SExternalIdentityMapping implements PersistentObject {
     public static final String GROUP_ID_KEY = "groupId";
     public static final String ROLE_ID_KEY = "roleId";
     public static final String EXTERNAL_ID_KEY = "externalId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private String kind;
     private String externalId;
     private long userId = -1;
     private long groupId = -1;
     private long roleId = -1;
+    @Transient
     private transient String displayNamePart1;
+    @Transient
     private transient String displayNamePart2;
+    @Transient
     private transient String displayNamePart3;
 
     public SExternalIdentityMapping(final String externalId) {

@@ -807,7 +807,6 @@
                 <!-- identity -->
                 <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
                 <!-- external identity -->
-                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
                 <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
                 <!-- document -->
                 <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
@@ -987,6 +986,7 @@
                 <value>org.bonitasoft.engine.identity.model.SUser</value>
                 <value>org.bonitasoft.engine.identity.model.SUserLogin</value>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+                <value>org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActor</value>
                 <value>org.bonitasoft.engine.actor.mapping.model.SActorMember</value>
                 <value>org.bonitasoft.engine.business.application.model.SApplication</value>
