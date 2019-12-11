@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 
@@ -26,14 +29,16 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusin
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("proc_simple_ref")
 public class SAProcessSimpleRefBusinessDataInstance extends SASimpleRefBusinessDataInstance {
-
+    @Column(name = "orig_proc_inst_id")
     private long processInstanceId;
 
     @Override
     public SRefBusinessDataInstance toSRefBusinessDataInstance() {
         SProcessSimpleRefBusinessDataInstance refBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
-        refBusinessDataInstance.setId(sourceObjectId);
+        refBusinessDataInstance.setId(getSourceObjectId());
         refBusinessDataInstance.setTenantId(tenantId);
         refBusinessDataInstance.setName(getName());
         refBusinessDataInstance.setDataClassName(getDataClassName());

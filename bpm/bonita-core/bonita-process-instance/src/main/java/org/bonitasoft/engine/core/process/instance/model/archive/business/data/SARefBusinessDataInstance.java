@@ -13,23 +13,62 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Emmanuel Duchastenier
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class SARefBusinessDataInstance extends SAPersistenceObjectImpl {
+@Entity
+@Filter(name = "tenantFilter")
+@Table(name = "arch_ref_biz_data_inst")
+@IdClass(PersistentObjectId.class)
+@DiscriminatorColumn(name = "kind")
+public abstract class SARefBusinessDataInstance implements ArchivedPersistentObject {
 
+    @Id
+    protected long id;
+    @Id
+    protected long tenantId;
     private String name;
+    @Column(name = "data_classname")
     private String dataClassName;
+
+    @Override
+    public long getSourceObjectId() {
+        // WARNING
+        // There is no column sourceObjectId, return the id of the column
+        // This is an error. we should have this column
+        return getId();
+    }
+
+    @Override
+    public long getArchiveDate() {
+        //There is no archiveDate column
+        return 0;
+    }
+
+    public void setSourceObjectId(long id) {
+        //Nothing to do, not persisted
+    }
+
+    public void setArchiveDate(long id) {
+        //Nothing to do, not persisted
+    }
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {

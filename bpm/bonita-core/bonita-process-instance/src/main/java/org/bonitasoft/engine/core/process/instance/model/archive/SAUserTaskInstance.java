@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,6 +30,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("user")
 public class SAUserTaskInstance extends SAHumanTaskInstance {
 
     public SAUserTaskInstance(final SUserTaskInstance sUserTaskInstance) {
@@ -36,11 +41,6 @@ public class SAUserTaskInstance extends SAHumanTaskInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.USER_TASK;
-    }
-
-    @Override
-    public String getKind() {
-        return "user";
     }
 
     @Override

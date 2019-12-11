@@ -13,22 +13,36 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 
 @Data
 @NoArgsConstructor
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Entity
+@Table(name = "arch_connector_instance")
 public class SAConnectorInstance implements ArchivedPersistentObject {
 
-    String FLOWNODE_TYPE = "flowNode";
-
-    String PROCESS_TYPE = "process";
+    private static final String FLOWNODE_TYPE = "flowNode";
+    private static final String PROCESS_TYPE = "process";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private long archiveDate;
     private long sourceObjectId;
@@ -36,6 +50,7 @@ public class SAConnectorInstance implements ArchivedPersistentObject {
     private long containerId;
     private String connectorId;
     private String version;
+    @Enumerated(EnumType.STRING)
     private ConnectorEvent activationEvent;
     private String state;
     private String containerType;

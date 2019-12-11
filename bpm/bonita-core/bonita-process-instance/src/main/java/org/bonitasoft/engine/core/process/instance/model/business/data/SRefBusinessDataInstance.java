@@ -41,7 +41,6 @@ public abstract class SRefBusinessDataInstance implements PersistentObject {
     private long id;
     @Id
     private long tenantId;
-    @Column
     private String name;
     @Column(name = "data_classname")
     private String dataClassName;

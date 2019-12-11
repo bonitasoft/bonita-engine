@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +26,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("intermediateThrowEvent")
 public class SAIntermediateThrowEventInstance extends SAThrowEventInstance {
     public SAIntermediateThrowEventInstance(final SIntermediateThrowEventInstance sIntermediateThrowEventInstance) {
         super(sIntermediateThrowEventInstance);
@@ -31,11 +36,6 @@ public class SAIntermediateThrowEventInstance extends SAThrowEventInstance {
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.INTERMEDIATE_THROW_EVENT;
-    }
-
-    @Override
-    public String getKind() {
-        return "intermediateThrowEvent";
     }
 
     @Override

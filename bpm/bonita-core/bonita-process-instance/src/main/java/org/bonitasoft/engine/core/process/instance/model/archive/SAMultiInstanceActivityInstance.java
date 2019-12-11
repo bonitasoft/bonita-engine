@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,6 +30,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("multi")
 public class SAMultiInstanceActivityInstance extends SAActivityInstance {
 
     private boolean sequential;
@@ -33,8 +39,11 @@ public class SAMultiInstanceActivityInstance extends SAActivityInstance {
     private String loopDataOutputRef;
     private String dataInputItemRef;
     private String dataOutputItemRef;
+    @Column(name = "nbActiveInst")
     private int numberOfActiveInstances;
+    @Column(name = "nbCompletedInst")
     private int numberOfCompletedInstances;
+    @Column(name = "nbTerminatedInst")
     private int numberOfTerminatedInstances;
     private int loopCardinality;
 
@@ -60,11 +69,6 @@ public class SAMultiInstanceActivityInstance extends SAActivityInstance {
         return numberOfActiveInstances + numberOfCompletedInstances + numberOfTerminatedInstances;
     }
 
-
-    @Override
-    public String getKind() {
-        return "multi";
-    }
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
