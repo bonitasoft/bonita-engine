@@ -16,15 +16,25 @@ package org.bonitasoft.engine.core.process.instance.model.event.handling;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
+@Entity
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@Table(name = "message_instance")
 public class SMessageInstance implements PersistentObject {
 
+    @Id
     private long id;
+    @Id
     private long tenantId;
     private String messageName;
     private String targetProcess;

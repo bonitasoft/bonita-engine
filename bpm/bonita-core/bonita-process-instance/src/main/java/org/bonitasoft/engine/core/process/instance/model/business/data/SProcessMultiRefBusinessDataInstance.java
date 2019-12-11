@@ -17,13 +17,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+import java.util.List;
+
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("proc_multi_ref")
 public class SProcessMultiRefBusinessDataInstance extends SMultiRefBusinessDataInstance {
+
+    @ElementCollection
+    @CollectionTable(name = "multi_biz_data", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id"), @JoinColumn(name = "tenantid", referencedColumnName = "tenantid")})
+    @OrderColumn(name = "idx")
+    @Column(name = "data_id")
+    private List<Long> dataIds;
+
+    @Column(name = "proc_inst_id")
     private long processInstanceId;
 
 }

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletion
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SAbstractConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
@@ -84,7 +85,7 @@ public interface ConnectorInstanceService {
      * @param state
      * @throws SConnectorInstanceModificationException
      */
-    void setState(SConnectorInstance sConnectorInstance, String state) throws SConnectorInstanceModificationException;
+    void setState(SAbstractConnectorInstance sConnectorInstance, String state) throws SConnectorInstanceModificationException;
 
     /**
      * Defines the exception associated to the connector failure

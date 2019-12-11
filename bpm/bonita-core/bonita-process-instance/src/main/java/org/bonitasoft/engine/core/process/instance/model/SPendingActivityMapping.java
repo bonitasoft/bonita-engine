@@ -18,6 +18,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
+
 
 /**
  * Used to get pending activities of a user.
@@ -27,19 +32,25 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * When the activity is created we insert one or more of this object:
  * - if the activity is not filtered we insert one of them for each actor of the activity with inside the actorId
  * - if the activity is filtered we execute those filter and insert a one of them for each user that is filtered
- * 
+ *
  * @author Baptiste Mesta
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "pending_mapping")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
 public class SPendingActivityMapping implements PersistentObject {
 
     public static final String ACTOR_ID = "actorId";
     public static final String ACTIVITY_ID = "activityId";
     public static final String USER_ID = "userId";
+    @Id
     private long id;
+    @Id
     private long tenantId;
     /**
      * the id of the activity

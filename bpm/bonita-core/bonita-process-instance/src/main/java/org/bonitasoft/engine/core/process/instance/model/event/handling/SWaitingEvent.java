@@ -13,10 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 /**
  * @author Zhao Na
@@ -25,20 +31,29 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Filter(name = "tenantFilter")
+@IdClass(PersistentObjectId.class)
+@Table(name = "waiting_event")
+@DiscriminatorColumn(name = "kind")
 public abstract class SWaitingEvent implements PersistentObject {
 
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Enumerated(EnumType.STRING)
     private SBPMEventType eventType;
     private String processName;
-    private String flowNodeName;
-    private long flowNodeDefinitionId;
     private long processDefinitionId;
-    private long rootProcessInstanceId = -1;
+    private long flowNodeDefinitionId;
+    private String flowNodeName;
+    private long subProcessId = -1;
     private long parentProcessInstanceId = -1;
+    private long rootProcessInstanceId = -1;
     private long flowNodeInstanceId = -1;
     private boolean active = true;
-    private long subProcessId = -1;
 
     public SWaitingEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
                              final String flowNodeName) {

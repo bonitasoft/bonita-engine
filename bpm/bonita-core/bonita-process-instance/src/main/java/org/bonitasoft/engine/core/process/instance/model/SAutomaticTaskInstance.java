@@ -18,12 +18,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Baptiste Mesta
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("auto")
 public class SAutomaticTaskInstance extends SActivityInstance {
 
     public SAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,

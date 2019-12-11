@@ -17,12 +17,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SSimpleRefBusinessDataInstance extends SRefBusinessDataInstance {
+    @Column(name = "data_id")
     private Long dataId;
 }

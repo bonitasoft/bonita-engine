@@ -16,8 +16,6 @@ package org.bonitasoft.engine.core.connector.impl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +31,13 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletion
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.model.SAbstractConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -85,7 +82,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void setState(final SConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
+    public void setState(final SAbstractConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SConnectorInstance.STATE_KEY, state);
         try {

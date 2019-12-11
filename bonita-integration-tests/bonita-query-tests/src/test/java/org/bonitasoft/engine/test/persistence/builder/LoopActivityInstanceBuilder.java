@@ -11,20 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.business.data;
+package org.bonitasoft.engine.test.persistence.builder;
 
-import java.util.List;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+public class LoopActivityInstanceBuilder extends FlowNodeInstanceBuilder {
 
-/**
- * @author Matthieu Chaffotte
- */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class SMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
-    public abstract List<Long> getDataIds();
+
+    public static LoopActivityInstanceBuilder aLoopActivity() {
+        return new LoopActivityInstanceBuilder();
+    }
+
+    @Override
+    LoopActivityInstanceBuilder getThisBuilder() {
+        return this;
+    }
+
+    @Override
+    SLoopActivityInstance _build() {
+        final SLoopActivityInstance loopActivityInstance = new SLoopActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
+        loopActivityInstance.setLoopCounter(loopCounter);
+        return loopActivityInstance;
+    }
 }

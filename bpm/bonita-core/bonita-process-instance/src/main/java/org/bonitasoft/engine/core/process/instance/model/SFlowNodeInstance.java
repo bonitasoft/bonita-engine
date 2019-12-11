@@ -19,6 +19,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
+
+import javax.persistence.*;
 
 /**
  * @author Feng Hui
@@ -28,14 +32,34 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "flownode_instance")
+@IdClass(PersistentObjectId.class)
+@Filter(name = "tenantFilter")
+@DiscriminatorColumn(name = "kind")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class SFlowNodeInstance implements PersistentObject {
 
+    @Id
     private long id;
+    @Id
     private long tenantId;
-    private String name;
+    private long flowNodeDefinitionId;
     private long rootContainerId;
     private long parentContainerId;
+    private String name;
+    private String displayName;
+    private String displayDescription;
+    private int stateId;
+    private String stateName;
+    @Column(name = "prev_state_id")
+    private int previousStateId;
+    private boolean terminal;
+    private boolean stable;
+    @Enumerated(EnumType.STRING)
     private SStateCategory stateCategory = SStateCategory.NORMAL;
+    private long reachedStateDate;
+    private long lastUpdateDate;
     //process definition id
     private long logicalGroup1;
     //root process instance id
@@ -44,28 +68,22 @@ public abstract class SFlowNodeInstance implements PersistentObject {
     private long logicalGroup3;
     //parent process instance id
     private long logicalGroup4;
-    private String description;
-    private boolean terminal;
-    private boolean stable;
-    private int stateId;
-    private String stateName;
-    private int previousStateId;
-    private long reachedStateDate;
-    private long lastUpdateDate;
-    private String displayName;
-    private String displayDescription;
     private int tokenCount = 0;
-    private int loopCounter;
+    private String description;
+    @Column(name = "loop_counter")
+    protected int loopCounter;
     /**
      * id of the user who originally executed the flow node
      */
+    @Column
     private long executedBy;
     /**
      * id of the user (delegate) who executed the flow node for the original executer
      */
+    @Column
     private long executedBySubstitute;
+    @Column(name = "state_executing")
     private boolean stateExecuting;
-    private long flowNodeDefinitionId;
 
     public SFlowNodeInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
                                  final long logicalGroup1, final long logicalGroup2) {

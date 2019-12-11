@@ -18,12 +18,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("intermediateCatchEvent")
 public class SIntermediateCatchEventInstance extends SCatchEventInstance {
     public SIntermediateCatchEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
                                                final long logicalGroup1, final long logicalGroup2) {

@@ -18,6 +18,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -25,6 +28,8 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("manual")
 public class SManualTaskInstance extends SHumanTaskInstance {
     public SManualTaskInstance
             (final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,

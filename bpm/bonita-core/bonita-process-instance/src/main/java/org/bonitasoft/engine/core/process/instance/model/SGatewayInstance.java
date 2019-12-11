@@ -20,14 +20,20 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 
+import javax.persistence.*;
+
 /**
  * @author Feng Hui
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("gate")
 public class SGatewayInstance extends SFlowNodeInstance {
 
+    @Column
+    @Enumerated(EnumType.STRING)
     private SGatewayType gatewayType;
     private String hitBys = "";
 

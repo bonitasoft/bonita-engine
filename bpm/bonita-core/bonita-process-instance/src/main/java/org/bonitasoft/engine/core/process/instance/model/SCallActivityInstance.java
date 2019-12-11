@@ -18,12 +18,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Elias Ricken de Medeiros
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("call")
 public class SCallActivityInstance extends SActivityInstance {
 
     public SCallActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,

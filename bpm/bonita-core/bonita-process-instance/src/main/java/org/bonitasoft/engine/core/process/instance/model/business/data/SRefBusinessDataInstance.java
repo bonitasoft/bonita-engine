@@ -13,20 +13,37 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Matthieu Chaffotte
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Filter(name = "tenantFilter")
+@Table(name = "ref_biz_data_inst")
+@IdClass(PersistentObjectId.class)
+@DiscriminatorColumn(name = "kind")
 public abstract class SRefBusinessDataInstance implements PersistentObject {
-
+    @Id
     private long id;
+    @Id
     private long tenantId;
+    @Column
     private String name;
+    @Column(name = "data_classname")
     private String dataClassName;
 
 }

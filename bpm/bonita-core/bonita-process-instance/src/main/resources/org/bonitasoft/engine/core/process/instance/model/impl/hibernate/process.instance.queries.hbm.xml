@@ -2058,7 +2058,7 @@
 
     <query name="getNumberOfDataOfMultiRefBusinessData">
         SELECT ref.dataIds.size
-        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance AS
+        FROM org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance AS
         ref
         WHERE ref.name = :name
         AND ref.processInstanceId = :processInstanceId

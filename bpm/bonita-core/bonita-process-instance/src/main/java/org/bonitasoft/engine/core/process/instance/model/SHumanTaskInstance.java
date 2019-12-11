@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,13 +25,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public abstract class SHumanTaskInstance extends SActivityInstance {
 
     private long actorId;
     private long assigneeId;
     private Long expectedEndDate;
-    private STaskPriority priority;
     private long claimedDate;
+    private STaskPriority priority;
 
 
     public SHumanTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,

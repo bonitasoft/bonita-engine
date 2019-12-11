@@ -14,10 +14,13 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.core.process.definition.model.SGatewayType.PARALLEL;
 import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
 import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
 import static org.bonitasoft.engine.test.persistence.builder.BoundaryInstanceBuilder.aBoundary;
 import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.LoopActivityInstanceBuilder.aLoopActivity;
 import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
@@ -26,16 +29,25 @@ import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBui
 import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +77,9 @@ public class FlowNodeInstanceTest {
 
     @Inject
     private FlowNodeInstanceRepository repository;
+
+    @Inject
+    private JdbcTemplate jdbcTemplate;
 
     @Before
     public void before() {
@@ -440,6 +455,39 @@ public class FlowNodeInstanceTest {
         assertThat(gate1).isNull();
     }
 
+    @Test
+    public void should_get_flownodeInstances_by_stateCategory() {
+        // Given
+        final SFlowNodeInstance sFlowNodeInstance = repository.add(aUserTask().withName("executingTask").withStateExecuting(true).build());
+        repository.flush();
+        final String stateCategory = jdbcTemplate.queryForObject("select stateCategory from flownode_instance", String.class);
+        final String priority = jdbcTemplate.queryForObject("select priority from flownode_instance", String.class);
+        assertThat(stateCategory).isEqualTo("NORMAL");
+        assertThat(priority).isEqualTo("2");
+    }
+
+
+    @Test
+    public void should_have_loopCounter_on_loop_Activity() {
+        // Given
+        final SLoopActivityInstance sLoopActivityInstance = (SLoopActivityInstance) repository.add(aLoopActivity().withLoopCounter(6).build());
+        repository.flush();
+        final int loopCounter = jdbcTemplate.queryForObject("select loop_counter from flownode_instance", Integer.class);
+        repository.getById(sLoopActivityInstance.getId());
+        assertThat(loopCounter).isEqualTo(6);
+        assertThat(sLoopActivityInstance.getLoopCounter()).isEqualTo(6);
+    }
+
+    @Test
+    public void should_get_gateway_instances_by_gateway_type() {
+        // Given
+        final SGatewayInstance gatewayInstance = repository.add(aGatewayInstanceBuilder().withGatewayType(PARALLEL).build());
+        repository.flush();
+        final String gatewayType = jdbcTemplate.queryForObject("select gatewayType from flownode_instance", String.class);
+        assertThat(gatewayType).isEqualTo("PARALLEL");
+        assertThat(gatewayInstance.getGatewayType()).isEqualTo(PARALLEL);
+    }
+
     private void buildAndAddAssignedTasks() {
         // Tasks OK assigned to John
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
@@ -541,5 +589,214 @@ public class FlowNodeInstanceTest {
         return repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true)
                 .withTerminal(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
+
+
+    @Test
+    public void should_save_and_get_SAutomaticTaskInstance(){
+        SFlowNodeInstance entity = new SAutomaticTaskInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("auto");
+    }
+
+    @Test
+    public void should_save_and_get_SCallActivityInstance(){
+        SFlowNodeInstance entity = new SCallActivityInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("call");
+    }
+
+    @Test
+    public void should_save_and_get_SGatewayInstance(){
+        SFlowNodeInstance entity = new SGatewayInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("gate");
+    }
+
+
+    @Test
+    public void should_save_and_get_SLoopActivityInstance(){
+        SFlowNodeInstance entity = new SLoopActivityInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("loop");
+    }
+
+    @Test
+    public void should_save_and_get_SManualTaskInstance(){
+        SFlowNodeInstance entity = new SManualTaskInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("manual");
+    }
+
+    @Test
+    public void should_save_and_get_SMultiInstanceActivityInstance(){
+        SFlowNodeInstance entity = new SMultiInstanceActivityInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("multi");
+    }
+
+    @Test
+    public void should_save_and_get_SReceiveTaskInstance(){
+        SFlowNodeInstance entity = new SReceiveTaskInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("receive");
+    }
+
+    @Test
+    public void should_save_and_get_SSendTaskInstance(){
+        SFlowNodeInstance entity = new SSendTaskInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("send");
+    }
+
+    @Test
+    public void should_save_and_get_SSubProcessActivityInstance(){
+        SFlowNodeInstance entity = new SSubProcessActivityInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("subProc");
+    }
+
+    @Test
+    public void should_save_and_get_SUserTaskInstance(){
+        SFlowNodeInstance entity = new SUserTaskInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("user");
+    }
+
+
+    @Test
+    public void should_save_and_get_SBoundaryEventInstance(){
+        SFlowNodeInstance entity = new SBoundaryEventInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("boundaryEvent");
+    }
+    @Test
+    public void should_save_and_get_SEndEventInstance(){
+        SFlowNodeInstance entity = new SEndEventInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("endEvent");
+    }
+    @Test
+    public void should_save_and_get_SIntermediateCatchEventInstance(){
+        SFlowNodeInstance entity = new SIntermediateCatchEventInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("intermediateCatchEvent");
+    }
+    @Test
+    public void should_save_and_get_SIntermediateThrowEventInstance(){
+        SFlowNodeInstance entity = new SIntermediateThrowEventInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("intermediateThrowEvent");
+    }
+    @Test
+    public void should_save_and_get_SStartEventInstance(){
+        SFlowNodeInstance entity = new SStartEventInstance();
+        SFlowNodeInstance flowNode = repository.add(entity);
+        repository.flush();
+
+        PersistentObject flowNodeFromQuery = repository.selectOne("getSFlowNodeInstanceById", pair("id", flowNode.getId()));
+        Map<String, Object> flowNodeAsMap = jdbcTemplate.queryForMap("SELECT * FROM flownode_instance where id = " + flowNode.getId());
+
+        assertThat(flowNodeFromQuery).isEqualTo(flowNode);
+        assertThat(flowNodeAsMap.get("KIND")).isEqualTo("startEvent");
+    }
+
+    @Test
+    public void should_save_and_get_STimerEventTriggerInstance() {
+        STimerEventTriggerInstance entity = new STimerEventTriggerInstance();
+        entity.setEventInstanceName("eventInstanceName");
+        STimerEventTriggerInstance trigger = repository.add(entity);
+        repository.flush();
+
+        PersistentObject triggerFromQuery = repository.selectOne("getEventTriggerInstanceById", pair("id", trigger.getId()));
+        Map<String, Object> triggerAsMap = jdbcTemplate.queryForMap("SELECT * FROM event_trigger_instance where id = " + trigger.getId());
+
+        assertThat(triggerFromQuery).isEqualTo(trigger);
+        assertThat(triggerAsMap.get("EVENTINSTANCENAME")).isEqualTo("eventInstanceName");
+    }
+
 
 }

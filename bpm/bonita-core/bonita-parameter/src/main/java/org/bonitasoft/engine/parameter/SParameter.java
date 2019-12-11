@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -37,9 +38,9 @@ public class SParameter implements PersistentObject {
     @Id
     private long tenantId;
 
-    @Column
     private String name;
-    @Column(columnDefinition = "materialized_clob")
+    @Column
+    @Type(type = "materialized_clob")
     private String value;
     @Column(name = "process_id")
     private long processDefinitionId;

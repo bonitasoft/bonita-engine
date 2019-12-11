@@ -18,12 +18,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * @author Baptiste Mesta
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("multi")
 public class SMultiInstanceActivityInstance extends SActivityInstance {
 
     private boolean sequential;
@@ -31,8 +37,11 @@ public class SMultiInstanceActivityInstance extends SActivityInstance {
     private String loopDataOutputRef;
     private String dataInputItemRef;
     private String dataOutputItemRef;
+    @Column(name = "nbActiveInst")
     private int numberOfActiveInstances;
+    @Column(name = "nbCompletedInst")
     private int numberOfCompletedInstances;
+    @Column(name = "nbTerminatedInst")
     private int numberOfTerminatedInstances;
     private int loopCardinality;
 
