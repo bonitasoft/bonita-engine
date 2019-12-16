@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -157,22 +158,26 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName, String.valueOf(groupName)));
             if (jobDetail == null) {
-                logger.debug("Re-execute job {} named {} of group {}  where its jobs details were deleted", jobId, jobName, groupName);
-                // no more quartz job (should not happen: create job details and trigger
+                logger.debug("Re-execute job {} named {} of group {}, there was no quartz job and no triggers left (one shot triggered that failed and was deleted)", jobId, jobName, groupName);
+                // The quartz job itself was deleted because the trigger that failed was the only one and was a one shot trigger
                 scheduler.scheduleJob(createJobDetails(jobId, groupName, jobName, disallowConcurrentExecution),
                         createOneShotTrigger(groupName, jobName, delayInMillis));
             } else {
                 List<? extends org.quartz.Trigger> triggersOfJob = scheduler.getTriggersOfJob(jobDetail.getKey());
-                //no more trigger or more than 1 trigger or current trigger may fire again: create a new one
-                if (triggersOfJob.size() != 1 || triggersOfJob.get(0).mayFireAgain()) {
-                    logger.debug("Re-execute job {} named {} of group {}  with a new one shot trigger, because existing triggers might fire again"
+                // We retrieve the first trigger that will not fire again
+                Optional<? extends org.quartz.Trigger> firstTriggerThatWillNotFire = triggersOfJob.stream().filter(t -> !t.mayFireAgain()).findFirst();
+                if (firstTriggerThatWillNotFire.isPresent()) {
+                    // if there is one, we reschedule the job by replacing it
+                    logger.debug("Re-execute job {} named {} of group {}, reuse existing trigger {} because it will not fire again." +
+                                    "(most likely a one shot trigger that failed and was not correctly deleted)"
+                            , jobId, jobName, groupName, firstTriggerThatWillNotFire.get());
+                    scheduler.rescheduleJob(firstTriggerThatWillNotFire.get().getKey(), createOneShotTrigger(groupName, jobName, delayInMillis));
+                }else {
+                    // in the other case we create a new trigger to schedule the job (it means other triggers are likely cron triggers)
+                    logger.debug("Re-execute job {} named {} of group {}, create a new trigger for that. " +
+                                    "(The job that failed was most likely triggered by a cron trigger)"
                             , jobId, jobName, groupName);
                     scheduler.scheduleJob(createOneShotTrigger(groupName, jobName, delayInMillis));
-                } else {
-                    // trigger will not fire again: create a new one shot trigger
-                    logger.debug("Re-execute job {} named {} of group {}  by rescheduling it, because existing triggers will not fire again"
-                            , jobId, jobName, groupName);
-                    scheduler.rescheduleJob(triggersOfJob.get(0).getKey(), createOneShotTrigger(groupName, jobName, delayInMillis));
                 }
             }
             if (useOptimization) {
