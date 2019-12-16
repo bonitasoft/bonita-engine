@@ -10,7 +10,7 @@
 	</query>
 
 	<query name="getNumberOfSProfile">
-		SELECT COUNT(profile)
+		SELECT COUNT(profile.id)
 		FROM org.bonitasoft.engine.profile.model.SProfile AS profile
 	</query>
 
@@ -27,14 +27,14 @@
 	</query>
 	
 	<query name="getNumberOfSProfilewithSProfileEntry">
-		SELECT COUNT(DISTINCT profile)
+		SELECT COUNT(DISTINCT profile.id)
 		FROM org.bonitasoft.engine.profile.model.SProfile AS profile ,
 		org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
 		WHERE profile.id = profileentry.profileId
 	</query>
 
 	<query name="getNumberOfSProfileEntry">
-		SELECT COUNT(profileentry)
+		SELECT COUNT(profileentry.id)
 		FROM org.bonitasoft.engine.profile.model.SProfileEntry AS profileentry
 	</query>
 
@@ -284,7 +284,7 @@
 	</query>
 
 	<query name="getNumberOfProfileMemberOfProfile">
-		SELECT COUNT(pm)
+		SELECT COUNT(pm.id)
 		FROM org.bonitasoft.engine.profile.model.SProfileMember AS pm
 		WHERE pm.profileId = :profileId
 	</query>

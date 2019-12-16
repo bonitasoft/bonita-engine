@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageWithContent;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

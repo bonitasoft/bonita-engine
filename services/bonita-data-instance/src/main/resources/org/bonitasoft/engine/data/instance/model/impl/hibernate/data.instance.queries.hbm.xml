@@ -26,7 +26,7 @@
 
 
     <query name="getNumberOfDataInstancesForContainer">
-        SELECT count(dataInstance)
+        SELECT count(dataInstance.id)
         FROM org.bonitasoft.engine.data.instance.model.SDataInstance AS dataInstance
         WHERE dataInstance.containerId = :containerId
         AND dataInstance.containerType = :containerType

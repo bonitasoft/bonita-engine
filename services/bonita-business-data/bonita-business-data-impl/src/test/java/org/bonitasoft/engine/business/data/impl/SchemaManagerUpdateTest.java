@@ -35,7 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class SchemaManagerTest {
+public class SchemaManagerUpdateTest {
 
     @Autowired
     @Qualifier("jpa-test-configuration")

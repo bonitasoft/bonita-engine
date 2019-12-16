@@ -16,26 +16,23 @@ package org.bonitasoft.engine.persistence;
 import java.io.Serializable;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.MaterializedClobType;
 import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
-public class XMLType
-        extends AbstractSingleColumnStandardBasicType<Serializable> {
+public class XMLType extends AbstractSingleColumnStandardBasicType<Serializable> {
 
     public static final XMLType INSTANCE = new XMLType();
 
     public XMLType() {
         super(ClobTypeDescriptor.DEFAULT, new XMLTypeDescriptor());
     }
- 
+
     public String getName() {
         return "xml_blob";
     }
- 
+
     @Override
     protected boolean registerUnderJavaType() {
         return true;
     }
- 
+
 }

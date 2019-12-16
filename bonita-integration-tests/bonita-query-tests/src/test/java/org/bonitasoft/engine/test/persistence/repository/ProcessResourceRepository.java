@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.SBARResourceLight;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

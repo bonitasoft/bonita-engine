@@ -15,22 +15,28 @@ package org.bonitasoft.engine.persistence;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.hibernate.cfg.Configuration;
+import org.bonitasoft.engine.services.Vendor;
+import org.hibernate.SessionFactory;
 
 /**
  * @author Celine Souchet
  */
 public interface HibernateConfigurationProvider {
 
-    Configuration getConfiguration() throws ConfigurationException;
-
-    HibernateResourcesConfigurationProvider getResources();
-
     Map<String, String> getClassAliasMappings();
     
     List<String> getMappingExclusions();
 
     Map<String, String> getCacheQueries();
+
+    void bootstrap(Properties extraHibernateProperties);
+
+    Vendor getVendor();
+
+    SessionFactory getSessionFactory();
+
+    List<Class<? extends PersistentObject>> getMappedClasses();
 
 }

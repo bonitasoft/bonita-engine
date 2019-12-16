@@ -16,21 +16,23 @@ package org.bonitasoft.engine.business.data.impl;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.jpa.boot.scan.spi.ScanOptions;
-import org.hibernate.jpa.boot.scan.spi.ScanResult;
-import org.hibernate.jpa.boot.spi.ClassDescriptor;
-import org.hibernate.jpa.boot.spi.MappingFileDescriptor;
-import org.hibernate.jpa.boot.spi.PackageDescriptor;
-import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
+import org.hibernate.boot.archive.scan.spi.ClassDescriptor;
+import org.hibernate.boot.archive.scan.spi.MappingFileDescriptor;
+import org.hibernate.boot.archive.scan.spi.PackageDescriptor;
+import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
+import org.hibernate.boot.archive.scan.spi.ScanOptions;
+import org.hibernate.boot.archive.scan.spi.ScanParameters;
+import org.hibernate.boot.archive.scan.spi.ScanResult;
+import org.hibernate.boot.archive.scan.spi.Scanner;
 
 /**
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public class InactiveScanner implements org.hibernate.jpa.boot.scan.spi.Scanner {
+public class InactiveScanner implements Scanner {
 
     @Override
-    public ScanResult scan(PersistenceUnitDescriptor persistenceUnit, ScanOptions options) {
+    public ScanResult scan(ScanEnvironment environment, ScanOptions options, ScanParameters params) {
         return new ScanResult() {
 
             @Override

@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.data.SchemaManager;
@@ -24,11 +24,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.tool.hbm2ddl.Target;
+import org.hibernate.tool.schema.TargetType;
 
 /**
  * @author Matthieu Chaffotte
@@ -48,15 +50,15 @@ public class SchemaManagerUpdate implements SchemaManager {
         }
     }
 
-    private Configuration buildConfiguration(final Set<String> managedClasses) {
-        final Configuration cfg = new Configuration();
-        final Properties properties = new Properties();
-        properties.putAll(configuration);
+    private Metadata buildConfiguration(final Set<String> managedClasses) {
+        MetadataSources metadata = new MetadataSources(
+                new StandardServiceRegistryBuilder()
+                        .applySettings(configuration)
+                        .build());
         for (final String entity : managedClasses) {
-            cfg.addAnnotatedClass(getMappedClass(entity));
+            metadata.addAnnotatedClass(getMappedClass(entity));
         }
-        cfg.setProperties(properties);
-        return cfg;
+        return metadata.buildMetadata();
     }
 
 
@@ -66,8 +68,8 @@ public class SchemaManagerUpdate implements SchemaManager {
         }
         try {
             return ReflectHelper.classForName(className);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new MappingException("entity class not found: " + className, cnfe);
+        } catch (final ClassNotFoundException notFound) {
+            throw new MappingException("entity class not found: " + className, notFound);
         }
     }
 
@@ -75,18 +77,22 @@ public class SchemaManagerUpdate implements SchemaManager {
     @SuppressWarnings("unchecked")
     public List<Exception> drop(final Set<String> managedClasses) {
         log.info("Dropping classes: {}", managedClasses);
-        final SchemaExport export = new SchemaExport(buildConfiguration(managedClasses));
-        export.drop(Target.EXPORT);
+
+        SchemaExport schemaExport = new SchemaExport();
+        schemaExport.drop(EnumSet.of(TargetType.DATABASE), buildConfiguration(managedClasses));
+
         log.info("Drop operation done");
-        return export.getExceptions();
+        return schemaExport.getExceptions();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Exception> update(final Set<String> managedClasses) {
         log.info("Updating classes: {}", managedClasses);
-        final SchemaUpdate schemaUpdate = new SchemaUpdate(buildConfiguration(managedClasses));
-        schemaUpdate.execute(Target.EXPORT);
+
+        final SchemaUpdate schemaUpdate = new SchemaUpdate();
+        schemaUpdate.execute(EnumSet.of(TargetType.DATABASE), buildConfiguration(managedClasses));
+
         log.info("Update operation done");
         return schemaUpdate.getExceptions();
     }

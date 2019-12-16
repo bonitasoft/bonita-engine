@@ -13,24 +13,16 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
 
-import java.util.Iterator;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.hibernate.Filter;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.RootClass;
-import org.hibernate.stat.Statistics;
+import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,17 +40,11 @@ public class TenantHibernatePersistenceServiceTest {
     @Mock
     private DataSource datasource;
 
-    private final boolean enableWordSearch = true;
-
     @Mock
     private HibernateConfigurationProvider hbmConfigurationProvider;
 
-    private final char likeEscapeCharacter = ' ';
-
     @Mock
     private TechnicalLoggerService logger;
-
-    private final String name = "TenantHibernatePersistenceService";
 
     @Mock
     private SequenceManager sequenceManager;
@@ -67,121 +53,75 @@ public class TenantHibernatePersistenceServiceTest {
     private ReadSessionAccessor sessionAccessor;
 
     @Mock
-    private Session session;
+    Query<?> query;
 
-    private TenantHibernatePersistenceService tenantHibernatePersistenceService;
     private HibernateMetricsBinder metricsBinder = (sessionFactory) -> {
     };
 
+    private TenantHibernatePersistenceService tenantHibernatePersistenceService;
+
     @Before
-    public void before() throws ConfigurationException {
-        doReturn(mock(Filter.class)).when(session).enableFilter("tenantFilter");
-
-        final SessionFactory sessionFactory = mock(SessionFactory.class);
-        doReturn(mock(Statistics.class)).when(sessionFactory).getStatistics();
-        doReturn(session).when(sessionFactory).getCurrentSession();
-
-        final Iterator<PersistentClass> classMappingsIterator = singletonList((PersistentClass) new RootClass()).iterator();
-
-        final Configuration configuration = mock(Configuration.class);
-        doReturn(sessionFactory).when(configuration).buildSessionFactory();
-        doReturn(classMappingsIterator).when(configuration).getClassMappings();
-        doReturn(configuration).when(hbmConfigurationProvider).getConfiguration();
+    public void before() throws Exception {
+        doReturn(mock(SessionFactory.class)).when(hbmConfigurationProvider).getSessionFactory();
+        tenantHibernatePersistenceService = spy(
+                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor, hbmConfigurationProvider, null,
+                        ' ', logger, sequenceManager, datasource,
+                        true, null, metricsBinder));
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test
-    public final void selectList_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_empty() throws Exception {
+    public final void checkOrderByClause_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_empty() {
         // Given
-        buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", "");
-
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
+        doReturn("").when(query).getQueryString();
 
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test(expected = IllegalArgumentException.class)
-    public final void selectList_should_throw_exception_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT() throws Exception {
+    public final void checkOrderByClause_should_throw_exception_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT() {
         // Given
-        buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
-
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource,
-                enableWordSearch, null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
+        doReturn("").when(query).getQueryString();
 
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test
-    public final void selectList_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_no_checking_mode() throws Exception {
+    public final void checkOrderByClause_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_no_checking_mode() {
         // Given
-        buildQueryWithoutOrderByClause();
         System.clearProperty("sysprop.bonita.orderby.checking.mode");
-
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
+        doReturn("").when(query).getQueryString();
 
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test
-    public final void selectList_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_NONE() throws Exception {
+    public final void checkOrderByClause_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_NONE() {
         // Given
-        buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.NONE.name());
-
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
+        doReturn("").when(query).getQueryString();
 
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test
-    public final void selectList_should_log_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_WARNING() throws Exception {
+    public final void should_log_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_WARNING() throws Exception {
         // Given
-        buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.WARNING.name());
-
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
-                null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
+        // recreate the service because the checking mode is read at service creation:
+        tenantHibernatePersistenceService = spy(
+                new TenantHibernatePersistenceService("TenantHibernatePersistenceService", sessionAccessor, hbmConfigurationProvider, null,
+                        ' ', logger, sequenceManager, datasource,
+                        true, null, metricsBinder));
+        doReturn("").when(query).getQueryString();
 
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
 
         // Then
         verify(logger).log(AbstractHibernatePersistenceService.class,
@@ -189,30 +129,14 @@ public class TenantHibernatePersistenceServiceTest {
                 "Query '' does not contain 'ORDER BY' clause. It's better to modify your query to order the result, especially if you use the pagination.");
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
-     */
     @Test
-    public final void selectList_should_do_nothing_when_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT() throws Exception {
+    public final void checkOrderByClause_should_do_nothing_when_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT() {
         // Given
-        final Query query = mock(Query.class);
         doReturn("Order by").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(nullable(String.class));
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
 
-        tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource,
-                enableWordSearch, null, metricsBinder));
-        final SelectListDescriptor<?> selectDescriptor = mock(SelectListDescriptor.class);
-
         // When
-        tenantHibernatePersistenceService.selectList(selectDescriptor);
+        tenantHibernatePersistenceService.checkOrderByClause(query);
     }
 
-    private void buildQueryWithoutOrderByClause() {
-        final Query query = mock(Query.class);
-        doReturn("").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(nullable(String.class));
-    }
 }

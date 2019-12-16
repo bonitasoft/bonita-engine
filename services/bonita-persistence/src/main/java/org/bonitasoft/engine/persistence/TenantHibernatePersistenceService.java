@@ -30,7 +30,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleStateException;
 import org.hibernate.exception.LockAcquisitionException;
@@ -54,7 +54,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
             final char likeEscapeCharacter,
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder) throws SPersistenceException, ClassNotFoundException {
+            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder) throws Exception {
         super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;

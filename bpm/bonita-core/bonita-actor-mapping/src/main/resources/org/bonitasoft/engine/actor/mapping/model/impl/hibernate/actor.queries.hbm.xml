@@ -22,7 +22,7 @@
     </query>
 
     <query name="getNumberOfActorMembersOfActor">
-        SELECT COUNT(actormember)
+        SELECT COUNT(actormember.id)
         FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
         WHERE actormember.actorId = :actorId
     </query>
@@ -73,7 +73,7 @@
 
 
     <query name="getNumberOfUsersOfActor">
-        SELECT COUNT(user)
+        SELECT COUNT(user.id)
         FROM org.bonitasoft.engine.identity.model.SUser AS user,
         org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
         WHERE actormember.actorId = :actorId
@@ -81,7 +81,7 @@
     </query>
 
     <query name="getNumberOfRolesOfActor">
-        SELECT COUNT(role)
+        SELECT COUNT(role.id)
         FROM org.bonitasoft.engine.identity.model.SRole AS role,
         org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
         WHERE actormember.actorId = :actorId
@@ -90,7 +90,7 @@
     </query>
 
     <query name="getNumberOfGroupsOfActor">
-        SELECT COUNT(group_)
+        SELECT COUNT(group_.id)
         FROM org.bonitasoft.engine.identity.model.SGroup AS group_,
         org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
         WHERE actormember.actorId = :actorId
@@ -99,7 +99,7 @@
     </query>
 
     <query name="getNumberOfMembershipsOfActor">
-        SELECT COUNT(actormember)
+        SELECT COUNT(actormember.id)
         FROM org.bonitasoft.engine.actor.mapping.model.SActorMember AS actormember
         WHERE actormember.actorId = :actorId
         AND actormember.userId = -1

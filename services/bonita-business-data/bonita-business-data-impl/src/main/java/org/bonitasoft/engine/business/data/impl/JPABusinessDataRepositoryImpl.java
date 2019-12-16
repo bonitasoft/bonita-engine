@@ -51,6 +51,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
+import org.hibernate.QueryException;
 import org.hibernate.proxy.HibernateProxy;
 
 /**
@@ -286,6 +287,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         try {
             return findList(typedQuery, parameters, startIndex, maxResults);
+        } catch (final QueryException e) {
+            throw new IllegalArgumentException(e);
         } catch (final PersistenceException e) {
             throw new SRetryableException(e);
         }

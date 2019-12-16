@@ -13,7 +13,7 @@
 	</query>
 
 	<query name="getNumberOfLogs">
-		SELECT COUNT(log)
+		SELECT COUNT(log.id)
 		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 
@@ -28,7 +28,7 @@
 	</query>
 
 	<query name="getNumberOfSQueriableLog">
-		SELECT COUNT(log)
+		SELECT COUNT(log.id)
 		FROM org.bonitasoft.engine.queriablelogger.model.SQueriableLog AS log
 	</query>
 

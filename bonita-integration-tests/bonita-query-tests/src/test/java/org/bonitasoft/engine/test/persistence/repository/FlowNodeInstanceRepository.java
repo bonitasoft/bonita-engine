@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateC
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

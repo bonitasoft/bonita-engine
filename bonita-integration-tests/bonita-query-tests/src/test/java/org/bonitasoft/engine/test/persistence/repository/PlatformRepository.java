@@ -17,7 +17,7 @@ import java.util.Random;
 
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

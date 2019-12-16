@@ -8,7 +8,7 @@
 	</query>
 
 	<query name="getNumberOfSComment">
-		SELECT COUNT(comment)
+		SELECT COUNT(comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.SComment AS comment
 	</query>
 
@@ -26,7 +26,7 @@
 	</query>
 
 	<query name="getNumberOfSCommentwithSUser">
-		SELECT count(comment)
+		SELECT count(comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.SComment AS comment,
 		     org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE user.id = comment.userId
@@ -34,7 +34,7 @@
 
 	<!-- External Service Queries -->
 	<query name="getNumberOfSCommentSupervisedBy">
-		SELECT COUNT(DISTINCT comment)
+		SELECT COUNT(DISTINCT comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.SHumanComment AS comment,
 			 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor
 		WHERE (

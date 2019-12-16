@@ -295,63 +295,63 @@
 
 <!--	get number of -->
 	<query name="getNumberOfSUser">
-		SELECT COUNT(user)
+		SELECT COUNT(user.id)
 		FROM org.bonitasoft.engine.identity.model.SUser AS user
 	</query>
 
 	<query name="getNumberOfUsersByGroup">
-		SELECT COUNT(user_membership)
+		SELECT COUNT(user_membership.id)
 		FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 		WHERE user_membership.groupId = :groupId
 	</query>
 
 	<query name="getNumberOfUsersByRole">
-		SELECT COUNT(user_membership)
+		SELECT COUNT(user_membership.id)
 		FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 		WHERE user_membership.roleId = :roleId
 	</query>
 
 	<query name="getNumberOfUserMembership">
-		SELECT COUNT(user_membership)
+		SELECT COUNT(user_membership.id)
 		FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 	</query>
 
 	<query name="getNumberOfUserMembershipsOfUser">
-		SELECT COUNT(user_membership)
+		SELECT COUNT(user_membership.id)
 		FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 		WHERE user_membership.userId = :userId
 	</query>
 
 	<query name="getNumberOfUsersByMembership">
-		SELECT COUNT(user_membership)
+		SELECT COUNT(user_membership.id)
 		FROM org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 		WHERE user_membership.roleId = :roleId
 		AND user_membership.groupId = :groupId
 	</query>
 
 	<query name="getNumberOfSRole">
-		SELECT COUNT(role)
+		SELECT COUNT(role.id)
 		FROM org.bonitasoft.engine.identity.model.SRole AS role
 	</query>
 
 	<query name="getNumberOfSGroup">
-		SELECT COUNT(group_)
+		SELECT COUNT(group_.id)
 		FROM org.bonitasoft.engine.identity.model.SGroup AS group_
 	</query>
 
 	<query name="getNumberOfGroupChildren">
-		SELECT COUNT(group_)
+		SELECT COUNT(group_.id)
 		FROM org.bonitasoft.engine.identity.model.SGroup AS group_
 		WHERE group_.parentPath = :parentPath
 	</query>
 
 	<query name="getNumberOfCustomUserInfoDefinition">
-        SELECT COUNT(custom_usr_inf_def)
+        SELECT COUNT(custom_usr_inf_def.id)
         FROM org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition AS custom_usr_inf_def
     </query>
 
     <query name="getNumberOfSCustomUserInfoValue">
-        SELECT COUNT(custom_usr_inf_val)
+        SELECT COUNT(custom_usr_inf_val.id)
         FROM org.bonitasoft.engine.identity.model.SCustomUserInfoValue AS custom_usr_inf_val
     </query>
 
@@ -361,7 +361,7 @@
 	</query>
 
 	<query name="getNumberOfSUserwithSUserMembership">
-		SELECT COUNT(DISTINCT user)
+		SELECT COUNT(DISTINCT user.id)
 		FROM org.bonitasoft.engine.identity.model.SUser AS user,
 		     org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 		WHERE user.id = user_membership.userId

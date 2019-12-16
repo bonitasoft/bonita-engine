@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 
 /**

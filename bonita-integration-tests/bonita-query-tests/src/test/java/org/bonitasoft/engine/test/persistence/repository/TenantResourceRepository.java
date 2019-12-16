@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

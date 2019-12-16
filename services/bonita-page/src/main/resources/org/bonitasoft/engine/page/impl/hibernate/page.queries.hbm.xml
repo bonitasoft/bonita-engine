@@ -29,7 +29,7 @@
     </query>
 
     <query name="getNumberOfSPage">
-		SELECT COUNT(page)
+		SELECT COUNT(page.id)
 		FROM org.bonitasoft.engine.page.SPage AS page
 	</query>
 

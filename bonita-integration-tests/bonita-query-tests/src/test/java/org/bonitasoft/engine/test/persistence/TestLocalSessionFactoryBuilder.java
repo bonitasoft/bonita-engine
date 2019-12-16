@@ -21,8 +21,8 @@ import org.bonitasoft.engine.persistence.SQLServerInterceptor;
 import org.bonitasoft.engine.persistence.XMLType;
 import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 
 public class TestLocalSessionFactoryBuilder extends LocalSessionFactoryBean {
 

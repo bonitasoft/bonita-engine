@@ -16,7 +16,7 @@
 
 	<!-- Job Parameter -->
 	<query name="getNumberOfSJobParameter">
-		SELECT COUNT(jp)
+		SELECT COUNT(jp.id)
 		FROM org.bonitasoft.engine.scheduler.model.SJobParameter AS jp
 	</query>
 	<query name="getJobParameters">
@@ -27,7 +27,7 @@
 
 	<!-- Job Log -->
 	<query name="getNumberOfSJobLog">
-		SELECT COUNT(jl)
+		SELECT COUNT(jl.id)
 		FROM org.bonitasoft.engine.scheduler.model.SJobLog AS jl
 	</query>
 

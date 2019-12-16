@@ -15,7 +15,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
