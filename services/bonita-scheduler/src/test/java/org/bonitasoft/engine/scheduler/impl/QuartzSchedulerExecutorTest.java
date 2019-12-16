@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -49,7 +49,6 @@ import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,7 +115,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     private Set<JobKey> newSet(final JobKey... jobKeys) {
-        final HashSet<JobKey> set = new HashSet<JobKey>();
+        final HashSet<JobKey> set = new HashSet<>();
         set.addAll(asList(jobKeys));
         return set;
     }
@@ -381,11 +380,10 @@ public class QuartzSchedulerExecutorTest {
 
 
     @Test
-    public void executeAgain_should_schedule_job_when_job_have_more_than_one_trigger() throws Exception {
+    public void executeAgain_should_schedule_job_when_job_have_no_trigger_that_may_not_fire_again() throws Exception {
         // given
         doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
-        doReturn(asList(new SimpleTriggerImpl(), new SimpleTriggerImpl()))
-                .when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayFireAgain())).when(scheduler).getTriggersOfJob(any(JobKey.class));
 
         // when
         quartzSchedulerExecutor.executeAgain(JOB_ID, GROUP_NAME, JOB_NAME, true, 5000);
@@ -396,12 +394,36 @@ public class QuartzSchedulerExecutorTest {
         verify(scheduler, times(0)).rescheduleJob(any(org.quartz.TriggerKey.class), any(org.quartz.Trigger.class));
     }
 
+    private SimpleTriggerImpl triggerThatMayFireAgain() {
+        SimpleTriggerImpl simpleTrigger = (SimpleTriggerImpl) TriggerBuilder.newTrigger().withIdentity(JOB_NAME, GROUP_NAME).build();
+        simpleTrigger.setNextFireTime(new Date());
+        return simpleTrigger;
+    }
+
+    @Test
+    public void executeAgain_should_reschedule_job_when_job_have_at_least_one_trigger_may_not_fire_again() throws Exception {
+        // given
+        doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
+        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayNotFireAgain())).when(scheduler).getTriggersOfJob(any(JobKey.class));
+
+        // when
+        quartzSchedulerExecutor.executeAgain(JOB_ID, GROUP_NAME, JOB_NAME, true, 5000);
+
+        // then: create a new trigger to execute it
+        verify(scheduler, times(0)).scheduleJob(any(org.quartz.Trigger.class));
+        verify(scheduler, times(0)).scheduleJob(any(JobDetail.class), any(org.quartz.Trigger.class));
+        verify(scheduler, times(1)).rescheduleJob(any(org.quartz.TriggerKey.class), any(org.quartz.Trigger.class));
+    }
+
+    private org.quartz.Trigger triggerThatMayNotFireAgain() {
+        return TriggerBuilder.newTrigger().withIdentity(JOB_NAME, GROUP_NAME).build();
+    }
+
     @Test
     public void executeAgain_should_schedule_job_when_job_have_a_trigger_that_may_not_fire_again() throws Exception {
         // given
         doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
-        doReturn(Collections.singletonList(TriggerBuilder.newTrigger().withIdentity(JOB_NAME, GROUP_NAME).build()))//will not fire again (no next fire date)
-                .when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(singletonList(triggerThatMayNotFireAgain())).when(scheduler).getTriggersOfJob(any(JobKey.class));
 
         // when
         quartzSchedulerExecutor.executeAgain(JOB_ID, GROUP_NAME, JOB_NAME, true, 5000);
@@ -416,9 +438,7 @@ public class QuartzSchedulerExecutorTest {
     public void executeAgain_should_schedule_job_when_job_have_a_trigger_that_may_fire_again() throws Exception {
         // given
         doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
-        SimpleTriggerImpl trigger = new SimpleTriggerImpl();
-        trigger.setNextFireTime(new Date());
-        doReturn(Collections.singletonList(trigger))
+        doReturn(singletonList(triggerThatMayFireAgain()))
                 .when(scheduler).getTriggersOfJob(any(JobKey.class));
 
         // when
