@@ -3,7 +3,7 @@
 <hibernate-mapping auto-import="false">
 
 	<query name="getNumberOfSTheme">
-		SELECT COUNT(theme)
+		SELECT COUNT(theme.id)
 		FROM org.bonitasoft.engine.theme.model.STheme AS theme
 	</query>
 

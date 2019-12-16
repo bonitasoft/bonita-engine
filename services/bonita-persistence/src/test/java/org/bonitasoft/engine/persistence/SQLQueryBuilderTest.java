@@ -25,6 +25,7 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -39,7 +40,7 @@ public class SQLQueryBuilderTest {
     @Mock
     private Session session;
     @Mock
-    private SQLQuery mockedQuery;
+    private NativeQuery mockedQuery;
     private static final char LIKE_ESCAPE_CHARACTER = '§';
     private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
 

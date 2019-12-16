@@ -47,6 +47,10 @@ public enum Vendor {
      */
     public static Vendor fromHibernateConfiguration(Configuration configuration){
         String hibernateDialect = configuration.getProperty("hibernate.dialect");
+        return fromHibernateDialectProperty(hibernateDialect);
+    }
+
+    public static Vendor fromHibernateDialectProperty(String hibernateDialect) {
         if (hibernateDialect != null) {
             if (hibernateDialect.toLowerCase().contains("postgresql")) {
                 return POSTGRES;

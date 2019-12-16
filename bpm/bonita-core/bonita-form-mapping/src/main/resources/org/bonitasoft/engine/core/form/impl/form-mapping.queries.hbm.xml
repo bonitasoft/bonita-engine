@@ -50,7 +50,7 @@
     </query>
 
     <query name="getNumberOfSFormMapping">
-        SELECT COUNT(formmap)
+        SELECT COUNT(formmap.id)
         FROM org.bonitasoft.engine.core.form.SFormMapping AS formmap
     </query>
 
@@ -60,7 +60,7 @@
     </query>
 
     <query name="getNumberOfSFormMappingwithSPageMapping">
-        SELECT count(formmap)
+        SELECT count(formmap.id)
         FROM org.bonitasoft.engine.core.form.SFormMapping AS formmap
         LEFT JOIN formmap.pageMapping AS pagemap
     </query>

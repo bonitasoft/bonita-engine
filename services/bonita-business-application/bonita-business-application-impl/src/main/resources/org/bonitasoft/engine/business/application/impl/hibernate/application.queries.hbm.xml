@@ -15,7 +15,7 @@
     </query>
 
     <query name="getNumberOfSApplication">
-        SELECT count(application)
+        SELECT count(application.id)
         FROM org.bonitasoft.engine.business.application.model.SApplication AS application
     </query>
 
@@ -54,7 +54,7 @@
     </query>
     
     <query name="getNumberOfSApplicationPage">
-        SELECT count(applicationPage)
+        SELECT count(applicationPage.id)
         FROM org.bonitasoft.engine.business.application.model.SApplicationPage as applicationPage
     </query>
     
@@ -70,7 +70,7 @@
     </query>
     
     <query name="getNumberOfSApplicationMenu">
-        SELECT count(applicationMenu)
+        SELECT count(applicationMenu.id)
         FROM org.bonitasoft.engine.business.application.model.SApplicationMenu as applicationMenu
     </query>
 

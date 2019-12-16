@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.LongType;
 import org.hibernate.usertype.UserType;
 
@@ -31,9 +32,6 @@ public class DateStoredAsLongUserType implements UserType, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("rawtypes")
-    private Class<? extends Enum> enumClass;
-
     private static final LongType type = new LongType();
 
     private static int[] sqlTypes = new int[] { type.sqlType() };
@@ -43,9 +41,7 @@ public class DateStoredAsLongUserType implements UserType, Serializable {
         return Date.class;
     }
 
-    @Override
-    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session, final Object owner) throws HibernateException,
-            SQLException {
+    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
         final Object identifier = type.get(rs, names[0], session);
         if (identifier == null) {
             return null;
@@ -54,7 +50,7 @@ public class DateStoredAsLongUserType implements UserType, Serializable {
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final Object value, final int index, final SessionImplementor session) throws HibernateException {
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
         try {
             if (value == null) {
                 st.setNull(index, type.sqlType());

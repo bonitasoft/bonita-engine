@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.business.data.impl.jackson.utils.ExtraPropertyUtils;
 import org.bonitasoft.engine.business.data.impl.jackson.writer.ExtraBeanPropertyWriter;
 import org.bonitasoft.engine.business.data.impl.jackson.writer.IgnoredPropertyWriter;
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class EntityBeanSerializerModifier extends BeanSerializerModifier {
             LOG.trace("Interfaces: {}", getNames(ClassUtils.getAllInterfaces(rawClass)));
             LOG.trace("Superclasses: {}", getNames(ClassUtils.getAllSuperclasses(rawClass)));
         }
-        if (MethodHandler.class.isAssignableFrom(rawClass) || Proxy.class.isAssignableFrom(rawClass)) {
+        if (MethodHandler.class.isAssignableFrom(rawClass) || Proxy.class.isAssignableFrom(rawClass) || HibernateProxy.class.isAssignableFrom(rawClass)) {
             return true;
         }
         return false;

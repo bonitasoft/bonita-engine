@@ -30,7 +30,7 @@
     </query>
 
     <query name="getNumberOfSMappedDocumentOfProcess">
-        SELECT COUNT(mappeddoc)
+        SELECT COUNT(mappeddoc.id)
         FROM org.bonitasoft.engine.core.document.model.SMappedDocument AS mappeddoc
         WHERE mappeddoc.processInstanceId = :processInstanceId
     </query>
@@ -54,7 +54,7 @@
 
 
     <query name="getNumberOfSMappedDocumentSupervisedBy">
-        SELECT COUNT(mappeddoc)
+        SELECT COUNT(mappeddoc.id)
         FROM org.bonitasoft.engine.core.document.model.SMappedDocument AS mappeddoc,
         org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
         WHERE mappeddoc.processInstanceId = p.id

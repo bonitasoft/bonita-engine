@@ -42,7 +42,7 @@
 
 
     <query name="getNumberOfSAMappedDocumentSupervisedBy">
-        SELECT COUNT(mappeddoc)
+        SELECT COUNT(mappeddoc.id)
         FROM org.bonitasoft.engine.core.document.model.archive.SAMappedDocument AS mappeddoc,
         org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance AS p
         WHERE mappeddoc.processInstanceId = p.sourceObjectId

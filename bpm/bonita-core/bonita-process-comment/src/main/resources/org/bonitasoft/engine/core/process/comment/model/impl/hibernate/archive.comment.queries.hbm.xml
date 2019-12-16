@@ -4,7 +4,7 @@
 <hibernate-mapping auto-import="false">
 
   <query name="getNumberOfSAComment">
-	SELECT COUNT(DISTINCT saComment)
+	SELECT COUNT(DISTINCT saComment.id)
 	FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS saComment
 	WHERE saComment.archiveDate = (
 			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.SAComment AS sac

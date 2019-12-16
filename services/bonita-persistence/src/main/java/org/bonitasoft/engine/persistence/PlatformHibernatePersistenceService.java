@@ -42,7 +42,7 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
     public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
             final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws Exception {
         super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }

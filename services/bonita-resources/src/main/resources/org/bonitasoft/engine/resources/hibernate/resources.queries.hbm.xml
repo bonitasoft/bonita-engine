@@ -15,7 +15,7 @@
         AND bar.type = :type
     </query>
     <query name="getNumberOfBARResourcesOfType">
-        SELECT count(bar)
+        SELECT count(bar.id)
         FROM org.bonitasoft.engine.resources.SBARResource AS bar
         WHERE bar.processDefinitionId= :processDefinitionId
         AND bar.type = :type
@@ -40,12 +40,12 @@
         WHERE r.type = :type
     </query>
     <query name="getNumberOfTenantResourcesOfType">
-        SELECT count(r)
+        SELECT count(r.id)
         FROM org.bonitasoft.engine.resources.STenantResource AS r
         WHERE r.type = :type
     </query>
     <query name="getNumberOfTenantResourcesOfTypeAndName">
-        SELECT count(r)
+        SELECT count(r.id)
         FROM org.bonitasoft.engine.resources.STenantResource AS r
         WHERE r.type = :type
         AND r.name = :name

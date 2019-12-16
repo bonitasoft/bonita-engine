@@ -16,7 +16,7 @@ package org.bonitasoft.engine.persistence;
 import java.util.Map;
 
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SQLQuery;
 
 /**

@@ -11,7 +11,7 @@
 	</query>
 
 	<query name="getNumberOfCategory">
-		SELECT COUNT(category)
+		SELECT COUNT(category.id)
 		FROM org.bonitasoft.engine.core.category.model.SCategory AS category
 	</query>
 
@@ -38,7 +38,7 @@
 	</query>
 	
 	<query name="getNumberOfCategoriesUnrelatedToProcess">
-		SELECT COUNT(category)
+		SELECT COUNT(category.id)
 		FROM org.bonitasoft.engine.core.category.model.SCategory AS category
 		WHERE category.id NOT IN (
 			SELECT categorymapping.categoryId
@@ -60,25 +60,25 @@
 	</query>
 	
 	<query name="getNumberOfCategoriesOfProcess">
-		SELECT COUNT(categorymapping)
+		SELECT COUNT(categorymapping.id)
 		FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = :processId
 	</query>
     
     <query name="getNumberOfProcessDefinitionsOfCategory">
-        SELECT COUNT(categorymapping)
+        SELECT COUNT(categorymapping.id)
         FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
         WHERE categorymapping.categoryId = :categoryId
     </query>
 
 	<query name="getNumberOfCategorizedProcessIds">
-		SELECT COUNT(categorymapping)
+		SELECT COUNT(categorymapping.id)
 		FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId IN (:processIds)
 	</query>
 
 	<query name="isCategoryExistsInProcess">
-		SELECT COUNT(categorymapping)
+		SELECT COUNT(categorymapping.id)
 		FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = :processDefinitionId
 		AND categorymapping.categoryId = :categoryId

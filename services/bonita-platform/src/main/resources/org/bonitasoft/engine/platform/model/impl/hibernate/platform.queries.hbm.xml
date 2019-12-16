@@ -38,7 +38,7 @@
   </query>
 
   <query name="getNumberOfTenants">
-    SELECT COUNT(tenant)
+    SELECT COUNT(tenant.id)
     FROM org.bonitasoft.engine.platform.model.STenant AS tenant
   </query>
   
@@ -48,7 +48,7 @@
   </query>
 	
   <query name="getNumberOfSTenant">
-    SELECT COUNT(tenant)
+    SELECT COUNT(tenant.id)
     FROM org.bonitasoft.engine.platform.model.STenant AS tenant
   </query>
 </hibernate-mapping>

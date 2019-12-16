@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 

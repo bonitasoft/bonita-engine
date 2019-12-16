@@ -22,7 +22,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;

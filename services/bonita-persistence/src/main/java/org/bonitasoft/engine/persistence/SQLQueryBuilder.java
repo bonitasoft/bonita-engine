@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 
 /**
@@ -47,7 +48,7 @@ public class SQLQueryBuilder extends QueryBuilder {
     Query buildQuery(Session session) {
         String builtQuery = stringQueryBuilder.toString();
         builtQuery = replaceHQLAliasesBySQLAliases(builtQuery);
-        SQLQuery sqlQuery = session.createSQLQuery(builtQuery);
+        NativeQuery sqlQuery = session.createSQLQuery(builtQuery);
         addConstantsAsParameters(sqlQuery);
         setReturnType(builtQuery, sqlQuery);
         return sqlQuery;

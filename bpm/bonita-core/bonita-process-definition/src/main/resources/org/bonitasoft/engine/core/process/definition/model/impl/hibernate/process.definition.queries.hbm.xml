@@ -148,12 +148,12 @@
 	</query>
 
 	<query name="getNumberOfProcessDefinitions">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfProcessDefinitionsInActivationState">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = :activationState
 	</query>
@@ -192,7 +192,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoStartedBy">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.activationState = 'ENABLED'
 		AND (process_definition.processId IN (
@@ -213,15 +213,15 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfo">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorized">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
-			SELECT categorymapping
+			SELECT categorymapping.id
 		    FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		    WHERE categorymapping.processId = process_definition.processId
 		)
@@ -231,14 +231,14 @@
 		SELECT process_definition
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
-			SELECT categorymapping
+			SELECT categorymapping.id
 			FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 			WHERE categorymapping.processId = process_definition.processId
 		)
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId NOT IN (
 				SELECT categorymapping.processId
@@ -258,10 +258,10 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorizedUserCanStart">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE NOT EXISTS (
-			SELECT categorymapping
+			SELECT categorymapping.id
 			FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 			WHERE categorymapping.processId = process_definition.processId
 		)
@@ -294,7 +294,7 @@
 	<query name="searchSProcessDefinitionDeployInfoUncategorizedUserCanStart">
 		SELECT process_definition
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
-		WHERE not exists (SELECT categorymapping
+		WHERE not exists (SELECT categorymapping.id
 		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND activationState = 'ENABLED'
@@ -353,7 +353,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUserCanStart">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
@@ -424,7 +424,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUsersManagedByCanStart">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 				FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE activationState = 'ENABLED'
 		AND process_definition.processId IN (
@@ -529,7 +529,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfowithSProcessCategoryMappingUserSupervised">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
 			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
@@ -577,7 +577,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUserSupervised">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
 		WHERE process_definition.processId IN (
 			SELECT supervisor.processDefId
@@ -621,9 +621,9 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoUncategorizedAndWithSupervisor">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
-		WHERE not exists (SELECT categorymapping
+		WHERE not exists (SELECT categorymapping.id
 		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND process_definition.processId IN (
@@ -648,7 +648,7 @@
 	<query name="searchSProcessDefinitionDeployInfoUncategorizedAndWithSupervisor">
 		SELECT process_definition
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition
-		WHERE not exists (SELECT categorymapping
+		WHERE not exists (SELECT categorymapping.id
 		                  FROM org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		                  WHERE categorymapping.processId = process_definition.processId)
 		AND process_definition.processId IN (
@@ -696,7 +696,7 @@
 	</query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfowithSProcessCategoryMapping">
-		SELECT COUNT(process_definition)
+		SELECT COUNT(process_definition.id)
 		FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
 			 org.bonitasoft.engine.core.category.model.SProcessCategoryMapping AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
@@ -769,7 +769,7 @@
 
 
     <query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor">
-        SELECT COUNT(DISTINCT process_definition)
+        SELECT COUNT(DISTINCT process_definition.id)
         FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
         	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
@@ -861,7 +861,7 @@
     </query>
 
 	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy">
-        SELECT COUNT(DISTINCT process_definition)
+        SELECT COUNT(DISTINCT process_definition.id)
         FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
         	 org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
@@ -983,7 +983,7 @@
     </query>
 
  	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
-        SELECT COUNT(DISTINCT process_definition)
+        SELECT COUNT(DISTINCT process_definition.id)
         FROM org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo AS process_definition,
         	 org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance AS a
 		WHERE process_definition.processId = a.logicalGroup1
