@@ -193,6 +193,9 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
                 assertThat(f.getLastMessage()).contains("a Job exception"));
 
+        //small sleep because quartz do not always immediately delete the associated trigger (done in the quartz Thread)
+        // because of that it can cause issues when rescheduling (Foreign key violation)
+        Thread.sleep(500);
         //reschedule the job: no more exception
         inTx(() -> {
             schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
