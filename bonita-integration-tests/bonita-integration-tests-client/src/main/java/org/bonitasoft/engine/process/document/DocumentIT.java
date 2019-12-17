@@ -14,16 +14,11 @@
 package org.bonitasoft.engine.process.document;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -78,6 +73,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
@@ -394,8 +390,8 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(deployAndEnableProcess(archive.done()).getId());
         waitForProcessToFinish(processInstance.getId());
 
-        final Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>>singletonMap(
-                new ExpressionBuilder().createDocumentReferenceExpression("document"), Collections.<String, Serializable>emptyMap());
+        final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(
+                new ExpressionBuilder().createDocumentReferenceExpression("document"), emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
 
@@ -545,7 +541,7 @@ public class DocumentIT extends TestWithUser {
 
         // Finalize the process
         getProcessAPI().assignUserTask(step1, user.getId());
-        getProcessAPI().executeUserTask(user.getId(), step1, Collections.<String, Serializable>emptyMap());
+        getProcessAPI().executeUserTask(user.getId(), step1, emptyMap());
         waitForProcessToFinish(processInstance);
 
         //search archive document order by archive date
@@ -1359,7 +1355,7 @@ public class DocumentIT extends TestWithUser {
         builder.addTransition("updateStep", "verifyStep");
         final DocumentListDefinitionBuilder invoices = builder.addDocumentListDefinition("invoices");
         invoices.addDescription("My invoices");
-        final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
+        final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myurl.com/mydoc.txt\"), " +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file.txt\")," +
                 "null," +
@@ -1383,7 +1379,7 @@ public class DocumentIT extends TestWithUser {
         List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices1).hasSize(5);
         final Document urlDocument = invoices1.get(0);
-        assertThat(urlDocument.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
+        assertThat(urlDocument.getUrl()).isEqualTo("http://www.myurl.com/mydoc.txt");
         final Document fileDocument = invoices1.get(1);
         assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
         final Document fileFromFileInput = invoices1.get(4);
@@ -1440,7 +1436,7 @@ public class DocumentIT extends TestWithUser {
         invoicesCopyList = getProcessAPI().getDocumentList(processInstance.getId(), "invoicesCopy", 0, 100);
         assertThat(invoicesCopyList).hasSize(5);
         final Document urlDocumentCopy = invoicesCopyList.get(0);
-        assertThat(urlDocumentCopy.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
+        assertThat(urlDocumentCopy.getUrl()).isEqualTo("http://www.myurl.com/mydoc.txt");
         final Document fileDocumentCopy = invoicesCopyList.get(1);
         assertThat(getProcessAPI().getDocumentContent(fileDocumentCopy.getContentStorageId())).isEqualTo("hello1".getBytes());
         final Document fileFromFileInputCopy = invoicesCopyList.get(4);
@@ -1532,7 +1528,7 @@ public class DocumentIT extends TestWithUser {
     }
 
     @Test
-    public void add_and_update_a_signle_document() throws Exception {
+    public void add_and_update_a_single_document() throws Exception {
         //process with doc1 init and doc2 non init
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
         builder.addDocumentDefinition("doc1").addUrl("the url");
@@ -1590,6 +1586,9 @@ public class DocumentIT extends TestWithUser {
     public void add_and_update_a_list_of_document() throws Exception {
         final ProcessInstance processInstance = deployProcessWithList();
 
+        // To ensure doc1_1 is not added in the same millis as the process instance start date:
+        Thread.sleep(20);
+
         //add doc1_1 to list1
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_1"));
         //add doc1_2 to list1 with bad index: fail
@@ -1629,11 +1628,18 @@ public class DocumentIT extends TestWithUser {
         assertThat(updated.getUrl()).isEqualTo("The new value");
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
-        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable>emptyMap());
+        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), emptyMap());
         final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions)
                 .get("list1");
-        assertThat(initialList1).hasSize(4);
-        assertThat(initialList1.get(0).getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
+        try {
+            assertThat(initialList1).hasSize(4);
+        } catch (Exception e ) {
+            for (Document doc : initialList1) {
+                APITestUtil.LOGGER.debug("{}: {}", doc.getUrl(), doc.getCreationDate().getTime());
+            }
+            throw e;
+        }
+        assertThat(initialList1.get(0).getUrl()).isEqualTo("http://www.myurl.com/mydoc.txt");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(1).getContentStorageId()))).isEqualTo("hello1");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(2).getContentStorageId()))).isEqualTo("hello2");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(3).getContentStorageId()))).isEqualTo("hello3");
@@ -1784,7 +1790,7 @@ public class DocumentIT extends TestWithUser {
     private ProcessInstance deployProcessWithList() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
         //process with list1 with init value
-        final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
+        final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myurl.com/mydoc.txt\"), " +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file1.txt\")," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file2.txt\")," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file3.txt\")" +
