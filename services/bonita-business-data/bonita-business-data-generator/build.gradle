@@ -10,7 +10,7 @@ dependencies {
     compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${Deps.hibernateJpaVersion}"
     compile project(':bpm:bonita-common')
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
-    compile "com.sun.xml.bind:jaxb-xjc:${Deps.jaxbVersion}"
+    compile "org.glassfish.jaxb:jaxb-xjc:${Deps.jaxbVersion}"
     compile "org.javassist:javassist:${Deps.javassistVersion}"
     compile "org.eclipse.jdt.core.compiler:ecj:${Deps.eclipseCompilerVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
