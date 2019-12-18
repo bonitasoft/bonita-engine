@@ -47,5 +47,6 @@ public class DefaultExecutorServiceMetricsProvider implements ExecutorServiceMet
         Optional.ofNullable(meterRegistry.find("executor.queue.remaining").tags(tags).gauge()).ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.queued").tags(tags).gauge()).ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.completed").tags(tags).functionCounter()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.idle").tags(tags).timer()).ifPresent(meterRegistry::remove);
     }
 }
