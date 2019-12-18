@@ -9,9 +9,9 @@ dependencies {
     compile "org.slf4j:slf4j-api:${Deps.slf4jVersion}"
     compile "org.apache.commons:commons-lang3:${Deps.commonsLangVersion}"
     compile "commons-codec:commons-codec:${Deps.commonsCodecVersion}"
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
+    compile "com.fasterxml.jackson.core:jackson-annotations:${Deps.jacksonDataBindingVersion}"
     runtime "javax.xml.bind:jaxb-api:${Deps.jaxbVersion}"
-    runtime "com.sun.xml.bind:jaxb-impl:${Deps.jaxbVersion}"
+    runtime "org.glassfish.jaxb:jaxb-runtime:${Deps.jaxbVersion}"
     runtime "javax.activation:activation:${Deps.javaxActivationVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
     testCompile "org.assertj:assertj-core:${Deps.assertjVersion}"
