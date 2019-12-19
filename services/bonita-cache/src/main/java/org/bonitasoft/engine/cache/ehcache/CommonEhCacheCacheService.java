@@ -87,6 +87,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             throw new SCacheException(message);
         }
         final Configuration configuration = new Configuration();
+        configuration.setName(getCacheManagerName());
         configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
         configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
         cacheManager = new CacheManager(configuration);
@@ -351,4 +352,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     public boolean isStopped() {
         return cacheManager == null;
     }
+
+
+    protected abstract String getCacheManagerName();
 }

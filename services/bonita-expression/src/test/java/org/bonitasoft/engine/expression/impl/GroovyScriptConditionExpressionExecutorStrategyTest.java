@@ -34,6 +34,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +74,10 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         context = new HashMap<>();
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
+    }
+    @After
+    public void stop() {
+        cacheService.stop();
     }
     
     @Test

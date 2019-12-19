@@ -1,7 +1,7 @@
 
 
 dependencies {
-    compile "net.sf.ehcache:ehcache-core:${Deps.ehcacheVersion}"
+    compile "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
     compile project(':services:bonita-commons')
     compile project(':services:bonita-session')
     compile project(':services:bonita-log-technical')
