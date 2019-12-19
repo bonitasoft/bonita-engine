@@ -12,7 +12,7 @@ dependencyManagement {
             entry 'slf4j-simple'
         }
         dependency "com.h2database:h2:${Deps.h2Version}"
-        dependency "net.sf.ehcache:ehcache-core:${Deps.ehcacheVersion}"
+        dependency "net.sf.ehcache:ehcache:${Deps.ehcacheVersion}"
 
         dependencySet(group: 'org.springframework', version: Deps.springVersion) {
             entry 'spring-context'

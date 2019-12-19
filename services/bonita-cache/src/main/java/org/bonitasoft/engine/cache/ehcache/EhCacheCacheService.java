@@ -44,6 +44,11 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
     }
 
     @Override
+    protected String getCacheManagerName() {
+        return "BONITA_TENANT_"+tenantId;
+    }
+
+    @Override
     public List<String> getCachesNames() {
         if (cacheManager == null) {
             return Collections.emptyList();

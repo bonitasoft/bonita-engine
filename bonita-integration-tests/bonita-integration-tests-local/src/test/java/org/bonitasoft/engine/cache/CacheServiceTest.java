@@ -107,7 +107,13 @@ public class CacheServiceTest {
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
         return new EhCacheCacheService(mock(TechnicalLoggerService.class), configurationsList, new CacheConfiguration(),
-                "target", 1);
+                "target", 1){
+            @Override
+            protected String getCacheManagerName() {
+                //override the default name so it works in integration tests
+                return "TEST_CACHE_MANAGER";
+            }
+        };
     }
 
 	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {

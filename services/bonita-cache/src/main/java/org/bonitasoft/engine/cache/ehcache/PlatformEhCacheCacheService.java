@@ -34,6 +34,12 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
         super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 
+
+    @Override
+    protected String getCacheManagerName() {
+        return "BONITA_PLATFORM";
+    }
+
     @Override
     protected String getKeyFromCacheName(final String cacheName) {
         return "P_" + cacheName;
