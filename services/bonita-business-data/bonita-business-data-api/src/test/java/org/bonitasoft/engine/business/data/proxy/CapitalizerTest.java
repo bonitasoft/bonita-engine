@@ -20,17 +20,22 @@ import org.junit.Test;
 public class CapitalizerTest {
 
     @Test
-    public void testCapitalizer() throws Exception {
+    public void testCapitalizer() {
         assertThat(Capitalizer.capitalize("name")).isEqualTo("Name");
     }
 
     @Test
-    public void capitalizer_null_value() throws Exception {
+    public void capitalizer_null_value() {
         assertThat(Capitalizer.capitalize(null)).isEqualTo(null);
     }
 
     @Test
-    public void capitalizer_empty_value() throws Exception {
+    public void capitalizer_empty_value() {
         assertThat(Capitalizer.capitalize("")).isEqualTo("");
+    }
+
+    @Test
+    public void capitalizer_1_char_value() {
+        assertThat(Capitalizer.capitalize("a")).isEqualTo("A");
     }
 }

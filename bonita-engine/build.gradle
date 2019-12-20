@@ -22,9 +22,7 @@ dependencyManagement {
         }
         dependency("org.hibernate:hibernate-core:${Deps.hibernateVersion}") {
             exclude 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec'
-            exclude 'org.hibernate:hibernate-entitymanager'
         }
-        dependency "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${Deps.hibernateJpaVersion}"
         dependency "commons-io:commons-io:${Deps.commonsIOVersion}"
         dependency("commons-beanutils:commons-beanutils:${Deps.commonsBeanutilsVersion}") { exclude 'commons-collections:commons-collections' }
         dependency "commons-collections:commons-collections:${Deps.commonsCollectionsVersion}"
