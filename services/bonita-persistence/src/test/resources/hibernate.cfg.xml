@@ -11,7 +11,7 @@
         <!-- JDBC connection pool (use the built-in) -->
         <property name="hibernate.connection.pool_size">1</property>
         <!-- SQL dialect -->
-        <!-- <property name="dialect">org.hibernate.dialect.MySQLInnoDBDialect</property> -->
+        <!-- <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property> -->
         <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
         <!-- Enable Hibernate's automatic session context management -->
         <property name="hibernate.current_session_context_class">thread</property>
