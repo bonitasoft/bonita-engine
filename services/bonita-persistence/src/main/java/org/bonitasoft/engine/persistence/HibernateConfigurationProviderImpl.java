@@ -85,6 +85,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
             case ORACLE:
             case SQLSERVER:
             case MYSQL:
+                System.setProperty("hibernate.dialect.storage_engine", "innodb");
             case OTHER:
                 CustomDataTypesRegistration.addTypeOverride(new XMLType());
                 break;
