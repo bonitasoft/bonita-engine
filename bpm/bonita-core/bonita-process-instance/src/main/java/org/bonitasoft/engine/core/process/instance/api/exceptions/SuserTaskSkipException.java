@@ -21,7 +21,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 public class SuserTaskSkipException extends SBonitaException {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7556717384908033L;
 

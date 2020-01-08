@@ -19,7 +19,8 @@ import org.bonitasoft.engine.search.Sort;
 /**
  * Sort criterion used to specify the sort order of the {@link ProcessDeploymentInfo}. <br>
  * Used by {@link org.bonitasoft.engine.api.ProcessManagementAPI} methods like
- * {@link org.bonitasoft.engine.api.ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)} to
+ * {@link org.bonitasoft.engine.api.ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)}
+ * to
  * indicate in what order we should return the list of the results.
  *
  * @author Baptiste Mesta
@@ -85,7 +86,7 @@ public enum ProcessDeploymentInfoCriterion {
 
     /**
      * Get the {@link Order} corresponding to this object.
-     * 
+     *
      * @return The {@link Order} corresponding to this object.
      * @since 6.3.5
      */
@@ -95,7 +96,7 @@ public enum ProcessDeploymentInfoCriterion {
 
     /**
      * Get the name of the field used to sort the {@link ProcessDeploymentInfo}, corresponding to this object.
-     * 
+     *
      * @return The name of the field corresponding to this object.
      * @since 6.3.5
      */
@@ -105,7 +106,7 @@ public enum ProcessDeploymentInfoCriterion {
 
     /**
      * Build the {@link Sort} corresponding to this object.
-     * 
+     *
      * @return The {@link Sort} corresponding to this object.
      * @since 6.3.5
      */

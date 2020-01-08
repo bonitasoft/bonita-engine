@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -38,7 +38,8 @@ public class EntitiesActionsExecutorTest {
     @Mock
     private EntityAction action;
 
-    private final BusinessDataContext businessDataContext = new BusinessDataContext("data", new Container(1L, "process"));
+    private final BusinessDataContext businessDataContext = new BusinessDataContext("data",
+            new Container(1L, "process"));
 
     @Test
     public void executeAction_should_execute_action_on_entity_if_its_a_simple_entity() throws Exception {

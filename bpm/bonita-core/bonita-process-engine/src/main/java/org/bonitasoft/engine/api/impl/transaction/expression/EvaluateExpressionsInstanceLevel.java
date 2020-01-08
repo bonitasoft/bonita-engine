@@ -31,7 +31,8 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
-public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpressionsInstance implements TransactionContentWithResult<Map<String, Serializable>> {
+public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpressionsInstance
+        implements TransactionContentWithResult<Map<String, Serializable>> {
 
     private final Map<Expression, Map<String, Serializable>> expressions;
 
@@ -45,7 +46,8 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
 
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
-    public EvaluateExpressionsInstanceLevel(final Map<Expression, Map<String, Serializable>> expressions, final long containerId, final String containerType,
+    public EvaluateExpressionsInstanceLevel(final Map<Expression, Map<String, Serializable>> expressions,
+            final long containerId, final String containerType,
             final long processDefinitionId, final ExpressionResolverService expressionService,
             final BusinessDataRepository bdrService) {
         super(bdrService);

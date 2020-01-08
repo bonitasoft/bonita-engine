@@ -43,9 +43,11 @@ public class ContractVariableHelperTest {
 
         final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("nature");
 
-        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
-                constraintDefinition, variables);
-        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper
+                .buildMandatoryMultipleInputVariables(
+                        constraintDefinition, variables);
+        assertThat(buildMandatoryMultipleInputVariables)
+                .as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
 
     }
 
@@ -55,9 +57,11 @@ public class ContractVariableHelperTest {
 
         final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("nature");
 
-        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
-                constraintDefinition, variables);
-        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper
+                .buildMandatoryMultipleInputVariables(
+                        constraintDefinition, variables);
+        assertThat(buildMandatoryMultipleInputVariables)
+                .as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
 
     }
 
@@ -67,9 +71,11 @@ public class ContractVariableHelperTest {
 
         final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("not in payload");
 
-        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
-                constraintDefinition, variables);
-        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).isEmpty();
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper
+                .buildMandatoryMultipleInputVariables(
+                        constraintDefinition, variables);
+        assertThat(buildMandatoryMultipleInputVariables)
+                .as("should not find variable for constraint " + constraintDefinition.getName()).isEmpty();
 
     }
 
@@ -80,7 +86,8 @@ public class ContractVariableHelperTest {
         final Map<String, Serializable> variable = aMap().put("key", (Serializable) values).build();
 
         //when
-        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
+        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper
+                .convertMultipleToList(variable);
 
         //then
         assertThat(convertMultipleToList).as("should split multiple item").hasSize(3);
@@ -97,7 +104,8 @@ public class ContractVariableHelperTest {
         final Map<String, Serializable> variable = aMap().put("key", "not a list").build();
 
         //when
-        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
+        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper
+                .convertMultipleToList(variable);
 
         //then
         assertThat(convertMultipleToList).as("should not split multiple item").isNotNull().isEmpty();
@@ -106,16 +114,19 @@ public class ContractVariableHelperTest {
     private Map<String, Serializable> buildMap() {
         final Map<String, Serializable> variables;
         final Map<String, Serializable> user = aMap().put("firstName", "john").put("lastName", "doe").build();
-        final Map<String, Serializable> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow")
+        final Map<String, Serializable> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30)
+                .put("date", "2014-10-16").put("comment", "slow")
                 .build();
-        final Map<String, Serializable> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16")
+        final Map<String, Serializable> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000)
+                .put("date", "2014-10-16")
                 .put("comment", "expensive")
                 .build();
         final List<Map<String, Serializable>> expenseLines = new ArrayList<Map<String, Serializable>>();
         expenseLines.add(taxiExpenseLine);
         expenseLines.add(hotelExpenseLine);
 
-        final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines).build();
+        final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines)
+                .build();
 
         final List<Map<String, Serializable>> expenseReports = new ArrayList<Map<String, Serializable>>();
         expenseReports.add(expenseReport);

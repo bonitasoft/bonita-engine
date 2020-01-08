@@ -74,7 +74,8 @@ public abstract class Field {
     public boolean equals(final Object obj) {
         if (obj instanceof Field) {
             final Field other = (Field) obj;
-            return new EqualsBuilder().append(collection, other.collection).append(name, other.name).append(nullable, other.nullable).isEquals();
+            return new EqualsBuilder().append(collection, other.collection).append(name, other.name)
+                    .append(nullable, other.nullable).isEquals();
         }
         return false;
     }

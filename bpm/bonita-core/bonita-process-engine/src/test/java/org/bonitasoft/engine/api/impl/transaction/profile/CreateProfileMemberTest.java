@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.api.impl.transaction.profile;
 
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.identity.IdentityService;
@@ -74,7 +74,8 @@ public class CreateProfileMemberTest {
 
         doReturn(null).when(profileService).addGroupToProfile(anyLong(), anyLong(), anyString(), anyString());
         doReturn(null).when(profileService).addRoleToProfile(anyLong(), anyLong(), anyString());
-        doReturn(null).when(profileService).addRoleAndGroupToProfile(anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString());
+        doReturn(null).when(profileService).addRoleAndGroupToProfile(anyLong(), anyLong(), anyLong(), anyString(),
+                anyString(), anyString());
 
         doReturn("group").when(sGroup).getName();
         doReturn("/parent").when(sGroup).getParentPath();
@@ -83,67 +84,77 @@ public class CreateProfileMemberTest {
     }
 
     @Test
-    public void should_updateProfileMetaData_and_addUserToProfile_when_userId_is_not_empty_and_member_is_user() throws Exception {
+    public void should_updateProfileMetaData_and_addUserToProfile_when_userId_is_not_empty_and_member_is_user()
+            throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, USER_ID, null, null,
-                MemberType.USER));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, USER_ID, null, null,
+                        MemberType.USER));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), nullable(String.class), nullable(String.class), nullable(String.class));
+        verify(profileService).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), nullable(String.class),
+                nullable(String.class), nullable(String.class));
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_no_user_and_member_is_user() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, USER_ID, null, null,
-                MemberType.USER));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, USER_ID, null, null,
+                        MemberType.USER));
         doReturn(null).when(identityService).getUser(USER_ID);
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(),
+                anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_userId_is_null_and_member_is_user() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
-                MemberType.USER));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
+                        MemberType.USER));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(),
+                anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_userId_equals_0_and_member_is_user() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, 0L, null, null,
-                MemberType.USER));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, 0L, null, null,
+                        MemberType.USER));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(),
+                anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_addGroupToProfile_when_member_is_group() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
-                MemberType.GROUP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
+                        MemberType.GROUP));
 
         // When
         createProfileMember.execute();
@@ -156,8 +167,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_no_group_and_member_is_group() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
-                MemberType.GROUP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
+                        MemberType.GROUP));
         doReturn(null).when(identityService).getGroup(GROUP_ID);
 
         // When
@@ -171,8 +183,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_groupId_is_null_and_member_is_group() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
-                MemberType.GROUP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
+                        MemberType.GROUP));
 
         // When
         createProfileMember.execute();
@@ -185,8 +198,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_groupId_equals_0_and_member_is_group() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, 0L, null,
-                MemberType.GROUP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, 0L, null,
+                        MemberType.GROUP));
 
         // When
         createProfileMember.execute();
@@ -199,107 +213,122 @@ public class CreateProfileMemberTest {
     @Test
     public void should_addRoleAndGroupToProfile_when_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
+                        MemberType.MEMBERSHIP));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, times(1)).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, times(1)).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID),
+                anyString(), anyString(), anyString());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_no_group_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
+                        MemberType.MEMBERSHIP));
         doReturn(null).when(identityService).getGroup(GROUP_ID);
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_no_role_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, ROLE_ID,
+                        MemberType.MEMBERSHIP));
         doReturn(null).when(identityService).getRole(ROLE_ID);
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_groupId_is_null_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
+                        MemberType.MEMBERSHIP));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_groupId_equals_0_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, 0L, ROLE_ID,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, 0L, ROLE_ID,
+                        MemberType.MEMBERSHIP));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_roleId_is_null_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, null,
+                        MemberType.MEMBERSHIP));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_just_updateProfileMetaData_when_roleId_equals_0_and_member_is_membership() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, 0L,
-                MemberType.MEMBERSHIP));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, GROUP_ID, 0L,
+                        MemberType.MEMBERSHIP));
 
         // When
         createProfileMember.execute();
 
         // Then
-        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(), anyString(), anyString());
+        verify(profileService, never()).addRoleAndGroupToProfile(eq(PROFILE_ID), eq(ROLE_ID), eq(GROUP_ID), anyString(),
+                anyString(), anyString());
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
     public void should_addRoleToProfile_when_member_is_role() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
-                MemberType.ROLE));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
+                        MemberType.ROLE));
 
         // When
         createProfileMember.execute();
@@ -311,8 +340,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_no_role_and_member_is_role() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
-                MemberType.ROLE));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, ROLE_ID,
+                        MemberType.ROLE));
         doReturn(null).when(identityService).getRole(ROLE_ID);
 
         // When
@@ -326,8 +356,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_roleId_is_null_and_member_is_role() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
-                MemberType.ROLE));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null,
+                        MemberType.ROLE));
 
         // When
         createProfileMember.execute();
@@ -340,8 +371,9 @@ public class CreateProfileMemberTest {
     @Test
     public void should_just_updateProfileMetaData_when_roleId_equals_0_and_member_is_role() throws Exception {
         // Given
-        final CreateProfileMember createProfileMember = spy(new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, 0L,
-                MemberType.ROLE));
+        final CreateProfileMember createProfileMember = spy(
+                new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, 0L,
+                        MemberType.ROLE));
 
         // When
         createProfileMember.execute();
@@ -354,7 +386,8 @@ public class CreateProfileMemberTest {
     @Test
     public void getResult() {
         // Given
-        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, PROFILE_ID, null, null, null, MemberType.ROLE);
+        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService,
+                PROFILE_ID, null, null, null, MemberType.ROLE);
 
         // When
         final SProfileMember result = createProfileMember.getResult();

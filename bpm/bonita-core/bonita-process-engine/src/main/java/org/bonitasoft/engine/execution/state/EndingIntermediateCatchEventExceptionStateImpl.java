@@ -36,17 +36,21 @@ public abstract class EndingIntermediateCatchEventExceptionStateImpl implements 
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
-        final SCatchEventDefinition catchEventDef = (SCatchEventDefinition) processDefinition.getProcessContainer().getFlowNode(
-                instance.getFlowNodeDefinitionId());
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
+        final SCatchEventDefinition catchEventDef = (SCatchEventDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(
+                        instance.getFlowNodeDefinitionId());
         try {
             final SIntermediateCatchEventInstance intermediateCatchEventInstance = (SIntermediateCatchEventInstance) instance;
-            waitingEventsInterrupter.interruptWaitingEvents(processDefinition, intermediateCatchEventInstance, catchEventDef);
+            waitingEventsInterrupter.interruptWaitingEvents(processDefinition, intermediateCatchEventInstance,
+                    catchEventDef);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -54,7 +58,8 @@ public abstract class EndingIntermediateCatchEventExceptionStateImpl implements 
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 

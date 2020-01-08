@@ -83,6 +83,7 @@ public class SQueriableLog implements PersistentObject {
     private long numericIndex5 = -1;
 
     public static class SQueriableLogBuilder {
+
         public SQueriableLogBuilder initializeNow() {
             final Date date = new Date();
             final Calendar calendar = Calendar.getInstance();

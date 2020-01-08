@@ -105,7 +105,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     @Override
-    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         logger.trace("Starting Server API call {} {}", apiInterfaceName, methodName);
 
@@ -168,8 +169,10 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private SessionAccessor beforeInvokeMethod(final Session session, final Object api) throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException,
+    private SessionAccessor beforeInvokeMethod(final Session session, final Object api)
+            throws BonitaHomeNotSetException,
+            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException,
+            IOException,
             SBonitaException {
         SessionAccessor sessionAccessor = null;
 
@@ -182,11 +185,13 @@ public class ServerAPIImpl implements ServerAPI {
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             switch (sessionType) {
                 case PLATFORM:
-                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor, session);
+                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor,
+                            session);
                     break;
 
                 case API:
-                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, platformServiceAccessor, session);
+                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, platformServiceAccessor,
+                            session);
                     break;
 
                 default:
@@ -212,7 +217,8 @@ public class ServerAPIImpl implements ServerAPI {
         return true;
     }
 
-    private ClassLoader beforeInvokeMethodForAPISession(SessionAccessor sessionAccessor, PlatformServiceAccessor platformServiceAccessor, Session session) throws SBonitaException {
+    private ClassLoader beforeInvokeMethodForAPISession(SessionAccessor sessionAccessor,
+            PlatformServiceAccessor platformServiceAccessor, Session session) throws SBonitaException {
         checkTenantSession(platformServiceAccessor, session);
         long tenantId = ((APISession) session).getTenantId();
         SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
@@ -221,7 +227,8 @@ public class ServerAPIImpl implements ServerAPI {
         return getTenantClassLoader(platformServiceAccessor, session);
     }
 
-    private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor, final PlatformServiceAccessor platformServiceAccessor,
+    private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor,
+            final PlatformServiceAccessor platformServiceAccessor,
             final Session session) throws SSessionException, SClassLoaderException {
         final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
         final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
@@ -244,34 +251,41 @@ public class ServerAPIImpl implements ServerAPI {
         return sessionType;
     }
 
-    private Object invokeAPI(Object api, String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues,
-                             final Session session) throws Throwable {
+    private Object invokeAPI(Object api, String apiInterfaceName, final String methodName,
+            final List<String> classNameParameters, final Object[] parametersValues,
+            final Session session) throws Throwable {
         final Class<?>[] parameterTypes = getParameterTypes(classNameParameters);
 
         final Method method = ClassReflector.getMethod(api.getClass(), methodName, parameterTypes);
         // No session required means that there is no transaction
-        if (method.isAnnotationPresent(CustomTransactions.class) || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
+        if (method.isAnnotationPresent(CustomTransactions.class)
+                || Class.forName(apiInterfaceName).isAnnotationPresent(NoSessionRequired.class)) {
             return invokeAPIOutsideTransaction(parametersValues, api, method, apiInterfaceName, session);
         } else {
             return invokeAPIInTransaction(parametersValues, api, method, session, apiInterfaceName);
         }
     }
 
-    private Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session)
+    private Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method,
+            String apiInterfaceName, Session session)
             throws Throwable {
         checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */false);
         return invokeAPI(method, apiImpl, parametersValues);
     }
 
-    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session,
+    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method,
+            final Session session,
             boolean isAlreadyInTransaction) {
         final MethodAvailability methodAvailability = getMethodAvailability(apiImpl, method);
         if (methodAvailability.isDeprecated) {
             logger.warn("The API method {}.{} is deprecated. It will be deleted in a future release. " +
-                    "Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.", apiInterfaceName, method.getName());
+                    "Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.",
+                    apiInterfaceName, method.getName());
         }
         if (!methodAvailability.isAvailableWhenPlatformIsStopped && !isNodeStarted()) {
-            logger.error("Node not started. Method '{}. {}' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: {}", apiInterfaceName, method.getName(), method.getDeclaringClass().getName());
+            logger.error(
+                    "Node not started. Method '{}. {}' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: {}",
+                    apiInterfaceName, method.getName(), method.getDeclaringClass().getName());
             throw new NodeNotStartedException();
         }
         // we don't check if tenant is in pause mode at platform level and when there is no session
@@ -288,15 +302,19 @@ public class ServerAPIImpl implements ServerAPI {
         }
         boolean tenantIsPaused = isTenantPaused(tenantId, session, isAlreadyInTransaction);
         if (tenantIsPaused && !methodAvailability.isAvailableOnPausedTenant) {
-            throw new TenantStatusException(MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is paused.", apiInterfaceName, method.getName(), tenantId));
+            throw new TenantStatusException(
+                    MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is paused.",
+                            apiInterfaceName, method.getName(), tenantId));
         }
         if (!tenantIsPaused && !methodAvailability.isAvailableOnRunningTenant) {
-            throw new TenantStatusException(MessageFormat.format("Unable to call API method {0}.{1}, The tenant {2} is running and this method can only be called when tenant is paused."
-                    , apiInterfaceName, method.getName(), tenantId));
+            throw new TenantStatusException(MessageFormat.format(
+                    "Unable to call API method {0}.{1}, The tenant {2} is running and this method can only be called when tenant is paused.",
+                    apiInterfaceName, method.getName(), tenantId));
         }
     }
 
     private static class MethodAvailability {
+
         boolean isDeprecated;
         boolean isAvailableOnRunningTenant = true;
         boolean isAvailableOnPausedTenant = true;
@@ -304,7 +322,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private MethodAvailability getMethodAvailability(Object apiInstance, Method method) {
-        AvailableWhenTenantIsPaused availableWhenTenantIsPaused = Optional.ofNullable(method.getAnnotation(AvailableWhenTenantIsPaused.class))
+        AvailableWhenTenantIsPaused availableWhenTenantIsPaused = Optional
+                .ofNullable(method.getAnnotation(AvailableWhenTenantIsPaused.class))
                 .orElseGet(() -> apiInstance.getClass().getAnnotation(AvailableWhenTenantIsPaused.class));
         AvailableOnStoppedNode availableOnStoppedNode = method.getAnnotation(AvailableOnStoppedNode.class);
         MethodAvailability methodAvailability = new MethodAvailability();
@@ -335,7 +354,8 @@ public class ServerAPIImpl implements ServerAPI {
      */
     protected boolean isTenantPaused(final long tenantId, final Session session, boolean isAlreadyInTransaction) {
         try {
-            TenantAdministrationAPI tenantAdministrationAPI = accessResolver.getAPIImplementation(TenantAdministrationAPI.class);
+            TenantAdministrationAPI tenantAdministrationAPI = accessResolver
+                    .getAPIImplementation(TenantAdministrationAPI.class);
             if (isAlreadyInTransaction) {
                 return tenantAdministrationAPI.isPaused();
             } else {
@@ -343,7 +363,8 @@ public class ServerAPIImpl implements ServerAPI {
                         .executeInTransaction(tenantAdministrationAPI::isPaused);
             }
         } catch (final Throwable e) {
-            throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible", e);
+            throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible",
+                    e);
         }
     }
 
@@ -358,16 +379,19 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method, final Session session,
+    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method,
+            final Session session,
             final String apiInterfaceName) throws Throwable {
         if (session == null) {
             throw new BonitaRuntimeException("session is null");
         }
-        final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
+        final UserTransactionService userTransactionService = selectUserTransactionService(session,
+                getSessionType(session));
 
         return userTransactionService.executeInTransaction(() -> {
             try {
-                checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Already in a transaction */true);
+                checkMethodAccessibility(apiImpl, apiInterfaceName, method, session,
+                        /* Already in a transaction */true);
                 return invokeAPI(method, apiImpl, parametersValues);
             } catch (final Throwable cause) {
                 throw new ServerAPIRuntimeException(cause);
@@ -375,8 +399,10 @@ public class ServerAPIImpl implements ServerAPI {
         });
     }
 
-    UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+    UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType)
+            throws BonitaHomeNotSetException,
+            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException,
+            BonitaHomeConfigurationException {
         UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
@@ -385,7 +411,8 @@ public class ServerAPIImpl implements ServerAPI {
                 transactionService = platformServiceAccessor.getTransactionService();
                 break;
             case API:
-                final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+                final TenantServiceAccessor tenantAccessor = platformServiceAccessor
+                        .getTenantServiceAccessor(((APISession) session).getTenantId());
                 transactionService = tenantAccessor.getUserTransactionService();
                 break;
             default:
@@ -394,7 +421,8 @@ public class ServerAPIImpl implements ServerAPI {
         return transactionService;
     }
 
-    protected Object invokeAPI(final Method method, final Object apiImpl, final Object... parametersValues) throws Throwable {
+    protected Object invokeAPI(final Method method, final Object apiImpl, final Object... parametersValues)
+            throws Throwable {
         try {
             return method.invoke(apiImpl, parametersValues);
         } catch (final InvocationTargetException e) {
@@ -424,27 +452,32 @@ public class ServerAPIImpl implements ServerAPI {
         return parameterTypes;
     }
 
-    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws SSchedulerException {
+    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session)
+            throws SSchedulerException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (!schedulerService.isStarted()) {
             logger.debug("The scheduler is not started!");
         }
         final APISession apiSession = (APISession) session;
-        final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(apiSession.getTenantId());
+        final TenantServiceAccessor tenantAccessor = platformAccessor
+                .getTenantServiceAccessor(apiSession.getTenantId());
         final LoginService tenantLoginService = tenantAccessor.getLoginService();
         if (!tenantLoginService.isValid(apiSession.getId())) {
             throw new InvalidSessionException("Invalid session");
         }
     }
 
-    private ClassLoader getTenantClassLoader(final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SClassLoaderException {
+    private ClassLoader getTenantClassLoader(final PlatformServiceAccessor platformServiceAccessor,
+            final Session session) throws SClassLoaderException {
         final APISession apiSession = (APISession) session;
-        final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(apiSession.getTenantId());
+        final TenantServiceAccessor tenantAccessor = platformServiceAccessor
+                .getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), apiSession.getTenantId());
     }
 
-    private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor) throws SClassLoaderException {
+    private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor)
+            throws SClassLoaderException {
         ClassLoader classLoader = null;
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         // get the platform to put it in cache if needed

@@ -34,12 +34,16 @@ public class VirtualClassLoader extends ClassLoader {
 
     /**
      * WARNING!!!!!!
-     * The bigger weakness of this class is that it does not override ALL public, package and protected methods of the java.lang.ClassLoader class
-     * The risk (already experimented with Groovy integration for example) is that this VirtualClassLoader will be the parent of any other kind of classloader
+     * The bigger weakness of this class is that it does not override ALL public, package and protected methods of the
+     * java.lang.ClassLoader class
+     * The risk (already experimented with Groovy integration for example) is that this VirtualClassLoader will be the
+     * parent of any other kind of classloader
      * (GroovyClassLoader for example)
-     * and thus, all protected/package methods can be called with this "child" classloader. If VirtualClassLoader does not override the given method to delegate
+     * and thus, all protected/package methods can be called with this "child" classloader. If VirtualClassLoader does
+     * not override the given method to delegate
      * this to the BonitaClassLoader instance
-     * then the delegation model does not work anymore and some classes/resources can't be found. A good implementation should override all methods...
+     * then the delegation model does not work anymore and some classes/resources can't be found. A good implementation
+     * should override all methods...
      */
     private BonitaClassLoader classloader;
 
@@ -128,7 +132,7 @@ public class VirtualClassLoader extends ClassLoader {
         final BonitaClassLoader classloader = this.classloader;
         destroy(classloader);
         notifyDestroy();
-        if(virtualParent != null){
+        if (virtualParent != null) {
             virtualParent.removeChild(this);
         }
     }
@@ -153,7 +157,8 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + identifier.getType() + ", id=" + identifier.getId() + " delegate: " + classloader;
+        return super.toString() + ", type=" + identifier.getType() + ", id=" + identifier.getId() + " delegate: "
+                + classloader;
     }
 
     public synchronized boolean addListener(ClassLoaderListener listener) {

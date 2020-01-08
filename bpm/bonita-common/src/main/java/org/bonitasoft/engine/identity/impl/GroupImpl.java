@@ -177,6 +177,7 @@ public class GroupImpl implements Group {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description, createdBy, parentPath, creationDate, lastUpdate, iconId);
+        return Objects.hash(id, name, displayName, description, createdBy, parentPath, creationDate, lastUpdate,
+                iconId);
     }
 }

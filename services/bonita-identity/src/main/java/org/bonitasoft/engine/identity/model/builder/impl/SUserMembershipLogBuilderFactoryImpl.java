@@ -21,7 +21,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  */
-public class SUserMembershipLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SUserMembershipLogBuilderFactory {
+public class SUserMembershipLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SUserMembershipLogBuilderFactory {
 
     public static final int USER_MEMBERSHIP_INDEX = 4;
 
@@ -43,12 +44,12 @@ public class SUserMembershipLogBuilderFactoryImpl extends CRUDELogBuilderFactory
     public SUserMembershipLogBuilder createNewInstance() {
         return new SUserMembershipLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return USER_MEMBERSHIP_INDEX_NAME;
     }
-    
+
     @Override
     public String getRoleNameKey() {
         return ROLE_INDEX_NAME;

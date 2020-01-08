@@ -62,16 +62,22 @@ public class APIMethodLocalIT {
             if (!isADefaultMethod(method)) {
                 final Class<?>[] parameterTypes = method.getParameterTypes();
                 for (final Class<?> parameterType : parameterTypes) {
-                    if (!parameterType.isPrimitive() && !Collection.class.isAssignableFrom(parameterType) && !Map.class.isAssignableFrom(parameterType)) {
+                    if (!parameterType.isPrimitive() && !Collection.class.isAssignableFrom(parameterType)
+                            && !Map.class.isAssignableFrom(parameterType)) {
                         final boolean assignableFrom = Serializable.class.isAssignableFrom(parameterType);
-                        assertTrue("Method: " + method.getName() + " of API: " + api.getName() + " contains an unserializable parameter " + parameterType,
+                        assertTrue(
+                                "Method: " + method.getName() + " of API: " + api.getName()
+                                        + " contains an unserializable parameter " + parameterType,
                                 assignableFrom);
                     }
                 }
                 final Class<?> returnType = method.getReturnType();
-                if (!returnType.isPrimitive() && !Collection.class.isAssignableFrom(returnType) && !Map.class.isAssignableFrom(returnType)) {
+                if (!returnType.isPrimitive() && !Collection.class.isAssignableFrom(returnType)
+                        && !Map.class.isAssignableFrom(returnType)) {
                     final boolean assignableFrom = Serializable.class.isAssignableFrom(returnType);
-                    assertTrue("Method: " + method.getName() + " of API: " + api.getName() + " contains an unserializable return type " + returnType,
+                    assertTrue(
+                            "Method: " + method.getName() + " of API: " + api.getName()
+                                    + " contains an unserializable return type " + returnType,
                             assignableFrom);
                 }
             }
@@ -79,7 +85,8 @@ public class APIMethodLocalIT {
     }
 
     private boolean isADefaultMethod(final Method method) {
-        final List<String> defaultMethods = Arrays.asList("wait", "equals", "toString", "hashCode", "getClass", "notify", "notifyAll");
+        final List<String> defaultMethods = Arrays.asList("wait", "equals", "toString", "hashCode", "getClass",
+                "notify", "notifyAll");
         return defaultMethods.contains(method.getName());
     }
 

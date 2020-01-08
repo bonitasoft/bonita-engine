@@ -25,7 +25,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @EqualsAndHashCode(callSuper = true)
 public class SAXMLDataInstance extends SADataInstance {
 
-
     private String value;
     private String namespace;
     private String element;

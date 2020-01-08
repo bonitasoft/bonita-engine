@@ -17,7 +17,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
  * Thrown when the exporting of the content of the process definition under the bonita home fails.
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  * @version 6.3.5
@@ -29,9 +29,10 @@ public class ProcessExportException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessExportException(final Throwable cause) {
@@ -44,7 +45,8 @@ public class ProcessExportException extends ExecutionException {
      * @param message
      *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessExportException(final String message, final Throwable cause) {

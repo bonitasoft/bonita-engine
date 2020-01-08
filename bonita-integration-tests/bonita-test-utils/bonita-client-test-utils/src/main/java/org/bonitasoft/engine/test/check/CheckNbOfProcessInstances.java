@@ -32,7 +32,8 @@ public final class CheckNbOfProcessInstances extends WaitUntil {
     private final ProcessInstanceCriterion orderBy;
 
     @Deprecated
-    public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst, final ProcessInstanceCriterion orderBy,
+    public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst,
+            final ProcessInstanceCriterion orderBy,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.nbOfProcInst = nbOfProcInst;
@@ -41,7 +42,8 @@ public final class CheckNbOfProcessInstances extends WaitUntil {
     }
 
     @Deprecated
-    public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst, final ProcessAPI processAPI) {
+    public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst,
+            final ProcessAPI processAPI) {
         this(repeatEach, timeout, nbOfProcInst, ProcessInstanceCriterion.NAME_ASC, processAPI);
     }
 

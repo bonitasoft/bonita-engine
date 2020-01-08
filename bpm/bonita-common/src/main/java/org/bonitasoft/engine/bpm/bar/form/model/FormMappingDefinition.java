@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.bar.form.model;
 
 import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -56,7 +57,8 @@ public class FormMappingDefinition implements Serializable {
         this.target = target;
     }
 
-    public FormMappingDefinition(final String form, final FormMappingType type, final FormMappingTarget target, final String taskname) {
+    public FormMappingDefinition(final String form, final FormMappingType type, final FormMappingTarget target,
+            final String taskname) {
         this(form, type, target);
         setTaskname(taskname);
     }
@@ -90,7 +92,8 @@ public class FormMappingDefinition implements Serializable {
     public boolean equals(final Object obj) {
         if (obj instanceof FormMappingDefinition) {
             final FormMappingDefinition other = (FormMappingDefinition) obj;
-            return new EqualsBuilder().append(form, other.form).append(target, other.target).append(type, other.type).isEquals();
+            return new EqualsBuilder().append(form, other.form).append(target, other.target).append(type, other.type)
+                    .isEquals();
         }
         return false;
     }

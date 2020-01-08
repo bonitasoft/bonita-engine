@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
@@ -31,10 +36,7 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.connectors.TestConnector3;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
@@ -43,15 +45,9 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.xml.sax.SAXException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
 
 public class ClassLoaderIT extends TestWithTechnicalUser {
+
     @Rule
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
@@ -70,7 +66,8 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         final ActivityInstance task = waitForUserTaskAndGetIt(processInstance, "step1");
 
         assertEquals("stringFromPublicMethod", task.getDisplayName());
-        assertThat(processDeployLog).containsOnlyOnce("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
+        assertThat(processDeployLog)
+                .containsOnlyOnce("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
     }
 
     @Test
@@ -99,10 +96,9 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         getProcessAPI().disableAndDeleteProcessDefinition(processDefinition.getId());
         String processDeployLog = systemOutRule.getLog();
 
-
-        assertThat(processDeployLog).doesNotContain("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
+        assertThat(processDeployLog)
+                .doesNotContain("Refreshing classloader with key: PROCESS:" + processDefinition.getId());
     }
-
 
     private BusinessObjectModel buildCustomBOM() {
         final SimpleField name = new SimpleField();
@@ -116,25 +112,30 @@ public class ClassLoaderIT extends TestWithTechnicalUser {
         return model;
     }
 
-    private BusinessArchive createProcessWithDependencies() throws InvalidExpressionException, InvalidProcessDefinitionException, IOException, InvalidBusinessArchiveFormatException {
+    private BusinessArchive createProcessWithDependencies() throws InvalidExpressionException,
+            InvalidProcessDefinitionException, IOException, InvalidBusinessArchiveFormatException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
-        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
+        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess",
+                String.valueOf(System.currentTimeMillis()));
         pBuilder.addShortTextData("aData", new ExpressionBuilder().createGroovyScriptExpression("myScript",
                 "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName()));
         pBuilder.addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
                         new ExpressionBuilder().createGroovyScriptExpression("myScript",
-                                "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName()));
+                                "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()",
+                                String.class.getName()));
         final DesignProcessDefinition designProcessDefinition = pBuilder.done();
-
 
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(designProcessDefinition);
-        builder.addClasspathResource(new BarResource("mylibrary.jar", IOUtils.toByteArray(CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak"))));
-        builder.addClasspathResource(BuildTestUtil.generateJarAndBuildBarResource(TestFilterWithAutoAssign.class, "TestFilterWithAutoAssign.jar"));
-        builder.addClasspathResource(BuildTestUtil.generateJarAndBuildBarResource(TestConnector3.class, "TestConnector3.jar"));
+        builder.addClasspathResource(new BarResource("mylibrary.jar",
+                IOUtils.toByteArray(CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak"))));
+        builder.addClasspathResource(BuildTestUtil.generateJarAndBuildBarResource(TestFilterWithAutoAssign.class,
+                "TestFilterWithAutoAssign.jar"));
+        builder.addClasspathResource(
+                BuildTestUtil.generateJarAndBuildBarResource(TestConnector3.class, "TestConnector3.jar"));
         return builder.done();
     }
 }

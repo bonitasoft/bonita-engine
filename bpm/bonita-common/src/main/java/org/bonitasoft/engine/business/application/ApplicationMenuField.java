@@ -13,49 +13,49 @@
  **/
 package org.bonitasoft.engine.business.application;
 
+/**
+ * Contains fields used by {@link ApplicationMenuCreator} and {@link ApplicationMenuUpdater}
+ *
+ * @author Elias Ricken de Medeiros
+ * @since 6.4
+ */
+public enum ApplicationMenuField {
 
     /**
-     * Contains fields used by {@link ApplicationMenuCreator} and {@link ApplicationMenuUpdater}
-     * @author Elias Ricken de Medeiros
-     * @since 6.4
+     * References the {@link ApplicationMenu} display name
+     *
+     * @see ApplicationMenu
      */
-    public enum ApplicationMenuField {
+    DISPLAY_NAME,
 
-        /**
-         * References the {@link ApplicationMenu} display name
-         *
-         * @see ApplicationMenu
-         */
-        DISPLAY_NAME,
+    /**
+     * References the identifier of {@link Application} related to the {@link ApplicationMenu}
+     *
+     * @see ApplicationMenu
+     * @see Application
+     */
+    APPLICATION_ID,
 
-        /**
-         * References the identifier of {@link Application} related to the {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         * @see Application
-         */
-        APPLICATION_ID,
+    /**
+     * References the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
+     *
+     * @see ApplicationMenu
+     * @see ApplicationPage
+     */
+    APPLICATION_PAGE_ID,
 
-        /**
-         * References the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         * @see ApplicationPage
-         */
-        APPLICATION_PAGE_ID,
+    /**
+     * References the identifier of parent {@link ApplicationMenu}
+     *
+     * @see ApplicationMenu
+     */
+    PARENT_ID,
 
-        /**
-         * References the identifier of parent {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         */
-        PARENT_ID,
+    /**
+     * References the {@link ApplicationMenu} index
+     *
+     * @see ApplicationMenu
+     */
+    INDEX;
 
-        /**
-         * References the {@link ApplicationMenu} index
-         *
-         * @see ApplicationMenu
-         */
-        INDEX;
-
-    }
+}

@@ -49,17 +49,16 @@ public class AbstractQuartzJobTest {
         abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
     }
 
-
     @Test
     public void should_not_unschedule_job_on_exception() throws Exception {
         // job should never throw an exception and be handled by the JobWrapper
         // we do not unschedule the job in that case. we don't want to loose the job
         doReturn(jobThatFails()).when(schedulerService).getPersistedJob(any());
 
-        try{
+        try {
             abstractQuartzJob.execute(null);
             fail("should throw exception");
-        } catch (JobExecutionException e ){
+        } catch (JobExecutionException e) {
             assertThat(e.unscheduleFiringTrigger()).isFalse();
             assertThat(e.refireImmediately()).isFalse();
         }
@@ -71,11 +70,9 @@ public class AbstractQuartzJobTest {
         abstractQuartzJob.setSchedulerService(schedulerService);
         abstractQuartzJob.setJobDetails(createJobDetails(1, 2));
 
-
         abstractQuartzJob.execute(null);
 
         verify(schedulerService).executeAgain(2, 5000);
     }
-
 
 }

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.commons.exceptions;
 
 /**
  * To define the context of an exception in the message.
- * 
+ *
  * @author Celine Souchet
  */
 public enum SExceptionContext {

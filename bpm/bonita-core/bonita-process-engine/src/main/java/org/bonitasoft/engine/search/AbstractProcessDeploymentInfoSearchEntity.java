@@ -23,9 +23,11 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractProcessDeploymentInfoSearchEntity extends AbstractSearchEntity<ProcessDeploymentInfo, SProcessDefinitionDeployInfo> {
+public abstract class AbstractProcessDeploymentInfoSearchEntity
+        extends AbstractSearchEntity<ProcessDeploymentInfo, SProcessDefinitionDeployInfo> {
 
-    public AbstractProcessDeploymentInfoSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public AbstractProcessDeploymentInfoSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
     }
 

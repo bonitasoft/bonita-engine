@@ -38,7 +38,8 @@ public class SearchFlowNodeInstances<T extends SFlowNodeInstance> implements Tra
 
     private long count;
 
-    public SearchFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService, final QueryOptions queryOptions,
+    public SearchFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService,
+            final QueryOptions queryOptions,
             final Class<T> entityClass) {
         super();
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -49,7 +50,8 @@ public class SearchFlowNodeInstances<T extends SFlowNodeInstance> implements Tra
     @Override
     public void execute() throws SBonitaException {
         result = flowNodeInstanceService.searchFlowNodeInstances(entityClass, queryOptions);
-        final QueryOptions countOptions = new QueryOptions(0, 1, Collections.<OrderByOption> emptyList(), queryOptions.getFilters(),
+        final QueryOptions countOptions = new QueryOptions(0, 1, Collections.<OrderByOption> emptyList(),
+                queryOptions.getFilters(),
                 queryOptions.getMultipleFilter());
         count = flowNodeInstanceService.getNumberOfFlowNodeInstances(entityClass, countOptions);
     }

@@ -58,7 +58,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
-
     private final long processInstanceId;
 
     private final long rootProcessInstanceId;
@@ -69,22 +68,28 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     private long subProcessDefinitionId;
 
-    ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-                              final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
-                              List<Long> flowNodeDefinitionsFilter, Long subProcessDefinitionId) {
-        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
-                DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId), processInstanceId);
+    ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId,
+            final String connectorDefinitionName,
+            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
+            List<Long> flowNodeDefinitionsFilter, Long subProcessDefinitionId) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName,
+                new SExpressionContext(processInstanceId,
+                        DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId),
+                processInstanceId);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;
-        this.filterFlowNodeDefinitions = flowNodeDefinitionsFilter != null ? new FlowNodeIdFilter(flowNodeDefinitionsFilter) : new StartFlowNodeFilter();
+        this.filterFlowNodeDefinitions = flowNodeDefinitionsFilter != null
+                ? new FlowNodeIdFilter(flowNodeDefinitionsFilter) : new StartFlowNodeFilter();
         this.subProcessDefinitionId = subProcessDefinitionId != null ? subProcessDefinitionId : -1;
     }
 
     @Override
-    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
+    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result,
+            final SConnectorDefinition sConnectorDefinition)
             throws SBonitaException {
-        evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+        evaluateOutput(context, result, sConnectorDefinition, processInstanceId,
+                DataInstanceContainer.PROCESS_INSTANCE.name());
     }
 
     @Override
@@ -94,10 +99,13 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
 
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinition(processDefinitionId);
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(sProcessDefinition, filterFlowNodeDefinitions, subProcessDefinitionId);
-        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent,
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(sProcessDefinition, filterFlowNodeDefinitions,
+                subProcessDefinitionId);
+        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance,
+                activationEvent,
                 flowNodeSelector);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
@@ -116,17 +124,21 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected SThrowEventInstance createThrowErrorEventInstance(final Map<String, Object> context, final SEndEventDefinition eventDefinition)
+    protected SThrowEventInstance createThrowErrorEventInstance(final Map<String, Object> context,
+            final SEndEventDefinition eventDefinition)
             throws SBonitaException {
         final BPMInstancesCreator bpmInstancesCreator = getTenantAccessor(context).getBPMInstancesCreator();
-        final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, rootProcessInstanceId,
-                processInstanceId, SFlowElementsContainerType.PROCESS, eventDefinition, rootProcessInstanceId, processInstanceId, false, -1,
+        final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId,
+                rootProcessInstanceId,
+                processInstanceId, SFlowElementsContainerType.PROCESS, eventDefinition, rootProcessInstanceId,
+                processInstanceId, false, -1,
                 SStateCategory.NORMAL, -1);
         return (SThrowEventInstance) createFlowNodeInstance;
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable exception)
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition,
+            final Throwable exception)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
@@ -135,19 +147,24 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         setConnectorOnlyToFailed(context, exception);
         // create a fake definition
         final String errorCode = sConnectorDefinition.getErrorCode();
-        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory
+                .get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
                 .createNewInstance(errorCode).done();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
-        final SEndEventDefinition eventDefinition = BuilderFactory.get(SEndEventDefinitionBuilderFactory.class).createNewInstance(errorCode)
+        final SEndEventDefinition eventDefinition = BuilderFactory.get(SEndEventDefinitionBuilderFactory.class)
+                .createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
         // create an instance using this definition
         final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(context, eventDefinition);
 
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinition(processDefinitionId);
+        final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(
+                sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, throwEventInstance);
 
-        tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true, sProcessDefinition.getId());
+        tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true,
+                sProcessDefinition.getId());
         if (!hasActionToExecute) {
             setConnectorAndContainerToFailed(context, exception);
         }
@@ -155,7 +172,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId = " + processInstanceId + ", connectorDefinitionName = " + connectorDefinitionName;
+        return getClass().getSimpleName() + ": processInstanceId = " + processInstanceId
+                + ", connectorDefinitionName = " + connectorDefinitionName;
     }
 
     @Override
@@ -164,7 +182,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         // final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionId);// FIXME: Uncomment when generate id
-        final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionName);
+        final SConnectorDefinition sConnectorDefinition = processContainer
+                .getConnectorDefinition(connectorDefinitionName);
         if (sConnectorDefinition == null) {
             throw new SConnectorDefinitionNotFoundException(connectorDefinitionName);
         }

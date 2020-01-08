@@ -41,7 +41,8 @@ public abstract class CompilableCode {
 
         String javaxPersistencefilePath = findJarPath(javax.persistence.Basic.class);
         String bdmEntityfilePath = findJarPath(Entity.class);
-        optionList.addAll(Arrays.asList("-classpath", javaxPersistencefilePath + File.pathSeparator + bdmEntityfilePath));
+        optionList
+                .addAll(Arrays.asList("-classpath", javaxPersistencefilePath + File.pathSeparator + bdmEntityfilePath));
         final Boolean compiled = compiler.getTask(null, fileManager, null, optionList, null, compUnits).call();
         assertThat(compiled).isTrue();
     }

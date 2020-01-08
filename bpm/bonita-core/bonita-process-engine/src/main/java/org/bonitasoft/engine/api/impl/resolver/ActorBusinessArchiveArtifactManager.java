@@ -55,7 +55,7 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
     private final TechnicalLoggerService technicalLoggerService;
 
     public ActorBusinessArchiveArtifactManager(ActorMappingService actorMappingService, IdentityService identityService,
-                                               TechnicalLoggerService technicalLoggerService) {
+            TechnicalLoggerService technicalLoggerService) {
         this.actorMappingService = actorMappingService;
         this.identityService = identityService;
         this.technicalLoggerService = technicalLoggerService;
@@ -71,7 +71,7 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
         if (actorInitiator != null) {
             initiatorName = actorInitiator.getName();
             sActors.add(SActor.builder().name(initiatorName).scopeId(processDefinition.getId()).initiator(true)
-            .description(actorInitiator.getDescription()).build());
+                    .description(actorInitiator.getDescription()).build());
         }
         for (final SActorDefinition actor : actors) {
             if (initiatorName == null || !initiatorName.equals(actor.getName())) {
@@ -83,12 +83,14 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
             actorMappingService.addActors(sActors);
             ActorMapping actorMapping = businessArchive.getActorMapping();
             if (actorMapping != null) {
-                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService,identityService);
-                    importActorMapping.execute(actorMapping,processDefinition.getId());
+                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService,
+                        identityService);
+                importActorMapping.execute(actorMapping, processDefinition.getId());
             }
             // ignored
         } catch (SBonitaException e) {
-            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, "Error in importing the actor-mapping: " + e.getMessage());
+            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    "Error in importing the actor-mapping: " + e.getMessage());
         }
         return checkResolution(actorMappingService, processDefinition.getId()).isEmpty();
     }
@@ -104,17 +106,21 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
         try {
             actorMappingService.deleteActors(processDefinition.getId());
         } catch (SActorDeletionException e) {
-            throw new SObjectModificationException("Unable to delete actors of the process definition <" + processDefinition.getName() + ">", e);
+            throw new SObjectModificationException(
+                    "Unable to delete actors of the process definition <" + processDefinition.getName() + ">", e);
         }
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
-        final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, processDefinitionId);
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
+        final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService,
+                processDefinitionId);
         businessArchiveBuilder.setActorMapping(exportActorMapping.getActorMapping());
     }
 
-    public List<Problem> checkResolution(final ActorMappingService actorMappingService, final long processDefinitionId) {
+    public List<Problem> checkResolution(final ActorMappingService actorMappingService,
+            final long processDefinitionId) {
         try {
             final List<Problem> problems = new ArrayList<Problem>();
             QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
@@ -128,11 +134,13 @@ public class ActorBusinessArchiveArtifactManager implements BusinessArchiveArtif
             }
             return problems;
         } catch (final SBonitaReadException e) {
-            return Collections.singletonList((Problem) new ProblemImpl(Level.ERROR, processDefinitionId, "process", "Unable to read actors"));
+            return Collections.singletonList(
+                    (Problem) new ProblemImpl(Level.ERROR, processDefinitionId, "process", "Unable to read actors"));
         }
     }
 
-    private void checkIfAActorMemberExists(final ActorMappingService actorMappingService, final List<Problem> problems, final SActor sActor)
+    private void checkIfAActorMemberExists(final ActorMappingService actorMappingService, final List<Problem> problems,
+            final SActor sActor)
             throws SBonitaReadException {
         final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, 1);
         if (actorMembers.isEmpty()) {

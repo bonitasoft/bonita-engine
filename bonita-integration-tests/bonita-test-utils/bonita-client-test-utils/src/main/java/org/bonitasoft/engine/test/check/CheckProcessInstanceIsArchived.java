@@ -28,7 +28,8 @@ public final class CheckProcessInstanceIsArchived extends WaitUntil {
     private final long processInstance;
 
     @Deprecated
-    public CheckProcessInstanceIsArchived(final int repeatEach, final int timeout, final long processInstance, final ProcessAPI processAPI) {
+    public CheckProcessInstanceIsArchived(final int repeatEach, final int timeout, final long processInstance,
+            final ProcessAPI processAPI) {
         super(repeatEach, timeout, false);
         this.processInstance = processInstance;
         this.processAPI = processAPI;

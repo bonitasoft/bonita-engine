@@ -41,7 +41,8 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String queryName = expression.getContent();
         final String returnType = expression.getReturnType();
@@ -59,18 +60,19 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                 }
                 return businessDataRepository.findByNamedQuery(queryName, numberClass, parameters);
             } else if (List.class.getName().equals(returnType)) {
-                List<Entity> entities =
-                        businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters,
-                                getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters),
-                                getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters));
-                
+                List<Entity> entities = businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters,
+                        getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(),
+                                parameters),
+                        getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(),
+                                parameters));
+
                 List<Entity> e = new ArrayList<>();
                 for (Entity entity : entities) {
                     ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                     Entity proxify = proxyfier.proxify(entity);
                     e.add(proxify);
                 }
-                
+
                 return e;
             } else {
                 Entity findByNamedQuery = businessDataRepository.findByNamedQuery(queryName, Entity.class, parameters);
@@ -82,7 +84,8 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private int getStartIndexParameter(final List<SExpression> dependencies, final Map<Integer, Object> resolvedExpressions, final String expressionName,
+    private int getStartIndexParameter(final List<SExpression> dependencies,
+            final Map<Integer, Object> resolvedExpressions, final String expressionName,
             final Map<String, Serializable> parameters) throws SExpressionEvaluationException {
         for (SExpression dependency : dependencies) {
             if ("startIndex".equals(dependency.getName())) {
@@ -91,10 +94,12 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
             }
         }
         throw new SExpressionEvaluationException(
-                "Pagination parameter 'startIndex' is mandatory when calling 'find*()' methods returning a List of Business Data", expressionName);
+                "Pagination parameter 'startIndex' is mandatory when calling 'find*()' methods returning a List of Business Data",
+                expressionName);
     }
 
-    private int getMaxResultParameter(final List<SExpression> dependencies, final Map<Integer, Object> resolvedExpressions, final String expressionName,
+    private int getMaxResultParameter(final List<SExpression> dependencies,
+            final Map<Integer, Object> resolvedExpressions, final String expressionName,
             final Map<String, Serializable> parameters) throws SExpressionEvaluationException {
         for (SExpression dependency : dependencies) {
             if ("maxResults".equals(dependency.getName())) {
@@ -103,11 +108,13 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
             }
         }
         throw new SExpressionEvaluationException(
-                "Pagination parameter 'maxResults' is mandatory when calling 'find*()' methods returning a List of Business Data", expressionName);
+                "Pagination parameter 'maxResults' is mandatory when calling 'find*()' methods returning a List of Business Data",
+                expressionName);
     }
 
     private boolean isNumber(final String returnType) {
-        return Long.class.getName().equals(returnType) || Integer.class.getName().equals(returnType) || Double.class.getName().equals(returnType)
+        return Long.class.getName().equals(returnType) || Integer.class.getName().equals(returnType)
+                || Double.class.getName().equals(returnType)
                 || Float.class.getName().equals(returnType);
     }
 
@@ -117,7 +124,8 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {

@@ -21,7 +21,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Zhang Bole
  */
 public class SPlatformCommandUpdateBuilderFactoryImpl implements SPlatformCommandUpdateBuilderFactory {
-    
+
     public SPlatformCommandUpdateBuilder createNewInstance() {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SPlatformCommandUpdateBuilderImpl(descriptor);

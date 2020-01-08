@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInst
  */
 public interface SASubProcessActivityInstanceBuilderFactory extends SAActivityInstanceBuilderFactory {
 
-    SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(SSubProcessActivityInstance subProcActInst);
+    SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(
+            SSubProcessActivityInstance subProcActInst);
 
     String getTriggeredByEventKey();
 

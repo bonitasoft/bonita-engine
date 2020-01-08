@@ -16,6 +16,10 @@ package org.bonitasoft.engine.business.data.impl;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
@@ -28,11 +32,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
         implements JsonBusinessDataSerializer, ClassLoaderListener {

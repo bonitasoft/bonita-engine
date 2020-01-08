@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
-
 import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,7 +41,8 @@ public class ExportedUserMembership {
     public ExportedUserMembership() {
     }
 
-    public ExportedUserMembership(String userName, String roleName, String groupName, String groupParentPath, String assignedBy, Long assignedDate) {
+    public ExportedUserMembership(String userName, String roleName, String groupName, String groupParentPath,
+            String assignedBy, Long assignedDate) {
         this.userName = userName;
         this.roleName = roleName;
         this.groupName = groupName;
@@ -112,8 +113,10 @@ public class ExportedUserMembership {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ExportedUserMembership that = (ExportedUserMembership) o;
         return Objects.equals(userName, that.userName) &&
                 Objects.equals(roleName, that.roleName) &&

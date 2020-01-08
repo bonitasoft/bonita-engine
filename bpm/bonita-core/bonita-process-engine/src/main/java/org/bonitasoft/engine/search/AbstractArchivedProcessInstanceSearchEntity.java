@@ -26,19 +26,22 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public abstract class AbstractArchivedProcessInstanceSearchEntity extends AbstractSearchEntity<ArchivedProcessInstance, SAProcessInstance> {
+public abstract class AbstractArchivedProcessInstanceSearchEntity
+        extends AbstractSearchEntity<ArchivedProcessInstance, SAProcessInstance> {
 
     private SProcessDefinition sProcessDefinition;
 
     private ProcessDefinitionService processDefinitionService;
 
-    public AbstractArchivedProcessInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+    public AbstractArchivedProcessInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
             final SProcessDefinition sProcessDefinition) {
         super(searchDescriptor, options);
         this.sProcessDefinition = sProcessDefinition;
     }
 
-    public AbstractArchivedProcessInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+    public AbstractArchivedProcessInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
             final ProcessDefinitionService processDefinitionService) {
         super(searchDescriptor, options);
         this.processDefinitionService = processDefinitionService;

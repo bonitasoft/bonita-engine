@@ -24,7 +24,6 @@ import org.bonitasoft.engine.business.application.ApplicationMenuField;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationMenuCreatorValidator {
 

@@ -17,7 +17,6 @@ import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 
 /**
  * @author Romain Bioteau
- *
  */
 public interface DummyDAO extends BusinessObjectDAO {
 

@@ -13,20 +13,20 @@
  **/
 package org.bonitasoft.engine.bpm;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Instant;
+import java.util.List;
+
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
-import java.time.Instant;
-import java.util.List;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
@@ -34,20 +34,19 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
     private TransactionService transactionService;
     private long oneMinuteAgo = Instant.now().minusSeconds(60).toEpochMilli();
 
-
     @Before
     public void before() throws Exception {
         eventInstanceRepository = getTenantAccessor().getEventInstanceRepository();
         transactionService = getTransactionService();
 
         transactionService.executeInTransaction(() -> {
-            List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(System.currentTimeMillis(), new QueryOptions(0, 1000));
+            List<Long> messageInstanceIdOlderThanCreationDate = eventInstanceRepository
+                    .getMessageInstanceIdOlderThanCreationDate(System.currentTimeMillis(), new QueryOptions(0, 1000));
             System.out.println("ids" + messageInstanceIdOlderThanCreationDate);
             eventInstanceRepository.deleteMessageInstanceByIds(messageInstanceIdOlderThanCreationDate);
             return null;
         });
     }
-
 
     @Test
     public void should_create_message_with_a_creation_date() throws Exception {
@@ -60,7 +59,6 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
         assertThat(createdMessage.getId()).isGreaterThan(0);
         assertThat(createdMessage.getCreationDate()).isGreaterThan(0);
-
 
     }
 
@@ -76,7 +74,6 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
         myMessageOld2.setCreationDate(oneMinuteAgo);
         myMessageOld.setCreationDate(oneMinuteAgo);
 
-
         List<Long> ids = transactionService.executeInTransaction(() -> {
             eventInstanceRepository.createMessageInstance(myMessageNow);
             eventInstanceRepository.createMessageInstance(myMessageOld);
@@ -86,9 +83,7 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
         });
         assertThat(ids).containsExactly(myMessageOld.getId(), myMessageOld2.getId());
 
-
     }
-
 
     @Test
     public void should_get_older_message_with_creationDate_messageName_filter() throws Exception {
@@ -98,9 +93,9 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
         myMessageOld2.setCreationDate(oneMinuteAgo);
         myMessageOld.setCreationDate(oneMinuteAgo);
 
-
         List<Long> ids = transactionService.executeInTransaction(() -> {
-            QueryOptions queryOptions = new QueryOptions(0, 100, emptyList(), singletonList(new FilterOption(SMessageInstance.class, "messageName", "myMessage")), null);
+            QueryOptions queryOptions = new QueryOptions(0, 100, emptyList(),
+                    singletonList(new FilterOption(SMessageInstance.class, "messageName", "myMessage")), null);
 
             eventInstanceRepository.createMessageInstance(myMessageNow);
             eventInstanceRepository.createMessageInstance(myMessageOld);
@@ -109,7 +104,6 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
 
         });
         assertThat(ids).containsExactly(myMessageOld.getId());
-
 
     }
 
@@ -133,12 +127,10 @@ public class EventInstanceRepositoryIT extends CommonBPMServicesTest {
         assertThat(getMessageInstance(sMessageInstance.getId())).isNull();
         assertThat(getMessageInstance(sMessageInstance2.getId())).isNotNull();
 
-
     }
 
     private SMessageInstance getMessageInstance(long id) throws Exception {
         return transactionService.executeInTransaction(() -> eventInstanceRepository.getMessageInstance(id));
     }
-
 
 }

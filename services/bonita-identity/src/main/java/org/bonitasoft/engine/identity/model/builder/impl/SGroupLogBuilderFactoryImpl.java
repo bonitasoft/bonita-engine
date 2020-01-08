@@ -31,7 +31,7 @@ public class SGroupLogBuilderFactoryImpl extends CRUDELogBuilderFactory implemen
     public SGroupLogBuilder createNewInstance() {
         return new SGroupLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return GROUP_INDEX_NAME;

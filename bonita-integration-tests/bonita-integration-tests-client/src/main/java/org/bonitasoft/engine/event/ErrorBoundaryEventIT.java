@@ -44,25 +44,29 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
 
     protected void executionWitherrorEventTriggered(final String catchErrorCode) throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1");
-        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
+        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "pErrorBoundary", "calledProcess", "callStep",
                 catchErrorCode, "delivery");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         final FlowNodeInstance callActivity = waitForFlowNodeInExecutingState(processInstance, "callStep", false);
         final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
         final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstance = getProcessAPI()
+                .getProcessInstance(calledStep1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, user);
 
         waitForProcessToFinish(calledProcessInstance);
         try {
             waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         } catch (final Exception e) {
-            final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
-                    ActivityInstanceCriterion.DEFAULT);
+            final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI()
+                    .getArchivedActivityInstances(processInstance.getId(), 0, 100,
+                            ActivityInstanceCriterion.DEFAULT);
             System.out.println("After completion of the called process");
             for (final ArchivedActivityInstance archivedActivityInstance : archivedActivityInstances) {
-                System.out.println("name=" + archivedActivityInstance.getName() + ", state=" + archivedActivityInstance.getState() + ", archivedDate="
+                System.out.println("name=" + archivedActivityInstance.getName() + ", state="
+                        + archivedActivityInstance.getState() + ", archivedDate="
                         + archivedActivityInstance.getArchiveDate().getTime());
             }
             throw new Exception(archivedActivityInstances.toString(), e);
@@ -79,13 +83,15 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     @Test
     public void errorBoundaryEventNotTriggered() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1");
-        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
+        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "pErrorBoundary", "calledProcess", "callStep",
                 "error1", "delivery");
 
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
             final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
-            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
+            final ProcessInstance calledProcessInstance = getProcessAPI()
+                    .getProcessInstance(calledStep1.getParentProcessInstanceId());
             waitForUserTaskAndExecuteIt(processInstance, "calledStep2", user);
             waitForFlowNodeInState(processInstance, "calledStep1", TestStates.ABORTED, true);
             waitForProcessToFinish(calledProcessInstance);
@@ -102,7 +108,8 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     public void uncaughtThrowErrorEvent() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1");
         // catch a different error
-        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
+        final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "pErrorBoundary", "calledProcess", "callStep",
                 "error2", "delivery");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
@@ -124,9 +131,11 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     @Test
     public void errorEventCaughtAtParentLevel2() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1");
-        final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
+        final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "procDefLevel1", "procDefLevel0", "callStepL1",
                 "error2", "delivery");
-        final ProcessDefinition procDefLevel2 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel2", "procDefLevel1", "callStepL2",
+        final ProcessDefinition procDefLevel2 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "procDefLevel2", "procDefLevel1", "callStepL2",
                 "error1", "delivery");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
@@ -135,8 +144,10 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
         final ActivityInstance calledStep1 = waitForUserTaskAndExecuteAndGetIt(processInstance, "calledStep1", user);
 
-        final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
-        final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstanceL0 = getProcessAPI()
+                .getProcessInstance(calledStep1.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstanceL1 = getProcessAPI()
+                .getProcessInstance(callActivityL1.getParentProcessInstanceId());
 
         waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(processInstance, EXCEPTION_STEP, false);
@@ -155,9 +166,11 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     @Test
     public void errorEventTwoCatchErrorMatching() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1");
-        final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
+        final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "procDefLevel1", "procDefLevel0", "callStepL1",
                 "error1", "delivery");
-        final ProcessDefinition procDefLevel2 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel2", "procDefLevel1", "callStepL2",
+        final ProcessDefinition procDefLevel2 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(
+                "procDefLevel2", "procDefLevel1", "callStepL2",
                 "error1", "delivery");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
@@ -165,12 +178,15 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
         final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
         final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
-        final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
-        final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstanceL0 = getProcessAPI()
+                .getProcessInstance(calledStep1.getParentProcessInstanceId());
+        final ProcessInstance calledProcessInstanceL1 = getProcessAPI()
+                .getProcessInstance(callActivityL1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, user.getId());
 
         waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
-        final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(calledProcessInstanceL1, EXCEPTION_STEP, false);
+        final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(calledProcessInstanceL1, EXCEPTION_STEP,
+                false);
         waitForProcessToFinish(calledProcessInstanceL0);
 
         assignAndExecuteStep(executionStep.getId(), user.getId());
@@ -189,8 +205,10 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     @Test
     public void errorCodeThrownBySubProcessShouldBeCatchByMainProcess() throws Exception {
         final ProcessDefinition subProcess = deployAndEnableSubProcessWhichThrowsAnErrorEvent("SubProcess", "Mistake");
-        final ProcessDefinition midProcess = deployAndEnableMidProcessWhichContainsACallActivity("MidProcess", "SubProcess");
-        final ProcessDefinition mainProcess = deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity("Process", "MidProcess", "Mistake", "acme");
+        final ProcessDefinition midProcess = deployAndEnableMidProcessWhichContainsACallActivity("MidProcess",
+                "SubProcess");
+        final ProcessDefinition mainProcess = deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity("Process",
+                "MidProcess", "Mistake", "acme");
 
         final ProcessInstance instance = getProcessAPI().startProcess(mainProcess.getId());
         waitForFlowNodeInReadyState(instance, EXCEPTION_STEP, true);
@@ -201,9 +219,11 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
 
     @Test
     public void processWithMIUserTaskWithErrorEvent_should_take_the_error_flow() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = BuildTestUtil.buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(PROCESS_NAME,
-                "step1");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorThatThrowException(processDefinitionBuilder);
+        final ProcessDefinitionBuilder processDefinitionBuilder = BuildTestUtil
+                .buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(PROCESS_NAME,
+                        "step1");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorThatThrowException(
+                processDefinitionBuilder);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);

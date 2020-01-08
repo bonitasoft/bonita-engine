@@ -130,9 +130,9 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     @Override
     public <T> T lookup(String serviceName) throws NotFoundException {
-        try{
+        try {
             return beanAccessor.getService(serviceName);
-        }catch (NoSuchBeanDefinitionException e) {
+        } catch (NoSuchBeanDefinitionException e) {
             throw new NotFoundException(e);
         }
 

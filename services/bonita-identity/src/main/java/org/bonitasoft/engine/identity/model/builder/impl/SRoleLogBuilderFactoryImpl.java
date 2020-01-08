@@ -31,7 +31,7 @@ public class SRoleLogBuilderFactoryImpl extends CRUDELogBuilderFactory implement
     public SRoleLogBuilder createNewInstance() {
         return new SRoleLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return ROLE_INDEX_NAME;

@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SSystemComment extends SComment {
+
     public SSystemComment(final long processInstanceId, final String content) {
         super(processInstanceId, content);
     }

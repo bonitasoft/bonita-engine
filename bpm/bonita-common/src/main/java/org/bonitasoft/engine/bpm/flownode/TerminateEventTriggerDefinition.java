@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
-
 /**
  * @author Matthieu Chaffotte
- *
  */
 public interface TerminateEventTriggerDefinition extends EventTriggerDefinition {
 

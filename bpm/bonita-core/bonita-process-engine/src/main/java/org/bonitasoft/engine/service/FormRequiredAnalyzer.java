@@ -31,7 +31,8 @@ public class FormRequiredAnalyzer {
     }
 
     /**
-     * Is a form required to start case / execute task: if there is a contract, a form is required (by the web part only, the Engine never needs a form mapping
+     * Is a form required to start case / execute task: if there is a contract, a form is required (by the web part
+     * only, the Engine never needs a form mapping
      * to start a case / execute a task)
      *
      * @param sFormMapping
@@ -42,15 +43,22 @@ public class FormRequiredAnalyzer {
             return false;
         }
         try {
-            final DesignProcessDefinition designProcessDefinition = processDefinitionService.getDesignProcessDefinition(sFormMapping.getProcessDefinitionId());
+            final DesignProcessDefinition designProcessDefinition = processDefinitionService
+                    .getDesignProcessDefinition(sFormMapping.getProcessDefinitionId());
             if (designProcessDefinition != null) {
                 if (sFormMapping.getType() == SFormMapping.TYPE_PROCESS_START) {
-                    return designProcessDefinition.getContract() != null && designProcessDefinition.getContract().getInputs() != null && !designProcessDefinition.getContract().getInputs().isEmpty();
+                    return designProcessDefinition.getContract() != null
+                            && designProcessDefinition.getContract().getInputs() != null
+                            && !designProcessDefinition.getContract().getInputs().isEmpty();
                 } else // if (sFormMapping.getType() == TYPE_TASK)
                 {
-                    final List<ActivityDefinition> activities = designProcessDefinition.getFlowElementContainer().getActivities();
-                    final UserTaskDefinition userTaskDefinition = findActivityWithName(activities, sFormMapping.getTask());
-                    return userTaskDefinition != null && userTaskDefinition.getContract() != null && userTaskDefinition.getContract().getInputs() != null && !userTaskDefinition.getContract().getInputs().isEmpty();
+                    final List<ActivityDefinition> activities = designProcessDefinition.getFlowElementContainer()
+                            .getActivities();
+                    final UserTaskDefinition userTaskDefinition = findActivityWithName(activities,
+                            sFormMapping.getTask());
+                    return userTaskDefinition != null && userTaskDefinition.getContract() != null
+                            && userTaskDefinition.getContract().getInputs() != null
+                            && !userTaskDefinition.getContract().getInputs().isEmpty();
                 }
             }
         } catch (SBonitaException e) {

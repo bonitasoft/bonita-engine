@@ -35,7 +35,8 @@ public class SearchOpenProcessInstancesSupervisedBy extends AbstractProcessInsta
     private final long userId;
 
     public SearchOpenProcessInstancesSupervisedBy(final ProcessInstanceService processInstanceService,
-            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long userId, final SearchOptions options,
+            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long userId,
+            final SearchOptions options,
             final ProcessDefinitionService processDefinitionService) {
         super(searchEntitiesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;

@@ -27,12 +27,11 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 /**
  * Report incident in a log file located inside the bonita home
  * Is a tenant service must be declared in tenant part
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 public class FileLoggerIncidentHandler implements IncidentHandler {
-
 
     private final Map<Long, Logger> loggers;
 
@@ -46,7 +45,8 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
             final Logger logger = getLogger(tenantId);
             logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
             logger.log(Level.SEVERE, "Exception was", incident.getCause());
-            logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
+            logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of",
+                    incident.getExceptionWhenHandlingFailure());
             final String recoveryProcedure = incident.getRecoveryProcedure();
             if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
                 logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);

@@ -38,7 +38,8 @@ public class GetSPlatformCommands implements TransactionContentWithResult<List<S
 
     private List<SPlatformCommand> platformCommands;
 
-    public GetSPlatformCommands(final PlatformCommandService platformCommandService, final int startIndex, final int maxResults, final CommandCriterion sort) {
+    public GetSPlatformCommands(final PlatformCommandService platformCommandService, final int startIndex,
+            final int maxResults, final CommandCriterion sort) {
         super();
         this.platformCommandService = platformCommandService;
         this.startIndex = startIndex;
@@ -51,11 +52,13 @@ public class GetSPlatformCommands implements TransactionContentWithResult<List<S
         final QueryOptions queryOptions;
         switch (sort) {
             case NAME_ASC:
-                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name", OrderByType.ASC);
+                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name",
+                        OrderByType.ASC);
                 break;
             case NAME_DESC:
             default:
-                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name", OrderByType.DESC);
+                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name",
+                        OrderByType.DESC);
                 break;
         }
         platformCommands = platformCommandService.getPlatformCommands(queryOptions);

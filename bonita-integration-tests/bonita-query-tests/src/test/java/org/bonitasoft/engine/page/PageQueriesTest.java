@@ -64,16 +64,21 @@ public class PageQueriesTest {
     public void should_getPageByName_return_the_page_without_processDefinitionId() throws Exception {
         //given
         repository.add(aPage().withName("aPage").withContent("content of the global page".getBytes()).build());
-        repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes()).withProcessDefinitionId(123L).build());
-        repository.add(aPage().withName("anOtherPage").withContent("content of the process page 2".getBytes()).withProcessDefinitionId(123L).build());
+        repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes())
+                .withProcessDefinitionId(123L).build());
+        repository.add(aPage().withName("anOtherPage").withContent("content of the process page 2".getBytes())
+                .withProcessDefinitionId(123L).build());
         //when
         SPage globalPage = repository.getPageByName("aPage");
         SPage processPage1 = repository.getPageByNameAndProcessDefinitionId("aPage", 123L);
         SPage processPage2 = repository.getPageByNameAndProcessDefinitionId("anOtherPage", 123L);
         //then
-        assertThat(new String(repository.getPageContent(globalPage.getId()).getContent())).isEqualTo("content of the global page");
-        assertThat(new String(repository.getPageContent(processPage1.getId()).getContent())).isEqualTo("content of the process page 1");
-        assertThat(new String(repository.getPageContent(processPage2.getId()).getContent())).isEqualTo("content of the process page 2");
+        assertThat(new String(repository.getPageContent(globalPage.getId()).getContent()))
+                .isEqualTo("content of the global page");
+        assertThat(new String(repository.getPageContent(processPage1.getId()).getContent()))
+                .isEqualTo("content of the process page 1");
+        assertThat(new String(repository.getPageContent(processPage2.getId()).getContent()))
+                .isEqualTo("content of the process page 2");
     }
 
     @Test
@@ -113,7 +118,8 @@ public class PageQueriesTest {
 
         // //then
         assertThat(results).as("should retrieve the page").hasSize(1);
-        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name", "processDefinitionId", "contentType");
+        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name",
+                "processDefinitionId", "contentType");
 
     }
 

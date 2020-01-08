@@ -51,10 +51,14 @@ public class SFormMapping implements PersistentObject {
 
     public String getProcessElementName() {
         switch (FormMappingType.getTypeFromId(this.getType())) {
-            case TASK: return this.getTask();
-            case PROCESS_OVERVIEW: return FormMappingType.PROCESS_OVERVIEW.toString();
-            case PROCESS_START: return FormMappingType.PROCESS_START.toString();
-            default: return null;
+            case TASK:
+                return this.getTask();
+            case PROCESS_OVERVIEW:
+                return FormMappingType.PROCESS_OVERVIEW.toString();
+            case PROCESS_START:
+                return FormMappingType.PROCESS_START.toString();
+            default:
+                return null;
         }
     }
 }

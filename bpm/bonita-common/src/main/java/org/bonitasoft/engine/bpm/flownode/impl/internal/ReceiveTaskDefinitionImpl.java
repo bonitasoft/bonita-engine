@@ -49,7 +49,8 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
         trigger = new CatchMessageEventTriggerDefinitionImpl(messageName);
     }
 
-    public ReceiveTaskDefinitionImpl(final long id, final String name, final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
+    public ReceiveTaskDefinitionImpl(final long id, final String name,
+            final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(id, name);
         trigger = new CatchMessageEventTriggerDefinitionImpl(catchMessageEventTriggerDefinition);
     }
@@ -76,9 +77,12 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ReceiveTaskDefinitionImpl that = (ReceiveTaskDefinitionImpl) o;
         return Objects.equals(trigger, that.trigger);
     }

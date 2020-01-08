@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-
 /**
  * represent the deletion of an persisted element
  */

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @EqualsAndHashCode(callSuper = true)
 
 public class SAReceiveTaskInstance extends SAActivityInstance {
+
     public SAReceiveTaskInstance(final SReceiveTaskInstance sReceiveTaskInstance) {
         super(sReceiveTaskInstance);
     }

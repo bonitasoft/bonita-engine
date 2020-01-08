@@ -31,10 +31,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class CancellingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
-    public CancellingCallActivityStateImpl(ProcessInstanceService processInstanceService, final ArchiveService archiveService, final SCommentService commentService,
-                                           final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-                                           final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService,
-                                           ProcessInstanceInterruptor processInstanceInterruptor) {
+    public CancellingCallActivityStateImpl(ProcessInstanceService processInstanceService,
+            final ArchiveService archiveService, final SCommentService commentService,
+            final DocumentService documentService, final TechnicalLoggerService logger,
+            final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
+            RefBusinessDataService refBusinessDataService,
+            ProcessInstanceInterruptor processInstanceInterruptor) {
         super(processInstanceService, archiveService, commentService, documentService, logger, processDefinitionService,
                 connectorInstanceService, classLoaderService, refBusinessDataService, processInstanceInterruptor);
     }

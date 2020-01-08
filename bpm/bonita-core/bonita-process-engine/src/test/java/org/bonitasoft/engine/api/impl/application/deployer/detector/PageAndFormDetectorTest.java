@@ -17,9 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.io.FileAndContentUtils.file;
 import static org.bonitasoft.engine.io.FileAndContentUtils.zip;
 
-import java.io.File;
-import java.nio.file.Files;
-
 import org.bonitasoft.engine.io.FileAndContent;
 import org.junit.Rule;
 import org.junit.Test;

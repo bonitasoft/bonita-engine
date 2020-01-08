@@ -55,7 +55,8 @@ public class BusinessObjectModelBuilder {
     }
 
     private BusinessObject buildMyBusinessObject() {
-        return aBO("BusinessObject").withField(aStringField("stringField").nullable().build()).withField(aBooleanField("booleanField"))
+        return aBO("BusinessObject").withField(aStringField("stringField").nullable().build())
+                .withField(aBooleanField("booleanField"))
                 .withField(aDateField("dateField").notNullable().build()).withField(aDoubleField("doubleField").build())
                 .withField(anIntegerField("integerField").build()).withField(aTextField("textField").build()).build();
     }

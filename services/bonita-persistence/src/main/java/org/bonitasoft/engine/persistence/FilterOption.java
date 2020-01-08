@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 
 /**
  * @author Matthieu Chaffotte
@@ -44,14 +45,16 @@ public class FilterOption implements Serializable {
 
     private FilterOperationType operationType;
 
-    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object value,
+    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName,
+            final Object value,
             final FilterOperationType operatorType) {
         this(persistentClass, fieldName);
         this.value = value;
         operationType = operatorType;
     }
 
-    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object value) {
+    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName,
+            final Object value) {
         // EQUALS operation by default:
         this(persistentClass, fieldName, value, FilterOperationType.EQUALS);
     }
@@ -61,7 +64,8 @@ public class FilterOption implements Serializable {
         this.fieldName = fieldName;
     }
 
-    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object from, final Object to) {
+    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName,
+            final Object from, final Object to) {
         // EQUALS operation by default:
         this(persistentClass, fieldName, null, FilterOperationType.BETWEEN);
         this.from = from;

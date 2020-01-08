@@ -91,7 +91,7 @@ public class Query {
         return List.class.getName().equals(returnType);
     }
 
-    public boolean isCountQuery(){
+    public boolean isCountQuery() {
         return Long.class.getName().equals(returnType);
     }
 
@@ -144,7 +144,8 @@ public class Query {
 
     @Override
     public String toString() {
-        return "Query [name=" + name + ", content=" + content + ", returnType=" + returnType + ", queryParameters=" + queryParameters + "]";
+        return "Query [name=" + name + ", content=" + content + ", returnType=" + returnType + ", queryParameters="
+                + queryParameters + "]";
     }
 
 }

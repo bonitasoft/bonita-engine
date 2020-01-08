@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.lock.LockService;
@@ -28,7 +29,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 public class SequenceManagerImplTest {
-
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -51,6 +51,7 @@ public class SequenceManagerImplTest {
     @Before
     public void before() {
         sequenceManager = new SequenceManagerImpl(lockService, sequenceMappingProvider, dataSource, 2, 1, 1) {
+
             @Override
             TenantSequenceManagerImpl createTenantSequenceManager(long tenantId) {
                 callsToCreateTenantSequenceManager.incrementAndGet();

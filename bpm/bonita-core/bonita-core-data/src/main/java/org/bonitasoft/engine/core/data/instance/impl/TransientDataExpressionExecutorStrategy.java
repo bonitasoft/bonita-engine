@@ -43,8 +43,10 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         return evaluate(Arrays.asList(expression), dependencyValues, resolvedExpressions, containerState).get(0);
     }
 
@@ -55,7 +57,8 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Object> resolvedExpressions, final ContainerState containerState) throws SExpressionEvaluationException,
+            final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+            throws SExpressionEvaluationException,
             SExpressionDependencyMissingException {
         long containerId;
         String containerType;
@@ -75,7 +78,8 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
         if (dataNames.isEmpty()) {
             return buildExpressionResultSameOrderAsInputList(expressions, results);
         }
-        if (dependencyValues != null && dependencyValues.containsKey(CONTAINER_ID_KEY) && dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
+        if (dependencyValues != null && dependencyValues.containsKey(CONTAINER_ID_KEY)
+                && dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
             String currentData = null;
             try {
                 containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
@@ -90,10 +94,12 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
                 throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             }
         }
-        throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
+        throw new SExpressionDependencyMissingException(
+                "The context to evaluate the data '" + dataNames + "' was not set");
     }
 
-    private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
+    private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions,
+            final Map<String, Serializable> results) {
         return expressions.stream()
                 .map(exp -> results.get(exp.getContent()))
                 .collect(Collectors.toList());

@@ -69,7 +69,8 @@ public class SPageImplTest {
     @Test
     public void should_set_all_fields_from_sPage() {
         //given
-        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED,
+                LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
 
@@ -83,7 +84,8 @@ public class SPageImplTest {
     @Test
     public void should_set_content_type_and_process_definition() {
         //given
-        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED,
+                LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
 

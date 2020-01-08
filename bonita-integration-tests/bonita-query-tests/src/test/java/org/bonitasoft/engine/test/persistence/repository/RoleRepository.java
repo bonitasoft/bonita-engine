@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import java.util.List;
-
-import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
@@ -36,6 +32,5 @@ public class RoleRepository extends TestRepository {
         namedQuery.setParameter("name", name);
         return ((SRole) namedQuery.uniqueResult());
     }
-
 
 }

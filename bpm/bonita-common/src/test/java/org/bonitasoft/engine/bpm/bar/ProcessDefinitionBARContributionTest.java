@@ -63,7 +63,8 @@ public class ProcessDefinitionBARContributionTest {
     public final void serializeDeserializeProcessDefinitionWithContract() throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessBuilderDefinition();
         processBuilder.addUserTask("taskWithInput", ACTOR_NAME).addContract();
-        processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addInput("simpleInput", Type.INTEGER, DESCRIPTION)
+        processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract()
+                .addInput("simpleInput", Type.INTEGER, DESCRIPTION)
                 .addConstraint("Mandatory", "in != null", "in must be set", "in");
         processBuilder.addUserTask("taskWithComplexInput", ACTOR_NAME).addContract()
                 .addComplexInput("complexInput", DESCRIPTION).addInput("simple", Type.TEXT, DESCRIPTION);
@@ -101,17 +102,20 @@ public class ProcessDefinitionBARContributionTest {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("6.0 namespace is not compatible with your current version");
 
-        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
+        new ProcessDefinitionBARContribution()
+                .checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
     }
 
     @Test
     public void checkVersion_should_accept_new_7_4_content() throws Exception {
-        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
+        new ProcessDefinitionBARContribution()
+                .checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
     }
 
     @Test
     public void convertXmlToProcess_should_accept_new_7_2_content() throws Exception {
-        new ProcessDefinitionBARContribution().convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
+        new ProcessDefinitionBARContribution()
+                .convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
     }
 
     @Test
@@ -135,7 +139,8 @@ public class ProcessDefinitionBARContributionTest {
         new ProcessDefinitionBARContribution().checkVersion("invalid");
     }
 
-    private DesignProcessDefinition checkSerializeDeserializeProcessDefinition(final DesignProcessDefinition designProcessDefinition) throws IOException,
+    private DesignProcessDefinition checkSerializeDeserializeProcessDefinition(
+            final DesignProcessDefinition designProcessDefinition) throws IOException,
             InvalidBusinessArchiveFormatException {
         // Serialize designProcessDefinition
         final File processDesignFolder = temporaryFolder.newFolder();
@@ -143,35 +148,46 @@ public class ProcessDefinitionBARContributionTest {
         processDefinitionBARContribution.serializeProcessDefinition(processDesignFolder, designProcessDefinition);
 
         // Deserialize designProcessDefinition
-        final File processDesignFile = new File(processDesignFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        final DesignProcessDefinition resultDesignProcessDefinition = processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
+        final File processDesignFile = new File(processDesignFolder,
+                ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+        final DesignProcessDefinition resultDesignProcessDefinition = processDefinitionBARContribution
+                .deserializeProcessDefinition(processDesignFile);
         assertThat(resultDesignProcessDefinition).isEqualTo(designProcessDefinition);
         return resultDesignProcessDefinition;
     }
 
-    private DesignProcessDefinition createDesignProcessDefinition() throws InvalidExpressionException, InvalidProcessDefinitionException {
+    private DesignProcessDefinition createDesignProcessDefinition()
+            throws InvalidExpressionException, InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder processBuilder = createProcessBuilderDefinition();
         return processBuilder.done();
     }
 
     private ProcessDefinitionBuilder createProcessBuilderDefinition() throws InvalidExpressionException {
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME, true);
         processBuilder.addActor("actor2").addDescription(DESCRIPTION);
         processBuilder.addDescription(DESCRIPTION);
-        processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
-                .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
-        processBuilder.addUserTask("UserTask", ACTOR_NAME).addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
+        processBuilder.addAutomaticTask("AutomaticTask")
+                .addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
+                .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent")
+                .addSignalEventTrigger("signalName");
+        processBuilder.addUserTask("UserTask", ACTOR_NAME)
+                .addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
                 .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
-        processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
+        processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
+                ConnectorEvent.ON_ENTER);
         processBuilder.addDocumentDefinition("Doc").addUrl("plop");
         processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
-        processBuilder.addBlobData("BlobData", null).addDescription("blolbDescription").addBooleanData("BooleanData", null);
+        processBuilder.addBlobData("BlobData", null).addDescription("blolbDescription").addBooleanData("BooleanData",
+                null);
         processBuilder.addDisplayName("plop").addDisplayDescription("plop2").addEndEvent("EndEvent");
-        processBuilder.addIntermediateCatchEvent("IntermediateCatchEvent").addIntermediateThrowEvent("IntermediateThrowEvent");
+        processBuilder.addIntermediateCatchEvent("IntermediateCatchEvent")
+                .addIntermediateThrowEvent("IntermediateThrowEvent");
         processBuilder.addReceiveTask("ReceiveTask", "messageName");
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
@@ -183,29 +199,37 @@ public class ProcessDefinitionBARContributionTest {
         Expression value1 = new ExpressionBuilder().createConstantStringExpression("value1");
         Expression value2 = new ExpressionBuilder().createConstantStringExpression("value2");
         Expression processValue1 = new ExpressionBuilder().createConstantStringExpression("processValue1");
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithContext", "1.0");
-        processBuilder.addUserTask("taskWithContext", ACTOR_NAME).addContextEntry("key1", value1).addContextEntry("key2", value2);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithContext", "1.0");
+        processBuilder.addUserTask("taskWithContext", ACTOR_NAME).addContextEntry("key1", value1)
+                .addContextEntry("key2", value2);
         processBuilder.addContextEntry("processKey1", processValue1);
         processBuilder.addUserTask("taskWithoutContext", ACTOR_NAME);
         processBuilder.addActor(ACTOR_NAME);
 
-        DesignProcessDefinition designProcessDefinition = checkSerializeDeserializeProcessDefinition(processBuilder.done());
+        DesignProcessDefinition designProcessDefinition = checkSerializeDeserializeProcessDefinition(
+                processBuilder.done());
         final ContextEntry contextEntry = designProcessDefinition.getContext().get(0);
         assertThat(contextEntry.getKey()).isEqualTo("processKey1");
         assertThat(contextEntry.getExpression().isEquivalent(processValue1))
                 .as("expected Expression 'processValue1' is not equivalent").isTrue();
 
-        final ContextEntry taskWithContext0 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext"))
-                .getContext().get(0);
+        final ContextEntry taskWithContext0 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer()
+                .getActivity("taskWithContext"))
+                        .getContext().get(0);
         assertThat(taskWithContext0.getKey()).isEqualTo("key1");
-        assertThat(taskWithContext0.getExpression().isEquivalent(value1)).as("expected Expression 'value1' is not equivalent").isTrue();
+        assertThat(taskWithContext0.getExpression().isEquivalent(value1))
+                .as("expected Expression 'value1' is not equivalent").isTrue();
 
-        final ContextEntry taskWithContext1 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext"))
-                .getContext().get(1);
+        final ContextEntry taskWithContext1 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer()
+                .getActivity("taskWithContext"))
+                        .getContext().get(1);
         assertThat(taskWithContext1.getKey()).isEqualTo("key2");
-        assertThat(taskWithContext1.getExpression().isEquivalent(value2)).as("expected Expression 'value2' is not equivalent").isTrue();
+        assertThat(taskWithContext1.getExpression().isEquivalent(value2))
+                .as("expected Expression 'value2' is not equivalent").isTrue();
 
-        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithoutContext")).getContext()).isEmpty();
+        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer()
+                .getActivity("taskWithoutContext")).getContext()).isEmpty();
     }
 
 }

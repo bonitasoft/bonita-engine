@@ -76,22 +76,26 @@ public class PlatformAPIAccessor {
      * @throws ServerAPIException
      * @throws UnknownAPITypeException
      */
-    public static PlatformLoginAPI getPlatformLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static PlatformLoginAPI getPlatformLoginAPI()
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PlatformLoginAPI.class);
     }
 
-    static <T> T getAPI(final Class<T> clazz, final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+    static <T> T getAPI(final Class<T> clazz, final PlatformSession session)
+            throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz },
+                sessionInterceptor);
     }
 
     static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz },
+                sessionInterceptor);
     }
 
     /**
@@ -104,7 +108,8 @@ public class PlatformAPIAccessor {
      * @throws ServerAPIException
      * @throws UnknownAPITypeException
      */
-    public static PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static PlatformAPI getPlatformAPI(final PlatformSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PlatformAPI.class, session);
     }
 
@@ -118,7 +123,8 @@ public class PlatformAPIAccessor {
      * @throws UnknownAPITypeException
      * @throws InvalidSessionException
      */
-    public static PlatformCommandAPI getPlatformCommandAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+    public static PlatformCommandAPI getPlatformCommandAPI(final PlatformSession session)
+            throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(PlatformCommandAPI.class, session);
     }

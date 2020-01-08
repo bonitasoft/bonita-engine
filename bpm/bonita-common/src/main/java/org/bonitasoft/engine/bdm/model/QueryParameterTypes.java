@@ -22,22 +22,26 @@ import java.util.stream.Stream;
 
 public enum QueryParameterTypes {
 
-    STRING(String.class.getCanonicalName(), String.class),
-    INTEGER(Integer.class.getCanonicalName(), Integer.class), 
-    DOUBLE(Double.class.getCanonicalName(), Double.class),
-    LONG(Long.class.getCanonicalName(), Long.class),
-    FLOAT(Float.class.getCanonicalName(), Float.class),
-    DATE(Date.class.getCanonicalName(), Date.class),
-    BOOLEAN(Boolean.class.getCanonicalName(),Boolean.class),
-    LOCALDATETIME(LocalDateTime.class.getCanonicalName(),LocalDateTime.class),
-    LOCALDATE(LocalDate.class.getCanonicalName(),LocalDate.class),
-    OFFSETDATETIME(OffsetDateTime.class.getCanonicalName(),OffsetDateTime.class),
-    STRING_ARRAY(String[].class.getCanonicalName(),String[].class),
-    INT_ARRAY(Integer[].class.getCanonicalName(),Integer[].class),
-    LONG_ARRAY(Long[].class.getCanonicalName(),Long[].class),
-    DOUBLE_ARRAY(Double[].class.getCanonicalName(), Double[].class),
-    FLOAT_ARRAY(Float[].class.getCanonicalName(), Float[].class);
-    
+    STRING(String.class.getCanonicalName(), String.class), INTEGER(Integer.class.getCanonicalName(),
+            Integer.class), DOUBLE(Double.class.getCanonicalName(), Double.class), LONG(Long.class.getCanonicalName(),
+                    Long.class), FLOAT(Float.class.getCanonicalName(), Float.class), DATE(Date.class.getCanonicalName(),
+                            Date.class), BOOLEAN(Boolean.class.getCanonicalName(), Boolean.class), LOCALDATETIME(
+                                    LocalDateTime.class.getCanonicalName(),
+                                    LocalDateTime.class), LOCALDATE(LocalDate.class.getCanonicalName(),
+                                            LocalDate.class), OFFSETDATETIME(OffsetDateTime.class.getCanonicalName(),
+                                                    OffsetDateTime.class), STRING_ARRAY(
+                                                            String[].class.getCanonicalName(),
+                                                            String[].class), INT_ARRAY(
+                                                                    Integer[].class.getCanonicalName(),
+                                                                    Integer[].class), LONG_ARRAY(
+                                                                            Long[].class.getCanonicalName(),
+                                                                            Long[].class), DOUBLE_ARRAY(
+                                                                                    Double[].class.getCanonicalName(),
+                                                                                    Double[].class), FLOAT_ARRAY(
+                                                                                            Float[].class
+                                                                                                    .getCanonicalName(),
+                                                                                            Float[].class);
+
     private Class<?> clazz;
     private String name;
 

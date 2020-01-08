@@ -42,7 +42,8 @@ public class SearchUserDescriptor extends SearchEntityDescriptor {
         userKeys.put(UserSearchDescriptor.LAST_CONNECTION, new FieldDescriptor(SUser.class, SUser.LAST_CONNECTION));
         userKeys.put(UserSearchDescriptor.MANAGER_USER_ID, new FieldDescriptor(SUser.class, SUser.MANAGER_USER_ID));
         userKeys.put(UserSearchDescriptor.ROLE_ID, new FieldDescriptor(SUserMembership.class, SUserMembership.ROLE_ID));
-        userKeys.put(UserSearchDescriptor.GROUP_ID, new FieldDescriptor(SUserMembership.class, SUserMembership.GROUP_ID));
+        userKeys.put(UserSearchDescriptor.GROUP_ID,
+                new FieldDescriptor(SUserMembership.class, SUserMembership.GROUP_ID));
 
         userAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> userFields = new HashSet<String>(4);

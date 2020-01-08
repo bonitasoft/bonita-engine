@@ -32,7 +32,8 @@ public class UniqueNameValidationRule extends ValidationRule<BusinessObjectModel
     @Override
     protected ValidationStatus validate(BusinessObjectModel bom) {
         ValidationStatus validationStatus = new ValidationStatus();
-        validationStatus.addValidationStatus(uniqueNameValidator.validate(bom.getUniqueConstraints(), "unique contraints"));
+        validationStatus
+                .addValidationStatus(uniqueNameValidator.validate(bom.getUniqueConstraints(), "unique contraints"));
         validationStatus.addValidationStatus(uniqueNameValidator.validate(bom.getIndexes(), "indexes"));
         return validationStatus;
     }

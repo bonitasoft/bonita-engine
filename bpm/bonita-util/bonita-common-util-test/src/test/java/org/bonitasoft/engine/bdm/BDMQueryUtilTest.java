@@ -87,7 +87,8 @@ public class BDMQueryUtilTest {
 
         // then:
         assertThat(queries).extracting(Query::getName)
-                .containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr","countForFindByUnikAttr");
+                .containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr",
+                        "countForFindByUnikAttr");
     }
 
     protected SimpleField aStringField(final String name) {
@@ -159,11 +160,13 @@ public class BDMQueryUtilTest {
         bo.setQualifiedName("org.bonita.Employee");
 
         assertThat(BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)).extracting("name", "content", "returnType")
-                .contains(tuple("findByPersistenceId", "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n", "org.bonita.Employee"));
+                .contains(tuple("findByPersistenceId",
+                        "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n", "org.bonita.Employee"));
     }
 
     @Test
-    public void should_not_generate_findByPersistenceId_query_in_provided_queries_names_if_already_defined_in_custom_queries() throws Exception {
+    public void should_not_generate_findByPersistenceId_query_in_provided_queries_names_if_already_defined_in_custom_queries()
+            throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -180,6 +183,5 @@ public class BDMQueryUtilTest {
         assertThat(BDMQueryUtil.getCountQueryName("findByStreet")).isEqualTo("countForFindByStreet");
         assertThat(BDMQueryUtil.getCountQueryName("myQuery")).isEqualTo("countForMyQuery");
     }
-
 
 }

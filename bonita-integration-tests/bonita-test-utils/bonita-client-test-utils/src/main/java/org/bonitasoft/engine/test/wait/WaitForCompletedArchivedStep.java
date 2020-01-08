@@ -35,7 +35,8 @@ public final class WaitForCompletedArchivedStep extends WaitUntil {
 
     private ArchivedHumanTaskInstance archivedHumanTaskInstance;
 
-    public WaitForCompletedArchivedStep(final int repeatEach, final int timeout, final String stepName, final long processDefinitionId,
+    public WaitForCompletedArchivedStep(final int repeatEach, final int timeout, final String stepName,
+            final long processDefinitionId,
             final ProcessAPI processApi) {
         super(repeatEach, timeout);
         this.processApi = processApi;
@@ -49,7 +50,8 @@ public final class WaitForCompletedArchivedStep extends WaitUntil {
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, id);
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.NAME, value);
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.COMPLETED_STATE);
-        final SearchResult<ArchivedHumanTaskInstance> searchArchivedTasks = processApi.searchArchivedHumanTasks(builder.done());
+        final SearchResult<ArchivedHumanTaskInstance> searchArchivedTasks = processApi
+                .searchArchivedHumanTasks(builder.done());
         final boolean ok = searchArchivedTasks.getCount() >= 1;
         if (ok) {
             archivedHumanTaskInstance = searchArchivedTasks.getResult().get(0);

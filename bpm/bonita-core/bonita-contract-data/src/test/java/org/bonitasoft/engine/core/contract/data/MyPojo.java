@@ -19,6 +19,7 @@ import java.io.Serializable;
  * @author Baptiste Mesta
  */
 class MyPojo implements Serializable {
+
     private final String name;
     private final byte[] content;
 

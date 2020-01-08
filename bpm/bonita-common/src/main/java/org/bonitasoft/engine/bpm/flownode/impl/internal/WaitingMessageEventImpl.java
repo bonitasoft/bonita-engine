@@ -31,7 +31,8 @@ public class WaitingMessageEventImpl extends WaitingEventImpl implements Waiting
     public WaitingMessageEventImpl() {
     }
 
-    public WaitingMessageEventImpl(final BPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+    public WaitingMessageEventImpl(final BPMEventType eventType, final long processdefinitionId,
+            final String processName, final long flowNodeDefinitionId,
             final String messageName) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId);
         this.messageName = messageName;

@@ -65,35 +65,41 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         final long userId = user.getId();
 
         // create process1
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2"),
+                        Arrays.asList(true, true));
         enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user));
         final ProcessInstance pi1 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(0).getId());
         waitForUserTask(pi1, "step1");
 
         // create process2
-        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2",
-                PROCESS_VERSION,
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2",
+                        PROCESS_VERSION,
+                        Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user));
         final ProcessInstance pi2 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(1).getId());
         waitForUserTask(pi2, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
         builder.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.ASC);
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId, builder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI()
+                .searchProcessDeploymentInfosStartedBy(userId, builder.done());
         assertEquals(2, searchRes.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos = searchRes.getResult();
-        assertEquals("The first process definition must be " + designProcessDefinition1.getName(), enabledProcessDefinitions.get(0).getId(),
+        assertEquals("The first process definition must be " + designProcessDefinition1.getName(),
+                enabledProcessDefinitions.get(0).getId(),
                 processDeploymentInfos.get(0).getProcessId());
-        assertEquals("The second process definition must be " + designProcessDefinition2.getName(), enabledProcessDefinitions.get(1).getId(),
+        assertEquals("The second process definition must be " + designProcessDefinition2.getName(),
+                enabledProcessDefinitions.get(1).getId(),
                 processDeploymentInfos.get(1).getProcessId());
 
         // test search in order
         final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 5);
         builder1.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.DESC);
-        final SearchResult<ProcessDeploymentInfo> searchRes1 = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId, builder1.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes1 = getProcessAPI()
+                .searchProcessDeploymentInfosStartedBy(userId, builder1.done());
         assertEquals(2, searchRes1.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos1 = searchRes1.getResult();
         assertNotNull(processDeploymentInfos1);
@@ -104,7 +110,8 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         // test term
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 5);
         builder2.searchTerm("My_Process2"); // use name as term
-        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId, builder2.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI()
+                .searchProcessDeploymentInfosStartedBy(userId, builder2.done());
         assertEquals(1, searchRes2.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos2 = searchRes2.getResult();
         assertNotNull(processDeploymentInfos2);
@@ -114,7 +121,8 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         // test filter
         final SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 5);
         builder3.filter(ProcessDeploymentInfoSearchDescriptor.NAME, "My_Process2");
-        final SearchResult<ProcessDeploymentInfo> searchRes3 = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId, builder3.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes3 = getProcessAPI()
+                .searchProcessDeploymentInfosStartedBy(userId, builder3.done());
         assertEquals(1, searchRes3.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos3 = searchRes3.getResult();
         assertNotNull(processDeploymentInfos3);
@@ -130,7 +138,8 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         // Get all process definitions, reverse order:
         SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
-        final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(2, searchRes0.getCount());
         // reverse order:
         assertEquals(enabledProcessDefinitions.get(0).getId(), searchRes0.getResult().get(1).getProcessId());
@@ -139,13 +148,15 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         // partial term search
         optsBuilder = new SearchOptionsBuilder(0, 5);
         optsBuilder.searchTerm(PROCESS_NAME); // use process def as term
-        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(2, searchRes2.getCount());
 
         // partial term search
         optsBuilder = new SearchOptionsBuilder(0, 5);
         optsBuilder.searchTerm("1.01"); // use process def as term
-        final SearchResult<ProcessDeploymentInfo> searchRes3 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes3 = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchRes3.getCount());
     }
 
@@ -157,14 +168,17 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         // Get all process definitions, reverse order:
         SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.ASC);
-        SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchRes0.getCount());
-        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.00", "1.01", "1.02", "1.03", "1.04");
+        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.00", "1.01", "1.02", "1.03",
+                "1.04");
         optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.DESC);
         searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchRes0.getCount());
-        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.04", "1.03", "1.02", "1.01", "1.00");
+        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.04", "1.03", "1.02", "1.01",
+                "1.00");
     }
 
     @Test
@@ -173,15 +187,17 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(5, user);
 
         // create 1 disabled process
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("plop",
-                PROCESS_VERSION, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("plop",
+                        PROCESS_VERSION, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         disabledProcessDefinitions.add(getProcessAPI().deploy(designProcessDefinition));
 
         // Filter on version
         SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.ASC);
         optsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.VERSION, "1.03");
-        SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchResult.getCount());
         assertThat(searchResult.getResult()).extracting("version").containsExactly("1.03");
 
@@ -191,7 +207,8 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         optsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.ACTIVATION_STATE, ActivationState.ENABLED.name());
         searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchResult.getCount());
-        assertFalse("Don't have to contain the process definition \"plop\" !!", searchResult.getResult().contains(enabledProcessDefinitions.get(4)));
+        assertFalse("Don't have to contain the process definition \"plop\" !!",
+                searchResult.getResult().contains(enabledProcessDefinitions.get(4)));
     }
 
     @Test
@@ -205,14 +222,16 @@ public class SearchProcessDefinitionIT extends TestWithUser {
     }
 
     private void searchProcessDefinitions(final String processName, final String processVersion) throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                processVersion);
         processBuilder.addActor(ACTOR_NAME);
         enabledProcessDefinitions.add(deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user));
 
         // Get all process definitions, reverse order:
         final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.searchTerm("process'");
-        final SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchResult.getCount());
         assertEquals(processName, searchResult.getResult().get(0).getName());
     }
@@ -226,19 +245,22 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.ASC);
         optsBuilder.searchTerm("1.03");
-        final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchRes0.getCount());
         assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.03");
     }
 
-    private void createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(final int nbProcess, final User user) throws BonitaException {
+    private void createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(final int nbProcess, final User user)
+            throws BonitaException {
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;
             if (i >= 0 && i < 10) {
                 processName += "0";
             }
-            final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
-                    PROCESS_VERSION + i, Arrays.asList("step1_" + i, "step2_" + i), Arrays.asList(true, true));
+            final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                    .buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
+                            PROCESS_VERSION + i, Arrays.asList("step1_" + i, "step2_" + i), Arrays.asList(true, true));
             enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user));
         }
     }

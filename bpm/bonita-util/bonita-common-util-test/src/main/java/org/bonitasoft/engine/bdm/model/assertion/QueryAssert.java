@@ -24,133 +24,141 @@ import org.bonitasoft.engine.bdm.model.QueryParameter;
  */
 public class QueryAssert extends AbstractAssert<QueryAssert, Query> {
 
-  /**
-   * Creates a new <code>{@link QueryAssert}</code> to make assertions on actual Query.
-   * @param actual the Query we want to make assertions on.
-   */
-  public QueryAssert(Query actual) {
-    super(actual, QueryAssert.class);
-  }
-
-  /**
-   * An entry point for QueryAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
-   * With a static import, one can write directly: <code>assertThat(myQuery)</code> and get specific assertion with code completion.
-   * @param actual the Query we want to make assertions on.
-   * @return a new <code>{@link QueryAssert}</code>
-   */
-  public static QueryAssert assertThat(Query actual) {
-    return new QueryAssert(actual);
-  }
-
-  /**
-   * Verifies that the actual Query's content is equal to the given one.
-   * @param content the given content to compare the actual Query's content to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual Query's content is not equal to the given one.
-   */
-  public QueryAssert hasContent(String content) {
-    // check that actual Query we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected content of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualContent = actual.getContent();
-    if (!Objects.areEqual(actualContent, content)) {
-      failWithMessage(assertjErrorMessage, actual, content, actualContent);
+    /**
+     * Creates a new <code>{@link QueryAssert}</code> to make assertions on actual Query.
+     *
+     * @param actual the Query we want to make assertions on.
+     */
+    public QueryAssert(Query actual) {
+        super(actual, QueryAssert.class);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
-   * Verifies that the actual Query's name is equal to the given one.
-   * @param name the given name to compare the actual Query's name to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual Query's name is not equal to the given one.
-   */
-  public QueryAssert hasName(String name) {
-    // check that actual Query we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected name of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualName = actual.getName();
-    if (!Objects.areEqual(actualName, name)) {
-      failWithMessage(assertjErrorMessage, actual, name, actualName);
+    /**
+     * An entry point for QueryAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
+     * With a static import, one can write directly: <code>assertThat(myQuery)</code> and get specific assertion with
+     * code completion.
+     *
+     * @param actual the Query we want to make assertions on.
+     * @return a new <code>{@link QueryAssert}</code>
+     */
+    public static QueryAssert assertThat(Query actual) {
+        return new QueryAssert(actual);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual Query's content is equal to the given one.
+     *
+     * @param content the given content to compare the actual Query's content to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual Query's content is not equal to the given one.
+     */
+    public QueryAssert hasContent(String content) {
+        // check that actual Query we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual Query's queryParameters contains the given QueryParameter elements.
-   * @param queryParameters the given elements that should be contained in actual Query's queryParameters.
-   * @return this assertion object.
-   * @throws AssertionError if the actual Query's queryParameters does not contain all given QueryParameter elements.
-   */
-  public QueryAssert hasQueryParameters(QueryParameter... queryParameters) {
-    // check that actual Query we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected content of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // check that given QueryParameter varargs is not null.
-    if (queryParameters == null) throw new AssertionError("Expecting queryParameters parameter not to be null.");
-    
-    // check with standard error message, to set another message call: info.overridingErrorMessage("my error message");
-    Iterables.instance().assertContains(info, actual.getQueryParameters(), queryParameters);
+        // null safe check
+        String actualContent = actual.getContent();
+        if (!Objects.areEqual(actualContent, content)) {
+            failWithMessage(assertjErrorMessage, actual, content, actualContent);
+        }
 
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
-   * Verifies that the actual Query has no queryParameters.
-   * @return this assertion object.
-   * @throws AssertionError if the actual Query's queryParameters is not empty.
-   */
-  public QueryAssert hasNoQueryParameters() {
-    // check that actual Query we want to make assertions on is not null.
-    isNotNull();
-
-    // we override the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected :\n  <%s>\nnot to have queryParameters but had :\n  <%s>";
-    
-    // check
-    if (actual.getQueryParameters().iterator().hasNext()) {
-      failWithMessage(assertjErrorMessage, actual, actual.getQueryParameters());
-    }
-    
-    // return the current assertion for method chaining
-    return this;
-  }
-  
-
-  /**
-   * Verifies that the actual Query's returnType is equal to the given one.
-   * @param returnType the given returnType to compare the actual Query's returnType to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual Query's returnType is not equal to the given one.
-   */
-  public QueryAssert hasReturnType(String returnType) {
-    // check that actual Query we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected returnType of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualReturnType = actual.getReturnType();
-    if (!Objects.areEqual(actualReturnType, returnType)) {
-      failWithMessage(assertjErrorMessage, actual, returnType, actualReturnType);
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual Query's name is equal to the given one.
+     *
+     * @param name the given name to compare the actual Query's name to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual Query's name is not equal to the given one.
+     */
+    public QueryAssert hasName(String name) {
+        // check that actual Query we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected name of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // null safe check
+        String actualName = actual.getName();
+        if (!Objects.areEqual(actualName, name)) {
+            failWithMessage(assertjErrorMessage, actual, name, actualName);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual Query's queryParameters contains the given QueryParameter elements.
+     *
+     * @param queryParameters the given elements that should be contained in actual Query's queryParameters.
+     * @return this assertion object.
+     * @throws AssertionError if the actual Query's queryParameters does not contain all given QueryParameter elements.
+     */
+    public QueryAssert hasQueryParameters(QueryParameter... queryParameters) {
+        // check that actual Query we want to make assertions on is not null.
+        isNotNull();
+
+        // check that given QueryParameter varargs is not null.
+        if (queryParameters == null)
+            throw new AssertionError("Expecting queryParameters parameter not to be null.");
+
+        // check with standard error message, to set another message call: info.overridingErrorMessage("my error message");
+        Iterables.instance().assertContains(info, actual.getQueryParameters(), queryParameters);
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual Query has no queryParameters.
+     *
+     * @return this assertion object.
+     * @throws AssertionError if the actual Query's queryParameters is not empty.
+     */
+    public QueryAssert hasNoQueryParameters() {
+        // check that actual Query we want to make assertions on is not null.
+        isNotNull();
+
+        // we override the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected :\n  <%s>\nnot to have queryParameters but had :\n  <%s>";
+
+        // check
+        if (actual.getQueryParameters().iterator().hasNext()) {
+            failWithMessage(assertjErrorMessage, actual, actual.getQueryParameters());
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual Query's returnType is equal to the given one.
+     *
+     * @param returnType the given returnType to compare the actual Query's returnType to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual Query's returnType is not equal to the given one.
+     */
+    public QueryAssert hasReturnType(String returnType) {
+        // check that actual Query we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected returnType of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // null safe check
+        String actualReturnType = actual.getReturnType();
+        if (!Objects.areEqual(actualReturnType, returnType)) {
+            failWithMessage(assertjErrorMessage, actual, returnType, actualReturnType);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
 
 }

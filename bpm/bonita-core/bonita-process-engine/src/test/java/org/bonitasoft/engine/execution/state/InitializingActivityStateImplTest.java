@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.state;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;

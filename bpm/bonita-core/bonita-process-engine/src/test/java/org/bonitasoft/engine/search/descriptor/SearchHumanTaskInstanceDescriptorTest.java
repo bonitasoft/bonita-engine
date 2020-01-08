@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class SearchHumanTaskInstanceDescriptorTest {
 
@@ -24,7 +24,8 @@ public class SearchHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
@@ -33,7 +34,8 @@ public class SearchHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_root_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
@@ -42,7 +44,8 @@ public class SearchHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_parent_process_instance_to_the_logical_group_4_which_is_the_parent_process_instance() {
         final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup4");
     }

@@ -23,8 +23,10 @@ public class SMessageInstanceBuilder implements SCorrelationContainerBuilder {
     public static final String HANDLED = "handled";
     protected final SMessageInstance entity;
 
-    public static SMessageInstanceBuilder create(String messageName, String targetProcess, String targetFlowNode, Long processDefinitionId, String flowNodeName) {
-        return new SMessageInstanceBuilder(new SMessageInstance(messageName, targetProcess, targetFlowNode, processDefinitionId, flowNodeName));
+    public static SMessageInstanceBuilder create(String messageName, String targetProcess, String targetFlowNode,
+            Long processDefinitionId, String flowNodeName) {
+        return new SMessageInstanceBuilder(
+                new SMessageInstance(messageName, targetProcess, targetFlowNode, processDefinitionId, flowNodeName));
     }
 
     private SMessageInstanceBuilder(SMessageInstance entity) {

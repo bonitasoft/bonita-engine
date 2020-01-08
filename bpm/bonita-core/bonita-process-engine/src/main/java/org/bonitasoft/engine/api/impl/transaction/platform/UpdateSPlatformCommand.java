@@ -54,7 +54,8 @@ public class UpdateSPlatformCommand implements TransactionContent {
     }
 
     private EntityUpdateDescriptor getCommandUpdateDescriptor() {
-        final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder = BuilderFactory.get(SPlatformCommandUpdateBuilderFactory.class).createNewInstance();
+        final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder = BuilderFactory
+                .get(SPlatformCommandUpdateBuilderFactory.class).createNewInstance();
         final Map<CommandField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<CommandField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {

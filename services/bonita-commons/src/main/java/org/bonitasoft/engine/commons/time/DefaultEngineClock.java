@@ -17,7 +17,7 @@ import java.time.Instant;
 
 /**
  * This is the default engine clock that return the real system time
- * 
+ *
  * @author Baptiste Mesta.
  */
 public class DefaultEngineClock implements EngineClock {

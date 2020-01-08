@@ -25,16 +25,18 @@ import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescripto
 
 /**
  * @author Celine Souchet
- * 
  */
-public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy
+        extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
     private final long managerUserId;
 
-    public SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final ProcessDefinitionService processDefinitionService,
-            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long managerUserId) {
+    public SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy(
+            final ProcessDefinitionService processDefinitionService,
+            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options,
+            final long managerUserId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
         this.managerUserId = managerUserId;
@@ -42,12 +44,15 @@ public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy extends Ab
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return processDefinitionService.getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
+        return processDefinitionService.getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId,
+                searchOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-        return processDefinitionService.searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
+        return processDefinitionService.searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId,
+                searchOptions);
     }
 
 }

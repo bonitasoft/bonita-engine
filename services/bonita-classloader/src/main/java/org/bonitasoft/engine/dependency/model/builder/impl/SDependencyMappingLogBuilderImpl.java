@@ -44,7 +44,8 @@ public class SDependencyMappingLogBuilderImpl extends CRUDELogBuilder implements
         }
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(SDependencyLogIndexesMapper.DEPENDENCY_MAPPING_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Dependency Mapping Id");
+                throw new MissingMandatoryFieldsException(
+                        "Some mandatoryFildes are missing: " + "Dependency Mapping Id");
             }
         }
     }

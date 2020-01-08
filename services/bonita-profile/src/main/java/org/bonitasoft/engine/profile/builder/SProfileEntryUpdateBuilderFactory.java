@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.profile.builder;
 
-
 /**
  * @author Celine Souchet
  */
 public interface SProfileEntryUpdateBuilderFactory {
 
     SProfileEntryUpdateBuilder createNewInstance();
-    
+
 }

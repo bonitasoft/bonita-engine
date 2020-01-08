@@ -72,9 +72,11 @@ public class WorkDescriptor implements Serializable {
     public Long getLong(String key) {
         return (Long) getParameter(key);
     }
+
     public Integer getInteger(String key) {
         return (Integer) getParameter(key);
     }
+
     public Boolean getBoolean(String key) {
         return (Boolean) getParameter(key);
     }
@@ -121,7 +123,9 @@ public class WorkDescriptor implements Serializable {
         this.registrationDate = registrationDate;
     }
 
-    public Instant getRegistrationDate() { return registrationDate; }
+    public Instant getRegistrationDate() {
+        return registrationDate;
+    }
 
     public WorkDescriptor abnormalExecutionDetected() {
         this.abnormalExecutionDetected = true;

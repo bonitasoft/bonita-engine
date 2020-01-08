@@ -53,12 +53,14 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         try {
             final SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) flowNodeInstance;
             stateBehaviors.createAttachedBoundaryEvents(processDefinition, multiInstanceActivityInstance);
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-            final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+            final SActivityDefinition activity = (SActivityDefinition) processContainer
+                    .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
             if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics) {
                 final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
@@ -66,22 +68,27 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
                 int numberOfInstanceMax = -1;
                 if (loopCardinality != null) {
                     numberOfInstanceMax = (Integer) expressionResolverService.evaluate(loopCardinality,
-                            new SExpressionContext(multiInstanceActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinition
-                                    .getId()));
+                            new SExpressionContext(multiInstanceActivityInstance.getId(),
+                                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinition
+                                            .getId()));
                     activityInstanceService.setLoopCardinality(multiInstanceActivityInstance, numberOfInstanceMax);
                 } else if (miLoop.getLoopDataInputRef() != null) {
-                    numberOfInstanceMax = stateBehaviors.getNumberOfInstancesToCreateFromInputRef(processDefinition, multiInstanceActivityInstance, miLoop,
+                    numberOfInstanceMax = stateBehaviors.getNumberOfInstancesToCreateFromInputRef(processDefinition,
+                            multiInstanceActivityInstance, miLoop,
                             numberOfInstanceMax);
                 }
                 if (numberOfInstanceMax < 0) {
-                    throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
-                            + processDefinition.getName() + " " + processDefinition.getVersion()
-                            + " did not have loop cardinality nor loop data input ref set");
+                    throw new SActivityStateExecutionException(
+                            "The multi instance on activity " + flowNodeInstance.getName() + " of process "
+                                    + processDefinition.getName() + " " + processDefinition.getVersion()
+                                    + " did not have loop cardinality nor loop data input ref set");
                 }
-                stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop, numberOfInstanceMax);
+                stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop,
+                        numberOfInstanceMax);
                 if (numberOfInstanceMax > 0) {
-                    stateBehaviors.createInnerInstances(processDefinition.getId(), activity, multiInstanceActivityInstance, miLoop.isSequential() ? 1
-                            : numberOfInstanceMax);
+                    stateBehaviors.createInnerInstances(processDefinition.getId(), activity,
+                            multiInstanceActivityInstance, miLoop.isSequential() ? 1
+                                    : numberOfInstanceMax);
                 }
             }
         } catch (final SActivityStateExecutionException e) {
@@ -118,12 +125,14 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

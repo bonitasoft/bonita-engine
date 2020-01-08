@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.junit.Test;
 
-
 public class InputDefinitionImplTest {
 
     private static final String DESCRIPTION = "description";
@@ -66,8 +65,6 @@ public class InputDefinitionImplTest {
         assertThat(inputDefinition.toString()).containsIgnoringCase("multiple");
     }
 
-
-
     @Test
     public void equal_test() throws Exception {
         //given
@@ -87,6 +84,7 @@ public class InputDefinitionImplTest {
         //then
         assertThat(inputDefinition).isNotEqualTo(inputDefinition2);
     }
+
     @Test
     public void constructor_multiple() throws Exception {
         inputDefinition = new InputDefinitionImpl(NAME, DESCRIPTION, true);

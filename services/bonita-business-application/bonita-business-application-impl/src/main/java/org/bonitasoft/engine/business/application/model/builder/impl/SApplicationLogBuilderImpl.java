@@ -22,7 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationLogBuilderImpl extends CRUDELogBuilder implements SApplicationLogBuilder {
 
@@ -39,8 +38,10 @@ public class SApplicationLogBuilderImpl extends CRUDELogBuilder implements SAppl
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SApplicationLogBuilderFactoryImpl.APPLICATION_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: business application identifier");
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SApplicationLogBuilderFactoryImpl.APPLICATION_INDEX) == 0L) {
+            throw new MissingMandatoryFieldsException(
+                    "Some mandatoryFields are missing: business application identifier");
         }
     }
 

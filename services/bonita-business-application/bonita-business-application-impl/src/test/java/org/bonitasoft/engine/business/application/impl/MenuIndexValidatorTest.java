@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.impl.MenuIndex;
-import org.bonitasoft.engine.business.application.impl.MenuIndexValidator;
 import org.junit.Test;
 
 public class MenuIndexValidatorTest {
@@ -41,7 +39,8 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_problem_when_parent_is_same_and_new_index_is_greater_than_last_used_index() throws Exception {
+    public void isValid_should_return_problem_when_parent_is_same_and_new_index_is_greater_than_last_used_index()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(null, 6, 5);
@@ -56,7 +55,8 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_no_problems_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_one() throws Exception {
+    public void isValid_should_return_no_problems_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_one()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(2L, 4, 3);
@@ -69,7 +69,8 @@ public class MenuIndexValidatorTest {
     }
 
     @Test
-    public void isValid_should_return_problem_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_more_than_one() throws Exception {
+    public void isValid_should_return_problem_when_parent_is_not_the_same_and_new_index_is_greater_than_last_used_index_by_more_than_one()
+            throws Exception {
         //given
         MenuIndex oldIndex = new MenuIndex(null, 5, 5);
         MenuIndex newIndex = new MenuIndex(2L, 5, 3);

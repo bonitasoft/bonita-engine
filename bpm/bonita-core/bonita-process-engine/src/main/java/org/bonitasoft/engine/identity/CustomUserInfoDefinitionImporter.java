@@ -21,22 +21,23 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
-
 /**
  * @author Elias Ricken de Medeiros
  */
 public class CustomUserInfoDefinitionImporter {
 
-
     private final IdentityService identityService;
     private final ImportOrganizationStrategy strategy;
 
-    public CustomUserInfoDefinitionImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy) {
+    public CustomUserInfoDefinitionImporter(TenantServiceAccessor serviceAccessor,
+            final ImportOrganizationStrategy strategy) {
         this.strategy = strategy;
         identityService = serviceAccessor.getIdentityService();
     }
 
-    public Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(List<ExportedCustomUserInfoDefinition> userInfoDefinitionCreators) throws SIdentityException, ImportDuplicateInOrganizationException {
+    public Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(
+            List<ExportedCustomUserInfoDefinition> userInfoDefinitionCreators)
+            throws SIdentityException, ImportDuplicateInOrganizationException {
         Map<String, SCustomUserInfoDefinition> nameToDefinition = new HashMap<>(userInfoDefinitionCreators.size());
         for (ExportedCustomUserInfoDefinition creator : userInfoDefinitionCreators) {
             String name = creator.getName();
@@ -52,8 +53,10 @@ public class CustomUserInfoDefinitionImporter {
         return nameToDefinition;
     }
 
-    private SCustomUserInfoDefinition addCustomUserInfoDefinition(ExportedCustomUserInfoDefinition creator) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException {
-        final SCustomUserInfoDefinition.SCustomUserInfoDefinitionBuilder userInfoBuilder = SCustomUserInfoDefinition.builder();
+    private SCustomUserInfoDefinition addCustomUserInfoDefinition(ExportedCustomUserInfoDefinition creator)
+            throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException {
+        final SCustomUserInfoDefinition.SCustomUserInfoDefinitionBuilder userInfoBuilder = SCustomUserInfoDefinition
+                .builder();
         userInfoBuilder.name(creator.getName());
         userInfoBuilder.description(creator.getDescription());
         return identityService.createCustomUserInfoDefinition(userInfoBuilder.build());

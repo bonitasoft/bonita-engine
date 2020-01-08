@@ -45,8 +45,10 @@ public class GetArchivedProcessInstanceList implements TransactionContentWithRes
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId, final int startIndex, final int maxResults) {
+    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
+            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId, final int startIndex,
+            final int maxResults) {
         this.processInstanceService = processInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
@@ -54,14 +56,18 @@ public class GetArchivedProcessInstanceList implements TransactionContentWithRes
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
     }
 
-    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId, final int startIndex, final int maxResults,
+    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
+            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId, final int startIndex,
+            final int maxResults,
             final String field, final OrderByType order) {
-        this(processInstanceService, processDefinitionService, searchEntitiesDescriptor, processInstanceId, startIndex, maxResults);
+        this(processInstanceService, processDefinitionService, searchEntitiesDescriptor, processInstanceId, startIndex,
+                maxResults);
         searchOptionsBuilder.sort(field, Order.valueOf(order.name()));
     }
 
-    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService,
+    public GetArchivedProcessInstanceList(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
             final SearchEntitiesDescriptor searchEntitiesDescriptor, final SearchOptions searchOptions) {
         this.processInstanceService = processInstanceService;
         this.processDefinitionService = processDefinitionService;
@@ -71,8 +77,10 @@ public class GetArchivedProcessInstanceList implements TransactionContentWithRes
 
     @Override
     public void execute() throws SBonitaException {
-        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                processDefinitionService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptionsBuilder.done());
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(
+                processInstanceService,
+                processDefinitionService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(),
+                searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
         processInstanceList = searchArchivedProcessInstances.getResult().getResult();
     }

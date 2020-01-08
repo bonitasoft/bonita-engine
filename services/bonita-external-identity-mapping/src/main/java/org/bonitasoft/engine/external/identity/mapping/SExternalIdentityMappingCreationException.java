@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.external.identity.mapping;
 
-
 /**
  * @author Emmanuel Duchastenier
  */

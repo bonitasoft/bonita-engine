@@ -30,7 +30,9 @@ public class PersistRightOperandResolver {
     }
 
     /**
-     * Check if the right operand should be persisted based on its position (it's the last operation for the given left operand)
+     * Check if the right operand should be persisted based on its position (it's the last operation for the given left
+     * operand)
+     *
      * @param currentIndex the index of current operation
      * @param operations the list of all operations
      * @return true if the right operand should be persisted; false otherwise
@@ -45,19 +47,22 @@ public class PersistRightOperandResolver {
             return true;
         }
         //get the index of next operation that will use the current left operand as dependency to set another business data
-        int dependencyIndex = operationsAnalyzer.findBusinessDataDependencyIndex(currentOperation.getLeftOperand().getName(), currentIndex + 1, operations);
+        int dependencyIndex = operationsAnalyzer.findBusinessDataDependencyIndex(
+                currentOperation.getLeftOperand().getName(), currentIndex + 1, operations);
         return dependencyIndex != -1 && dependencyIndex < leftOperandIndexes.getNextIndex();
     }
 
     /**
      * Check if the right operand should be persisted based of the right operand value
+     *
      * @param rightOperandValue the right operand value
      * @param shouldPersistByPosition should persist based on operation position (position in the list of operations)
      * @param shouldPersistOnNull should persist on null result
      * @return true if the right operand should be persisted; false otherwise
      */
-    public boolean shouldPersistByValue(Object rightOperandValue, boolean shouldPersistByPosition, final boolean shouldPersistOnNull) {
-        if(rightOperandValue == null && shouldPersistByPosition) {
+    public boolean shouldPersistByValue(Object rightOperandValue, boolean shouldPersistByPosition,
+            final boolean shouldPersistOnNull) {
+        if (rightOperandValue == null && shouldPersistByPosition) {
             return shouldPersistOnNull;
         }
         return shouldPersistByPosition;

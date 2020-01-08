@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.handler;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,21 +22,17 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchedulerServiceRestartHandlerTest {
@@ -55,9 +48,11 @@ public class SchedulerServiceRestartHandlerTest {
     public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Before
-    public void before() throws Exception{
-        handler = new SchedulerServiceRestartHandler(schedulerService, new TechnicalLoggerSLF4JImpl(), userTransactionService);
-        when(userTransactionService.executeInTransaction(any())).thenAnswer(invocation -> ((Callable) invocation.getArgument(0)).call());
+    public void before() throws Exception {
+        handler = new SchedulerServiceRestartHandler(schedulerService, new TechnicalLoggerSLF4JImpl(),
+                userTransactionService);
+        when(userTransactionService.executeInTransaction(any()))
+                .thenAnswer(invocation -> ((Callable) invocation.getArgument(0)).call());
 
     }
 
@@ -76,7 +71,8 @@ public class SchedulerServiceRestartHandlerTest {
         systemOutRule.clearLog();
         handler.execute();
 
-        assertThat(systemOutRule.getLog()).contains("Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry.");
+        assertThat(systemOutRule.getLog()).contains(
+                "Unable to reschedule all erroneous triggers, call PlatformAPI.rescheduleErroneousTriggers to retry.");
     }
 
 }

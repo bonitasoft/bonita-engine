@@ -45,7 +45,7 @@ public interface ConnectorInstanceService {
 
     /**
      * Get a list of connectorInstances for specified container
-     * 
+     *
      * @param containerId
      *        Identifier of container
      * @param containerType
@@ -56,12 +56,13 @@ public interface ConnectorInstanceService {
      * @throws SConnectorInstanceReadException
      *         Error thrown if has exceptions during the connector retrieve
      */
-    List<SConnectorInstance> getConnectorInstances(long containerId, String containerType, ConnectorEvent activationEvent, int from, int numberOfResult,
+    List<SConnectorInstance> getConnectorInstances(long containerId, String containerType,
+            ConnectorEvent activationEvent, int from, int numberOfResult,
             String state) throws SConnectorInstanceReadException;
 
     /**
      * Create connector instance by give connector instance, the connector instance will be stored in database
-     * 
+     *
      * @param connectorInstance
      *        Connector instance
      * @throws SConnectorInstanceCreationException
@@ -71,7 +72,7 @@ public interface ConnectorInstanceService {
 
     /**
      * Delete the given connector instance from the database
-     * 
+     *
      * @param connectorInstance
      *        the connector instance
      * @throws SConnectorInstanceDeletionException
@@ -88,13 +89,14 @@ public interface ConnectorInstanceService {
 
     /**
      * Defines the exception associated to the connector failure
-     * 
+     *
      * @param connectorInstanceWithFailure failed connector instance
      * @param throwable exception responsible for connector failure
      * @throws SConnectorInstanceModificationException
      * @since 6.1
      */
-    void setConnectorInstanceFailureException(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, Throwable throwable)
+    void setConnectorInstanceFailureException(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure,
+            Throwable throwable)
             throws SConnectorInstanceModificationException;
 
     /**
@@ -103,18 +105,20 @@ public interface ConnectorInstanceService {
      * @throws SConnectorInstanceReadException
      * @throws SConnectorInstanceNotFoundException
      */
-    SConnectorInstance getConnectorInstance(long connectorInstanceId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException;
+    SConnectorInstance getConnectorInstance(long connectorInstanceId)
+            throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException;
 
     /**
      * Retrieves the connector instance with failure information for the given connector instance id
-     * 
+     *
      * @param connectorInstanceId
      * @return the connector instance with failure information for the given connector instance id
      * @throws SConnectorInstanceReadException
      * @throws SConnectorInstanceNotFoundException
      * @since 6.1
      */
-    SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(long connectorInstanceId) throws SConnectorInstanceReadException,
+    SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(long connectorInstanceId)
+            throws SConnectorInstanceReadException,
             SConnectorInstanceNotFoundException;
 
     /**
@@ -130,7 +134,8 @@ public interface ConnectorInstanceService {
      * @throws SConnectorInstanceNotFoundException
      * @since 6.1
      */
-    List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(long containerId, String containerType, String state, int from, int maxResults)
+    List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(long containerId, String containerType,
+            String state, int from, int maxResults)
             throws SConnectorInstanceReadException;
 
     /**
@@ -148,7 +153,8 @@ public interface ConnectorInstanceService {
      * @param numberOfResult
      * @throws SConnectorInstanceReadException
      */
-    List<SConnectorInstance> getConnectorInstances(long containerId, String containerType, int from, int numberOfResult, String fieldName,
+    List<SConnectorInstance> getConnectorInstances(long containerId, String containerType, int from, int numberOfResult,
+            String fieldName,
             OrderByType orderByType) throws SConnectorInstanceReadException;
 
     /**
@@ -157,7 +163,8 @@ public interface ConnectorInstanceService {
      * @return
      * @throws SConnectorInstanceReadException
      */
-    SConnectorInstance getNextExecutableConnectorInstance(long containerId, String containerType, ConnectorEvent activationEvent)
+    SConnectorInstance getNextExecutableConnectorInstance(long containerId, String containerType,
+            ConnectorEvent activationEvent)
             throws SConnectorInstanceReadException;
 
     /**
@@ -177,7 +184,8 @@ public interface ConnectorInstanceService {
      * @param archiveDate
      * @throws SConnectorInstanceCreationException
      */
-    void archiveConnectorInstance(SConnectorInstance connectorInstance, long archiveDate) throws SConnectorInstanceCreationException;
+    void archiveConnectorInstance(SConnectorInstance connectorInstance, long archiveDate)
+            throws SConnectorInstanceCreationException;
 
     /**
      * @param searchOptions
@@ -185,7 +193,8 @@ public interface ConnectorInstanceService {
      * @return
      * @throws SBonitaReadException
      */
-    long getNumberArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaReadException;
+    long getNumberArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService)
+            throws SBonitaReadException;
 
     /**
      * @param searchOptions
@@ -193,7 +202,8 @@ public interface ConnectorInstanceService {
      * @return
      * @throws SBonitaReadException
      */
-    List<SAConnectorInstance> searchArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService)
+    List<SAConnectorInstance> searchArchivedConnectorInstance(QueryOptions searchOptions,
+            ReadPersistenceService persistenceService)
             throws SBonitaReadException;
 
     /**
@@ -203,7 +213,8 @@ public interface ConnectorInstanceService {
      * @throws SConnectorInstanceDeletionException
      * @since 6.1
      */
-    void deleteConnectors(long containerId, String containerType) throws SConnectorInstanceReadException, SConnectorInstanceDeletionException;
+    void deleteConnectors(long containerId, String containerType)
+            throws SConnectorInstanceReadException, SConnectorInstanceDeletionException;
 
     /**
      * Delete archived connector instances using a list of container ids and a container type

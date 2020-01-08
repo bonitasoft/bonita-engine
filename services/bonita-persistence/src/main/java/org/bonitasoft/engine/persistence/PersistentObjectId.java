@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 /**
  * ID for persistent objects
  * org.bonitasoft.engine.persistence.PersistentObjectId
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */

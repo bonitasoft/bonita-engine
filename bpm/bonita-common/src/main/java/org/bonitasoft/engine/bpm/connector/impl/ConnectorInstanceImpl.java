@@ -37,7 +37,8 @@ public class ConnectorInstanceImpl extends NamedElementImpl implements Connector
 
     private final ConnectorEvent activationEvent;
 
-    public ConnectorInstanceImpl(final String name, final long containerId, final String containerType, final String connectorId, final String version,
+    public ConnectorInstanceImpl(final String name, final long containerId, final String containerType,
+            final String connectorId, final String version,
             final ConnectorState state, final ConnectorEvent activationEvent) {
         super(name);
         this.containerId = containerId;

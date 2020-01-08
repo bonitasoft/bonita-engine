@@ -39,7 +39,8 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
     private final ParentContainerResolver parentContainerResolver;
 
-    public DataLeftOperandHandler(final DataInstanceService dataInstanceService, final ParentContainerResolver parentContainerResolver) {
+    public DataLeftOperandHandler(final DataInstanceService dataInstanceService,
+            final ParentContainerResolver parentContainerResolver) {
         this.dataInstanceService = dataInstanceService;
         this.parentContainerResolver = parentContainerResolver;
     }
@@ -50,7 +51,8 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue,
+            final long containerId, final String containerType)
             throws SOperationExecutionException {
         updateDataInstance(leftOperand, containerId, containerType, inputValues, newValue);
         return newValue;
@@ -63,7 +65,8 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }
 
-    private void checkReturnType(final Object value, final SDataInstance sDataInstance) throws SOperationExecutionException {
+    private void checkReturnType(final Object value, final SDataInstance sDataInstance)
+            throws SOperationExecutionException {
         if (value != null) {
             final Object dataValue = sDataInstance.getValue();
             /*
@@ -73,21 +76,25 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
             if (dataValue != null) {
                 final Class<?> dataEffectiveType = dataValue.getClass();
                 final Class<?> evaluatedReturnedType = value.getClass();
-                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType) || dataEffectiveType.equals(evaluatedReturnedType))) {
-                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType
-                            + " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + sDataInstance.getName() + "'");
+                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType)
+                        || dataEffectiveType.equals(evaluatedReturnedType))) {
+                    throw new SOperationExecutionException(
+                            "Incompatible assignment operation type: Left operand " + dataEffectiveType
+                                    + " is not compatible with right operand " + evaluatedReturnedType
+                                    + " for expression with name '" + sDataInstance.getName() + "'");
                 }
             }
         }
     }
 
-    private void updateDataInstance(final SLeftOperand leftOperand, final long containerId, final String containerType, Map<String, Object> inputValues, final Object expressionResult)
+    private void updateDataInstance(final SLeftOperand leftOperand, final long containerId, final String containerType,
+            Map<String, Object> inputValues, final Object expressionResult)
             throws SOperationExecutionException {
         final String dataInstanceName = leftOperand.getName();
         SDataInstance dataInstance;
         try {
             dataInstance = (SDataInstance) inputValues.get(DATA_INSTANCE + dataInstanceName);
-            if(dataInstance == null){
+            if (dataInstance == null) {
                 dataInstance = getDataInstance(dataInstanceName, containerId, containerType);
             }
             // Specific return type check for Data:
@@ -99,21 +106,26 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting a data is not supported");
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SBonitaReadException {
         try {
-            putInContext(sLeftOperand,leftOperandContainerId,leftOperandContainerType, expressionContext);
+            putInContext(sLeftOperand, leftOperandContainerId, leftOperandContainerType, expressionContext);
         } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
         }
     }
 
-    private void putInContext(SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, SExpressionContext expressionContext) throws SDataInstanceException {
-        SDataInstance dataInstance = getDataInstance(sLeftOperand.getName(), leftOperandContainerId, leftOperandContainerType);
+    private void putInContext(SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, SExpressionContext expressionContext) throws SDataInstanceException {
+        SDataInstance dataInstance = getDataInstance(sLeftOperand.getName(), leftOperandContainerId,
+                leftOperandContainerType);
         putDataInContext(expressionContext.getInputValues(), dataInstance);
     }
 
@@ -125,15 +137,17 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SBonitaReadException {
         try {
             ArrayList<String> names = new ArrayList<>(sLeftOperand.size());
             for (SLeftOperand leftOperand : sLeftOperand) {
                 names.add(leftOperand.getName());
             }
-            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(names, leftOperandContainerId, leftOperandContainerType, parentContainerResolver);
+            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(names, leftOperandContainerId,
+                    leftOperandContainerType, parentContainerResolver);
             for (SDataInstance dataInstance : dataInstances) {
                 putDataInContext(expressionContext.getInputValues(), dataInstance);
             }
@@ -142,9 +156,10 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-
-    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
-        return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
+    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId,
+            final String containerType) throws SDataInstanceException {
+        return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType,
+                parentContainerResolver);
     }
 
 }

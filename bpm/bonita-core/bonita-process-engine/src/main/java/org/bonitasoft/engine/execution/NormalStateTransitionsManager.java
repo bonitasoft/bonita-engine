@@ -27,7 +27,8 @@ public class NormalStateTransitionsManager {
 
     private final SFlowNodeInstance flowNodeInstance;
 
-    public NormalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions, SFlowNodeInstance flowNodeInstance) {
+    public NormalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions,
+            SFlowNodeInstance flowNodeInstance) {
         this.stateTransitions = stateTransitions;
         this.flowNodeInstance = flowNodeInstance;
     }
@@ -41,8 +42,10 @@ public class NormalStateTransitionsManager {
     }
 
     private String getMessage(FlowNodeState currentState) {
-        return "no state found after " + currentState.getClass().getName() + " for flow node of type " + flowNodeInstance.getClass().getName()
-                + " in state category " + flowNodeInstance.getStateCategory() + ". Flow node instance: " + flowNodeInstance.toString();
+        return "no state found after " + currentState.getClass().getName() + " for flow node of type "
+                + flowNodeInstance.getClass().getName()
+                + " in state category " + flowNodeInstance.getStateCategory() + ". Flow node instance: "
+                + flowNodeInstance.toString();
     }
 
     protected FlowNodeState getNextStateFromMap(FlowNodeState currentState) {

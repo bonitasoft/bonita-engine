@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SHumanTaskInsta
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class SHumanTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SHumanTaskInstanceBuilder {
+public abstract class SHumanTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl
+        implements SHumanTaskInstanceBuilder {
 
     protected SHumanTaskInstanceBuilderImpl(final SHumanTaskInstance entity) {
         super(entity);

@@ -139,7 +139,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
 
-        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class).createNewInstance();
+        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class)
+                .createNewInstance();
         updateBuilder.updateName(newName).updateDescription(newDescription);
         categoryService.updateCategory(categoryId, updateBuilder.done());
         transactionService.complete();
@@ -160,7 +161,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         final long categoryId = 1;
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
-        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class).createNewInstance();
+        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class)
+                .createNewInstance();
         updateBuilder.updateName(newName).updateDescription(newDescription);
 
         transactionService.begin();
@@ -261,7 +263,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     @Test(expected = SCategoryNotFoundException.class)
     public void addProcessDefinitionToCategoryWithSCategoryNotFoundException() throws Exception {
         // generate the meaningful of ProcessDefinition id
-        final SProcessDefinition processDefinition = createSProcessDefinition("processName", "test category not found exceptioin");
+        final SProcessDefinition processDefinition = createSProcessDefinition("processName",
+                "test category not found exceptioin");
 
         transactionService.begin();
         try {
@@ -277,7 +280,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void getNumberOfCategories4Process() throws Exception {
         // generate a meaningful processDefinitionId
-        final long processDefinitionId = createSProcessDefinition("processName", "test get number of categories of process").getId();
+        final long processDefinitionId = createSProcessDefinition("processName",
+                "test get number of categories of process").getId();
 
         transactionService.begin();
         long count = categoryService.getNumberOfCategoriesOfProcess(processDefinitionId);
@@ -308,7 +312,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
     @Test
     public void getNumberOfCategoriesUnrelatedToProcess() throws Exception {
-        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName", "test get number of categories of process");
+        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName",
+                "test get number of categories of process");
 
         transactionService.begin();
         // generate a meaningful processDefinitionId
@@ -345,12 +350,14 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
     @Test
     public void getCategoriesUnrelatedToProcess() throws Exception {
-        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName", "test get number of categories of process");
+        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName",
+                "test get number of categories of process");
 
         transactionService.begin();
         // generate a meaningful processDefinitionId
         final long processDefinitionId = processDefinitions.get(0).getId();
-        List<SCategory> categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0, 4, OrderByType.ASC);
+        List<SCategory> categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0,
+                4, OrderByType.ASC);
         assertEquals(0, categories.size());
 
         final String name = "categoryName";
@@ -364,12 +371,14 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         categoryService.addProcessDefinitionToCategory(categoryList.get(1).getId(), processDefinitionId);
 
         // check
-        categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0, 4, OrderByType.ASC);
+        categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0, 4,
+                OrderByType.ASC);
         assertEquals(2, categories.size());
         assertEquals(categoryList.get(2).getId(), categories.get(0).getId());
         assertEquals(categoryList.get(3).getId(), categories.get(1).getId());
 
-        categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitions.get(1).getId(), 0, 4, OrderByType.ASC);
+        categories = categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitions.get(1).getId(), 0, 4,
+                OrderByType.ASC);
         assertEquals(4, categories.size());
         assertEquals(categoryList.get(0).getId(), categories.get(0).getId());
         assertEquals(categoryList.get(1).getId(), categories.get(1).getId());
@@ -388,12 +397,14 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
     @Test
     public void getCategoriesOfProcessDefinition() throws Exception {
-        final SProcessDefinition processDefinition = createSProcessDefinitions(1, "processName", "test get categores of process definition").get(0);
+        final SProcessDefinition processDefinition = createSProcessDefinitions(1, "processName",
+                "test get categores of process definition").get(0);
 
         transactionService.begin();
         // generate the meaningful processDefinition id and delete it in the end
         final long processDefinitionId = processDefinition.getId();
-        List<SCategory> categoryList = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0, 2, OrderByType.ASC);
+        List<SCategory> categoryList = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0, 2,
+                OrderByType.ASC);
         assertEquals(0, categoryList.size());
         final String name = "categoryName";
         final String description = "test get categories of process definition";
@@ -409,32 +420,38 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
         transactionService.begin();
         // test
-        final List<SCategory> categoryList1 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0, 2, OrderByType.ASC);
+        final List<SCategory> categoryList1 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0,
+                2, OrderByType.ASC);
         assertNotNull(categoryList1);
         assertEquals(2, categoryList1.size());
         assertEquals("categoryName1", categoryList1.get(0).getName());
         assertEquals("categoryName2", categoryList1.get(1).getName());
 
-        final List<SCategory> categoryList2 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 1, 2, OrderByType.ASC);
+        final List<SCategory> categoryList2 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 1,
+                2, OrderByType.ASC);
         assertNotNull(categoryList2);
         assertEquals(2, categoryList2.size());
         assertEquals("categoryName2", categoryList2.get(0).getName());
         assertEquals("categoryName3", categoryList2.get(1).getName());
 
-        final List<SCategory> categoryList3 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 2, 2, OrderByType.ASC);
+        final List<SCategory> categoryList3 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 2,
+                2, OrderByType.ASC);
         assertNotNull(categoryList3);
         assertEquals(2, categoryList3.size());
         assertEquals("categoryName3", categoryList3.get(0).getName());
         assertEquals("categoryName4", categoryList3.get(1).getName());
 
-        final List<SCategory> categoryList4 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 4, 2, OrderByType.ASC);
+        final List<SCategory> categoryList4 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 4,
+                2, OrderByType.ASC);
         assertNotNull(categoryList4);
         assertEquals(1, categoryList4.size());
         assertEquals("categoryName5", categoryList4.get(0).getName());
 
-        final List<SCategory> categories = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 5, 2, OrderByType.ASC);
+        final List<SCategory> categories = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 5, 2,
+                OrderByType.ASC);
         assertTrue(categories.isEmpty());
-        final List<SCategory> categoryList5 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0, 3, OrderByType.DESC);
+        final List<SCategory> categoryList5 = categoryService.getCategoriesOfProcessDefinition(processDefinitionId, 0,
+                3, OrderByType.DESC);
         assertNotNull(categoryList5);
         assertEquals(3, categoryList5.size());
         assertEquals("categoryName5", categoryList5.get(0).getName());
@@ -451,7 +468,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         deleteSProcessDefinition(processDefinitionId);
     }
 
-    private List<SCategory> createCategories(final int count, final String name, final String description) throws Exception {
+    private List<SCategory> createCategories(final int count, final String name, final String description)
+            throws Exception {
         final List<SCategory> categoryList = new ArrayList<SCategory>();
         for (int i = 1; i <= count; i++) {
             final SCategory category = categoryService.createCategory(name + i, description + i);

@@ -37,7 +37,8 @@ public class IsActorInitiatorRule implements AuthorizationRule {
 
     FormMappingService formMappingService;
 
-    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
+    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor,
+            SessionService sessionService,
             FormMappingService formMappingService) {
         this.actorMappingService = actorMappingService;
         this.sessionAccessor = sessionAccessor;
@@ -53,7 +54,8 @@ public class IsActorInitiatorRule implements AuthorizationRule {
             final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
             return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
         } catch (final SBonitaException e) {
-            throw new SExecutionException("Unable to figure out if the logged user is an actor initiator for the process.", e);
+            throw new SExecutionException(
+                    "Unable to figure out if the logged user is an actor initiator for the process.", e);
         }
     }
 

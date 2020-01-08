@@ -26,7 +26,8 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * Service that allows to map an arbitrary String key to a (Custom) Page or URL.
- * Also allows to process the URL or Page return by providing an URLAdapter implementation that will be called automatically.
+ * Also allows to process the URL or Page return by providing an URLAdapter implementation that will be called
+ * automatically.
  * Also allows to execute Authorization checkings by specifying rules to execute before returning the Page or URL.
  *
  * @see URLAdapter
@@ -49,13 +50,15 @@ public interface PageMappingService {
     /**
      * @param key the key used to retrieve the mapping
      * @param url the external URL the mapping points to
-     * @param urlAdapter the name of the URL adapter that transform the URL in case of an external URL. i.e. it can add parameters
+     * @param urlAdapter the name of the URL adapter that transform the URL in case of an external URL. i.e. it can add
+     *        parameters
      * @param authorizationRules the names of the authorization rules to execute
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, String url, String urlAdapter, List<String> authorizationRules) throws SObjectCreationException;
+    SPageMapping create(String key, String url, String urlAdapter, List<String> authorizationRules)
+            throws SObjectCreationException;
 
     /**
      * @param key the key of the page mapping to retrieve
@@ -72,7 +75,8 @@ public interface PageMappingService {
      * @throws SExecutionException
      * @throws SAuthorizationException
      */
-    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context, boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException;
+    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context,
+            boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException;
 
     /**
      * delete this page mapping
@@ -88,7 +92,8 @@ public interface PageMappingService {
      * @param pageId the id of the page or null
      * @throws SObjectModificationException
      */
-    void update(SPageMapping pageMapping, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
+    void update(SPageMapping pageMapping, Long pageId)
+            throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
 
     /**
      * update the given page mapping
@@ -98,7 +103,8 @@ public interface PageMappingService {
      * @param urlAdapter the new URL adapter to use
      * @throws SObjectModificationException
      */
-    void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
+    void update(SPageMapping pageMapping, String url, String urlAdapter)
+            throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
 
     /**
      * Gets the paginated mappings of the page.

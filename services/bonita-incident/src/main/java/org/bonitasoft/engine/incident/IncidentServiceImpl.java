@@ -40,7 +40,8 @@ public class IncidentServiceImpl implements IncidentService {
             try {
                 handler.handle(tenantId, incident);
             } catch (final Exception t) {
-                logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to report an incident using the handler " + handler + " incident was " + incident);
+                logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                        "Unable to report an incident using the handler " + handler + " incident was " + incident);
             }
         }
     }

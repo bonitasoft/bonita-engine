@@ -65,7 +65,7 @@ public class SUserFilterDefinitionImpl extends SNamedElementImpl implements SUse
     public String getVersion() {
         return version;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("SUserFilterDefinitionImpl{");

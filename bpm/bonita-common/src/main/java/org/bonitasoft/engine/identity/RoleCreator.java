@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * represents a helper for creating a {@link Role}. Chaining is possible with this creator to ease the {@link Role} creation.
+ * represents a helper for creating a {@link Role}. Chaining is possible with this creator to ease the {@link Role}
+ * creation.
  * <br>
  * For instance, new RoleCreator("member").setDisplayName("Member").setIconName("userIcon");
  *
@@ -36,7 +37,9 @@ public class RoleCreator implements Serializable {
      * represents the available {@link Role} field
      */
     public enum RoleField {
-        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, ICON_FILENAME, ICON_CONTENT
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated
+        ICON_NAME, @Deprecated
+        ICON_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<RoleField, Serializable> fields;
@@ -96,7 +99,7 @@ public class RoleCreator implements Serializable {
 
     /**
      * set the icon on the role to be created
-     * 
+     *
      * @param filename the filename of the icon
      * @param content the content of the icon
      * @return the role created

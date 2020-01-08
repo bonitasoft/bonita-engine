@@ -31,13 +31,16 @@ public class IndexManager {
         this.validator = validator;
     }
 
-    public void organizeIndexesOnDelete(MenuIndex deletedMenuIndex) throws SBonitaReadException, SObjectModificationException {
-        updater.decrementIndexes(deletedMenuIndex.getParentId(), deletedMenuIndex.getValue() + 1, deletedMenuIndex.getLastUsedIndex());
+    public void organizeIndexesOnDelete(MenuIndex deletedMenuIndex)
+            throws SBonitaReadException, SObjectModificationException {
+        updater.decrementIndexes(deletedMenuIndex.getParentId(), deletedMenuIndex.getValue() + 1,
+                deletedMenuIndex.getLastUsedIndex());
     }
 
-    public void organizeIndexesOnUpdate(MenuIndex oldIndex, MenuIndex newIndex) throws SBonitaReadException, SObjectModificationException {
+    public void organizeIndexesOnUpdate(MenuIndex oldIndex, MenuIndex newIndex)
+            throws SBonitaReadException, SObjectModificationException {
         validateNewIndex(oldIndex, newIndex);
-        if(oldIndex.getParentId() == newIndex.getParentId()) {
+        if (oldIndex.getParentId() == newIndex.getParentId()) {
             if (newIndex.getValue() < oldIndex.getValue()) {
                 updater.incrementIndexes(oldIndex.getParentId(), newIndex.getValue(), oldIndex.getValue() - 1);
             } else {

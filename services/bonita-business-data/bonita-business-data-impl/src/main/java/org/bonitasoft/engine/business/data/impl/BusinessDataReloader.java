@@ -47,7 +47,8 @@ public class BusinessDataReloader {
     }
 
     /**
-     * Reloads the {@link Entity} from database using the current {@code Entity} className and persistenceId if persistenceId is set. Otherwise returns the
+     * Reloads the {@link Entity} from database using the current {@code Entity} className and persistenceId if
+     * persistenceId is set. Otherwise returns the
      * object itself.
      *
      * @param entityToReload the entity to be reloaded

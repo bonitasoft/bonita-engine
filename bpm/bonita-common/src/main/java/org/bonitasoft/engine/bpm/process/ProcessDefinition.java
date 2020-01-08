@@ -17,7 +17,8 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
- * Represents the Definition of a process. Gives access to basic information of the process, whereas it is deployed or not.
+ * Represents the Definition of a process. Gives access to basic information of the process, whereas it is deployed or
+ * not.
  * For information about deployment information, use {@link ProcessDeploymentInfo}.
  *
  * @see ProcessDeploymentInfo

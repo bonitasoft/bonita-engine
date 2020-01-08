@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SGroup;
 
 /**
  * @author Danila Mazour

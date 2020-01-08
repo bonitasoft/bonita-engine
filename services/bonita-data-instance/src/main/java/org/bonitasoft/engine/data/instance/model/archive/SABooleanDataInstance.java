@@ -24,8 +24,8 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SABooleanDataInstance extends SADataInstance {
-    private Boolean value;
 
+    private Boolean value;
 
     public SABooleanDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

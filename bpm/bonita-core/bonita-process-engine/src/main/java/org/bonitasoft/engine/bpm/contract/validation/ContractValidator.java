@@ -30,12 +30,14 @@ public class ContractValidator {
     private final ContractStructureValidator structureValidator;
     private final ContractConstraintsValidator rulesValidator;
 
-    public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractConstraintsValidator contractRulesValidator) {
+    public ContractValidator(final ContractStructureValidator contractStructureValidator,
+            final ContractConstraintsValidator contractRulesValidator) {
         structureValidator = contractStructureValidator;
         rulesValidator = contractRulesValidator;
     }
 
-    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
+    public void validate(long processDefinitionId, final SContractDefinition contract,
+            final Map<String, Serializable> variables)
             throws SContractViolationException {
         structureValidator.validate(contract, variables);
         rulesValidator.validate(processDefinitionId, contract, variables);

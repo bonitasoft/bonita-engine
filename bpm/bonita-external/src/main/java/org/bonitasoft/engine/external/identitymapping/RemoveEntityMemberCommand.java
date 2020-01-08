@@ -23,7 +23,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Parameter keys: ENTITY_MEMBER_ID_KEY: entity member id to remove.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
@@ -37,7 +37,8 @@ public class RemoveEntityMemberCommand extends EntityMemberCommand {
         try {
             entityMemberId = (Long) parameters.get(ENTITY_MEMBER_ID_KEY);
         } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + ENTITY_MEMBER_ID_KEY + " is missing or not convertible to Long.");
+            throw new SCommandParameterizationException(
+                    "Mandatory parameter " + ENTITY_MEMBER_ID_KEY + " is missing or not convertible to Long.");
         }
         try {
             removeExternalIdentityMapping(entityMemberId);

@@ -29,7 +29,6 @@ public class SProcessCategoryMapping implements PersistentObject {
     private long categoryId;
     private long processId;
 
-
     public SProcessCategoryMapping(final long categoryId, final long processId) {
         this.categoryId = categoryId;
         this.processId = processId;

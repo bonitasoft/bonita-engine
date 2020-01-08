@@ -23,7 +23,7 @@ import org.junit.Test;
  * @author Danila Mazour
  */
 public class STypeLocalDateTest {
-    
+
     @Test
     public void localDate_are_valid() throws Exception {
 
@@ -31,7 +31,7 @@ public class STypeLocalDateTest {
 
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void null_is_valid() throws Exception {
 
@@ -49,5 +49,5 @@ public class STypeLocalDateTest {
         boolean stringValidation = SType.LOCALDATE.validate("false");
         assertThat(stringValidation).isFalse();
     }
-    
+
 }

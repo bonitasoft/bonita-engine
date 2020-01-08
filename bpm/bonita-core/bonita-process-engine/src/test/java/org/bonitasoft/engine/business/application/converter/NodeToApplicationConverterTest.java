@@ -78,7 +78,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_return_ImportResult_with_no_errors_and_application_with_all_fields_except_home_page() throws Exception {
+    public void toSApplication_should_return_ImportResult_with_no_errors_and_application_with_all_fields_except_home_page()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setDisplayName("My app");
@@ -119,6 +120,7 @@ public class NodeToApplicationConverterTest {
         assertThat(importStatus.getErrors()).isEmpty();
 
     }
+
     @Test
     public void toSApplication_should_use_layout_defined_in_ApplicationNode() throws Exception {
         //given
@@ -154,7 +156,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_use_default_layout_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
+    public void toSApplication_should_use_default_layout_when_layout_is_not_defined_in_ApplicationNode()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setToken("app");
@@ -176,7 +179,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_throw_importException_when_neither_specified_layout_neither_default_layout_is_found() throws Exception {
+    public void toSApplication_should_throw_importException_when_neither_specified_layout_neither_default_layout_is_found()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         String notAvailableLayout = "notAvailableLayout";
@@ -188,9 +192,9 @@ public class NodeToApplicationConverterTest {
 
         //then
         expectedException.expect(ImportException.class);
-        expectedException.expectMessage(String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
-                token, notAvailableLayout));
-
+        expectedException.expectMessage(
+                String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
+                        token, notAvailableLayout));
 
         //when
         converter.toSApplication(node, 1L);
@@ -226,7 +230,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_use_default_theme_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
+    public void toSApplication_should_use_default_theme_when_layout_is_not_defined_in_ApplicationNode()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setToken("app");
@@ -247,7 +252,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_throw_ImportException_when_neither_specified_theme_neither_default_theme_is_found() throws Exception {
+    public void toSApplication_should_throw_ImportException_when_neither_specified_theme_neither_default_theme_is_found()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setTheme("notAvailable");
@@ -257,8 +263,9 @@ public class NodeToApplicationConverterTest {
 
         //then
         expectedException.expect(ImportException.class);
-        expectedException.expectMessage(String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
-                "app", "notAvailable", ApplicationService.DEFAULT_THEME_NAME));
+        expectedException.expectMessage(
+                String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
+                        "app", "notAvailable", ApplicationService.DEFAULT_THEME_NAME));
 
         //when
         converter.toSApplication(node, 1L);
@@ -266,7 +273,8 @@ public class NodeToApplicationConverterTest {
     }
 
     @Test
-    public void toSApplication_should_return_application_with_null_profile_id_when_node_has_no_profile() throws Exception {
+    public void toSApplication_should_return_application_with_null_profile_id_when_node_has_no_profile()
+            throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setProfile(null);
@@ -351,9 +359,5 @@ public class NodeToApplicationConverterTest {
         converter.toSApplication(applicationNode, 1L);
 
     }
-
-
-
-
 
 }

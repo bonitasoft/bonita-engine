@@ -35,27 +35,28 @@ public class ClassLoaderEnvironmentTest {
     public ClassLoaderEnvironment classLoaderEnvironment;
 
     @Before
-    public void before(){
+    public void before() {
         classLoaderEnvironment = new ClassLoaderEnvironment(classloader);
     }
 
-
     @Test
-    public void should_toPointedNotation_return_the_packageName(){
-        String packageName = classLoaderEnvironment.toPointedNotation(new char[][]{{'o', 'r', 'g'}, {'b', 'o', 'n', 'i', 't', 'a', 's', 'o', 'f', 't'}});
+    public void should_toPointedNotation_return_the_packageName() {
+        String packageName = classLoaderEnvironment.toPointedNotation(
+                new char[][] { { 'o', 'r', 'g' }, { 'b', 'o', 'n', 'i', 't', 'a', 's', 'o', 'f', 't' } });
         assertThat(packageName).isEqualTo("org.bonitasoft");
     }
 
     @Test
     public void should_isPackage_return_false_for_known_class() throws ClassNotFoundException {
-        boolean aPackage = classLoaderEnvironment.isPackage(new char[][]{"java".toCharArray(), "lang".toCharArray()}, "String".toCharArray());
+        boolean aPackage = classLoaderEnvironment.isPackage(new char[][] { "java".toCharArray(), "lang".toCharArray() },
+                "String".toCharArray());
 
         assertThat(aPackage).isFalse();
     }
 
     @Test
     public void should_isPackage_return_false_for_parent_known_class() throws ClassNotFoundException {
-        boolean aPackage = classLoaderEnvironment.isPackage(charsArray("java.lang.String"),"SubElement".toCharArray());
+        boolean aPackage = classLoaderEnvironment.isPackage(charsArray("java.lang.String"), "SubElement".toCharArray());
 
         assertThat(aPackage).isFalse();
     }
@@ -69,19 +70,19 @@ public class ClassLoaderEnvironmentTest {
         return chars;
     }
 
-
     @Test
     public void should_isPackage_return_true_for_package() throws ClassNotFoundException {
         doThrow(ClassNotFoundException.class).when(classloader).loadClass("java.lang");
 
-        boolean aPackage = classLoaderEnvironment.isPackage(new char[][]{"java".toCharArray()}, "lang".toCharArray());
+        boolean aPackage = classLoaderEnvironment.isPackage(new char[][] { "java".toCharArray() },
+                "lang".toCharArray());
 
         assertThat(aPackage).isTrue();
     }
 
     @Test
     public void should_isPackage_return_false_for_empty_package() throws ClassNotFoundException {
-        boolean aPackage = classLoaderEnvironment.isPackage(new char[][]{}, "Toto".toCharArray());
+        boolean aPackage = classLoaderEnvironment.isPackage(new char[][] {}, "Toto".toCharArray());
 
         assertThat(aPackage).isFalse();
     }
@@ -95,7 +96,8 @@ public class ClassLoaderEnvironmentTest {
 
     @Test
     public void should_find_type_return_type_from_classloader() throws ClassNotFoundException {
-        doReturn(Thread.currentThread().getContextClassLoader().getResourceAsStream("java/lang/String.class")).when(classloader).getResourceAsStream("java/lang/String.class");
+        doReturn(Thread.currentThread().getContextClassLoader().getResourceAsStream("java/lang/String.class"))
+                .when(classloader).getResourceAsStream("java/lang/String.class");
 
         NameEnvironmentAnswer type = classLoaderEnvironment.findType(charsArray("java.lang.String"));
         assertThat(type).isNotNull();
@@ -104,9 +106,11 @@ public class ClassLoaderEnvironmentTest {
         type = classLoaderEnvironment.findType(charsArray("java.lang.String"));
         assertThat(type).isNotNull();
     }
+
     @Test
     public void should_find_type_return_type2_from_classloader() throws ClassNotFoundException {
-        doReturn(Thread.currentThread().getContextClassLoader().getResourceAsStream("java/lang/String.class")).when(classloader).getResourceAsStream("java/lang/String.class");
+        doReturn(Thread.currentThread().getContextClassLoader().getResourceAsStream("java/lang/String.class"))
+                .when(classloader).getResourceAsStream("java/lang/String.class");
 
         NameEnvironmentAnswer type = classLoaderEnvironment.findType("String".toCharArray(), charsArray("java.lang"));
         assertThat(type).isNotNull();
@@ -117,15 +121,16 @@ public class ClassLoaderEnvironmentTest {
         classLoaderEnvironment.cleanup();
     }
 
-
     @Test
     public void should_find_type_return_null_when_bad_class() throws ClassNotFoundException {
-        doReturn(new ByteArrayInputStream("/** plop*/".getBytes())).when(classloader).getResourceAsStream("java/lang/String.class");
+        doReturn(new ByteArrayInputStream("/** plop*/".getBytes())).when(classloader)
+                .getResourceAsStream("java/lang/String.class");
 
         NameEnvironmentAnswer type = classLoaderEnvironment.findType("String".toCharArray(), charsArray("java.lang"));
 
         assertThat(type).isNull();
     }
+
     @Test
     public void should_find_type_return_null_when_not_found() throws ClassNotFoundException {
 
@@ -133,6 +138,5 @@ public class ClassLoaderEnvironmentTest {
 
         assertThat(type).isNull();
     }
-
 
 }

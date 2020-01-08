@@ -122,7 +122,6 @@ public abstract class TransactionSynchronizationTest {
         assertEquals(expected, StaticSynchronizationResult.COMMENT);
     }
 
-
     private void testRegisteredSynchronizationsOrderOnFailure(final boolean rollback, final boolean failOnBefore,
             final boolean failOnAfter) throws Exception {
         testRegisteredSynchronizationsOrder(rollback, new StaticSynchronization(1, failOnBefore, failOnAfter),
@@ -139,7 +138,8 @@ public abstract class TransactionSynchronizationTest {
 
         testRegisteredSynchronizationsOrder(rollback, new StaticSynchronization(1, failOnBefore, failOnAfter),
                 new StaticSynchronization(2, failOnBefore,
-                        failOnAfter), new StaticSynchronization(3, failOnBefore, failOnAfter));
+                        failOnAfter),
+                new StaticSynchronization(3, failOnBefore, failOnAfter));
 
     }
 

@@ -50,7 +50,8 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the new value for the {@link Application} token. It cannot be empty or null and should contain only alpha numeric
+     * Defines the new value for the {@link Application} token. It cannot be empty or null and should contain only alpha
+     * numeric
      * characters and the following special characters '-', '.', '_' or '~'.
      *
      * @param token the new value for the {@code Application} token
@@ -136,7 +137,8 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new {@link org.bonitasoft.engine.business.application.ApplicationPage} defined as the {@link Application} home page
+     * Defines the identifier of the new {@link org.bonitasoft.engine.business.application.ApplicationPage} defined as
+     * the {@link Application} home page
      *
      * @param applicationPageId the identifier of {@code ApplicationPage} associated to the {@code Application}
      * @return the current {@code ApplicationUpdater}

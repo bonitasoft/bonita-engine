@@ -30,8 +30,10 @@ public class SearchArchivedHumanTasksSupervisedBy extends AbstractArchivedHumanT
 
     private final Long supervisorId;
 
-    public SearchArchivedHumanTasksSupervisedBy(final Long supervisorId, final ActivityInstanceService activityInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor, final SearchOptions searchOptions) {
+    public SearchArchivedHumanTasksSupervisedBy(final Long supervisorId,
+            final ActivityInstanceService activityInstanceService,
+            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions, flowNodeStateManager);
         this.supervisorId = supervisorId;
         this.activityInstanceService = activityInstanceService;

@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public enum ApplicationState {
 

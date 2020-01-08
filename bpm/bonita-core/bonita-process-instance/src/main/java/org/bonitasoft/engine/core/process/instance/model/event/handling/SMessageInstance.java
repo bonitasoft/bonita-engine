@@ -40,8 +40,9 @@ public class SMessageInstance implements PersistentObject {
     private String correlation5;
     private long creationDate;
 
-    public SMessageInstance(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
-                                final String flowNodeName) {
+    public SMessageInstance(final String messageName, final String targetProcess, final String targetFlowNode,
+            final long processDefinitionId,
+            final String flowNodeName) {
         this.messageName = messageName;
         this.targetProcess = targetProcess;
         this.targetFlowNode = targetFlowNode;

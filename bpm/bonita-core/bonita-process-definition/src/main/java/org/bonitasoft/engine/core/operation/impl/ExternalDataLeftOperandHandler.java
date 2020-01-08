@@ -34,27 +34,31 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType) {
+    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue,
+            final long containerId, final String containerType) {
         // nothing to do, the value is already changed in the context
         return newValue;
     }
 
     @Override
-    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting an external data is not supported");
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext) {
         String name = sLeftOperand.getName();
-        if(!expressionContext.getInputValues().containsKey(name)) {
+        if (!expressionContext.getInputValues().containsKey(name)) {
             expressionContext.getInputValues().put(name, expressionContext.getInputValues().get(name));
         }
     }
 
-
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SBonitaReadException {
         for (SLeftOperand leftOperand : sLeftOperand) {
             loadLeftOperandInContext(leftOperand, leftOperandContainerId, leftOperandContainerType, expressionContext);
         }

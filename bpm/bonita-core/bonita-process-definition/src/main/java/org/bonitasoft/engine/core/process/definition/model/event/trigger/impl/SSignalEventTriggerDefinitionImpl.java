@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SSignal
 /**
  * @author Matthieu Chaffotte
  */
-public class SSignalEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl implements SSignalEventTriggerDefinition {
+public class SSignalEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl
+        implements SSignalEventTriggerDefinition {
 
     private static final long serialVersionUID = 1762616027337330056L;
 

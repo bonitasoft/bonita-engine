@@ -54,7 +54,7 @@ public class TenantMaintenanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private void assertCannotLoginOnTenant() throws Exception{
+    private void assertCannotLoginOnTenant() throws Exception {
         try {
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
             fail("Expected that user is not able to do login, but he is");
@@ -64,7 +64,7 @@ public class TenantMaintenanceIT extends TestWithUser {
         }
     }
 
-    private void assertCanLoginOnTenantAndStartProcess(final ProcessDefinition processDefinition) throws Exception{
+    private void assertCanLoginOnTenantAndStartProcess(final ProcessDefinition processDefinition) throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step1");

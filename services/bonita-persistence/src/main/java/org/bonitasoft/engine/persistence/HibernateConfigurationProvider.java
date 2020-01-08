@@ -28,7 +28,7 @@ public interface HibernateConfigurationProvider {
     HibernateResourcesConfigurationProvider getResources();
 
     Map<String, String> getClassAliasMappings();
-    
+
     List<String> getMappingExclusions();
 
     Map<String, String> getCacheQueries();

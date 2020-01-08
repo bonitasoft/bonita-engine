@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.command.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -79,7 +79,8 @@ public class CommandServiceImplTest {
 
     @Before
     public final void setUp() {
-        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, logger, queriableLoggerService, commandProvider, FETCH_SIZE);
+        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, logger, queriableLoggerService,
+                commandProvider, FETCH_SIZE);
     }
 
     /**
@@ -97,10 +98,12 @@ public class CommandServiceImplTest {
         final OrderByType orderByType = OrderByType.ASC;
         final int startIndex = 0;
         final int maxResults = 1;
-        when(persistence.selectList(SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults))).thenReturn(sCommands);
+        when(persistence.selectList(SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults)))
+                .thenReturn(sCommands);
 
         // When
-        final List<SCommand> allCommands = commandServiceImpl.getAllCommands(startIndex, maxResults, SCommandCriterion.NAME_ASC);
+        final List<SCommand> allCommands = commandServiceImpl.getAllCommands(startIndex, maxResults,
+                SCommandCriterion.NAME_ASC);
 
         // Then
         Assert.assertEquals(sCommands, allCommands);
@@ -113,7 +116,8 @@ public class CommandServiceImplTest {
         final OrderByType orderByType = OrderByType.ASC;
         final int startIndex = 0;
         final int maxResults = 1;
-        when(persistence.selectList(SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults))).thenThrow(new SBonitaReadException(""));
+        when(persistence.selectList(SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults)))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         commandServiceImpl.getAllCommands(startIndex, maxResults, SCommandCriterion.NAME_DESC);
@@ -153,7 +157,8 @@ public class CommandServiceImplTest {
     public final void getByIdThrowException() throws SBonitaReadException, SCommandNotFoundException {
         // Given
         final long commandId = 456L;
-        when(persistence.selectById(SelectDescriptorBuilder.getCommandById(commandId))).thenThrow(new SBonitaReadException(""));
+        when(persistence.selectById(SelectDescriptorBuilder.getCommandById(commandId)))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         commandServiceImpl.get(commandId);
@@ -193,14 +198,16 @@ public class CommandServiceImplTest {
     public final void getByNameThrowException() throws SBonitaReadException, SCommandNotFoundException {
         // Given
         final String commandName = "name";
-        when(persistence.selectOne(SelectDescriptorBuilder.getCommandByName(commandName))).thenThrow(new SBonitaReadException(""));
+        when(persistence.selectOne(SelectDescriptorBuilder.getCommandByName(commandName)))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         commandServiceImpl.get(commandName);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getNumberOfCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getNumberOfCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
      *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
@@ -244,10 +251,13 @@ public class CommandServiceImplTest {
         final OrderByType orderByType = OrderByType.ASC;
         final int startIndex = 0;
         final int maxResults = 1;
-        when(persistence.selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults))).thenReturn(sCommands);
+        when(persistence
+                .selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults)))
+                        .thenReturn(sCommands);
 
         // When
-        final List<SCommand> userCommands = commandServiceImpl.getUserCommands(startIndex, maxResults, SCommandCriterion.NAME_ASC);
+        final List<SCommand> userCommands = commandServiceImpl.getUserCommands(startIndex, maxResults,
+                SCommandCriterion.NAME_ASC);
 
         // Then
         Assert.assertEquals(sCommands, userCommands);
@@ -260,15 +270,18 @@ public class CommandServiceImplTest {
         final OrderByType orderByType = OrderByType.ASC;
         final int startIndex = 0;
         final int maxResults = 1;
-        when(persistence.selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults))).thenThrow(
-                new SBonitaReadException(""));
+        when(persistence
+                .selectList(SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults)))
+                        .thenThrow(
+                                new SBonitaReadException(""));
 
         // When
         commandServiceImpl.getUserCommands(startIndex, maxResults, SCommandCriterion.NAME_DESC);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#searchCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#searchCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
      *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
@@ -310,22 +323,32 @@ public class CommandServiceImplTest {
     public void start_should_add_missing_system_commands() throws Exception {
         //given
         CommandDeployment firstDeploy = new CommandDeployment("first", "the first command", "com.company.FirstCommand");
-        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command", "com.company.SecondCommand");
+        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command",
+                "com.company.SecondCommand");
         CommandDeployment thirdDeploy = new CommandDeployment("third", "the third command", "com.company.ThirdCommand");
-        CommandDeployment fourthDeploy = new CommandDeployment("fourth", "the fourth command", "com.company.FourthCommand");
+        CommandDeployment fourthDeploy = new CommandDeployment("fourth", "the fourth command",
+                "com.company.FourthCommand");
         CommandDeployment fifthDeploy = new CommandDeployment("fifth", "the fifth command", "com.company.FifthCommand");
         CommandDeployment sixthDeploy = new CommandDeployment("sixth", "the sixth command", "com.company.sixthCommand");
 
-        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
-        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
-        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
-        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command").implementation("com.company.FourthCommand").build();
-        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command").implementation("com.company.FifthCommand").build();
-        SCommand sixth = SCommand.builder().name("sixth").description("the sixth command").implementation("com.company.sixthCommand").build();
-        given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(firstDeploy, secondDeploy, thirdDeploy, fourthDeploy, fifthDeploy, sixthDeploy));
+        SCommand first = SCommand.builder().name("first").description("the first command")
+                .implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command")
+                .implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command")
+                .implementation("com.company.ThirdCommand").build();
+        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command")
+                .implementation("com.company.FourthCommand").build();
+        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command")
+                .implementation("com.company.FifthCommand").build();
+        SCommand sixth = SCommand.builder().name("sixth").description("the sixth command")
+                .implementation("com.company.sixthCommand").build();
+        given(commandProvider.getDefaultCommands()).willReturn(
+                Arrays.asList(firstDeploy, secondDeploy, thirdDeploy, fourthDeploy, fifthDeploy, sixthDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
-        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE))).willReturn(Arrays.asList(first, third));
+        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE)))
+                .willReturn(Arrays.asList(first, third));
         given(mockedCommandService.searchCommands(getQueryOptions(2, FETCH_SIZE))).willReturn(Arrays.asList(sixth));
         doNothing().when(mockedCommandService).create(any(SCommand.class));
 
@@ -335,26 +358,35 @@ public class CommandServiceImplTest {
         //then
         ArgumentCaptor<SCommand> commandArgumentCaptor = ArgumentCaptor.forClass(SCommand.class);
         verify(mockedCommandService, times(3)).create(commandArgumentCaptor.capture());
-        assertThat(commandArgumentCaptor.getAllValues()).usingElementComparator(new CommandComparator()).contains(second, fourth, fifth);
+        assertThat(commandArgumentCaptor.getAllValues()).usingElementComparator(new CommandComparator())
+                .contains(second, fourth, fifth);
 
     }
 
     @Test
     public void start_should_delete_system_commands_not_present_in_default_commands() throws Exception {
         //given
-        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command", "com.company.SecondCommand");
+        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command",
+                "com.company.SecondCommand");
         CommandDeployment fifthDeploy = new CommandDeployment("fifth", "the fifth command", "com.company.FifthCommand");
 
-        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
-        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
-        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
-        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command").implementation("com.company.FourthCommand").build();
-        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command").implementation("com.company.FifthCommand").build();
+        SCommand first = SCommand.builder().name("first").description("the first command")
+                .implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command")
+                .implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command")
+                .implementation("com.company.ThirdCommand").build();
+        SCommand fourth = SCommand.builder().name("fourth").description("the fourth command")
+                .implementation("com.company.FourthCommand").build();
+        SCommand fifth = SCommand.builder().name("fifth").description("the fifth command")
+                .implementation("com.company.FifthCommand").build();
         given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(secondDeploy, fifthDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
-        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE))).willReturn(Arrays.asList(first, second));
-        given(mockedCommandService.searchCommands(getQueryOptions(2, FETCH_SIZE))).willReturn(Arrays.asList(third, fourth));
+        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE)))
+                .willReturn(Arrays.asList(first, second));
+        given(mockedCommandService.searchCommands(getQueryOptions(2, FETCH_SIZE)))
+                .willReturn(Arrays.asList(third, fourth));
         given(mockedCommandService.searchCommands(getQueryOptions(4, FETCH_SIZE))).willReturn(Arrays.asList(fifth));
         doNothing().when(mockedCommandService).delete(any(SCommand.class), any(SCommandLogBuilder.class));
 
@@ -364,24 +396,32 @@ public class CommandServiceImplTest {
         //then
         ArgumentCaptor<SCommand> commandArgumentCaptor = ArgumentCaptor.forClass(SCommand.class);
         verify(mockedCommandService, times(3)).delete(commandArgumentCaptor.capture(), any(SCommandLogBuilder.class));
-        assertThat(commandArgumentCaptor.getAllValues()).usingElementComparator(new CommandComparator()).contains(first, third, fourth);
+        assertThat(commandArgumentCaptor.getAllValues()).usingElementComparator(new CommandComparator()).contains(first,
+                third, fourth);
 
     }
 
     @Test
     public void start_should_update_existing_system_commands() throws Exception {
         //given
-        CommandDeployment firstDeploy = new CommandDeployment("first", "the first command with a modified description", "com.company.FirstCommand");
-        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command", "com.company.SecondCommand");
-        CommandDeployment thirdDeploy = new CommandDeployment("third", "the third command", "com.company.ThirdCommandModified");
+        CommandDeployment firstDeploy = new CommandDeployment("first", "the first command with a modified description",
+                "com.company.FirstCommand");
+        CommandDeployment secondDeploy = new CommandDeployment("second", "the second command",
+                "com.company.SecondCommand");
+        CommandDeployment thirdDeploy = new CommandDeployment("third", "the third command",
+                "com.company.ThirdCommandModified");
 
-        SCommand first = SCommand.builder().name("first").description("the first command").implementation("com.company.FirstCommand").build();
-        SCommand second = SCommand.builder().name("second").description("the second command").implementation("com.company.SecondCommand").build();
-        SCommand third = SCommand.builder().name("third").description("the third command").implementation("com.company.ThirdCommand").build();
+        SCommand first = SCommand.builder().name("first").description("the first command")
+                .implementation("com.company.FirstCommand").build();
+        SCommand second = SCommand.builder().name("second").description("the second command")
+                .implementation("com.company.SecondCommand").build();
+        SCommand third = SCommand.builder().name("third").description("the third command")
+                .implementation("com.company.ThirdCommand").build();
         given(commandProvider.getDefaultCommands()).willReturn(Arrays.asList(firstDeploy, secondDeploy, thirdDeploy));
 
         CommandServiceImpl mockedCommandService = spy(commandServiceImpl);
-        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE))).willReturn(Arrays.asList(first, second));
+        given(mockedCommandService.searchCommands(getQueryOptions(0, FETCH_SIZE)))
+                .willReturn(Arrays.asList(first, second));
         given(mockedCommandService.searchCommands(getQueryOptions(2, FETCH_SIZE))).willReturn(Arrays.asList(third));
         doNothing().when(mockedCommandService).update(any(SCommand.class), any(EntityUpdateDescriptor.class));
 
@@ -390,17 +430,20 @@ public class CommandServiceImplTest {
 
         //then
         ArgumentCaptor<SCommand> commandCaptor = ArgumentCaptor.forClass(SCommand.class);
-        ArgumentCaptor<EntityUpdateDescriptor> updateDescriptorCaptor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
+        ArgumentCaptor<EntityUpdateDescriptor> updateDescriptorCaptor = ArgumentCaptor
+                .forClass(EntityUpdateDescriptor.class);
         verify(mockedCommandService, times(2)).update(commandCaptor.capture(), updateDescriptorCaptor.capture());
         assertThat(commandCaptor.getAllValues()).usingElementComparator(new CommandComparator()).contains(first, third);
         assertThat(updateDescriptorCaptor.getAllValues()).contains(
-                new SCommandUpdateBuilderImpl().updateDescription("the first command with a modified description").done(),
+                new SCommandUpdateBuilderImpl().updateDescription("the first command with a modified description")
+                        .done(),
                 new SCommandUpdateBuilderImpl().updateImplementation("com.company.ThirdCommandModified").done());
 
     }
 
     private QueryOptions getQueryOptions(final int fromIndex, int maxResults) {
-        return new QueryOptions(fromIndex, maxResults, Collections.singletonList(new OrderByOption(SCommand.class, "id", OrderByType.ASC)),
+        return new QueryOptions(fromIndex, maxResults,
+                Collections.singletonList(new OrderByOption(SCommand.class, "id", OrderByType.ASC)),
                 Collections.singletonList(new FilterOption(SCommand.class, "isSystem", true)), null);
     }
 }

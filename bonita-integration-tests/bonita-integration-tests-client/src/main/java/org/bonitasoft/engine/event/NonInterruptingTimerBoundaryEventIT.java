@@ -26,7 +26,8 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     public void nonInterruptTimerBoundaryEventTriggered() throws Exception {
         // deploy process with non-interrupting boundary event
         final long timerDuration = 1000;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, false, "step1", "exceptionStep", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, false,
+                "step1", "exceptionStep", "step2");
 
         // start the process and wait for timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -56,10 +57,12 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final String simpleTaskName = "stepCA";
 
         // deploy a simple process p1
-        final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName,
+                simpleTaskName);
 
         // deploy a process, p2, with a call activity calling p1. The call activity has a non-interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(timerDuration, false, simpleProcessName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(
+                timerDuration, false, simpleProcessName);
 
         // start the root process and wait for boundary event triggering
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -91,7 +94,8 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final String exceptionFlowTaskName = "exceptionStep";
         final int loopCardinality = 2;
         final String normalFlowTaskName = "step2";
-        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration,
+                false, multiTaskName, loopCardinality,
                 true,
                 normalFlowTaskName, exceptionFlowTaskName);
 
@@ -124,7 +128,8 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         // deploy a process with a interrupting timer boundary event attached to a parallel multi-instance
         final String multiTaskName = "step1";
         final String normalTaskName = "step2";
-        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration,
+                false, multiTaskName, loopCardinality,
                 false, normalTaskName, "exceptionStep");
 
         // start the process and wait for process to be triggered
@@ -154,7 +159,8 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final String loopActivityName = "step1";
         final String normalFlowStepName = "step2";
         final String exceptionFlowStepName = "exceptionStep";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(timerDuration, false, loopMax, loopActivityName,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(
+                timerDuration, false, loopMax, loopActivityName,
                 normalFlowStepName, exceptionFlowStepName);
 
         // start the process and wait timer to trigger

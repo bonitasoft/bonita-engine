@@ -25,20 +25,23 @@ public class BusinessDataDefinitionBuilder extends FlowElementContainerBuilder i
 
     private final BusinessDataDefinitionImpl businessDataDefinition;
 
-    protected BusinessDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    protected BusinessDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final BusinessDataDefinitionImpl businessDataDefinition) {
         super(container, processDefinitionBuilder);
         this.businessDataDefinition = businessDataDefinition;
         container.addBusinessDataDefinition(businessDataDefinition);
     }
 
-    private static BusinessDataDefinitionImpl getBusinessData(final String name, final String className, final Expression defaultValue) {
+    private static BusinessDataDefinitionImpl getBusinessData(final String name, final String className,
+            final Expression defaultValue) {
         final BusinessDataDefinitionImpl businessData = new BusinessDataDefinitionImpl(name, defaultValue);
         businessData.setClassName(className);
         return businessData;
     }
 
-    public BusinessDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public BusinessDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final String className, final Expression defaultValue) {
         this(processDefinitionBuilder, container, getBusinessData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);

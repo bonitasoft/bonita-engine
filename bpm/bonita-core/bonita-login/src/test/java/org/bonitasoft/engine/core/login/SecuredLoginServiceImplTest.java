@@ -161,7 +161,8 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithInvalidPlatformCredentialsWithGenericAuthenticationService() throws Exception {
+    public void testSecuredLoginServiceWithInvalidPlatformCredentialsWithGenericAuthenticationService()
+            throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = 1L;
         final Long userId = -1L;
@@ -244,7 +245,6 @@ public class SecuredLoginServiceImplTest {
         }
     }
 
-
     @Test
     public void should_fail_if_credentials_are_empty() {
         final Map<String, Serializable> credentials = new HashMap<>();
@@ -278,7 +278,6 @@ public class SecuredLoginServiceImplTest {
         }
     }
 
-
     @Test
     public void should_fail_when_given_null_credentials() {
         try {
@@ -288,7 +287,6 @@ public class SecuredLoginServiceImplTest {
             assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, map is null");
         }
     }
-
 
     @Test
     public void should_login_with_technical_user() throws Exception {
@@ -330,7 +328,8 @@ public class SecuredLoginServiceImplTest {
 
         securedLoginServiceImpl.login(credentials("john", "bpm", 42));
 
-        verify(identityService).updateUser(eq(user), argThat(e -> e.getFields().keySet().equals(Collections.singleton("lastConnection"))));
+        verify(identityService).updateUser(eq(user),
+                argThat(e -> e.getFields().keySet().equals(Collections.singleton("lastConnection"))));
     }
 
     @Test
@@ -363,7 +362,6 @@ public class SecuredLoginServiceImplTest {
         return credentials;
     }
 
-
     private SUser havingUser(String username, String password, long tenantId) throws Exception {
         SUser user = new SUser();
         user.setId(UUID.randomUUID().getLeastSignificantBits());
@@ -372,8 +370,8 @@ public class SecuredLoginServiceImplTest {
         user.setEnabled(true);
         doReturn(user).when(identityService).getUserByUserName(username);
 
-
-        doReturn(username).when(genericAuthenticationService).checkUserCredentials(eq(credentials(username, password, tenantId)));
+        doReturn(username).when(genericAuthenticationService)
+                .checkUserCredentials(eq(credentials(username, password, tenantId)));
 
         return user;
     }

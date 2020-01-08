@@ -25,10 +25,11 @@ import io.micrometer.core.instrument.step.StepCounter;
  * Add the total of the counter as a Measurement to the original StepCounter
  */
 public class CumulativeAndStepCounter extends StepCounter {
+
     private final DoubleAdder count;
 
     CumulativeAndStepCounter(Id id, Clock clock, long stepMillis) {
-       super(id, clock, stepMillis);
+        super(id, clock, stepMillis);
         count = new DoubleAdder();
     }
 
@@ -44,7 +45,8 @@ public class CumulativeAndStepCounter extends StepCounter {
 
     @Override
     public Iterable<Measurement> measure() {
-        return Arrays.asList(new Measurement(this::count, Statistic.COUNT), new Measurement(this::total, Statistic.TOTAL));
+        return Arrays.asList(new Measurement(this::count, Statistic.COUNT),
+                new Measurement(this::total, Statistic.TOTAL));
     }
 
 }

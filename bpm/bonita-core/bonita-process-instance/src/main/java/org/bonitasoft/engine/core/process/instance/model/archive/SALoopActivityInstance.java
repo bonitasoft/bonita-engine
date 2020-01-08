@@ -27,6 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SALoopActivityInstance extends SAActivityInstance {
+
     private int loopCounter;
     private int loopMax;
 
@@ -50,6 +51,5 @@ public class SALoopActivityInstance extends SAActivityInstance {
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SLoopActivityInstance.class;
     }
-
 
 }

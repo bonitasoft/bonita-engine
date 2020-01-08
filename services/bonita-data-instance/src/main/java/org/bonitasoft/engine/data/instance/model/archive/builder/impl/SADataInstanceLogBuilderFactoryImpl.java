@@ -20,7 +20,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-public class SADataInstanceLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SADataInstanceLogBuilderFactory {
+public class SADataInstanceLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SADataInstanceLogBuilderFactory {
 
     private static final String SA_DATA_INSTANCE_INDEX_NAME = "numericIndex1";
 

@@ -71,9 +71,11 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         executeProcessTriggeringEventSubProcess(null, "e1");
     }
 
-    private void executeProcessTriggeringEventSubProcess(final String catchErrorCode, final String throwErrorCode) throws Exception {
+    private void executeProcessTriggeringEventSubProcess(final String catchErrorCode, final String throwErrorCode)
+            throws Exception {
         final String subProcStartEventName = "errorStart";
-        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess(catchErrorCode, throwErrorCode, subProcStartEventName));
+        processDefinitions.add(
+                deployAndEnableProcessWithErrorEventSubProcess(catchErrorCode, throwErrorCode, subProcStartEventName));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTask(processInstance.getId(), "step1");
         final long step2Id = waitForUserTask(processInstance, "step2");
@@ -106,7 +108,8 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     @Test
     public void errorEventSubProcessNotTriggered() throws Exception {
         final String subProcStartEventName = "errorStart";
-        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("error 1", "error 1", subProcStartEventName));
+        processDefinitions
+                .add(deployAndEnableProcessWithErrorEventSubProcess("error 1", "error 1", subProcStartEventName));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         final long step1Id = waitForUserTask(processInstance.getId(), "step1");
         final long step2Id = waitForUserTask(processInstance.getId(), "step2");
@@ -166,7 +169,8 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         final String subProcUserTaskName = "subStep";
         final String dataName = "content";
         final String dataValue = "default";
-        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInRoot("error1", "errorStart", rootUserTaskName,
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInRoot("error1", "errorStart",
+                rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTaskAndExecuteIt(processInstance, rootUserTaskName, user);
@@ -189,7 +193,8 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         final String subProcUserTaskName = "subStep";
         final String dataName = "content";
         final String dataValue = "default";
-        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInSubProc("error1", "errorStart", rootUserTaskName,
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInSubProc("error1",
+                "errorStart", rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTaskAndExecuteIt(processInstance, rootUserTaskName, user);
@@ -205,17 +210,20 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
-    private void checkEvaluateExpression(final ActivityInstance subStep, final String dataName, final Class<?> expressionType, final Serializable expectedValue)
+    private void checkEvaluateExpression(final ActivityInstance subStep, final String dataName,
+            final Class<?> expressionType, final Serializable expectedValue)
             throws InvalidExpressionException, ExpressionEvaluationException {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(1);
         final Expression contVarExpr = new ExpressionBuilder().createDataExpression(dataName, expressionType.getName());
         expressions.put(contVarExpr, null);
 
-        final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
+        final Map<String, Serializable> expressionResults = getProcessAPI()
+                .evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
         assertEquals(expectedValue, expressionResults.get(contVarExpr.getName()));
     }
 
-    private void checkRetrieveDataInstances(final ProcessInstance processInstance, final ActivityInstance subStep, final ProcessInstance subProcInst)
+    private void checkRetrieveDataInstances(final ProcessInstance processInstance, final ActivityInstance subStep,
+            final ProcessInstance subProcInst)
             throws DataNotFoundException {
         checkProcessDataInstance("count", subProcInst.getId(), 1);
         checkProcessDataInstance("content", subProcInst.getId(), "childVar");
@@ -224,12 +232,14 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         checkActivityDataInstance("content", subStep.getId(), "childActivityVar");
     }
 
-    private void checkProcessDataInstance(final String dataName, final long processInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkProcessDataInstance(final String dataName, final long processInstanceId,
+            final Serializable expectedValue) throws DataNotFoundException {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId,
+            final Serializable expectedValue)
             throws DataNotFoundException {
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
@@ -238,7 +248,8 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     @Test
     public void errorEventSubProcInsideTargetCallActivity() throws Exception {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e1", "e1", "errorStart"));
-        processDefinitions.add(deployAndEnableProcessWithCallActivity(processDefinitions.get(0).getName(), processDefinitions.get(0).getVersion()));
+        processDefinitions.add(deployAndEnableProcessWithCallActivity(processDefinitions.get(0).getName(),
+                processDefinitions.get(0).getVersion()));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
         final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
         waitForUserTaskAndExecuteIt(processInstance, "step2", user);
@@ -257,23 +268,28 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     }
 
     @Test
-    public void processWithErrorEventSubProcAndCallActivity_must_be_finished_when_subProcess_is_finished() throws Exception {
+    public void processWithErrorEventSubProcAndCallActivity_must_be_finished_when_subProcess_is_finished()
+            throws Exception {
         // Create the target process
         processDefinitions.add(deployAndEnableProcessWithTestConnectorThatThrowException(BuildTestUtil
                 .buildProcessDefinitionWithUserTaskAndFailedConnector(PROCESS_NAME)));
 
         // Create the caller process
-        final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_NAME);
-        final Expression targetVersionExpr = new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_VERSION);
+        final Expression targetProcessExpr = new ExpressionBuilder()
+                .createConstantStringExpression(BuildTestUtil.PROCESS_NAME);
+        final Expression targetVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(BuildTestUtil.PROCESS_VERSION);
 
-        final ProcessDefinitionBuilder builder = BuildTestUtil.buildProcessDefinitionWithCallActivity("ProcessWithEventSubProcessAndCallActivity",
+        final ProcessDefinitionBuilder builder = BuildTestUtil.buildProcessDefinitionWithCallActivity(
+                "ProcessWithEventSubProcessAndCallActivity",
                 targetProcessExpr, targetVersionExpr);
         BuildTestUtil.buildErrorEventSubProcessWithUserTask("SubStep", builder);
         processDefinitions.add(deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user));
 
         // Start the caller process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
-        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteAndGetIt("StepBeforeFailedConnector", user);
+        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteAndGetIt(
+                "StepBeforeFailedConnector", user);
         final ActivityInstance subStep = waitForUserTaskAndExecuteAndGetIt("SubStep", user);
 
         waitForProcessToFinish(subStep.getParentProcessInstanceId());

@@ -22,9 +22,9 @@ public interface Recorder {
 
     /**
      * Add a record to database
-     * 
+     *
      * @param record
-     *            the record for insert
+     *        the record for insert
      * @param type
      * @throws SRecorderException
      * @since 6.0
@@ -33,9 +33,9 @@ public interface Recorder {
 
     /**
      * Delete a record from database
-     * 
+     *
      * @param record
-     *            the record for insert
+     *        the record for insert
      * @param type
      * @throws SRecorderException
      * @since 6.0
@@ -44,9 +44,9 @@ public interface Recorder {
 
     /**
      * Update a record from database
-     * 
+     *
      * @param record
-     *            the record for insert
+     *        the record for insert
      * @param type
      * @throws SRecorderException
      * @since 6.0
@@ -58,11 +58,11 @@ public interface Recorder {
      * If no rows have been updated the event is not thrown
      *
      * @param record
-     *              the record for insert
+     *        the record for insert
      * @param type
-     *              Object type
+     *        Object type
      * @param query
-     *              NamedQuery to be used
+     *        NamedQuery to be used
      * @return number of updated rows
      * @throws SRecorderException
      * @since 7.6
@@ -71,9 +71,9 @@ public interface Recorder {
 
     /**
      * Delete all records for a table from database, for the connected tenant
-     * 
+     *
      * @param record
-     *            table to clean
+     *        table to clean
      * @throws SRecorderException
      * @since 6.1
      */

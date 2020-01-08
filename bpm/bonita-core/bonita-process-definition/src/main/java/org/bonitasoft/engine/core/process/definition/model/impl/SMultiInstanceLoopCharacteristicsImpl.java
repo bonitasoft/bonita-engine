@@ -39,14 +39,16 @@ public class SMultiInstanceLoopCharacteristicsImpl implements SMultiInstanceLoop
 
     private String dataOutputItemRef;
 
-    public SMultiInstanceLoopCharacteristicsImpl(final MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics) {
+    public SMultiInstanceLoopCharacteristicsImpl(
+            final MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics) {
         isSequential = multiInstanceLoopCharacteristics.isSequential();
         loopDataInputRef = multiInstanceLoopCharacteristics.getLoopDataInputRef();
         loopDataOutputRef = multiInstanceLoopCharacteristics.getLoopDataOutputRef();
         dataInputItemRef = multiInstanceLoopCharacteristics.getDataInputItemRef();
         dataOutputItemRef = multiInstanceLoopCharacteristics.getDataOutputItemRef();
         loopCardinality = ServerModelConvertor.convertExpression(multiInstanceLoopCharacteristics.getLoopCardinality());
-        completionCondition = ServerModelConvertor.convertExpression(multiInstanceLoopCharacteristics.getCompletionCondition());
+        completionCondition = ServerModelConvertor
+                .convertExpression(multiInstanceLoopCharacteristics.getCompletionCondition());
     }
 
     @Override

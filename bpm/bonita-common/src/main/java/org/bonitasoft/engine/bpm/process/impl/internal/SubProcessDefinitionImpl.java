@@ -71,9 +71,12 @@ public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements 
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SubProcessDefinitionImpl that = (SubProcessDefinitionImpl) o;
         return Objects.equals(triggeredByEvent, that.triggeredByEvent) &&
                 Objects.equals(subProcessContainer, that.subProcessContainer);

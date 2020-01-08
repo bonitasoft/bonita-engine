@@ -34,7 +34,8 @@ public class ConstraintsDefinitionHelper {
         return inputDefinition;
     }
 
-    private SInputDefinition getInputDefinitionInSimple(final String inputName, final List<SInputDefinition> simpleInputs) {
+    private SInputDefinition getInputDefinitionInSimple(final String inputName,
+            final List<SInputDefinition> simpleInputs) {
         for (final SInputDefinition sInputDefinition : simpleInputs) {
             if (sInputDefinition.getName().equals(inputName)) {
                 return sInputDefinition;
@@ -43,12 +44,14 @@ public class ConstraintsDefinitionHelper {
         return null;
     }
 
-    private SInputDefinition getInputDefinitionInComplex(final String inputName, final List<SInputDefinition> complexInputs) {
+    private SInputDefinition getInputDefinitionInComplex(final String inputName,
+            final List<SInputDefinition> complexInputs) {
         for (final SInputDefinition sInputDefinition : complexInputs) {
             if (sInputDefinition.getName().equals(inputName)) {
                 return sInputDefinition;
             }
-            final SInputDefinition inputDefinition = getInputDefinition(inputName, sInputDefinition.getInputDefinitions());
+            final SInputDefinition inputDefinition = getInputDefinition(inputName,
+                    sInputDefinition.getInputDefinitions());
             if (inputDefinition != null) {
                 return inputDefinition;
             }

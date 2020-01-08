@@ -71,7 +71,8 @@ public class QueryOptions implements Serializable {
         multipleFilter = null;
     }
 
-    public QueryOptions(final int fromIndex, final int numberOfResults, final List<OrderByOption> orderByOptions, final List<FilterOption> filters,
+    public QueryOptions(final int fromIndex, final int numberOfResults, final List<OrderByOption> orderByOptions,
+            final List<FilterOption> filters,
             final SearchFields multipleFilter) {
         super();
         this.fromIndex = fromIndex;
@@ -88,7 +89,8 @@ public class QueryOptions implements Serializable {
         this(0, UNLIMITED_NUMBER_OF_RESULTS, Collections.<OrderByOption> emptyList(), filters, multipleFilter);
     }
 
-    public QueryOptions(final int fromIndex, final int numberOfResults, final Class<? extends PersistentObject> clazz, final String fieldName,
+    public QueryOptions(final int fromIndex, final int numberOfResults, final Class<? extends PersistentObject> clazz,
+            final String fieldName,
             final OrderByType orderByType) {
         super();
         this.fromIndex = fromIndex;
@@ -114,7 +116,8 @@ public class QueryOptions implements Serializable {
     }
 
     @Deprecated
-    public QueryOptions(final Class<? extends PersistentObject> clazz, final String fieldName, final OrderByType orderByType) {
+    public QueryOptions(final Class<? extends PersistentObject> clazz, final String fieldName,
+            final OrderByType orderByType) {
         super();
         fromIndex = 0;
         numberOfResults = UNLIMITED_NUMBER_OF_RESULTS;
@@ -156,13 +159,15 @@ public class QueryOptions implements Serializable {
     }
 
     public static QueryOptions getNextPage(final QueryOptions queryOptions) {
-        return new QueryOptions(queryOptions.getFromIndex() + queryOptions.getNumberOfResults(), queryOptions.getNumberOfResults(),
+        return new QueryOptions(queryOptions.getFromIndex() + queryOptions.getNumberOfResults(),
+                queryOptions.getNumberOfResults(),
                 queryOptions.getOrderByOptions(), queryOptions.getFilters(), queryOptions.getMultipleFilter());
     }
 
     @Override
     public String toString() {
-        return "QueryOptions [fromIndex=" + fromIndex + ", numberOfResults=" + numberOfResults + ", orderByOptions=" + orderByOptions + "]";
+        return "QueryOptions [fromIndex=" + fromIndex + ", numberOfResults=" + numberOfResults + ", orderByOptions="
+                + orderByOptions + "]";
     }
 
     public boolean hasAFilter() {

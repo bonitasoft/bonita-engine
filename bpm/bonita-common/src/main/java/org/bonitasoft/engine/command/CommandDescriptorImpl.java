@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-
 /**
  * @author Zhang Bole
  * @author Matthieu Chaffotte

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.configuration.datasource;
 
-
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +28,7 @@ public class QuartzDataSourceAccessorProvider {
     private static QuartzDataSourceAccessor INSTANCE;
 
     public QuartzDataSourceAccessorProvider(@Qualifier("bonitaDataSource") DataSource bonitaDataSource,
-                                            @Qualifier("bonitaNonXaDataSource") DataSource bonitaNonXaDataSource) {
+            @Qualifier("bonitaNonXaDataSource") DataSource bonitaNonXaDataSource) {
         INSTANCE = new QuartzDataSourceAccessor(bonitaDataSource, bonitaNonXaDataSource);
     }
 

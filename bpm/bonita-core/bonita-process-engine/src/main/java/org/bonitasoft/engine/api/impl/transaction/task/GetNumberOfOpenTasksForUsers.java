@@ -20,10 +20,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 
-
 /**
  * @author Yanyan Liu
- *
  */
 public class GetNumberOfOpenTasksForUsers implements TransactionContentWithResult<Map<Long, Long>> {
 
@@ -31,7 +29,8 @@ public class GetNumberOfOpenTasksForUsers implements TransactionContentWithResul
     private final ActivityInstanceService activityInstanceService;
     private Map<Long, Long> result;
 
-    public GetNumberOfOpenTasksForUsers(final List<Long> userIds, final ActivityInstanceService activityInstanceService) {
+    public GetNumberOfOpenTasksForUsers(final List<Long> userIds,
+            final ActivityInstanceService activityInstanceService) {
         this.userIds = userIds;
         this.activityInstanceService = activityInstanceService;
     }

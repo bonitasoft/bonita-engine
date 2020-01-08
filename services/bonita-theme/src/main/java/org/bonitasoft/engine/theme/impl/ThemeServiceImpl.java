@@ -76,8 +76,10 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeRetriever themeRetriever;
 
-    public ThemeServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, ThemeRetriever themeRetriever) {
+    public ThemeServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService,
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            ThemeRetriever themeRetriever) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -150,7 +152,8 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public STheme getTheme(final SThemeType type, final boolean isDefault) throws SThemeNotFoundException, SThemeReadException {
+    public STheme getTheme(final SThemeType type, final boolean isDefault)
+            throws SThemeNotFoundException, SThemeReadException {
         try {
             final STheme theme = themeRetriever.getTheme(type, isDefault);
             if (theme == null) {
@@ -167,7 +170,8 @@ public class ThemeServiceImpl implements ThemeService {
         final String methodName = "getTheme";
         logBeforeMethod(methodName);
         try {
-            final SelectByIdDescriptor<STheme> descriptor = SelectDescriptorBuilder.getElementById(STheme.class, "Theme", id);
+            final SelectByIdDescriptor<STheme> descriptor = SelectDescriptorBuilder.getElementById(STheme.class,
+                    "Theme", id);
             final STheme theme = persistenceService.selectById(descriptor);
             if (theme == null) {
                 throw new SThemeNotFoundException(id);
@@ -193,6 +197,7 @@ public class ThemeServiceImpl implements ThemeService {
             throw new SThemeReadException(e);
         }
     }
+
     @Override
     public long getLastUpdateDate(final SThemeType type) throws SBonitaReadException {
         final SelectOneDescriptor<Long> selectDescriptor = SelectDescriptorBuilder.getLastUpdateDate(type);
@@ -200,7 +205,8 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public STheme updateTheme(final STheme sTheme, final EntityUpdateDescriptor descriptor) throws SThemeUpdateException {
+    public STheme updateTheme(final STheme sTheme, final EntityUpdateDescriptor descriptor)
+            throws SThemeUpdateException {
         final String methodName = "updateTheme";
         logBeforeMethod(methodName);
         NullCheckingUtil.checkArgsNotNull(sTheme);
@@ -239,7 +245,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     private void logBeforeMethod(final String methodName) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
     }
 
@@ -253,7 +260,8 @@ public class ThemeServiceImpl implements ThemeService {
     private void logOnExceptionMethod(final String methodName, final SBonitaException e) {
         final Class<? extends ThemeServiceImpl> thisClass = this.getClass();
         if (logger.isLoggable(thisClass, TechnicalLogSeverity.TRACE)) {
-            logger.log(thisClass, TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(thisClass, methodName, e));
+            logger.log(thisClass, TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogOnExceptionMethod(thisClass, methodName, e));
         }
     }
 
@@ -264,7 +272,8 @@ public class ThemeServiceImpl implements ThemeService {
         return logBuilder;
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -282,28 +291,29 @@ public class ThemeServiceImpl implements ThemeService {
         logBuilder.setActionType(actionType);
     }
 
-	@Override
-	public void start() throws SBonitaException {
-		try {
-			new ThemeServiceStartupHelper(this, themeRetriever, new ThemeActionCalculator(logger)).createOrUpdateDefaultThemes();
-		} catch (IOException e) {
-			throw new SBonitaRuntimeException("Failed to start theme service due to: "+ e.getMessage(), e);
-		}
-	}
+    @Override
+    public void start() throws SBonitaException {
+        try {
+            new ThemeServiceStartupHelper(this, themeRetriever, new ThemeActionCalculator(logger))
+                    .createOrUpdateDefaultThemes();
+        } catch (IOException e) {
+            throw new SBonitaRuntimeException("Failed to start theme service due to: " + e.getMessage(), e);
+        }
+    }
 
-	@Override
-	public void stop() throws SBonitaException {
-		// nothing to do
-	}
+    @Override
+    public void stop() throws SBonitaException {
+        // nothing to do
+    }
 
-	@Override
-	public void pause() throws SBonitaException {
-		// nothing to do
-	}
+    @Override
+    public void pause() throws SBonitaException {
+        // nothing to do
+    }
 
-	@Override
-	public void resume() throws SBonitaException {
-		// nothing to do
-	}
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
+    }
 
 }

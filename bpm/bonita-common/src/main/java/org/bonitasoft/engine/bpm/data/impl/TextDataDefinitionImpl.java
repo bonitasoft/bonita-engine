@@ -35,7 +35,9 @@ public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDa
     @XmlAttribute
     private boolean longText;
 
-    public TextDataDefinitionImpl(){}
+    public TextDataDefinitionImpl() {
+    }
+
     public TextDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name, defaultValueExpression);
     }
@@ -51,9 +53,12 @@ public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDa
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         TextDataDefinitionImpl that = (TextDataDefinitionImpl) o;
         return Objects.equals(longText, that.longText);
     }

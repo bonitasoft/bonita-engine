@@ -15,10 +15,8 @@ package org.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.exception.NotFoundException;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationMenuNotFoundException extends NotFoundException {
 

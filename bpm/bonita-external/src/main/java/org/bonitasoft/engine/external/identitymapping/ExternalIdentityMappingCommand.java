@@ -16,7 +16,6 @@ package org.bonitasoft.engine.external.identitymapping;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -63,32 +62,37 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
         return serviceAccessor;
     }
 
-    protected SExternalIdentityMapping addExternalIdentityMapping(final String externalId, final long userId, final long roleId, final long groupId,
+    protected SExternalIdentityMapping addExternalIdentityMapping(final String externalId, final long userId,
+            final long roleId, final long groupId,
             final String kind, final MemberType memberType) throws SBonitaException {
-        final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder = SExternalIdentityMapping.builder().externalId(externalId)
+        final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder = SExternalIdentityMapping.builder()
+                .externalId(externalId)
                 .groupId(groupId);
         builder.kind(kind).roleId(roleId).userId(userId);
-        final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
+        final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType,
+                userId, groupId, roleId);
         transactionContent.execute();
         return transactionContent.getResult();
     }
 
     protected void removeExternalIdentityMapping(final long sExtIdentityMappingId) throws SBonitaException {
-        final RemoveExternalIdentityMapping transactionContent = new RemoveExternalIdentityMapping(sExtIdentityMappingId);
+        final RemoveExternalIdentityMapping transactionContent = new RemoveExternalIdentityMapping(
+                sExtIdentityMappingId);
         transactionContent.execute();
     }
 
     /**
      * Deletes all <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind.
-     * 
+     *
      * @param externalId
-     *            the external Id identifying the <code>SExternalIdentityMapping</code>s to delete.
+     *        the external Id identifying the <code>SExternalIdentityMapping</code>s to delete.
      * @param kind
-     *            the discriminator of the <code>SExternalIdentityMapping</code>
+     *        the discriminator of the <code>SExternalIdentityMapping</code>
      * @throws SExternalIdentityMappingDeletionException
-     *             in case a deletion problem occurs
+     *         in case a deletion problem occurs
      */
-    protected void deleteExternalIdentityMappings(final String externalId, final String kind) throws SExternalIdentityMappingDeletionException {
+    protected void deleteExternalIdentityMappings(final String externalId, final String kind)
+            throws SExternalIdentityMappingDeletionException {
         final DeleteExternalIdentityMappings transactionContent = new DeleteExternalIdentityMappings(kind, externalId);
         try {
             transactionContent.execute();
@@ -111,7 +115,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
         SExternalIdentityMapping mapping;
 
-        CreateExternalIdentityMapping(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
+        CreateExternalIdentityMapping(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder,
+                final MemberType memberType, final long userId, final long groupId,
                 final long roleId) {
             this.builder = builder;
             this.memberType = memberType;
@@ -127,7 +132,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
             serviceAccessor.getExternalIdentityMappingService().createExternalIdentityMapping(mapping);
             // Let's retrieve the created mapping from its id, updated by the persistence service:
             final String querySuffix = getQuerySuffix(memberType);
-            mapping = serviceAccessor.getExternalIdentityMappingService().getExternalIdentityMappingById(mapping.getId(), querySuffix, querySuffix);
+            mapping = serviceAccessor.getExternalIdentityMappingService()
+                    .getExternalIdentityMappingById(mapping.getId(), querySuffix, querySuffix);
         }
 
         @Override
@@ -164,19 +170,23 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
         @Override
         public void execute() throws SBonitaException {
-            final List<SExternalIdentityMapping> searchExternalIdentityMappings = serviceAccessor.getExternalIdentityMappingService()
-                    .searchExternalIdentityMappings(kind, externalId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+            final List<SExternalIdentityMapping> searchExternalIdentityMappings = serviceAccessor
+                    .getExternalIdentityMappingService()
+                    .searchExternalIdentityMappings(kind, externalId,
+                            new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
             for (final SExternalIdentityMapping mapping : searchExternalIdentityMappings) {
                 serviceAccessor.getExternalIdentityMappingService().deleteExternalIdentityMapping(mapping);
             }
         }
     }
 
-    protected abstract class ExternalIdentityMappingSearchEntity extends AbstractSearchEntity<EntityMember, SExternalIdentityMapping> {
+    protected abstract class ExternalIdentityMappingSearchEntity
+            extends AbstractSearchEntity<EntityMember, SExternalIdentityMapping> {
 
         protected final String kind;
 
-        public ExternalIdentityMappingSearchEntity(final SearchEntityDescriptor searchDescriptor, final String kind, final SearchOptions options) {
+        public ExternalIdentityMappingSearchEntity(final SearchEntityDescriptor searchDescriptor, final String kind,
+                final SearchOptions options) {
             super(searchDescriptor, options);
             this.kind = kind;
         }
@@ -189,7 +199,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
     }
 
     protected EntityMember toEntityMember(final SExternalIdentityMapping eiMapping) {
-        return new EntityMemberImpl(eiMapping.getId(), eiMapping.getExternalId(), eiMapping.getUserId(), eiMapping.getGroupId(), eiMapping.getRoleId(),
+        return new EntityMemberImpl(eiMapping.getId(), eiMapping.getExternalId(), eiMapping.getUserId(),
+                eiMapping.getGroupId(), eiMapping.getRoleId(),
                 eiMapping.getDisplayNamePart1(), eiMapping.getDisplayNamePart2(), eiMapping.getDisplayNamePart3());
     }
 
@@ -201,7 +212,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
         return list;
     }
 
-    private void setDisplayNames(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
+    private void setDisplayNames(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder,
+            final MemberType memberType, final long userId, final long groupId,
             final long roleId) throws SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
         switch (memberType) {
             case USER:

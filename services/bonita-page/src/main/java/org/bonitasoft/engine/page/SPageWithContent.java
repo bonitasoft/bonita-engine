@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SPageWithContent extends SPage {
+
     private byte[] content;
 
     public SPageWithContent(final SPage sPage, final byte[] pagContent) {

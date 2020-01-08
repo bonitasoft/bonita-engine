@@ -28,8 +28,8 @@ import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -58,7 +58,8 @@ public class JobServiceImplForFailedJobTest {
     public final void getFailedJobs() throws SBonitaReadException, SFailedJobReadException {
         // Given
         final SFailedJob sFailedJob = mock(SFailedJob.class);
-        when(readPersistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SFailedJob>> any())).thenReturn(Collections.singletonList(sFailedJob));
+        when(readPersistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SFailedJob>> any()))
+                .thenReturn(Collections.singletonList(sFailedJob));
 
         // When
         final SFailedJob result = jobServiceImpl.getFailedJobs(0, 10).get(0);
@@ -69,8 +70,10 @@ public class JobServiceImplForFailedJobTest {
     }
 
     @Test(expected = SFailedJobReadException.class)
-    public void getFailedJobs_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SFailedJobReadException {
-        doThrow(new SBonitaReadException("")).when(readPersistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SFailedJob>> any());
+    public void getFailedJobs_should_throw_exception_when_persistenceService_failed()
+            throws SBonitaReadException, SFailedJobReadException {
+        doThrow(new SBonitaReadException("")).when(readPersistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SFailedJob>> any());
 
         jobServiceImpl.getFailedJobs(0, 10);
     }

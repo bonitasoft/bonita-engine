@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletion
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
-import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
@@ -76,7 +75,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 @Deprecated
 public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
-
     private static final int BATCH_SIZE = 100;
 
     private Recorder recorder;
@@ -92,12 +90,18 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private RefBusinessDataService refBusinessDataService;
 
     public ProcessInstanceService7_7_4(final Recorder recorder, final ReadPersistenceService persistenceRead,
-                                       final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
-                                       final DataInstanceService dataInstanceService, final ArchiveService archiveService, final ProcessDefinitionService processDefinitionService,
-                                       final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final DocumentService documentService,
-                                       final SCommentService commentService, final RefBusinessDataService refBusinessDataService, ContractDataService contractDataService) {
-        super(recorder, persistenceRead, activityService, logger, bpmEventInstanceService, dataInstanceService, archiveService, processDefinitionService,
-                connectorInstanceService, classLoaderService, documentService, commentService, refBusinessDataService, contractDataService);
+            final ActivityInstanceService activityService, final TechnicalLoggerService logger,
+            final EventInstanceService bpmEventInstanceService,
+            final DataInstanceService dataInstanceService, final ArchiveService archiveService,
+            final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final DocumentService documentService,
+            final SCommentService commentService, final RefBusinessDataService refBusinessDataService,
+            ContractDataService contractDataService) {
+        super(recorder, persistenceRead, activityService, logger, bpmEventInstanceService, dataInstanceService,
+                archiveService, processDefinitionService,
+                connectorInstanceService, classLoaderService, documentService, commentService, refBusinessDataService,
+                contractDataService);
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.activityService = activityService;
@@ -113,10 +117,10 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
                 "You are using a deprecated implementation of the ProcessInstanceService, This implementation will most likely be deleted in 7.9.");
     }
 
-
     @Override
     public int deleteArchivedProcessInstances(List<Long> sourceProcessInstanceIds) throws SBonitaException {
-            final List<SAProcessInstance> saProcessInstances = getArchivedProcessInstancesInAllStates(sourceProcessInstanceIds);
+        final List<SAProcessInstance> saProcessInstances = getArchivedProcessInstancesInAllStates(
+                sourceProcessInstanceIds);
         return deleteArchivedParentProcessInstancesAndElements(saProcessInstances);
 
     }
@@ -127,7 +131,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         }
     }
 
-    private int deleteArchivedParentProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
+    private int deleteArchivedParentProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances)
+            throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         int nbDeleted = 0;
         HashSet<Long> sourceProcessInstanceIds = new HashSet<>();
@@ -146,18 +151,21 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         return nbDeleted;
     }
 
-    private void deleteArchivedParentProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    private void deleteArchivedParentProcessInstanceAndElements(final SAProcessInstance saProcessInstance)
+            throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(saProcessInstance.getCallerId());
         try {
-            deleteArchivedProcessInstanceElements(saProcessInstance.getSourceObjectId(), saProcessInstance.getProcessDefinitionId());
+            deleteArchivedProcessInstanceElements(saProcessInstance.getSourceObjectId(),
+                    saProcessInstance.getProcessDefinitionId());
             deleteArchivedProcessInstance(saProcessInstance);
         } catch (final SProcessInstanceModificationException e) {
             getArchivedProcessInstanceAndLogWhenNotFound(saProcessInstance, e);
         }
     }
 
-    private void getArchivedProcessInstanceAndLogWhenNotFound(final SAProcessInstance saProcessInstance, final SProcessInstanceModificationException e)
+    private void getArchivedProcessInstanceAndLogWhenNotFound(final SAProcessInstance saProcessInstance,
+            final SProcessInstanceModificationException e)
             throws SProcessInstanceModificationException {
         try {
             final SAProcessInstance saProcessInstance2 = getArchivedProcessInstance(saProcessInstance.getId());
@@ -170,8 +178,6 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
             logArchivedProcessInstanceNotFound(e);
         }
     }
-
-
 
     private void deleteArchivedProcessInstanceElements(final long processInstanceId, final long processDefinitionId)
             throws SProcessInstanceModificationException {
@@ -193,8 +199,10 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     }
 
     private void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, SAComment.PROCESSINSTANCEID_KEY, processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, SAComment.ID_KEY, OrderByType.ASC));
+        final List<FilterOption> filters = Collections
+                .singletonList(new FilterOption(SAComment.class, SAComment.PROCESSINSTANCEID_KEY, processInstanceId));
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SAComment.class, SAComment.ID_KEY, OrderByType.ASC));
         List<SAComment> searchArchivedComments;
         // fromIndex always will be zero because the elements will be deleted
         final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
@@ -224,17 +232,19 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         }
     }
 
-
-    private void deleteArchivedChildrenProcessInstanceAndElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
+    private void deleteArchivedChildrenProcessInstanceAndElements(final long processInstanceId,
+            final long processDefinitionId) throws SBonitaException {
         List<Long> childrenProcessInstanceIds;
         do {
             // from index always will be zero because elements will be deleted
-            childrenProcessInstanceIds = getArchivedChildrenSourceObjectIdsFromRootProcessInstance(processInstanceId, 0, BATCH_SIZE, OrderByType.ASC);
+            childrenProcessInstanceIds = getArchivedChildrenSourceObjectIdsFromRootProcessInstance(processInstanceId, 0,
+                    BATCH_SIZE, OrderByType.ASC);
             deleteArchivedChildrenProcessInstancesAndElements(processDefinitionId, childrenProcessInstanceIds);
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    private void deleteArchivedChildrenProcessInstancesAndElements(final long processDefinitionId, final List<Long> childrenProcessInstanceIds)
+    private void deleteArchivedChildrenProcessInstancesAndElements(final long processDefinitionId,
+            final List<Long> childrenProcessInstanceIds)
             throws SBonitaException {
         for (final Long childProcessInstanceId : childrenProcessInstanceIds) {
             deleteArchivedProcessInstanceElements(childProcessInstanceId, processDefinitionId);
@@ -245,10 +255,14 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
 
     private void deleteArchivedProcessInstancesOfProcessInstance(final long processInstanceId) throws SBonitaException {
         // fromIndex variable is not updated because the elements will be deleted, so we always need to start from zero;
-        final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
-        final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
-        final OrderByOption orderBy = new OrderByOption(SAProcessInstance.class, processInstanceBuilderFact.getIdKey(), OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), Collections.singletonList(filterOption), null);
+        final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory
+                .get(SAProcessInstanceBuilderFactory.class);
+        final FilterOption filterOption = new FilterOption(SAProcessInstance.class,
+                processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
+        final OrderByOption orderBy = new OrderByOption(SAProcessInstance.class, processInstanceBuilderFact.getIdKey(),
+                OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy),
+                Collections.singletonList(filterOption), null);
 
         List<SAProcessInstance> archProcessInstances;
         do {
@@ -258,7 +272,6 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
             }
         } while (!archProcessInstances.isEmpty()); // never will be null as the persistence service sends an empty list if there are no results
     }
-
 
     private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeDeletionException {
         try {
@@ -279,8 +292,9 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         } while (!saFlowNodeInstances.isEmpty());
     }
 
-    private Set<Long> deleteArchivedFlowNodeInstancesAndElements(final Set<Long> sourceActivityIds, final List<SAFlowNodeInstance> saFlowNodeInstances)
-            throws SBonitaException{
+    private Set<Long> deleteArchivedFlowNodeInstancesAndElements(final Set<Long> sourceActivityIds,
+            final List<SAFlowNodeInstance> saFlowNodeInstances)
+            throws SBonitaException {
         Set<Long> newSourceActivityIds = new HashSet<Long>(sourceActivityIds);
         for (final SAFlowNodeInstance saFlowNodeInstance : saFlowNodeInstances) {
             newSourceActivityIds = deleteArchivedFlowNodeInstanceAndElements(newSourceActivityIds, saFlowNodeInstance);
@@ -288,17 +302,21 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         return newSourceActivityIds;
     }
 
-    private Set<Long> deleteArchivedFlowNodeInstanceAndElements(final Set<Long> sourceActivityIds, final SAFlowNodeInstance saFlowNodeInstance)
+    private Set<Long> deleteArchivedFlowNodeInstanceAndElements(final Set<Long> sourceActivityIds,
+            final SAFlowNodeInstance saFlowNodeInstance)
             throws SBonitaException {
         final Set<Long> newSourceActivityIds = new HashSet<Long>(sourceActivityIds);
-        if (saFlowNodeInstance instanceof SAActivityInstance && !sourceActivityIds.contains(saFlowNodeInstance.getSourceObjectId())) {
+        if (saFlowNodeInstance instanceof SAActivityInstance
+                && !sourceActivityIds.contains(saFlowNodeInstance.getSourceObjectId())) {
             newSourceActivityIds.add(saFlowNodeInstance.getSourceObjectId());
             deleteArchivedFlowNodeInstanceElements((SAActivityInstance) saFlowNodeInstance);
         }
         deleteArchivedFlowNodeInstance(saFlowNodeInstance);
         return newSourceActivityIds;
     }
-    public void deleteArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeDeletionException {
+
+    public void deleteArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNodeInstance)
+            throws SFlowNodeDeletionException {
         try {
             recorder.recordDelete(new DeleteRecord(saFlowNodeInstance), "ARCHIVED_FLOWNODE_INSTANCE");
         } catch (final SRecorderException e) {
@@ -306,8 +324,10 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         }
     }
 
-    private void deleteArchivedFlowNodeInstanceElements(final SAActivityInstance saActivityInstance) throws SBonitaException {
-        deleteLocalArchivedDataInstances(saActivityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+    private void deleteArchivedFlowNodeInstanceElements(final SAActivityInstance saActivityInstance)
+            throws SBonitaException {
+        deleteLocalArchivedDataInstances(saActivityInstance.getSourceObjectId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.toString());
         deleteArchivedConnectorInstances(saActivityInstance.getSourceObjectId(), SConnectorInstance.FLOWNODE_TYPE);
     }
 
@@ -319,7 +339,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         }
     }
 
-    private void deleteLocalArchivedDataInstances(final long containerId, final String containerType) throws SDataInstanceException {
+    private void deleteLocalArchivedDataInstances(final long containerId, final String containerType)
+            throws SDataInstanceException {
         List<SADataInstance> sDataInstances;
         do {
             sDataInstances = dataInstanceService.getLocalSADataInstances(containerId, containerType, 0, 100);
@@ -329,7 +350,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         } while (!sDataInstances.isEmpty());
     }
 
-    private void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaException{
+    private void deleteArchivedConnectorInstances(final long containerId, final String containerType)
+            throws SBonitaException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType);
         final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, SConnectorInstance.ID_KEY,
@@ -337,14 +359,16 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
         List<SAConnectorInstance> connectorInstances;
         do {
-            connectorInstances = connectorInstanceService.searchArchivedConnectorInstance(queryOptions, persistenceService);
+            connectorInstances = connectorInstanceService.searchArchivedConnectorInstance(queryOptions,
+                    persistenceService);
             for (final SAConnectorInstance sConnectorInstance : connectorInstances) {
                 deleteArchivedConnectorInstance(sConnectorInstance);
             }
         } while (!connectorInstances.isEmpty());
     }
 
-    private void deleteArchivedConnectorInstance(final SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException {
+    private void deleteArchivedConnectorInstance(final SAConnectorInstance sConnectorInstance)
+            throws SConnectorInstanceDeletionException {
         try {
             recorder.recordDelete(new DeleteRecord(sConnectorInstance), "CONNECTOR_INSTANCE");
         } catch (final SRecorderException e) {
@@ -359,8 +383,8 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
         return filters;
     }
 
-
-    private void removeArchivedDocument(final SAMappedDocument mappedDocument) throws SRecorderException, SBonitaReadException, SObjectNotFoundException {
+    private void removeArchivedDocument(final SAMappedDocument mappedDocument)
+            throws SRecorderException, SBonitaReadException, SObjectNotFoundException {
         // Delete document itself and the mapping
         delete(mappedDocument);
         delete(documentService.getDocument(mappedDocument.getDocumentId()));
@@ -369,6 +393,7 @@ public class ProcessInstanceService7_7_4 extends ProcessInstanceServiceImpl {
     private void delete(final SLightDocument document) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(document), "SDocument");
     }
+
     private void delete(final SAMappedDocument mappedDocument) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(mappedDocument), "SADocumentMapping");
     }

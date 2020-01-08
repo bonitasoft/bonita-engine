@@ -23,11 +23,10 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Map;
 
-import org.junit.Test;
-
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.Test;
 
 public class MonitoringJobListenerTest {
 

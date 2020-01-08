@@ -32,6 +32,7 @@ import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
  * @author Baptiste Mesta
  */
 class ArchivedDataInContainersComparator implements Comparator<SADataInstance> {
+
     private final List<DataContainer> containerHierarchy;
 
     ArchivedDataInContainersComparator(List<DataContainer> containerHierarchy) {

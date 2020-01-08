@@ -46,7 +46,8 @@ public class PlatformSetupApplicationTest {
     @Test
     public void should_gracefully_fail_with_error_message_when_action_unknown() {
         systemExit.expectSystemExitWithStatus(1);
-        systemExit.checkAssertionAfterwards(() -> assertThat(systemOutRule.getLog()).contains("no command named: wrong value"));
+        systemExit.checkAssertionAfterwards(
+                () -> assertThat(systemOutRule.getLog()).contains("no command named: wrong value"));
 
         PlatformSetupApplication.main(new String[] { "wrong value" });
     }
@@ -64,7 +65,8 @@ public class PlatformSetupApplicationTest {
         systemExit.expectSystemExitWithStatus(1);
         systemExit.checkAssertionAfterwards(() -> {
             assertThat(systemOutRule.getLog()).contains("Need to specify a command, see usage above.");
-            assertThat(systemOutRule.getLog()).contains("usage: setup ( init | configure | pull | push ) [-D <property=value>]");
+            assertThat(systemOutRule.getLog())
+                    .contains("usage: setup ( init | configure | pull | push ) [-D <property=value>]");
         });
         //when
         PlatformSetupApplication.main(new String[] {});
@@ -74,7 +76,8 @@ public class PlatformSetupApplicationTest {
     public void should_show_help_of_a_command() {
         //then
         systemExit.expectSystemExitWithStatus(0);
-        systemExit.checkAssertionAfterwards(() -> assertThat(systemOutRule.getLog()).contains("Run this init command once to create database structure"));
+        systemExit.checkAssertionAfterwards(() -> assertThat(systemOutRule.getLog())
+                .contains("Run this init command once to create database structure"));
         //when
         PlatformSetupApplication.main(new String[] { "help", "init" });
     }

@@ -68,10 +68,10 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException;
+    SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
-     *
      * get the flow node instances directly contained in the given process instance
      *
      * @param processInstanceId the parent process isntance
@@ -81,9 +81,10 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(long processInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
+    List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(long processInstanceId, int fromIndex, int maxResults)
+            throws SFlowNodeReadException, SBonitaReadException;
+
     /**
-     *
      * get the flow node instances directly contained in the given activity instance
      *
      * @param parentActivityInstanceId the parent process instance
@@ -93,7 +94,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 7.8
      */
-    List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults) throws SFlowNodeReadException, SBonitaReadException;
+    List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults)
+            throws SFlowNodeReadException, SBonitaReadException;
 
     /**
      * @param flowNodeInstance
@@ -109,7 +111,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void setTaskPriority(SFlowNodeInstance flowNodeInstance, STaskPriority priority) throws SFlowNodeModificationException;
+    void setTaskPriority(SFlowNodeInstance flowNodeInstance, STaskPriority priority)
+            throws SFlowNodeModificationException;
 
     /**
      * @param flowNodeInstance
@@ -117,7 +120,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void updateDisplayDescription(SFlowNodeInstance flowNodeInstance, String displayDescription) throws SFlowNodeModificationException;
+    void updateDisplayDescription(SFlowNodeInstance flowNodeInstance, String displayDescription)
+            throws SFlowNodeModificationException;
 
     /**
      * @param flowNodeInstance
@@ -125,7 +129,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void updateDisplayName(SFlowNodeInstance flowNodeInstance, String displayName) throws SFlowNodeModificationException;
+    void updateDisplayName(SFlowNodeInstance flowNodeInstance, String displayName)
+            throws SFlowNodeModificationException;
 
     /**
      * @param flowElementInstance
@@ -133,7 +138,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void setStateCategory(SFlowNodeInstance flowElementInstance, SStateCategory stateCategory) throws SFlowNodeModificationException;
+    void setStateCategory(SFlowNodeInstance flowElementInstance, SStateCategory stateCategory)
+            throws SFlowNodeModificationException;
 
     /**
      * @param entityClass
@@ -142,7 +148,8 @@ public interface FlowNodeInstanceService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfFlowNodeInstances(Class<? extends SFlowNodeInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
+    long getNumberOfFlowNodeInstances(Class<? extends SFlowNodeInstance> entityClass, QueryOptions countOptions)
+            throws SBonitaReadException;
 
     /**
      * @param entityClass
@@ -151,7 +158,8 @@ public interface FlowNodeInstanceService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfFlowNodeInstancesSupervisedBy(Long supervisorId, Class<? extends SFlowNodeInstance> entityClass, QueryOptions countOptions)
+    long getNumberOfFlowNodeInstancesSupervisedBy(Long supervisorId, Class<? extends SFlowNodeInstance> entityClass,
+            QueryOptions countOptions)
             throws SBonitaReadException;
 
     /**
@@ -161,7 +169,8 @@ public interface FlowNodeInstanceService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    <T extends SFlowNodeInstance> List<T> searchFlowNodeInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
+    <T extends SFlowNodeInstance> List<T> searchFlowNodeInstances(Class<T> entityClass, QueryOptions searchOptions)
+            throws SBonitaReadException;
 
     /**
      * @param entityClass
@@ -170,29 +179,35 @@ public interface FlowNodeInstanceService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(Long supervisorId, Class<T> entityClass, QueryOptions searchOptions)
+    <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(Long supervisorId, Class<T> entityClass,
+            QueryOptions searchOptions)
             throws SBonitaReadException;
 
     /**
-     * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given process instance, not flownodes in
+     * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given
+     * process instance, not flownodes in
      * sub-process instances. Results are counted per flownode name and per state.
      *
      * @param processInstanceId the ID of the process instance to search flownodes for.
      * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
-    List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
+    List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long processInstanceId)
+            throws SBonitaReadException;
 
     /**
-     * Counts the number of archived flownode instances in a specific state. Only considers archived flownodes direcly contained in given process instance, not
+     * Counts the number of archived flownode instances in a specific state. Only considers archived flownodes direcly
+     * contained in given process instance, not
      * flownodes in sub-process instances. Results are counted per flownode name and per state.
      *
-     * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process instance before it was archived
+     * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process
+     *        instance before it was archived
      *        (corresponding to the sourceObjectId in the archives)
      * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
-    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long processInstanceId)
+            throws SBonitaReadException;
 
     /**
      * Set execute by for the specific flow node instance
@@ -216,7 +231,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeModificationException
      * @since 6.0.1
      */
-    void setExecutedBySubstitute(SFlowNodeInstance sFlowNodeInstance, long executerSubstituteId) throws SFlowNodeModificationException;
+    void setExecutedBySubstitute(SFlowNodeInstance sFlowNodeInstance, long executerSubstituteId)
+            throws SFlowNodeModificationException;
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
@@ -228,10 +244,12 @@ public interface FlowNodeInstanceService {
      * @return The number found, 0 if none matching search criteria
      * @since 6.0
      */
-    long getNumberOfArchivedFlowNodeInstances(Class<? extends SAFlowNodeInstance> entityClass, QueryOptions queryOptions) throws SBonitaReadException;
+    long getNumberOfArchivedFlowNodeInstances(Class<? extends SAFlowNodeInstance> entityClass,
+            QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
+     * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific
+     * supervisor.
      *
      * @param supervisorId
      *        The identifier of the supervisor
@@ -242,7 +260,8 @@ public interface FlowNodeInstanceService {
      * @return The number found, 0 if no matching search criteria
      * @since 6.3
      */
-    long getNumberOfArchivedFlowNodeInstancesSupervisedBy(long supervisorId, Class<? extends SAFlowNodeInstance> entityClass, QueryOptions queryOptions)
+    long getNumberOfArchivedFlowNodeInstancesSupervisedBy(long supervisorId,
+            Class<? extends SAFlowNodeInstance> entityClass, QueryOptions queryOptions)
             throws SBonitaReadException;
 
     /**
@@ -255,10 +274,12 @@ public interface FlowNodeInstanceService {
      * @return The list of paginated results, according to the QueryOptions search criteria
      * @since 6.0
      */
-    <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass, QueryOptions queryOptions) throws SBonitaReadException;
+    <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass,
+            QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
+     * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific
+     * supervisor.
      *
      * @param supervisorId
      *        The identifier of the supervisor
@@ -269,7 +290,8 @@ public interface FlowNodeInstanceService {
      * @return The list of paginated results, according to the QueryOptions search criteria
      * @since 6.3
      */
-    <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(long supervisorId, Class<T> entityClass, QueryOptions queryOptions)
+    <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(long supervisorId,
+            Class<T> entityClass, QueryOptions queryOptions)
             throws SBonitaReadException;
 
     /**
@@ -286,7 +308,8 @@ public interface FlowNodeInstanceService {
      * @return
      * @throws SFlowNodeReadException
      */
-    List<SAFlowNodeInstance> getArchivedFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
+    List<SAFlowNodeInstance> getArchivedFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults)
+            throws SFlowNodeReadException;
 
     /**
      * @param archivedFlowNodeInstanceId
@@ -295,7 +318,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeNotFoundException
      * @since 6.0
      */
-    SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId) throws SFlowNodeReadException, SFlowNodeNotFoundException;
+    SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException;
 
     /**
      * @param sourceObjectFlowNodeInstanceId
@@ -303,7 +327,8 @@ public interface FlowNodeInstanceService {
      * @return The last archived flow node
      * @since 6.3
      */
-    <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
+    <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass,
+            final long sourceObjectFlowNodeInstanceId)
             throws SBonitaReadException;
 
     /**
@@ -318,7 +343,8 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeDeletionException
      * @since 6.1
      */
-    void deleteFlowNodeInstance(SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
+    void deleteFlowNodeInstance(SFlowNodeInstance sFlowNodeInstance)
+            throws SFlowNodeReadException, SFlowNodeDeletionException;
 
     /**
      * retrieve ids of elements that need to be restarted
@@ -333,7 +359,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * get the number of flow node is this root container
-     * 
+     *
      * @param rootContainerId
      * @return the number of flow node
      * @since 6.5
@@ -342,11 +368,13 @@ public interface FlowNodeInstanceService {
 
     /**
      * get all flow nodes contained in the list of root source process instance ids
+     *
      * @param sourceProcessInstanceIds root source process instance ids
      * @return list of root source process instance ids
      * @throws SBonitaReadException
      */
-    Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds) throws SBonitaReadException;
+    Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds)
+            throws SBonitaReadException;
 
     void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException;
 }

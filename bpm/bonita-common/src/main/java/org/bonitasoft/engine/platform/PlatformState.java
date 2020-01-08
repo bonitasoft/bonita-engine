@@ -15,8 +15,6 @@ package org.bonitasoft.engine.platform;
 
 /**
  * Describes the possible states of the Platform.
- *
- *
  */
 public enum PlatformState {
 
@@ -34,7 +32,6 @@ public enum PlatformState {
      * - No calls can be made on APIs
      */
     STARTING,
-
 
     /**
      * The Platform is stopped:

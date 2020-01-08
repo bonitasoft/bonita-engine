@@ -156,7 +156,8 @@ public class BDMUpdateIT extends CommonAPIIT {
         return getRelationField(businessObject, relationType, "multiple", Boolean.TRUE);
     }
 
-    private RelationField getRelationField(BusinessObject businessObject, RelationField.Type relationType, String name, Boolean isCollection) {
+    private RelationField getRelationField(BusinessObject businessObject, RelationField.Type relationType, String name,
+            Boolean isCollection) {
         final RelationField relationField = new RelationField();
         relationField.setType(relationType);
         relationField.setFetchType(RelationField.FetchType.LAZY);
@@ -182,7 +183,8 @@ public class BDMUpdateIT extends CommonAPIIT {
             tenantAdministrationAPI.uninstallBusinessDataModel();
         }
         resumeTenant();
-        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should uninstall BusinessDataModel ").isNull();
+        assertThat(tenantAdministrationAPI.getBusinessDataModelVersion()).as("should uninstall BusinessDataModel ")
+                .isNull();
 
     }
 
@@ -192,7 +194,8 @@ public class BDMUpdateIT extends CommonAPIIT {
         }
     }
 
-    private byte[] convertBomToZip(BusinessObjectModel businessObjectModel) throws IOException, JAXBException, SAXException {
+    private byte[] convertBomToZip(BusinessObjectModel businessObjectModel)
+            throws IOException, JAXBException, SAXException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         return converter.zip(businessObjectModel);
     }

@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SThrowErrorEventTriggerDefinitionImpl extends SErrorEventTriggerDefinitionImpl implements SThrowErrorEventTriggerDefinition {
+public class SThrowErrorEventTriggerDefinitionImpl extends SErrorEventTriggerDefinitionImpl
+        implements SThrowErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8087566164595708656L;
 

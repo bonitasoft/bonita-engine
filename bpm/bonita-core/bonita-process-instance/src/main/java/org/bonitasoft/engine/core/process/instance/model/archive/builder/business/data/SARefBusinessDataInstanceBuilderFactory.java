@@ -27,7 +27,8 @@ public interface SARefBusinessDataInstanceBuilderFactory {
 
     SARefBusinessDataInstanceBuilder createNewInstance(SProcessMultiRefBusinessDataInstance businessDataInstance);
 
-    SARefBusinessDataInstanceBuilder createNewInstanceForFlowNode(SFlowNodeSimpleRefBusinessDataInstance businessDataInstance);
+    SARefBusinessDataInstanceBuilder createNewInstanceForFlowNode(
+            SFlowNodeSimpleRefBusinessDataInstance businessDataInstance);
 
     SARefBusinessDataInstanceBuilder createNewInstance(SRefBusinessDataInstance sRefBusinessDataInstance);
 

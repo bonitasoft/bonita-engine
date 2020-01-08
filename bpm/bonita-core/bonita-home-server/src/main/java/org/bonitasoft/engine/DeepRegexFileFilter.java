@@ -20,7 +20,8 @@ import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.bonitasoft.engine.commons.StringUtils;
 
 /**
- * Identical to {@link org.apache.commons.io.filefilter.RegexFileFilter}, but accept files based on the complete file path and name, not only its name.
+ * Identical to {@link org.apache.commons.io.filefilter.RegexFileFilter}, but accept files based on the complete file
+ * path and name, not only its name.
  *
  * @author Emmanuel Duchastenier
  */

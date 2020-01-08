@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.connector.exception;
 
-
 /**
  * @author Feng Hui
  * @author Celine Souchet

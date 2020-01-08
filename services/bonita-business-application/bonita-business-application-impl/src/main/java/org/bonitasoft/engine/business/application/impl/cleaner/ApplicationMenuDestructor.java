@@ -31,7 +31,8 @@ public class ApplicationMenuDestructor {
     }
 
     public void onDeleteApplicationMenu(SApplicationMenu applicationMenu) throws SBonitaException {
-        applicationMenuCleaner.deleteRelatedApplicationMenus(new ChildrenMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationMenu.getId()));
+        applicationMenuCleaner.deleteRelatedApplicationMenus(new ChildrenMenusFilterBuilder(
+                new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationMenu.getId()));
     }
 
 }

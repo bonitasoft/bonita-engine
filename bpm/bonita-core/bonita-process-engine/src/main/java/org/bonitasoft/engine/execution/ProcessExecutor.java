@@ -39,21 +39,27 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface ProcessExecutor extends ContainerExecutor {
 
-    SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId, long starterSubstituteId,
-                           SExpressionContext expressionContext, List<SOperation> operations,
-                           long callerId, long subProcessDefinitionId, Map<String, Serializable> processInputs)
+    SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId,
+            long starterSubstituteId,
+            SExpressionContext expressionContext, List<SOperation> operations,
+            long callerId, long subProcessDefinitionId, Map<String, Serializable> processInputs)
             throws SProcessInstanceCreationException, SContractViolationException;
 
     SProcessInstance start(long starterId, long starterSubstituteId, List<SOperation> operations,
-            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector,
-            Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException;
+            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput,
+            FlowNodeSelector selector,
+            Map<String, Serializable> processInputs)
+            throws SProcessInstanceCreationException, SContractViolationException;
 
-    boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
-                              FlowNodeSelector selector) throws SBonitaException;
+    boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance,
+            ConnectorEvent activationEvent,
+            FlowNodeSelector selector) throws SBonitaException;
 
-    SProcessInstance startElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector) throws SProcessInstanceCreationException,
+    SProcessInstance startElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector)
+            throws SProcessInstanceCreationException,
             SFlowNodeExecutionException, SFlowNodeReadException;
 
-    void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
+    void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
+            final boolean hasActionsToExecute)
             throws SBonitaException;
 }

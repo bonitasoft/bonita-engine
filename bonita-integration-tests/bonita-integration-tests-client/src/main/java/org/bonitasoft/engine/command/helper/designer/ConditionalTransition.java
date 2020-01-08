@@ -33,7 +33,7 @@ public class ConditionalTransition extends Transition {
     public void bind(String source, String target, ProcessDefinitionBuilder builder) {
         builder.addTransition(source, target, expression);
 
-        if(otherwise != null) {
+        if (otherwise != null) {
             otherwise.build(builder);
             otherwise.bind(source, new DefaultTransition(), builder);
         }

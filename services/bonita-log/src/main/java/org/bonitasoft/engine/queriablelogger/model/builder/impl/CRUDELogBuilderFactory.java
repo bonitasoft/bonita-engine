@@ -24,16 +24,14 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
  * @author Matthieu Chaffotte
  */
 public abstract class CRUDELogBuilderFactory implements HasCRUDEActionFactory, SLogBuilderFactory {
-    
 
     public CRUDELogBuilderFactory() {
 
     }
-    
+
     @Override
     public SLogBuilder createNewInstance() {
         return new SQueriableLogBuilder();
     }
-
 
 }

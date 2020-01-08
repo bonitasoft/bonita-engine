@@ -144,8 +144,10 @@ public class FormMapping implements BaseElement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FormMapping)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof FormMapping))
+            return false;
         FormMapping that = (FormMapping) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&
@@ -161,7 +163,8 @@ public class FormMapping implements BaseElement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, processDefinitionId, type, target, task, pageId, pageURL, pageMappingKey, lastUpdatedBy, lastUpdateDate);
+        return Objects.hash(id, processDefinitionId, type, target, task, pageId, pageURL, pageMappingKey, lastUpdatedBy,
+                lastUpdateDate);
     }
 
     @Override

@@ -24,17 +24,21 @@ import io.micrometer.core.instrument.MeterRegistry;
 public interface ExecutorServiceMetricsProvider {
 
     /**
-     * bind the executor service to the registry, only support ThreadPool right now, see {@link DefaultExecutorServiceMetricsProvider#unbind(MeterRegistry, String, long)}
+     * bind the executor service to the registry, only support ThreadPool right now, see
+     * {@link DefaultExecutorServiceMetricsProvider#unbind(MeterRegistry, String, long)}
+     *
      * @return the monitored executor service with monitoring on execution time
      */
-    ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId);
+    ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName,
+            long tenantId);
 
     /**
-     *
-     * bind the executor service to the registry, only support ThreadPool right now, see {@link DefaultExecutorServiceMetricsProvider#unbind(MeterRegistry, String, long)}
+     * bind the executor service to the registry, only support ThreadPool right now, see
+     * {@link DefaultExecutorServiceMetricsProvider#unbind(MeterRegistry, String, long)}
      * This will only bind statisctics of the Threadpool, and not time taks.
      */
-    void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId);
+    void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName,
+            long tenantId);
 
     /**
      * unbind all metrics of the named executor service from the meter registry

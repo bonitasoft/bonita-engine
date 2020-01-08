@@ -96,7 +96,8 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
             setContract(new SContractDefinitionImpl(contract));
         }
         for (ContextEntry contextEntry : processDefinition.getContext()) {
-            context.add(new SContextEntryImpl(contextEntry.getKey(), ServerModelConvertor.convertExpression(contextEntry.getExpression())));
+            context.add(new SContextEntryImpl(contextEntry.getKey(),
+                    ServerModelConvertor.convertExpression(contextEntry.getExpression())));
         }
         container = new SFlowElementContainerDefinitionImpl(processDefinition.getFlowElementContainer());
 
@@ -238,7 +239,6 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         return contract;
     }
 
-
     public void setContract(SContractDefinition contract) {
         this.contract = contract;
     }
@@ -247,6 +247,5 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
     public List<SContextEntry> getContext() {
         return context;
     }
-
 
 }

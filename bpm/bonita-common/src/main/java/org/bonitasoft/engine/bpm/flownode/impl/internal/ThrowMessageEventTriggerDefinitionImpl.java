@@ -38,7 +38,8 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl implements ThrowMessageEventTriggerDefinition {
+public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl
+        implements ThrowMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -1678256136944568540L;
     @XmlElement(type = ExpressionImpl.class)
@@ -58,7 +59,8 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         dataDefinitions = new ArrayList<>();
     }
 
-    public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode) {
+    public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess,
+            final Expression targetFlowNode) {
         super(name);
         this.targetProcess = getNonNullCopy(targetProcess);
         this.targetFlowNode = getNonNullCopy(targetFlowNode);
@@ -72,7 +74,8 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         dataDefinitions = new ArrayList<>();
     }
 
-    public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode,
+    public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess,
+            final Expression targetFlowNode,
             final List<DataDefinition> dataDefinitions, final List<CorrelationDefinition> correlations) {
         super(name, correlations);
         this.targetProcess = getNonNullCopy(targetProcess);
@@ -116,9 +119,12 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ThrowMessageEventTriggerDefinitionImpl that = (ThrowMessageEventTriggerDefinitionImpl) o;
         return Objects.equals(targetProcess, that.targetProcess) &&
                 Objects.equals(targetFlowNode, that.targetFlowNode) &&

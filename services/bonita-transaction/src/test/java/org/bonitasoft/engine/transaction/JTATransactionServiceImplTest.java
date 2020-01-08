@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
@@ -147,7 +148,8 @@ public class JTATransactionServiceImplTest {
     }
 
     @Test
-    public void should_not_register_synchronization_to_decrement_numberOfActiveTransaction_when_tx_managed_externally() throws Exception {
+    public void should_not_register_synchronization_to_decrement_numberOfActiveTransaction_when_tx_managed_externally()
+            throws Exception {
         doReturn(Status.STATUS_ACTIVE).when(txManager).getStatus();
 
         txService.begin();
@@ -321,11 +323,13 @@ public class JTATransactionServiceImplTest {
             txService.begin();
             fail();
         } catch (STransactionCreationException e) {
-            assertThat(e.getMessage()).contains("in_an_other_method_to_verify_the_stacktrace_contains_this_method_name");
+            assertThat(e.getMessage())
+                    .contains("in_an_other_method_to_verify_the_stacktrace_contains_this_method_name");
         }
     }
 
-    private void in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(TransactionService txService) throws STransactionCreationException {
+    private void in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(TransactionService txService)
+            throws STransactionCreationException {
         txService.begin();
     }
 

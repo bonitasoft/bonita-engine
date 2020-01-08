@@ -33,12 +33,14 @@ public class ContractStructureValidator {
     private final ContractTypeValidator typeValidator;
     private final TechnicalLoggerService logger;
 
-    public ContractStructureValidator(final ContractTypeValidator typeValidator, final TechnicalLoggerService loggerService) {
+    public ContractStructureValidator(final ContractTypeValidator typeValidator,
+            final TechnicalLoggerService loggerService) {
         this.typeValidator = typeValidator;
         logger = loggerService;
     }
 
-    public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws SContractViolationException {
+    public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs)
+            throws SContractViolationException {
         final ErrorReporter errorReporter = new ErrorReporter();
         validateInputContainer(contract, inputs, errorReporter);
         if (errorReporter.hasError()) {
@@ -46,15 +48,18 @@ public class ContractStructureValidator {
         }
     }
 
-    void validateInputContainer(SInputContainerDefinition inputContainer, Map<String, Serializable> inputs, ErrorReporter errorReporter) {
+    void validateInputContainer(SInputContainerDefinition inputContainer, Map<String, Serializable> inputs,
+            ErrorReporter errorReporter) {
         logInputsWhichAreNotInContract(DEBUG, inputContainer.getInputDefinitions(), inputs);
         for (final SInputDefinition inputDefinition : inputContainer.getInputDefinitions()) {
             // For each input, fills the errorReporter if some rule is not valid:
-            validateInput(inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter, inputDefinition);
+            validateInput(inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter,
+                    inputDefinition);
         }
     }
 
-    private void validateInput(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
+    private void validateInput(Map<String, Serializable> inputs, ErrorReporter errorReporter,
+            SInputDefinition inputDefinition) {
         final String inputName = inputDefinition.getName();
         if (expectedInputIsProvided(inputs, errorReporter, inputName)) {
             final Serializable input = inputs.get(inputName);
@@ -64,22 +69,26 @@ public class ContractStructureValidator {
         }
     }
 
-    private void validateChildren(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
+    private void validateChildren(Map<String, Serializable> inputs, ErrorReporter errorReporter,
+            SInputDefinition inputDefinition) {
         if (inputDefinition.hasChildren() && inputDefinition.getType() == null) {
             if (inputDefinition.isMultiple()) {
-                for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(inputDefinition.getName())) {
+                for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs
+                        .get(inputDefinition.getName())) {
                     // we tolerate (and ignore) null values in lists:
                     if (complexItem != null) {
                         validateInputContainer(inputDefinition, complexItem, errorReporter);
                     }
                 }
             } else {
-                validateInputContainer(inputDefinition, (Map<String, Serializable>) inputs.get(inputDefinition.getName()), errorReporter);
+                validateInputContainer(inputDefinition,
+                        (Map<String, Serializable>) inputs.get(inputDefinition.getName()), errorReporter);
             }
         }
     }
 
-    private boolean expectedInputIsProvided(Map<String, Serializable> inputs, ErrorReporter errorReporter, String inputName) {
+    private boolean expectedInputIsProvided(Map<String, Serializable> inputs, ErrorReporter errorReporter,
+            String inputName) {
         if (!inputs.containsKey(inputName)) {
             errorReporter.addError("Expected input [" + inputName + "] is missing");
             return false;
@@ -88,7 +97,8 @@ public class ContractStructureValidator {
     }
 
     // Log when some inputs were not expected but provided:
-    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SInputDefinition> simpleInputs,
+    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity,
+            final List<SInputDefinition> simpleInputs,
             final Map<String, Serializable> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
@@ -97,7 +107,8 @@ public class ContractStructureValidator {
         }
     }
 
-    private List<String> getInputsWhichAreNotInContract(final List<SInputDefinition> simpleInputs, final Map<String, Serializable> inputs) {
+    private List<String> getInputsWhichAreNotInContract(final List<SInputDefinition> simpleInputs,
+            final Map<String, Serializable> inputs) {
         if (inputs == null || inputs.isEmpty()) {
             return Collections.emptyList();
         }

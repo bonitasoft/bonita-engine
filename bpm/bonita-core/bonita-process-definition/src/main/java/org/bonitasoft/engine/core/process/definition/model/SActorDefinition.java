@@ -19,7 +19,7 @@ package org.bonitasoft.engine.core.process.definition.model;
 public interface SActorDefinition extends SNamedElement {
 
     String getDescription();
-    
+
     boolean isInitiator();
 
 }

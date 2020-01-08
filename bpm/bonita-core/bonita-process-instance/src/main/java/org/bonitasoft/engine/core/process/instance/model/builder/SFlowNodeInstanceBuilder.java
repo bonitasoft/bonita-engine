@@ -47,7 +47,7 @@ public interface SFlowNodeInstanceBuilder {
     SFlowNodeInstanceBuilder setStateCategory(SStateCategory stateCategory);
 
     SFlowNodeInstance done();
-    
+
     SFlowNodeType getFlowNodeType();
 
 }

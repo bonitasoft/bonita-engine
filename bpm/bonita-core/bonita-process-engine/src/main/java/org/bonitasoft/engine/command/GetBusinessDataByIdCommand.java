@@ -41,7 +41,8 @@ public class GetBusinessDataByIdCommand extends CommandWithParameters {
 
         final Long identifier = getLongMandadoryParameter(parameters, BUSINESS_DATA_ID);
         final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
+        final String businessDataURIPattern = getStringMandadoryParameter(parameters,
+                BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
         try {
             if (StringUtils.isNotEmpty(childName)) {

@@ -54,7 +54,8 @@ public class SessionProviderImplTest {
     public void testDeleteSessionsOfTenantKeepTechnical() throws Exception {
         sessionProvider.removeSessions();
         sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
-        sessionProvider.addSession(SSession.builder().id(55L).tenantId(3).userName("john").userId(12).technicalUser(true).build());
+        sessionProvider.addSession(
+                SSession.builder().id(55L).tenantId(3).userName("john").userId(12).technicalUser(true).build());
         sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(12).build());
         sessionProvider.deleteSessionsOfTenant(3, true /* keep technical sessions */);
         sessionProvider.getSession(55);
@@ -71,7 +72,8 @@ public class SessionProviderImplTest {
     public void testDeleteSessionsOfTenant() throws Exception {
         sessionProvider.removeSessions();
         sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
-        sessionProvider.addSession(SSession.builder().id(55L).tenantId(3).userName("tech").userId(13).technicalUser(true).build());
+        sessionProvider.addSession(
+                SSession.builder().id(55L).tenantId(3).userName("tech").userId(13).technicalUser(true).build());
         sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(14).build());
         sessionProvider.deleteSessionsOfTenant(3, false /* keep technical sessions */);
         sessionProvider.getSession(56);

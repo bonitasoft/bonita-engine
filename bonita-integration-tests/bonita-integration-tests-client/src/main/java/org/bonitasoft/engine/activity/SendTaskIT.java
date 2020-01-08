@@ -57,7 +57,8 @@ public class SendTaskIT extends AbstractEventIT {
 
     public static final String DATA_INPUT_ITEM_REF_NAME = "lastName";
 
-    private ProcessDefinition deployAndEnableProcessWithSendTask(final String processName, final String messageName, final String targetProcess,
+    private ProcessDefinition deployAndEnableProcessWithSendTask(final String processName, final String messageName,
+            final String targetProcess,
             final String targetFlowNode, final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
@@ -65,11 +66,13 @@ public class SendTaskIT extends AbstractEventIT {
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
         // create expression for target process/flowNode
-        final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
+        final Expression targetProcessExpression = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcess);
         final SendTaskDefinitionBuilder sendTaskDefinitionBuilder;
         sendTaskDefinitionBuilder = processBuilder.addSendTask("sendMessage", messageName, targetProcessExpression);
         if (targetFlowNode != null) {
-            sendTaskDefinitionBuilder.setTargetFlowNode(new ExpressionBuilder().createConstantStringExpression(targetFlowNode));
+            sendTaskDefinitionBuilder
+                    .setTargetFlowNode(new ExpressionBuilder().createConstantStringExpression(targetFlowNode));
         }
         processBuilder.addEndEvent("endEvent");
         addMessageData(messageData, dataInputMapping, sendTaskDefinitionBuilder);
@@ -78,7 +81,8 @@ public class SendTaskIT extends AbstractEventIT {
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcess(designProcessDefinition);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(sendMessageProcess.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(sendMessageProcess.getId());
         assertThat(processDeploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
 
         return sendMessageProcess;
@@ -92,16 +96,19 @@ public class SendTaskIT extends AbstractEventIT {
 
                 Expression defaultValue = null;
                 if (dataInputMapping.containsKey(entry.getKey())) {
-                    defaultValue = new ExpressionBuilder().createDataExpression(dataInputMapping.get(entry.getKey()), entry.getValue());
+                    defaultValue = new ExpressionBuilder().createDataExpression(dataInputMapping.get(entry.getKey()),
+                            entry.getValue());
                 }
                 sendTaskDefinitionBuilder.addMessageContentExpression(displayName, defaultValue);
             }
         }
     }
 
-    private ProcessDefinition deployAndEnableProcessWithMultiInstantiatedSendTask(final String processName, final String messageName,
+    private ProcessDefinition deployAndEnableProcessWithMultiInstantiatedSendTask(final String processName,
+            final String messageName,
             final String targetProcess,
-            final String targetFlowNode, String inputListScript, final Map<String, String> messageData, final Map<String, String> dataInputMapping)
+            final String targetFlowNode, String inputListScript, final Map<String, String> messageData,
+            final Map<String, String> dataInputMapping)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
@@ -111,14 +118,17 @@ public class SendTaskIT extends AbstractEventIT {
                 .addData(
                         loopDataInput,
                         List.class.getName(),
-                        new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithLoopDataInputAndOutput1", inputListScript,
+                        new ExpressionBuilder().createGroovyScriptExpression(
+                                "executeAMultiInstanceWithLoopDataInputAndOutput1", inputListScript,
                                 List.class.getName()));
         // create expression for target process/flowNode
-        final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
+        final Expression targetProcessExpression = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcess);
         final SendTaskDefinitionBuilder sendTaskDefinitionBuilder;
         sendTaskDefinitionBuilder = processBuilder.addSendTask("sendMessage", messageName, targetProcessExpression);
         if (targetFlowNode != null) {
-            sendTaskDefinitionBuilder.setTargetFlowNode(new ExpressionBuilder().createConstantStringExpression(targetFlowNode));
+            sendTaskDefinitionBuilder
+                    .setTargetFlowNode(new ExpressionBuilder().createConstantStringExpression(targetFlowNode));
         }
         sendTaskDefinitionBuilder.addShortTextData(DATA_INPUT_ITEM_REF_NAME, null);
         sendTaskDefinitionBuilder.addMultiInstance(false, loopDataInput).addDataInputItemRef(DATA_INPUT_ITEM_REF_NAME);
@@ -129,19 +139,23 @@ public class SendTaskIT extends AbstractEventIT {
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcess(designProcessDefinition);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(sendMessageProcess.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(sendMessageProcess.getId());
         assertThat(processDeploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
 
         return sendMessageProcess;
     }
 
-    private Operation buildAssignOperation(final String dataInstanceName, final String newConstantValue, final String className,
+    private Operation buildAssignOperation(final String dataInstanceName, final String newConstantValue,
+            final String className,
             final ExpressionType expressionType) throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(newConstantValue)
+        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName)
+                .setContent(newConstantValue)
                 .setExpressionType(expressionType).setReturnType(className).done();
         final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         return operation;
     }
@@ -149,48 +163,62 @@ public class SendTaskIT extends AbstractEventIT {
     /*
      * 1 receiveProcess, 1 sendProcess, Message contains data goes from SendTask to IntermediateEvent
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
-     * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and reaches user task , data is transmitted to
+     * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and
+     * reaches user task , data is transmitted to
      * the receiveProcess.
      */
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEventWithTargetFlowNode() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14", "receiveMessageProcess",
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14",
+                "receiveMessageProcess",
                 "waitForMessage", Collections.singletonMap("lastName", String.class.getName()),
-                Collections.singletonMap("lName", String.class.getName()), Collections.singletonMap("lName", "lastName"));
+                Collections.singletonMap("lName", String.class.getName()),
+                Collections.singletonMap("lName", "lastName"));
 
-        final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
-                ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent("receiveMessageProcess", "m14", null,
+        final List<Operation> catchMessageOperations = Collections
+                .singletonList(buildAssignOperation("name", "lName", String.class.getName(),
+                        ExpressionType.TYPE_VARIABLE));
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(
+                "receiveMessageProcess", "m14", null,
                 Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
 
         // start a instance of a receive message process
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
-        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name",
+                receiveMessageProcessInstance.getId());
         assertThat(dataInstance.getValue()).isNull();
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
-                Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+                Arrays.asList(
+                        buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)),
+                null);
 
         // No need to verify anything, if no exception, query exists
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, sendMessageProcessInstance.getId())
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                                sendMessageProcessInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK).done());
 
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, sendMessageProcessInstance.getId())
-                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                                sendMessageProcessInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK)
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         waitForProcessToFinish(sendMessageProcessInstance);
-        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(sendMessageProcessInstance.getId(), 0,
+        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(
+                sendMessageProcessInstance.getId(), 0,
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertThat(archivedActivityInstances.get(0)).isInstanceOf(ArchivedSendTaskInstance.class);
         waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
@@ -205,31 +233,40 @@ public class SendTaskIT extends AbstractEventIT {
     /*
      * 1 receiveProcess, 1 sendProcess, Message contains data goes from SendTask to IntermediateEvent
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
-     * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and reaches user task , data is transmitted to
+     * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and
+     * reaches user task , data is transmitted to
      * the receiveProcess.
      */
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEvent() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14", "receiveMessageProcess",
-                null, Collections.singletonMap("lastName", String.class.getName()), Collections.singletonMap("lName", String.class.getName()),
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14",
+                "receiveMessageProcess",
+                null, Collections.singletonMap("lastName", String.class.getName()),
+                Collections.singletonMap("lName", String.class.getName()),
                 Collections.singletonMap("lName", "lastName"));
 
-        final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
-                ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent("receiveMessageProcess", "m14", null,
+        final List<Operation> catchMessageOperations = Collections
+                .singletonList(buildAssignOperation("name", "lName", String.class.getName(),
+                        ExpressionType.TYPE_VARIABLE));
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(
+                "receiveMessageProcess", "m14", null,
                 Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
 
         // start a instance of a receive message process
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
-        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name",
+                receiveMessageProcessInstance.getId());
         assertThat(dataInstance.getValue()).isNull();
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
-                Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+                Arrays.asList(
+                        buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)),
+                null);
         waitForProcessToFinish(sendMessageProcessInstance);
         waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
@@ -248,13 +285,16 @@ public class SendTaskIT extends AbstractEventIT {
     @Test
     public void can_transfer_taskData_from_multi_instance_sendTask_to_messageStartEvent() throws Exception {
         //given
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithMultiInstantiatedSendTask("sendMessageProcess", "m15", "receiveMessageProcess",
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithMultiInstantiatedSendTask(
+                "sendMessageProcess", "m15", "receiveMessageProcess",
                 START_EVENT_NAME, "[\"Doe\", \"Smith\"]", Collections.singletonMap("lName", String.class.getName()),
                 Collections.singletonMap("lName", DATA_INPUT_ITEM_REF_NAME));
 
-        final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
-                ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "m15",
+        final List<Operation> catchMessageOperations = Collections
+                .singletonList(buildAssignOperation("name", "lName", String.class.getName(),
+                        ExpressionType.TYPE_VARIABLE));
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(
+                "receiveMessageProcess", "m15",
                 Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
 
         //when
@@ -275,9 +315,11 @@ public class SendTaskIT extends AbstractEventIT {
         assertThat(step1I1.getParentProcessInstanceId()).isNotEqualTo(step1I2.getParentProcessInstanceId());
 
         //data of first instance
-        DataInstance dataInstanceI1 = getProcessAPI().getProcessDataInstance("name", step1I1.getParentProcessInstanceId());
+        DataInstance dataInstanceI1 = getProcessAPI().getProcessDataInstance("name",
+                step1I1.getParentProcessInstanceId());
         //data of second instance
-        DataInstance dataInstanceI2 = getProcessAPI().getProcessDataInstance("name", step1I2.getParentProcessInstanceId());
+        DataInstance dataInstanceI2 = getProcessAPI().getProcessDataInstance("name",
+                step1I2.getParentProcessInstanceId());
 
         assertThat(Arrays.asList(dataInstanceI1.getValue(), dataInstanceI2.getValue())).contains("Doe", "Smith");
 

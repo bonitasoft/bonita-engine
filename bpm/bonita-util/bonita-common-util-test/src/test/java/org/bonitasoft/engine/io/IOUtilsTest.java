@@ -19,10 +19,9 @@ import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.junit.Test;
 
 public class IOUtilsTest {
 

@@ -42,7 +42,8 @@ public class PropertyLoader {
                 properties.load(this.getClass().getResourceAsStream(propertyFile));
             } catch (IOException e) {
                 throw new PlatformException("Error reading configuration file " + propertyFile +
-                        ". Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted", e);
+                        ". Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted",
+                        e);
             }
         }
         return properties;

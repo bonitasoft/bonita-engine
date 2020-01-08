@@ -33,7 +33,8 @@ public class SearchProcessDeploymentInfosStartedBy extends AbstractProcessDeploy
     private final long userId;
 
     public SearchProcessDeploymentInfosStartedBy(final ProcessDefinitionService processDefinitionService,
-            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final long userId, final SearchOptions options) {
+            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final long userId,
+            final SearchOptions options) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
         this.userId = userId;
@@ -45,7 +46,8 @@ public class SearchProcessDeploymentInfosStartedBy extends AbstractProcessDeploy
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return processDefinitionService.searchProcessDeploymentInfosStartedBy(userId, searchOptions);
     }
 

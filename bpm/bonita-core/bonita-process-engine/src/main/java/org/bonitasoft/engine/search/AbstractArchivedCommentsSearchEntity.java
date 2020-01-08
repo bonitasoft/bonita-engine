@@ -25,7 +25,8 @@ import org.bonitasoft.engine.service.ModelConvertor;
  */
 public abstract class AbstractArchivedCommentsSearchEntity extends AbstractSearchEntity<ArchivedComment, SAComment> {
 
-    public AbstractArchivedCommentsSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public AbstractArchivedCommentsSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
     }
 

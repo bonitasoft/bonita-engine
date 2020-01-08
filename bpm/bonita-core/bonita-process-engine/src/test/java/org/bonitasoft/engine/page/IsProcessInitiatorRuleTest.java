@@ -75,7 +75,8 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(false).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(false).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -87,7 +88,8 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(true).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(true).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -99,8 +101,10 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
         //given
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, LOGGED_USER_ID);
 
-        ProcessInstanceNotFoundException processInstanceNotFoundException = new ProcessInstanceNotFoundException("message");
-        doThrow(processInstanceNotFoundException).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
+        ProcessInstanceNotFoundException processInstanceNotFoundException = new ProcessInstanceNotFoundException(
+                "message");
+        doThrow(processInstanceNotFoundException).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(
+                LOGGED_USER_ID,
                 PROCESS_INSTANCE_ID);
 
         //expect

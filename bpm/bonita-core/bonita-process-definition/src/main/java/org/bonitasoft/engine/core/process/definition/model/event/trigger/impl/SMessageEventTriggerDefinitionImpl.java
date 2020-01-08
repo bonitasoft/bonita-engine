@@ -38,7 +38,8 @@ import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBui
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl implements SMessageEventTriggerDefinition {
+public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl
+        implements SMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = 4603391860834299674L;
 
@@ -64,8 +65,9 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         messageName = messageEventTrigger.getMessageName();
         correlations = new ArrayList<SCorrelationDefinition>(messageEventTrigger.getCorrelations().size());
         for (final CorrelationDefinition correlation : messageEventTrigger.getCorrelations()) {
-            correlations.add(new SCorrelationDefinitionImpl(ServerModelConvertor.convertExpression(correlation.getKey()),
-                    ServerModelConvertor.convertExpression(correlation.getValue())));
+            correlations
+                    .add(new SCorrelationDefinitionImpl(ServerModelConvertor.convertExpression(correlation.getKey()),
+                            ServerModelConvertor.convertExpression(correlation.getValue())));
         }
     }
 
@@ -91,7 +93,8 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         if (isXMLDataDefinition(dataDefinition)) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
-            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(messageName).setElement(xmlDataDef.getElement())
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(messageName)
+                    .setElement(xmlDataDef.getElement())
                     .setNamespace(xmlDataDef.getNamespace());
             builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
             builder.setDescription(dataDefinition.getDescription());

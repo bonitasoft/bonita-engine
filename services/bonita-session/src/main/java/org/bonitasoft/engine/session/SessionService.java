@@ -50,7 +50,8 @@ public interface SessionService {
 
     SSession createSession(long tenantId, long userId, String userName, boolean technicalUser) throws SSessionException;
 
-    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles) throws SSessionException;
+    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles)
+            throws SSessionException;
 
     /**
      * Delete a session having the given id
@@ -103,7 +104,8 @@ public interface SessionService {
     long getLoggedUserFromSession(ReadSessionAccessor sessionAccessor);
 
     /**
-     * Define how long, in milliseconds, the created sessions will be valid. This does not affect already created session
+     * Define how long, in milliseconds, the created sessions will be valid. This does not affect already created
+     * session
      *
      * @param duration
      * @since 6.0
@@ -119,7 +121,8 @@ public interface SessionService {
     long getDefaultSessionDuration();
 
     /**
-     * Retrieve the duration, in milliseconds, of new created session. If no duration was specified, the default duration will be used
+     * Retrieve the duration, in milliseconds, of new created session. If no duration was specified, the default
+     * duration will be used
      *
      * @return the duration of new created session.
      * @since 6.0

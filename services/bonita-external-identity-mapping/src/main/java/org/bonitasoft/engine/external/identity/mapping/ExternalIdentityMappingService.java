@@ -48,7 +48,8 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingNotFoundException
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      */
-    SExternalIdentityMapping getExternalIdentityMappingById(long mappingId) throws SExternalIdentityMappingNotFoundException;
+    SExternalIdentityMapping getExternalIdentityMappingById(long mappingId)
+            throws SExternalIdentityMappingNotFoundException;
 
     /**
      * Get externalIdentityMapping by its id with displayNamePart having user related informations
@@ -59,7 +60,8 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingNotFoundException
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      */
-    SExternalIdentityMapping getExternalIdentityMappingForUser(long mappingId) throws SExternalIdentityMappingNotFoundException;
+    SExternalIdentityMapping getExternalIdentityMappingForUser(long mappingId)
+            throws SExternalIdentityMappingNotFoundException;
 
     /**
      * Get externalIdentityMapping by its id with displayNamePart having group related informations
@@ -70,7 +72,8 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingNotFoundException
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      */
-    SExternalIdentityMapping getExternalIdentityMappingForGroup(long mappingId) throws SExternalIdentityMappingNotFoundException;
+    SExternalIdentityMapping getExternalIdentityMappingForGroup(long mappingId)
+            throws SExternalIdentityMappingNotFoundException;
 
     /**
      * Get externalIdentityMapping by its id with displayNamePart having role related informations
@@ -81,7 +84,8 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingNotFoundException
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      */
-    SExternalIdentityMapping getExternalIdentityMappingForRole(long mappingId) throws SExternalIdentityMappingNotFoundException;
+    SExternalIdentityMapping getExternalIdentityMappingForRole(long mappingId)
+            throws SExternalIdentityMappingNotFoundException;
 
     /**
      * Get externalIdentityMapping by its id with displayNamePart having role and group related informations
@@ -92,7 +96,8 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingNotFoundException
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      */
-    SExternalIdentityMapping getExternalIdentityMappingForRoleAndGroup(long mappingId) throws SExternalIdentityMappingNotFoundException;
+    SExternalIdentityMapping getExternalIdentityMappingForRoleAndGroup(long mappingId)
+            throws SExternalIdentityMappingNotFoundException;
 
     /**
      * Delete the id specified externalIdentityMapping
@@ -103,7 +108,8 @@ public interface ExternalIdentityMappingService {
      *         error thrown if no externalIdentityMapping have an id corresponding to the parameter.
      * @throws SExternalIdentityMappingDeletionException
      */
-    void deleteExternalIdentityMapping(long mappingId) throws SExternalIdentityMappingNotFoundException, SExternalIdentityMappingDeletionException;
+    void deleteExternalIdentityMapping(long mappingId)
+            throws SExternalIdentityMappingNotFoundException, SExternalIdentityMappingDeletionException;
 
     /**
      * Delete the specific externalIdentityMapping
@@ -112,7 +118,8 @@ public interface ExternalIdentityMappingService {
      *        the externalIdentityMapping will be deleted
      * @throws SExternalIdentityMappingDeletionException
      */
-    void deleteExternalIdentityMapping(SExternalIdentityMapping externalIdentityMapping) throws SExternalIdentityMappingDeletionException;
+    void deleteExternalIdentityMapping(SExternalIdentityMapping externalIdentityMapping)
+            throws SExternalIdentityMappingDeletionException;
 
     /**
      * Delete all external identity mapping for the connected tenant
@@ -123,7 +130,8 @@ public interface ExternalIdentityMappingService {
     void deleteAllExternalIdentityMappings() throws SExternalIdentityMappingDeletionException;
 
     /**
-     * Get all externalIdentityMappings for specific kind according to the queryOptions. use querySuffix to indicate what the displayNamePart is related to
+     * Get all externalIdentityMappings for specific kind according to the queryOptions. use querySuffix to indicate
+     * what the displayNamePart is related to
      *
      * @param kind
      *        the discriminator of the <code>SExternalIdentityMapping</code> to search for.
@@ -134,7 +142,8 @@ public interface ExternalIdentityMappingService {
      * @return a list of SExternalIdentityMapping objects matching the criteria.
      * @throws SBonitaReadException
      */
-    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, QueryOptions queryOptions, String querySuffix) throws SBonitaReadException;
+    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, QueryOptions queryOptions,
+            String querySuffix) throws SBonitaReadException;
 
     /**
      * Get total number of externalIdentityMappings for specific kind according to the queryOptions.
@@ -148,10 +157,12 @@ public interface ExternalIdentityMappingService {
      * @return number of externalIdentityMappings matching the criteria.
      * @throws SBonitaReadException
      */
-    long getNumberOfExternalIdentityMappings(String kind, QueryOptions searchOptions, String querySuffix) throws SBonitaReadException;
+    long getNumberOfExternalIdentityMappings(String kind, QueryOptions searchOptions, String querySuffix)
+            throws SBonitaReadException;
 
     /**
-     * Search all <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind for the specific user. Use querySuffix to
+     * Search all <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind for
+     * the specific user. Use querySuffix to
      * indicate what the displayNamePart is related to
      *
      * @param kind
@@ -167,11 +178,13 @@ public interface ExternalIdentityMappingService {
      * @return the list of results matching the criteria.
      * @throws SBonitaReadException
      */
-    List<SExternalIdentityMapping> searchExternalIdentityMappingsForUser(String kind, long userId, final String externalId, QueryOptions queryOptions,
+    List<SExternalIdentityMapping> searchExternalIdentityMappingsForUser(String kind, long userId,
+            final String externalId, QueryOptions queryOptions,
             String querySuffix) throws SBonitaReadException;
 
     /**
-     * Get total number of <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind for the specific user. Use
+     * Get total number of <code>SExternalIdentityMapping</code> objects associated with the specified externalId and
+     * kind for the specific user. Use
      * querySuffix to
      * indicate what the displayNamePart is related to
      *
@@ -188,7 +201,8 @@ public interface ExternalIdentityMappingService {
      * @return the number of externalIdentityMappings matching the criteria.
      * @throws SBonitaReadException
      */
-    long getNumberOfExternalIdentityMappingsForUser(String kind, long userId, final String externalId, QueryOptions searchOptions, String querySuffix)
+    long getNumberOfExternalIdentityMappingsForUser(String kind, long userId, final String externalId,
+            QueryOptions searchOptions, String querySuffix)
             throws SBonitaReadException;
 
     /**
@@ -204,7 +218,8 @@ public interface ExternalIdentityMappingService {
      * @throws SBonitaReadException
      *         in case of search error.
      */
-    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, String externalId, QueryOptions queryOptions) throws SBonitaReadException;
+    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, String externalId,
+            QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param mappingId

@@ -48,7 +48,8 @@ public class ArchiveServiceImpl implements ArchiveService {
     private ArchivingStrategy archivingStrategy;
 
     public ArchiveServiceImpl(final PersistenceService definitiveArchivePersistenceService,
-            final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy, final UserTransactionService transactionService) {
+            final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy,
+            final UserTransactionService transactionService) {
         super();
         this.definitiveArchivePersistenceService = definitiveArchivePersistenceService;
         this.archivingStrategy = archivingStrategy;
@@ -76,7 +77,8 @@ public class ArchiveServiceImpl implements ArchiveService {
             } catch (final STransactionNotFoundException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
-                            "Unable to register the beforeCommitCallable to log queriable logs: transaction not found", e);
+                            "Unable to register the beforeCommitCallable to log queriable logs: transaction not found",
+                            e);
                 }
             }
         }
@@ -85,7 +87,8 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     // As a protected method for test purposes.
-    protected BatchArchiveCallable buildBatchArchiveCallable(final ArchiveInsertRecord... records) throws SRecorderException {
+    protected BatchArchiveCallable buildBatchArchiveCallable(final ArchiveInsertRecord... records)
+            throws SRecorderException {
         return new BatchArchiveCallable(definitiveArchivePersistenceService, records);
     }
 
@@ -120,9 +123,11 @@ public class ArchiveServiceImpl implements ArchiveService {
         }
     }
 
-    private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName, final Exception e) {
+    private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName,
+            final Exception e) {
         if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
-            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
+            logger.log(this.getClass(), technicalLogSeverity,
+                    LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
         }
     }
 

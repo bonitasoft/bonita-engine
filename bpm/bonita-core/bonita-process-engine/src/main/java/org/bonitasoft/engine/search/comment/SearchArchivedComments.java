@@ -31,7 +31,8 @@ public class SearchArchivedComments extends AbstractArchivedCommentsSearchEntity
 
     private final SCommentService sCommentService;
 
-    public SearchArchivedComments(final SCommentService sCommentService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchArchivedComments(final SCommentService sCommentService, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.sCommentService = sCommentService;
     }

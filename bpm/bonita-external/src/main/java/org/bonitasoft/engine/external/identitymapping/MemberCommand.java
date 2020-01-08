@@ -26,7 +26,8 @@ import org.bonitasoft.engine.identity.MemberType;
  */
 public abstract class MemberCommand extends CommandWithParameters {
 
-    protected MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws SCommandParameterizationException {
+    protected MemberType getMemberType(final Long userId, final Long groupId, final Long roleId)
+            throws SCommandParameterizationException {
         MemberType memberType = null;
         if (userId != null) {
             memberType = MemberType.USER;
@@ -48,21 +49,25 @@ public abstract class MemberCommand extends CommandWithParameters {
         return memberType;
     }
 
-    protected Long getProfileIdParameter(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected Long getProfileIdParameter(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getLongMandadoryParameter(parameters, ProfileMemberUtils.PROFILE_ID);
     }
 
-    protected Long getUserIdParameter(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected Long getUserIdParameter(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         final String message = "Error while retrieving the parameter " + ProfileMemberUtils.USER_ID + " (long value).";
         return getParameter(parameters, ProfileMemberUtils.USER_ID, message);
     }
 
-    protected Long getGroupIdParameter(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected Long getGroupIdParameter(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         final String message = "Error while retrieving the parameter " + ProfileMemberUtils.GROUP_ID + " (long value).";
         return getParameter(parameters, ProfileMemberUtils.GROUP_ID, message);
     }
 
-    protected Long getRoleIdParameter(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected Long getRoleIdParameter(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         final String message = "Error while retrieving the parameter " + ProfileMemberUtils.ROLE_ID + " (long value).";
         return getParameter(parameters, ProfileMemberUtils.ROLE_ID, message);
     }

@@ -120,7 +120,8 @@ public abstract class TransactionServiceTest {
 
         private final CountDownLatch startSignal;
 
-        TransactionWorker(final CountDownLatch lock, final TransactionService transactionService, final CountDownLatch startSignal) {
+        TransactionWorker(final CountDownLatch lock, final TransactionService transactionService,
+                final CountDownLatch startSignal) {
             this.lock = lock;
             this.transactionService = transactionService;
             this.startSignal = startSignal;

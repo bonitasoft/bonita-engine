@@ -108,7 +108,8 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     public void testCreateMembershipSupervisor() throws Exception {
         final SRole role = createSRole("role1");
         final SGroup group = createSGroup("group1");
-        final SProcessSupervisor createdSupervisor = createRoleAndGroupSupervisors(Collections.singletonMap(role.getId(), group.getId())).get(0);
+        final SProcessSupervisor createdSupervisor = createRoleAndGroupSupervisors(
+                Collections.singletonMap(role.getId(), group.getId())).get(0);
         final SProcessSupervisor gotSupervisor = getSSupevisor(createdSupervisor.getId());
         Assert.assertEquals(createdSupervisor, gotSupervisor);
         // clean-up
@@ -212,7 +213,8 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         return supervisorList;
     }
 
-    private List<SProcessSupervisor> createRoleAndGroupSupervisors(final Map<Long, Long> roleGroupMap) throws Exception {
+    private List<SProcessSupervisor> createRoleAndGroupSupervisors(final Map<Long, Long> roleGroupMap)
+            throws Exception {
         final List<SProcessSupervisor> supervisorList = new ArrayList<>();
         this.transactionService.begin();
         for (final Entry<Long, Long> roleGroup : roleGroupMap.entrySet()) {
@@ -331,7 +333,8 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
         assertFalse(isUserProcesSupervisor(user1));
         assertFalse(isUserProcesSupervisor(user2));
-        final SProcessSupervisor supervisor = createRoleAndGroupSupervisors(Collections.singletonMap(role1.getId(), group1.getId())).get(0);
+        final SProcessSupervisor supervisor = createRoleAndGroupSupervisors(
+                Collections.singletonMap(role1.getId(), group1.getId())).get(0);
         assertTrue(isUserProcesSupervisor(user1));
         assertFalse(isUserProcesSupervisor(user2));
 

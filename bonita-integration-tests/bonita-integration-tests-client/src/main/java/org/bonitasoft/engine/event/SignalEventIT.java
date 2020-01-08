@@ -35,29 +35,35 @@ public class SignalEventIT extends AbstractEventIT {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("SayGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addUserTask("step1", ACTOR_NAME).addEndEvent("End")
+        builder.createNewInstance("SayGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start")
+                .addUserTask("step1", ACTOR_NAME).addEndEvent("End")
                 .addSignalEventTrigger("GO").addTransition("Start", "step1").addTransition("step1", "End");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
         builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
+        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal")
+                .addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
-        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, user);
-        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive, ACTOR_NAME, user);
+        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableProcessWithActor(startSignalArchive,
+                ACTOR_NAME, user);
+        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive,
+                ACTOR_NAME, user);
 
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // Check that the process with trigger signal on start is not started, before send signal
-        final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
+        final ProcessInstance processInstanceWithEndSignal = getProcessAPI()
+                .startProcess(processDefinitionWithEndSignal.getId());
         waitForUserTask(processInstanceWithEndSignal, "step1");
         checkNbOfProcessInstances(1);
 
-        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         assertEquals("step1", taskInstances.get(0).getName());
 
@@ -67,7 +73,8 @@ public class SignalEventIT extends AbstractEventIT {
 
         // Check that the process with trigger signal on start is started, after send signal
         waitForUserTask("Task1");
-        taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         assertEquals("Task1", taskInstances.get(0).getName());
 
@@ -79,12 +86,14 @@ public class SignalEventIT extends AbstractEventIT {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("SayGO", "1.0").addStartEvent("Start").addEndEvent("End").addSignalEventTrigger("GO").addTransition("Start", "End");
+        builder.createNewInstance("SayGO", "1.0").addStartEvent("Start").addEndEvent("End").addSignalEventTrigger("GO")
+                .addTransition("Start", "End");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
         builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
+        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start")
+                .addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("Start", "OnSignal").addTransition("OnSignal", "Task1");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
@@ -109,13 +118,15 @@ public class SignalEventIT extends AbstractEventIT {
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String intermediate = "Intermediate";
-        builder.createNewInstance("SayGO", "1.0").addStartEvent("Start").addIntermediateThrowEvent(intermediate).addSignalEventTrigger("GO").addEndEvent("End")
+        builder.createNewInstance("SayGO", "1.0").addStartEvent("Start").addIntermediateThrowEvent(intermediate)
+                .addSignalEventTrigger("GO").addEndEvent("End")
                 .addTransition("Start", intermediate).addTransition(intermediate, "End");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
         builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
+        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal")
+                .addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
@@ -135,7 +146,8 @@ public class SignalEventIT extends AbstractEventIT {
     @Test
     public void sendSignalViaAPIToStartSignalEvent() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
+        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal")
+                .addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
         final DesignProcessDefinition startSignalDef = builder.done();
 
@@ -153,7 +165,8 @@ public class SignalEventIT extends AbstractEventIT {
     public void sendSignalViaAPIToIntermediateSignalEvent() throws Exception {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
+        builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start")
+                .addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("Start", "OnSignal").addTransition("OnSignal", "Task1");
         final ProcessDefinition intermediateSignal = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         logoutOnTenant();

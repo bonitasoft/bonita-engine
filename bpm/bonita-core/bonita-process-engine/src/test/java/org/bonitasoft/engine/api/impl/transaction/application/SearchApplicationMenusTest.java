@@ -63,7 +63,8 @@ public class SearchApplicationMenusTest {
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void executeCount_should_throw_SearchException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void executeCount_should_throw_SearchException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, MAX_RESULTS);
         given(applicationService.getNumberOfApplicationMenus(options)).willThrow(new SBonitaReadException(""));

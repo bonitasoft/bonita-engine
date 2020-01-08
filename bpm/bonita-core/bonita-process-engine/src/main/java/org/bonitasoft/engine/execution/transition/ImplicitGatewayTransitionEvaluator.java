@@ -32,28 +32,36 @@ public class ImplicitGatewayTransitionEvaluator {
     private final TransitionConditionEvaluator conditionEvaluator;
     private final DefaultTransitionGetter defaultTransitionGetter;
 
-    public ImplicitGatewayTransitionEvaluator(TransitionConditionEvaluator conditionEvaluator, DefaultTransitionGetter defaultTransitionGetter) {
+    public ImplicitGatewayTransitionEvaluator(TransitionConditionEvaluator conditionEvaluator,
+            DefaultTransitionGetter defaultTransitionGetter) {
         this.conditionEvaluator = conditionEvaluator;
         this.defaultTransitionGetter = defaultTransitionGetter;
     }
 
-    public List<STransitionDefinition> evaluateTransitions(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
-            FlowNodeTransitionsWrapper transitions, final SExpressionContext sExpressionContext) throws SBonitaException {
-        EvaluatedTransitions evaluatedTransitions = evaluatedTransitions(sExpressionContext, transitions.getNonDefaultOutgoingTransitionDefinitions());
+    public List<STransitionDefinition> evaluateTransitions(final SProcessDefinition sDefinition,
+            final SFlowNodeInstance flowNodeInstance,
+            FlowNodeTransitionsWrapper transitions, final SExpressionContext sExpressionContext)
+            throws SBonitaException {
+        EvaluatedTransitions evaluatedTransitions = evaluatedTransitions(sExpressionContext,
+                transitions.getNonDefaultOutgoingTransitionDefinitions());
         return buildChosenTransitions(evaluatedTransitions, transitions, sDefinition, flowNodeInstance);
     }
 
-    private List<STransitionDefinition> buildChosenTransitions(final EvaluatedTransitions evaluatedTransitions, final FlowNodeTransitionsWrapper transitions,
-            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
-        final List<STransitionDefinition> chosenTransitions = new ArrayList<>(evaluatedTransitions.getUnconditionalTransitions().size()
-                + evaluatedTransitions.getTrueTransitions().size());
+    private List<STransitionDefinition> buildChosenTransitions(final EvaluatedTransitions evaluatedTransitions,
+            final FlowNodeTransitionsWrapper transitions,
+            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityExecutionException {
+        final List<STransitionDefinition> chosenTransitions = new ArrayList<>(
+                evaluatedTransitions.getUnconditionalTransitions().size()
+                        + evaluatedTransitions.getTrueTransitions().size());
         if (evaluatedTransitions.hasUnconditionalTransitions()) {
             chosenTransitions.addAll(evaluatedTransitions.getUnconditionalTransitions());
         }
         if (evaluatedTransitions.hasTrueTransitions()) {
             chosenTransitions.addAll(evaluatedTransitions.getTrueTransitions());
         } else if (evaluatedTransitions.hasFalseTransitons()) {
-            final STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(transitions, sDefinition, flowNodeInstance);
+            final STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(transitions,
+                    sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
         }
         return chosenTransitions;
@@ -68,7 +76,8 @@ public class ImplicitGatewayTransitionEvaluator {
         return evaluatedTransitions;
     }
 
-    private void evaluateTransition(final EvaluatedTransitions evaluatedTransitions, final STransitionDefinition sTransitionDefinition,
+    private void evaluateTransition(final EvaluatedTransitions evaluatedTransitions,
+            final STransitionDefinition sTransitionDefinition,
             final SExpressionContext sExpressionContext) throws SBonitaException {
         final Boolean condition = conditionEvaluator.evaluateCondition(sTransitionDefinition, sExpressionContext);
         if (!sTransitionDefinition.hasCondition()) {

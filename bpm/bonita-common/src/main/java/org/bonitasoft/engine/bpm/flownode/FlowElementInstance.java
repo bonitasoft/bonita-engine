@@ -27,7 +27,7 @@ public interface FlowElementInstance extends NamedElement {
 
     /**
      * Is this flow element instance currently aborting?
-     * 
+     *
      * @return true if this flow element instance is currently aborting, false otherwise
      * @since 6.0
      */

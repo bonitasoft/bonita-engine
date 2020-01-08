@@ -49,6 +49,7 @@ public class RoleBuilder extends PersistentObjectBuilder<SRole, RoleBuilder> {
         this.id = id;
         return this;
     }
+
     public RoleBuilder forTenant(Long tenantId) {
         this.tenantId = tenantId;
         return this;

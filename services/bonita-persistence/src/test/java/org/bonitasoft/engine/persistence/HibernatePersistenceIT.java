@@ -66,19 +66,24 @@ public class HibernatePersistenceIT {
         executeSearch(enableWordSearch, expectedResults);
     }
 
-    protected void executeSearch(final boolean enableWordSearch, final int expectedResults) throws ClassNotFoundException, SPersistenceException,
+    protected void executeSearch(final boolean enableWordSearch, final int expectedResults)
+            throws ClassNotFoundException, SPersistenceException,
             SBonitaReadException {
         // Setup Hibernate and extract SessionFactory
         final Configuration configuration = new Configuration().configure();
-        final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+        final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+                .applySettings(configuration.getProperties()).buildServiceRegistry();
         SessionFactory sessionFactory;
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
         //
-        final List<Class<? extends PersistentObject>> classMapping = Arrays.<Class<? extends PersistentObject>> asList(Book.class);
+        final List<Class<? extends PersistentObject>> classMapping = Arrays
+                .<Class<? extends PersistentObject>> asList(Book.class);
         final Map<String, String> classAliasMappings = Collections.singletonMap(Book.class.getName(), "book");
-        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, classMapping,
-                classAliasMappings, enableWordSearch, Collections.<String> emptySet(), mock(TechnicalLoggerService.class));
+        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(
+                sessionFactory, classMapping,
+                classAliasMappings, enableWordSearch, Collections.<String> emptySet(),
+                mock(TechnicalLoggerService.class));
 
         Session session;
         session = persistenceService.getSession(true);
@@ -106,7 +111,8 @@ public class HibernatePersistenceIT {
         session = persistenceService.getSession(true);
         session.beginTransaction();
         try {
-            final List<Book> allBooks = persistenceService.selectList(new SelectListDescriptor<Book>("getAllBooks", null, Book.class, queryOptions));
+            final List<Book> allBooks = persistenceService
+                    .selectList(new SelectListDescriptor<Book>("getAllBooks", null, Book.class, queryOptions));
             assertThat(allBooks).hasSize(expectedResults);
         } finally {
             session.getTransaction().commit();

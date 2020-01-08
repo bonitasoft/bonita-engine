@@ -169,7 +169,8 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), callableElement, callableElementVersion, dataInputOperations, contractInputs, dataOutputOperations,
+        return Objects.hash(super.hashCode(), callableElement, callableElementVersion, dataInputOperations,
+                contractInputs, dataOutputOperations,
                 callableElementType);
     }
 

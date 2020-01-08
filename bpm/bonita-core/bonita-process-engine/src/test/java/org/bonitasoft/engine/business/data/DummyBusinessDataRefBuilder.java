@@ -32,7 +32,8 @@ public class DummyBusinessDataRefBuilder {
         return sRefBusinessDataInstance;
     }
 
-    public static SSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String dataName, final String dataClassName) {
+    public static SSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String dataName,
+            final String dataClassName) {
         final SSimpleRefBusinessDataInstance sRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
         sRefBusinessDataInstance.setName(dataName);
         sRefBusinessDataInstance.setDataClassName(dataClassName);

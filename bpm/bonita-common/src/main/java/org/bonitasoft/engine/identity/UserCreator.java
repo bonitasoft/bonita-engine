@@ -21,7 +21,8 @@ import java.util.Objects;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 
 /**
- * represents a helper for creating {@link User}. Chaining is possible with this creator to ease the {@link User} creation.
+ * represents a helper for creating {@link User}. Chaining is possible with this creator to ease the {@link User}
+ * creation.
  * <br>
  * For instance, new UserCreator("john.doe", "password").setFirstname("John").setLastname("Doe");
  *
@@ -37,7 +38,9 @@ public class UserCreator implements Serializable {
      * represents the available {@link User} field
      */
     public enum UserField {
-        NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated ICON_NAME, @Deprecated ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
+        NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated
+        ICON_NAME, @Deprecated
+        ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<UserField, Serializable> fields;

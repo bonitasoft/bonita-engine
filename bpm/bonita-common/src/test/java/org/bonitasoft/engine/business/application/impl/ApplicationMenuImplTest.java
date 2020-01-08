@@ -33,7 +33,8 @@ public class ApplicationMenuImplTest {
         menu.setParentId(parentId);
 
         //then
-        assertThat(menu).hasDisplayName(displayName).hasApplicationId(applicationId).hasApplicationPageId(applicationPageId).hasIndex(index)
+        assertThat(menu).hasDisplayName(displayName).hasApplicationId(applicationId)
+                .hasApplicationPageId(applicationPageId).hasIndex(index)
                 .hasParentId(parentId);
     }
 }

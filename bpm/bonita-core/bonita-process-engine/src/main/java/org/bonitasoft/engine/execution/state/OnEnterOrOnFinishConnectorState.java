@@ -38,27 +38,33 @@ public abstract class OnEnterOrOnFinishConnectorState implements FlowNodeState {
         this.stateBehaviors = stateBehaviors;
     }
 
-    protected abstract void beforeConnectors(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected abstract void beforeConnectors(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException;
 
-    protected abstract void afterConnectors(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected abstract void afterConnectors(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException;
 
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         // Retrieve the phase to execute depending on which connectors to execute and when to execute them:
         try {
             ConnectorEvent connectorEvent = getConnectorEvent();
             //get all element to check where we are in the state execution
-            List<SConnectorDefinition> connectorDefinitions = stateBehaviors.getConnectorDefinitions(processDefinition, flowNodeInstance, connectorEvent);
-            final SConnectorInstance connectorInstance = stateBehaviors.getNextConnectorInstance(connectorDefinitions, flowNodeInstance, connectorEvent);
-            boolean noConnectorStartedOnEnter = stateBehaviors.noConnectorHasStartedInCurrentList(connectorDefinitions, connectorInstance
-            );
+            List<SConnectorDefinition> connectorDefinitions = stateBehaviors.getConnectorDefinitions(processDefinition,
+                    flowNodeInstance, connectorEvent);
+            final SConnectorInstance connectorInstance = stateBehaviors.getNextConnectorInstance(connectorDefinitions,
+                    flowNodeInstance, connectorEvent);
+            boolean noConnectorStartedOnEnter = stateBehaviors.noConnectorHasStartedInCurrentList(connectorDefinitions,
+                    connectorInstance);
             if (noConnectorStartedOnEnter) {
                 //TODO unit test condition on this
                 beforeConnectors(processDefinition, flowNodeInstance);
             }
             if (connectorInstance != null) {
-                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, connectorDefinitions, connectorInstance);
+                stateBehaviors.executeConnector(processDefinition, flowNodeInstance, connectorDefinitions,
+                        connectorInstance);
                 return StateCode.EXECUTING;
             }
             afterConnectors(processDefinition, flowNodeInstance);

@@ -25,7 +25,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCa
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SIntermediateCatchEventDefinitionImpl extends SCatchEventDefinitionImpl implements SIntermediateCatchEventDefinition {
+public class SIntermediateCatchEventDefinitionImpl extends SCatchEventDefinitionImpl
+        implements SIntermediateCatchEventDefinition {
 
     private static final long serialVersionUID = -5011521635705533392L;
 

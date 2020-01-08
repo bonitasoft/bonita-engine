@@ -41,7 +41,8 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     private final ReadPersistenceService persistenceService;
     private final TechnicalLoggerService logger;
 
-    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, TechnicalLoggerService logger) {
+    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
+            TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.logger = logger;
@@ -55,7 +56,8 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
             recorder.recordInsert(new InsertRecord(resource), TENANT_RESOURCE);
         } else {
             logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                    "Tenant resource file contains an empty file " + name + " that will be ignored. Check that this is not a mistake.");
+                    "Tenant resource file contains an empty file " + name
+                            + " that will be ignored. Check that this is not a mistake.");
         }
     }
 
@@ -69,20 +71,24 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         }
     }
 
-    public List<STenantResourceLight> getLight(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException {
+    public List<STenantResourceLight> getLight(TenantResourceType type, int from, int numberOfElements)
+            throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService
-                .selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
+                .selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType",
+                        inputParameters, STenantResourceLight.class,
                         new QueryOptions(from, numberOfElements)));
     }
 
     @Override
-    public List<STenantResource> get(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException {
+    public List<STenantResource> get(TenantResourceType type, int from, int numberOfElements)
+            throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService.selectList(
-                new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters, STenantResource.class,
+                new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters,
+                        STenantResource.class,
                         new QueryOptions(from, numberOfElements)));
     }
 
@@ -90,7 +96,8 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     public long count(TenantResourceType type) throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
-        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfType", inputParameters, STenantResource.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfType",
+                inputParameters, STenantResource.class));
     }
 
     @Override
@@ -107,7 +114,8 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         inputParameters.put("name", name);
-        return persistenceService.selectOne(new SelectOneDescriptor<STenantResource>("getTenantResource", inputParameters, STenantResource.class));
+        return persistenceService.selectOne(
+                new SelectOneDescriptor<STenantResource>("getTenantResource", inputParameters, STenantResource.class));
     }
 
     @Override

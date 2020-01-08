@@ -29,7 +29,8 @@ public class UpdateMembershipByRoleIdAndGroupId implements TransactionContent {
 
     private final long userMemebershipId;
 
-    public UpdateMembershipByRoleIdAndGroupId(final long userMemebershipId, final IdentityService identityService, final EntityUpdateDescriptor changeDescriptor) {
+    public UpdateMembershipByRoleIdAndGroupId(final long userMemebershipId, final IdentityService identityService,
+            final EntityUpdateDescriptor changeDescriptor) {
         this.userMemebershipId = userMemebershipId;
         this.identityService = identityService;
         this.changeDescriptor = changeDescriptor;
@@ -37,7 +38,8 @@ public class UpdateMembershipByRoleIdAndGroupId implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        identityService.updateUserMembership(identityService.getLightUserMembership(userMemebershipId), changeDescriptor);
+        identityService.updateUserMembership(identityService.getLightUserMembership(userMemebershipId),
+                changeDescriptor);
     }
 
 }

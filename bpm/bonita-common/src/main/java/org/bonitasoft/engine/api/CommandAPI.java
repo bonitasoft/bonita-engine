@@ -35,44 +35,54 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
  * <p>
- * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br>
+ * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server
+ * side. <br>
  * in the execute method of this class.
  * </p>
  * <p>
- * A command is composed of a jar containing at least one class that implements <code>org.bonitasoft.engine.command.TenantCommand</code>.
- * <code>org.bonitasoft.engine.command.system.CommandWithParameters</code> can be used to handle parameter more easily. The behavior of the command must be
+ * A command is composed of a jar containing at least one class that implements
+ * <code>org.bonitasoft.engine.command.TenantCommand</code>.
+ * <code>org.bonitasoft.engine.command.system.CommandWithParameters</code> can be used to handle parameter more easily.
+ * The behavior of the command must be
  * defined in the
  * execute method of this class.<br>
- * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
+ * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a
+ * dependency on that jar.
  * <p>
- * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method with a name to identify the dependency so
+ * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method
+ * with a name to identify the dependency so
  * that it can be removed later.<br>
- * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
+ * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify
+ * it and an implementation that is the
  * fully qualified name of the command class.<br>
- * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
- * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br>
- * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or {@link CommandAPI#unregister(String)} and
+ * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by
+ * the register method or
+ * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the
+ * command.<br>
+ * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or
+ * {@link CommandAPI#unregister(String)} and
  * {@link CommandAPI#removeDependency(String)} </p>
+ *
  * <pre>
  * Code example:<br>
- * 
- * In this example we deploy a command named "myCommandName". The class that implements <code>TenantCommand</code> is <code>org.bonitasoft.engine.command.IntegerCommand</code> and 
+ *
+ * In this example we deploy a command named "myCommandName". The class that implements <code>TenantCommand</code> is <code>org.bonitasoft.engine.command.IntegerCommand</code> and
  * is contained in the jar we deploy using CommandAPI.addDependency.
  * <br>
  * <br>
  * {@code
  * byte[] byteArray = /* read the jar containing the command as a byte array * /
- * 
+ *
  *  //deploy
  * getCommandAPI().addDependency("myCommandDependency", byteArray);
  * getCommandAPI().register("myCommandName", "Retrieving the integer value", "org.bonitasoft.engine.command.IntegerCommand");
- * 
+ *
  *  //execute
  * final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
  * parameters.put("aParamterName", "aParameterValue");
  * parameters.put("anIntParameter", 42);
  * Integer theResultOfTheCommandExecution = (Integer) getCommandAPI().execute("myCommandName", parameters);
- * 
+ *
  *  //undeploy
  * getCommandAPI().unregister("myCommandName");
  * getCommandAPI().removeDependency("myCommandDependency");
@@ -135,7 +145,8 @@ public interface CommandAPI {
      * @param description
      *        The description of the command
      * @param implementation
-     *        The name of the implementation class of the command. It will be used when executing the command. This class is inside the jar of a dependency.
+     *        The name of the implementation class of the command. It will be used when executing the command. This
+     *        class is inside the jar of a dependency.
      * @return The descriptor of the newly created command
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
@@ -145,7 +156,8 @@ public interface CommandAPI {
      *         If an other problem occurs
      * @since 6.0
      */
-    CommandDescriptor register(String name, String description, String implementation) throws AlreadyExistsException, CreationException;
+    CommandDescriptor register(String name, String description, String implementation)
+            throws AlreadyExistsException, CreationException;
 
     /**
      * Execute a command according to its name and a map of parameters.
@@ -165,11 +177,13 @@ public interface CommandAPI {
      *         If an other problem occurs
      * @since 6.0
      */
-    Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    Serializable execute(String name, Map<String, Serializable> parameters)
+            throws CommandNotFoundException, CommandParameterizationException,
             CommandExecutionException;
 
     /**
-     * Execute a command according to its name and a map of parameters. During the execution of this method, the command's implementation will have to manage
+     * Execute a command according to its name and a map of parameters. During the execution of this method, the
+     * command's implementation will have to manage
      * itself its transactions.
      *
      * @param name
@@ -187,7 +201,8 @@ public interface CommandAPI {
      *         If an other problem occurs
      * @since 6.2
      */
-    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters) throws CommandNotFoundException,
+    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters)
+            throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException;
 
     /**
@@ -208,11 +223,13 @@ public interface CommandAPI {
      *         If an other problem occurs
      * @since 6.0
      */
-    Serializable execute(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    Serializable execute(long commandId, Map<String, Serializable> parameters)
+            throws CommandNotFoundException, CommandParameterizationException,
             CommandExecutionException;
 
     /**
-     * Execute a command according to its id and a map of parameters. During the execution of this method, the command's implementation
+     * Execute a command according to its id and a map of parameters. During the execution of this method, the command's
+     * implementation
      * will have to manage itself its transactions.
      *
      * @param commandId
@@ -230,7 +247,8 @@ public interface CommandAPI {
      *         If an other problem occurs
      * @since 6.2
      */
-    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException,
+    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters)
+            throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException;
 
     /**

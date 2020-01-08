@@ -82,10 +82,14 @@ public class CustomUserInfoQueriesTest {
     @Test
     public void query_getUserIdsWithCustomUserInfo_should_return_only_ids_of_users_with_chosen_custom_user_info() {
         // given
-        repository.add(aCustomUserInfoValue().withUserId(user1.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("Java").build());
-        repository.add(aCustomUserInfoValue().withUserId(user2.getId()).withCustomUserInfoDefinitionId(developer.getId()).withValue("Java").build());
-        repository.add(aCustomUserInfoValue().withUserId(user3.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("C").build());
-        repository.add(aCustomUserInfoValue().withUserId(user4.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user1.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user2.getId())
+                .withCustomUserInfoDefinitionId(developer.getId()).withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user3.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("C").build());
+        repository.add(aCustomUserInfoValue().withUserId(user4.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("Java").build());
 
         // when
         final List<Long> userIds = repository.getUserIdsWithCustomUserInfo(SKILLS_NAME, "Java", false);
@@ -99,10 +103,14 @@ public class CustomUserInfoQueriesTest {
     @Test
     public void query_getUserIdsWithCustomUserInfoContains_should_return_ids_of_users_with_chosen_custom_user_info_partial_match() {
         // given
-        repository.add(aCustomUserInfoValue().withUserId(user1.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("Java").build());
-        repository.add(aCustomUserInfoValue().withUserId(user2.getId()).withCustomUserInfoDefinitionId(developer.getId()).withValue("Java").build());
-        repository.add(aCustomUserInfoValue().withUserId(user3.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("C").build());
-        repository.add(aCustomUserInfoValue().withUserId(user4.getId()).withCustomUserInfoDefinitionId(skills.getId()).withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user1.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user2.getId())
+                .withCustomUserInfoDefinitionId(developer.getId()).withValue("Java").build());
+        repository.add(aCustomUserInfoValue().withUserId(user3.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("C").build());
+        repository.add(aCustomUserInfoValue().withUserId(user4.getId()).withCustomUserInfoDefinitionId(skills.getId())
+                .withValue("Java").build());
 
         // when
         final List<Long> userIdsWholeValue = repository.getUserIdsWithCustomUserInfo(SKILLS_NAME, "Java", true);

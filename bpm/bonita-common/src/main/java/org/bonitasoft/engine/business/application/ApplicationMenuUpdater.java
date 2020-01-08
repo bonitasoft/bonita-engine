@@ -39,7 +39,8 @@ public class ApplicationMenuUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new {@link ApplicationPage} related to the {@link org.bonitasoft.engine.business.application.ApplicationMenu}. Use
+     * Defines the identifier of the new {@link ApplicationPage} related to the
+     * {@link org.bonitasoft.engine.business.application.ApplicationMenu}. Use
      * {@code null} to reference no {@code ApplicationPage}.
      *
      * @param applicationPageId the identifier of new related {@code ApplicationPage}
@@ -77,7 +78,8 @@ public class ApplicationMenuUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new parent {@link ApplicationMenu}.Use {@code null} to reference no {@code ApplicationMenu}
+     * Defines the identifier of the new parent {@link ApplicationMenu}.Use {@code null} to reference no
+     * {@code ApplicationMenu}
      *
      * @param parentId the identifier of the new parent {@link ApplicationMenu}
      * @return the current {@code ApplicationMenuUpdater}

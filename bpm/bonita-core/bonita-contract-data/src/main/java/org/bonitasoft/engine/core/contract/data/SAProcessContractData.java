@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.contract.data;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * author Emmanuel Duchastenier
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAProcessContractData extends SAContractData {
-
 
     public SAProcessContractData(SProcessContractData processContract) {
         super(processContract);

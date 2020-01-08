@@ -92,7 +92,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             awaitTermination();
         } catch (final SWorkException e) {
             if (e.getCause() != null) {
-                logger.warn(e.getMessage(),e.getCause());
+                logger.warn(e.getMessage(), e.getCause());
             } else {
                 logger.warn(e.getMessage());
             }
@@ -126,7 +126,8 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
     private void awaitTermination() throws SWorkException {
         try {
             if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
-                throw new SWorkException(format("Waited termination of all work %ds but all tasks were not finished", workTerminationTimeout));
+                throw new SWorkException(format("Waited termination of all work %ds but all tasks were not finished",
+                        workTerminationTimeout));
             }
         } catch (final InterruptedException e) {
             throw new SWorkException("Interrupted while stopping the work service", e);

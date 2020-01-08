@@ -221,8 +221,10 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), parentContainerId, archiveDate, state, rootContainerId, processDefinitionId, processInstanceId,
-                parentActivityInstanceId, displayName, displayDescription, sourceObjectId, description, executedBy, executedBySubstitute, flownodeDefinitionId,
+        return Objects.hash(super.hashCode(), parentContainerId, archiveDate, state, rootContainerId,
+                processDefinitionId, processInstanceId,
+                parentActivityInstanceId, displayName, displayDescription, sourceObjectId, description, executedBy,
+                executedBySubstitute, flownodeDefinitionId,
                 terminal, reachedStateDate, lastUpdateDate);
     }
 

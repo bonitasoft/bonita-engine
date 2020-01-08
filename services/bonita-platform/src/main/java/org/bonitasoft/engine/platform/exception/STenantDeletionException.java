@@ -17,7 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Exception related to the platform module
- * 
+ *
  * @author Charles Souillard
  */
 public class STenantDeletionException extends SBonitaException {

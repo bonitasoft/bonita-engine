@@ -87,7 +87,8 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
         final String operationType = strategy.getOperationType();
 
         //then
-        assertThat(operationType).as("should get opration type").isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
+        assertThat(operationType).as("should get opration type")
+                .isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
 
     }
 
@@ -106,8 +107,10 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
 
         Address valueAfterCallOperation = new Address(20L);
         Address valueAfterMerge = new Address(21L);
-        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willReturn(valueAfterCallOperation);
-        given(actionsExecutor.executeAction(valueAfterCallOperation, null, mergeEntityAction)).willReturn(valueAfterMerge);
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType))
+                .willReturn(valueAfterCallOperation);
+        given(actionsExecutor.executeAction(valueAfterCallOperation, null, mergeEntityAction))
+                .willReturn(valueAfterMerge);
 
         //when
         Object newValue = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, true);
@@ -118,7 +121,8 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
     }
 
     @Test
-    public void should_delegate_To_BusinessDataService_without_calling_merge_action_when_should_not_persist() throws Exception {
+    public void should_delegate_To_BusinessDataService_without_calling_merge_action_when_should_not_persist()
+            throws Exception {
         //given
         final String methodName = METHOD_NAME;
         final String parameterType = PARAMETER_TYPE;
@@ -131,7 +135,8 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
         doReturn(map).when(context).getInputValues();
 
         Address valueAfterCallOperation = new Address(20L);
-        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willReturn(valueAfterCallOperation);
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType))
+                .willReturn(valueAfterCallOperation);
 
         //when
         Object newValue = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
@@ -155,8 +160,9 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
         doReturn(methodName + ":" + parameterType).when(operation).getOperator();
         doReturn(map).when(context).getInputValues();
 
-        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willThrow(
-                new SBusinessDataNotFoundException(""));
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType))
+                .willThrow(
+                        new SBusinessDataNotFoundException(""));
 
         //when
         strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);

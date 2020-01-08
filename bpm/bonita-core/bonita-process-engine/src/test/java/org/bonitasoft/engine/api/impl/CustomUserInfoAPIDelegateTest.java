@@ -63,7 +63,8 @@ public class CustomUserInfoAPIDelegateTest {
 
     @Test
     public void list_should_return_an_empty_when_there_is_no_definitions() throws Exception {
-        given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Collections.<SCustomUserInfoDefinition> emptyList());
+        given(service.getCustomUserInfoDefinitions(0, 2))
+                .willReturn(Collections.<SCustomUserInfoDefinition> emptyList());
 
         List<CustomUserInfo> result = api.list(1L, 0, 2);
 
@@ -74,8 +75,7 @@ public class CustomUserInfoAPIDelegateTest {
     public void list_should_retrieve_values_associated_to_definitions_for_a_given_user() throws Exception {
         List<SCustomUserInfoDefinition> list1 = Arrays.asList(
                 SCustomUserInfoDefinition.builder().id(1).name("definition 1").build(),
-                SCustomUserInfoDefinition.builder().id(2).name("definition 2").build()
-        );
+                SCustomUserInfoDefinition.builder().id(2).name("definition 2").build());
         List<SCustomUserInfoValue> list2 = Arrays.asList(
                 SCustomUserInfoValue.builder().definitionId(1).value("value 1").build(),
                 SCustomUserInfoValue.builder().definitionId(2).value("value 2").build());

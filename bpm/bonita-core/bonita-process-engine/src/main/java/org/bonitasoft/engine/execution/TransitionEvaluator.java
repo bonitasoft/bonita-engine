@@ -41,7 +41,8 @@ public class TransitionEvaluator {
     private final InclusiveExclusiveTransitionEvaluator exclusiveTransitionEvaluator;
 
     public TransitionEvaluator(ImplicitGatewayTransitionEvaluator implicitGatewayTransitionEvaluator,
-            ParallelGatewayTransitionEvaluator parallelGatewayTransitionEvaluator, InclusiveExclusiveTransitionEvaluator inclusiveTransitionEvaluator,
+            ParallelGatewayTransitionEvaluator parallelGatewayTransitionEvaluator,
+            InclusiveExclusiveTransitionEvaluator inclusiveTransitionEvaluator,
             InclusiveExclusiveTransitionEvaluator exclusiveTransitionEvaluator) {
         this.implicitGatewayTransitionEvaluator = implicitGatewayTransitionEvaluator;
         this.parallelGatewayTransitionEvaluator = parallelGatewayTransitionEvaluator;
@@ -56,18 +57,22 @@ public class TransitionEvaluator {
         if (!SStateCategory.NORMAL.equals(flowNodeInstance.getStateCategory())) {
             return Collections.emptyList();
         }
-        final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+        final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 sDefinition.getId());
         if (SFlowNodeType.GATEWAY.equals(flowNodeInstance.getType())) {
-            return evaluateOutgoingTransitionsForGateways(transitions, sDefinition, flowNodeInstance, sExpressionContext);
+            return evaluateOutgoingTransitionsForGateways(transitions, sDefinition, flowNodeInstance,
+                    sExpressionContext);
         } else if (SFlowNodeType.BOUNDARY_EVENT.equals(flowNodeInstance.getType())) {
             return new ArrayList<>(transitions.getNonDefaultOutgoingTransitionDefinitions());
         } else {
-            return evaluateOutgoingTransitionsForActivity(transitions, sDefinition, flowNodeInstance, sExpressionContext);
+            return evaluateOutgoingTransitionsForActivity(transitions, sDefinition, flowNodeInstance,
+                    sExpressionContext);
         }
     }
 
-    List<STransitionDefinition> evaluateOutgoingTransitionsForActivity(final FlowNodeTransitionsWrapper transitions, final SProcessDefinition sDefinition,
+    List<STransitionDefinition> evaluateOutgoingTransitionsForActivity(final FlowNodeTransitionsWrapper transitions,
+            final SProcessDefinition sDefinition,
             final SFlowNodeInstance flowNodeInstance, final SExpressionContext sExpressionContext)
             throws SBonitaException {
         if (transitions.getNonDefaultOutgoingTransitionDefinitions().isEmpty()) {
@@ -82,33 +87,39 @@ public class TransitionEvaluator {
     }
 
     List<STransitionDefinition> evaluateOutgoingTransitionsForGateways(final FlowNodeTransitionsWrapper transitions,
-            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance, final SExpressionContext sExpressionContext)
+            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SExpressionContext sExpressionContext)
             throws SBonitaException {
         List<STransitionDefinition> chosenTransitionDefinitions;
         final SGatewayInstance gatewayInstance = (SGatewayInstance) flowNodeInstance;
         switch (gatewayInstance.getGatewayType()) {
             case EXCLUSIVE:
-                chosenTransitionDefinitions = exclusiveTransitionEvaluator.evaluateTransitions(sDefinition, flowNodeInstance, transitions, sExpressionContext);
+                chosenTransitionDefinitions = exclusiveTransitionEvaluator.evaluateTransitions(sDefinition,
+                        flowNodeInstance, transitions, sExpressionContext);
                 break;
             case INCLUSIVE:
-                chosenTransitionDefinitions = inclusiveTransitionEvaluator.evaluateTransitions(sDefinition, flowNodeInstance, transitions, sExpressionContext);
+                chosenTransitionDefinitions = inclusiveTransitionEvaluator.evaluateTransitions(sDefinition,
+                        flowNodeInstance, transitions, sExpressionContext);
                 break;
             case PARALLEL:
                 chosenTransitionDefinitions = parallelGatewayTransitionEvaluator.evaluateTransitions(transitions);
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported gateway type: " + gatewayInstance.getGatewayType());
+                throw new UnsupportedOperationException(
+                        "Unsupported gateway type: " + gatewayInstance.getGatewayType());
         }
         return chosenTransitionDefinitions;
     }
 
-    protected STransitionDefinition getDefaultTransition(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) {
+    protected STransitionDefinition getDefaultTransition(final SProcessDefinition sDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final SFlowNodeDefinition flowNode = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         return flowNode.getDefaultTransition();
     }
 
-    FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode, final SProcessDefinition sProcessDefinition,
+    FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode,
+            final SProcessDefinition sProcessDefinition,
             final SFlowNodeInstance child) throws SBonitaException {
         final FlowNodeTransitionsWrapper transitionsDescriptor = new FlowNodeTransitionsWrapper();
         // Retrieve all outgoing transitions
@@ -118,7 +129,8 @@ public class TransitionEvaluator {
             transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         } else {
             transitionsDescriptor.setInputTransitionsSize(flowNode.getIncomingTransitions().size());
-            transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<>(flowNode.getOutgoingTransitions()));
+            transitionsDescriptor
+                    .setAllOutgoingTransitionDefinitions(new ArrayList<>(flowNode.getOutgoingTransitions()));
             transitionsDescriptor.setDefaultTransition(flowNode.getDefaultTransition());
         }
 

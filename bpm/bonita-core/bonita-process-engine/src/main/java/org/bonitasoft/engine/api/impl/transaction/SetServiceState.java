@@ -26,8 +26,6 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -41,7 +39,9 @@ public class SetServiceState implements Callable<Void>, Serializable {
 
     private static Logger logger = LoggerFactory.getLogger(SetServiceState.class);
 
-    public enum ServiceAction {START, STOP, PAUSE, RESUME}
+    public enum ServiceAction {
+        START, STOP, PAUSE, RESUME
+    }
 
     private static final long serialVersionUID = 7880459346729952396L;
 
@@ -62,18 +62,21 @@ public class SetServiceState implements Callable<Void>, Serializable {
         return changeServiceState(classLoaderService, tenantConfiguration);
     }
 
-    public Void changeServiceState(ClassLoaderService classLoaderService, TenantConfiguration tenantConfiguration) throws SClassLoaderException, UpdateException {
+    public Void changeServiceState(ClassLoaderService classLoaderService, TenantConfiguration tenantConfiguration)
+            throws SClassLoaderException, UpdateException {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         try {
 
             // Set the right classloader only on start and resume because we destroy it on stop and pause anyway
             if (action == ServiceAction.START || action == ServiceAction.RESUME) {
-                final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
+                final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(),
+                        tenantId);
                 Thread.currentThread().setContextClassLoader(serverClassLoader);
             }
 
             for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
-                logger.info("{} tenant-level service {} on tenant with ID {}", action, tenantService.getClass().getName(), tenantId);
+                logger.info("{} tenant-level service {} on tenant with ID {}", action,
+                        tenantService.getClass().getName(), tenantId);
 
                 try {
                     switch (action) {
@@ -91,7 +94,8 @@ public class SetServiceState implements Callable<Void>, Serializable {
                             break;
                     }
                 } catch (final SBonitaException sbe) {
-                    throw new UpdateException("Unable to " + action + " service: " + tenantService.getClass().getName(), sbe);
+                    throw new UpdateException("Unable to " + action + " service: " + tenantService.getClass().getName(),
+                            sbe);
                 }
             }
             return null;
@@ -101,7 +105,8 @@ public class SetServiceState implements Callable<Void>, Serializable {
         }
     }
 
-    public PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+    public PlatformServiceAccessor getPlatformAccessor()
+            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }

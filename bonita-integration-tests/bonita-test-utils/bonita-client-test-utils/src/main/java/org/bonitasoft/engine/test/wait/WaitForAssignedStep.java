@@ -32,7 +32,8 @@ public class WaitForAssignedStep extends WaitUntil {
 
     private HumanTaskInstance result;
 
-    public WaitForAssignedStep(final ProcessAPI processAPI, final String userTaskName, final long processInstanceId, final long userId) {
+    public WaitForAssignedStep(final ProcessAPI processAPI, final String userTaskName, final long processInstanceId,
+            final long userId) {
         super(100, 1500);
         this.processAPI = processAPI;
         this.userTaskName = userTaskName;
@@ -42,9 +43,11 @@ public class WaitForAssignedStep extends WaitUntil {
 
     @Override
     protected boolean check() {
-        final List<HumanTaskInstance> taskInstances = processAPI.getAssignedHumanTaskInstances(userId, 0, 20, ActivityInstanceCriterion.DEFAULT);
+        final List<HumanTaskInstance> taskInstances = processAPI.getAssignedHumanTaskInstances(userId, 0, 20,
+                ActivityInstanceCriterion.DEFAULT);
         for (final HumanTaskInstance taskInstance : taskInstances) {
-            if (taskInstance.getName().equals(userTaskName) && taskInstance.getParentProcessInstanceId() == processInstanceId) {
+            if (taskInstance.getName().equals(userTaskName)
+                    && taskInstance.getParentProcessInstanceId() == processInstanceId) {
                 result = taskInstance;
                 return true;
             }

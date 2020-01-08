@@ -16,6 +16,7 @@ package org.bonitasoft.engine.xml.parser;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

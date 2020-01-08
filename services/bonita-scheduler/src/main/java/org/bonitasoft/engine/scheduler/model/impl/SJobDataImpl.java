@@ -16,8 +16,6 @@ package org.bonitasoft.engine.scheduler.model.impl;
 import java.util.Map.Entry;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 
 /**

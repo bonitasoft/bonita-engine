@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -121,7 +122,8 @@ public class BonitaHomeServer {
         return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf(tenantId));
     }
 
-    private Properties mergeProperties(Properties mergeInto, List<BonitaConfiguration> configurationFiles) throws IOException {
+    private Properties mergeProperties(Properties mergeInto, List<BonitaConfiguration> configurationFiles)
+            throws IOException {
         for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
             if (bonitaConfiguration.getResourceName().endsWith(".properties")) {
                 Properties properties = new Properties();
@@ -132,7 +134,8 @@ public class BonitaHomeServer {
         return mergeInto;
     }
 
-    private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles) throws IOException {
+    private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles)
+            throws IOException {
         List<BonitaConfiguration> configurations = new ArrayList<>();
         for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
             if (bonitaConfiguration.getResourceName().endsWith(".xml")) {
@@ -153,7 +156,8 @@ public class BonitaHomeServer {
     }
 
     /**
-     * get the name of the implementation of {@link org.bonitasoft.engine.api.internal.ServerAPI} based on the current configuration of
+     * get the name of the implementation of {@link org.bonitasoft.engine.api.internal.ServerAPI} based on the current
+     * configuration of
      * <code>bonita-platform.properties</code>
      *
      * @return the name of the class implementing {@link org.bonitasoft.engine.api.internal.ServerAPI}
@@ -189,14 +193,18 @@ public class BonitaHomeServer {
         return FolderMgr.getPlatformGlobalClassLoaderFolder().toURI();
     }
 
-    public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws BonitaHomeNotSetException, IOException {
+    public URI getLocalTemporaryFolder(final String artifactType, final long artifactId)
+            throws BonitaHomeNotSetException, IOException {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
     public void createTenant(final long tenantId) {
-        getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(), tenantId);
-        getConfigurationService().storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
-        getConfigurationService().storeTenantPortalConf(getConfigurationService().getTenantTemplatePortalConf(), tenantId);
+        getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(),
+                tenantId);
+        getConfigurationService()
+                .storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
+        getConfigurationService().storeTenantPortalConf(getConfigurationService().getTenantTemplatePortalConf(),
+                tenantId);
 
     }
 
@@ -204,7 +212,8 @@ public class BonitaHomeServer {
         getConfigurationService().deleteTenantConfiguration(tenantId);
     }
 
-    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
+    public void modifyTechnicalUser(long tenantId, String userName, String password)
+            throws IOException, BonitaHomeNotSetException {
         List<BonitaConfiguration> tenantEngineConf = getConfigurationService().getTenantEngineConf(tenantId);
         for (BonitaConfiguration bonitaConfiguration : tenantEngineConf) {
             if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community-custom.properties")) {
@@ -233,7 +242,8 @@ public class BonitaHomeServer {
         return tenantSecurityScriptsFolder.getFile();
     }
 
-    private void writeBonitaConfiguration(File folder, List<BonitaConfiguration> bonitaConfigurations) throws IOException {
+    private void writeBonitaConfiguration(File folder, List<BonitaConfiguration> bonitaConfigurations)
+            throws IOException {
         for (BonitaConfiguration bonitaConfiguration : bonitaConfigurations) {
             String[] pathArray = bonitaConfiguration.getResourceName().split("/");
             Path path = folder.toPath();
@@ -272,7 +282,8 @@ public class BonitaHomeServer {
         for (BonitaConfiguration bonitaConfiguration : tenantPortalConf) {
             if (bonitaConfiguration.getResourceName().equals(file)) {
                 bonitaConfiguration.setResourceContent(content);
-                getConfigurationService().storeTenantPortalConf(Collections.singletonList(bonitaConfiguration), tenantId);
+                getConfigurationService().storeTenantPortalConf(Collections.singletonList(bonitaConfiguration),
+                        tenantId);
                 return;
             }
         }

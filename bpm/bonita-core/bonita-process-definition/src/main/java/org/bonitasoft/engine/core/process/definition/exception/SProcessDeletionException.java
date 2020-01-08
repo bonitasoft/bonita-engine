@@ -24,7 +24,8 @@ public class SProcessDeletionException extends SBonitaException {
 
     private static final long serialVersionUID = 4908892108076783889L;
 
-    public SProcessDeletionException(final Throwable cause, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
+    public SProcessDeletionException(final Throwable cause,
+            final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
         this(cause, processDefinitionDeployInfo.getId());
 
         setProcessDefinitionNameOnContext(processDefinitionDeployInfo.getName());

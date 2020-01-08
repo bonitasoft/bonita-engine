@@ -17,7 +17,8 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 
 /**
- * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link Application}s
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for
+ * {@link Application}s
  *
  * @author Elias Ricken de Medeiros
  * @since 6.4
@@ -73,7 +74,8 @@ public class ApplicationSearchDescriptor {
     public static final String UPDATED_BY = "updatedBy";
 
     /**
-     * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and
+     * Used to filter or order by the <code>Application</code> state. The possible values are
+     * {@link ApplicationState#ACTIVATED#name()} and
      * {@link ApplicationState#DEACTIVATED#name()}
      *
      * @see ApplicationState
@@ -91,7 +93,7 @@ public class ApplicationSearchDescriptor {
 
     /**
      * Used to filter or order by the identifier of {@link Page} set as {@link Application} layout.
-     * 
+     *
      * @since 7.0.0
      * @see Page
      * @see Application

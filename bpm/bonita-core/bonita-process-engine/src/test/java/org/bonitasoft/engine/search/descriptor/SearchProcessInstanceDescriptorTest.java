@@ -209,7 +209,8 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys
+                .get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("userId", fieldDescriptor.getValue());
@@ -224,7 +225,8 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_GROUP_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys
+                .get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_GROUP_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("groupId", fieldDescriptor.getValue());
@@ -239,7 +241,8 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_ROLE_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys
+                .get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_ROLE_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("roleId", fieldDescriptor.getValue());
@@ -266,7 +269,8 @@ public class SearchProcessInstanceDescriptorTest {
     @Test
     public final void getAllFields_should_return_map_containing_process_instance_name() {
         // When
-        final Map<Class<? extends PersistentObject>, Set<String>> allFields = searchProcessInstanceDescriptor.getAllFields();
+        final Map<Class<? extends PersistentObject>, Set<String>> allFields = searchProcessInstanceDescriptor
+                .getAllFields();
 
         // Then
         final Set<String> fieldDescriptor = allFields.get(SProcessInstance.class);
@@ -281,7 +285,8 @@ public class SearchProcessInstanceDescriptorTest {
     @Test
     public final void convertFilterValue_should_convert_state_name_to_state_id_if_state_name_is_ProcessInstanceState() {
         // When
-        final Serializable convertFilterValue = searchProcessInstanceDescriptor.convertFilterValue(ProcessInstanceSearchDescriptor.STATE_NAME,
+        final Serializable convertFilterValue = searchProcessInstanceDescriptor.convertFilterValue(
+                ProcessInstanceSearchDescriptor.STATE_NAME,
                 ProcessInstanceState.ERROR);
 
         // Then
@@ -291,7 +296,8 @@ public class SearchProcessInstanceDescriptorTest {
     @Test
     public final void convertFilterValue_should_convert_state_name_to_state_id_if_state_name_is_String() {
         // When
-        final Serializable convertFilterValue = searchProcessInstanceDescriptor.convertFilterValue(ProcessInstanceSearchDescriptor.STATE_NAME,
+        final Serializable convertFilterValue = searchProcessInstanceDescriptor.convertFilterValue(
+                ProcessInstanceSearchDescriptor.STATE_NAME,
                 ProcessInstanceState.ABORTED.name());
 
         // Then
@@ -307,7 +313,8 @@ public class SearchProcessInstanceDescriptorTest {
     @Test
     public final void convertFilterValue_should_not_convert_if_field_is_not_state_name() {
         // When
-        final Serializable convertFilterValue = searchProcessInstanceDescriptor.convertFilterValue(ProcessInstanceSearchDescriptor.ID, 6);
+        final Serializable convertFilterValue = searchProcessInstanceDescriptor
+                .convertFilterValue(ProcessInstanceSearchDescriptor.ID, 6);
 
         // Then
         assertEquals(6, convertFilterValue);
@@ -315,8 +322,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-     *
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_EQUALS() {
@@ -326,7 +334,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.EQUALS, filterOption.getFilterOperationType());
@@ -337,8 +346,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-     *
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_DIFFERENT() {
@@ -348,7 +358,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.DIFFERENT, filterOption.getFilterOperationType());
@@ -359,8 +370,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_GREATER_OR_EQUAL() {
@@ -370,7 +382,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.GREATER_OR_EQUALS, filterOption.getFilterOperationType());
@@ -381,8 +394,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_GREATER_THAN() {
@@ -392,7 +406,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.GREATER, filterOption.getFilterOperationType());
@@ -403,8 +418,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_LESS_OR_EQUAL() {
@@ -414,7 +430,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.LESS_OR_EQUALS, filterOption.getFilterOperationType());
@@ -425,8 +442,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_LESS_THAN() {
@@ -436,7 +454,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.LESS, filterOption.getFilterOperationType());
@@ -447,8 +466,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_BETWEEN() {
@@ -460,7 +480,8 @@ public class SearchProcessInstanceDescriptorTest {
         final FieldDescriptor fieldDescriptor = new FieldDescriptor(SProcessInstance.class, fieldName);
 
         // When
-        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter, fieldDescriptor);
+        final FilterOption filterOption = searchProcessInstanceDescriptor.constructFilterOption(filter,
+                fieldDescriptor);
 
         // Then
         assertEquals(FilterOperationType.BETWEEN, filterOption.getFilterOperationType());
@@ -473,11 +494,13 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
-    public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_AND() throws IncorrectParameterException {
+    public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_AND()
+            throws IncorrectParameterException {
         //Given
         final SearchFilter filter = new SearchFilter(SearchFilterOperation.AND);
 
@@ -493,11 +516,13 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
-    public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_OR() throws IncorrectParameterException {
+    public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_OR()
+            throws IncorrectParameterException {
         //Given
         final SearchFilter filter = new SearchFilter(SearchFilterOperation.OR);
 
@@ -513,8 +538,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_L_PARENTHESIS()
@@ -534,8 +560,9 @@ public class SearchProcessInstanceDescriptorTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter, FieldDescriptor)
-
+     * {@link
+     * org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#constructFilterOption(org.bonitasoft.engine.search.impl.SearchFilter,
+     * FieldDescriptor)
      */
     @Test
     public final void constructFilterOption_should_convert_SearchFilter_to_FilterOption_when_SearchFilterOperation_is_R_PARENTHESIS()

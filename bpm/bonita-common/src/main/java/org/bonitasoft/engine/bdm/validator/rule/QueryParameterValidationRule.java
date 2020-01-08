@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bdm.validator.rule;
 
 /**
  * Tests the validity of Query parameters
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 
@@ -33,7 +33,8 @@ import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class QueryParameterValidationRule extends ValidationRule<QueryParameter, ValidationStatus> {
 
-    public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
+    public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME,
+            BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
     public QueryParameterValidationRule() {
         super(QueryParameter.class);

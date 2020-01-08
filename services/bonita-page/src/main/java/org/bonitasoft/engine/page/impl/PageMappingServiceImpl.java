@@ -59,7 +59,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     private final Map<String, URLAdapter> urlAdapterMap;
     private final Map<String, AuthorizationRule> authorizationRuleMap;
 
-    public PageMappingServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final SessionService sessionService,
+    public PageMappingServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
+            final SessionService sessionService,
             final ReadSessionAccessor sessionAccessor) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -82,7 +83,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageMapping create(final String key, final Long pageId, final List<String> authorizationRules) throws SObjectCreationException {
+    public SPageMapping create(final String key, final Long pageId, final List<String> authorizationRules)
+            throws SObjectCreationException {
         SPageMapping pageMapping = null;
         try {
             pageMapping = findMapping(key);
@@ -96,7 +98,8 @@ public class PageMappingServiceImpl implements PageMappingService {
             entity.setKey(key);
             return insert(entity);
         }
-        throw new SObjectCreationException(String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
+        throw new SObjectCreationException(
+                String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
     }
 
     SPageMapping insert(final SPageMapping entity) throws SObjectCreationException {
@@ -109,7 +112,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageMapping create(final String key, final String url, final String urlAdapter, final List<String> authorizationRules)
+    public SPageMapping create(final String key, final String url, final String urlAdapter,
+            final List<String> authorizationRules)
             throws SObjectCreationException {
         SPageMapping pageMapping = null;
         try {
@@ -125,7 +129,8 @@ public class PageMappingServiceImpl implements PageMappingService {
             entity.setKey(key);
             return insert(entity);
         }
-        throw new SObjectCreationException(String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
+        throw new SObjectCreationException(
+                String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
     }
 
     @Override
@@ -143,12 +148,14 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageURL resolvePageURL(final SPageMapping pageMapping, final Map<String, Serializable> context, final boolean executeAuthorizationRules)
+    public SPageURL resolvePageURL(final SPageMapping pageMapping, final Map<String, Serializable> context,
+            final boolean executeAuthorizationRules)
             throws SExecutionException, SAuthorizationException {
         if (executeAuthorizationRules) {
             final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
             if (!isAllowedToAccess(pageMapping, context, pageAuthorizationRules)) {
-                throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
+                throw new SAuthorizationException(
+                        "Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
             }
         }
         String url = pageMapping.getUrl();
@@ -159,13 +166,15 @@ public class PageMappingServiceImpl implements PageMappingService {
         return new SPageURL(url, pageMapping.getPageId());
     }
 
-    protected boolean isAllowedToAccess(final SPageMapping pageMapping, final Map<String, Serializable> context, final List<String> pageAuthorizationRules)
+    protected boolean isAllowedToAccess(final SPageMapping pageMapping, final Map<String, Serializable> context,
+            final List<String> pageAuthorizationRules)
             throws SExecutionException {
         boolean authorized = true;
         for (final String rule : pageAuthorizationRules) {
             final AuthorizationRule authorizationRule = authorizationRuleMap.get(rule);
             if (authorizationRule == null) {
-                throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
+                throw new SExecutionException(
+                        "Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
             }
             if (authorizationRule.isAllowed(pageMapping.getKey(), context)) {
                 return true;
@@ -179,7 +188,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     private URLAdapter getUrlAdapter(final String urlAdapterName) throws SExecutionException {
         final URLAdapter urlAdapter = urlAdapterMap.get(urlAdapterName);
         if (urlAdapter == null) {
-            throw new SExecutionException("unable to execute the url adapter " + urlAdapterName + " because it does not exists");
+            throw new SExecutionException(
+                    "unable to execute the url adapter " + urlAdapterName + " because it does not exists");
         }
         return urlAdapter;
     }
@@ -194,7 +204,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void update(final SPageMapping pageMapping, final Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
+    public void update(final SPageMapping pageMapping, final Long pageId)
+            throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
         update(pageMapping, pageId, null, null);
 
     }
@@ -210,7 +221,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void update(final SPageMapping pageMapping, final String url, final String urlAdapter) throws SObjectModificationException, SObjectNotFoundException,
+    public void update(final SPageMapping pageMapping, final String url, final String urlAdapter)
+            throws SObjectModificationException, SObjectNotFoundException,
             SBonitaReadException {
         update(pageMapping, null, url, urlAdapter);
 
@@ -237,9 +249,11 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public List<SPageMapping> get(final long pageId, final int startIndex, final int maxResults) throws SBonitaReadException {
+    public List<SPageMapping> get(final long pageId, final int startIndex, final int maxResults)
+            throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(startIndex, maxResults);
-        final SelectListDescriptor<SPageMapping> listDescriptor = new SelectListDescriptor<SPageMapping>("getPageMappingByPageId",
+        final SelectListDescriptor<SPageMapping> listDescriptor = new SelectListDescriptor<SPageMapping>(
+                "getPageMappingByPageId",
                 Collections.<String, Object> singletonMap("pageId", pageId), SPageMapping.class, options);
         return persistenceService.selectList(listDescriptor);
     }

@@ -32,7 +32,8 @@ public class SearchThemes extends AbstractSearchEntity<Theme, STheme> {
 
     private final ThemeService themeService;
 
-    public SearchThemes(final ThemeService themeService, final SearchThemeDescriptor searchThemeDescriptor, final SearchOptions options) {
+    public SearchThemes(final ThemeService themeService, final SearchThemeDescriptor searchThemeDescriptor,
+            final SearchOptions options) {
         super(searchThemeDescriptor, options);
         this.themeService = themeService;
     }

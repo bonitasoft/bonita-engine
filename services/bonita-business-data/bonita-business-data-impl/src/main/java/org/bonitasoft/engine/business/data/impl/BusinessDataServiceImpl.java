@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -69,9 +70,10 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final CountQueryProvider countQueryProvider;
 
-    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
-                                   final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
-                                   BusinessDataReloader businessDataReloader, CountQueryProvider countQueryProvider) {
+    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository,
+            final JsonBusinessDataSerializer jsonBusinessDataSerializer,
+            final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
+            BusinessDataReloader businessDataReloader, CountQueryProvider countQueryProvider) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
         this.businessDataModelRepository = businessDataModelRepository;
@@ -92,7 +94,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (!List.class.isAssignableFrom(data.getClass())) {
             return false;
         }
-        @SuppressWarnings("rawtypes") final List dataList = (List) data;
+        @SuppressWarnings("rawtypes")
+        final List dataList = (List) data;
         if (dataList.isEmpty()) {
             return true;
         }
@@ -109,7 +112,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object callJavaOperation(final Object businessObject, final Object valueToSetObjectWith, final String methodName, final String parameterType)
+    public Object callJavaOperation(final Object businessObject, final Object valueToSetObjectWith,
+            final String methodName, final String parameterType)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         if (businessObject == null) {
             throw new SBusinessDataNotFoundException("business data is null");
@@ -118,13 +122,15 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return callJavaOperationOnEntity((Entity) businessObject, valueToSetObjectWith, methodName, parameterType);
         }
         if (isListOfEntities(businessObject)) {
-            return callJavaOperationOnEntityList((List<Entity>) businessObject, valueToSetObjectWith, methodName, parameterType);
+            return callJavaOperationOnEntityList((List<Entity>) businessObject, valueToSetObjectWith, methodName,
+                    parameterType);
         }
         throw new SBusinessDataRepositoryException("not a business data");
     }
 
-    private Object callJavaOperationOnEntityList(final List<Entity> businessObject, final Object valueToSetObjectWith, final String methodName,
-                                                 final String parameterType)
+    private Object callJavaOperationOnEntityList(final List<Entity> businessObject, final Object valueToSetObjectWith,
+            final String methodName,
+            final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
         try {
             invokeJavaMethod(businessObject, methodName, parameterType, valueToSetObjectWith);
@@ -134,8 +140,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName,
-                                             final String parameterType)
+    private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith,
+            final String methodName,
+            final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
         Entity jpaEntity = businessDataReloader.reloadEntitySoftly(businessObject);
         final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
@@ -148,7 +155,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    protected void invokeJavaMethod(final Object objectToSet, final String methodName, final String parameterType, final Object valueToSet)
+    protected void invokeJavaMethod(final Object objectToSet, final String methodName, final String parameterType,
+            final Object valueToSet)
             throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final JavaMethodInvoker methodInvoker = new JavaMethodInvoker();
@@ -156,7 +164,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     @SuppressWarnings("unchecked")
-    private Object loadValueToSet(final Entity businessObject, final Object valueToSetObjectWith, final String methodName)
+    private Object loadValueToSet(final Entity businessObject, final Object valueToSetObjectWith,
+            final String methodName)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         Object valueToSet;
         if (isEntity(valueToSetObjectWith)) {
@@ -176,7 +185,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
-                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
+                throw new SBusinessDataNotFoundException(String.format(
+                        "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()));
             }
             primaryKeys.add(entity.getPersistenceId());
@@ -184,12 +194,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return primaryKeys;
     }
 
-    private Object getPersistedValues(final List<Entity> entities, final Type type) throws SBusinessDataNotFoundException {
+    private Object getPersistedValues(final List<Entity> entities, final Type type)
+            throws SBusinessDataNotFoundException {
         if (entities.isEmpty()) {
             return new ArrayList<Entity>();
         }
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findByIds(businessDataReloader.getEntityRealClass(entities.get(0)), getPrimaryKeys(entities));
+            return businessDataRepository.findByIds(businessDataReloader.getEntityRealClass(entities.get(0)),
+                    getPrimaryKeys(entities));
         } else {
             return entities;
         }
@@ -200,7 +212,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             try {
                 return businessDataReloader.reloadEntity(entity);
             } catch (SBusinessDataNotFoundException e) {
-                throw new SBusinessDataNotFoundException(String.format("Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
+                throw new SBusinessDataNotFoundException(String.format(
+                        "Forbidden instance of %s found. It is only possible to reference persisted instances in an aggregation relation.",
                         businessDataReloader.getEntityRealClass(entity).getName()), e);
             }
         } else {
@@ -208,7 +221,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    private Type getRelationType(final Entity businessObject, final String methodName) throws SBusinessDataRepositoryException {
+    private Type getRelationType(final Entity businessObject, final String methodName)
+            throws SBusinessDataRepositoryException {
         final String fieldName = ClassReflector.getFieldName(methodName);
         Annotation[] annotations;
         try {
@@ -249,7 +263,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     @Override
-    public Serializable getJsonEntity(final String entityClassName, final Long identifier, final String businessDataURIPattern)
+    public Serializable getJsonEntity(final String entityClassName, final Long identifier,
+            final String businessDataURIPattern)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final Entity entity = businessDataRepository.findById(entityClass, identifier);
@@ -258,7 +273,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Serializable getJsonEntities(final String entityClassName, final List<Long> identifiers, final String businessDataURIPattern)
+    public Serializable getJsonEntities(final String entityClassName, final List<Long> identifiers,
+            final String businessDataURIPattern)
             throws SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final List<? extends Entity> entities = businessDataRepository.findByIdentifiers(entityClass, identifiers);
@@ -267,8 +283,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Serializable getJsonChildEntity(final String entityClassName, final Long identifier, final String childFieldName,
-                                           final String businessDataURIPattern)
+    public Serializable getJsonChildEntity(final String entityClassName, final Long identifier,
+            final String childFieldName,
+            final String businessDataURIPattern)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final Object entity = businessDataRepository.findById(entityClass, identifier);
@@ -299,13 +316,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     @Override
-    public BusinessDataQueryResult getJsonQueryEntities(final String entityClassName, final String queryName, final Map<String, Serializable> parameters,
-                                                        final Integer startIndex, final Integer maxResults, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
+    public BusinessDataQueryResult getJsonQueryEntities(final String entityClassName, final String queryName,
+            final Map<String, Serializable> parameters,
+            final Integer startIndex, final Integer maxResults, final String businessDataURIPattern)
+            throws SBusinessDataRepositoryException {
         final Class<? extends Entity> businessDataClass = loadClass(entityClassName);
         BusinessObject businessObject = getBusinessObjectFromClassName(entityClassName);
         final Query queryDefinition = getQueryDefinition(businessObject, entityClassName, queryName);
         final Map<String, Serializable> queryParameters = getQueryParameters(queryDefinition, parameters);
-        final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(getQualifiedQueryName(businessDataClass, queryName),
+        final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(
+                getQualifiedQueryName(businessDataClass, queryName),
                 getQueryReturnType(queryDefinition, entityClassName), queryParameters, startIndex, maxResults);
 
         BusinessDataQueryMetadataImpl businessDataQueryMetadata = null;
@@ -313,7 +333,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (countQueryDefinition != null) {
             try {
                 businessDataQueryMetadata = new BusinessDataQueryMetadataImpl(startIndex, maxResults,
-                        (Long) businessDataRepository.findByNamedQuery(getQualifiedQueryName(businessDataClass, countQueryDefinition.getName()),
+                        (Long) businessDataRepository.findByNamedQuery(
+                                getQualifiedQueryName(businessDataClass, countQueryDefinition.getName()),
                                 getQueryReturnType(countQueryDefinition, entityClassName), queryParameters));
             } catch (NonUniqueResultException e) {
                 throw new SBusinessDataRepositoryException("unable to count results for query " + queryName);
@@ -328,7 +349,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return new BusinessDataQueryResultImpl(jsonResults, businessDataQueryMetadata);
     }
 
-    private Query getCountQueryDefinition(Class<? extends Entity> businessDataClass, BusinessObject businessObject, Query queryDefinition) {
+    private Query getCountQueryDefinition(Class<? extends Entity> businessDataClass, BusinessObject businessObject,
+            Query queryDefinition) {
         final Query countQueryDefinition = countQueryProvider.getCountQueryDefinition(businessObject, queryDefinition);
         if (ensureQueryIsDefinedInEntity(businessDataClass, countQueryDefinition)) {
             return countQueryDefinition;
@@ -336,7 +358,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return null;
     }
 
-    private boolean ensureQueryIsDefinedInEntity(Class<? extends Entity> businessDataClass, Query countQueryDefinition) {
+    private boolean ensureQueryIsDefinedInEntity(Class<? extends Entity> businessDataClass,
+            Query countQueryDefinition) {
         final NamedQueries namedQueries = businessDataClass.getAnnotation(NamedQueries.class);
         if (namedQueries == null || countQueryDefinition == null) {
             return false;
@@ -355,7 +378,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return loadClass(entityClassName);
         }
         try {
-            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader()
+                    .loadClass(queryDefinition.getReturnType());
         } catch (final ClassNotFoundException e) {
             throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
         }
@@ -365,20 +389,23 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return String.format("%s.%s", businessDataClass.getSimpleName(), queryName);
     }
 
-    private Map<String, Serializable> getQueryParameters(final Query queryDefinition, final Map<String, Serializable> parameters)
+    private Map<String, Serializable> getQueryParameters(final Query queryDefinition,
+            final Map<String, Serializable> parameters)
             throws SBusinessDataRepositoryException {
         final Set<String> errors = new HashSet<>();
         final Map<String, Serializable> queryParameters = new HashMap<>();
         for (final QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
             if (parameters != null && parameters.containsKey(queryParameter.getName())) {
                 queryParameters.put(queryParameter.getName(),
-                        convertToType(loadSerializableClass(queryParameter.getClassName()), parameters.get(queryParameter.getName())));
+                        convertToType(loadSerializableClass(queryParameter.getClassName()),
+                                parameters.get(queryParameter.getName())));
             } else {
                 errors.add(queryParameter.getName());
             }
         }
         if (!errors.isEmpty()) {
-            final StringBuilder errorMessage = new StringBuilder().append("parameter(s) are missing for query named ").append(queryDefinition.getName())
+            final StringBuilder errorMessage = new StringBuilder().append("parameter(s) are missing for query named ")
+                    .append(queryDefinition.getName())
                     .append(" : ");
             errorMessage.append(StringUtils.join(errors, ","));
             throw new SBusinessDataRepositoryException(errorMessage.toString());
@@ -390,7 +417,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return (Serializable) typeConverterUtil.convertToType(clazz, parameterValue);
     }
 
-    private Query getQueryDefinition(BusinessObject businessObject, String className, final String queryName) throws SBusinessDataRepositoryException {
+    private Query getQueryDefinition(BusinessObject businessObject, String className, final String queryName)
+            throws SBusinessDataRepositoryException {
         final List<Query> allQueries = new ArrayList<>();
         allQueries.addAll(businessObject.getQueries());
         allQueries.addAll(BDMQueryUtil.createProvidedQueriesForBusinessObject(businessObject));
@@ -399,7 +427,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 return query;
             }
         }
-        throw new SBusinessDataRepositoryException("unable to get query " + queryName + " for business object " + className);
+        throw new SBusinessDataRepositoryException(
+                "unable to get query " + queryName + " for business object " + className);
     }
 
     private BusinessObject getBusinessObjectFromClassName(String className) throws SBusinessDataRepositoryException {
@@ -424,7 +453,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    protected Class<? extends Serializable> loadSerializableClass(final String className) throws SBusinessDataRepositoryException {
+    protected Class<? extends Serializable> loadSerializableClass(final String className)
+            throws SBusinessDataRepositoryException {
         try {
             return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(className);
         } catch (final ClassNotFoundException e) {

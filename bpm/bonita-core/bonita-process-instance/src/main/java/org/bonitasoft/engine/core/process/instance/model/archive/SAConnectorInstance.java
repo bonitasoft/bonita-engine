@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-
 @Data
 @NoArgsConstructor
 public class SAConnectorInstance implements ArchivedPersistentObject {

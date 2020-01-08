@@ -31,7 +31,7 @@ public class SUserLogBuilderFactoryImpl extends CRUDELogBuilderFactory implement
     public SUserLogBuilder createNewInstance() {
         return new SUserLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return USER_INDEX_NAME;

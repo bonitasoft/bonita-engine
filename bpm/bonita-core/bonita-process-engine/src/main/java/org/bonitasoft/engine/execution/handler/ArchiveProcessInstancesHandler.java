@@ -67,13 +67,17 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final DocumentService documentService = tenantServiceAccessor.getDocumentService();
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
-            final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-            final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
+            final ProcessDefinitionService processDefinitionService = tenantServiceAccessor
+                    .getProcessDefinitionService();
+            final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor
+                    .getConnectorInstanceService();
             ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
             RefBusinessDataService refBusinessDataService = tenantServiceAccessor.getRefBusinessDataService();
 
-            new ProcessArchiver().archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
-                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+            new ProcessArchiver().archiveProcessInstance(processInstance, archiveService, processInstanceService,
+                    documentService,
+                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService,
+                    refBusinessDataService);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }
@@ -94,7 +98,8 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
 
     @Override
     public boolean isInterested(final SUpdateEvent event) {
-        boolean isInterested = ProcessInstanceService.PROCESSINSTANCE_STATE_UPDATED.equals(event.getType()) && event.getObject() instanceof SProcessInstance;
+        boolean isInterested = ProcessInstanceService.PROCESSINSTANCE_STATE_UPDATED.equals(event.getType())
+                && event.getObject() instanceof SProcessInstance;
         if (isInterested) {
             final SProcessInstance processInstance = (SProcessInstance) event.getObject();
             // TODO add a method isInTerminalState in SProcessInstance
@@ -103,7 +108,8 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
                     || ProcessInstanceState.CANCELLED.getId() == processInstance.getStateId();
             // process instances called by an call activity are archive in the state CompletingCallActivity (wait data transfer from called process to caller).
             // Sub-process can be archived directly
-            isInterested = isTerminal && (processInstance.getCallerId() <= 0 || SFlowNodeType.SUB_PROCESS.equals(processInstance.getCallerType()));
+            isInterested = isTerminal && (processInstance.getCallerId() <= 0
+                    || SFlowNodeType.SUB_PROCESS.equals(processInstance.getCallerType()));
         }
         return isInterested;
     }

@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
  * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
  * mapping groups or roles, the process can be supervised by several people.
- * 
+ *
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet

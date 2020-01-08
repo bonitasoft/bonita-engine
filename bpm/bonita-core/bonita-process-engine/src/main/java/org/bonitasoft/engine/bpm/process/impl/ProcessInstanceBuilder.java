@@ -31,7 +31,7 @@ public class ProcessInstanceBuilder {
     private ProcessInstanceBuilder() {
         this.processInstance = null;
     }
-    
+
     private ProcessInstanceBuilder(final ProcessInstanceImpl processInstance) {
         super();
         this.processInstance = processInstance;

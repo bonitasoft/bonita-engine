@@ -18,7 +18,6 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -59,11 +58,11 @@ public class ClassLoaderUpdaterTest {
     @InjectMocks
     private ClassLoaderUpdater classLoaderUpdater;
 
-
     @Test
     public void should_refresh_classloaders_in_session_and_in_transaction() throws Exception {
         doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
-        doReturn(null).when(userTransactionService).executeInTransaction(callableGivenToTheTransactionService.capture());
+        doReturn(null).when(userTransactionService)
+                .executeInTransaction(callableGivenToTheTransactionService.capture());
 
         HashSet<Pair<ScopeType, Long>> ids = new HashSet<>();
         ids.add(pair(ScopeType.TENANT, 4L));
@@ -76,6 +75,7 @@ public class ClassLoaderUpdaterTest {
         verify(classLoaderService).refreshClassLoaderImmediately(ScopeType.TENANT, 4L);
         verify(classLoaderService).refreshClassLoaderImmediately(PROCESS, 45L);
     }
+
     @Test
     public void should_not_create_a_session_when_there_is_no_tenant_id() throws Exception {
         doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());
@@ -86,6 +86,7 @@ public class ClassLoaderUpdaterTest {
 
         verifyZeroInteractions(sessionAccessor);
     }
+
     @Test
     public void should_create_a_session_when_there_is_a_tenant_id() throws Exception {
         doReturn(completedFuture(null)).when(bonitaTaskExecutor).execute(callableGivenToTheTaskExecutor.capture());

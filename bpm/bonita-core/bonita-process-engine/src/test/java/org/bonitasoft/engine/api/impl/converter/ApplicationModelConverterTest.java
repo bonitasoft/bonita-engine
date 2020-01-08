@@ -64,7 +64,8 @@ public class ApplicationModelConverterTest {
     private ApplicationModelConverter converter;
 
     @Test
-    public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
+    public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         creator.setDescription(APP_DESC);
@@ -102,7 +103,8 @@ public class ApplicationModelConverterTest {
     }
 
     @Test(expected = CreationException.class)
-    public void buildSApplication_should_throw_CreationException_when_the_default_page_layout_is_not_available() throws Exception {
+    public void buildSApplication_should_throw_CreationException_when_the_default_page_layout_is_not_available()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         final long userId = 10;
@@ -116,7 +118,8 @@ public class ApplicationModelConverterTest {
     }
 
     @Test(expected = CreationException.class)
-    public void buildSApplication_should_throw_CreationException_when_the_default_theme_is_not_available() throws Exception {
+    public void buildSApplication_should_throw_CreationException_when_the_default_theme_is_not_available()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         final long userId = 10;
@@ -138,7 +141,8 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID, state, LAYOUT_ID, THEME_ID);
+        final SApplication sApp = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
+                state, LAYOUT_ID, THEME_ID);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -169,11 +173,14 @@ public class ApplicationModelConverterTest {
     }
 
     @Test
-    public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
+    public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values()
+            throws Exception {
         //given
-        final SApplication sApp1 = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+        final SApplication sApp1 = new SApplication(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(),
+                CREATOR_ID,
                 SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
-        final SApplication sApp2 = new SApplication(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+        final SApplication sApp2 = new SApplication(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(),
+                CREATOR_ID,
                 SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
 
         //when
@@ -197,7 +204,8 @@ public class ApplicationModelConverterTest {
         updater.setHomePageId(11L);
 
         //when
-        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater,
+                LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();
@@ -220,7 +228,8 @@ public class ApplicationModelConverterTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
 
         //when
-        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater,
+                LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();

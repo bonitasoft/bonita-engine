@@ -40,8 +40,9 @@ public abstract class SWaitingEvent implements PersistentObject {
     private boolean active = true;
     private long subProcessId = -1;
 
-    public SWaitingEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
-                             final String flowNodeName) {
+    public SWaitingEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
+            final String flowNodeName) {
         this.eventType = eventType;
         this.processName = processName;
         this.flowNodeDefinitionId = flowNodeDefinitionId;

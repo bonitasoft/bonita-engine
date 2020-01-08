@@ -47,7 +47,8 @@ public class FlowNodeTransitionsWrapper {
         return Collections.unmodifiableList(allOutgoingTransitionDefinitions);
     }
 
-    public void setAllOutgoingTransitionDefinitions(final List<STransitionDefinition> allOutgoingTransitionDefinitions) {
+    public void setAllOutgoingTransitionDefinitions(
+            final List<STransitionDefinition> allOutgoingTransitionDefinitions) {
         if (allOutgoingTransitionDefinitions != null) {
             this.allOutgoingTransitionDefinitions = allOutgoingTransitionDefinitions;
         } else {
@@ -59,7 +60,8 @@ public class FlowNodeTransitionsWrapper {
         return Collections.unmodifiableList(validOutgoingTransitionDefinitions);
     }
 
-    public void setValidOutgoingTransitionDefinitions(final List<STransitionDefinition> validOutgoingTransitionDefinitions) {
+    public void setValidOutgoingTransitionDefinitions(
+            final List<STransitionDefinition> validOutgoingTransitionDefinitions) {
         if (validOutgoingTransitionDefinitions != null) {
             this.validOutgoingTransitionDefinitions = validOutgoingTransitionDefinitions;
         } else {
@@ -89,7 +91,7 @@ public class FlowNodeTransitionsWrapper {
 
     /**
      * from 0 or 1 input transition to one outgoing transition
-     * 
+     *
      * @return true for flow node with 0 or 1 input transition and one outgoing transitions
      * @since 6.2
      */
@@ -98,12 +100,13 @@ public class FlowNodeTransitionsWrapper {
     }
 
     private boolean hasOneElement() {
-        return allOutgoingTransitionDefinitions.size() == 1 || allOutgoingTransitionDefinitions.isEmpty() && validOutgoingTransitionDefinitions.size() == 1;
+        return allOutgoingTransitionDefinitions.size() == 1
+                || allOutgoingTransitionDefinitions.isEmpty() && validOutgoingTransitionDefinitions.size() == 1;
     }
 
     /**
      * from 0 or 1 input transition to more than one outgoing transitions
-     * 
+     *
      * @return true for flow node with 0 or 1 input transition and more than one outgoing transitions
      * @since 6.2
      */
@@ -113,7 +116,7 @@ public class FlowNodeTransitionsWrapper {
 
     /**
      * from more than 1 input transition to one outgoing transition
-     * 
+     *
      * @return true for flow node with more than 1 input transition and one outgoing transitions
      * @since 6.2
      */

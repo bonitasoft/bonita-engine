@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -29,7 +28,6 @@ import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
@@ -58,8 +56,10 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         final long subStepId = waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
-        expressions.put(new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName()), new HashMap<String, Serializable>(0));
-        final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStepId, expressions);
+        expressions.put(new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName()),
+                new HashMap<String, Serializable>(0));
+        final Map<String, Serializable> expressionResults = getProcessAPI()
+                .evaluateExpressionsOnActivityInstance(subStepId, expressions);
         assertEquals("childActivityVar", expressionResults.get(SHORT_DATA_NAME));
 
         disableAndDeleteProcess(process);
@@ -180,13 +180,15 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    private void checkProcessDataInstance(final String dataName, final long processInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkProcessDataInstance(final String dataName, final long processInstanceId,
+            final Serializable expectedValue) throws DataNotFoundException {
         final DataInstance processDataInstance;
         processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId,
+            final Serializable expectedValue)
             throws DataNotFoundException {
         final DataInstance activityDataInstance;
         activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
@@ -196,7 +198,8 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     @Test
     public void signalEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithSignalEventSubProcess(false, false);
-        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
+        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(),
+                targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
         final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
@@ -221,7 +224,8 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     @Test
     public void should_process_with_gateway_be_canceled_by_event_subprocess() throws Exception {
         //given
-        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessInterrupted", "1.0");
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessInterrupted", "1.0");
         processDefinitionBuilder.addActor("john", true);
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addAutomaticTask("auto1");
@@ -237,12 +241,14 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         processDefinitionBuilder.addTransition("auto2", "p2");
         processDefinitionBuilder.addTransition("user1", "p2");
         processDefinitionBuilder.addTransition("p2", "end");
-        SubProcessDefinitionBuilder eventSub = processDefinitionBuilder.addSubProcess("eventSub", true).getSubProcessBuilder();
+        SubProcessDefinitionBuilder eventSub = processDefinitionBuilder.addSubProcess("eventSub", true)
+                .getSubProcessBuilder();
         eventSub.addStartEvent("signalStart").addSignalEventTrigger("bip_bip");
         eventSub.addAutomaticTask("subAuto1");
         eventSub.addEndEvent("subEnd").addTerminateEventTrigger();
         eventSub.addTransition("signalStart", "subAuto1").addTransition("subAuto1", "subEnd");
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), "john", user);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), "john",
+                user);
         //when
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance.getId(), "user1");

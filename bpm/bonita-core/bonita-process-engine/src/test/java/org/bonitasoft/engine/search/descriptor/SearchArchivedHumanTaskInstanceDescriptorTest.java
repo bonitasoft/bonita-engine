@@ -24,7 +24,8 @@ public class SearchArchivedHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
@@ -33,7 +34,8 @@ public class SearchArchivedHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_root_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
@@ -42,7 +44,8 @@ public class SearchArchivedHumanTaskInstanceDescriptorTest {
     public void getEntityKey_should_map_parent_process_instance_to_the_logical_group_4_which_is_the_parent_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys()
+                .get(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup4");
     }

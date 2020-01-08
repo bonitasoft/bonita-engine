@@ -34,7 +34,8 @@ public class BonitaConfigurationPreparedStatementSetter implements BatchPrepared
     private ConfigurationType type;
     private long tenantId;
 
-    public BonitaConfigurationPreparedStatementSetter(List<BonitaConfiguration> bonitaConfigurations, String dbVendor, ConfigurationType type, long tenantId) {
+    public BonitaConfigurationPreparedStatementSetter(List<BonitaConfiguration> bonitaConfigurations, String dbVendor,
+            ConfigurationType type, long tenantId) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.dbVendor = dbVendor;
         if (this.dbVendor == null) {
@@ -60,7 +61,8 @@ public class BonitaConfigurationPreparedStatementSetter implements BatchPrepared
             case "oracle":
             case "mysql":
             case "sqlserver":
-                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
+                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
+                        bonitaConfiguration.getResourceContent());
                 break;
             default:
                 throw new IllegalArgumentException("unsupported db vendor:" + dbVendor);

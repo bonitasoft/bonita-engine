@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution;
 
-
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -38,7 +37,6 @@ import org.mockito.junit.MockitoRule;
 
 public class WaitingEventsInterrupterTest {
 
-
     public static final long CATCH_EVENT_INSTANCE_ID = 432987L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -55,14 +53,14 @@ public class WaitingEventsInterrupterTest {
 
     @Before
     public void before() {
-        waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, schedulerService, new TechnicalLoggerSLF4JImpl());
+        waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, schedulerService,
+                new TechnicalLoggerSLF4JImpl());
 
         processDefinition = new SProcessDefinitionImpl("myPocess", "1.0");
         catchEventInstance = new SIntermediateCatchEventInstance();
         catchEventInstance.setId(CATCH_EVENT_INSTANCE_ID);
         catchEventDefinition = new SIntermediateCatchEventDefinitionImpl(1234L, "myCatchTimer");
     }
-
 
     @Test
     public void should_delete_timer_job_associated_with_the_catch_event() throws Exception {
@@ -73,17 +71,18 @@ public class WaitingEventsInterrupterTest {
         verify(schedulerService).delete("Timer_Ev_" + CATCH_EVENT_INSTANCE_ID);
     }
 
-
     @Test
     public void should_delete_event_trigger_instance_associated_with_the_catch_timer() throws Exception {
         catchEventDefinition.addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(STimerType.DURATION, null));
         STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance(123, "someEvent", 123, "job");
-        doReturn(Optional.of(eventTriggerInstance)).when(eventInstanceService).getTimerEventTriggerInstanceOfFlowNode(CATCH_EVENT_INSTANCE_ID);
+        doReturn(Optional.of(eventTriggerInstance)).when(eventInstanceService)
+                .getTimerEventTriggerInstanceOfFlowNode(CATCH_EVENT_INSTANCE_ID);
 
         waitingEventsInterrupter.interruptWaitingEvents(processDefinition, catchEventInstance, catchEventDefinition);
 
         verify(eventInstanceService).deleteEventTriggerInstanceOfFlowNode(CATCH_EVENT_INSTANCE_ID);
     }
+
     @Test
     public void should_not_delete_timer_and_event_trigger_when_catch_is_not_a_timer() throws Exception {
 

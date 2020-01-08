@@ -18,11 +18,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.bonitasoft.engine.scheduler.BonitaJobListener;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.bonitasoft.engine.scheduler.BonitaJobListener;
 
 public class MonitoringJobListener implements BonitaJobListener {
 

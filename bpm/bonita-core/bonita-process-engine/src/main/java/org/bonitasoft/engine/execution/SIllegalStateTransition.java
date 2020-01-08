@@ -15,15 +15,13 @@ package org.bonitasoft.engine.execution;
 
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SIllegalStateTransition extends SActivityExecutionException {
-    
+
     private static final long serialVersionUID = 6940283544247417112L;
-    
+
     public SIllegalStateTransition(String message, Throwable cause) {
         super(message, cause);
     }
@@ -35,5 +33,5 @@ public class SIllegalStateTransition extends SActivityExecutionException {
     public SIllegalStateTransition(Throwable cause) {
         super(cause);
     }
-    
+
 }

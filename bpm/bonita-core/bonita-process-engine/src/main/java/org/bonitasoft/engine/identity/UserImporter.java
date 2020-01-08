@@ -41,8 +41,9 @@ public class UserImporter {
 
     private final CustomUserInfoValueImporter infoValueImporter;
 
-    public UserImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy, long userIdFromSession,
-                        CustomUserInfoValueImporter infoValueImporter) {
+    public UserImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy,
+            long userIdFromSession,
+            CustomUserInfoValueImporter infoValueImporter) {
         this.strategy = strategy;
         this.userIdFromSession = userIdFromSession;
         this.infoValueImporter = infoValueImporter;
@@ -50,7 +51,8 @@ public class UserImporter {
     }
 
     public Map<String, SUser> importUsers(final List<ExportedUser> usersToImport) throws SBonitaException {
-        final Map<String, SUser> userNameToSUsers = new HashMap<>((int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
+        final Map<String, SUser> userNameToSUsers = new HashMap<>(
+                (int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
         for (final ExportedUser userToImport : usersToImport) {
             SUser sUser;
             if (hasUserWithUserName(userToImport.getUserName())) {
@@ -79,9 +81,11 @@ public class UserImporter {
     }
 
     private void addContactInfo(final ExportedUser userToImport, SUser persistedUser) throws SUserCreationException {
-        final SContactInfo persoSContactInfo = ModelConvertor.constructSUserContactInfo(userToImport, true, persistedUser.getId());
+        final SContactInfo persoSContactInfo = ModelConvertor.constructSUserContactInfo(userToImport, true,
+                persistedUser.getId());
         identityService.createUserContactInfo(persoSContactInfo);
-        final SContactInfo professSContactInfo = ModelConvertor.constructSUserContactInfo(userToImport, false, persistedUser.getId());
+        final SContactInfo professSContactInfo = ModelConvertor.constructSUserContactInfo(userToImport, false,
+                persistedUser.getId());
         identityService.createUserContactInfo(professSContactInfo);
     }
 

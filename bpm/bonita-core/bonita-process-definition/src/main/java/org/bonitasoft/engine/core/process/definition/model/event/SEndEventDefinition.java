@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 public interface SEndEventDefinition extends SThrowEventDefinition {
 
     STerminateEventTriggerDefinition getTerminateEventTriggerDefinition();
-    
+
     List<SThrowErrorEventTriggerDefinition> getErrorEventTriggerDefinitions();
 
 }

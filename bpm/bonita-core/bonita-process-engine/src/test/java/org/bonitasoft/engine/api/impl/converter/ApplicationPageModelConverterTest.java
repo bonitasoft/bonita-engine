@@ -25,7 +25,6 @@ import org.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.junit.Test;
 
-
 public class ApplicationPageModelConverterTest {
 
     private static final long ID = 11;
@@ -52,7 +51,8 @@ public class ApplicationPageModelConverterTest {
     }
 
     @Test
-    public void toApplicationPageList_should_call_toApplitionPage_for_each_element_and_return_the_list_of_converted_values() throws Exception {
+    public void toApplicationPageList_should_call_toApplitionPage_for_each_element_and_return_the_list_of_converted_values()
+            throws Exception {
         //given
         final SApplicationPage sAppPage1 = new SApplicationPage(10, 21, "appPage1");
         final SApplicationPage sAppPage2 = new SApplicationPage(10, 21, "appPage2");
@@ -63,7 +63,8 @@ public class ApplicationPageModelConverterTest {
         doReturn(appPage2).when(convertorMock).toApplicationPage(sAppPage2);
 
         //when
-        final List<ApplicationPage> applicationPages = convertorMock.toApplicationPage(Arrays.<SApplicationPage> asList(sAppPage1, sAppPage2));
+        final List<ApplicationPage> applicationPages = convertorMock
+                .toApplicationPage(Arrays.<SApplicationPage> asList(sAppPage1, sAppPage2));
 
         //then
         assertThat(applicationPages).containsExactly(appPage1, appPage2);

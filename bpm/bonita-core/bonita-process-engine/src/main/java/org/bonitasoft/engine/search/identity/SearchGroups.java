@@ -30,7 +30,8 @@ public class SearchGroups extends AbstractGroupSearchEntity {
 
     private final IdentityService identityService;
 
-    public SearchGroups(final IdentityService identityService, final SearchGroupDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchGroups(final IdentityService identityService, final SearchGroupDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.identityService = identityService;
     }

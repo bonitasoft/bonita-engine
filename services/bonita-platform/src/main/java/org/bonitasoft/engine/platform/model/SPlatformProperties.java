@@ -15,7 +15,6 @@ package org.bonitasoft.engine.platform.model;
 
 /**
  * @author Celine Souchet
- * 
  */
 public interface SPlatformProperties {
 

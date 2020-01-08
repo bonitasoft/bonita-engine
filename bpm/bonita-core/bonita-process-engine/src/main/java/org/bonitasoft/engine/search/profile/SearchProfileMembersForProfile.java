@@ -35,7 +35,8 @@ public class SearchProfileMembersForProfile extends AbstractSearchEntity<Profile
 
     private final String querySuffix;
 
-    public SearchProfileMembersForProfile(final String querySuffix, final ProfileService profileService, final SearchEntityDescriptor searchDescriptor,
+    public SearchProfileMembersForProfile(final String querySuffix, final ProfileService profileService,
+            final SearchEntityDescriptor searchDescriptor,
             final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.querySuffix = querySuffix;

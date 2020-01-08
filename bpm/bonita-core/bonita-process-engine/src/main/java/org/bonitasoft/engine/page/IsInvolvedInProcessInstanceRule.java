@@ -32,7 +32,8 @@ public class IsInvolvedInProcessInstanceRule extends AuthorizationRuleWithParame
 
     private final TaskInvolvementDelegate taskInvolvementDelegate;
 
-    public IsInvolvedInProcessInstanceRule(SessionService sessionService, SessionAccessor sessionAccessor, TaskInvolvementDelegate taskInvolvementDelegate) {
+    public IsInvolvedInProcessInstanceRule(SessionService sessionService, SessionAccessor sessionAccessor,
+            TaskInvolvementDelegate taskInvolvementDelegate) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.taskInvolvementDelegate = taskInvolvementDelegate;

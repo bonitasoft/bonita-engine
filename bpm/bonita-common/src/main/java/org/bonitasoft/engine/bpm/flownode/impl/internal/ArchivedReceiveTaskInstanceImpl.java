@@ -19,7 +19,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 /**
  * @author Julien Molinaro
  */
-public class ArchivedReceiveTaskInstanceImpl extends ArchivedHumanTaskInstanceImpl implements ArchivedReceiveTaskInstance {
+public class ArchivedReceiveTaskInstanceImpl extends ArchivedHumanTaskInstanceImpl
+        implements ArchivedReceiveTaskInstance {
 
     private static final long serialVersionUID = 7671768841192077283L;
 

@@ -31,10 +31,9 @@ import javax.persistence.OrderColumn;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
-import org.hibernate.annotations.Index;
-
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import org.hibernate.annotations.Index;
 
 /**
  * Describe a simple employee

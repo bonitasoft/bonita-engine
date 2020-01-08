@@ -21,114 +21,121 @@ import org.assertj.core.util.Objects;
  */
 public class ApplicationPageImplAssert extends AbstractAssert<ApplicationPageImplAssert, ApplicationPageImpl> {
 
-  /**
-   * Creates a new <code>{@link ApplicationPageImplAssert}</code> to make assertions on actual ApplicationPageImpl.
-   * @param actual the ApplicationPageImpl we want to make assertions on.
-   */
-  public ApplicationPageImplAssert(ApplicationPageImpl actual) {
-    super(actual, ApplicationPageImplAssert.class);
-  }
-
-  /**
-   * An entry point for ApplicationPageImplAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
-   * With a static import, one can write directly: <code>assertThat(myApplicationPageImpl)</code> and get specific assertion with code completion.
-   * @param actual the ApplicationPageImpl we want to make assertions on.
-   * @return a new <code>{@link ApplicationPageImplAssert}</code>
-   */
-  public static ApplicationPageImplAssert assertThat(ApplicationPageImpl actual) {
-    return new ApplicationPageImplAssert(actual);
-  }
-
-  /**
-   * Verifies that the actual ApplicationPageImpl's applicationId is equal to the given one.
-   * @param applicationId the given applicationId to compare the actual ApplicationPageImpl's applicationId to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual ApplicationPageImpl's applicationId is not equal to the given one.
-   */
-  public ApplicationPageImplAssert hasApplicationId(long applicationId) {
-    // check that actual ApplicationPageImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected applicationId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualApplicationId = actual.getApplicationId();
-    if (actualApplicationId != applicationId) {
-      failWithMessage(assertjErrorMessage, actual, applicationId, actualApplicationId);
+    /**
+     * Creates a new <code>{@link ApplicationPageImplAssert}</code> to make assertions on actual ApplicationPageImpl.
+     *
+     * @param actual the ApplicationPageImpl we want to make assertions on.
+     */
+    public ApplicationPageImplAssert(ApplicationPageImpl actual) {
+        super(actual, ApplicationPageImplAssert.class);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
-   * Verifies that the actual ApplicationPageImpl's id is equal to the given one.
-   * @param id the given id to compare the actual ApplicationPageImpl's id to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual ApplicationPageImpl's id is not equal to the given one.
-   */
-  public ApplicationPageImplAssert hasId(long id) {
-    // check that actual ApplicationPageImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected id of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualId = actual.getId();
-    if (actualId != id) {
-      failWithMessage(assertjErrorMessage, actual, id, actualId);
+    /**
+     * An entry point for ApplicationPageImplAssert to follow AssertJ standard <code>assertThat()</code> statements.<br>
+     * With a static import, one can write directly: <code>assertThat(myApplicationPageImpl)</code> and get specific
+     * assertion with code completion.
+     *
+     * @param actual the ApplicationPageImpl we want to make assertions on.
+     * @return a new <code>{@link ApplicationPageImplAssert}</code>
+     */
+    public static ApplicationPageImplAssert assertThat(ApplicationPageImpl actual) {
+        return new ApplicationPageImplAssert(actual);
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual ApplicationPageImpl's applicationId is equal to the given one.
+     *
+     * @param applicationId the given applicationId to compare the actual ApplicationPageImpl's applicationId to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual ApplicationPageImpl's applicationId is not equal to the given one.
+     */
+    public ApplicationPageImplAssert hasApplicationId(long applicationId) {
+        // check that actual ApplicationPageImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual ApplicationPageImpl's pageId is equal to the given one.
-   * @param pageId the given pageId to compare the actual ApplicationPageImpl's pageId to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual ApplicationPageImpl's pageId is not equal to the given one.
-   */
-  public ApplicationPageImplAssert hasPageId(long pageId) {
-    // check that actual ApplicationPageImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected applicationId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected pageId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // check
-    long actualPageId = actual.getPageId();
-    if (actualPageId != pageId) {
-      failWithMessage(assertjErrorMessage, actual, pageId, actualPageId);
+        // check
+        long actualApplicationId = actual.getApplicationId();
+        if (actualApplicationId != applicationId) {
+            failWithMessage(assertjErrorMessage, actual, applicationId, actualApplicationId);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual ApplicationPageImpl's id is equal to the given one.
+     *
+     * @param id the given id to compare the actual ApplicationPageImpl's id to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual ApplicationPageImpl's id is not equal to the given one.
+     */
+    public ApplicationPageImplAssert hasId(long id) {
+        // check that actual ApplicationPageImpl we want to make assertions on is not null.
+        isNotNull();
 
-  /**
-   * Verifies that the actual ApplicationPageImpl's token is equal to the given one.
-   * @param token the given token to compare the actual ApplicationPageImpl's token to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual ApplicationPageImpl's token is not equal to the given one.
-   */
-  public ApplicationPageImplAssert hasToken(String token) {
-    // check that actual ApplicationPageImpl we want to make assertions on is not null.
-    isNotNull();
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected id of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected token of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualToken = actual.getToken();
-    if (!Objects.areEqual(actualToken, token)) {
-      failWithMessage(assertjErrorMessage, actual, token, actualToken);
+        // check
+        long actualId = actual.getId();
+        if (actualId != id) {
+            failWithMessage(assertjErrorMessage, actual, id, actualId);
+        }
+
+        // return the current assertion for method chaining
+        return this;
     }
 
-    // return the current assertion for method chaining
-    return this;
-  }
+    /**
+     * Verifies that the actual ApplicationPageImpl's pageId is equal to the given one.
+     *
+     * @param pageId the given pageId to compare the actual ApplicationPageImpl's pageId to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual ApplicationPageImpl's pageId is not equal to the given one.
+     */
+    public ApplicationPageImplAssert hasPageId(long pageId) {
+        // check that actual ApplicationPageImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected pageId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // check
+        long actualPageId = actual.getPageId();
+        if (actualPageId != pageId) {
+            failWithMessage(assertjErrorMessage, actual, pageId, actualPageId);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
+
+    /**
+     * Verifies that the actual ApplicationPageImpl's token is equal to the given one.
+     *
+     * @param token the given token to compare the actual ApplicationPageImpl's token to.
+     * @return this assertion object.
+     * @throws AssertionError - if the actual ApplicationPageImpl's token is not equal to the given one.
+     */
+    public ApplicationPageImplAssert hasToken(String token) {
+        // check that actual ApplicationPageImpl we want to make assertions on is not null.
+        isNotNull();
+
+        // overrides the default error message with a more explicit one
+        String assertjErrorMessage = "\nExpected token of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+        // null safe check
+        String actualToken = actual.getToken();
+        if (!Objects.areEqual(actualToken, token)) {
+            failWithMessage(assertjErrorMessage, actual, token, actualToken);
+        }
+
+        // return the current assertion for method chaining
+        return this;
+    }
 
 }

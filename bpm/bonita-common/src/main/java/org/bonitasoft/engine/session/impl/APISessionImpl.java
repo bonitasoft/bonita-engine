@@ -32,7 +32,8 @@ public class APISessionImpl extends SessionImpl implements APISession {
     private long tenantId;
     private List<String> profiles;
 
-    public APISessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId, final String tenantName,
+    public APISessionImpl(final long id, final Date creationDate, final long duration, final String userName,
+            final long userId, final String tenantName,
             final long tenantId) {
         super(id, creationDate, duration, userName, userId);
         this.tenantName = tenantName;

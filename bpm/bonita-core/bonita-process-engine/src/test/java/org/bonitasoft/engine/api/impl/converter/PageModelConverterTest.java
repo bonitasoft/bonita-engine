@@ -51,7 +51,8 @@ public class PageModelConverterTest {
     public void should_construct_SPage_with_pageCreator() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDisplayName(DISPLAY_NAME)
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, PROCESS_DEFINITION_ID)
+                .setDisplayName(DISPLAY_NAME)
                 .setDescription(DESCRIPTION);
 
         //when
@@ -73,7 +74,8 @@ public class PageModelConverterTest {
     public void should_construct_SPage_with_pageUpdater() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME)
+                .setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
                 .setContentType(ContentType.PAGE).setProcessDefinitionId(PROCESS_DEFINITION_ID);
 
         //when
@@ -96,7 +98,8 @@ public class PageModelConverterTest {
     public void should_constructSPage_with_null_processDefinitionId_set_it_to_0() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME)
+                .setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
                 .setContentType(ContentType.PAGE).setProcessDefinitionId(null);
 
         //when
@@ -110,13 +113,14 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED,
+                LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         sPage.setContentType(SContentType.FORM);
         sPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
 
-        //when 
+        //when
         final Page page = pageModelConverter.toPage(sPage);
 
         //then
@@ -136,7 +140,8 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage_with_no_processDefinitionId() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED,
+                LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         //when
@@ -149,13 +154,14 @@ public class PageModelConverterTest {
     public void should_construct_Page_with_SPage_list() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
-        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+        final SPage sPage = new SPage(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED,
+                LAST_MODIFICATION_DATE,
                 LAST_UPDATED_BY,
                 CONTENT_ZIP);
         List<SPage> sPages = new ArrayList<>();
         sPages.add(sPage);
 
-        //when 
+        //when
         final Page page = pageModelConverter.toPage(sPage);
         final List<Page> pages = pageModelConverter.toPages(sPages);
 

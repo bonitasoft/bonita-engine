@@ -26,14 +26,17 @@ import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescripto
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy
+        extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
     private final long userId;
 
-    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final ProcessDefinitionService processDefinitionService,
-            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long userId) {
+    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
+            final ProcessDefinitionService processDefinitionService,
+            final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options,
+            final long userId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
         this.userId = userId;
@@ -41,12 +44,15 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervis
 
     @Override
     public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
-        return processDefinitionService.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, queryOptions);
+        return processDefinitionService
+                .getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, queryOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
-        return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, queryOptions);
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions)
+            throws SBonitaReadException {
+        return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId,
+                queryOptions);
     }
 
 }

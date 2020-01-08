@@ -23,6 +23,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class SComment implements PersistentObject {
+
     public static final String ID_KEY = "id";
     public static final String USERID_KEY = "userId";
     public static final String PROCESSINSTANCEID_KEY = "processInstanceId";

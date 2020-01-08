@@ -26,7 +26,8 @@ public class SelectDescriptorBuilder {
 
     public static SelectOneDescriptor<SPlatformCommand> getPlatformCommandByName(final String platformCommandName) {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) platformCommandName);
-        return new SelectOneDescriptor<SPlatformCommand>("getPlatformCommandByName", parameters, SPlatformCommand.class);
+        return new SelectOneDescriptor<SPlatformCommand>("getPlatformCommandByName", parameters,
+                SPlatformCommand.class);
     }
 
 }

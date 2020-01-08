@@ -32,8 +32,10 @@ public class GetProcessDefinitionDeployInfosWithActorOnlyForRole extends Abstrac
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public GetProcessDefinitionDeployInfosWithActorOnlyForRole(final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor,
-            final int fromIndex, final int numberOfResults, final ProcessDeploymentInfoCriterion criterion, final long roleId) {
+    public GetProcessDefinitionDeployInfosWithActorOnlyForRole(final ProcessDefinitionService processDefinitionService,
+            final SearchEntityDescriptor searchDescriptor,
+            final int fromIndex, final int numberOfResults, final ProcessDeploymentInfoCriterion criterion,
+            final long roleId) {
         super(searchDescriptor, fromIndex, numberOfResults, criterion);
         this.roleId = roleId;
         this.processDefinitionService = processDefinitionService;

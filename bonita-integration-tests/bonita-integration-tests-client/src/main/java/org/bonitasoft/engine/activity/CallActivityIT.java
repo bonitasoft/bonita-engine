@@ -105,12 +105,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
         super.after();
     }
 
-    private ProcessDefinition getSimpleProcess(final String ACTOR_NAME, final String processName, final String processVersion, final boolean terminateEnd)
+    private ProcessDefinition getSimpleProcess(final String ACTOR_NAME, final String processName,
+            final String processVersion, final boolean terminateEnd)
             throws BonitaException {
         final Expression clientNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(10);
         final Expression protocolNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(305020);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                processVersion);
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addShortTextData("firstName", null);
         processDefBuilder.addShortTextData("lastName", null);
@@ -126,33 +128,41 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addTransition("tStart", "tStep1");
         processDefBuilder.addTransition("tStep1", "tEnd");
 
-        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(),
+                ACTOR_NAME, cebolinha);
 
         return targetProcessDefinition;
     }
 
-    private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations, final boolean addOutputOperations,
-            final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
+    private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations,
+            final boolean addOutputOperations,
+            final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion)
+            throws BonitaException {
 
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcessName);
         Expression targetProcessVersionExpr = null;
         if (strTargetVersion != null) {
             targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(strTargetVersion);
         }
         final Expression expressionTrue = new ExpressionBuilder().createConstantBooleanExpression(true);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         processDefBuilder.addShortTextData("fName", null);
         processDefBuilder.addShortTextData("lName", null);
         processDefBuilder.addIntegerData("cNumber", null);
         processDefBuilder.addIntegerData("pNumber", null);
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
-        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity",
+                targetProcessNameExpr, targetProcessVersionExpr);
         addDataInputOperationsIfNeed(addInputOperations, callActivityBuilder);
-        callActivityBuilder.addShortTextData("callActivityData", new ExpressionBuilder().createConstantStringExpression("defaultValue"));
+        callActivityBuilder.addShortTextData("callActivityData",
+                new ExpressionBuilder().createConstantStringExpression("defaultValue"));
         if (loopNb > 0) {
-            callActivityBuilder.addLoop(false, expressionTrue, new ExpressionBuilder().createConstantIntegerExpression(loopNb));
+            callActivityBuilder.addLoop(false, expressionTrue,
+                    new ExpressionBuilder().createConstantIntegerExpression(loopNb));
         }
         addDataOutputOperationIfNeed(addOutputOperations, callActivityBuilder);
         processDefBuilder.addUserTask("step1", ACTOR_NAME);
@@ -164,34 +174,43 @@ public class CallActivityIT extends TestWithTechnicalUser {
         return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
     }
 
-    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName, final String strTargetVersion)
+    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName,
+            final String strTargetVersion)
             throws BonitaException {
         return buildProcessWithCallActivity(false, false, processName, targetProcessName, 0, strTargetVersion);
     }
 
-    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName, int loopNb, final String strTargetVersion)
+    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName,
+            int loopNb, final String strTargetVersion)
             throws BonitaException {
         return buildProcessWithCallActivity(false, false, processName, targetProcessName, loopNb, strTargetVersion);
     }
 
-    private void addDataOutputOperationIfNeed(final boolean addOutputOperations, final CallActivityBuilder callActivityBuilder)
+    private void addDataOutputOperationIfNeed(final boolean addOutputOperations,
+            final CallActivityBuilder callActivityBuilder)
             throws InvalidExpressionException {
         if (addOutputOperations) {
-            final Operation setClientNumber = BuildTestUtil.buildAssignOperation("cNumber", "clientNumber", ExpressionType.TYPE_VARIABLE,
+            final Operation setClientNumber = BuildTestUtil.buildAssignOperation("cNumber", "clientNumber",
+                    ExpressionType.TYPE_VARIABLE,
                     Integer.class.getName());
-            final Operation setProtocalNumber = BuildTestUtil.buildAssignOperation("pNumber", "protocolNumber", ExpressionType.TYPE_VARIABLE,
+            final Operation setProtocalNumber = BuildTestUtil.buildAssignOperation("pNumber", "protocolNumber",
+                    ExpressionType.TYPE_VARIABLE,
                     Integer.class.getName());
             callActivityBuilder.addDataOutputOperation(setClientNumber);
             callActivityBuilder.addDataOutputOperation(setProtocalNumber);
         }
     }
 
-    private void addDataInputOperationsIfNeed(final boolean addInputOperations, final CallActivityBuilder callActivityBuilder)
+    private void addDataInputOperationsIfNeed(final boolean addInputOperations,
+            final CallActivityBuilder callActivityBuilder)
             throws InvalidExpressionException {
         if (addInputOperations) {
-            final Operation setFirstName = BuildTestUtil.buildAssignOperation("firstName", "fName", ExpressionType.TYPE_VARIABLE, String.class.getName());
-            final Operation setLastName = BuildTestUtil.buildAssignOperation("lastName", "lName", ExpressionType.TYPE_VARIABLE, String.class.getName());
-            final Operation mapFromCallActivity = BuildTestUtil.buildAssignOperation("calledProcessData", "callActivityData", ExpressionType.TYPE_VARIABLE,
+            final Operation setFirstName = BuildTestUtil.buildAssignOperation("firstName", "fName",
+                    ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation setLastName = BuildTestUtil.buildAssignOperation("lastName", "lName",
+                    ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation mapFromCallActivity = BuildTestUtil.buildAssignOperation("calledProcessData",
+                    "callActivityData", ExpressionType.TYPE_VARIABLE,
                     String.class.getName());
             callActivityBuilder.addDataInputOperation(setFirstName);
             callActivityBuilder.addDataInputOperation(setLastName);
@@ -252,13 +271,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition receiveProcessDefinition = null;
         ProcessDefinition sendProcessDefinition = null;
         try {
-            final Expression processVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+            final Expression processVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
 
             // Main process
-            final ProcessDefinitionBuilder mainProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Main", PROCESS_VERSION);
+            final ProcessDefinitionBuilder mainProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Main", PROCESS_VERSION);
             mainProcessDefinitionBuilder.addActor(ACTOR_NAME);
             mainProcessDefinitionBuilder.addStartEvent("MainStart").addEndEvent("MainEnd");
-            mainProcessDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL).addGateway("Gateway2", GatewayType.PARALLEL);
+            mainProcessDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL).addGateway("Gateway2",
+                    GatewayType.PARALLEL);
             // Send callActivity
             final Expression sendExpr = new ExpressionBuilder().createConstantStringExpression("Send");
             mainProcessDefinitionBuilder.addCallActivity("Send", sendExpr, processVersionExpr);
@@ -266,25 +288,34 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final Expression receiveExpr = new ExpressionBuilder().createConstantStringExpression("Receive");
             mainProcessDefinitionBuilder.addCallActivity("Receive", receiveExpr, processVersionExpr);
             // Transitions
-            mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send").addTransition("Gateway1", "Receive")
-                    .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2").addTransition("Gateway2", "MainEnd");
-            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send")
+                    .addTransition("Gateway1", "Receive")
+                    .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2")
+                    .addTransition("Gateway2", "MainEnd");
+            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME,
+                    cascao);
 
             // Receive process
-            final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
+            final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Receive", PROCESS_VERSION);
             receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
             receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
             receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
-            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG", ExpressionType.TYPE_VARIABLE, String.class.getName());
-            final IntermediateCatchEventDefinitionBuilder intermediateCatchEvent = receiveProcessDefinitionBuilder.addIntermediateCatchEvent("ReceiveMsg");
+            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG",
+                    ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final IntermediateCatchEventDefinitionBuilder intermediateCatchEvent = receiveProcessDefinitionBuilder
+                    .addIntermediateCatchEvent("ReceiveMsg");
             intermediateCatchEvent.addMessageEventTrigger("ping").addOperation(operation);
             intermediateCatchEvent.addLongTextData("copymsg", null);
             // Transitions
-            receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
-            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg")
+                    .addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
+            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(),
+                    ACTOR_NAME, cascao);
 
             // Send process
-            final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Send", PROCESS_VERSION);
+            final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Send", PROCESS_VERSION);
             sendProcessDefinitionBuilder.addActor(ACTOR_NAME);
             sendProcessDefinitionBuilder.addStartEvent("SendStart");
             final Expression msgData = new ExpressionBuilder().createConstantStringExpression("data");
@@ -294,35 +325,42 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final Expression targetFlowNode = new ExpressionBuilder().createConstantStringExpression("ReceiveMsg");
             final Expression displayName = new ExpressionBuilder().createConstantStringExpression("MSG");
             final Expression messageContent = new ExpressionBuilder().createDataExpression("msg", "java.lang.String");
-            sendProcessDefinitionBuilder.addEndEvent("SendMsgEnd").addMessageEventTrigger("ping", targetProcess, targetFlowNode)
+            sendProcessDefinitionBuilder.addEndEvent("SendMsgEnd")
+                    .addMessageEventTrigger("ping", targetProcess, targetFlowNode)
                     .addMessageContentExpression(displayName, messageContent);
             // Transitions
             sendProcessDefinitionBuilder.addTransition("SendStart", "Step1").addTransition("Step1", "SendMsgEnd");
-            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME,
+                    cascao);
 
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
-            final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
+            final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(),
+                    mainProcessDefinition.getId());
 
             // No need to verify anything, if no exception, query exists
             getProcessAPI().searchActivities(
-                    new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
+                    new SearchOptionsBuilder(0, 10)
+                            .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
                             .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).done());
 
             getProcessAPI().searchActivities(
-                    new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
-                            .filter(ProcessSupervisorSearchDescriptor.USER_ID,cascao.getId()).done());
+                    new SearchOptionsBuilder(0, 10)
+                            .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
+                            .filter(ProcessSupervisorSearchDescriptor.USER_ID, cascao.getId()).done());
 
             getProcessAPI().searchActivities(
                     new SearchOptionsBuilder(0, 10)
-                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,cascao.getId()).done());
+                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY)
+                            .filter(ProcessSupervisorSearchDescriptor.USER_ID, cascao.getId()).done());
 
             waitForUserTaskAndExecuteIt("Step1", cascao);
 
             getProcessAPI().searchActivities(new SearchOptionsBuilder(0, 10)
-                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).done());
+                    .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).done());
 
             final ActivityInstance read = waitForUserTaskAndGetIt("Read");
-            final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
+            final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg",
+                    read.getParentProcessInstanceId());
             assertThat(copyMsg.getValue()).isEqualTo("data");
             assignAndExecuteStep(read, cascao.getId());
 
@@ -338,12 +376,15 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition receiveProcessDefinition = null;
         ProcessDefinition sendProcessDefinition = null;
         try {
-            final Expression processVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+            final Expression processVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
             // Main process
-            final ProcessDefinitionBuilder mainProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Main", PROCESS_VERSION);
+            final ProcessDefinitionBuilder mainProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Main", PROCESS_VERSION);
             mainProcessDefinitionBuilder.addActor(ACTOR_NAME);
             mainProcessDefinitionBuilder.addStartEvent("MainStart").addEndEvent("MainEnd");
-            mainProcessDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL).addGateway("Gateway2", GatewayType.PARALLEL);
+            mainProcessDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL).addGateway("Gateway2",
+                    GatewayType.PARALLEL);
             // Send callActivity
             final Expression sendExpr = new ExpressionBuilder().createConstantStringExpression("Send");
             mainProcessDefinitionBuilder.addCallActivity("Send", sendExpr, processVersionExpr);
@@ -351,22 +392,30 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final Expression receiveExpr = new ExpressionBuilder().createConstantStringExpression("Receive");
             mainProcessDefinitionBuilder.addCallActivity("Receive", receiveExpr, processVersionExpr);
             // Transitions
-            mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send").addTransition("Gateway1", "Receive")
-                    .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2").addTransition("Gateway2", "MainEnd");
-            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send")
+                    .addTransition("Gateway1", "Receive")
+                    .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2")
+                    .addTransition("Gateway2", "MainEnd");
+            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME,
+                    cascao);
             // Receive process
-            final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
+            final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Receive", PROCESS_VERSION);
             receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
             receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
             receiveProcessDefinitionBuilder.addLongTextData("copymsg", null);
             receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
-            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG2", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG2",
+                    ExpressionType.TYPE_VARIABLE, String.class.getName());
             receiveProcessDefinitionBuilder.addReceiveTask("ReceiveMsg", "ping2").addMessageOperation(operation);
             // Transitions
-            receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
-            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg")
+                    .addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
+            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(),
+                    ACTOR_NAME, cascao);
             // Send process
-            final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Send", PROCESS_VERSION);
+            final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("Send", PROCESS_VERSION);
             sendProcessDefinitionBuilder.addActor(ACTOR_NAME);
             sendProcessDefinitionBuilder.addStartEvent("SendStart");
             final Expression msgData = new ExpressionBuilder().createConstantStringExpression("data");
@@ -376,17 +425,21 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final Expression targetFlowNode = new ExpressionBuilder().createConstantStringExpression("ReceiveMsg");
             final Expression displayName = new ExpressionBuilder().createConstantStringExpression("MSG2");
             final Expression messageContent = new ExpressionBuilder().createDataExpression("msg", "java.lang.String");
-            sendProcessDefinitionBuilder.addSendTask("SendMsgEnd", "ping2", targetProcess).setTargetFlowNode(targetFlowNode)
+            sendProcessDefinitionBuilder.addSendTask("SendMsgEnd", "ping2", targetProcess)
+                    .setTargetFlowNode(targetFlowNode)
                     .addMessageContentExpression(displayName, messageContent);
             // Transitions
             sendProcessDefinitionBuilder.addTransition("SendStart", "Step1").addTransition("Step1", "SendMsgEnd");
-            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME,
+                    cascao);
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
-            final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
+            final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(),
+                    mainProcessDefinition.getId());
             waitForUserTaskAndExecuteIt("Step1", cascao);
             final ActivityInstance read = waitForUserTaskAndGetIt("Read");
-            final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
+            final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg",
+                    read.getParentProcessInstanceId());
             assertThat(copyMsg.getValue()).isEqualTo("data");
             assignAndExecuteStep(read, cascao.getId());
             waitForProcessToFinish(mainProcessInstance);
@@ -403,16 +456,22 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void callActivityWithDataOutputAndOperationAreExecutedInTheGoodOrder() throws Exception {
 
-        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithCallActivity", PROCESS_VERSION);
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression("targetProcess");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithCallActivity", PROCESS_VERSION);
         processDefBuilder.addIntegerData("cNumber", new ExpressionBuilder().createConstantIntegerExpression(125));
         processDefBuilder.addIntegerData("pNumber", null);
-        processDefBuilder.addIntegerData("dataInitWithCNumber", new ExpressionBuilder().createConstantIntegerExpression(12));
+        processDefBuilder.addIntegerData("dataInitWithCNumber",
+                new ExpressionBuilder().createConstantIntegerExpression(12));
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
-        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity",
+                targetProcessNameExpr, targetProcessVersionExpr);
         addDataOutputOperationIfNeed(true, callActivityBuilder);
         callActivityBuilder.addOperation(new OperationBuilder().createSetDataOperation("dataInitWithCNumber",
                 new ExpressionBuilder().createDataExpression("cNumber", Integer.class.getName())));
@@ -421,7 +480,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
-        final ProcessDefinition callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessDefinition callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(),
+                ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
@@ -434,7 +494,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
          * targetProcess:clientNumber(10) -> callingProcess:cNumber(was 125)
          * callingProcess:cNumber(10) -> callingProcess:dataInitWithCNumber(was 12)
          */
-        assertThat(getProcessAPI().getProcessDataInstance("dataInitWithCNumber", callingProcessInstance.getId()).getValue()).isEqualTo(Integer.valueOf(10));
+        assertThat(getProcessAPI().getProcessDataInstance("dataInitWithCNumber", callingProcessInstance.getId())
+                .getValue()).isEqualTo(Integer.valueOf(10));
 
         disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
@@ -442,28 +503,36 @@ public class CallActivityIT extends TestWithTechnicalUser {
     /*
      * 1 parent process : callingProcess : startEvent(start) -> callActivity -> userTask(step1) -> endEvent(end).
      * 1 called process : targetProcess : startEvent(tStart) -> userTask(tStep1) -> endEvent(tEnd).
-     * checks : No instances of a process exist, 2 process instances (callingProcess starts and set off targetProcess of call activity),
-     * callingProcess stopped on the call activity, targetProcess is executing, callingProcess is the root process of targetProcess,
-     * call activity called the callProcess, callingProcess continues and reaches user task, targetProcess is finished, the user task is
+     * checks : No instances of a process exist, 2 process instances (callingProcess starts and set off targetProcess of
+     * call activity),
+     * callingProcess stopped on the call activity, targetProcess is executing, callingProcess is the root process of
+     * targetProcess,
+     * call activity called the callProcess, callingProcess continues and reaches user task, targetProcess is finished,
+     * the user task is
      * the one from the callingProcess, calling Process is finished.
      */
-    private void executeCallAtivityUntilEndOfProcess(final boolean addInputOperations, final boolean addOutputOperations, final String strTargetVersion,
+    private void executeCallAtivityUntilEndOfProcess(final boolean addInputOperations,
+            final boolean addOutputOperations, final String strTargetVersion,
             final boolean terminateEnd) throws Exception {
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, terminateEnd);
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                terminateEnd);
         final ProcessDefinition targetProcessDef3 = getSimpleProcess(ACTOR_NAME, "targetProcess", "3.0", terminateEnd);
         final ProcessDefinition targetProcessDef2 = getSimpleProcess(ACTOR_NAME, "targetProcess", "2.0", terminateEnd);
 
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity(addInputOperations, addOutputOperations, "callingProcess",
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity(addInputOperations,
+                addOutputOperations, "callingProcess",
                 "targetProcess", 0, strTargetVersion);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
         final List<Operation> operations = getStartOperations();
-        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(),
+                operations, null);
 
         if (strTargetVersion != null && strTargetVersion.contentEquals("4.0")) {
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
-            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
+            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                    ProcessInstanceCriterion.NAME_DESC);
             assertThat(processInstances).hasSize(1);
 
             waitForFlowNodeInFailedState(callingProcessInstance, "callActivity");
@@ -471,7 +540,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
 
         checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_DESC);
         assertThat(processInstances).hasSize(2); // two instances are expected calling and target processes
         final ProcessInstance targetPI = processInstances.get(0);
 
@@ -484,7 +554,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(targetPI.getProcessDefinitionId()).isEqualTo(targetProcessDef1.getId());
         }
 
-        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
+        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance,
+                "callActivity", true);
         assertThat(targetPI.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
         assertThat(targetPI.getCallerId()).isEqualTo(callActivityInstance.getId());
 
@@ -510,25 +581,32 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     private List<Operation> getStartOperations() throws InvalidExpressionException {
         final ArrayList<Operation> operations = new ArrayList<>(2);
-        operations.add(BuildTestUtil.buildAssignOperation("fName", "Fulano", ExpressionType.TYPE_CONSTANT, String.class.getName()));
-        operations.add(BuildTestUtil.buildAssignOperation("lName", "de Tal", ExpressionType.TYPE_CONSTANT, String.class.getName()));
+        operations.add(BuildTestUtil.buildAssignOperation("fName", "Fulano", ExpressionType.TYPE_CONSTANT,
+                String.class.getName()));
+        operations.add(BuildTestUtil.buildAssignOperation("lName", "de Tal", ExpressionType.TYPE_CONSTANT,
+                String.class.getName()));
         return operations;
     }
 
-    private void checkOutputOperations(final boolean addOutputOperations, final ProcessInstance callingProcessInstance) throws Exception {
+    private void checkOutputOperations(final boolean addOutputOperations, final ProcessInstance callingProcessInstance)
+            throws Exception {
         if (addOutputOperations) {
-            final DataInstance clientNumberData = getProcessAPI().getProcessDataInstance("cNumber", callingProcessInstance.getId());
-            final DataInstance protocolNumberData = getProcessAPI().getProcessDataInstance("pNumber", callingProcessInstance.getId());
+            final DataInstance clientNumberData = getProcessAPI().getProcessDataInstance("cNumber",
+                    callingProcessInstance.getId());
+            final DataInstance protocolNumberData = getProcessAPI().getProcessDataInstance("pNumber",
+                    callingProcessInstance.getId());
             assertThat(clientNumberData.getValue()).isEqualTo(10);
             assertThat(protocolNumberData.getValue()).isEqualTo(305020);
         }
     }
 
-    private void checkDataInputOperations(final boolean addInputOperations, final ProcessInstance targetPI) throws DataNotFoundException {
+    private void checkDataInputOperations(final boolean addInputOperations, final ProcessInstance targetPI)
+            throws DataNotFoundException {
         if (addInputOperations) {
             final DataInstance firstNameData = getProcessAPI().getProcessDataInstance("firstName", targetPI.getId());
             final DataInstance lastNameData = getProcessAPI().getProcessDataInstance("lastName", targetPI.getId());
-            final DataInstance calledProcessData = getProcessAPI().getProcessDataInstance("calledProcessData", targetPI.getId());
+            final DataInstance calledProcessData = getProcessAPI().getProcessDataInstance("calledProcessData",
+                    targetPI.getId());
             assertThat(firstNameData.getValue()).isEqualTo("Fulano");
             assertThat(lastNameData.getValue()).isEqualTo("de Tal");
             assertThat(calledProcessData.getValue()).isEqualTo("defaultValue");
@@ -539,9 +617,11 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessDefinition[] processDefLevels = new ProcessDefinition[nbLevel];
 
         for (int i = 0; i < nbLevel - 1; i++) {
-            processDefLevels[i] = buildProcessWithCallActivity("processLevel" + i, "processLevel" + (i + 1), PROCESS_VERSION);
+            processDefLevels[i] = buildProcessWithCallActivity("processLevel" + i, "processLevel" + (i + 1),
+                    PROCESS_VERSION);
         }
-        processDefLevels[nbLevel - 1] = getSimpleProcess(ACTOR_NAME, "processLevel" + (nbLevel - 1), PROCESS_VERSION, false);
+        processDefLevels[nbLevel - 1] = getSimpleProcess(ACTOR_NAME, "processLevel" + (nbLevel - 1), PROCESS_VERSION,
+                false);
 
         final List<Operation> operations = getStartOperations();
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
@@ -549,12 +629,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessInstance[] procInstLevels = new ProcessInstance[nbLevel];
         procInstLevels[0] = getProcessAPI().startProcess(processDefLevels[0].getId(), operations, null);
         checkNbOfProcessInstances(nbLevel, ProcessInstanceCriterion.NAME_DESC);
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, nbLevel, ProcessInstanceCriterion.NAME_ASC); // if nbLevel>10 use
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, nbLevel,
+                ProcessInstanceCriterion.NAME_ASC); // if nbLevel>10 use
         assertThat(processInstances).hasSize(nbLevel);
 
         for (int i = 0; i < nbLevel; i++) {
             procInstLevels[i] = processInstances.get(i);
-            assertThat(procInstLevels[i].getProcessDefinitionId()).as("Level of process : " + i).isEqualTo(processDefLevels[i].getId());
+            assertThat(procInstLevels[i].getProcessDefinitionId()).as("Level of process : " + i)
+                    .isEqualTo(processDefLevels[i].getId());
         }
 
         waitForUserTaskAndExecuteIt(procInstLevels[0], "tStep1", cebolinha);
@@ -578,10 +660,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void callUndeployedProcess() throws Exception {
 
-        final ProcessDefinition processDef = buildProcessWithCallActivity("callingProcess", "unDeployedProcess", PROCESS_VERSION);
+        final ProcessDefinition processDef = buildProcessWithCallActivity("callingProcess", "unDeployedProcess",
+                PROCESS_VERSION);
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_DESC);
         assertThat(processInstances).hasSize(1);
 
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
@@ -590,12 +674,15 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     private void callActivityInALoop(final int nbLoop) throws Exception {
-        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", nbLoop,
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                nbLoop,
                 PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0);
-        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null,
+                null);
         waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
         for (int i = 0; i < nbLoop; i++) {
@@ -621,7 +708,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     private ProcessInstance getTargetProcessInstance(final ProcessDefinition targetProcessDef) throws Exception {
-        final List<ProcessInstance> processInstances = checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC).getResult();
+        final List<ProcessInstance> processInstances = checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC)
+                .getResult();
         assertThat(processInstances).hasSize(2);// two instances are expected calling and target processes
         final ProcessInstance targetPI = processInstances.get(0);
         assertThat(targetPI.getProcessDefinitionId()).isEqualTo(targetProcessDef.getId());
@@ -630,21 +718,26 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test
     public void getArchivedCallActivityInstance() throws Exception {
-        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
         final ProcessInstance targetPI = getTargetProcessInstance(targetProcessDef);
 
-        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
+        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance,
+                "callActivity", true);
 
         waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha); // first loop execution
         waitForProcessToFinish(targetPI);
 
-        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = waitForFinalArchivedActivity("callActivity", callingProcessInstance);
+        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = waitForFinalArchivedActivity("callActivity",
+                callingProcessInstance);
         assertThat(waitForFinalArchivedActivity.getResult().getType()).isEqualTo(FlowNodeType.CALL_ACTIVITY);
-        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(targetPI.getId(), 0, 20);
+        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                .getArchivedProcessInstances(targetPI.getId(), 0, 20);
 
         final ArchivedProcessInstance firstProcessInstanceArchive = archivedProcessInstanceList.get(0);
         assertThat(firstProcessInstanceArchive.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
@@ -660,7 +753,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test
     public void callActivityUsingUndeployedVersion() throws Exception {
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", "unexisting_version_4.0");
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                "unexisting_version_4.0");
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
@@ -671,7 +765,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test
     public void callActivityUsingUndeployedProcess() throws Exception {
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                null);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
@@ -682,9 +777,11 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test
     public void callActivityUsingDisabledProcess() throws Exception {
-        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
         getProcessAPI().disableProcess(targetProcessDef.getId());
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                PROCESS_VERSION);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
@@ -696,13 +793,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
         final List<Operation> operations = getStartOperations();
-        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(),
+                operations, null);
         final ActivityInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
 
         try {
@@ -724,13 +824,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION,
+                false);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess",
+                PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
         final List<Operation> operations = getStartOperations();
-        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(),
+                operations, null);
         waitForUserTask(callingProcessInstance, "tStep1");
 
         getProcessAPI().disableProcess(targetProcessDef1.getId());
@@ -749,14 +852,18 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition callingProcessDef = null;
         try {
             targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
             final Expression vExpression = new ExpressionBuilder().createDataExpression("v", String.class.getName());
             final List<Expression> dependencies = new ArrayList<>(1);
             dependencies.add(vExpression);
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createGroovyScriptExpression("version", "v", String.class.getName(),
+            final Expression targetProcessVersionExpr = new ExpressionBuilder().createGroovyScriptExpression("version",
+                    "v", String.class.getName(),
                     dependencies);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
-            processDefBuilder.addShortTextData("v", new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION));
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
+            processDefBuilder.addShortTextData("v",
+                    new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION));
             processDefBuilder.addShortTextData("lName", null);
             processDefBuilder.addIntegerData("cNumber", null);
             processDefBuilder.addIntegerData("pNumber", null);
@@ -770,14 +877,17 @@ public class CallActivityIT extends TestWithTechnicalUser {
             processDefBuilder.addTransition("step1", "end");
             callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
+            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null,
+                    null);
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
-            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
+            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                    ProcessInstanceCriterion.NAME_DESC);
             assertThat(processInstances).hasSize(2); // two instances are expected calling and target process
             final ProcessInstance targetPI = processInstances.get(0);
             assertThat(targetProcessDef.getId()).isEqualTo(targetPI.getProcessDefinitionId());
             assertThat(targetProcessDef.getVersion()).isEqualTo(PROCESS_VERSION);
-            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
+            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance,
+                    "callActivity", true);
             assertThat(targetPI.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assertThat(targetPI.getCallerId()).isEqualTo(callActivityInstance.getId());
             final HumanTaskInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
@@ -801,9 +911,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition callingProcessDef = null;
         try {
             targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
             processDefBuilder.addShortTextData("lName", null);
             processDefBuilder.addIntegerData("cNumber", null);
             processDefBuilder.addIntegerData("pNumber", null);
@@ -812,7 +925,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
             processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
                     .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName"))
                     .addDescription("callActivityDescription")
-                    .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+                    .addDisplayDescription(
+                            new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
             processDefBuilder.addUserTask("step1", ACTOR_NAME);
             processDefBuilder.addEndEvent("end");
             processDefBuilder.addTransition("start", "callActivity");
@@ -820,12 +934,15 @@ public class CallActivityIT extends TestWithTechnicalUser {
             processDefBuilder.addTransition("step1", "end");
             callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
+            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null,
+                    null);
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
-            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
+            final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                    ProcessInstanceCriterion.NAME_DESC);
             assertThat(processInstances).hasSize(2); // two instances are expected calling and target process
             final ProcessInstance targetPI = processInstances.get(0);
-            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
+            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance,
+                    "callActivity", true);
             assertThat(targetPI.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assertThat(targetPI.getCallerId()).isEqualTo(callActivityInstance.getId());
             assertThat(callActivityInstance.getDisplayName()).isEqualTo("callActivityDisplayName");
@@ -849,8 +966,10 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test(expected = InvalidProcessDefinitionException.class)
     public void callActivityTargetProcessExprIsNull() throws Exception {
         final Expression targetProcessNameExpr = null;
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("callingProcess", PROCESS_VERSION);
         processDefBuilder.addShortTextData("lName", null);
         processDefBuilder.addIntegerData("cNumber", null);
         processDefBuilder.addIntegerData("pNumber", null);
@@ -871,29 +990,36 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition callingProcessDefinition = null;
         try {
             // Build target process
-            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("targetProcess", PROCESS_VERSION);
             targetProcessDefBuilder.addActor(ACTOR_NAME);
             targetProcessDefBuilder.addStartEvent("tStart");
             targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME);
             targetProcessDefBuilder.addEndEvent("tEnd");
             targetProcessDefBuilder.addTransition("tStart", "tStep1");
             targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME,
+                    cebolinha);
             // Build and start calling process
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
             processDefBuilder.addActor(ACTOR_NAME);
             processDefBuilder.addStartEvent("start");
             processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
                     .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName"))
                     .addDescription("callActivityDescription")
-                    .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+                    .addDisplayDescription(
+                            new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
             processDefBuilder.addEndEvent("end");
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "end");
             callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            final ProcessInstance callingProcessInstance = getProcessAPI()
+                    .startProcess(callingProcessDefinition.getId());
             // Execute step in the target process
             waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha);
             waitForProcessToFinish(callingProcessInstance);
@@ -901,7 +1027,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(getProcessAPI().getNumberOfArchivedProcessInstances()).isEqualTo(1L);
             final SearchOptionsBuilder searchOptions = new SearchOptionsBuilder(0, 10);
             searchOptions.sort(ArchivedProcessInstancesSearchDescriptor.NAME, Order.ASC);
-            final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptions.done()).getResult();
+            final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI()
+                    .searchArchivedProcessInstances(searchOptions.done()).getResult();
             assertThat(archivedProcessInstances).hasSize(1);
             assertThat(archivedProcessInstances.get(0).getSourceObjectId()).isEqualTo(callingProcessInstance.getId());
         } finally {
@@ -913,28 +1040,36 @@ public class CallActivityIT extends TestWithTechnicalUser {
     public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
         // check that real root process definition is retrieved (taken from parent process instance)
         // Build target process
-        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("targetProcess", PROCESS_VERSION);
         targetProcessDefBuilder.addActor(ACTOR_NAME);
         targetProcessDefBuilder.addStartEvent("tStart");
         targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME);
         targetProcessDefBuilder.addEndEvent("tEnd");
         targetProcessDefBuilder.addTransition("tStart", "tStep1");
         targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(
+                targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         // Build and start calling process
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression("targetProcess");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                .createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("callingProcess", PROCESS_VERSION);
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
-                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
-                .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName"))
+                .addDescription("callActivityDescription")
+                .addDisplayDescription(
+                        new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(),
+                ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
         final long tStep1Id = waitForUserTask(callingProcessInstance.getId(), "tStep1");
 
@@ -950,7 +1085,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition callingProcessDefinition = null;
         try {
             // Build target process
-            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("targetProcess", PROCESS_VERSION);
             targetProcessDefBuilder.addActor(ACTOR_NAME);
             targetProcessDefBuilder.addStartEvent("tStart");
             targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME).addData("rootProcId", Long.class.getName(),
@@ -958,11 +1094,15 @@ public class CallActivityIT extends TestWithTechnicalUser {
             targetProcessDefBuilder.addEndEvent("tEnd");
             targetProcessDefBuilder.addTransition("tStart", "tStep1");
             targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME,
+                    cebolinha);
             // Build and start calling process
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
             processDefBuilder.addActor(ACTOR_NAME);
             processDefBuilder.addStartEvent("start");
             processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
@@ -970,9 +1110,11 @@ public class CallActivityIT extends TestWithTechnicalUser {
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "end");
             callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            final ProcessInstance callingProcessInstance = getProcessAPI()
+                    .startProcess(callingProcessDefinition.getId());
             final long tStep1Id = waitForUserTask(callingProcessInstance, "tStep1");
-            assertThat(getProcessAPI().getActivityDataInstance("rootProcId", tStep1Id).getValue()).isEqualTo(callingProcessInstance.getId());
+            assertThat(getProcessAPI().getActivityDataInstance("rootProcId", tStep1Id).getValue())
+                    .isEqualTo(callingProcessInstance.getId());
         } finally {
             disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
         }
@@ -984,58 +1126,85 @@ public class CallActivityIT extends TestWithTechnicalUser {
         ProcessDefinition callingProcessDefinition = null;
         try {
             // Build target process
-            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("targetProcess", PROCESS_VERSION);
             targetProcessDefBuilder.addActor(ACTOR_NAME);
-            targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
+            targetProcessDefBuilder.addData("subProcessData", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("subDefault"));
             targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
-                    new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
-            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+                    new OperationBuilder().createSetDataOperation("subProcessData",
+                            new ExpressionBuilder().createConstantStringExpression("subModified")));
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME,
+                    cebolinha);
             // Build and start calling process
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
             processDefBuilder.addActor(ACTOR_NAME);
-            processDefBuilder.addData("parentProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("parentDefault"));
-            processDefBuilder.addData("valueOnCallOnEnter", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("none"));
-            processDefBuilder.addData("valueOnCallOnFinish", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("none"));
-            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+            processDefBuilder.addData("parentProcessData", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("parentDefault"));
+            processDefBuilder.addData("valueOnCallOnEnter", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("none"));
+            processDefBuilder.addData("valueOnCallOnFinish", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("none"));
+            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity",
+                    targetProcessNameExpr, targetProcessVersionExpr);
             callActivityBuilder
-                    .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_ENTER)
-                    .addInput("input1", new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
-                    .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnEnter").done(), OperatorType.ASSIGNMENT, "=", "",
-                            new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
+                    .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput",
+                            PROCESS_VERSION, ConnectorEvent.ON_ENTER)
+                    .addInput("input1",
+                            new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
+                    .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnEnter").done(),
+                            OperatorType.ASSIGNMENT, "=", "",
+                            new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME,
+                                    String.class.getName()));
             callActivityBuilder
-                    .addConnector("onFinishConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_FINISH)
-                    .addInput("input1", new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
-                    .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnFinish").done(), OperatorType.ASSIGNMENT, "=", "",
-                            new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-            callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
-                    new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
+                    .addConnector("onFinishConnector", "org.bonitasoft.connector.testConnectorWithOutput",
+                            PROCESS_VERSION, ConnectorEvent.ON_FINISH)
+                    .addInput("input1",
+                            new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
+                    .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnFinish").done(),
+                            OperatorType.ASSIGNMENT, "=", "",
+                            new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME,
+                                    String.class.getName()));
+            callActivityBuilder
+                    .addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
+                            new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
             processDefBuilder.addUserTask("end", ACTOR_NAME);
             processDefBuilder.addTransition("callActivity", "end");
             final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
             bizArchive.createNewBusinessArchive();
             bizArchive.setProcessDefinition(processDefBuilder.done());
-            bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(CommonAPIIT.class
-                    .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
-            bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
+            bizArchive.addConnectorImplementation(
+                    new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(CommonAPIIT.class
+                            .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
+            bizArchive.addClasspathResource(
+                    new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            final ProcessInstance callingProcessInstance = getProcessAPI()
+                    .startProcess(callingProcessDefinition.getId());
             final long endId = waitForUserTask(callingProcessInstance, "end");
-            assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", endId).getValue()).isEqualTo("parentDefault");
-            assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", endId).getValue()).isEqualTo("subModified");
+            assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", endId).getValue())
+                    .isEqualTo("parentDefault");
+            assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", endId).getValue())
+                    .isEqualTo("subModified");
         } finally {
             disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
         }
     }
 
     @Test
-    public void transfert_a_custom_data_and_contract_input_from_a_parent_process_to_a_child_and_vice_versa() throws Exception {
+    public void transfert_a_custom_data_and_contract_input_from_a_parent_process_to_a_child_and_vice_versa()
+            throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("child", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addContract().addInput("isOk", Type.BOOLEAN, "isOk is the process contract input");
-        builder.addBooleanData("dataOk", new ExpressionBuilder().createContractInputExpression("isOk", Boolean.class.getName()));
+        builder.addBooleanData("dataOk",
+                new ExpressionBuilder().createContractInputExpression("isOk", Boolean.class.getName()));
         builder.addData("data1", "org.bonitasoft.complextypes.MyType", null);
         builder.addUserTask("childTask", ACTOR_NAME).addOperation(
                 new OperationBuilder().createJavaMethodOperation("data1", "setName", String.class.getName(),
@@ -1044,21 +1213,29 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         builder.createNewInstance("parent", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addData("data1", "org.bonitasoft.complextypes.MyType", expressionBuilder.createGroovyScriptExpression("initMyType",
-                "import org.bonitasoft.complextypes.MyType; new MyType()", "org.bonitasoft.complextypes.MyType"));
+        builder.addData("data1", "org.bonitasoft.complextypes.MyType",
+                expressionBuilder.createGroovyScriptExpression("initMyType",
+                        "import org.bonitasoft.complextypes.MyType; new MyType()",
+                        "org.bonitasoft.complextypes.MyType"));
         builder.addShortTextData("name", null);
-        final CallActivityBuilder callActivityBuilder = builder.addCallActivity("caTask", expressionBuilder.createConstantStringExpression("child"),
+        final CallActivityBuilder callActivityBuilder = builder.addCallActivity("caTask",
+                expressionBuilder.createConstantStringExpression("child"),
                 expressionBuilder.createConstantStringExpression("1.0"));
-        callActivityBuilder.addDataInputOperation(BuildTestUtil.buildAssignOperation("data1", "data1", ExpressionType.TYPE_VARIABLE,
-                "org.bonitasoft.complextypes.MyType"));
+        callActivityBuilder.addDataInputOperation(
+                BuildTestUtil.buildAssignOperation("data1", "data1", ExpressionType.TYPE_VARIABLE,
+                        "org.bonitasoft.complextypes.MyType"));
 
-        callActivityBuilder.addProcessStartContractInput("isOk", new ExpressionBuilder().createConstantBooleanExpression(true));
+        callActivityBuilder.addProcessStartContractInput("isOk",
+                new ExpressionBuilder().createConstantBooleanExpression(true));
 
-        callActivityBuilder.addDataOutputOperation(BuildTestUtil.buildAssignOperation("data1", "data1", ExpressionType.TYPE_VARIABLE,
-                "org.bonitasoft.complextypes.MyType"));
-        final Expression initIndex = expressionBuilder.createGroovyScriptExpression("initIndex", "data1.getName()", String.class.getName(),
+        callActivityBuilder.addDataOutputOperation(
+                BuildTestUtil.buildAssignOperation("data1", "data1", ExpressionType.TYPE_VARIABLE,
+                        "org.bonitasoft.complextypes.MyType"));
+        final Expression initIndex = expressionBuilder.createGroovyScriptExpression("initIndex", "data1.getName()",
+                String.class.getName(),
                 expressionBuilder.createDataExpression("data1", "org.bonitasoft.complextypes.MyType"));
-        builder.addAutomaticTask("setData").addOperation(new OperationBuilder().createSetDataOperation("name", initIndex));
+        builder.addAutomaticTask("setData")
+                .addOperation(new OperationBuilder().createSetDataOperation("name", initIndex));
         builder.addUserTask("parentTask", ACTOR_NAME);
         builder.addTransition("caTask", "setData");
         builder.addTransition("setData", "parentTask");
@@ -1110,31 +1287,43 @@ public class CallActivityIT extends TestWithTechnicalUser {
         try {
 
             // Build target process
-            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("targetProcess", PROCESS_VERSION);
             targetProcessDefBuilder.addActor(ACTOR_NAME);
-            targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
+            targetProcessDefBuilder.addData("subProcessData", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("subDefault"));
             targetProcessDefBuilder
                     .addData(
                             "dataActivity",
                             java.lang.Object.class.getName(),
-                            new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()",
+                            new ExpressionBuilder().createGroovyScriptExpression("myScript",
+                                    "new org.bonitasoft.dfgdfg.Restaurant()",
                                     java.lang.Object.class.getName()));
             targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
-                    new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
+                    new OperationBuilder().createSetDataOperation("subProcessData",
+                            new ExpressionBuilder().createConstantStringExpression("subModified")));
             BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
             businessArchiveBuilder.setProcessDefinition(targetProcessDefBuilder.done());
             //add a jar that is not known from the parent process
-            businessArchiveBuilder.addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
-            targetProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, cebolinha);
+            businessArchiveBuilder
+                    .addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
+            targetProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
+                    cebolinha);
             // Build and start calling process
-            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            final Expression targetProcessNameExpr = new ExpressionBuilder()
+                    .createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder()
+                    .createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("callingProcess", PROCESS_VERSION);
             processDefBuilder.addActor(ACTOR_NAME);
-            processDefBuilder.addData("parentProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("parentDefault"));
-            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
-            callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
-                    new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
+            processDefBuilder.addData("parentProcessData", String.class.getName(),
+                    new ExpressionBuilder().createConstantStringExpression("parentDefault"));
+            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity",
+                    targetProcessNameExpr, targetProcessVersionExpr);
+            callActivityBuilder
+                    .addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
+                            new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
             processDefBuilder.addUserTask("end", ACTOR_NAME);
             processDefBuilder.addTransition("callActivity", "end");
             final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
@@ -1142,7 +1331,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
             bizArchive.setProcessDefinition(processDefBuilder.done());
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
 
-            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            final ProcessInstance callingProcessInstance = getProcessAPI()
+                    .startProcess(callingProcessDefinition.getId());
             waitForUserTask(callingProcessInstance, "end");
         } finally {
             disableAndDeleteProcess(callingProcessDefinition);
@@ -1154,17 +1344,20 @@ public class CallActivityIT extends TestWithTechnicalUser {
     public void should_abort_call_activity_when_sub_process_is_triggered() throws Exception {
 
         ProcessDefinition mainProcess = getProcessAPI()
-                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processWithCallActivityAndTimerESB", "1.0")
-                        .addStartEvent("start")
-                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("calledProcess"),
-                                new ExpressionBuilder().createConstantStringExpression("1.0"))
-                        .addTransition("start", "call")
-                        .getProcess());
-        ProcessDefinition calledProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
-                //not the normal flow: no elements started
-                .addStartEvent("signalStart").addSignalEventTrigger("calledProcSignal")
-                .addAutomaticTask("auto2")
-                .addTransition("signalStart", "auto2").getProcess());
+                .deployAndEnableProcess(
+                        new ProcessDefinitionBuilder().createNewInstance("processWithCallActivityAndTimerESB", "1.0")
+                                .addStartEvent("start")
+                                .addCallActivity("call",
+                                        new ExpressionBuilder().createConstantStringExpression("calledProcess"),
+                                        new ExpressionBuilder().createConstantStringExpression("1.0"))
+                                .addTransition("start", "call")
+                                .getProcess());
+        ProcessDefinition calledProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
+                        //not the normal flow: no elements started
+                        .addStartEvent("signalStart").addSignalEventTrigger("calledProcSignal")
+                        .addAutomaticTask("auto2")
+                        .addTransition("signalStart", "auto2").getProcess());
 
         ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
 
@@ -1177,12 +1370,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
     public void should_be_able_to_cancel_process_with_call_activity_calling_unknown_process() throws Exception {
         //given
         ProcessDefinition processDefinition = getProcessAPI()
-                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processThatCallUnknownProcess", "1.0")
-                        .addStartEvent("start")
-                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
-                                new ExpressionBuilder().createConstantStringExpression("1.0"))
-                        .addTransition("start", "call")
-                        .getProcess());
+                .deployAndEnableProcess(
+                        new ProcessDefinitionBuilder().createNewInstance("processThatCallUnknownProcess", "1.0")
+                                .addStartEvent("start")
+                                .addCallActivity("call",
+                                        new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
+                                        new ExpressionBuilder().createConstantStringExpression("1.0"))
+                                .addTransition("start", "call")
+                                .getProcess());
         //when
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         ActivityInstance activityInstance = waitForTaskToFail(processInstance);
@@ -1197,8 +1392,10 @@ public class CallActivityIT extends TestWithTechnicalUser {
         } catch (ProcessInstanceNotFoundException ignored) {
         }
         //verify the call activity was archived in cancelled state:
-        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
-                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI()
+                .searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call")
+                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
         assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
         assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
         disableAndDeleteProcess(processDefinition);

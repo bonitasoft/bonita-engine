@@ -23,7 +23,6 @@ class TestEvent extends SEvent {
         super(type);
     }
 
-
     void flag() {
         this.flagged = true;
     }

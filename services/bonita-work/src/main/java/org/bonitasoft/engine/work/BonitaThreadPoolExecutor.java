@@ -25,15 +25,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.bonitasoft.engine.commons.time.EngineClock;
-import org.bonitasoft.engine.log.technical.TechnicalLogger;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import org.bonitasoft.engine.commons.time.EngineClock;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
 
 /**
  * @author Julien Reboul
@@ -59,14 +58,14 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final Gauge numberOfWorksRunning;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
-                                    final int maximumPoolSize,
-                                    final long keepAliveTime,
-                                    final TimeUnit unit,
-                                    final BlockingQueue<Runnable> workQueue,
-                                    final ThreadFactory threadFactory,
-                                    final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-                                    EngineClock engineClock, WorkExecutionCallback workExecutionCallback,
-                                    WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry, long tenantId) {
+            final int maximumPoolSize,
+            final long keepAliveTime,
+            final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue,
+            final ThreadFactory threadFactory,
+            final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
+            EngineClock engineClock, WorkExecutionCallback workExecutionCallback,
+            WorkExecutionAuditor workExecutionAuditor, MeterRegistry meterRegistry, long tenantId) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;

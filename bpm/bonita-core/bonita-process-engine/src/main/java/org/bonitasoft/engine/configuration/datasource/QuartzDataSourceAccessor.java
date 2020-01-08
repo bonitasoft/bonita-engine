@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.configuration.datasource;
 
-
 import javax.sql.DataSource;
 
 /**

@@ -17,8 +17,9 @@ import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
  * Thrown when a process fails to deploy. <br>
- * It also gives access to the ID of the process Definition that tried to be deployed, through method {@link #getProcessDefinitionId()}.
- * 
+ * It also gives access to the ID of the process Definition that tried to be deployed, through method
+ * {@link #getProcessDefinitionId()}.
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
@@ -45,9 +46,10 @@ public class ProcessDeployException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessDeployException(final Throwable cause) {
@@ -56,7 +58,7 @@ public class ProcessDeployException extends ExecutionException {
 
     /**
      * Get the identifier of the process definition who failed.
-     * 
+     *
      * @return The identifier of the process definition who failed.
      */
     public Long getProcessDefinitionId() {

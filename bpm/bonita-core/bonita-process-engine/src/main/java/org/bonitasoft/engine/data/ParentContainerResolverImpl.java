@@ -41,7 +41,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     private final ProcessInstanceService processInstanceService;
     private boolean allowUnknownContainer;
 
-    public ParentContainerResolverImpl(final FlowNodeInstanceService flowNodeInstanceService, final ProcessInstanceService processInstanceService) {
+    public ParentContainerResolverImpl(final FlowNodeInstanceService flowNodeInstanceService,
+            final ProcessInstanceService processInstanceService) {
         super();
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
@@ -56,12 +57,14 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     }
 
     @Override
-    public List<DataContainer> getContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException {
+    public List<DataContainer> getContainerHierarchy(final DataContainer currentContainer)
+            throws SObjectNotFoundException, SObjectReadException {
         return getContainerHierarchy(currentContainer, false);
     }
 
     @Override
-    public List<DataContainer> getArchivedContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException {
+    public List<DataContainer> getArchivedContainerHierarchy(final DataContainer currentContainer)
+            throws SObjectNotFoundException, SObjectReadException {
         try {
             return getContainerHierarchy(currentContainer, true);
         } catch (SObjectNotFoundException e) {
@@ -69,7 +72,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private List<DataContainer> getContainerHierarchy(DataContainer currentContainer, boolean isArchived) throws SObjectNotFoundException, SObjectReadException {
+    private List<DataContainer> getContainerHierarchy(DataContainer currentContainer, boolean isArchived)
+            throws SObjectNotFoundException, SObjectReadException {
         DataContainer container = new DataContainer(currentContainer.getId(), currentContainer.getType());
         final List<DataContainer> containerHierarchy = new ArrayList<>();
         containerHierarchy.add(container);
@@ -85,9 +89,13 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private DataContainer getNextContainer(boolean isArchived, DataContainer container, List<DataContainer> containerHierarchy) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SObjectNotFoundException {
+    private DataContainer getNextContainer(boolean isArchived, DataContainer container,
+            List<DataContainer> containerHierarchy)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException,
+            SProcessInstanceNotFoundException, SProcessInstanceReadException, SObjectNotFoundException {
         if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(container.getType())) {
-            container = handleActivityContainer(containerHierarchy, getsFlowNodeInstance(container.getId(), isArchived));
+            container = handleActivityContainer(containerHierarchy,
+                    getsFlowNodeInstance(container.getId(), isArchived));
         } else if (DataInstanceContainer.MESSAGE_INSTANCE.name().equals(container.getType())) {
             container = null;
         } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getType())) {
@@ -102,7 +110,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         return container;
     }
 
-    private DataContainer handleActivityContainer(List<DataContainer> containerHierarchy, ActivityContainer flowNodeInstance) {
+    private DataContainer handleActivityContainer(List<DataContainer> containerHierarchy,
+            ActivityContainer flowNodeInstance) {
         String containerType;
         if (flowNodeInstance.parentActivityInstanceId > 0) {
             containerType = DataInstanceContainer.ACTIVITY_INSTANCE.name();
@@ -111,20 +120,24 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
         DataContainer container = new DataContainer(flowNodeInstance.parentContainerId, containerType);
         containerHierarchy.add(container);
-        if (flowNodeInstance.parentActivityInstanceId <= 0 && flowNodeInstance.parentContainerId == flowNodeInstance.rootContainerId) {
+        if (flowNodeInstance.parentActivityInstanceId <= 0
+                && flowNodeInstance.parentContainerId == flowNodeInstance.rootContainerId) {
             container = null;
         }
         return container;
     }
 
-    private DataContainer handleProcessContainer(long id, List<DataContainer> containerHierarchy, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeNotFoundException, SBonitaReadException, SFlowNodeReadException {
+    private DataContainer handleProcessContainer(long id, List<DataContainer> containerHierarchy, boolean isArchived)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeNotFoundException,
+            SBonitaReadException, SFlowNodeReadException {
         final long callerId = getCallerId(id, isArchived);
         if (callerId >= 0) {
             ActivityContainer callerFlowNodeInstance = getsFlowNodeInstance(callerId, isArchived);
             final SFlowNodeType callerType = callerFlowNodeInstance.type;
             if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
                 final long callerProcessInstanceId = callerFlowNodeInstance.parentProcessInstanceId;
-                DataContainer container = new DataContainer(callerProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+                DataContainer container = new DataContainer(callerProcessInstanceId,
+                        DataInstanceContainer.PROCESS_INSTANCE.name());
                 containerHierarchy.add(container);
                 return container;
             } else {
@@ -150,7 +163,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         return new ActivityContainer(flowNodeInstance);
     }
 
-    private long getCallerId(long id, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
+    private long getCallerId(long id, boolean isArchived)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
         if (isArchived) {
             return getArchivedCallerId(id);
         } else {
@@ -158,7 +172,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private ActivityContainer getsFlowNodeInstance(long callerId, boolean isArchived) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
+    private ActivityContainer getsFlowNodeInstance(long callerId, boolean isArchived)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
         if (isArchived) {
             return getSaFlowNodeInstance(callerId);
         } else {
@@ -166,12 +181,14 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private long getCallerId(Long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+    private long getCallerId(Long processInstanceId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
         SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         return processInstance.getCallerId();
     }
 
-    private long getArchivedCallerId(Long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
+    private long getArchivedCallerId(Long processInstanceId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
         SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
         if (processInstance == null) {
             throw new SProcessInstanceNotFoundException(processInstanceId);
@@ -180,6 +197,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     }
 
     private class ActivityContainer {
+
         private long parentContainerId;
         private long parentActivityInstanceId;
         private long rootContainerId;

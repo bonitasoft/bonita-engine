@@ -22,5 +22,5 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 public interface SProcessSupervisorLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
     SProcessSupervisorLogBuilder createNewInstance();
-    
+
 }

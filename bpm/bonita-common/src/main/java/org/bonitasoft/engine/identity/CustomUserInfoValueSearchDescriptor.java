@@ -25,21 +25,21 @@ public final class CustomUserInfoValueSearchDescriptor {
 
     /**
      * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getUserId()}
-     * 
+     *
      * @see CustomUserInfoValue#getUserId()
      */
     public static final String USER_ID = "userId";
 
     /**
      * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getDefinitionId()}
-     * 
+     *
      * @see CustomUserInfoValue#getDefinitionId()
      */
     public static final String DEFINITION_ID = "definitionId";
 
     /**
      * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getValue()}
-     * 
+     *
      * @see CustomUserInfoValue#getValue()
      */
     public static final String VALUE = "value";

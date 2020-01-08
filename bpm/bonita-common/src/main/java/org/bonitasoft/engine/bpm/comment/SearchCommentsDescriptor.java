@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.comment;
 
 /**
  * The fields on which a search can be made for the comments.
- * 
+ *
  * @author Hongwen Zang
  * @author Emmanuel Duchastenier
  * @author Celine Souchet

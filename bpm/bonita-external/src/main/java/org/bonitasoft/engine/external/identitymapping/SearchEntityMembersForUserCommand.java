@@ -23,9 +23,10 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Parameter keys: USER_ID_KEY: the ID of the user to search for, DISCRIMINATOR_ID_KEY : the discriminator to isolate the different functional notions,
+ * Parameter keys: USER_ID_KEY: the ID of the user to search for, DISCRIMINATOR_ID_KEY : the discriminator to isolate
+ * the different functional notions,
  * SEARCH_OPTIONS_KEY: the Search options to filter & sort the results.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -39,8 +40,9 @@ public class SearchEntityMembersForUserCommand extends EntityMemberCommand {
         final String kind = getStringMandadoryParameter(parameters, DISCRIMINATOR_ID_KEY);
         final Long userId = getUserIdParameter(parameters);
         final String externalId = getStringMandadoryParameter(parameters, EXTERNAL_ID_KEY);
-        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY, "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
-                + " with a SearchOptions value");
+        final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY,
+                "Parameters map must contain an entry " + SEARCH_OPTIONS_KEY
+                        + " with a SearchOptions value");
         try {
             return searchEntityMembersInvolvingUser(kind, userId, externalId, searchOptions);
         } catch (SCommandExecutionException e) {

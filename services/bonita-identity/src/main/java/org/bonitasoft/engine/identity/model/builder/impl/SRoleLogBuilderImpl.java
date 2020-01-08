@@ -34,7 +34,8 @@ public class SRoleLogBuilderImpl extends CRUDELogBuilder implements SRoleLogBuil
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SRoleLogBuilderFactoryImpl.ROLE_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SRoleLogBuilderFactoryImpl.ROLE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Identity Role Id");
         }
     }

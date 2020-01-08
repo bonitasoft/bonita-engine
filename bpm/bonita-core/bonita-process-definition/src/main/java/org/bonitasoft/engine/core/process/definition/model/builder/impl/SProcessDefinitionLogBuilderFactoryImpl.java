@@ -20,13 +20,14 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
 /**
  * @author Baptiste Mesta
  */
-public class SProcessDefinitionLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SProcessDefinitionLogBuilderFactory {
+public class SProcessDefinitionLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SProcessDefinitionLogBuilderFactory {
 
     @Override
     public SProcessDefinitionLogBuilder createNewInstance() {
         return new SProcessDefinitionLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return ProcessDefinitionLogIndexesMapper.PROCESS_DEFINITION_NAME;

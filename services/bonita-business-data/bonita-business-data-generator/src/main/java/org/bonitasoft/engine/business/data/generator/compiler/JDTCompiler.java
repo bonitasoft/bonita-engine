@@ -28,7 +28,7 @@ import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
  * Compiler based on JDTCompiler
- * 
+ *
  * @author Colin PUY
  * @author Matthieu Chaffotte
  */
@@ -42,7 +42,7 @@ public class JDTCompiler {
     /**
      * Compile files in output directory using provided classpath
      * Put null for classpath argument to take current classpath
-     * 
+     *
      * @throws CompilationException
      *         if compilation errors occurs
      */
@@ -97,9 +97,11 @@ public class JDTCompiler {
         }
     }
 
-    private void doCompilation(final String[] commandLine, final PrintWriter outWriter, final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
+    private void doCompilation(final String[] commandLine, final PrintWriter outWriter,
+            final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
             throws CompilationException {
-        final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */, new DummyCompilationProgress()) {
+        final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */,
+                new DummyCompilationProgress()) {
 
             @Override
             public FileSystem getLibraryAccess() {

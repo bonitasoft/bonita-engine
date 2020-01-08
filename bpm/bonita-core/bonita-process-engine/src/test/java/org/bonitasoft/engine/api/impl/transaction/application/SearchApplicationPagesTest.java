@@ -50,7 +50,8 @@ public class SearchApplicationPagesTest {
     private SearchApplicationPages search;
 
     @Test
-    public void executeCount_should_return_the_result_of_applicationService_getNumberOfApplicationPages() throws Exception {
+    public void executeCount_should_return_the_result_of_applicationService_getNumberOfApplicationPages()
+            throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         given(applicationService.getNumberOfApplicationPages(options)).willReturn(8L);
@@ -63,7 +64,8 @@ public class SearchApplicationPagesTest {
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void executeCount_should_throw_SBonitaSeachException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void executeCount_should_throw_SBonitaSeachException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         given(applicationService.getNumberOfApplicationPages(options)).willThrow(new SBonitaReadException(""));

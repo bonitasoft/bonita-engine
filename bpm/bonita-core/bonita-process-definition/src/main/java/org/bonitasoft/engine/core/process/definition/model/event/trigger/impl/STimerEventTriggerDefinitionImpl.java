@@ -24,7 +24,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class STimerEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl implements STimerEventTriggerDefinition {
+public class STimerEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl
+        implements STimerEventTriggerDefinition {
 
     private static final long serialVersionUID = 1240658984583267877L;
 

@@ -63,18 +63,20 @@ public class FolderComparator {
         final String expectedFileExtension = getExtension(expectedFile.getName());
         final String expectedFileAbsolutePath = expectedFile.getAbsolutePath();
         Assertions.assertThat(new ExtensionFileComparator().compare(expectedFile, givenFile))
-                .as(expectedFileAbsolutePath + " and " + givenFileAbsolutePath + " should have same extension").isEqualTo(ARE_EQUALS);
+                .as(expectedFileAbsolutePath + " and " + givenFileAbsolutePath + " should have same extension")
+                .isEqualTo(ARE_EQUALS);
 
         switch (expectedFileExtension) {
             case PROPERTIES:
                 Assertions.assertThat(getProperties(expectedFile))
-                        .as(expectedFileAbsolutePath + " and " + givenFileAbsolutePath + " should contain same properties")
+                        .as(expectedFileAbsolutePath + " and " + givenFileAbsolutePath
+                                + " should contain same properties")
                         .isEqualTo(getProperties(givenFile));
                 break;
             case XML:
                 final List allDifferences = new DetailedDiff(
                         XMLUnit.compareXML(new FileReader(givenFile), new FileReader(expectedFile)))
-                        .getAllDifferences();
+                                .getAllDifferences();
                 Assertions.assertThat(allDifferences).as("should xml file be equals").isEmpty();
                 break;
             default:

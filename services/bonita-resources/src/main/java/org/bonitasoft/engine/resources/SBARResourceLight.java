@@ -23,6 +23,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class SBARResourceLight implements PersistentObject {
+
     protected String name;
     protected BARResourceType type;
     protected long processDefinitionId;

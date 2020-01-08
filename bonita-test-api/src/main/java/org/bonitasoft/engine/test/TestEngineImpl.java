@@ -13,11 +13,10 @@
  **/
 package org.bonitasoft.engine.test;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Baptiste Mesta

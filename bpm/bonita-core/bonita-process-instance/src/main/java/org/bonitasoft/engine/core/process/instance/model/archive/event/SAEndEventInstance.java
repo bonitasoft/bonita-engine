@@ -24,6 +24,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAEndEventInstance extends SAThrowEventInstance {
+
     public SAEndEventInstance(final SEndEventInstance endEvent) {
         super(endEvent);
     }

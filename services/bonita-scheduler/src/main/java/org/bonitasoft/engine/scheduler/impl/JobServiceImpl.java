@@ -71,7 +71,8 @@ public class JobServiceImpl implements JobService {
 
     private final TechnicalLoggerService logger;
 
-    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService,
+    public JobServiceImpl(final EventService eventService, final Recorder recorder,
+            final ReadPersistenceService readPersistenceService,
             final TechnicalLoggerService logger) {
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
@@ -80,7 +81,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final long tenantId) throws SJobDescriptorCreationException {
+    public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final long tenantId)
+            throws SJobDescriptorCreationException {
         if (sJobDescriptor == null) {
             throw new IllegalArgumentException("The job descriptor is null");
         } else if (sJobDescriptor.getJobName() == null) {
@@ -88,7 +90,8 @@ public class JobServiceImpl implements JobService {
         }
 
         // Set the tenant manually on the object because it will be serialized
-        final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(), sJobDescriptor.getJobName(),
+        final SJobDescriptor sJobDescriptorToRecord = new SJobDescriptor(sJobDescriptor.getJobClassName(),
+                sJobDescriptor.getJobName(),
                 sJobDescriptor.getDescription(), sJobDescriptor.disallowConcurrentExecution());
         sJobDescriptorToRecord.setTenantId(tenantId);
 
@@ -131,8 +134,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public SJobDescriptor getJobDescriptor(final long id) throws SJobDescriptorReadException {
         try {
-            final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobDescriptor.class,
-                    "SJobDescriptor", id));
+            final SJobDescriptor sJobDescriptor = readPersistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SJobDescriptor.class,
+                            "SJobDescriptor", id));
             return sJobDescriptor;
         } catch (final SBonitaReadException sbre) {
             throw new SJobDescriptorReadException(sbre);
@@ -150,7 +154,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SJobParameter> createJobParameters(final List<SJobParameter> sJobParameters, final long tenantId, final long jobDescriptorId)
+    public List<SJobParameter> createJobParameters(final List<SJobParameter> sJobParameters, final long tenantId,
+            final long jobDescriptorId)
             throws SJobParameterCreationException {
         final List<SJobParameter> createdSJobParameters = new ArrayList<SJobParameter>();
         if (sJobParameters != null) {
@@ -162,7 +167,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SJobParameter> setJobParameters(final long tenantId, final long jobDescriptorId, final List<SJobParameter> parameters)
+    public List<SJobParameter> setJobParameters(final long tenantId, final long jobDescriptorId,
+            final List<SJobParameter> parameters)
             throws SJobParameterCreationException {
         deleteAllJobParameters(jobDescriptorId);
         return createJobParameters(parameters, tenantId, jobDescriptorId);
@@ -179,7 +185,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobParameter createJobParameter(final SJobParameter sJobParameter, final long tenantId, final long jobDescriptorId)
+    public SJobParameter createJobParameter(final SJobParameter sJobParameter, final long tenantId,
+            final long jobDescriptorId)
             throws SJobParameterCreationException {
         if (sJobParameter == null) {
             throw new IllegalArgumentException("The job descriptor is null");
@@ -200,7 +207,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void deleteJobParameter(final long id) throws SJobParameterNotFoundException, SJobParameterReadException, SJobParameterDeletionException {
+    public void deleteJobParameter(final long id)
+            throws SJobParameterNotFoundException, SJobParameterReadException, SJobParameterDeletionException {
         final SJobParameter sJobParameter = getJobParameter(id);
         deleteJobParameter(sJobParameter);
     }
@@ -215,10 +223,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobParameter getJobParameter(final long id) throws SJobParameterNotFoundException, SJobParameterReadException {
+    public SJobParameter getJobParameter(final long id)
+            throws SJobParameterNotFoundException, SJobParameterReadException {
         try {
-            final SJobParameter sJobParameter = readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobParameter.class, "SJobParameter",
-                    id));
+            final SJobParameter sJobParameter = readPersistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SJobParameter.class, "SJobParameter",
+                            id));
             if (sJobParameter == null) {
                 throw new SJobParameterNotFoundException(id);
             }
@@ -228,11 +238,11 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-
     @Override
     public List<SJobParameter> getJobParameters(Long jobDescriptorId) throws SBonitaReadException {
-        Map<String, Object> parameters = Collections.<String, Object>singletonMap("jobDescriptorId", jobDescriptorId);
-        return readPersistenceService.selectList(new SelectListDescriptor<SJobParameter>("getJobParameters", parameters, SJobParameter.class, QueryOptions.countQueryOptions()));
+        Map<String, Object> parameters = Collections.<String, Object> singletonMap("jobDescriptorId", jobDescriptorId);
+        return readPersistenceService.selectList(new SelectListDescriptor<SJobParameter>("getJobParameters", parameters,
+                SJobParameter.class, QueryOptions.countQueryOptions()));
     }
 
     @Override
@@ -278,10 +288,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SJobLog> getJobLogs(final long jobDescriptorId, final int fromIndex, final int maxResults) throws SBonitaReadException {
+    public List<SJobLog> getJobLogs(final long jobDescriptorId, final int fromIndex, final int maxResults)
+            throws SBonitaReadException {
         final FilterOption filter = new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId);
         final OrderByOption orderByOption = new OrderByOption(SJobLog.class, "jobDescriptorId", OrderByType.ASC);
-        final QueryOptions options = new QueryOptions(fromIndex, maxResults, Arrays.asList(orderByOption), Arrays.asList(filter), null);
+        final QueryOptions options = new QueryOptions(fromIndex, maxResults, Arrays.asList(orderByOption),
+                Arrays.asList(filter), null);
         return searchJobLogs(options);
     }
 
@@ -304,7 +316,6 @@ public class JobServiceImpl implements JobService {
         recorder.recordDelete(new DeleteRecord(persistentObject), eventType);
     }
 
-
     private void create(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
         recorder.recordInsert(new InsertRecord(persistentObject), eventType);
     }
@@ -323,7 +334,8 @@ public class JobServiceImpl implements JobService {
     public void deleteJobDescriptorByJobName(final String jobName) throws SJobDescriptorDeletionException {
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
-        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SJobDescriptor.class, "id", OrderByType.ASC));
+        final List<OrderByOption> orders = Arrays
+                .asList(new OrderByOption(SJobDescriptor.class, "id", OrderByType.ASC));
         final QueryOptions queryOptions = new QueryOptions(0, 1, orders, filters, null);
         try {
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
@@ -331,7 +343,8 @@ public class JobServiceImpl implements JobService {
                 deleteJobDescriptor(jobDescriptors.get(0));
             }
         } catch (final SBonitaReadException e) {
-            throw new SJobDescriptorDeletionException("Job " + jobName + " not found, can't delete corresponding job descriptor");
+            throw new SJobDescriptorDeletionException(
+                    "Job " + jobName + " not found, can't delete corresponding job descriptor");
         }
     }
 
@@ -350,7 +363,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void updateJobLog(final SJobLog jobLog, final EntityUpdateDescriptor descriptor) throws SJobLogUpdatingException {
+    public void updateJobLog(final SJobLog jobLog, final EntityUpdateDescriptor descriptor)
+            throws SJobLogUpdatingException {
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(jobLog, descriptor), JOB_LOG);
         } catch (final SRecorderException e) {
@@ -359,7 +373,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void logJobError(final Throwable jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+    public void logJobError(final Throwable jobException, final Long jobDescriptorId)
+            throws SBonitaReadException, SJobLogUpdatingException,
             SJobLogCreationException, SJobDescriptorReadException {
         final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId, 0, 1);
         if (!jobLogs.isEmpty()) {
@@ -376,8 +391,8 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-
-    public void createJobLog(final Throwable jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
+    public void createJobLog(final Throwable jobException, final Long jobDescriptorId)
+            throws SJobLogCreationException, SJobDescriptorReadException {
         SJobDescriptor jobDescriptor = getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null) {
             final SJobLog jobLog = new SJobLog(jobDescriptorId);
@@ -387,7 +402,8 @@ public class JobServiceImpl implements JobService {
             createJobLog(jobLog);
         } else {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Impossible to mark the job with id '" + jobDescriptorId
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Impossible to mark the job with id '"
+                        + jobDescriptorId
                         + "' as failed because no job was found for this identifier. It was probably removed just after its failure and before this action.");
             }
         }

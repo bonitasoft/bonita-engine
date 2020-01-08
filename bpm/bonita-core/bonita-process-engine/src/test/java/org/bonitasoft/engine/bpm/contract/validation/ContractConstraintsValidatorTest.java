@@ -60,7 +60,8 @@ public class ContractConstraintsValidatorTest {
     private ContractConstraintsValidator validator;
 
     @Before
-    public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException,
+    public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException,
+            SExpressionEvaluationException,
             SInvalidExpressionException {
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMap(), anyMap(),
@@ -70,7 +71,8 @@ public class ContractConstraintsValidatorTest {
         validator = new ContractConstraintsValidator(loggerService, expressionService);
     }
 
-    private void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+    private void returnTrueForExpressionWithContent(String content)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMap(),
                 anyMap(), any(ContainerState.class));
@@ -84,13 +86,16 @@ public class ContractConstraintsValidatorTest {
     public void should_log_all_rules_in_debug_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
-        validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
+        validator.validate(PROCESS_DEFINITION_ID, contract,
+                contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
 
         //then
-        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating constraint [Mandatory] on input(s) [isValid]");
+        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
+                "Evaluating constraint [Mandatory] on input(s) [isValid]");
         verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
                 "Evaluating constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
-        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING), anyString());
+        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING),
+                anyString());
     }
 
     @Test
@@ -98,17 +103,20 @@ public class ContractConstraintsValidatorTest {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
         //given
-        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(false);
+        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG))
+                .thenReturn(false);
 
         //
-        validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
+        validator.validate(PROCESS_DEFINITION_ID, contract,
+                contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
 
         //then
         verify(loggerService, never()).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
                 "Evaluating constraint [Mandatory] on input(s) [isValid]");
         verify(loggerService, never()).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
                 "Evaluating constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
-        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING), anyString());
+        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING),
+                anyString());
     }
 
     @Test
@@ -116,10 +124,13 @@ public class ContractConstraintsValidatorTest {
         //given
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(BOOLEAN).withName(IS_VALID).build())
-                .withConstraint(aRuleFor(IS_VALID).name("false constraint").expression("false").explanation("should re implement").build()).build();
+                .withConstraint(aRuleFor(IS_VALID).name("false constraint").expression("false")
+                        .explanation("should re implement").build())
+                .build();
 
         try {
-            validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, null)));
+            validator.validate(PROCESS_DEFINITION_ID, contract,
+                    contractInputMap(entry(IS_VALID, false), entry(COMMENT, null)));
             fail("validation should fail");
         } catch (final SContractViolationException e) {
             verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
@@ -128,7 +139,8 @@ public class ContractConstraintsValidatorTest {
     }
 
     @Test
-    public void validate_should_throw_ContractViolation_with_explanations_when_rule_fails_to_evaluate() throws Exception {
+    public void validate_should_throw_ContractViolation_with_explanations_when_rule_fails_to_evaluate()
+            throws Exception {
         //given
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
         final SConstraintDefinitionImpl badRule = new SConstraintDefinitionImpl("bad rule", "a == b", "failing rule");
@@ -136,7 +148,8 @@ public class ContractConstraintsValidatorTest {
 
         //when
         try {
-            validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
+            validator.validate(PROCESS_DEFINITION_ID, contract,
+                    contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
             fail("validation should fail");
         } catch (final SContractViolationException e) {
             assertThat(e.getExplanations()).hasSize(1).containsExactly(badRule.getExplanation());
@@ -153,7 +166,8 @@ public class ContractConstraintsValidatorTest {
 
         //when
         try {
-            validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
+            validator.validate(PROCESS_DEFINITION_ID, contract,
+                    contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
             fail("validation should fail");
         } catch (final SContractViolationException e) {
             assertThat(e.getMessage()).contains("Exception while");
@@ -165,8 +179,10 @@ public class ContractConstraintsValidatorTest {
         return aContract()
                 .withInput(aSimpleInput(BOOLEAN).withName(IS_VALID).build())
                 .withInput(aSimpleInput(BOOLEAN).withName(IS_VALID).build())
-                .withConstraint(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null").explanation("isValid must be set").build())
-                .withConstraint(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid").expression("isValid || !isValid && comment != null")
+                .withConstraint(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null")
+                        .explanation("isValid must be set").build())
+                .withConstraint(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid")
+                        .expression("isValid || !isValid && comment != null")
                         .explanation("A comment is required when no validation").build())
                 .build();
     }

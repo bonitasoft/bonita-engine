@@ -26,9 +26,8 @@ import org.bonitasoft.engine.work.BonitaWork;
 /**
  * This work manages the transaction in its handleFailure method.
  * Don't use this work with {@link org.bonitasoft.engine.execution.work.TxBonitaWork}
- * 
+ *
  * @author Celine Souchet
- * 
  */
 public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
 
@@ -60,5 +59,6 @@ public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
         getWrappedWork().handleFailure(e, context);
     }
 
-    protected abstract void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException;
+    protected abstract void setExceptionContext(final SBonitaException sBonitaException,
+            final Map<String, Object> context) throws SBonitaException;
 }

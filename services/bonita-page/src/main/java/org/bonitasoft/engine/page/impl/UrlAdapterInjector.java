@@ -34,7 +34,7 @@ public class UrlAdapterInjector {
     }
 
     public void injectUrlAdapters() {
-        if(urlAdapters != null){
+        if (urlAdapters != null) {
             pageMappingService.setURLAdapters(urlAdapters);
         }
     }

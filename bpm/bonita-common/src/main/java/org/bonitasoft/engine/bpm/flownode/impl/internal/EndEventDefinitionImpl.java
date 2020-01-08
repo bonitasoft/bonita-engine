@@ -61,7 +61,8 @@ public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements 
         return terminateEventTriggerDefinition;
     }
 
-    public void setTerminateEventTriggerDefinition(final TerminateEventTriggerDefinition terminateEventTriggerDefinition) {
+    public void setTerminateEventTriggerDefinition(
+            final TerminateEventTriggerDefinition terminateEventTriggerDefinition) {
         this.terminateEventTriggerDefinition = terminateEventTriggerDefinition;
     }
 
@@ -85,9 +86,12 @@ public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements 
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         EndEventDefinitionImpl that = (EndEventDefinitionImpl) o;
         return Objects.equals(errorEventTriggerDefinitions, that.errorEventTriggerDefinitions) &&
                 Objects.equals(terminateEventTriggerDefinition, that.terminateEventTriggerDefinition);

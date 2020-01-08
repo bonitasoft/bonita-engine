@@ -24,9 +24,10 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
- * Evaluate a list of SExpression, represented by the {@link SExpression#getDependencies()} method. The result is a {@link java.util.List} of Serializable
+ * Evaluate a list of SExpression, represented by the {@link SExpression#getDependencies()} method. The result is a
+ * {@link java.util.List} of Serializable
  * objects.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
@@ -43,7 +44,8 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
     }
 
     @Override
-    public Serializable evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Serializable evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) {
         final List<Object> result = new ArrayList<Object>(expression.getDependencies().size());
         for (final SExpression exp : expression.getDependencies()) {
@@ -55,7 +57,8 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {

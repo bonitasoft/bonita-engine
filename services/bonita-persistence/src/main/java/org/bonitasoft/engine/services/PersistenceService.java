@@ -91,7 +91,8 @@ public interface PersistenceService extends ReadPersistenceService {
      * @throws SPersistenceException
      * @since 6.1
      */
-    void deleteByTenant(Class<? extends PersistentObject> entityClass, List<FilterOption> filters) throws SPersistenceException;
+    void deleteByTenant(Class<? extends PersistentObject> entityClass, List<FilterOption> filters)
+            throws SPersistenceException;
 
     /**
      * @param desc

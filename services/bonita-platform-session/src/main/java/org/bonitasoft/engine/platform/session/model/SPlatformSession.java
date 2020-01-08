@@ -23,49 +23,49 @@ public interface SPlatformSession extends Serializable {
 
     /**
      * Gets the session's id
-     * 
+     *
      * @return
      */
     long getId();
 
     /**
      * Gets the session's creation date (GMT+0)
-     * 
+     *
      * @return
      */
     Date getCreationDate();
 
     /**
      * Gets the session's last renew date (GMT+0)
-     * 
+     *
      * @return
      */
     Date getLastRenewDate();
 
     /**
      * Gets the session's duration
-     * 
+     *
      * @return
      */
     long getDuration();
 
     /**
      * Gets the session's expiration date (GMT+0)
-     * 
+     *
      * @return
      */
     Date getExpirationDate();
 
     /**
      * Gets the user name associated to this session
-     * 
+     *
      * @return
      */
     String getUserName();
 
     /**
      * Gets the user id associated to this session
-     * 
+     *
      * @return the user Id for this session
      */
     long getUserId();

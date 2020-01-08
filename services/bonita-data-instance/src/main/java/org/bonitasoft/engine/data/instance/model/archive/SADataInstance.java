@@ -36,7 +36,6 @@ public abstract class SADataInstance implements ArchivedPersistentObject {
     private long archiveDate;
     private long sourceObjectId;
 
-
     public SADataInstance(final SDataInstance sDataInstance) {
         name = sDataInstance.getName();
         description = sDataInstance.getDescription();

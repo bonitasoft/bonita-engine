@@ -17,9 +17,9 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -86,7 +86,8 @@ public class SchedulerServiceImplTest {
 
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver,
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
+                transactionService, sessionAccessor, servicesResolver,
                 persistenceService);
     }
 
@@ -174,7 +175,8 @@ public class SchedulerServiceImplTest {
     @Test(expected = SSchedulerException.class)
     public void cannot_schedule_a_null_job() throws Exception {
         final Trigger trigger = mock(Trigger.class);
-        when(jobService.createJobDescriptor(nullable(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
+        when(jobService.createJobDescriptor(nullable(SJobDescriptor.class), any(Long.class)))
+                .thenThrow(new SJobDescriptorCreationException(""));
 
         schedulerService.schedule(null, trigger);
     }
@@ -226,7 +228,8 @@ public class SchedulerServiceImplTest {
         // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
         verify(jobService, times(1)).createJobParameters(parameters, TENANT_ID, jogDescriptorId);
-        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger, disallowConcurrency);
+        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger,
+                disallowConcurrency);
     }
 
     @Test

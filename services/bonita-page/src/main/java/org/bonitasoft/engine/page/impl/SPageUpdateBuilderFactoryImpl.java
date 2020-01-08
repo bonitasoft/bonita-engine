@@ -14,9 +14,8 @@
 package org.bonitasoft.engine.page.impl;
 
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 public class SPageUpdateBuilderFactoryImpl implements SPageUpdateBuilderFactory {
 

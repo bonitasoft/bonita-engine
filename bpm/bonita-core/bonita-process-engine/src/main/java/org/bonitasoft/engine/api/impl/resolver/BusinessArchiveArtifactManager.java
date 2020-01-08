@@ -44,7 +44,8 @@ public interface BusinessArchiveArtifactManager {
      * @return true if the process is resolved for this deployer, false otherwise
      * @throws BonitaException
      */
-    boolean deploy(BusinessArchive businessArchive, SProcessDefinition processDefinition) throws BonitaException, SBonitaException;
+    boolean deploy(BusinessArchive businessArchive, SProcessDefinition processDefinition)
+            throws BonitaException, SBonitaException;
 
     /**
      * @param processDefinition
@@ -54,7 +55,9 @@ public interface BusinessArchiveArtifactManager {
      */
     List<Problem> checkResolution(final SProcessDefinition processDefinition);
 
-    void delete(final SProcessDefinition processDefinition) throws SObjectModificationException, SBonitaReadException, SRecorderException;
+    void delete(final SProcessDefinition processDefinition)
+            throws SObjectModificationException, SBonitaReadException, SRecorderException;
 
-    void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException;
+    void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException;
 }

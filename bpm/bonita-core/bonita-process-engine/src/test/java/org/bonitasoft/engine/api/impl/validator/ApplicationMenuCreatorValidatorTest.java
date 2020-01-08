@@ -18,8 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.junit.Test;
 
-
-
 public class ApplicationMenuCreatorValidatorTest {
 
     private final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();

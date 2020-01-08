@@ -32,14 +32,16 @@ public class DeleteUser extends DeleteWithActorMembers implements TransactionCon
 
     private final String userName;
 
-    public DeleteUser(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteUser(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final long userId) {
         super(actorMappingService, profileService, identityService);
         this.userId = userId;
         userName = null;
     }
 
-    public DeleteUser(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteUser(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final String userName) {
         super(actorMappingService, profileService, identityService);
         userId = -1;

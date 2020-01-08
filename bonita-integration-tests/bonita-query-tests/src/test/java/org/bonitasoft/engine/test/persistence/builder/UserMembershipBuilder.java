@@ -15,7 +15,6 @@ package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.SUserMembership;
 
 public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembership, UserMembershipBuilder> {
 

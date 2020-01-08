@@ -66,7 +66,8 @@ public class JDTCompilerTest {
         final File compilableOne = getTestResourceAsFile("CompilableOne.java");
         final File compilableTwo = getTestResourceAsFile("CompilableTwo.java");
 
-        jdtCompiler.compile(asList(compilableOne, compilableTwo), outputDirectory, Thread.currentThread().getContextClassLoader());
+        jdtCompiler.compile(asList(compilableOne, compilableTwo), outputDirectory,
+                Thread.currentThread().getContextClassLoader());
 
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableOne.class")).exists();
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableTwo.class")).exists();
@@ -101,7 +102,8 @@ public class JDTCompilerTest {
     public void should_compile_class_with_external_dependencies() throws Exception {
         final File compilableWithDependency = getTestResourceAsFile("DependenciesNeeded.java");
         final File externalLib = getTestResourceAsFile("external-lib.jar");
-        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { externalLib.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { externalLib.toURI().toURL() },
+                Thread.currentThread().getContextClassLoader());
 
         jdtCompiler.compile(asList(compilableWithDependency), outputDirectory, urlClassLoader);
     }

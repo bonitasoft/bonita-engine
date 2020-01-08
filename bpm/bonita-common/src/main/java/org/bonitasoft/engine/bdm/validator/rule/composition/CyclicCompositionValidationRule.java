@@ -28,7 +28,7 @@ import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
 
 /**
  * Check that there are no circular references on referenced business objects by composition.
- * 
+ *
  * @author Colin PUY
  */
 public class CyclicCompositionValidationRule extends ValidationRule<BusinessObjectModel, ValidationStatus> {

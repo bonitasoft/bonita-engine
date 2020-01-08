@@ -62,14 +62,16 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void archiveGatewayInstance() throws Exception {
         createTrueAndFalseExpression();
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My_Process", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My_Process",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("description");
         builder.addAutomaticTask("step1");
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addUserTask("step3", ACTOR_NAME);
         builder.addUserTask("step4", ACTOR_NAME);
         builder.addGateway("d'stàp", GatewayType.INCLUSIVE)
-                .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("description after completion"))
+                .addDisplayDescriptionAfterCompletion(
+                        new ExpressionBuilder().createConstantStringExpression("description after completion"))
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("display name"));
         builder.addTransition("step1", "d'stàp");
         builder.addTransition("d'stàp", "step2", falseExpression);
@@ -77,8 +79,10 @@ public class GatewayExecutionIT extends TestWithUser {
                 .addDefaultTransition("d'stàp", "step4");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // create gateway instance and transition instance and archive them
@@ -98,7 +102,8 @@ public class GatewayExecutionIT extends TestWithUser {
         SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, "gate");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
-        final SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done());
+        final SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI()
+                .searchArchivedFlowNodeInstances(builder1.done());
         // we expect all normal gateway states to be archived:
         assertEquals(getProcessAPI().getSupportedStates(FlowNodeType.GATEWAY).size(), searchResult1.getCount());
 
@@ -108,7 +113,8 @@ public class GatewayExecutionIT extends TestWithUser {
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "d'stàp");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
-        final ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done()).getResult().get(0);
+        final ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done())
+                .getResult().get(0);
         // we expect all normal gateway states to be archived:
         assertThat(gatewayOne.getDisplayName()).isEqualTo("display name");
         assertThat(gatewayOne.getDisplayDescription()).isEqualTo("description after completion");
@@ -128,11 +134,15 @@ public class GatewayExecutionIT extends TestWithUser {
         // test initialization (will be extracted in other methods
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.PARALLEL)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2").addTransition("gateway1", "step3").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2")
+                .addTransition("gateway1", "step3").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
@@ -158,12 +168,17 @@ public class GatewayExecutionIT extends TestWithUser {
         //given
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.PARALLEL).addTransition("step1", "gateway1")
-                .addTransition("gateway1", "step2").addTransition("gateway1", "step3").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3")
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.PARALLEL)
+                .addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2").addTransition("gateway1", "step3")
+                .addTransition("step2", "gateway2").addTransition("step3", "gateway2")
                 .addTransition("gateway2", "step4").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
 
         // when
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -184,9 +199,12 @@ public class GatewayExecutionIT extends TestWithUser {
     public void processMultiMerge() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.PARALLEL).addTransition("step1", "gateway1").addTransition("gateway1", "step2")
-                .addTransition("gateway1", "step3").addTransition("step2", "step4").addTransition("step3", "step4").getProcess();
+                .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3")
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2")
+                .addTransition("gateway1", "step3").addTransition("step2", "step4").addTransition("step3", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step4", "step4");
     }
 
@@ -199,9 +217,12 @@ public class GatewayExecutionIT extends TestWithUser {
     public void parallelWithConditionalTransitions() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.PARALLEL)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", falseExpression)
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", trueExpression)
+                .addTransition("gateway1", "step3", falseExpression)
                 .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
@@ -215,9 +236,12 @@ public class GatewayExecutionIT extends TestWithUser {
     public void exclusiveWithUnconditionalTransitions() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2").addTransition("gateway1", "step3").getProcess();
+                .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2")
+                .addTransition("gateway1", "step3").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
     }
 
@@ -230,9 +254,12 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveWithUnconditionalTransitions() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_inclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.INCLUSIVE)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2").addTransition("gateway1", "step3").getProcess();
+                .createNewInstance("My_Process_with_inclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2")
+                .addTransition("gateway1", "step3").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
 
@@ -244,25 +271,32 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void linearProcessWith2UserTasks() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addUserTask("step2", ACTOR_NAME).addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addUserTask("step2", ACTOR_NAME).addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
+                .addTransition("step1", "step2")
                 .addTransition("step2", "step3").addTransition("step3", "step4").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 300, 5000, true, 1, user);
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 300, 5000, true, 1,
+                user);
         assertTrue("there was no pending task for john (expected step2)", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                null);
         assertEquals(1, pendingTasks.size());
         final HumanTaskInstance humanTaskInstance = pendingTasks.get(0);
         assertEquals("step2", humanTaskInstance.getName());
         assignAndExecuteStep(humanTaskInstance, user.getId());
 
         assertTrue("there was no pending task for john (expected step4)", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks2 = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> pendingTasks2 = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+                null);
         assertEquals(1, pendingTasks2.size());
         final HumanTaskInstance humanTaskInstance2 = pendingTasks2.get(0);
         assertEquals("step4", humanTaskInstance2.getName());
@@ -283,10 +317,13 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -300,16 +337,23 @@ public class GatewayExecutionIT extends TestWithUser {
     public void processWithExclusiveAndInclusive() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addStartEvent("start")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addStartEvent("start")
                 .addUserTask("step1", ACTOR_NAME).addGateway("para1", GatewayType.PARALLEL).addAutomaticTask("step2")
-                .addGateway("inclu1", GatewayType.INCLUSIVE).addAutomaticTask("step3").addAutomaticTask("step4").addGateway("inclu2", GatewayType.INCLUSIVE)
-                .addEndEvent("end").addTerminateEventTrigger().addGateway("para2", GatewayType.PARALLEL).addTransition("start", "step1")
+                .addGateway("inclu1", GatewayType.INCLUSIVE).addAutomaticTask("step3").addAutomaticTask("step4")
+                .addGateway("inclu2", GatewayType.INCLUSIVE)
+                .addEndEvent("end").addTerminateEventTrigger().addGateway("para2", GatewayType.PARALLEL)
+                .addTransition("start", "step1")
                 .addTransition("step1", "para1").addTransition("para1", "step2").addTransition("para1", "inclu1")
                 .addTransition("inclu1", "step3", new ExpressionBuilder().createConstantBooleanExpression(true))
-                .addTransition("inclu1", "step4", new ExpressionBuilder().createConstantBooleanExpression(false)).addTransition("step4", "inclu2")
-                .addTransition("step3", "inclu2").addTransition("inclu2", "para2").addTransition("step2", "para2").addTransition("para2", "end").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+                .addTransition("inclu1", "step4", new ExpressionBuilder().createConstantBooleanExpression(false))
+                .addTransition("step4", "inclu2")
+                .addTransition("step3", "inclu2").addTransition("inclu2", "para2").addTransition("step2", "para2")
+                .addTransition("para2", "end").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         waitForUserTaskAndExecuteIt(startProcess, "step1", user);
         waitForProcessToFinish(startProcess);
@@ -329,9 +373,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", trueExpression)
-                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", trueExpression)
+                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
     }
 
@@ -348,9 +395,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step3", trueExpression)
-                .addTransition("gateway1", "step2", trueExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step3", trueExpression)
+                .addTransition("gateway1", "step2", trueExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step3");
     }
 
@@ -367,9 +417,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
-                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step3");
     }
 
@@ -386,9 +439,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
-                .addTransition("gateway1", "step3", falseExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", falseExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step4");
     }
 
@@ -404,8 +460,10 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression).addTransition("gateway1", "step3", falseExpression)
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", falseExpression)
                 .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "");
     }
@@ -421,25 +479,33 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void exclusiveSplitWithNoDefaultTransitionFailThenRestart() throws Exception {
         createTrueAndFalseExpression();
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_parallel_gateway",
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+                "My_Process_with_parallel_gateway",
                 PROCESS_VERSION);
-        processDefinitionBuilder.addActor("actor").addAutomaticTask("step1").addUserTask("step2", "actor").addGateway("gateway1", GatewayType.EXCLUSIVE)
+        processDefinitionBuilder.addActor("actor").addAutomaticTask("step1").addUserTask("step2", "actor")
+                .addGateway("gateway1", GatewayType.EXCLUSIVE)
                 .addTransition("step1", "gateway1")
-                .addTransition("gateway1", "step2", new ExpressionBuilder().createDataExpression("condition", Boolean.class.getName())).getProcess();
+                .addTransition("gateway1", "step2",
+                        new ExpressionBuilder().createDataExpression("condition", Boolean.class.getName()))
+                .getProcess();
         processDefinitionBuilder.addData("condition", Boolean.class.getName(), falseExpression);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), "actor", user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // the gateway failed
         final FlowNodeInstance gateway = waitForFlowNodeInFailedState(processInstance);
-        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).filter(FlowNodeInstanceSearchDescriptor.NAME, "gateway1").done();
-        final SearchResult<FlowNodeInstance> searchFlowNodeInstances = getProcessAPI().searchFlowNodeInstances(searchOptions);
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 1)
+                .filter(FlowNodeInstanceSearchDescriptor.NAME, "gateway1").done();
+        final SearchResult<FlowNodeInstance> searchFlowNodeInstances = getProcessAPI()
+                .searchFlowNodeInstances(searchOptions);
         final FlowNodeInstance flowNodeInstance = searchFlowNodeInstances.getResult().get(0);
         assertTrue(flowNodeInstance instanceof GatewayInstance);
         // retry the gateway
         getProcessAPI().retryTask(gateway.getId());
         waitForFlowNodeInFailedState(processInstance);
         // should still be in failed
-        final SearchResult<FlowNodeInstance> searchFlowNodeInstances2 = getProcessAPI().searchFlowNodeInstances(searchOptions);
+        final SearchResult<FlowNodeInstance> searchFlowNodeInstances2 = getProcessAPI()
+                .searchFlowNodeInstances(searchOptions);
         assertEquals("failed", searchFlowNodeInstances2.getResult().get(0).getState());
 
         // change value of condition to make it work
@@ -463,10 +529,13 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveSplit1() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
                 .addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", trueExpression)
-                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", trueExpression)
+                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
 
@@ -483,9 +552,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
-                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", trueExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step3");
     }
 
@@ -501,7 +573,8 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveSplit2WithDataAsCondition() throws Exception {
         createTrueAndFalseExpression();
         final Expression trueData = new ExpressionBuilder().createDataExpression("trueData", Boolean.class.getName());
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_parallel_gateway",
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+                "My_Process_with_parallel_gateway",
                 PROCESS_VERSION);
         processDefinitionBuilder.addBooleanData("trueData", trueExpression);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder
@@ -516,7 +589,8 @@ public class GatewayExecutionIT extends TestWithUser {
                 .addTransition(
                         "gateway1",
                         "step2",
-                        new ExpressionBuilder().createGroovyScriptExpression("inclusiveSplit2WithDataAsCondition", "!trueData", Boolean.class.getName(),
+                        new ExpressionBuilder().createGroovyScriptExpression("inclusiveSplit2WithDataAsCondition",
+                                "!trueData", Boolean.class.getName(),
                                 Arrays.asList(trueData)))
                 .addTransition("gateway1", "step3", trueData).addDefaultTransition("gateway1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step3");
@@ -535,9 +609,12 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
-                .addTransition("gateway1", "step3", falseExpression).addDefaultTransition("gateway1", "step4").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", falseExpression).addDefaultTransition("gateway1", "step4")
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step4");
     }
 
@@ -553,8 +630,10 @@ public class GatewayExecutionIT extends TestWithUser {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.INCLUSIVE)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression).addTransition("gateway1", "step3", falseExpression)
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", falseExpression)
+                .addTransition("gateway1", "step3", falseExpression)
                 .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "");
     }
@@ -567,11 +646,15 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveSplitThenInclusiveMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME).addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE).addTransition("step1", "gateway1")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE)
+                .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", trueExpression)
-                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step5");
     }
@@ -579,19 +662,25 @@ public class GatewayExecutionIT extends TestWithUser {
     /**
      * Parallel then Inclusive Gateway
      * step 1 -> parallel gateway1 -> ( step 2, step3 ) -> inclusive gateway2 -> step4
-     * Dynamic expected : step2 & step3 pending, exec step2, step3 pending , exec step3, step4 pending , exec step4, end process.
+     * Dynamic expected : step2 & step3 pending, exec step2, step3 pending , exec step3, step4 pending , exec step4, end
+     * process.
      */
     @Test
     public void parallelSplitThenInclusiveMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.INCLUSIVE).addTransition("step1", "gateway1")
-                .addTransition("gateway1", "step2").addTransition("gateway1", "step3").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.INCLUSIVE)
+                .addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2").addTransition("gateway1", "step3")
+                .addTransition("step2", "gateway2").addTransition("step3", "gateway2")
                 .addTransition("gateway2", "step4").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -600,7 +689,8 @@ public class GatewayExecutionIT extends TestWithUser {
         final long step3Id = waitForUserTask(processInstance, "step3");
         waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf2 = new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, true, 2, user);
+        final CheckNbPendingTaskOf checkNbPendingTaskOf2 = new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, true, 2,
+                user);
         assertFalse("there was no pending task for john (expected step3)", checkNbPendingTaskOf2.waitUntil());
 
         assignAndExecuteStep(step3Id, user);
@@ -620,7 +710,8 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void notifyInclusiveGatewayThatABranchDied() throws Exception {
         createTrueAndFalseExpression();
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("NotifiedBranchDeadProcess", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("NotifiedBranchDeadProcess", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("start");
         builder.addGateway("inclusive1", GatewayType.INCLUSIVE);
@@ -637,8 +728,10 @@ public class GatewayExecutionIT extends TestWithUser {
         builder.addTransition("step2", "inclusive2");
         builder.addTransition("inclusive2", "step3");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // execute step2
@@ -667,12 +760,14 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void inclusiveGatewayWithNonInterruptingBoundary() throws Exception {
         createTrueAndFalseExpression();
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("NotifiedBranchDeadProcess", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("NotifiedBranchDeadProcess", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("start");
         builder.addGateway("inclusive1", GatewayType.INCLUSIVE);
         builder.addUserTask("step1", ACTOR_NAME).addBoundaryEvent("timer", false)
-                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1));
+                .addTimerEventTriggerDefinition(TimerType.DURATION,
+                        new ExpressionBuilder().createConstantLongExpression(1));
         builder.addUserTask("exceptionStep", ACTOR_NAME);
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addGateway("inclusive2", GatewayType.INCLUSIVE);
@@ -685,8 +780,10 @@ public class GatewayExecutionIT extends TestWithUser {
         builder.addTransition("step2", "inclusive2");
         builder.addTransition("inclusive2", "step3");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // execute step2
@@ -711,13 +808,18 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveSplitThenExclusiveMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4")
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", trueExpression)
-                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -739,16 +841,21 @@ public class GatewayExecutionIT extends TestWithUser {
     public void exclusiveThenInclusive() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_exclusive_inclusive_gateways", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME).addAutomaticTask("step6")
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE).addGateway("gateway3", GatewayType.INCLUSIVE)
+                .createNewInstance("My_Process_with_exclusive_inclusive_gateways", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4")
+                .addUserTask("step5", ACTOR_NAME).addAutomaticTask("step6")
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE)
+                .addGateway("gateway3", GatewayType.INCLUSIVE)
                 .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step6", falseExpression)
                 .addDefaultTransition("gateway1", "gateway2").addTransition("gateway2", "step2", trueExpression)
                 .addTransition("gateway2", "step3", trueExpression)
-                .addDefaultTransition("gateway2", "step4").addTransition("step2", "gateway3").addTransition("step3", "gateway3")
+                .addDefaultTransition("gateway2", "step4").addTransition("step2", "gateway3")
+                .addTransition("step3", "gateway3")
                 .addTransition("step4", "gateway3").addTransition("gateway3", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -768,14 +875,20 @@ public class GatewayExecutionIT extends TestWithUser {
     public void exclusiveSplitThenExclusiveMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4")
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", trueExpression)
-                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
@@ -796,14 +909,21 @@ public class GatewayExecutionIT extends TestWithUser {
     public void parallelSplitThenExclusiveMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
-                .addTransition("gateway1", "step2").addTransition("gateway1", "step3").addTransition("gateway1", "step4")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4")
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step2").addTransition("gateway1", "step3")
+                .addTransition("gateway1", "step4")
                 .addTransition("step2", "gateway2")
-                .addTransition("step3", "gateway2").addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+                .addTransition("step3", "gateway2").addTransition("step4", "gateway2")
+                .addTransition("gateway2", "step5").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
@@ -825,20 +945,27 @@ public class GatewayExecutionIT extends TestWithUser {
     public void inclusiveSplitThenParallelMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME).addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.PARALLEL).addTransition("step1", "gateway1")
+                .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.INCLUSIVE).addGateway("gateway2", GatewayType.PARALLEL)
+                .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", trueExpression)
-                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         waitForGateway(processInstance, "gateway2");
 
-        final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+        final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(
+                user.getId(), 0, 10,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(0, pendingHumanTaskInstances.size());
 
@@ -853,21 +980,28 @@ public class GatewayExecutionIT extends TestWithUser {
     public void exclusiveSplitThenParallelMerge() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Processy_exclusiveSplitThenParallelMerge", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME).addUserTask("step5", ACTOR_NAME)
-                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.PARALLEL).addTransition("step1", "gateway1")
+                .createNewInstance("My_Processy_exclusiveSplitThenParallelMerge", PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addAutomaticTask("step1")
+                .addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
+                .addUserTask("step5", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.PARALLEL)
+                .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step2", trueExpression).addTransition("gateway1", "step3", trueExpression)
-                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
+                .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         waitForGateway(processInstance, "gateway2");
 
-        final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
+        final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(
+                user.getId(), 0, 10,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(0, pendingHumanTaskInstances.size());
         disableAndDeleteProcess(processDefinition);
@@ -876,9 +1010,12 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsToTrueTransitionEvenIfADefaultTransitionIsSet() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", trueExpression).addTransition("step1", "step3", falseExpression)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", trueExpression)
+                .addTransition("step1", "step3", falseExpression)
                 .addDefaultTransition("step1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
     }
@@ -886,9 +1023,12 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsToDefaultTransitionWhenAllTransitionsAreConditionalAndFalse() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", falseExpression).addTransition("step1", "step3", falseExpression)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", falseExpression)
+                .addTransition("step1", "step3", falseExpression)
                 .addDefaultTransition("step1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step4");
     }
@@ -896,9 +1036,12 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsToDefaultTransitionAndNormalTransition() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2").addTransition("step1", "step3", falseExpression)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2")
+                .addTransition("step1", "step3", falseExpression)
                 .addDefaultTransition("step1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step4");
     }
@@ -906,9 +1049,12 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsToTrueConditionTransitionAndNormalTransition() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2").addTransition("step1", "step3", trueExpression)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2")
+                .addTransition("step1", "step3", trueExpression)
                 .addDefaultTransition("step1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
@@ -917,7 +1063,8 @@ public class GatewayExecutionIT extends TestWithUser {
     public void activitySplitsTo2NormalTransitions() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2")
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addTransition("step1", "step2")
                 .addTransition("step1", "step3").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
@@ -925,9 +1072,12 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsTo2TrueTransitions() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", trueExpression).addTransition("step1", "step3", trueExpression)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2", trueExpression)
+                .addTransition("step1", "step3", trueExpression)
                 .addDefaultTransition("step1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2", "step3");
     }
@@ -935,8 +1085,10 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsWithNormalAndFalseConditionnal() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
                 .addTransition("step1", "step2").addTransition("step1", "step3", falseExpression).getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "");
     }
@@ -944,25 +1096,33 @@ public class GatewayExecutionIT extends TestWithUser {
     @Test
     public void activitySplitsWith2FalseConditionnal() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("splitActivity", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addTransition("step1", "step2", falseExpression).addTransition("step1", "step3", falseExpression).getProcess();
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("splitActivity", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                .addUserTask("step3", ACTOR_NAME)
+                .addTransition("step1", "step2", falseExpression).addTransition("step1", "step3", falseExpression)
+                .getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "");
     }
 
     @Test
     public void inputAndOutputTransitionsOfInclusiveGatewayShouldBeEvaluatedToTrue() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("testInputTransitionOfInclusiveShouldBeEvaluatedToTrue", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
-                .addGateway("gateway", GatewayType.INCLUSIVE).addUserTask("step2", ACTOR_NAME).addTransition("step1", "gateway")
+                .createNewInstance("testInputTransitionOfInclusiveShouldBeEvaluatedToTrue", PROCESS_VERSION)
+                .addActor(ACTOR_NAME).addAutomaticTask("step1")
+                .addGateway("gateway", GatewayType.INCLUSIVE).addUserTask("step2", ACTOR_NAME)
+                .addTransition("step1", "gateway")
                 .addTransition("gateway", "step2").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
     }
 
-    private void assertJohnHasGotTheExpectedTaskPending(final String actorName, final DesignProcessDefinition designProcessDefinition,
+    private void assertJohnHasGotTheExpectedTaskPending(final String actorName,
+            final DesignProcessDefinition designProcessDefinition,
             final String... expected) throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName,
+                user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -973,20 +1133,24 @@ public class GatewayExecutionIT extends TestWithUser {
                 @Override
                 protected boolean check() throws Exception {
                     final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-                    searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
+                    searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+                            processDefinition.getId());
                     searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.STATE_NAME, "failed");
-                    final SearchResult<FlowNodeInstance> searchActivities = getProcessAPI().searchFlowNodeInstances(searchOptionsBuilder.done());
+                    final SearchResult<FlowNodeInstance> searchActivities = getProcessAPI()
+                            .searchFlowNodeInstances(searchOptionsBuilder.done());
                     return searchActivities.getCount() == 1;
                 }
             };
             assertTrue("Expected a task in fail state, there was none or more than one", waitUntil.waitUntil());
         } else {
-            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, true,
+            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(),
+                    DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, true,
                     expected.length, user);
             // assertTrue("there was no pending task for john", checkNbPendingTaskOf.waitUntil());
             checkNbPendingTaskOf.waitUntil();
             assertEquals(expected.length, checkNbPendingTaskOf.getPendingHumanTaskInstances().size());
-            final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, expected.length,
+            final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0,
+                    expected.length,
                     ActivityInstanceCriterion.NAME_ASC);
             for (int i = 0; i < expected.length; i++) {
                 assertEquals(expected[i], pendingTasks.get(i).getName());// TODO check order
@@ -1049,7 +1213,8 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Gateway2", "Step2");
         processDefinitionBuilder.addTransition("Step2", "Terminate");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "Step3", user);
         waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
@@ -1080,7 +1245,8 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Step1", "Gateway2");
         processDefinitionBuilder.addTransition("Gateway2", "Step4");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         //branch 1 is executed
         waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
@@ -1126,7 +1292,8 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Step2", "Gateway2");
         processDefinitionBuilder.addTransition("Gateway2", "Step6");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
         waitForUserTaskAndExecuteIt(processInstance, "Step2", user);
@@ -1155,7 +1322,8 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Step2", "Gateway2");
         processDefinitionBuilder.addTransition("Gateway2", "Step3");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         //branch 1 is executed
         waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
@@ -1175,17 +1343,22 @@ public class GatewayExecutionIT extends TestWithUser {
 
     @Test
     public void restartNodeShouldNotRestartGatewaysWithNotFullfilledMergingCondition() throws Exception {
-        final ProcessDefinitionBuilder processDesignBuilder = new ProcessDefinitionBuilder().createNewInstance("process_with_join_gateway", PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDesignBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("process_with_join_gateway", PROCESS_VERSION);
         processDesignBuilder.addStartEvent("goForIt");
         processDesignBuilder.addEndEvent("terminated");
-        final DesignProcessDefinition designProcessDefinition = processDesignBuilder.addActor(ACTOR_NAME).addGateway("split", GatewayType.PARALLEL)
-                .addAutomaticTask("autoTask").addUserTask("manualTask", ACTOR_NAME).addGateway("join", GatewayType.PARALLEL).addTransition("goForIt", "split")
-                .addTransition("split", "autoTask").addTransition("split", "manualTask").addTransition("autoTask", "join").addTransition("manualTask", "join")
+        final DesignProcessDefinition designProcessDefinition = processDesignBuilder.addActor(ACTOR_NAME)
+                .addGateway("split", GatewayType.PARALLEL)
+                .addAutomaticTask("autoTask").addUserTask("manualTask", ACTOR_NAME)
+                .addGateway("join", GatewayType.PARALLEL).addTransition("goForIt", "split")
+                .addTransition("split", "autoTask").addTransition("split", "manualTask")
+                .addTransition("autoTask", "join").addTransition("manualTask", "join")
                 .addTransition("join", "terminated").getProcess();
 
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         FlowNodeInstance joinGateway = waitForFlowNodeInExecutingState(processInstance, "join", false);
 
@@ -1246,7 +1419,8 @@ public class GatewayExecutionIT extends TestWithUser {
 
         Expression integerVarExpr = new ExpressionBuilder().createDataExpression("count", Integer.class.getName());
         Expression fiveExpr = new ExpressionBuilder().createConstantIntegerExpression(5);
-        Expression greaterThan = new ExpressionBuilder().createComparisonExpression("greaterThan", integerVarExpr, ComparisonOperator.GREATER_THAN, fiveExpr);
+        Expression greaterThan = new ExpressionBuilder().createComparisonExpression("greaterThan", integerVarExpr,
+                ComparisonOperator.GREATER_THAN, fiveExpr);
 
         String start = "start";
         String gateway = "gateway";
@@ -1276,8 +1450,8 @@ public class GatewayExecutionIT extends TestWithUser {
     }
 
     @Test
-    public void link_events_following_a_parallel_gateway_and_going_into_one_should_properly_activate_it() throws Exception {
-
+    public void link_events_following_a_parallel_gateway_and_going_into_one_should_properly_activate_it()
+            throws Exception {
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
         String task2 = "task2";
@@ -1287,25 +1461,25 @@ public class GatewayExecutionIT extends TestWithUser {
         builder.addEndEvent(theEnd);
         builder.addActor("user");
         builder.addGateway(gateway1, GatewayType.PARALLEL);
-        builder.addUserTask(task2,"user");
+        builder.addUserTask(task2, "user");
         builder.addGateway(gateway, GatewayType.PARALLEL);
         builder.addTransition(gateway, gateway1);
         builder.addTransition(gateway, gateway1);
         builder.addTransition(gateway, gateway1);
         builder.addTransition(gateway1, task2);
-        builder.addTransition(task2,theEnd);
+        builder.addTransition(task2, theEnd);
         DesignProcessDefinition designProcessDefinition = builder.done();
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "user", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(processInstance,task2,user);
+        waitForUserTaskAndExecuteIt(processInstance, task2, user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
 
     }
 
-
     @Test
-    public void link_events_coming_from_the_same_node_and_going_into_an_inclusive_gateway_should_activate_it_only_once() throws Exception {
+    public void link_events_coming_from_the_same_node_and_going_into_an_inclusive_gateway_should_activate_it_only_once()
+            throws Exception {
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
         String task1 = "task1";
@@ -1319,19 +1493,19 @@ public class GatewayExecutionIT extends TestWithUser {
         builder.addActor("user");
         builder.addGateway(gateway, GatewayType.INCLUSIVE);
         builder.addGateway(gateway1, GatewayType.PARALLEL);
-        builder.addUserTask(task2,"user");
+        builder.addUserTask(task2, "user");
         builder.addAutomaticTask(task1);
-        builder.addTransition(task1,gateway1);
-        builder.addTransition(gateway1,gateway);
-        builder.addTransition(gateway1,gateway);
-        builder.addTransition(gateway1,gateway);
+        builder.addTransition(task1, gateway1);
+        builder.addTransition(gateway1, gateway);
+        builder.addTransition(gateway1, gateway);
+        builder.addTransition(gateway1, gateway);
         builder.addTransition(gateway, task2);
-        builder.addTransition(task2,theEnd);
-        builder.addTransition(start,task1);
+        builder.addTransition(task2, theEnd);
+        builder.addTransition(start, task1);
         DesignProcessDefinition designProcessDefinition = builder.done();
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "user", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(processInstance,task2,user);
+        waitForUserTaskAndExecuteIt(processInstance, task2, user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
 

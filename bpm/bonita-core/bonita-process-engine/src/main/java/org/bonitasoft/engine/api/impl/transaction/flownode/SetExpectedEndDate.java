@@ -31,7 +31,8 @@ public class SetExpectedEndDate implements TransactionContent {
 
     private final Date dueDate;
 
-    public SetExpectedEndDate(final ActivityInstanceService activityInstanceService, final long userTaskId, final Date dueDate) {
+    public SetExpectedEndDate(final ActivityInstanceService activityInstanceService, final long userTaskId,
+            final Date dueDate) {
         this.activityInstanceService = activityInstanceService;
         this.userTaskId = userTaskId;
         this.dueDate = dueDate;

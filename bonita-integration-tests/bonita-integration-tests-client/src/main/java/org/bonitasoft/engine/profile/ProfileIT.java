@@ -92,7 +92,8 @@ public class ProfileIT extends AbstractProfileIT {
 
     @Test
     public void addUser_to_profile_updates_profile_metadata() throws Exception {
-        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        final ProfileMemberCreator creator = new ProfileMemberCreator(
+                getProfileAPI().getProfile(adminProfileId).getId());
         creator.setUserId(user3.getId());
 
         shouldProfileMemberOperation_update_profile_metadata(creator);
@@ -100,7 +101,8 @@ public class ProfileIT extends AbstractProfileIT {
 
     @Test
     public void addGroup_to_profile_updates_profile_metadata() throws Exception {
-        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        final ProfileMemberCreator creator = new ProfileMemberCreator(
+                getProfileAPI().getProfile(adminProfileId).getId());
         creator.setGroupId(group3.getId());
 
         shouldProfileMemberOperation_update_profile_metadata(creator);
@@ -108,7 +110,8 @@ public class ProfileIT extends AbstractProfileIT {
 
     @Test
     public void addRole_to_profile_updates_profile_metadata() throws Exception {
-        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        final ProfileMemberCreator creator = new ProfileMemberCreator(
+                getProfileAPI().getProfile(adminProfileId).getId());
         creator.setRoleId(role3.getId());
 
         shouldProfileMemberOperation_update_profile_metadata(creator);
@@ -116,14 +119,16 @@ public class ProfileIT extends AbstractProfileIT {
 
     @Test
     public void addRoleAndGroup_to_profile_updates_profile_metadata() throws Exception {
-        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        final ProfileMemberCreator creator = new ProfileMemberCreator(
+                getProfileAPI().getProfile(adminProfileId).getId());
         creator.setGroupId(group3.getId());
         creator.setRoleId(role3.getId());
 
         shouldProfileMemberOperation_update_profile_metadata(creator);
     }
 
-    private void shouldProfileMemberOperation_update_profile_metadata(final ProfileMemberCreator creator) throws Exception {
+    private void shouldProfileMemberOperation_update_profile_metadata(final ProfileMemberCreator creator)
+            throws Exception {
         // given
         final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
 
@@ -147,8 +152,10 @@ public class ProfileIT extends AbstractProfileIT {
     }
 
     private void checkMetaData(final Profile profileBefore, final Profile profileAfter, final User user) {
-        assertThat(profileAfter.getLastUpdateDate()).as("lastUpdateDate should be modified").isAfter(profileBefore.getLastUpdateDate());
-        assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isNotEqualTo(profileBefore.getLastUpdatedBy());
+        assertThat(profileAfter.getLastUpdateDate()).as("lastUpdateDate should be modified")
+                .isAfter(profileBefore.getLastUpdateDate());
+        assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified")
+                .isNotEqualTo(profileBefore.getLastUpdatedBy());
         assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isEqualTo(user.getId());
 
     }

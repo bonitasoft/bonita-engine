@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.work;
 
-
 /**
  * A factory to create executor service that will be given to the WorkService
- * 
+ *
  * @author Baptiste Mesta
  */
 public interface BonitaExecutorServiceFactory {
 
     /**
      * Create a bonita executor service with the given {@link WorkExecutionCallback}
+     *
      * @param workExecutionCallback this callback will be executed when a work complete.
      * @return the {@link BonitaExecutorService}
      */

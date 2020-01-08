@@ -73,7 +73,8 @@ public class BusinessDataAssignmentStrategyTest {
     }
 
     @Test(expected = SOperationExecutionException.class)
-    public void computeNewValueForLeftOperand_should_throws_operation_exception_when_merge_throws_exception() throws Exception {
+    public void computeNewValueForLeftOperand_should_throws_operation_exception_when_merge_throws_exception()
+            throws Exception {
         //given
         given(actionsExecutor.executeAction(entity, null, action)).willThrow(new SEntityActionExecutionException(""));
 
@@ -85,7 +86,8 @@ public class BusinessDataAssignmentStrategyTest {
 
     @Test
     public void getOperationType_should_return_business_data_assignment() throws Exception {
-        assertThat(strategy.getOperationType()).isEqualTo(SOperatorType.ASSIGNMENT + "_" + SLeftOperand.TYPE_BUSINESS_DATA);
+        assertThat(strategy.getOperationType())
+                .isEqualTo(SOperatorType.ASSIGNMENT + "_" + SLeftOperand.TYPE_BUSINESS_DATA);
     }
 
     @Test

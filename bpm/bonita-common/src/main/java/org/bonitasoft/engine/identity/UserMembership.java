@@ -22,7 +22,8 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * <p>
  * A {@link User} can be associated with a {@link Group} or a {@link Role} or both.
  * If a User is associated with a Group only, the
- * Role methods of this class will return null or 0. If a user is associated with a Role only, the Group methods of this class will return null or 0.
+ * Role methods of this class will return null or 0. If a user is associated with a Role only, the Group methods of this
+ * class will return null or 0.
  *
  * @author Bole Zhang
  * @author Matthieu Chaffotte

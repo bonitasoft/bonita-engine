@@ -101,7 +101,8 @@ public class ClassLoaderServiceImplTest {
     @Before
     public void before() throws Exception {
         classLoaderService = new ClassLoaderServiceImpl(parentClassLoaderResolver, logger, eventService,
-                platformDependencyService, sessionAccessor, userTransactionService, broadcastService, classLoaderUpdater);
+                platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
+                classLoaderUpdater);
         //tenant in theses tests is 0L
         classLoaderService.registerDependencyServiceOfTenant(0L, tenantDependencyService);
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
@@ -213,7 +214,6 @@ public class ClassLoaderServiceImplTest {
         classLoaderService.removeLocalClassLoader(TENANT.name(), PARENT_ID);
     }
 
-
     @Test
     public void should_getLocalClassLoader_create_expected_hierarchy() {
         //given
@@ -223,7 +223,8 @@ public class ClassLoaderServiceImplTest {
         assertThat(localClassLoader.getIdentifier()).isEqualTo(new ClassLoaderIdentifier(PROCESS.name(), CHILD_ID));
         ClassLoader parent = localClassLoader.getParent();
         assertThat(parent).isInstanceOf(VirtualClassLoader.class);
-        assertThat(((VirtualClassLoader) parent).getIdentifier()).isEqualTo(new ClassLoaderIdentifier(TENANT.name(), PARENT_ID));
+        assertThat(((VirtualClassLoader) parent).getIdentifier())
+                .isEqualTo(new ClassLoaderIdentifier(TENANT.name(), PARENT_ID));
         ClassLoader global = parent.getParent();
         assertThat(global).isInstanceOf(VirtualClassLoader.class);
         assertThat(((VirtualClassLoader) global).getIdentifier()).isEqualTo(ClassLoaderIdentifier.GLOBAL);
@@ -234,14 +235,15 @@ public class ClassLoaderServiceImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void should_create_throw_an_exception_if_bad_resolver() {
         //given
-        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService, platformDependencyService, sessionAccessor, userTransactionService, broadcastService, classLoaderUpdater);
+        classLoaderService = new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService,
+                platformDependencyService, sessionAccessor, userTransactionService, broadcastService,
+                classLoaderUpdater);
         //when
         processClassLoader = classLoaderService.getLocalClassLoader(PROCESS.name(), CHILD_ID);
 
         //then exception
 
     }
-
 
     @Test
     public void should_globalListeners_be_called_on_destroy() throws Exception {
@@ -280,9 +282,9 @@ public class ClassLoaderServiceImplTest {
         assertThat(synchronizationArgumentCaptor.getValue()).isInstanceOf(RefreshClassloaderSynchronization.class);
     }
 
-
     @Test
-    public void should_register_only_one_synchronization_when_refreshing_multiple_classloader_in_the_same_transaction() throws Exception {
+    public void should_register_only_one_synchronization_when_refreshing_multiple_classloader_in_the_same_transaction()
+            throws Exception {
         doNothing().when(userTransactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
 
         classLoaderService.refreshClassLoaderAfterUpdate(PROCESS, 42);
@@ -324,15 +326,16 @@ public class ClassLoaderServiceImplTest {
         doReturn(55L).when(sessionAccessor).getTenantId();
 
         classLoaderService.refreshClassLoaderImmediately(TENANT, 55L);
-        verify(logger).log(any(), eq(TechnicalLogSeverity.WARNING), contains("No dependency service is initialized"), eq(55L));
+        verify(logger).log(any(), eq(TechnicalLogSeverity.WARNING), contains("No dependency service is initialized"),
+                eq(55L));
     }
-
 
     @Test
     public void should_initialize_class_loader_when_getting_it() {
         VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
 
-        verify(classLoaderUpdater).initializeClassLoader(classLoaderService, localClassLoader, new ClassLoaderIdentifier(TENANT.name(), 43L));
+        verify(classLoaderUpdater).initializeClassLoader(classLoaderService, localClassLoader,
+                new ClassLoaderIdentifier(TENANT.name(), 43L));
     }
 
     @Test
@@ -346,8 +349,8 @@ public class ClassLoaderServiceImplTest {
         VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
         classLoaderService.getLocalClassLoader(TENANT.name(), 43L);
 
-
-        verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, localClassLoader, new ClassLoaderIdentifier(TENANT.name(), 43L));
+        verify(classLoaderUpdater, times(1)).initializeClassLoader(classLoaderService, localClassLoader,
+                new ClassLoaderIdentifier(TENANT.name(), 43L));
     }
 
     @Test
@@ -357,7 +360,8 @@ public class ClassLoaderServiceImplTest {
         assertThat(classLoaderService.addListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
         assertThat(classLoaderService.removeListener(TENANT.name(), 44L, classLoaderListener)).isTrue();
 
-        verify(classLoaderUpdater, never()).initializeClassLoader(any(), any(), eq(new ClassLoaderIdentifier(TENANT.name(), 44L)));
+        verify(classLoaderUpdater, never()).initializeClassLoader(any(), any(),
+                eq(new ClassLoaderIdentifier(TENANT.name(), 44L)));
     }
 
 }

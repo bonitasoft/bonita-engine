@@ -28,6 +28,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class SDocumentMapping implements PersistentObject {
+
     private long id;
     private long tenantId;
     private long processInstanceId;

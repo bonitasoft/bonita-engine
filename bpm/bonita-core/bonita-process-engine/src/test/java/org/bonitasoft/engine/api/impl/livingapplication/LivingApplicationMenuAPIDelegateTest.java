@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
@@ -105,7 +105,8 @@ public class LivingApplicationMenuAPIDelegateTest {
         final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
         given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
         given(sAppMenu.getId()).willReturn(9811L);
-        given(applicationService.updateApplicationMenu(eq(sAppMenu.getId()), nullable(EntityUpdateDescriptor.class))).willReturn(sAppMenu);
+        given(applicationService.updateApplicationMenu(eq(sAppMenu.getId()), nullable(EntityUpdateDescriptor.class)))
+                .willReturn(sAppMenu);
 
         //when
         delegate.updateApplicationMenu(sAppMenu.getId(), mock(ApplicationMenuUpdater.class));
@@ -150,7 +151,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = CreationException.class)
-    public void createApplicationMenu_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
+    public void createApplicationMenu_should_throw_CreationException_when_applicationService_throws_SObjectCreationException()
+            throws Exception {
         //given
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
         final SApplicationMenu sAppMenu = new SApplicationMenu("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
@@ -177,7 +179,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test
-    public void updateApplicationMenu_should_return_result_of_applicationService_updateApplicationMenu_converted_to_client_object() throws Exception {
+    public void updateApplicationMenu_should_return_result_of_applicationService_updateApplicationMenu_converted_to_client_object()
+            throws Exception {
         //given
         final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
         final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
@@ -197,7 +200,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = ApplicationMenuNotFoundException.class)
-    public void updateApplicationMenu_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void updateApplicationMenu_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
         final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
@@ -213,13 +217,15 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplicationMenu_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void updateApplicationMenu_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         //given
         final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
         final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
 
         given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
-        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willThrow(new SObjectModificationException());
+        given(applicationService.updateApplicationMenu(4, updateDescriptor))
+                .willThrow(new SObjectModificationException());
 
         //when
         delegate.updateApplicationMenu(4, updater);
@@ -245,7 +251,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = ApplicationMenuNotFoundException.class)
-    public void getApplicationMenu_should_throw_ApplicationMenuNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void getApplicationMenu_should_throw_ApplicationMenuNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         given(applicationService.getApplicationMenu(10)).willThrow(new SObjectNotFoundException());
 
@@ -256,7 +263,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getApplicationMenu_should_throw_RetriveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void getApplicationMenu_should_throw_RetriveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.getApplicationMenu(10)).willThrow(new SBonitaReadException(""));
 
@@ -283,7 +291,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void deleteApplicationMenu_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void deleteApplicationMenu_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         //given
         doThrow(new SObjectModificationException()).when(applicationService).deleteApplicationMenu(15);
 
@@ -294,7 +303,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void deleteApplicationMenu_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void deleteApplicationMenu_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         doThrow(new SObjectNotFoundException()).when(applicationService).deleteApplicationMenu(15);
 
@@ -318,7 +328,8 @@ public class LivingApplicationMenuAPIDelegateTest {
     }
 
     @Test(expected = SearchException.class)
-    public void searchApplicationMenus_should_throw_SearchException_when_searchApplicationMenus_execute_throws_exception() throws Exception {
+    public void searchApplicationMenus_should_throw_SearchException_when_searchApplicationMenus_execute_throws_exception()
+            throws Exception {
         //given
         doThrow(new SBonitaReadException("")).when(searchApplicatonMenus).execute();
 

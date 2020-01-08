@@ -37,7 +37,8 @@ public class SADataInstanceQueriesTest {
     @Inject
     private SADataInstanceRepository repository;
 
-    private void addSADataInstance(final int id, final String name, final int containerId, final String value, final long archiveDate, final long sourceObjectId) {
+    private void addSADataInstance(final int id, final String name, final int containerId, final String value,
+            final long archiveDate, final long sourceObjectId) {
         final SAShortTextDataInstance dataInstance = new SAShortTextDataInstance();
         dataInstance.setTenantId(1);
         dataInstance.setId(id);
@@ -57,7 +58,8 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(4L);
         final long time = System.currentTimeMillis();
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -68,7 +70,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<Long>();
         dataInstanceIds.add(4L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L, 1);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -83,7 +86,8 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(205093L);
 
         final long time = 0L;
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
         assertThat(dataInstances).isEmpty();
     }
 
@@ -97,7 +101,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<Long>();
         dataInstanceIds.add(205093L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000, 1);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025356);
     }
@@ -112,7 +117,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<Long>();
         dataInstanceIds.add(205093L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000, 1);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025259);
     }

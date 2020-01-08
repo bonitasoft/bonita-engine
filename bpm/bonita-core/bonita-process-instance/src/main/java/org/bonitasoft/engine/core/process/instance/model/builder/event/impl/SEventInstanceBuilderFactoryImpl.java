@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.impl.SFlowNodeI
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
-public abstract class SEventInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl implements SEventInstanceBuilderFactory {
+public abstract class SEventInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl
+        implements SEventInstanceBuilderFactory {
 
     private static final String ID_KEY = "id";
 

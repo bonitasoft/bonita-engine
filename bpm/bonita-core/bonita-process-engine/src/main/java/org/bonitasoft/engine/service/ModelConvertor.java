@@ -317,18 +317,21 @@ public class ModelConvertor {
         final Date creationDate = session.getCreationDate();
         final long duration = session.getDuration();
         final boolean technicalUser = session.isTechnicalUser();
-        final APISessionImpl apiSession = new APISessionImpl(id, creationDate, duration, userName, userId, tenant, tenantId);
+        final APISessionImpl apiSession = new APISessionImpl(id, creationDate, duration, userName, userId, tenant,
+                tenantId);
         apiSession.setTechnicalUser(technicalUser);
         apiSession.setProfiles(session.getProfiles());
         return apiSession;
     }
 
     public static Platform toPlatform(final SPlatform sPlatform) {
-        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(), sPlatform.getCreatedBy(),
+        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
+                sPlatform.getCreatedBy(),
                 sPlatform.getCreated());
     }
 
-    public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities, final FlowNodeStateManager flowNodeStateManager) {
+    public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities,
+            final FlowNodeStateManager flowNodeStateManager) {
         final List<ActivityInstance> activityInstances = new ArrayList<>();
         for (final SActivityInstance sActivity : sActivities) {
             final ActivityInstance activityInstance = toActivityInstance(sActivity, flowNodeStateManager);
@@ -337,7 +340,8 @@ public class ModelConvertor {
         return activityInstances;
     }
 
-    public static List<FlowNodeInstance> toFlowNodeInstances(final List<SFlowNodeInstance> sFlowNodes, final FlowNodeStateManager flowNodeStateManager) {
+    public static List<FlowNodeInstance> toFlowNodeInstances(final List<SFlowNodeInstance> sFlowNodes,
+            final FlowNodeStateManager flowNodeStateManager) {
         final List<FlowNodeInstance> flowNodeInstances = new ArrayList<>();
         for (final SFlowNodeInstance sFlowNode : sFlowNodes) {
             final FlowNodeInstance flowNodeInstance = toFlowNodeInstance(sFlowNode, flowNodeStateManager);
@@ -346,7 +350,8 @@ public class ModelConvertor {
         return flowNodeInstances;
     }
 
-    private static void updateFlowNode(final FlowNodeInstanceImpl flowNode, final SFlowNodeInstance sflowNode, final String state) {
+    private static void updateFlowNode(final FlowNodeInstanceImpl flowNode, final SFlowNodeInstance sflowNode,
+            final String state) {
         flowNode.setId(sflowNode.getId());
         flowNode.setState(state);
         flowNode.setParentContainerId(sflowNode.getParentContainerId());
@@ -363,7 +368,8 @@ public class ModelConvertor {
         flowNode.setLastUpdateDate(new Date(sflowNode.getLastUpdateDate()));
     }
 
-    public static ActivityInstance toActivityInstance(final SActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
+    public static ActivityInstance toActivityInstance(final SActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
         switch (sActivity.getType()) {
             case AUTOMATIC_TASK:
                 return toAutomaticTask((SAutomaticTaskInstance) sActivity, flowNodeStateManager);
@@ -382,13 +388,15 @@ public class ModelConvertor {
             case LOOP_ACTIVITY:
                 return toLoopActivityInstance((SLoopActivityInstance) sActivity, flowNodeStateManager);
             case MULTI_INSTANCE_ACTIVITY:
-                return toMultiInstanceActivityInstance((SMultiInstanceActivityInstance) sActivity, flowNodeStateManager);
+                return toMultiInstanceActivityInstance((SMultiInstanceActivityInstance) sActivity,
+                        flowNodeStateManager);
             default:
                 throw new UnknownElementType(sActivity.getType().name());
         }
     }
 
-    public static FlowNodeInstance toFlowNodeInstance(final SFlowNodeInstance sFlowNode, final FlowNodeStateManager flowNodeStateManager) {
+    public static FlowNodeInstance toFlowNodeInstance(final SFlowNodeInstance sFlowNode,
+            final FlowNodeStateManager flowNodeStateManager) {
         switch (sFlowNode.getType()) {
             case START_EVENT:
                 return toEventInstance((SEventInstance) sFlowNode, flowNodeStateManager);
@@ -410,34 +418,44 @@ public class ModelConvertor {
         }
     }
 
-    public static ActivityInstance toAutomaticTask(final SAutomaticTaskInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
-        final AutomaticTaskInstanceImpl automaticTaskInstance = new AutomaticTaskInstanceImpl(sActivity.getName(), sActivity.getFlowNodeDefinitionId());
+    public static ActivityInstance toAutomaticTask(final SAutomaticTaskInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final AutomaticTaskInstanceImpl automaticTaskInstance = new AutomaticTaskInstanceImpl(sActivity.getName(),
+                sActivity.getFlowNodeDefinitionId());
         updateActivityInstance(sActivity, flowNodeStateManager, automaticTaskInstance);
         return automaticTaskInstance;
     }
 
-    public static ActivityInstance toCallActivityInstance(final SCallActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
-        final CallActivityInstanceImpl callActivityInstance = new CallActivityInstanceImpl(sActivity.getName(), sActivity.getFlowNodeDefinitionId());
+    public static ActivityInstance toCallActivityInstance(final SCallActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final CallActivityInstanceImpl callActivityInstance = new CallActivityInstanceImpl(sActivity.getName(),
+                sActivity.getFlowNodeDefinitionId());
         updateActivityInstance(sActivity, flowNodeStateManager, callActivityInstance);
         return callActivityInstance;
     }
 
-    public static ActivityInstance toCallActivityInstance(final SSubProcessActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
-        final SubProcessActivityInstanceImpl subProcActivityInstance = new SubProcessActivityInstanceImpl(sActivity.getName(),
+    public static ActivityInstance toCallActivityInstance(final SSubProcessActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final SubProcessActivityInstanceImpl subProcActivityInstance = new SubProcessActivityInstanceImpl(
+                sActivity.getName(),
                 sActivity.getFlowNodeDefinitionId(), sActivity.isTriggeredByEvent());
         updateActivityInstance(sActivity, flowNodeStateManager, subProcActivityInstance);
         return subProcActivityInstance;
     }
 
-    public static ActivityInstance toSubProcessActivityInstance(final SSubProcessActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
-        final SubProcessActivityInstanceImpl subProcessActivityInstance = new SubProcessActivityInstanceImpl(sActivity.getName(),
+    public static ActivityInstance toSubProcessActivityInstance(final SSubProcessActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final SubProcessActivityInstanceImpl subProcessActivityInstance = new SubProcessActivityInstanceImpl(
+                sActivity.getName(),
                 sActivity.getFlowNodeDefinitionId(), sActivity.isTriggeredByEvent());
         updateActivityInstance(sActivity, flowNodeStateManager, subProcessActivityInstance);
         return subProcessActivityInstance;
     }
 
-    public static ActivityInstance toLoopActivityInstance(final SLoopActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
-        final LoopActivityInstanceImpl loopActivityInstance = new LoopActivityInstanceImpl(sActivity.getName(), sActivity.getFlowNodeDefinitionId(),
+    public static ActivityInstance toLoopActivityInstance(final SLoopActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final LoopActivityInstanceImpl loopActivityInstance = new LoopActivityInstanceImpl(sActivity.getName(),
+                sActivity.getFlowNodeDefinitionId(),
                 sActivity.getLoopCounter());
         updateActivityInstance(sActivity, flowNodeStateManager, loopActivityInstance);
         return loopActivityInstance;
@@ -445,16 +463,22 @@ public class ModelConvertor {
 
     public static ActivityInstance toMultiInstanceActivityInstance(final SMultiInstanceActivityInstance sActivity,
             final FlowNodeStateManager flowNodeStateManager) {
-        final MultiInstanceActivityInstanceImpl loopActivityInstance = new MultiInstanceActivityInstanceImpl(sActivity.getName(),
-                sActivity.getFlowNodeDefinitionId(), sActivity.isSequential(), sActivity.getLoopDataInputRef(), sActivity.getLoopDataOutputRef(),
-                sActivity.getDataInputItemRef(), sActivity.getDataOutputItemRef(), sActivity.getNumberOfActiveInstances(),
-                sActivity.getNumberOfCompletedInstances(), sActivity.getNumberOfTerminatedInstances(), sActivity.getLoopCardinality());
+        final MultiInstanceActivityInstanceImpl loopActivityInstance = new MultiInstanceActivityInstanceImpl(
+                sActivity.getName(),
+                sActivity.getFlowNodeDefinitionId(), sActivity.isSequential(), sActivity.getLoopDataInputRef(),
+                sActivity.getLoopDataOutputRef(),
+                sActivity.getDataInputItemRef(), sActivity.getDataOutputItemRef(),
+                sActivity.getNumberOfActiveInstances(),
+                sActivity.getNumberOfCompletedInstances(), sActivity.getNumberOfTerminatedInstances(),
+                sActivity.getLoopCardinality());
         updateActivityInstance(sActivity, flowNodeStateManager, loopActivityInstance);
         return loopActivityInstance;
     }
 
-    public static GatewayInstance toGatewayInstance(final SGatewayInstance sGatewayInstance, final FlowNodeStateManager flowNodeStateManager) {
-        final GatewayInstanceImpl gatewayInstance = new GatewayInstanceImpl(sGatewayInstance.getName(), sGatewayInstance.getFlowNodeDefinitionId());
+    public static GatewayInstance toGatewayInstance(final SGatewayInstance sGatewayInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final GatewayInstanceImpl gatewayInstance = new GatewayInstanceImpl(sGatewayInstance.getName(),
+                sGatewayInstance.getFlowNodeDefinitionId());
         final String state = flowNodeStateManager.getState(sGatewayInstance.getStateId()).getName();
         updateFlowNode(gatewayInstance, sGatewayInstance, state);
         return gatewayInstance;
@@ -464,17 +488,20 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         final String name = saGatewayInstance.getName();
         final ArchivedGatewayInstanceImpl aGatewayInstance = new ArchivedGatewayInstanceImpl(name);
-        updateArchivedFlowNodeInstance(aGatewayInstance, saGatewayInstance, flowNodeStateManager.getState(saGatewayInstance.getStateId()).getName());
+        updateArchivedFlowNodeInstance(aGatewayInstance, saGatewayInstance,
+                flowNodeStateManager.getState(saGatewayInstance.getStateId()).getName());
         return aGatewayInstance;
     }
 
-    private static void updateActivityInstance(final SActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager,
+    private static void updateActivityInstance(final SActivityInstance sActivity,
+            final FlowNodeStateManager flowNodeStateManager,
             final ActivityInstanceImpl activity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateFlowNode(activity, sActivity, state);
     }
 
-    public static List<UserTaskInstance> toUserTaskInstances(final List<SUserTaskInstance> sUserTasks, final FlowNodeStateManager flowNodeStateManager) {
+    public static List<UserTaskInstance> toUserTaskInstances(final List<SUserTaskInstance> sUserTasks,
+            final FlowNodeStateManager flowNodeStateManager) {
         final List<UserTaskInstance> userTaskInstances = new ArrayList<>();
         for (final SUserTaskInstance sUserTask : sUserTasks) {
             final UserTaskInstance userTask = toUserTaskInstance(sUserTask, flowNodeStateManager);
@@ -483,26 +510,33 @@ public class ModelConvertor {
         return userTaskInstances;
     }
 
-    public static UserTaskInstance toUserTaskInstance(final SUserTaskInstance sUserTask, final FlowNodeStateManager flowNodeStateManager) {
-        final UserTaskInstanceImpl userTaskInstance = new UserTaskInstanceImpl(sUserTask.getName(), sUserTask.getFlowNodeDefinitionId(),
+    public static UserTaskInstance toUserTaskInstance(final SUserTaskInstance sUserTask,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final UserTaskInstanceImpl userTaskInstance = new UserTaskInstanceImpl(sUserTask.getName(),
+                sUserTask.getFlowNodeDefinitionId(),
                 sUserTask.getActorId());
         updateHumanTaskInstance(sUserTask, flowNodeStateManager, userTaskInstance);
         return userTaskInstance;
     }
 
-    public static ActivityInstance toReceiveTaskInstance(final SReceiveTaskInstance sReceiveTask, final FlowNodeStateManager flowNodeStateManager) {
-        final ReceiveTaskInstanceImpl receiveTaskInstance = new ReceiveTaskInstanceImpl(sReceiveTask.getName(), sReceiveTask.getFlowNodeDefinitionId());
+    public static ActivityInstance toReceiveTaskInstance(final SReceiveTaskInstance sReceiveTask,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ReceiveTaskInstanceImpl receiveTaskInstance = new ReceiveTaskInstanceImpl(sReceiveTask.getName(),
+                sReceiveTask.getFlowNodeDefinitionId());
         updateActivityInstance(sReceiveTask, flowNodeStateManager, receiveTaskInstance);
         return receiveTaskInstance;
     }
 
-    public static ActivityInstance toSendTaskInstance(final SSendTaskInstance sSendTask, final FlowNodeStateManager flowNodeStateManager) {
-        final SendTaskInstanceImpl sendTask = new SendTaskInstanceImpl(sSendTask.getName(), sSendTask.getFlowNodeDefinitionId());
+    public static ActivityInstance toSendTaskInstance(final SSendTaskInstance sSendTask,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final SendTaskInstanceImpl sendTask = new SendTaskInstanceImpl(sSendTask.getName(),
+                sSendTask.getFlowNodeDefinitionId());
         updateActivityInstance(sSendTask, flowNodeStateManager, sendTask);
         return sendTask;
     }
 
-    private static void updateHumanTaskInstance(final SHumanTaskInstance sHumanTask, final FlowNodeStateManager flowNodeStateManager,
+    private static void updateHumanTaskInstance(final SHumanTaskInstance sHumanTask,
+            final FlowNodeStateManager flowNodeStateManager,
             final HumanTaskInstanceImpl humanTaskInstance) {
         updateActivityInstance(sHumanTask, flowNodeStateManager, humanTaskInstance);
         humanTaskInstance.setAssigneeId(sHumanTask.getAssigneeId());
@@ -527,7 +561,8 @@ public class ModelConvertor {
         return humanTaskInstances;
     }
 
-    public static HumanTaskInstance toHumanTaskInstance(final SHumanTaskInstance sHumanTask, final FlowNodeStateManager flowNodeStateManager) {
+    public static HumanTaskInstance toHumanTaskInstance(final SHumanTaskInstance sHumanTask,
+            final FlowNodeStateManager flowNodeStateManager) {
         switch (sHumanTask.getType()) {
             case USER_TASK:
                 return toUserTaskInstance((SUserTaskInstance) sHumanTask, flowNodeStateManager);
@@ -538,15 +573,18 @@ public class ModelConvertor {
         }
     }
 
-    public static ManualTaskInstance toManualTask(final SManualTaskInstance sHumanTask, final FlowNodeStateManager flowNodeStateManager) {
-        final ManualTaskInstanceImpl manualTaskInstance = new ManualTaskInstanceImpl(sHumanTask.getName(), sHumanTask.getFlowNodeDefinitionId(),
+    public static ManualTaskInstance toManualTask(final SManualTaskInstance sHumanTask,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ManualTaskInstanceImpl manualTaskInstance = new ManualTaskInstanceImpl(sHumanTask.getName(),
+                sHumanTask.getFlowNodeDefinitionId(),
                 sHumanTask.getActorId());
         updateHumanTaskInstance(sHumanTask, flowNodeStateManager, manualTaskInstance);
         return manualTaskInstance;
     }
 
     public static ProcessDefinition toProcessDefinition(final SProcessDefinition sDefinition) {
-        final ProcessDefinitionImpl processDefinitionImpl = new ProcessDefinitionImpl(sDefinition.getName(), sDefinition.getVersion());
+        final ProcessDefinitionImpl processDefinitionImpl = new ProcessDefinitionImpl(sDefinition.getName(),
+                sDefinition.getVersion());
         processDefinitionImpl.setId(sDefinition.getId());
         processDefinitionImpl.setDescription(sDefinition.getDescription());
         return processDefinitionImpl;
@@ -559,7 +597,8 @@ public class ModelConvertor {
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>();
 
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
-                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
+                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService,
+                        processDefinitions,
                         sProcessInstance.getProcessDefinitionId());
                 clientProcessInstances.add(toProcessInstance(sProcessDefinition, sProcessInstance));
             }
@@ -581,11 +620,14 @@ public class ModelConvertor {
         return sProcessDefinition;
     }
 
-    public static ProcessInstance toProcessInstance(final SProcessDefinition definition, final SProcessInstance sInstance) {
-        final ProcessInstanceBuilder clientProcessInstanceBuilder = ProcessInstanceBuilder.getInstance().createNewInstance(sInstance.getName());
+    public static ProcessInstance toProcessInstance(final SProcessDefinition definition,
+            final SProcessInstance sInstance) {
+        final ProcessInstanceBuilder clientProcessInstanceBuilder = ProcessInstanceBuilder.getInstance()
+                .createNewInstance(sInstance.getName());
         clientProcessInstanceBuilder.setId(sInstance.getId());
 
-        clientProcessInstanceBuilder.setState(ProcessInstanceState.getFromId(sInstance.getStateId()).name().toLowerCase());
+        clientProcessInstanceBuilder
+                .setState(ProcessInstanceState.getFromId(sInstance.getStateId()).name().toLowerCase());
         if (sInstance.getStartDate() > 0) {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
@@ -613,7 +655,8 @@ public class ModelConvertor {
         return clientProcessInstanceBuilder.done();
     }
 
-    public static List<ProcessDeploymentInfo> toProcessDeploymentInfo(final List<SProcessDefinitionDeployInfo> processDefinitionDIs) {
+    public static List<ProcessDeploymentInfo> toProcessDeploymentInfo(
+            final List<SProcessDefinitionDeployInfo> processDefinitionDIs) {
         final List<ProcessDeploymentInfo> deploymentInfos = new ArrayList<>();
         for (final SProcessDefinitionDeployInfo processDefinitionDI : processDefinitionDIs) {
             final ProcessDeploymentInfo deploymentInfo = toProcessDeploymentInfo(processDefinitionDI);
@@ -622,16 +665,21 @@ public class ModelConvertor {
         return deploymentInfos;
     }
 
-    public static ProcessDeploymentInfo toProcessDeploymentInfo(final SProcessDefinitionDeployInfo processDefinitionDI) {
-        return new ProcessDeploymentInfoImpl(processDefinitionDI.getId(), processDefinitionDI.getProcessId(), processDefinitionDI.getName(),
-                processDefinitionDI.getVersion(), processDefinitionDI.getDescription(), new Date(processDefinitionDI.getDeploymentDate()),
+    public static ProcessDeploymentInfo toProcessDeploymentInfo(
+            final SProcessDefinitionDeployInfo processDefinitionDI) {
+        return new ProcessDeploymentInfoImpl(processDefinitionDI.getId(), processDefinitionDI.getProcessId(),
+                processDefinitionDI.getName(),
+                processDefinitionDI.getVersion(), processDefinitionDI.getDescription(),
+                new Date(processDefinitionDI.getDeploymentDate()),
                 processDefinitionDI.getDeployedBy(), ActivationState.valueOf(processDefinitionDI.getActivationState()),
-                ConfigurationState.valueOf(processDefinitionDI.getConfigurationState()), processDefinitionDI.getDisplayName(), new Date(
+                ConfigurationState.valueOf(processDefinitionDI.getConfigurationState()),
+                processDefinitionDI.getDisplayName(), new Date(
                         processDefinitionDI.getLastUpdateDate()),
                 processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
     }
 
-    public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
+    public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(
+            final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
         if (sProcessDeploymentInfos != null && !sProcessDeploymentInfos.isEmpty()) {
             final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<>();
             final Set<Entry<Long, SProcessDefinitionDeployInfo>> entries = sProcessDeploymentInfos.entrySet();
@@ -643,30 +691,39 @@ public class ModelConvertor {
         return Collections.emptyMap();
     }
 
-    public static ArchivedUserTaskInstance toArchivedUserTaskInstance(final SAUserTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedUserTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedUserTaskInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+    public static ArchivedUserTaskInstance toArchivedUserTaskInstance(final SAUserTaskInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ArchivedUserTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedUserTaskInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         updateArchivedHumanTaskInstance(archivedUserTaskInstanceImpl, sInstance);
         return archivedUserTaskInstanceImpl;
     }
 
     public static ArchivedReceiveTaskInstance toArchivedReceiveTaskInstance(final SAReceiveTaskInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedReceiveTaskInstanceImpl archivedReceiveTaskInstanceImpl = new ArchivedReceiveTaskInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedReceiveTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedReceiveTaskInstanceImpl archivedReceiveTaskInstanceImpl = new ArchivedReceiveTaskInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedReceiveTaskInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedReceiveTaskInstanceImpl;
     }
 
-    public static ArchivedSendTaskInstance toArchivedSendTaskInstance(final SASendTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedSendTaskInstanceImpl archivedSendTaskInstanceImpl = new ArchivedSendTaskInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedSendTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+    public static ArchivedSendTaskInstance toArchivedSendTaskInstance(final SASendTaskInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ArchivedSendTaskInstanceImpl archivedSendTaskInstanceImpl = new ArchivedSendTaskInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedSendTaskInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedSendTaskInstanceImpl;
     }
 
     /**
      * Update the fields of ArchivedHumanTaskInstance from a SAHumanTaskInstance
      */
-    private static void updateArchivedHumanTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final SAHumanTaskInstance saHumanTask) {
+    private static void updateArchivedHumanTaskInstance(final ArchivedHumanTaskInstanceImpl activity,
+            final SAHumanTaskInstance saHumanTask) {
         activity.setAssigneeId(saHumanTask.getAssigneeId());
         activity.setPriority(TaskPriority.valueOf(saHumanTask.getPriority().name()));
         activity.setActorId(saHumanTask.getActorId());
@@ -678,7 +735,8 @@ public class ModelConvertor {
         }
     }
 
-    private static void updateArchivedFlowNodeInstance(final ArchivedFlowNodeInstanceImpl aFlowNode, final SAFlowNodeInstance saFlowNode, final String state) {
+    private static void updateArchivedFlowNodeInstance(final ArchivedFlowNodeInstanceImpl aFlowNode,
+            final SAFlowNodeInstance saFlowNode, final String state) {
         aFlowNode.setId(saFlowNode.getId());
         aFlowNode.setState(state);
         aFlowNode.setParentContainerId(saFlowNode.getParentContainerId());
@@ -705,33 +763,39 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedUserTaskInstance> archivedUserTaskInstances = new ArrayList<>();
         for (final SAUserTaskInstance sAUserTaskInstance : sInstances) {
-            final ArchivedUserTaskInstance archivedUserTaskInstance = toArchivedUserTaskInstance(sAUserTaskInstance, flowNodeStateManager);
+            final ArchivedUserTaskInstance archivedUserTaskInstance = toArchivedUserTaskInstance(sAUserTaskInstance,
+                    flowNodeStateManager);
             archivedUserTaskInstances.add(archivedUserTaskInstance);
         }
         return archivedUserTaskInstances;
     }
 
-    public static List<ArchivedReceiveTaskInstance> toArchivedReceiveTaskInstances(final List<SAReceiveTaskInstance> sInstances,
+    public static List<ArchivedReceiveTaskInstance> toArchivedReceiveTaskInstances(
+            final List<SAReceiveTaskInstance> sInstances,
             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedReceiveTaskInstance> archivedReceiveTaskInstances = new ArrayList<>();
         for (final SAReceiveTaskInstance sAReceiveTaskInstance : sInstances) {
-            final ArchivedReceiveTaskInstance archivedReceiveTaskInstance = toArchivedReceiveTaskInstance(sAReceiveTaskInstance, flowNodeStateManager);
+            final ArchivedReceiveTaskInstance archivedReceiveTaskInstance = toArchivedReceiveTaskInstance(
+                    sAReceiveTaskInstance, flowNodeStateManager);
             archivedReceiveTaskInstances.add(archivedReceiveTaskInstance);
         }
         return archivedReceiveTaskInstances;
     }
 
-    public static List<ArchivedHumanTaskInstance> toArchivedHumanTaskInstances(final List<? extends SAHumanTaskInstance> sInstances,
+    public static List<ArchivedHumanTaskInstance> toArchivedHumanTaskInstances(
+            final List<? extends SAHumanTaskInstance> sInstances,
             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedHumanTaskInstance> archivedUserTaskInstances = new ArrayList<>();
         for (final SAHumanTaskInstance sInstance : sInstances) {
-            final ArchivedHumanTaskInstance archivedUserTaskInstance = toArchivedHumanTaskInstance(sInstance, flowNodeStateManager);
+            final ArchivedHumanTaskInstance archivedUserTaskInstance = toArchivedHumanTaskInstance(sInstance,
+                    flowNodeStateManager);
             archivedUserTaskInstances.add(archivedUserTaskInstance);
         }
         return archivedUserTaskInstances;
     }
 
-    public static ArchivedHumanTaskInstance toArchivedHumanTaskInstance(final SAHumanTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
+    public static ArchivedHumanTaskInstance toArchivedHumanTaskInstance(final SAHumanTaskInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
         switch (sInstance.getType()) {
             case MANUAL_TASK:
                 return toArchivedManualTaskInstance((SAManualTaskInstance) sInstance, flowNodeStateManager);
@@ -742,7 +806,8 @@ public class ModelConvertor {
         }
     }
 
-    public static ArchivedActivityInstance toArchivedActivityInstance(final SAActivityInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
+    public static ArchivedActivityInstance toArchivedActivityInstance(final SAActivityInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
         switch (sInstance.getType()) {
             case AUTOMATIC_TASK:
                 return toArchivedAutomaticTaskInstance(sInstance, flowNodeStateManager);
@@ -759,9 +824,11 @@ public class ModelConvertor {
             case CALL_ACTIVITY:
                 return toArchivedCallActivityInstance((SACallActivityInstance) sInstance, flowNodeStateManager);
             case SUB_PROCESS:
-                return toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) sInstance, flowNodeStateManager);
+                return toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) sInstance,
+                        flowNodeStateManager);
             case MULTI_INSTANCE_ACTIVITY:
-                return toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) sInstance, flowNodeStateManager);
+                return toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) sInstance,
+                        flowNodeStateManager);
             case BOUNDARY_EVENT:
             case END_EVENT:
             case GATEWAY:
@@ -776,78 +843,100 @@ public class ModelConvertor {
 
     private static ArchivedLoopActivityInstance toArchivedLoopActivityInstance(final SALoopActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedLoopActivityInstanceImpl archivedloopActivityInstanceImpl = new ArchivedLoopActivityInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedloopActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedLoopActivityInstanceImpl archivedloopActivityInstanceImpl = new ArchivedLoopActivityInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedloopActivityInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         archivedloopActivityInstanceImpl.setLoopCounter(sInstance.getLoopCounter());
         archivedloopActivityInstanceImpl.setLoopMax(sInstance.getLoopMax());
         return archivedloopActivityInstanceImpl;
     }
 
-    private static ArchivedMultiInstanceActivityInstanceImpl toArchivedMultiInstanceActivityInstance(final SAMultiInstanceActivityInstance sInstance,
+    private static ArchivedMultiInstanceActivityInstanceImpl toArchivedMultiInstanceActivityInstance(
+            final SAMultiInstanceActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedMultiInstanceActivityInstanceImpl archivedMultiInstanceActivityInstanceImpl = new ArchivedMultiInstanceActivityInstanceImpl(
-                sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
-                sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(), sInstance.getNumberOfActiveInstances(),
-                sInstance.getNumberOfCompletedInstances(), sInstance.getNumberOfTerminatedInstances(), sInstance.getLoopCardinality());
-        updateArchivedFlowNodeInstance(archivedMultiInstanceActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+                sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(),
+                sInstance.getLoopDataInputRef(),
+                sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(),
+                sInstance.getNumberOfActiveInstances(),
+                sInstance.getNumberOfCompletedInstances(), sInstance.getNumberOfTerminatedInstances(),
+                sInstance.getLoopCardinality());
+        updateArchivedFlowNodeInstance(archivedMultiInstanceActivityInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedMultiInstanceActivityInstanceImpl;
     }
 
     public static ArchivedManualTaskInstance toArchivedManualTaskInstance(final SAManualTaskInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedManualTaskInstanceImpl archivedManualTaskInstance = new ArchivedManualTaskInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedManualTaskInstance, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedManualTaskInstanceImpl archivedManualTaskInstance = new ArchivedManualTaskInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedManualTaskInstance, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         updateArchivedHumanTaskInstance(archivedManualTaskInstance, sInstance);
         return archivedManualTaskInstance;
     }
 
     public static ArchivedCallActivityInstance toArchivedCallActivityInstance(final SACallActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedCallActivityInstanceImpl archivedCallActivityInstanceImpl = new ArchivedCallActivityInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedCallActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedCallActivityInstanceImpl archivedCallActivityInstanceImpl = new ArchivedCallActivityInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedCallActivityInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedCallActivityInstanceImpl;
     }
 
-    public static ArchivedSubProcessActivityInstance toArchivedSubProcessActivityInstance(final SASubProcessActivityInstance sInstance,
+    public static ArchivedSubProcessActivityInstance toArchivedSubProcessActivityInstance(
+            final SASubProcessActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedSubProcessActivityInstanceImpl archivedSubProcActivityInstanceImpl = new ArchivedSubProcessActivityInstanceImpl(sInstance.getName(),
+        final ArchivedSubProcessActivityInstanceImpl archivedSubProcActivityInstanceImpl = new ArchivedSubProcessActivityInstanceImpl(
+                sInstance.getName(),
                 sInstance.isTriggeredByEvent());
-        updateArchivedFlowNodeInstance(archivedSubProcActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        updateArchivedFlowNodeInstance(archivedSubProcActivityInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedSubProcActivityInstanceImpl;
     }
 
     public static ArchivedAutomaticTaskInstance toArchivedAutomaticTaskInstance(final SAActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedAutomaticTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedAutomaticTaskInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedAutomaticTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedAutomaticTaskInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedUserTaskInstanceImpl;
     }
 
     public static ArchivedGatewayInstance toArchivedGatewayInstance(final SAActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedGatewayInstanceImpl archGatewayInstanceImpl = new ArchivedGatewayInstanceImpl(sInstance.getName());
-        updateArchivedFlowNodeInstance(archGatewayInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        final ArchivedGatewayInstanceImpl archGatewayInstanceImpl = new ArchivedGatewayInstanceImpl(
+                sInstance.getName());
+        updateArchivedFlowNodeInstance(archGatewayInstanceImpl, sInstance,
+                flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archGatewayInstanceImpl;
     }
 
-    public static List<ArchivedActivityInstance> toArchivedActivityInstances(final List<SAActivityInstance> saActivityInstances,
+    public static List<ArchivedActivityInstance> toArchivedActivityInstances(
+            final List<SAActivityInstance> saActivityInstances,
             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedActivityInstance> archivedActivityInstances = new ArrayList<>();
         for (final SAActivityInstance saActivityInstance : saActivityInstances) {
-            final ArchivedActivityInstance archivedActivityInstance = toArchivedActivityInstance(saActivityInstance, flowNodeStateManager);
+            final ArchivedActivityInstance archivedActivityInstance = toArchivedActivityInstance(saActivityInstance,
+                    flowNodeStateManager);
             archivedActivityInstances.add(archivedActivityInstance);
         }
         return archivedActivityInstances;
     }
 
-    public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> saProcessInstances,
+    public static List<ArchivedProcessInstance> toArchivedProcessInstances(
+            final List<SAProcessInstance> saProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
         if (saProcessInstances != null) {
             final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<>(saProcessInstances.size());
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>(saProcessInstances.size());
 
             for (final SAProcessInstance saProcessInstance : saProcessInstances) {
-                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
+                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService,
+                        processDefinitions,
                         saProcessInstance.getProcessDefinitionId());
                 clientProcessInstances.add(toArchivedProcessInstance(saProcessInstance, sProcessDefinition));
             }
@@ -856,7 +945,8 @@ public class ModelConvertor {
         return Collections.unmodifiableList(new ArrayList<ArchivedProcessInstance>(1));
     }
 
-    public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> sProcessInstances,
+    public static List<ArchivedProcessInstance> toArchivedProcessInstances(
+            final List<SAProcessInstance> sProcessInstances,
             final SProcessDefinition sProcessDefinition) {
         final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<>(sProcessInstances.size());
         for (final SAProcessInstance sProcessInstance : sProcessInstances) {
@@ -865,7 +955,8 @@ public class ModelConvertor {
         return Collections.unmodifiableList(clientProcessInstances);
     }
 
-    public static ArchivedProcessInstance toArchivedProcessInstance(final SAProcessInstance sInstance, final SProcessDefinition sProcessDefinition) {
+    public static ArchivedProcessInstance toArchivedProcessInstance(final SAProcessInstance sInstance,
+            final SProcessDefinition sProcessDefinition) {
         final ArchivedProcessInstanceImpl archivedInstance = new ArchivedProcessInstanceImpl(sInstance.getName());
         archivedInstance.setId(sInstance.getId());
         final int stateId = sInstance.getStateId();
@@ -1046,7 +1137,8 @@ public class ModelConvertor {
     }
 
     public static UserMembership toUserMembership(final SUserMembership sUserMembership) {
-        final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(), sUserMembership.getUserId(), sUserMembership.getGroupId(),
+        final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(),
+                sUserMembership.getUserId(), sUserMembership.getGroupId(),
                 sUserMembership.getRoleId());
         userMembership.setAssignedBy(sUserMembership.getAssignedBy());
         userMembership.setAssignedDate(new Date(sUserMembership.getAssignedDate()));
@@ -1068,7 +1160,8 @@ public class ModelConvertor {
         return Collections.unmodifiableList(userMemberships);
     }
 
-    public static List<UserMembership> toUserMembership(final List<SUserMembership> sUserMemberships, final Map<Long, String> userNames,
+    public static List<UserMembership> toUserMembership(final List<SUserMembership> sUserMemberships,
+            final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
         final List<UserMembership> userMemberships = new ArrayList<>();
         if (sUserMemberships != null) {
@@ -1080,21 +1173,25 @@ public class ModelConvertor {
         return Collections.unmodifiableList(userMemberships);
     }
 
-    public static List<ExportedUserMembership> toExportedUserMembership(final List<SUserMembership> sUserMemberships, final Map<Long, String> userNames,
+    public static List<ExportedUserMembership> toExportedUserMembership(final List<SUserMembership> sUserMemberships,
+            final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
         final List<ExportedUserMembership> userMemberships = new ArrayList<>();
         if (sUserMemberships != null) {
             for (final SUserMembership sMembership : sUserMemberships) {
-                final ExportedUserMembership userMembership = toExportedUserMembership(sMembership, userNames, groupIdToGroup);
+                final ExportedUserMembership userMembership = toExportedUserMembership(sMembership, userNames,
+                        groupIdToGroup);
                 userMemberships.add(userMembership);
             }
         }
         return Collections.unmodifiableList(userMemberships);
     }
 
-    private static UserMembership toUserMembership(final SUserMembership sUserMembership, final Map<Long, String> userNames,
+    private static UserMembership toUserMembership(final SUserMembership sUserMembership,
+            final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
-        final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(), sUserMembership.getUserId(), sUserMembership.getGroupId(),
+        final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(),
+                sUserMembership.getUserId(), sUserMembership.getGroupId(),
                 sUserMembership.getRoleId());
         userMembership.setGroupName(sUserMembership.getGroupName());
         userMembership.setGroupParentPath(groupIdToGroup.get(sUserMembership.getGroupId()));
@@ -1109,7 +1206,8 @@ public class ModelConvertor {
         return userMembership;
     }
 
-    private static ExportedUserMembership toExportedUserMembership(final SUserMembership sUserMembership, final Map<Long, String> userNames,
+    private static ExportedUserMembership toExportedUserMembership(final SUserMembership sUserMembership,
+            final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
         final ExportedUserMembership userMembership = new ExportedUserMembership();
         userMembership.setGroupName(sUserMembership.getGroupName());
@@ -1132,14 +1230,16 @@ public class ModelConvertor {
     }
 
     public static CommandDescriptor toCommandDescriptor(final SCommand command) {
-        final CommandDescriptorImpl commandDescriptor = new CommandDescriptorImpl(command.getName(), command.getDescription(), command.getImplementation());
+        final CommandDescriptorImpl commandDescriptor = new CommandDescriptorImpl(command.getName(),
+                command.getDescription(), command.getImplementation());
         commandDescriptor.setId(command.getId());
         commandDescriptor.setSystem(command.isSystem());
         return commandDescriptor;
     }
 
     public static CommandDescriptor toCommandDescriptor(final SPlatformCommand platformCommand) {
-        final CommandDescriptorImpl commandDescriptor = new CommandDescriptorImpl(platformCommand.getName(), platformCommand.getDescription(),
+        final CommandDescriptorImpl commandDescriptor = new CommandDescriptorImpl(platformCommand.getName(),
+                platformCommand.getDescription(),
                 platformCommand.getImplementation());
         commandDescriptor.setId(platformCommand.getId());
         return commandDescriptor;
@@ -1178,7 +1278,8 @@ public class ModelConvertor {
         return Collections.emptyList();
     }
 
-    public static List<EventInstance> toEventInstances(final Collection<SEventInstance> sEvents, final FlowNodeStateManager flowNodeStateManager) {
+    public static List<EventInstance> toEventInstances(final Collection<SEventInstance> sEvents,
+            final FlowNodeStateManager flowNodeStateManager) {
         final List<EventInstance> eventInstances = new ArrayList<>();
         for (final SEventInstance sEvent : sEvents) {
             final EventInstance eventInstance = toEventInstance(sEvent, flowNodeStateManager);
@@ -1187,13 +1288,15 @@ public class ModelConvertor {
         return eventInstances;
     }
 
-    public static EventInstance toEventInstance(final SEventInstance sEvent, final FlowNodeStateManager flowNodeStateManager) {
+    public static EventInstance toEventInstance(final SEventInstance sEvent,
+            final FlowNodeStateManager flowNodeStateManager) {
         final EventInstanceImpl eventInstance = getEventInstance(sEvent);
         updateFlowNode(eventInstance, sEvent, flowNodeStateManager.getState(sEvent.getStateId()).getName());
         return eventInstance;
     }
 
-    public static List<TimerEventTriggerInstance> toTimerEventTriggerInstances(final List<STimerEventTriggerInstance> sEventTriggerInstances) {
+    public static List<TimerEventTriggerInstance> toTimerEventTriggerInstances(
+            final List<STimerEventTriggerInstance> sEventTriggerInstances) {
         final List<TimerEventTriggerInstance> eventTriggerInstances = new ArrayList<>();
         for (final STimerEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
             final TimerEventTriggerInstance eventTriggerInstance = toTimerEventTriggerInstance(sEventTriggerInstance);
@@ -1202,9 +1305,12 @@ public class ModelConvertor {
         return eventTriggerInstances;
     }
 
-    public static TimerEventTriggerInstance toTimerEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
-        return new TimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getId(), sTimerEventTriggerInstance.getEventInstanceId(),
-                sTimerEventTriggerInstance.getEventInstanceName(), new Date(sTimerEventTriggerInstance.getExecutionDate()));
+    public static TimerEventTriggerInstance toTimerEventTriggerInstance(
+            final STimerEventTriggerInstance sTimerEventTriggerInstance) {
+        return new TimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getId(),
+                sTimerEventTriggerInstance.getEventInstanceId(),
+                sTimerEventTriggerInstance.getEventInstanceName(),
+                new Date(sTimerEventTriggerInstance.getExecutionDate()));
     }
 
     public static WaitingEvent toWaitingEvent(final SWaitingEvent sWaitingEvent) {
@@ -1216,17 +1322,20 @@ public class ModelConvertor {
         switch (sWaitingEvent.getEventTriggerType()) {
             case ERROR:
                 final SWaitingErrorEvent sWaitingErrorEvent = (SWaitingErrorEvent) sWaitingEvent;
-                waitingEvent = new WaitingErrorEventImpl(bpmEventType, processDefinitionId, processName, flowNodeDefinitionId,
+                waitingEvent = new WaitingErrorEventImpl(bpmEventType, processDefinitionId, processName,
+                        flowNodeDefinitionId,
                         sWaitingErrorEvent.getErrorCode());
                 break;
             case MESSAGE:
                 final SWaitingMessageEvent sWaitingMessageEvent = (SWaitingMessageEvent) sWaitingEvent;
-                waitingEvent = new WaitingMessageEventImpl(bpmEventType, processDefinitionId, processName, flowNodeDefinitionId,
+                waitingEvent = new WaitingMessageEventImpl(bpmEventType, processDefinitionId, processName,
+                        flowNodeDefinitionId,
                         sWaitingMessageEvent.getMessageName());
                 break;
             case SIGNAL:
                 final SWaitingSignalEvent sWaitingSignalEvent = (SWaitingSignalEvent) sWaitingEvent;
-                waitingEvent = new WaitingSignalEventImpl(bpmEventType, processDefinitionId, processName, flowNodeDefinitionId,
+                waitingEvent = new WaitingSignalEventImpl(bpmEventType, processDefinitionId, processName,
+                        flowNodeDefinitionId,
                         sWaitingSignalEvent.getSignalName());
                 break;
             default:
@@ -1286,7 +1395,8 @@ public class ModelConvertor {
     public static DataDefinition toDataDefinition(final SDataDefinition sDataDefinition) {
         DataDefinitionImpl dataDefinitionImpl = null;
         if (sDataDefinition != null) {
-            dataDefinitionImpl = new DataDefinitionImpl(sDataDefinition.getName(), toExpression(sDataDefinition.getDefaultValueExpression()));
+            dataDefinitionImpl = new DataDefinitionImpl(sDataDefinition.getName(),
+                    toExpression(sDataDefinition.getDefaultValueExpression()));
             dataDefinitionImpl.setClassName(sDataDefinition.getClassName());
             dataDefinitionImpl.setDescription(sDataDefinition.getDescription());
             dataDefinitionImpl.setTransientData(sDataDefinition.isTransientData());
@@ -1374,7 +1484,8 @@ public class ModelConvertor {
     }
 
     public static ActorMember toActorMember(final SActorMember sActorMember) {
-        return new ActorMemberImpl(sActorMember.getId(), sActorMember.getUserId(), sActorMember.getGroupId(), sActorMember.getRoleId());
+        return new ActorMemberImpl(sActorMember.getId(), sActorMember.getUserId(), sActorMember.getGroupId(),
+                sActorMember.getRoleId());
     }
 
     public static List<ActorMember> toActorMembers(final List<SActorMember> sActorMembers) {
@@ -1392,7 +1503,8 @@ public class ModelConvertor {
         final long scopeId = actor.getScopeId();
         final String displayName = actor.getDisplayName();
         final boolean initiator = actor.isInitiator();
-        final ActorInstanceImpl actorInstance = new ActorInstanceImpl(name, description, displayName, scopeId, initiator);
+        final ActorInstanceImpl actorInstance = new ActorInstanceImpl(name, description, displayName, scopeId,
+                initiator);
         actorInstance.setId(actor.getId());
         return actorInstance;
     }
@@ -1437,7 +1549,8 @@ public class ModelConvertor {
         return userBuilder.build();
     }
 
-    public static SContactInfo constructSUserContactInfo(final UserCreator creator, final long userId, final boolean personal) {
+    public static SContactInfo constructSUserContactInfo(final UserCreator creator, final long userId,
+            final boolean personal) {
         Map<ContactDataField, Serializable> fields;
         if (personal) {
             fields = creator.getPersoFields();
@@ -1445,7 +1558,8 @@ public class ModelConvertor {
             fields = creator.getProFields();
         }
         if (fields != null && !fields.isEmpty()) {
-            final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId).personal(personal);
+            final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId)
+                    .personal(personal);
             final String address = (String) fields.get(ContactDataField.ADDRESS);
             if (address != null) {
                 contactInfoBuilder.address(address);
@@ -1499,8 +1613,10 @@ public class ModelConvertor {
         return null;
     }
 
-    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
-        final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId).personal(isPersonal);
+    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal,
+            final long userId) {
+        final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId)
+                .personal(isPersonal);
         if (isPersonal) {
             contactInfoBuilder.address(user.getPersonalAddress());
             contactInfoBuilder.building(user.getPersonalBuilding());
@@ -1614,7 +1730,8 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments, final DocumentService documentService) {
+    public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments,
+            final DocumentService documentService) {
         final List<Document> documents = new ArrayList<>();
         for (final SMappedDocument mappedDocument : mappedDocuments) {
             final Document document = toDocument(mappedDocument, documentService);
@@ -1635,7 +1752,8 @@ public class ModelConvertor {
         return documentImpl;
     }
 
-    private static void setDocumentFields(final SMappedDocument mappedDocument, final DocumentService documentService, final DocumentImpl documentImpl) {
+    private static void setDocumentFields(final SMappedDocument mappedDocument, final DocumentService documentService,
+            final DocumentImpl documentImpl) {
         documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
         documentImpl.setName(mappedDocument.getName());
         documentImpl.setDescription(mappedDocument.getDescription());
@@ -1648,13 +1766,15 @@ public class ModelConvertor {
         documentImpl.setContentStorageId(String.valueOf(mappedDocument.getDocumentId()));
         documentImpl.setIndex(mappedDocument.getIndex());
         if (mappedDocument.hasContent()) {
-            documentImpl.setUrl(documentService.generateDocumentURL(mappedDocument.getFileName(), String.valueOf(mappedDocument.getDocumentId())));
+            documentImpl.setUrl(documentService.generateDocumentURL(mappedDocument.getFileName(),
+                    String.valueOf(mappedDocument.getDocumentId())));
         } else {
             documentImpl.setUrl(mappedDocument.getUrl());
         }
     }
 
-    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments, final DocumentService documentService) {
+    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments,
+            final DocumentService documentService) {
         final List<ArchivedDocument> documents = new ArrayList<>();
         for (final SAMappedDocument mappedDocument : mappedDocuments) {
             final ArchivedDocument document = toArchivedDocument(mappedDocument, documentService);
@@ -1663,7 +1783,8 @@ public class ModelConvertor {
         return documents;
     }
 
-    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument, final DocumentService documentService) {
+    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument,
+            final DocumentService documentService) {
         final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(mappedDocument.getName());
         documentImpl.setId(mappedDocument.getId());
         setDocumentFields(mappedDocument, documentService, documentImpl);
@@ -1693,7 +1814,7 @@ public class ModelConvertor {
         } else if (state.equalsIgnoreCase(ActivityStates.FAILED_STATE)) {
             stateId = 3;
         } else {
-            throw new IllegalArgumentException("Unknown activity state "+ state);
+            throw new IllegalArgumentException("Unknown activity state " + state);
         }
         return stateId;
     }
@@ -1754,7 +1875,8 @@ public class ModelConvertor {
         for (final Expression dep : model.getDependencies()) {
             dependencies.add(constructSExpression(dep));
         }
-        final SExpressionBuilder expressionBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
+        final SExpressionBuilder expressionBuilder = BuilderFactory.get(SExpressionBuilderFactory.class)
+                .createNewInstance();
         expressionBuilder.setName(model.getName());
         expressionBuilder.setContent(model.getContent());
         expressionBuilder.setExpressionType(model.getExpressionType());
@@ -1779,7 +1901,8 @@ public class ModelConvertor {
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
-                        BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
+                        BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                                .setName(operation.getLeftOperand().getName())
                                 .setType(operation.getLeftOperand().getType()).done())
                 .done();
     }
@@ -1801,7 +1924,8 @@ public class ModelConvertor {
             final List<ConnectorImplementationDescriptor> connectorImplementationDescriptors = new ArrayList<>(
                     sConnectorImplementationDescriptors.size());
             for (final SConnectorImplementationDescriptor sConnectorImplementationDescriptor : sConnectorImplementationDescriptors) {
-                connectorImplementationDescriptors.add(toConnectorImplementationDescriptor(sConnectorImplementationDescriptor));
+                connectorImplementationDescriptors
+                        .add(toConnectorImplementationDescriptor(sConnectorImplementationDescriptor));
             }
             return connectorImplementationDescriptors;
         }
@@ -1812,7 +1936,8 @@ public class ModelConvertor {
             final SConnectorImplementationDescriptor sConnectorImplementationDescriptor) {
         return new ConnectorImplementationDescriptor(sConnectorImplementationDescriptor.getImplementationClassName(),
                 sConnectorImplementationDescriptor.getId(), sConnectorImplementationDescriptor.getVersion(),
-                sConnectorImplementationDescriptor.getDefinitionId(), sConnectorImplementationDescriptor.getDefinitionVersion(),
+                sConnectorImplementationDescriptor.getDefinitionId(),
+                sConnectorImplementationDescriptor.getDefinitionVersion(),
                 sConnectorImplementationDescriptor.getJarDependencies());
     }
 
@@ -1863,7 +1988,8 @@ public class ModelConvertor {
     }
 
     public static ConnectorDefinition toConnectorDefinition(final SConnectorDefinition connector) {
-        final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(connector.getName(), connector.getConnectorId(),
+        final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(connector.getName(),
+                connector.getConnectorId(),
                 connector.getVersion(), connector.getActivationEvent());
         // connectorDefinitionImpl.setId(connector.getId());
         for (final Entry<String, SExpression> input : connector.getInputs().entrySet()) {
@@ -1888,44 +2014,56 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedFlowNodeInstance> flowNodeInstances = new ArrayList<>();
         for (final SAFlowNodeInstance saFlowNode : saFlowNodes) {
-            final ArchivedFlowNodeInstance flowNodeInstance = toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager);
+            final ArchivedFlowNodeInstance flowNodeInstance = toArchivedFlowNodeInstance(saFlowNode,
+                    flowNodeStateManager);
             flowNodeInstances.add(flowNodeInstance);
         }
         return flowNodeInstances;
     }
 
-    public static ArchivedFlowNodeInstance toArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNode, final FlowNodeStateManager flowNodeStateManager) {
+    public static ArchivedFlowNodeInstance toArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNode,
+            final FlowNodeStateManager flowNodeStateManager) {
         ArchivedFlowNodeInstance archiveFlowNodeInstance = null;
         switch (saFlowNode.getType()) {
             case AUTOMATIC_TASK:
-                archiveFlowNodeInstance = toArchivedAutomaticTaskInstance((SAAutomaticTaskInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedAutomaticTaskInstance((SAAutomaticTaskInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case MANUAL_TASK:
-                archiveFlowNodeInstance = toArchivedManualTaskInstance((SAManualTaskInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedManualTaskInstance((SAManualTaskInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case USER_TASK:
-                archiveFlowNodeInstance = toArchivedUserTaskInstance((SAUserTaskInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedUserTaskInstance((SAUserTaskInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case RECEIVE_TASK:
-                archiveFlowNodeInstance = toArchivedReceiveTaskInstance((SAReceiveTaskInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedReceiveTaskInstance((SAReceiveTaskInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case SEND_TASK:
-                archiveFlowNodeInstance = toArchivedSendTaskInstance((SASendTaskInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedSendTaskInstance((SASendTaskInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case CALL_ACTIVITY:
-                archiveFlowNodeInstance = toArchivedCallActivityInstance((SACallActivityInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedCallActivityInstance((SACallActivityInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case LOOP_ACTIVITY:
-                archiveFlowNodeInstance = toArchivedLoopActivityInstance((SALoopActivityInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedLoopActivityInstance((SALoopActivityInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case SUB_PROCESS:
-                archiveFlowNodeInstance = toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedSubProcessActivityInstance(
+                        (SASubProcessActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case GATEWAY:
-                archiveFlowNodeInstance = toArchivedGatewayInstance((SAGatewayInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedGatewayInstance((SAGatewayInstance) saFlowNode,
+                        flowNodeStateManager);
                 break;
             case MULTI_INSTANCE_ACTIVITY:
-                archiveFlowNodeInstance = toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) saFlowNode, flowNodeStateManager);
+                archiveFlowNodeInstance = toArchivedMultiInstanceActivityInstance(
+                        (SAMultiInstanceActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case BOUNDARY_EVENT:
             case START_EVENT:
@@ -1949,8 +2087,10 @@ public class ModelConvertor {
     }
 
     private static ConnectorInstance toConnectorInstance(final SConnectorInstance sConnectorInstance) {
-        final ConnectorInstanceImpl connectorInstanceImpl = new ConnectorInstanceImpl(sConnectorInstance.getName(), sConnectorInstance.getContainerId(),
-                sConnectorInstance.getContainerType(), sConnectorInstance.getConnectorId(), sConnectorInstance.getVersion(),
+        final ConnectorInstanceImpl connectorInstanceImpl = new ConnectorInstanceImpl(sConnectorInstance.getName(),
+                sConnectorInstance.getContainerId(),
+                sConnectorInstance.getContainerType(), sConnectorInstance.getConnectorId(),
+                sConnectorInstance.getVersion(),
                 ConnectorState.valueOf(sConnectorInstance.getState()), sConnectorInstance.getActivationEvent());
         connectorInstanceImpl.setId(sConnectorInstance.getId());
         return connectorInstanceImpl;
@@ -1960,27 +2100,35 @@ public class ModelConvertor {
             final SConnectorInstanceWithFailureInfo sConnectorInstanceWithFailureInfo) {
         final ConnectorInstanceWithFailureInfoImpl connectorInstanceImpl = new ConnectorInstanceWithFailureInfoImpl(
                 sConnectorInstanceWithFailureInfo.getName(), sConnectorInstanceWithFailureInfo.getContainerId(),
-                sConnectorInstanceWithFailureInfo.getContainerType(), sConnectorInstanceWithFailureInfo.getConnectorId(),
-                sConnectorInstanceWithFailureInfo.getVersion(), ConnectorState.valueOf(sConnectorInstanceWithFailureInfo.getState()),
-                sConnectorInstanceWithFailureInfo.getActivationEvent(), sConnectorInstanceWithFailureInfo.getExceptionMessage(),
+                sConnectorInstanceWithFailureInfo.getContainerType(),
+                sConnectorInstanceWithFailureInfo.getConnectorId(),
+                sConnectorInstanceWithFailureInfo.getVersion(),
+                ConnectorState.valueOf(sConnectorInstanceWithFailureInfo.getState()),
+                sConnectorInstanceWithFailureInfo.getActivationEvent(),
+                sConnectorInstanceWithFailureInfo.getExceptionMessage(),
                 sConnectorInstanceWithFailureInfo.getStackTrace());
         connectorInstanceImpl.setId(sConnectorInstanceWithFailureInfo.getId());
         return connectorInstanceImpl;
     }
 
     public static ArchivedConnectorInstance toArchivedConnectorInstance(final SAConnectorInstance sAConnectorInstance) {
-        final ArchivedConnectorInstanceImpl connectorInstanceImpl = new ArchivedConnectorInstanceImpl(sAConnectorInstance.getName(), new Date(
-                sAConnectorInstance.getArchiveDate()), sAConnectorInstance.getContainerId(), sAConnectorInstance.getContainerType(),
-                sAConnectorInstance.getConnectorId(), sAConnectorInstance.getVersion(), sAConnectorInstance.getActivationEvent(),
+        final ArchivedConnectorInstanceImpl connectorInstanceImpl = new ArchivedConnectorInstanceImpl(
+                sAConnectorInstance.getName(), new Date(
+                        sAConnectorInstance.getArchiveDate()),
+                sAConnectorInstance.getContainerId(), sAConnectorInstance.getContainerType(),
+                sAConnectorInstance.getConnectorId(), sAConnectorInstance.getVersion(),
+                sAConnectorInstance.getActivationEvent(),
                 ConnectorState.valueOf(sAConnectorInstance.getState()), sAConnectorInstance.getSourceObjectId());
         connectorInstanceImpl.setId(sAConnectorInstance.getId());
         return connectorInstanceImpl;
     }
 
-    public static List<ArchivedConnectorInstance> toArchivedConnectorInstances(final List<SAConnectorInstance> serverObjects) {
+    public static List<ArchivedConnectorInstance> toArchivedConnectorInstances(
+            final List<SAConnectorInstance> serverObjects) {
         final List<ArchivedConnectorInstance> commments = new ArrayList<>();
         for (final SAConnectorInstance saConnectorInstance : serverObjects) {
-            final ArchivedConnectorInstance archivedConnectorInstance = toArchivedConnectorInstance(saConnectorInstance);
+            final ArchivedConnectorInstance archivedConnectorInstance = toArchivedConnectorInstance(
+                    saConnectorInstance);
             commments.add(archivedConnectorInstance);
         }
         return commments;
@@ -2017,7 +2165,8 @@ public class ModelConvertor {
     }
 
     public static ProfileEntry toProfileEntry(final SProfileEntry sProfileEntry) {
-        final ProfileEntryImpl profileEntryImpl = new ProfileEntryImpl(sProfileEntry.getName(), sProfileEntry.getProfileId());
+        final ProfileEntryImpl profileEntryImpl = new ProfileEntryImpl(sProfileEntry.getName(),
+                sProfileEntry.getProfileId());
         profileEntryImpl.setId(sProfileEntry.getId());
         profileEntryImpl.setDescription(sProfileEntry.getDescription());
         profileEntryImpl.setIndex(sProfileEntry.getIndex());
@@ -2052,7 +2201,8 @@ public class ModelConvertor {
 
     public static SProfileMember constructSProfileMember(final ProfileMemberCreator creator) {
         final Map<ProfileMemberField, Serializable> fields = creator.getFields();
-        final SProfileMember.SProfileMemberBuilder newSProfileMemberBuilder = SProfileMember.builder().profileId((Long) fields.get(ProfileMemberField.PROFILE_ID));
+        final SProfileMember.SProfileMemberBuilder newSProfileMemberBuilder = SProfileMember.builder()
+                .profileId((Long) fields.get(ProfileMemberField.PROFILE_ID));
         final Long groupeId = (Long) fields.get(ProfileMemberField.GROUP_ID);
         if (groupeId != null) {
             newSProfileMemberBuilder.groupId(groupeId);
@@ -2119,7 +2269,8 @@ public class ModelConvertor {
         return value;
     }
 
-    public static FormMapping toFormMapping(final SFormMapping sFormMapping, final FormRequiredAnalyzer formRequiredAnalyzer) {
+    public static FormMapping toFormMapping(final SFormMapping sFormMapping,
+            final FormRequiredAnalyzer formRequiredAnalyzer) {
         if (sFormMapping == null) {
             return null;
         }
@@ -2133,7 +2284,8 @@ public class ModelConvertor {
             formMapping.setPageURL(pageMapping.getUrl());
         }
         formMapping.setType(FormMappingType.getTypeFromId(sFormMapping.getType()));
-        formMapping.setTarget(sFormMapping.getTarget() == null ? null : FormMappingTarget.valueOf(sFormMapping.getTarget()));
+        formMapping.setTarget(
+                sFormMapping.getTarget() == null ? null : FormMappingTarget.valueOf(sFormMapping.getTarget()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
         final long lastUpdateDate = sFormMapping.getLastUpdateDate();
         formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate) : null);
@@ -2144,7 +2296,8 @@ public class ModelConvertor {
         return formMapping;
     }
 
-    public static List<FormMapping> toFormMappings(final List<SFormMapping> serverObjects, final FormRequiredAnalyzer formRequiredAnalyzer) {
+    public static List<FormMapping> toFormMappings(final List<SFormMapping> serverObjects,
+            final FormRequiredAnalyzer formRequiredAnalyzer) {
         final List<FormMapping> clientObjects = new ArrayList<>(serverObjects.size());
         for (final SFormMapping serverObject : serverObjects) {
             clientObjects.add(toFormMapping(serverObject, formRequiredAnalyzer));
@@ -2152,7 +2305,8 @@ public class ModelConvertor {
         return clientObjects;
     }
 
-    public static BusinessDataReference toBusinessDataReference(final SRefBusinessDataInstance sRefBusinessDataInstance) {
+    public static BusinessDataReference toBusinessDataReference(
+            final SRefBusinessDataInstance sRefBusinessDataInstance) {
         if (sRefBusinessDataInstance == null) {
             return null;
         }
@@ -2174,7 +2328,8 @@ public class ModelConvertor {
             contract.addInput(toInput(input));
         }
         for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {
-            final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(), sConstraintDefinition.getExpression(),
+            final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(),
+                    sConstraintDefinition.getExpression(),
                     sConstraintDefinition.getExplanation());
             for (final String inputName : sConstraintDefinition.getInputNames()) {
                 constraint.addInputName(inputName);
@@ -2190,7 +2345,8 @@ public class ModelConvertor {
             inputDefinitions.add(toInput(sInputDefinition));
         }
         final SType type = input.getType();
-        final InputDefinitionImpl inputDefinition = new InputDefinitionImpl(input.getName(), type == null ? null : Type.valueOf(type.toString()),
+        final InputDefinitionImpl inputDefinition = new InputDefinitionImpl(input.getName(),
+                type == null ? null : Type.valueOf(type.toString()),
                 input.getDescription(), input.isMultiple());
         inputDefinition.getInputs().addAll(inputDefinitions);
         return inputDefinition;
@@ -2201,11 +2357,14 @@ public class ModelConvertor {
         return new PageURL(sPageURL.getUrl(), sPageURL.getPageId());
     }
 
-    public static List<ExportedCustomUserInfoDefinition> toExportedCustomUserInfoDefinition(List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
-        ArrayList<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators = new ArrayList<>(customUserInfoDefinitions.size());
+    public static List<ExportedCustomUserInfoDefinition> toExportedCustomUserInfoDefinition(
+            List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
+        ArrayList<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators = new ArrayList<>(
+                customUserInfoDefinitions.size());
         for (SCustomUserInfoDefinition customUserInfoDefinition : customUserInfoDefinitions) {
             customUserInfoDefinitionCreators
-                    .add(new ExportedCustomUserInfoDefinition(customUserInfoDefinition.getName(), customUserInfoDefinition.getDescription()));
+                    .add(new ExportedCustomUserInfoDefinition(customUserInfoDefinition.getName(),
+                            customUserInfoDefinition.getDescription()));
         }
         return customUserInfoDefinitionCreators;
     }

@@ -36,23 +36,32 @@ public class StartEventIT extends TestWithUser {
     public void executeSeveralStartEventsInSameProcessDefinition() throws Exception {
         final int timerValue = 10000;
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerValue);
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addStartEvent("startEvent").addUserTask("step1", ACTOR_NAME).addTransition("startEvent", "step1");
-        processDefinitionBuilder.addStartEvent("startEventWithSignal").addSignalEventTrigger("signalName").addUserTask("step1WithSignal", ACTOR_NAME)
+        processDefinitionBuilder.addStartEvent("startEvent").addUserTask("step1", ACTOR_NAME)
+                .addTransition("startEvent", "step1");
+        processDefinitionBuilder.addStartEvent("startEventWithSignal").addSignalEventTrigger("signalName")
+                .addUserTask("step1WithSignal", ACTOR_NAME)
                 .addTransition("startEventWithSignal", "step1WithSignal");
-        processDefinitionBuilder.addStartEvent("startEventWithTimer").addTimerEventTriggerDefinition(TimerType.DURATION, timerExpression)
+        processDefinitionBuilder.addStartEvent("startEventWithTimer")
+                .addTimerEventTriggerDefinition(TimerType.DURATION, timerExpression)
                 .addUserTask("step1WithTimer", ACTOR_NAME).addTransition("startEventWithTimer", "step1WithTimer");
-        processDefinitionBuilder.addStartEvent("startEventWithMessage").addMessageEventTrigger("message").addUserTask("step1WithMessage", ACTOR_NAME)
+        processDefinitionBuilder.addStartEvent("startEventWithMessage").addMessageEventTrigger("message")
+                .addUserTask("step1WithMessage", ACTOR_NAME)
                 .addTransition("startEventWithMessage", "step1WithMessage");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(
+                processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance step1 = waitForUserTaskAndGetIt("step1");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
                 .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
-        List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
-        assertNotNull("searchPendingTasksForUser give a null result for userId:" + user.getId() + " search options:" + searchOptionsBuilder.done(),
+        List<HumanTaskInstance> humanTaskInstances = getProcessAPI()
+                .searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
+        assertNotNull(
+                "searchPendingTasksForUser give a null result for userId:" + user.getId() + " search options:"
+                        + searchOptionsBuilder.done(),
                 humanTaskInstances);
 
         // timerValue is slower than startProcess time
@@ -70,11 +79,13 @@ public class StartEventIT extends TestWithUser {
         // Verify that the start without trigger, and the start with a timer are started
         // wait for process instance creation
         waitForUserTask("step1WithTimer");
-        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
+        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
+                .getResult();
         assertEquals(2, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
         assertEquals("step1WithTimer", humanTaskInstances.get(1).getName());
-        final ProcessInstance processInstanceWithTimer = getProcessAPI().getProcessInstance(humanTaskInstances.get(1).getRootContainerId());
+        final ProcessInstance processInstanceWithTimer = getProcessAPI()
+                .getProcessInstance(humanTaskInstances.get(1).getRootContainerId());
         assertEquals(0, processInstanceWithTimer.getStartedBy());
         assertNotEquals(startProcess.getId(), processInstanceWithTimer.getId());
 
@@ -82,12 +93,14 @@ public class StartEventIT extends TestWithUser {
         getProcessAPI().sendSignal("signalName");
         waitForUserTask("step1WithSignal");
 
-        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
+        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
+                .getResult();
         assertEquals(3, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
         assertEquals("step1WithTimer", humanTaskInstances.get(1).getName());
         assertEquals("step1WithSignal", humanTaskInstances.get(2).getName());
-        final ProcessInstance processInstanceWithSignal = getProcessAPI().getProcessInstance(humanTaskInstances.get(2).getRootContainerId());
+        final ProcessInstance processInstanceWithSignal = getProcessAPI()
+                .getProcessInstance(humanTaskInstances.get(2).getRootContainerId());
         assertEquals(0, processInstanceWithSignal.getStartedBy());
         assertNotEquals(processInstanceWithTimer.getId(), processInstanceWithSignal.getId());
 
@@ -95,13 +108,15 @@ public class StartEventIT extends TestWithUser {
         getProcessAPI().sendMessage("message", new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME),
                 new ExpressionBuilder().createConstantStringExpression("startEventWithMessage"), null);
         waitForUserTask("step1WithMessage");
-        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
+        humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
+                .getResult();
         assertEquals(4, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
         assertEquals("step1WithTimer", humanTaskInstances.get(1).getName());
         assertEquals("step1WithSignal", humanTaskInstances.get(2).getName());
         assertEquals("step1WithMessage", humanTaskInstances.get(3).getName());
-        final ProcessInstance processInstanceWithMessage = getProcessAPI().getProcessInstance(humanTaskInstances.get(3).getRootContainerId());
+        final ProcessInstance processInstanceWithMessage = getProcessAPI()
+                .getProcessInstance(humanTaskInstances.get(3).getRootContainerId());
         assertEquals(0, processInstanceWithMessage.getStartedBy());
         assertNotEquals(processInstanceWithSignal.getId(), processInstanceWithMessage.getId());
 

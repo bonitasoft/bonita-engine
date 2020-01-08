@@ -19,8 +19,9 @@ import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 
-import javax.inject.Inject;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -50,7 +51,8 @@ public class UserMembershipTest {
     public void getUserMembershipsByGroup_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -65,7 +67,8 @@ public class UserMembershipTest {
     public void getUserMembershipsByRole_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -80,7 +83,8 @@ public class UserMembershipTest {
     public void getUserMembershipsOfUser_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -95,7 +99,8 @@ public class UserMembershipTest {
     public void getUserMembershipWithIds_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -110,7 +115,8 @@ public class UserMembershipTest {
     public void getUserMemberships_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -125,7 +131,8 @@ public class UserMembershipTest {
     public void getSUserMembershipById_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
@@ -140,7 +147,8 @@ public class UserMembershipTest {
     public void searchUserMembership_should_fill_in_groupParentPath() {
 
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
-        SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
+        SGroup group = repository
+                .add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
         SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);

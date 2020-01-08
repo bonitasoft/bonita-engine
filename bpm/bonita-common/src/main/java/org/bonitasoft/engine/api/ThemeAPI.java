@@ -20,47 +20,47 @@ import org.bonitasoft.engine.theme.ThemeType;
 
 /**
  * Manage mobile and portal theme. A Theme is a look &amp; feel in Bonita Portal.
- * 
+ *
  * @author Celine Souchet
  */
 public interface ThemeAPI {
 
     /**
      * Get the current theme for the specific type.
-     * 
+     *
      * @param type
-     *            The type of the theme
+     *        The type of the theme
      * @return The theme
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs while retrieving the theme
+     *         If an exception occurs while retrieving the theme
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
     Theme getCurrentTheme(ThemeType type);
 
     /**
      * Get the default theme for the specific type.
-     * 
+     *
      * @param type
-     *            The type of the theme
+     *        The type of the theme
      * @return The theme
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs while retrieving the theme
+     *         If an exception occurs while retrieving the theme
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
     Theme getDefaultTheme(ThemeType type);
 
     /**
      * Get the last updated date of the current theme for the specific type.
-     * 
+     *
      * @param type
-     *            The type of theme
+     *        The type of theme
      * @return The last updated date of the theme
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
     Date getLastUpdateDate(ThemeType type);

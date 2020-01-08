@@ -72,7 +72,7 @@ public abstract class ServletCall {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param request
      *        The request made to access this servletCall.
      * @param response
@@ -80,7 +80,8 @@ public abstract class ServletCall {
      * @throws IOException
      * @throws FileUploadException
      */
-    public ServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
+    public ServletCall(final HttpServletRequest request, final HttpServletResponse response)
+            throws FileUploadException, IOException {
         super();
         this.request = request;
         this.response = response;
@@ -141,7 +142,7 @@ public abstract class ServletCall {
 
     /**
      * Get the current call's HttpSession
-     * 
+     *
      * @return This method returns the session from the current call.
      */
     public HttpSession getHttpSession() {
@@ -160,7 +161,7 @@ public abstract class ServletCall {
      * The returned URL contains a protocol, server name, port
      * number, and server path, but it does not include query
      * string parameters.
-     * 
+     *
      * @return This method returns the reconstructed URL
      */
     public final String getRequestURL() {
@@ -194,7 +195,7 @@ public abstract class ServletCall {
 
     /**
      * Count the number of parameters passed in the URL
-     * 
+     *
      * @return This method returns the number of parameters in the URL
      */
     public final int countParameters() {
@@ -203,7 +204,7 @@ public abstract class ServletCall {
 
     /**
      * Get a parameter values by its name
-     * 
+     *
      * @param name
      *        The name of the parameter (case sensitive)
      * @return This method returns the values of a parameter as a list of String or null if the parameter isn't defined
@@ -214,7 +215,7 @@ public abstract class ServletCall {
 
     /**
      * Get a parameter values by its name
-     * 
+     *
      * @param name
      *        The name of the parameter (case sensitive)
      * @param defaultValue
@@ -235,7 +236,7 @@ public abstract class ServletCall {
 
     /**
      * Get a parameter first value by its name
-     * 
+     *
      * @param name
      *        The name of the parameter (case sensitive)
      * @return This method returns the first value of a parameter as a String or null if the parameter isn't define
@@ -246,7 +247,7 @@ public abstract class ServletCall {
 
     /**
      * Get a parameter first value by its name
-     * 
+     *
      * @param name
      *        The name of the parameter (case sensitive)
      * @param defaultValue
@@ -266,7 +267,7 @@ public abstract class ServletCall {
 
     /**
      * Write into the output header.
-     * 
+     *
      * @param name
      *        The name of the header to write.
      * @param value
@@ -278,7 +279,7 @@ public abstract class ServletCall {
 
     /**
      * Output a file
-     * 
+     *
      * @param file
      *        The file to output
      */
@@ -292,7 +293,7 @@ public abstract class ServletCall {
 
     /**
      * Output a stream as a file
-     * 
+     *
      * @param stream
      *        The stream to output
      * @param filename
@@ -305,7 +306,7 @@ public abstract class ServletCall {
 
     /**
      * Output a stream as a file
-     * 
+     *
      * @param stream
      *        The stream to output
      */
@@ -325,7 +326,7 @@ public abstract class ServletCall {
 
     /**
      * Write into the output
-     * 
+     *
      * @param string
      *        The string to output
      */
@@ -338,7 +339,7 @@ public abstract class ServletCall {
 
     /**
      * Write into the output
-     * 
+     *
      * @param object
      *        An object that will be transform into JSon
      */

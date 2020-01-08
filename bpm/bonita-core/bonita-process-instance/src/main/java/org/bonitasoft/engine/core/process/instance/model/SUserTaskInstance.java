@@ -26,9 +26,12 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SUserTaskInstance extends SHumanTaskInstance {
-    public SUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                 final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
-        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, priority, logicalGroup1, logicalGroup2);
+
+    public SUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, priority, logicalGroup1,
+                logicalGroup2);
     }
 
     @Override

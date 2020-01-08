@@ -33,27 +33,32 @@ public interface LeftOperandHandler {
     String getType();
 
     /**
-     * @param inputValues   contains value(s) given by the strategy to update the left operand with
-     * @param sLeftOperand  the left operand
-     * @param newValue      the value to set the element with
-     * @param containerId   the container id
+     * @param inputValues contains value(s) given by the strategy to update the left operand with
+     * @param sLeftOperand the left operand
+     * @param newValue the value to set the element with
+     * @param containerId the container id
      * @param containerType the container type
      * @throws SOperationExecutionException
      */
-    Object update(SLeftOperand sLeftOperand, Map<String, Object> inputValues, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
+    Object update(SLeftOperand sLeftOperand, Map<String, Object> inputValues, Object newValue, long containerId,
+            String containerType) throws SOperationExecutionException;
 
     void delete(SLeftOperand sLeftOperand, long containerId, String containerType) throws SOperationExecutionException;
 
     /**
      * retrieve the left operand and put it in context as needed by the left operand
      *
-     * @param sLeftOperand      the left operand
-     * @param leftOperandContainerId the left operand container id. Used to execute the left Operand in the correct context
-     * @param leftOperandContainerType the left operand container type. Used to execute the left Operand in the correct context
-     * @param contextToSet      the context to add the value i
+     * @param sLeftOperand the left operand
+     * @param leftOperandContainerId the left operand container id. Used to execute the left Operand in the correct
+     *        context
+     * @param leftOperandContainerType the left operand container type. Used to execute the left Operand in the correct
+     *        context
+     * @param contextToSet the context to add the value i
      * @throws SBonitaReadException
      */
-    void loadLeftOperandInContext(SLeftOperand sLeftOperand, final long leftOperandContainerId, final String leftOperandContainerType, SExpressionContext contextToSet) throws SBonitaReadException;
+    void loadLeftOperandInContext(SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, SExpressionContext contextToSet) throws SBonitaReadException;
 
-    void loadLeftOperandInContext(List<SLeftOperand> sLeftOperandList, final long leftOperandContainerId, final String leftOperandContainerType, SExpressionContext contextToSet) throws SBonitaReadException;
+    void loadLeftOperandInContext(List<SLeftOperand> sLeftOperandList, final long leftOperandContainerId,
+            final String leftOperandContainerType, SExpressionContext contextToSet) throws SBonitaReadException;
 }

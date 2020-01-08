@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.flownode;
 
 /**
  * Corresponding to a instance of {@link ActivityDefinition}.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet

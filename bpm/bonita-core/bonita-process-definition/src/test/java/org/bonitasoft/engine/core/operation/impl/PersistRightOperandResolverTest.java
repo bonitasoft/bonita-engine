@@ -46,7 +46,8 @@ public class PersistRightOperandResolverTest {
     @Test
     public void should_not_persist_if_not_business_data() throws Exception {
         //when
-        boolean persist = resolver.shouldPersistByPosition(0, Arrays.<SOperation>asList(buildMockOperation(SLeftOperand.TYPE_DATA)));
+        boolean persist = resolver.shouldPersistByPosition(0,
+                Arrays.<SOperation> asList(buildMockOperation(SLeftOperand.TYPE_DATA)));
 
         //then
         assertThat(persist).isFalse();
@@ -74,7 +75,8 @@ public class PersistRightOperandResolverTest {
     }
 
     @Test
-    public void should_persist_bo_when_next_operation_on_this_left_operand_is_after_next_usage_as_dependency() throws Exception {
+    public void should_persist_bo_when_next_operation_on_this_left_operand_is_after_next_usage_as_dependency()
+            throws Exception {
         //given
         SOperationImpl addressOp1 = buildMockOperation(SLeftOperand.TYPE_BUSINESS_DATA, "address");
         SOperationImpl employeeOp1 = buildMockOperation(SLeftOperand.TYPE_BUSINESS_DATA, "employee");
@@ -84,7 +86,8 @@ public class PersistRightOperandResolverTest {
         List<SOperation> operations = Arrays.<SOperation> asList(addressOp1, employeeOp1, addressOp2, employeeOp2);
 
         int currentIndex = 0;
-        given(operationsAnalyzer.findBusinessDataDependencyIndex("address", currentIndex + 1, operations)).willReturn(1);
+        given(operationsAnalyzer.findBusinessDataDependencyIndex("address", currentIndex + 1, operations))
+                .willReturn(1);
         LeftOperandIndexes indexes = new LeftOperandIndexes();
         indexes.setNextIndex(2);
         given(operationsAnalyzer.calculateIndexes(0, operations)).willReturn(indexes);
@@ -97,7 +100,8 @@ public class PersistRightOperandResolverTest {
     }
 
     @Test
-    public void should_not_persist_bo_when_is_not_last_operation_for_this_left_operand_neither_is_dependency() throws Exception {
+    public void should_not_persist_bo_when_is_not_last_operation_for_this_left_operand_neither_is_dependency()
+            throws Exception {
         //given
         SOperationImpl addressOp1 = buildMockOperation(SLeftOperand.TYPE_BUSINESS_DATA, "address");
         SOperationImpl employeeOp1 = buildMockOperation(SLeftOperand.TYPE_BUSINESS_DATA, "employee");
@@ -110,7 +114,8 @@ public class PersistRightOperandResolverTest {
         indexes.setNextIndex(2);
         given(operationsAnalyzer.calculateIndexes(indexOfCurrentOperation, operations)).willReturn(indexes);
 
-        given(operationsAnalyzer.findBusinessDataDependencyIndex("address", indexOfCurrentOperation + 1, operations)).willReturn(-1);
+        given(operationsAnalyzer.findBusinessDataDependencyIndex("address", indexOfCurrentOperation + 1, operations))
+                .willReturn(-1);
 
         //when
         boolean persist = resolver.shouldPersistByPosition(indexOfCurrentOperation, operations);
@@ -133,7 +138,8 @@ public class PersistRightOperandResolverTest {
     }
 
     @Test
-    public void should_persist_when_right_operand_is_null_and_should_not_persist_by_position_and_on_null() throws Exception {
+    public void should_persist_when_right_operand_is_null_and_should_not_persist_by_position_and_on_null()
+            throws Exception {
         //then
         assertThat(resolver.shouldPersistByValue(null, true, true)).isTrue();
     }

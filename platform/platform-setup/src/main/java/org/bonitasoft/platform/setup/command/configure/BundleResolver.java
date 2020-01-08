@@ -63,14 +63,16 @@ class BundleResolver {
     }
 
     private boolean isTomcatEnvironment() {
-        return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.sh")) || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.bat"));
+        return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.sh"))
+                || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.bat"));
     }
 
     BundleConfigurator getConfigurator() throws PlatformException {
         if (isTomcatEnvironment()) {
             return new TomcatBundleConfigurator(rootPath);
         } else {
-            LOGGER.info("No Application Server detected. You may need to manually configure the access to the database. Only Tomcat 8.x is supported");
+            LOGGER.info(
+                    "No Application Server detected. You may need to manually configure the access to the database. Only Tomcat 8.x is supported");
             return null;
         }
     }

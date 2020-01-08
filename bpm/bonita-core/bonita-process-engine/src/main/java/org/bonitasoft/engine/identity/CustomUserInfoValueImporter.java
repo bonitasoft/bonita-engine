@@ -21,7 +21,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 
-
 /**
  * @author Elias Ricken de Medeiros
  */
@@ -30,16 +29,19 @@ public class CustomUserInfoValueImporter {
     private final SCustomUserInfoValueAPI userInfoAPI;
     private final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions;
 
-    public CustomUserInfoValueImporter(SCustomUserInfoValueAPI userInfoAPI, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions) {
+    public CustomUserInfoValueImporter(SCustomUserInfoValueAPI userInfoAPI,
+            Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions) {
         this.userInfoAPI = userInfoAPI;
         this.customUserInfoDefinitions = customUserInfoDefinitions;
     }
 
-    public void imporCustomUserInfoValues(List<ExportedCustomUserInfoValue> customUserInfoValues, long persistedUserId) throws SBonitaException {
+    public void imporCustomUserInfoValues(List<ExportedCustomUserInfoValue> customUserInfoValues, long persistedUserId)
+            throws SBonitaException {
         for (ExportedCustomUserInfoValue infoValue : customUserInfoValues) {
             SCustomUserInfoDefinition infoDefinition = customUserInfoDefinitions.get(infoValue.getName());
             if (infoDefinition == null) {
-                String message = "The XML file is inconsistent. A custom user info value is refenced with name '" + infoValue.getName()
+                String message = "The XML file is inconsistent. A custom user info value is refenced with name '"
+                        + infoValue.getName()
                         + "', but no custom user info definition is defined with this name.";
                 throw new SImportOrganizationException(message);
             }

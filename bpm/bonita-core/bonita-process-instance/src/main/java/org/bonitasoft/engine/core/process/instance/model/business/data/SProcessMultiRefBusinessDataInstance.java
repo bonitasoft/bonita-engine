@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SProcessMultiRefBusinessDataInstance extends SMultiRefBusinessDataInstance {
+
     private long processInstanceId;
 
 }

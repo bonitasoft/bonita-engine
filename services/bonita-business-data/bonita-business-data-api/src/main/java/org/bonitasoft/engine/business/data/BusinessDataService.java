@@ -22,7 +22,8 @@ import java.util.Map;
  */
 public interface BusinessDataService {
 
-    Object callJavaOperation(Object businessObject, Object valueToSetObjectWith, String methodName, String parameterType)
+    Object callJavaOperation(Object businessObject, Object valueToSetObjectWith, String methodName,
+            String parameterType)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
     boolean isBusinessData(Object valueToSetObjectWith);
@@ -30,12 +31,15 @@ public interface BusinessDataService {
     Serializable getJsonEntity(String entityClassName, Long identifier, String businessDataURIPattern)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
-    Serializable getJsonChildEntity(String entityClassName, Long identifier, String childName, String businessDataURIPattern)
+    Serializable getJsonChildEntity(String entityClassName, Long identifier, String childName,
+            String businessDataURIPattern)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
-    Serializable getJsonQueryEntities(String entityClassName, String queryName, Map<String, Serializable> queryParameters, Integer startIndex,
-                                                 Integer maxResults, String businessDataURIPattern) throws SBusinessDataRepositoryException;
+    Serializable getJsonQueryEntities(String entityClassName, String queryName,
+            Map<String, Serializable> queryParameters, Integer startIndex,
+            Integer maxResults, String businessDataURIPattern) throws SBusinessDataRepositoryException;
 
-    Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern) throws SBusinessDataRepositoryException;
+    Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern)
+            throws SBusinessDataRepositoryException;
 
 }

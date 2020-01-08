@@ -20,13 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-
-import org.bonitasoft.engine.bdm.BDMQueryUtil;
-import org.bonitasoft.engine.bdm.model.BusinessObject;
-import org.bonitasoft.engine.bdm.model.Query;
-import org.bonitasoft.engine.business.data.generator.AbstractBDMCodeGenerator;
-
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
@@ -38,6 +31,11 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JVar;
+import org.bonitasoft.engine.bdm.BDMQueryUtil;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.Query;
+import org.bonitasoft.engine.business.data.generator.AbstractBDMCodeGenerator;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 
 /**
  * @author Romain Bioteau
@@ -57,7 +55,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         createDAOImpl(bo, entity, daoInterface);
     }
 
-    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException {
+    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface)
+            throws JClassAlreadyExistsException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -91,7 +90,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         return service;
     }
 
-    private void addQueryMethodBody(final JDefinedClass entity, final JMethod method, final String queryName, final JFieldVar businessDataRepository) {
+    private void addQueryMethodBody(final JDefinedClass entity, final JMethod method, final String queryName,
+            final JFieldVar businessDataRepository) {
         final String entityName = entity.name();
         final JTryBlock tryBlock = method.body()._try();
         final JBlock tryBody = tryBlock.body();
@@ -100,7 +100,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         queryParameterMapClass = queryParameterMapClass.narrow(String.class, Serializable.class);
         JClass hashMapClass = getModel().ref(HashMap.class);
         hashMapClass = hashMapClass.narrow(String.class, Serializable.class);
-        final JVar queryParameterMap = tryBody.decl(queryParameterMapClass, "queryParameters", JExpr._new(hashMapClass));
+        final JVar queryParameterMap = tryBody.decl(queryParameterMapClass, "queryParameters",
+                JExpr._new(hashMapClass));
 
         for (final JVar param : method.params()) {
             if (!FORBIDDEN_PARAMETER_NAMES.contains(param.name())) {
@@ -120,11 +121,14 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
             if (startIndex == null || maxResults == null) {
                 throw new IllegalArgumentException("Neither 'startIndex' nor 'maxResults' parameters should be null");
             }
-            tryBody._return(businessDataRepository.invoke("findListByNamedQuery").arg(JExpr.lit(entityName + "." + queryName)).arg(JExpr.dotclass(entity))
+            tryBody._return(businessDataRepository.invoke("findListByNamedQuery")
+                    .arg(JExpr.lit(entityName + "." + queryName)).arg(JExpr.dotclass(entity))
                     .arg(queryParameterMap).arg(startIndex).arg(maxResults));
         } else {
-            final JClass returnTypeClass = entity.fullName().equals(method.type().fullName()) ? entity : getModel().ref(method.type().fullName());
-            tryBody._return(businessDataRepository.invoke("findByNamedQuery").arg(JExpr.lit(entityName + "." + queryName)).arg(JExpr.dotclass(returnTypeClass))
+            final JClass returnTypeClass = entity.fullName().equals(method.type().fullName()) ? entity
+                    : getModel().ref(method.type().fullName());
+            tryBody._return(businessDataRepository.invoke("findByNamedQuery")
+                    .arg(JExpr.lit(entityName + "." + queryName)).arg(JExpr.dotclass(returnTypeClass))
                     .arg(queryParameterMap));
         }
 
@@ -148,7 +152,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
     protected String toDaoImplClassname(final BusinessObject bo) {
         final String boName = bo.getQualifiedName();
         final int pointIdx = boName.lastIndexOf('.');
-        return boName.substring(0, pointIdx + 1) + SERVER_DAO_PACKAGE_NAME + boName.substring(pointIdx + 1) + DAO_IMPL_SUFFIX;
+        return boName.substring(0, pointIdx + 1) + SERVER_DAO_PACKAGE_NAME + boName.substring(pointIdx + 1)
+                + DAO_IMPL_SUFFIX;
     }
 
 }

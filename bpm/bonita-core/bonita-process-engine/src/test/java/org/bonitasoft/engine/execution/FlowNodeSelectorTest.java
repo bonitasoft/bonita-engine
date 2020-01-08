@@ -36,13 +36,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeSelectorTest {
 
     /**
-     * 
+     *
      */
     private static final long SUB_PROCESS_DEFINITION_ID = 10L;
 
@@ -64,8 +63,9 @@ public class FlowNodeSelectorTest {
         doReturn(subProcessDefinition).when(rootContainer).getFlowNode(SUB_PROCESS_DEFINITION_ID);
         doReturn(subProcessContainer).when(subProcessDefinition).getSubProcessContainer();
 
-        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"),
-                creatFlowNode("step3")));
+        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(
+                Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"),
+                        creatFlowNode("step3")));
         doReturn(flowNodes).when(rootContainer).getFlowNodes();
     }
 
@@ -89,7 +89,8 @@ public class FlowNodeSelectorTest {
 
     @Test
     public void getStartNodes_return_all_selected_elements() {
-        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition, new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition,
+                new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
         assertEquals("[step1, step3]", stringfy(flowNodeSelector.getFilteredElements()));
     }
 

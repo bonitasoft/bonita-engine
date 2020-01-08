@@ -28,6 +28,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
@@ -42,11 +46,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 
 /**
  * Execute connectors directly
@@ -92,7 +91,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      * The rules to create new thread are:
      * - If the number of threads is less than the corePoolSize, create a new Thread to run a new task.
      * - If the number of threads is equal (or greater than) the corePoolSize, put the task into the queue.
-     * - If the queue is full, and the number of threads is less than the maxPoolSize, create a new thread to run tasks in.
+     * - If the queue is full, and the number of threads is less than the maxPoolSize, create a new thread to run tasks
+     * in.
      * - If the queue is full, and the number of threads is greater than or equal to maxPoolSize, reject the task.
      *
      * @param queueCapacity
@@ -109,10 +109,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      *        the core, this is the maximum time that excess idle threads
      *        will wait for new tasks before terminating. (in seconds)
      */
-    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService,
-                                 final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor,
-                                 final SessionService sessionService, final TimeTracker timeTracker, final MeterRegistry meterRegistry,
-                                 long tenantId, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
+    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize,
+            final TechnicalLoggerService loggerService,
+            final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor,
+            final SessionService sessionService, final TimeTracker timeTracker, final MeterRegistry meterRegistry,
+            long tenantId, ExecutorServiceMetricsProvider executorServiceMetricsProvider) {
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
         this.loggerService = loggerService;
@@ -320,8 +321,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory(
                     "ConnectorExecutor");
             executorService = executorServiceMetricsProvider
-                    .bind(meterRegistry, new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
-                            workQueue, threadFactory, handler), "bonita-connector-executor", tenantId);
+                    .bind(meterRegistry,
+                            new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
+                                    TimeUnit.SECONDS,
+                                    workQueue, threadFactory, handler),
+                            "bonita-connector-executor", tenantId);
             Tags tags = Tags.of("tenant", String.valueOf(tenantId));
             numberOfConnectorsPending = Gauge.builder(NUMBER_OF_CONNECTORS_PENDING, workQueue, Collection::size)
                     .tags(tags).baseUnit("connectors").description("Connectors pending in the execution queue")

@@ -32,6 +32,8 @@ import java.util.Set;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -50,9 +52,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.company.pojo.Employee;
-import com.company.pojo.Person;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -94,11 +93,14 @@ public class JPABusinessDataRepositoryImplITest {
         final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
 
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
-        final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(),
+                loggerService);
+        final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(
+                new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
+                        classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
-                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration.getJpaConfiguration(), classLoaderService, 1L));
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService,
+                        configuration.getJpaConfiguration(), classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
         ut.begin();
@@ -176,7 +178,8 @@ public class JPABusinessDataRepositoryImplITest {
         expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) firstName);
-        final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+        final Employee matti = businessDataRepository.find(Employee.class,
+                "FROM Employee e WHERE e.firstName = :firstName", parameters);
 
         assertThat(matti).isEqualTo(expectedEmployee);
     }
@@ -198,7 +201,8 @@ public class JPABusinessDataRepositoryImplITest {
         Employee emp2 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
         Employee emp3 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
 
-        List<Employee> emps = businessDataRepository.findByIds(Employee.class, Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
+        List<Employee> emps = businessDataRepository.findByIds(Employee.class,
+                Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
 
         assertThat(emps).contains(emp1, emp2);
         assertThat(emps).doesNotContain(emp3);
@@ -215,8 +219,11 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
-        final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");
-        assertThat(businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters)).isNull();
+        final Map<String, Serializable> parameters = Collections.singletonMap("lastName",
+                (Serializable) "Unknown_lastName");
+        assertThat(
+                businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters))
+                        .isNull();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -243,7 +250,8 @@ public class JPABusinessDataRepositoryImplITest {
         originalEmployee.setLastName("NewLastName");
         originalEmployee.setFirstName("NewFirstName");
 
-        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, originalEmployee.getPersistenceId());
+        final Employee updatedEmployee = businessDataRepository.findById(Employee.class,
+                originalEmployee.getPersistenceId());
         assertThat(updatedEmployee).isEqualTo(originalEmployee);
     }
 
@@ -290,9 +298,11 @@ public class JPABusinessDataRepositoryImplITest {
     public void findList_should_return_employee_list() {
         final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
         final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
-        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
+        final Employee e3 = addEmployeeToRepository(
+                anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
-        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
+        final List<Employee> employees = businessDataRepository.findList(Employee.class,
+                "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
                 null, 0, 10);
 
         assertThat(employees).containsExactly(e2, e3, e1);
@@ -304,7 +314,8 @@ public class JPABusinessDataRepositoryImplITest {
         addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
         addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
-        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
+        final List<Employee> employees = businessDataRepository.findList(Employee.class,
+                "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
                 null, 0, 0);
 
         assertThat(employees).isEmpty();
@@ -314,13 +325,15 @@ public class JPABusinessDataRepositoryImplITest {
     public void findListShouldReturnEmptyListIfNoResults() {
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,
-                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters, 0, 10);
+                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters, 0,
+                10);
         assertThat(employees).isEmpty();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findListShouldThrowAnExceptionIfAtLeastOneQueryParameterIsNotSet() {
-        businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null, 0, 10);
+        businessDataRepository.findList(Employee.class,
+                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null, 0, 10);
     }
 
     @Test
@@ -331,12 +344,14 @@ public class JPABusinessDataRepositoryImplITest {
         person.addTo("Jack");
         businessDataRepository.persist(person);
 
-        final Person actual = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)",
+        final Person actual = businessDataRepository.find(Person.class,
+                "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)",
                 null);
         assertThat(actual).isEqualTo(person);
         actual.getNickNames().remove("James");
 
-        final Person actual2 = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
+        final Person actual2 = businessDataRepository.find(Person.class,
+                "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
         assertThat(actual2).isNull();
     }
 

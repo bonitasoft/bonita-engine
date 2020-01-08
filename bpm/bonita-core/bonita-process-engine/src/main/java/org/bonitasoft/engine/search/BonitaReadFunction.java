@@ -16,7 +16,7 @@ package org.bonitasoft.engine.search;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 @FunctionalInterface
-public interface BonitaReadFunction<T,R> {
+public interface BonitaReadFunction<T, R> {
 
     R apply(T t) throws SBonitaReadException;
 }

@@ -133,7 +133,8 @@ public class PageAPIDelegate {
         return new SearchPages(pageService, searchEntitiesDescriptor.getSearchPageDescriptor(), searchOptions);
     }
 
-    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    public Page createPage(final PageCreator pageCreator, final byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         final SPage sPage = constructPage(pageCreator, userIdFromSession);
 
@@ -151,7 +152,8 @@ public class PageAPIDelegate {
         }
     }
 
-    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    public Page createPage(final String contentName, final byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         try {
             return convertToPage(pageService.addPage(content, contentName, userIdFromSession));
@@ -178,11 +180,15 @@ public class PageAPIDelegate {
         }
     }
 
-    Set<Long> updatePageMappings(long pageId) throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
+    Set<Long> updatePageMappings(long pageId)
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
         List<SFormMapping> formMappings;
-        QueryOptions queryOptions = new QueryOptions(0, 20, Collections.singletonList(new OrderByOption(SFormMapping.class,
-                FormMappingSearchDescriptor.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SPageMapping.class,
-                FormMappingSearchDescriptor.PAGE_ID, pageId)), null);
+        QueryOptions queryOptions = new QueryOptions(0, 20,
+                Collections.singletonList(new OrderByOption(SFormMapping.class,
+                        FormMappingSearchDescriptor.ID, OrderByType.ASC)),
+                Collections.singletonList(new FilterOption(SPageMapping.class,
+                        FormMappingSearchDescriptor.PAGE_ID, pageId)),
+                null);
         final Set<Long> processDefinitionIds = new HashSet<>();
         do {
             formMappings = formMappingService.searchFormMappings(queryOptions);
@@ -194,7 +200,6 @@ public class PageAPIDelegate {
         } while (formMappings.size() == 20);
         return processDefinitionIds;
     }
-
 
     private void updateProcessResolution(Long processDefinitionId) {
         businessArchiveArtifactsManager.resolveDependencies(processDefinitionId, tenantAccessor);
@@ -218,7 +223,8 @@ public class PageAPIDelegate {
         }
     }
 
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater)
+            throws UpdateException, AlreadyExistsException,
             UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
@@ -266,7 +272,8 @@ public class PageAPIDelegate {
         }
     }
 
-    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
+    public void updatePageContent(final long pageId, final byte[] content)
+            throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException {
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
@@ -284,8 +291,10 @@ public class PageAPIDelegate {
         }
     }
 
-    public Properties getPageProperties(final byte[] content, final boolean checkIfItAlreadyExists) throws InvalidPageTokenException, AlreadyExistsException,
-            InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
+    public Properties getPageProperties(final byte[] content, final boolean checkIfItAlreadyExists)
+            throws InvalidPageTokenException, AlreadyExistsException,
+            InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException,
+            InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException {
         try {
             return getProperties(content, checkIfItAlreadyExists, pageService);
@@ -320,9 +329,11 @@ public class PageAPIDelegate {
         return new PageModelConverter().constructSPage(pageUpdater, userId);
     }
 
-    private Properties getProperties(final byte[] content, final boolean checkIfItAlreadyExists, final PageService pageService)
+    private Properties getProperties(final byte[] content, final boolean checkIfItAlreadyExists,
+            final PageService pageService)
             throws SInvalidPageZipMissingIndexException,
-            SInvalidPageZipMissingAPropertyException, SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException,
+            SInvalidPageZipMissingAPropertyException, SInvalidPageZipInconsistentException,
+            SInvalidPageZipMissingPropertiesException,
             SInvalidPageTokenException, SBonitaReadException, AlreadyExistsException {
         final Properties properties = pageService.readPageZip(content);
         if (checkIfItAlreadyExists) {
@@ -340,7 +351,8 @@ public class PageAPIDelegate {
             return new InvalidPageZipMissingPropertiesException();
         }
         if (e instanceof SInvalidPageZipMissingAPropertyException) {
-            return new InvalidPageZipMissingAPropertyException(((SInvalidPageZipMissingAPropertyException) e).getFields());
+            return new InvalidPageZipMissingAPropertyException(
+                    ((SInvalidPageZipMissingAPropertyException) e).getFields());
         }
         if (e instanceof SInvalidPageZipInconsistentException) {
             return new InvalidPageZipInconsistentException(e.getMessage(), e);

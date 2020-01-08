@@ -37,7 +37,8 @@ public class IsProcessOwnerRule implements AuthorizationRule {
 
     FormMappingService formMappingService;
 
-    public IsProcessOwnerRule(SupervisorMappingService supervisorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
+    public IsProcessOwnerRule(SupervisorMappingService supervisorMappingService, SessionAccessor sessionAccessor,
+            SessionService sessionService,
             FormMappingService formMappingService) {
         this.supervisorMappingService = supervisorMappingService;
         this.sessionAccessor = sessionAccessor;

@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -38,7 +37,8 @@ public class SearchCommandDescriptor extends SearchEntityDescriptor {
         commandKeys.put(CommandSearchDescriptor.ID, new FieldDescriptor(SCommand.class, SCommand.ID));
         commandKeys.put(CommandSearchDescriptor.NAME, new FieldDescriptor(SCommand.class, SCommand.NAME));
         commandKeys.put(CommandSearchDescriptor.DESCRIPTION, new FieldDescriptor(SCommand.class, SCommand.DESCRIPTION));
-        commandKeys.put(CommandSearchDescriptor.IMPLEMENTATION, new FieldDescriptor(SCommand.class, SCommand.IMPLEMENTATION));
+        commandKeys.put(CommandSearchDescriptor.IMPLEMENTATION,
+                new FieldDescriptor(SCommand.class, SCommand.IMPLEMENTATION));
         commandKeys.put(CommandSearchDescriptor.SYSTEM, new FieldDescriptor(SCommand.class, SCommand.SYSTEM));
 
         commandAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);

@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
+import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
+
+import java.util.List;
+
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-import java.util.List;
-
-import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
 
 /**
  * @author Emmanuel Duchastenier

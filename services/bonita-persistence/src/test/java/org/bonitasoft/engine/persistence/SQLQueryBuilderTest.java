@@ -98,7 +98,10 @@ public class SQLQueryBuilderTest {
         doReturn(baseQuery).when(mockedQuery).getQueryString();
         //when
         QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
+                null,
                 false);
         queryBuilder.buildQuery(session);
         //then
@@ -113,7 +116,10 @@ public class SQLQueryBuilderTest {
         doReturn(baseQuery).when(mockedQuery).getQueryString();
         //when
         QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
+                null,
                 false);
         queryBuilder.buildQuery(session);
         //then

@@ -35,7 +35,8 @@ public class SearchFlowNodeInstances extends AbstractSearchEntity<FlowNodeInstan
 
     private final FlowNodeStateManager flowNodeStateManager;
 
-    public SearchFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService, final FlowNodeStateManager flowNodeStateManager,
+    public SearchFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService,
+            final FlowNodeStateManager flowNodeStateManager,
             final SearchFlowNodeInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.flowNodeInstanceService = flowNodeInstanceService;

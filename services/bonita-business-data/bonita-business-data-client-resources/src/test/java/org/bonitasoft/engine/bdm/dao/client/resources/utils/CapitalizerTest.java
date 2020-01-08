@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.bdm.dao.client.resources.utils.Capitalizer;
 import org.junit.Test;
 
 public class CapitalizerTest {

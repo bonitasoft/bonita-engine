@@ -35,7 +35,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         final Profile profile = getProfileUser();
         Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
         Page defaultTheme = getPageAPI().getPageByName(DEFAULT_THEME_NAME);
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -64,7 +65,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     @Test
     public void createApplication_without_profile_should_have_null_profileId() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
 
         //when
         final Application application = getLivingApplicationAPI().createApplication(creator);
@@ -78,7 +80,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void updateApplication_should_return_application_up_to_date() throws Exception {
         //given
         final Profile profile = getProfileUser();
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
         final Application application = getLivingApplicationAPI().createApplication(creator);
 
         final ApplicationUpdater updater = new ApplicationUpdater();
@@ -91,7 +94,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         updater.setState(ApplicationState.ACTIVATED.name());
 
         //when
-        final Application updatedApplication = getLivingApplicationAPI().updateApplication(application.getId(), updater);
+        final Application updatedApplication = getLivingApplicationAPI().updateApplication(application.getId(),
+                updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
@@ -110,7 +114,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     @Test
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
         final Application createdApp = getLivingApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
@@ -124,7 +129,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     @Test
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name",
+                "1.0");
         final Application createdApp = getLivingApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
@@ -144,15 +150,18 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
         //given
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
         final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
         final Application marketing = getLivingApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchResult<Application> firstPage = getLivingApplicationAPI().searchApplications(buildSearchOptions(0, 2));
+        final SearchResult<Application> firstPage = getLivingApplicationAPI()
+                .searchApplications(buildSearchOptions(0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -160,7 +169,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         assertThat(firstPage.getResult()).containsExactly(engineering, hr);
 
         //when
-        final SearchResult<Application> secondPage = getLivingApplicationAPI().searchApplications(buildSearchOptions(2, 2));
+        final SearchResult<Application> secondPage = getLivingApplicationAPI()
+                .searchApplications(buildSearchOptions(2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -172,8 +182,10 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_can_filter_on_name() throws Exception {
         //given
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0");
 
         getLivingApplicationAPI().createApplication(hrCreator);
         final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
@@ -193,8 +205,10 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_can_filter_on_display_name() throws Exception {
         //given
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dashboard", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
         getLivingApplicationAPI().createApplication(engineeringCreator);
@@ -214,8 +228,10 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_can_filter_on_version() throws Exception {
         //given
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "2.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "2.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "2.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
         getLivingApplicationAPI().createApplication(engineeringCreator);
@@ -237,9 +253,11 @@ public class LivingApplicationIT extends TestWithLivingApplication {
         //given
         final Profile profile = getProfileUser();
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
         engineeringCreator.setProfileId(profile.getId());
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard",
+                "1.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
         final Application engineering = getLivingApplicationAPI().createApplication(engineeringCreator);
@@ -263,7 +281,8 @@ public class LivingApplicationIT extends TestWithLivingApplication {
     public void searchApplications_can_use_search_term() throws Exception {
         //given
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
 
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);

@@ -46,5 +46,4 @@ public class SABoundaryEventInstance extends SACatchEventInstance {
         return SBoundaryEventInstance.class;
     }
 
-
 }

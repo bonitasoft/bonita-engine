@@ -25,7 +25,8 @@ public class SConnectorImplementationDescriptorTest {
     @Test
     public void theConstructorShouldNotGenerateANullFieldForJarsDependencies() {
 
-        SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor("implementationClassName", "id", "version", "definitionId",
+        SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor(
+                "implementationClassName", "id", "version", "definitionId",
                 "definitionVersion", null);
 
         assertThat(theConnector.getJarDependencies()).isNotNull();
@@ -37,10 +38,10 @@ public class SConnectorImplementationDescriptorTest {
     }
 
     @Test
-    public void theDefaultConstructorShouldNotGenerateANullFieldForJarsDependencies(){
-        
+    public void theDefaultConstructorShouldNotGenerateANullFieldForJarsDependencies() {
+
         SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor();
         assertThat(theConnector.getJarDependencies()).isNotNull();
-        
+
     }
 }

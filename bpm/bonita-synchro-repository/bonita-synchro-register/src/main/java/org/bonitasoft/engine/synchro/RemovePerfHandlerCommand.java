@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.events.EventService;
@@ -34,29 +35,29 @@ public class RemovePerfHandlerCommand extends TenantCommand {
     private static final String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
 
     private static final String ACTIVITYINSTANCE_STATE_UPDATED = "ACTIVITYINSTANCE_STATE_UPDATED";
-    
+
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
         JMSProducer.resetInstance();
-        
+
         final EventService eventService = serviceAccessor.getEventService();
-        
-        // Default: remove all the concerned handlers 
+
+        // Default: remove all the concerned handlers
         // TODO : remove specific handlers (those who have been created in addPerf and not others)
         removeAllHandlers(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceFinishedHandler.class);
         removeAllHandlers(eventService, ACTIVITYINSTANCE_STATE_UPDATED, TaskReadyHandler.class);
         removeAllHandlers(eventService, ACTIVITYINSTANCE_STATE_UPDATED, FlowNodeReachStateHandler.class);
 
         return null;
-    }    
+    }
 
     private void removeAllHandlers(final EventService eventService, final String eventType, final Class<?> clazz) {
         final Set<SHandler<SEvent>> handlers = eventService.getHandlers(eventType);
         Collection<SHandler<SEvent>> removeCandidates = new LinkedList<SHandler<SEvent>>();
-        
+
         if (handlers != null) {
-            for (final Iterator<SHandler<SEvent>> iter = handlers.iterator(); iter.hasNext(); ) {
+            for (final Iterator<SHandler<SEvent>> iter = handlers.iterator(); iter.hasNext();) {
                 final SHandler<SEvent> handler = iter.next();
                 if (clazz.isInstance(handler)) {
                     removeCandidates.add(handler);
@@ -64,6 +65,6 @@ public class RemovePerfHandlerCommand extends TenantCommand {
             }
             handlers.removeAll(removeCandidates);
         }
-    }    
-    
+    }
+
 }

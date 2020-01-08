@@ -28,7 +28,8 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
 
     private final GatewayDefinitionImpl gateway;
 
-    GatewayDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container, final String name,
+    GatewayDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container, final String name,
             final GatewayType gatewayType) {
         super(container, processDefinitionBuilder);
         gateway = new GatewayDefinitionImpl(name, gatewayType);
@@ -40,7 +41,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
 
     /**
      * Adds a default transition
-     * 
+     *
      * @param target target element
      * @return
      */
@@ -56,7 +57,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
 
     /**
      * Sets the display description on this gateway
-     * 
+     *
      * @param displayDescription
      *        expression representing the display description
      * @return
@@ -68,7 +69,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
 
     /**
      * Sets the display name on this gateway
-     * 
+     *
      * @param displayName
      *        expression representing the display name
      * @return
@@ -79,14 +80,16 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
     }
 
     /**
-     * Sets the display description after completion on this gateway. This will be used to updated the display description when the gateway completes its
+     * Sets the display description after completion on this gateway. This will be used to updated the display
+     * description when the gateway completes its
      * execution
-     * 
+     *
      * @param displayDescriptionAfterCompletion
      *        expression representing the new display description after the gateway completion.
      * @return
      */
-    public GatewayDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
+    public GatewayDefinitionBuilder addDisplayDescriptionAfterCompletion(
+            final Expression displayDescriptionAfterCompletion) {
         gateway.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;
     }

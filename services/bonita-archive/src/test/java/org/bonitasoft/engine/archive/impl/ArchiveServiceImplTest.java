@@ -35,13 +35,16 @@ public class ArchiveServiceImplTest {
         final ArchivingStrategy archivingStrategy = null;
         final UserTransactionService transactionService = mock(UserTransactionService.class);
 
-        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchivePersistenceService, logger, archivingStrategy, transactionService));
+        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchivePersistenceService, logger,
+                archivingStrategy, transactionService));
 
-        final ArchivedPersistentObjectWithSetter mockArchivedPersistentObject = mock(ArchivedPersistentObjectWithSetter.class);
+        final ArchivedPersistentObjectWithSetter mockArchivedPersistentObject = mock(
+                ArchivedPersistentObjectWithSetter.class);
         ArchiveInsertRecord record = new ArchiveInsertRecord(mockArchivedPersistentObject);
 
         BatchArchiveCallable mockBatchArchiveCallable = mock(BatchArchiveCallable.class);
-        when(archiveService.buildBatchArchiveCallable(any(ArchiveInsertRecord.class))).thenReturn(mockBatchArchiveCallable);
+        when(archiveService.buildBatchArchiveCallable(any(ArchiveInsertRecord.class)))
+                .thenReturn(mockBatchArchiveCallable);
 
         long archiveDate = 3L;
         archiveService.recordInserts(archiveDate, record);

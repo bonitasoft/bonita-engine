@@ -33,7 +33,7 @@ public class FlowNodeInstanceSearchDescriptor {
     public static final String DISPLAY_NAME = "displayName";
 
     public static final String STATE_CATEGORY = "stateCategory";
-    
+
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
 }

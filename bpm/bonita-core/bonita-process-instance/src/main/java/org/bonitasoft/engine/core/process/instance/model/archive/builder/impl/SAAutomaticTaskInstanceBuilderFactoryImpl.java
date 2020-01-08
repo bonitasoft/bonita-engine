@@ -21,10 +21,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutom
 /**
  * @author Baptiste Mesta
  */
-public class SAAutomaticTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAAutomaticTaskInstanceBuilderFactory {
+public class SAAutomaticTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAAutomaticTaskInstanceBuilderFactory {
 
     @Override
-    public SAAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(final SAutomaticTaskInstance sAutomaticTaskInstance) {
+    public SAAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(
+            final SAutomaticTaskInstance sAutomaticTaskInstance) {
         final SAAutomaticTaskInstance entity = new SAAutomaticTaskInstance(sAutomaticTaskInstance);
         return new SAAutomaticTaskInstanceBuilderImpl(entity);
     }

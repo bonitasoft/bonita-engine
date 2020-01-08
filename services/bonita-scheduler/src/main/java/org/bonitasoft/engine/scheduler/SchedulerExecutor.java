@@ -60,16 +60,19 @@ public interface SchedulerExecutor {
 
     List<String> getAllJobs() throws SSchedulerException;
 
-    void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
+    void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution)
+            throws SSchedulerException;
 
-    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution, int delayInMillis) throws SSchedulerException;
+    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution,
+            int delayInMillis) throws SSchedulerException;
 
     void pauseJobs(String groupName) throws SSchedulerException;
 
     void resumeJobs(String groupName) throws SSchedulerException;
 
     /**
-     * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the given key, and store the new given one - which must be associated
+     * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the given key, and store the new given one -
+     * which must be associated
      * with the same job (the new trigger must have the job name & group specified)
      * - however, the new trigger need not have the same name as the old trigger.
      *

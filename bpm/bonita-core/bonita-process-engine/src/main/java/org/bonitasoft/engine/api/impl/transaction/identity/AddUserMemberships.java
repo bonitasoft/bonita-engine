@@ -49,7 +49,8 @@ public class AddUserMemberships implements TransactionContent {
     public void execute() throws SBonitaException {
 
         for (final long userId : userIds) {
-            final SUserMembership userMembership = SUserMembership.builder().userId(userId).groupId(groupId).roleId(roleId)
+            final SUserMembership userMembership = SUserMembership.builder().userId(userId).groupId(groupId)
+                    .roleId(roleId)
                     .assignedBy(currentUserId).build();
             identityService.createUserMembership(userMembership);
         }

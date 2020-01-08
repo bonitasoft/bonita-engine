@@ -45,13 +45,16 @@ public class ParameterDefinitionBuilder extends ProcessBuilder implements Descri
      * @param type
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      */
-    protected ParameterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl designProcessDefinitionImpl,
-                                         final String parameterName, final String type) {
+    protected ParameterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final DesignProcessDefinitionImpl designProcessDefinitionImpl,
+            final String parameterName, final String type) {
         super(designProcessDefinitionImpl, processDefinitionBuilder);
         parameter = new ParameterDefinitionImpl(parameterName, type);
         designProcessDefinitionImpl.addParameter(parameter);
     }
-    protected ParameterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl designProcessDefinitionImpl){
+
+    protected ParameterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final DesignProcessDefinitionImpl designProcessDefinitionImpl) {
         super(designProcessDefinitionImpl, processDefinitionBuilder);
         parameter = null;
     }

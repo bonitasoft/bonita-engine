@@ -24,5 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SSimpleRefBusinessDataInstance extends SRefBusinessDataInstance {
+
     private Long dataId;
 }

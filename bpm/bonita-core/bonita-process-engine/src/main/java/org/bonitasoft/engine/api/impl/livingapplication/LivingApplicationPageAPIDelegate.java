@@ -51,15 +51,19 @@ public class LivingApplicationPageAPIDelegate {
     private final long loggedUserId;
     private final ApplicationTokenValidator tokenValidator;
 
-    public LivingApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
+    public LivingApplicationPageAPIDelegate(final TenantServiceAccessor accessor,
+            final ApplicationPageModelConverter converter, final long loggedUserId,
+            final ApplicationTokenValidator tokenValidator) {
         this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();
         this.converter = converter;
         this.loggedUserId = loggedUserId;
     }
 
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
-        final SApplicationUpdateBuilder sApplicationUpdateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId)
+            throws UpdateException, ApplicationNotFoundException {
+        final SApplicationUpdateBuilder sApplicationUpdateBuilder = BuilderFactory
+                .get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
                 .updateHomePageId(applicationPageId);
         try {
             applicationService.updateApplication(applicationId, sApplicationUpdateBuilder.done());
@@ -70,15 +74,18 @@ public class LivingApplicationPageAPIDelegate {
         }
     }
 
-    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token) throws AlreadyExistsException,
+    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token)
+            throws AlreadyExistsException,
             CreationException {
         validateToken(token);
-        final SApplicationPage.SApplicationPageBuilder pageBuilder = SApplicationPage.builder().applicationId(applicationId).pageId(pageId).token(token);
+        final SApplicationPage.SApplicationPageBuilder pageBuilder = SApplicationPage.builder()
+                .applicationId(applicationId).pageId(pageId).token(token);
         SApplicationPage sAppPage;
         try {
             sAppPage = applicationService.createApplicationPage(pageBuilder.build());
-            applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
-                    .done());
+            applicationService.updateApplication(applicationId,
+                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
+                            .done());
             return converter.toApplicationPage(sAppPage);
         } catch (final SObjectCreationException e) {
             throw new CreationException(e);
@@ -96,9 +103,11 @@ public class LivingApplicationPageAPIDelegate {
         }
     }
 
-    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken)
+            throws ApplicationPageNotFoundException {
         try {
-            final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName, applicationPageToken);
+            final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName,
+                    applicationPageToken);
             return converter.toApplicationPage(sAppPage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
@@ -121,7 +130,8 @@ public class LivingApplicationPageAPIDelegate {
     public void deleteApplicationPage(final long applicationPageId) throws DeletionException {
         try {
             final SApplicationPage deletedApplicationPage = applicationService.deleteApplicationPage(applicationPageId);
-            final SApplicationUpdateBuilder appBbuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId);
+            final SApplicationUpdateBuilder appBbuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
+                    .createNewInstance(loggedUserId);
             applicationService.updateApplication(deletedApplicationPage.getApplicationId(), appBbuilder.done());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
@@ -140,7 +150,8 @@ public class LivingApplicationPageAPIDelegate {
         }
     }
 
-    public SearchResult<ApplicationPage> searchApplicationPages(final SearchApplicationPages searchApplicationPages) throws SearchException {
+    public SearchResult<ApplicationPage> searchApplicationPages(final SearchApplicationPages searchApplicationPages)
+            throws SearchException {
         try {
             searchApplicationPages.execute();
             return searchApplicationPages.getResult();
@@ -156,6 +167,7 @@ public class LivingApplicationPageAPIDelegate {
             throw new RetrieveException(e);
         }
     }
+
     public List<String> getAllPagesForProfile(String profile) {
         try {
             return applicationService.getAllPagesForProfile(profile);

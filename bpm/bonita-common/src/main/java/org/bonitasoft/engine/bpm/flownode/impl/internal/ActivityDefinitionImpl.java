@@ -149,9 +149,12 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ActivityDefinitionImpl that = (ActivityDefinitionImpl) o;
         return Objects.equals(dataDefinitions, that.dataDefinitions) &&
                 Objects.equals(businessDataDefinitions, that.businessDataDefinitions) &&
@@ -162,7 +165,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), dataDefinitions, businessDataDefinitions, operations, loopCharacteristics, boundaryEventDefinitions);
+        return Objects.hash(super.hashCode(), dataDefinitions, businessDataDefinitions, operations, loopCharacteristics,
+                boundaryEventDefinitions);
     }
 
     @Override

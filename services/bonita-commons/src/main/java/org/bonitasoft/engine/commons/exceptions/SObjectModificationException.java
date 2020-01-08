@@ -21,7 +21,7 @@ public class SObjectModificationException extends SBonitaException {
     private static final long serialVersionUID = 7771832630450258316L;
 
     /**
-     * 
+     *
      */
     public SObjectModificationException() {
         super();

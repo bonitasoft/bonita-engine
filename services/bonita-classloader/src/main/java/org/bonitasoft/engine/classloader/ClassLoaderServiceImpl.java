@@ -60,7 +60,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final TechnicalLoggerService logger;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE, ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE,
+            ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
@@ -79,9 +80,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private BroadcastService broadcastService;
     private ClassLoaderUpdater classLoaderUpdater;
 
-    public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger,
-                                  final EventService eventService, PlatformDependencyService platformDependencyService, SessionAccessor sessionAccessor,
-                                  UserTransactionService userTransactionService, BroadcastService broadcastService, ClassLoaderUpdater classLoaderUpdater) {
+    public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver,
+            final TechnicalLoggerService logger,
+            final EventService eventService, PlatformDependencyService platformDependencyService,
+            SessionAccessor sessionAccessor,
+            UserTransactionService userTransactionService, BroadcastService broadcastService,
+            ClassLoaderUpdater classLoaderUpdater) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
@@ -129,7 +133,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
         if (shuttingDown && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Using local classloader on after ClassLoaderService shuttingdown: " + key);
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "Using local classloader on after ClassLoaderService shuttingdown: " + key);
         }
     }
 
@@ -171,14 +176,15 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "creating classloader with key " + identifier);
         }
         VirtualClassLoader parent = getParentClassLoader(identifier);
-        final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(), parent);
-
+        final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(),
+                parent);
 
         localClassLoaders.put(identifier, virtualClassLoader);
     }
 
     private VirtualClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
-        final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver.getParentClassLoaderIdentifier(identifier);
+        final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver
+                .getParentClassLoaderIdentifier(identifier);
         NullCheckingUtil.checkArgsNotNull(parentIdentifier);
         VirtualClassLoader parent;
         if (ClassLoaderIdentifier.GLOBAL.equals(parentIdentifier)) {
@@ -192,7 +198,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
         if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Removing local classloader for type " + type + " of id " + id);
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    "Removing local classloader for type " + type + " of id " + id);
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
 
@@ -208,7 +215,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
             if (localClassLoader.hasChildren()) {
-                throw new SClassLoaderException("Unable to delete classloader " + key + " because it has children: " + localClassLoader.getChildren());
+                throw new SClassLoaderException("Unable to delete classloader " + key + " because it has children: "
+                        + localClassLoader.getChildren());
             }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
@@ -230,10 +238,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException {
+    private void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources)
+            throws SClassLoaderException {
         final ClassLoaderIdentifier key = getKey(type, id);
         logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing classloader with key: " + key);
-        final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
+        final VirtualClassLoader virtualClassloader = getVirtualClassLoaderWithoutInitializingIt(
+                new ClassLoaderIdentifier(type, id));
         try {
             refreshClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id),
                     getParentClassLoader(key));
@@ -249,8 +259,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return BonitaHomeServer.getInstance().getLocalTemporaryFolder(type, id);
     }
 
-    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources, final String type, final long id,
-                                    final URI temporaryFolder, final ClassLoader parent) {
+    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources,
+            final String type, final long id,
+            final URI temporaryFolder, final ClassLoader parent) {
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         virtualClassloader.replaceClassLoader(classLoader);
         for (ClassLoaderListener globalListener : new HashSet<>(globalListeners)) {
@@ -261,7 +272,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void start() {
         if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Starting classloader service, creating the platform classloader");
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    "Starting classloader service, creating the platform classloader");
         }
         shuttingDown = false;
         //we do not create or destroy the global classloader because it does not point to a bonita classloader
@@ -270,7 +282,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void stop() throws SClassLoaderException {
         if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Stopping classloader service, destroying all classloaders");
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    "Stopping classloader service, destroying all classloaders");
         }
         shuttingDown = true;
         destroyAllLocalClassLoaders();
@@ -305,15 +318,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Added listener " + classLoaderListener + " on " + type + " " + id);
-        final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                "Added listener " + classLoaderListener + " on " + type + " " + id);
+        final VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
+                new ClassLoaderIdentifier(type, id));
         return localClassLoader.addListener(classLoaderListener);
     }
 
     @Override
     public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed listener " + classLoaderListener + " on " + type + " " + id);
-        VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(new ClassLoaderIdentifier(type, id));
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                "Removed listener " + classLoaderListener + " on " + type + " " + id);
+        VirtualClassLoader localClassLoader = getVirtualClassLoaderWithoutInitializingIt(
+                new ClassLoaderIdentifier(type, id));
         return localClassLoader.removeListener(classLoaderListener);
     }
 
@@ -349,7 +366,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 long tenantId = sessionAccessor.getTenantId();
                 TenantDependencyService tenantDependencyService = dependencyServicesByTenant.get(tenantId);
                 if (tenantDependencyService == null) {
-                    logger.log(getClass(), TechnicalLogSeverity.WARNING, "No dependency service is initialized on tenant {}. Initializing empty classloader", tenantId);
+                    logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                            "No dependency service is initialized on tenant {}. Initializing empty classloader",
+                            tenantId);
                     return Stream.empty();
                 }
                 resources = tenantDependencyService.getDependenciesResources(type, id);
@@ -378,7 +397,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 }
                 Map<String, TaskResult<Void>> execute;
                 try {
-                    execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(id, type), getTenantId(type));
+                    execute = broadcastService.executeOnOthersAndWait(new RefreshClassLoaderTask(id, type),
+                            getTenantId(type));
                 } catch (TimeoutException | STenantIdNotSetException | ExecutionException | InterruptedException e) {
                     throw new BonitaRuntimeException(e);
                 }
@@ -393,12 +413,14 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private void registerRefreshOnAllNodes(ScopeType type, long id) throws STransactionNotFoundException, STenantIdNotSetException {
+    private void registerRefreshOnAllNodes(ScopeType type, long id)
+            throws STransactionNotFoundException, STenantIdNotSetException {
         synchronized (synchroLock) {
             RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
             if (refreshTaskSynchronization == null) {
                 RefreshClassLoaderTask callable = new RefreshClassLoaderTask(id, type);
-                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, broadcastService, callable, classLoaderUpdater, getTenantId(type), type, id);
+                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, broadcastService, callable,
+                        classLoaderUpdater, getTenantId(type), type, id);
                 userTransactionService.registerBonitaSynchronization(refreshTaskSynchronization);
                 currentRefreshTask.set(refreshTaskSynchronization);
             } else {

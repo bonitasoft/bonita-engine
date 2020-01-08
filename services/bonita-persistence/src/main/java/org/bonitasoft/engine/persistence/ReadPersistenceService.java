@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import org.bonitasoft.engine.commons.exceptions.SRetryableException;
-
 import java.util.List;
 import java.util.Map;
+
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 
 /**
  * @author Charles Souillard
@@ -56,7 +56,8 @@ public interface ReadPersistenceService {
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
-    <T extends PersistentObject> long getNumberOfEntities(Class<T> entityClass, QueryOptions options, Map<String, Object> parameters)
+    <T extends PersistentObject> long getNumberOfEntities(Class<T> entityClass, QueryOptions options,
+            Map<String, Object> parameters)
             throws SBonitaReadException;
 
     /**
@@ -68,7 +69,8 @@ public interface ReadPersistenceService {
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
-    <T extends PersistentObject> long getNumberOfEntities(Class<T> entityClass, String querySuffix, QueryOptions options, Map<String, Object> parameters)
+    <T extends PersistentObject> long getNumberOfEntities(Class<T> entityClass, String querySuffix,
+            QueryOptions options, Map<String, Object> parameters)
             throws SBonitaReadException;
 
     /**
@@ -79,7 +81,8 @@ public interface ReadPersistenceService {
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
-    <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, QueryOptions options, Map<String, Object> parameters)
+    <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, QueryOptions options,
+            Map<String, Object> parameters)
             throws SBonitaReadException;
 
     /**
@@ -94,7 +97,8 @@ public interface ReadPersistenceService {
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
-    <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, String querySuffix, QueryOptions options, Map<String, Object> parameters)
+    <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, String querySuffix, QueryOptions options,
+            Map<String, Object> parameters)
             throws SBonitaReadException;
 
     /**

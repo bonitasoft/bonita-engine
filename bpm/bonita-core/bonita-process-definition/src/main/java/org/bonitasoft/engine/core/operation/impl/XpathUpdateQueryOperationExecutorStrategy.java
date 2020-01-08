@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,7 +72,8 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext,
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue) throws SOperationExecutionException {
         try {
             final String dataInstanceName = operation.getLeftOperand().getName();
@@ -95,7 +97,8 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                         if (variableValue instanceof String) {
                             element.setAttribute(attributeName, getStringValue(variableValue));
                         } else if (variableValue instanceof Attr) {
-                            element.setAttribute(((Attr) variableValue).getName(), ((Attr) variableValue).getTextContent());
+                            element.setAttribute(((Attr) variableValue).getName(),
+                                    ((Attr) variableValue).getTextContent());
                         }
                     }
                 } else if (node instanceof Attr) { // Set an existing attribute
@@ -115,7 +118,8 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                 if (variableValue instanceof Node) {
                     newNode = document.importNode((Node) variableValue, true);
                 } else if (variableValue instanceof String) {
-                    newNode = document.importNode(DocumentManager.generateDocument(getStringValue(variableValue)).getDocumentElement(), true);
+                    newNode = document.importNode(
+                            DocumentManager.generateDocument(getStringValue(variableValue)).getDocumentElement(), true);
                 }
 
                 // if (isAppend) {
@@ -131,7 +135,8 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                 parentNode.appendChild(document.createTextNode(getStringValue(variableValue)));
             }
             return DocumentManager.getDocumentContent(document);
-        } catch (final ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerFactoryConfigurationError | TransformerException pce) {
+        } catch (final ParserConfigurationException | SAXException | IOException | XPathExpressionException
+                | TransformerFactoryConfigurationError | TransformerException pce) {
             throw new SOperationExecutionException(pce);
         }
     }

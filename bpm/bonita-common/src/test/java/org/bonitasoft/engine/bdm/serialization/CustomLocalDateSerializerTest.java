@@ -17,12 +17,11 @@ import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * @author Emmanuel Duchastenier

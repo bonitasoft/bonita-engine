@@ -28,7 +28,8 @@ import org.junit.Test;
 public class RemoteEngineIT extends TestWithTechnicalUser {
 
     /*
-     * check that we return the stack server exception but not the server exception itself that is not known to the client
+     * check that we return the stack server exception but not the server exception itself that is not known to the
+     * client
      */
     @Test
     public void check_remote_exception_is_given_to_client() {

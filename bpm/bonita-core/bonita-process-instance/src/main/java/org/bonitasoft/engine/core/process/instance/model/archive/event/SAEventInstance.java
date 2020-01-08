@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SAEventInstance extends SAFlowNodeInstance {
+
     public SAEventInstance(final SEventInstance eventInstance) {
         super(eventInstance);
     }

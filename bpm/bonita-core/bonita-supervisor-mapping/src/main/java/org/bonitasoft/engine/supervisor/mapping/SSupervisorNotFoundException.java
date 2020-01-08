@@ -35,7 +35,8 @@ public class SSupervisorNotFoundException extends SBonitaException {
         super(message, cause);
     }
 
-    public SSupervisorNotFoundException(final Long userId, final Long roleId, final Long groupId, final Long processDefinitionId) {
+    public SSupervisorNotFoundException(final Long userId, final Long roleId, final Long groupId,
+            final Long processDefinitionId) {
         super("No supervisor was found !!");
         setUserIdOnContext(userId);
         setRoleIdOnContext(roleId);

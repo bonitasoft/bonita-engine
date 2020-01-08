@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.expression.model.builder;
 
-
 /**
  * @author Zhao na
  */

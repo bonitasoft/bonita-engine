@@ -18,5 +18,4 @@ package org.bonitasoft.engine.bpm;
  */
 public class ServiceAccessor {
 
-
 }

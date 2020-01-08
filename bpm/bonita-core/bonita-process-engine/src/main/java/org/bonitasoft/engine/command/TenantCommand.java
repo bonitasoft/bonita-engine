@@ -16,8 +16,9 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Class to be subclassed by implementors of a tenant scope {@link Command}. It is design to be executed by the {@link org.bonitasoft.engine.api.CommandAPI}.
- * 
+ * Class to be subclassed by implementors of a tenant scope {@link Command}. It is design to be executed by the
+ * {@link org.bonitasoft.engine.api.CommandAPI}.
+ *
  * @author Matthieu Chaffotte
  * @see org.bonitasoft.engine.api.CommandAPI
  * @since 6.0.0

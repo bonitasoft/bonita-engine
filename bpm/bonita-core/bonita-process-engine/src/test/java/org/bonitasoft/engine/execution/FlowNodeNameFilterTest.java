@@ -29,7 +29,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeNameFilterTest {

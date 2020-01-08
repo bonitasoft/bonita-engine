@@ -28,7 +28,6 @@ import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 @EqualsAndHashCode(callSuper = true)
 public class SXMLDataInstance extends SDataInstance {
 
-
     private String value;
     private String namespace;
     private String element;

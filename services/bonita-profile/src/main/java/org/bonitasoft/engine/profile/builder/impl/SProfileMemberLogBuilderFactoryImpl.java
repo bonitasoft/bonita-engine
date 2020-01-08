@@ -20,12 +20,12 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public class SProfileMemberLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SPersistenceLogBuilderFactory {
+public class SProfileMemberLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SPersistenceLogBuilderFactory {
 
     public static final String PROFILE_MEMBER_INDEX_NAME = "numericIndex3";
 
     // TODO: add index for user, group and role
-
 
     @Override
     public String getObjectIdKey() {

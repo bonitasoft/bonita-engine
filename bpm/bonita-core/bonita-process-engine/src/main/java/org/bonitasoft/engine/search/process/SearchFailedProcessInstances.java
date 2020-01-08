@@ -33,7 +33,8 @@ public class SearchFailedProcessInstances extends AbstractProcessInstanceSearchE
 
     private final ProcessInstanceService processInstanceService;
 
-    public SearchFailedProcessInstances(final ProcessInstanceService processInstanceService, final SearchProcessInstanceDescriptor searchEntitiesDescriptor,
+    public SearchFailedProcessInstances(final ProcessInstanceService processInstanceService,
+            final SearchProcessInstanceDescriptor searchEntitiesDescriptor,
             final SearchOptions options, final ProcessDefinitionService processDefinitionService) {
         super(searchEntitiesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;

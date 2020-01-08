@@ -31,9 +31,9 @@ public abstract class SHumanTaskInstance extends SActivityInstance {
     private STaskPriority priority;
     private long claimedDate;
 
-
-    public SHumanTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
-                                  final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
+    public SHumanTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parenteContainerId,
+            final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parenteContainerId, logicalGroup1, logicalGroup2);
         this.actorId = actorId;
         this.priority = priority;

@@ -60,7 +60,8 @@ public class BusinessArchiveFactory {
      * @throws InvalidBusinessArchiveFormatException
      *         if the input stream does not contains a valid business archive
      */
-    public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
+    public static BusinessArchive readBusinessArchive(final InputStream inputStream)
+            throws IOException, InvalidBusinessArchiveFormatException {
         File barFolder = null;
         return INSTANCE.readBusinessArchive(inputStream, contributions);
     }
@@ -77,14 +78,16 @@ public class BusinessArchiveFactory {
      * @throws InvalidBusinessArchiveFormatException
      *         if the input stream does not contains a valid business archive
      */
-    public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormatException, IOException {
+    public static BusinessArchive readBusinessArchive(final File barOrFolder)
+            throws InvalidBusinessArchiveFormatException, IOException {
         return INSTANCE.readBusinessArchive(barOrFolder, contributions);
     }
 
     /**
      * Write the {@link BusinessArchive} to the folder given in parameter
      * <p>
-     * the written business archive the uncompressed version of {@link #writeBusinessArchiveToFile(BusinessArchive, File)}
+     * the written business archive the uncompressed version of
+     * {@link #writeBusinessArchiveToFile(BusinessArchive, File)}
      *
      * @param businessArchive
      *        the {@link BusinessArchive} to write
@@ -92,7 +95,8 @@ public class BusinessArchiveFactory {
      *        the folder into the business archive must be written
      * @throws IOException
      */
-    public static void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath) throws IOException {
+    public static void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath)
+            throws IOException {
         INSTANCE.writeBusinessArchiveToFolder(businessArchive, folderPath, contributions);
     }
 
@@ -107,7 +111,8 @@ public class BusinessArchiveFactory {
      *        the folder into the business archive must be written
      * @throws IOException
      */
-    public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
+    public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile)
+            throws IOException {
         INSTANCE.writeBusinessArchiveToFile(businessArchive, businessArchiveFile, contributions);
     }
 
@@ -127,7 +132,8 @@ public class BusinessArchiveFactory {
 
     //--------------- instance methods
 
-    protected BusinessArchive readBusinessArchive(final InputStream inputStream, List<BusinessArchiveContribution> contributions)
+    protected BusinessArchive readBusinessArchive(final InputStream inputStream,
+            List<BusinessArchiveContribution> contributions)
             throws IOException, InvalidBusinessArchiveFormatException {
         File barFolder = File.createTempFile("tempBarFolder", null);
         barFolder.delete();
@@ -144,7 +150,8 @@ public class BusinessArchiveFactory {
         }
     }
 
-    protected BusinessArchive readBusinessArchive(final File barOrFolder, List<BusinessArchiveContribution> contributions)
+    protected BusinessArchive readBusinessArchive(final File barOrFolder,
+            List<BusinessArchiveContribution> contributions)
             throws InvalidBusinessArchiveFormatException, IOException {
         if (!barOrFolder.exists()) {
             throw new FileNotFoundException("the file does not exists: " + barOrFolder.getAbsolutePath());
@@ -163,13 +170,15 @@ public class BusinessArchiveFactory {
         final BusinessArchive businessArchive = new BusinessArchive();
         for (final BusinessArchiveContribution contribution : contributions) {
             if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
-                throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+                throw new InvalidBusinessArchiveFormatException(
+                        "Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
             }
         }
         return businessArchive;
     }
 
-    protected void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath, List<BusinessArchiveContribution> contributions)
+    protected void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath,
+            List<BusinessArchiveContribution> contributions)
             throws IOException {
         if (folderPath.exists()) {
             if (!folderPath.isDirectory()) {
@@ -197,7 +206,8 @@ public class BusinessArchiveFactory {
         }
     }
 
-    protected String businessArchiveFolderToFile(final File destFile, final String folderPath, List<BusinessArchiveContribution> contributions)
+    protected String businessArchiveFolderToFile(final File destFile, final String folderPath,
+            List<BusinessArchiveContribution> contributions)
             throws IOException {
         zipBarFolder(destFile, new File(folderPath));
         return destFile.getAbsolutePath();

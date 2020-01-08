@@ -105,7 +105,6 @@ public class TimeTracker implements TenantLifecycleService {
     /**
      * reference a new flushEventListener. The key of the reference is the flushEventListener.name().
      * If a listener exist with this name, it will be replaced.
-     *
      */
     public void addFlushEventListener(final FlushEventListener flushEventListener) {
         this.flushEventListeners.put(flushEventListener.getName(), flushEventListener);
@@ -113,7 +112,6 @@ public class TimeTracker implements TenantLifecycleService {
 
     /**
      * remove a flush event listener
-     *
      */
     public void removeFlushEventListener(final String flushEventListenerName) {
         this.flushEventListeners.remove(flushEventListenerName);

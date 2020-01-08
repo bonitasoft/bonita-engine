@@ -78,13 +78,15 @@ public abstract class SFlowNodeInstanceBuilderImpl implements SFlowNodeInstanceB
 
     @Override
     public SFlowNodeInstanceBuilder setParentProcessInstanceId(final long parentProcessInstanceId) {
-        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_PROCESS_INSTANCE_INDEX,
+                parentProcessInstanceId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setParentActivityInstanceId(final long activityInstanceId) {
-        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX, activityInstanceId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX,
+                activityInstanceId);
         return this;
     }
 

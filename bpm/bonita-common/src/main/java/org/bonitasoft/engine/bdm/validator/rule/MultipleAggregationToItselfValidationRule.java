@@ -45,7 +45,8 @@ public class MultipleAggregationToItselfValidationRule extends ValidationRule<Bu
                     RelationField relationField = (RelationField) boField;
                     String fieldReferenceQualifiedName = relationField.getReference().getQualifiedName();
                     String boQualifiedName = bo.getQualifiedName();
-                    if (relationField.getType() == AGGREGATION && fieldReferenceQualifiedName.equals(boQualifiedName) && relationField.isCollection()) {
+                    if (relationField.getType() == AGGREGATION && fieldReferenceQualifiedName.equals(boQualifiedName)
+                            && relationField.isCollection()) {
                         validationStatus.addError(MULTIPLE_AGGREGATION_RELATION_TO_ITSELF, "The object "
                                 + boQualifiedName + " is referencing itself in a multiple aggregation relation.",
                                 Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, boQualifiedName));

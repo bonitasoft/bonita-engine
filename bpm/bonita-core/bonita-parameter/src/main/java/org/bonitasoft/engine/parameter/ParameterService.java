@@ -28,7 +28,7 @@ public interface ParameterService {
 
     /**
      * Update specific parameter value in a process
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param parameterName
@@ -44,7 +44,7 @@ public interface ParameterService {
     /**
      * Merge given parameters with existing ones.
      * Unknown parameters are ignored.
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param parameters
@@ -59,7 +59,7 @@ public interface ParameterService {
 
     /**
      * Store all parameters provided to the specific process in file system
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param parameters
@@ -73,7 +73,7 @@ public interface ParameterService {
 
     /**
      * return all parameters in a map
-     * 
+     *
      * @param processDefinitionId
      */
     Map<String, String> getAll(long processDefinitionId)
@@ -81,7 +81,7 @@ public interface ParameterService {
 
     /**
      * Delete all parameters for a specific processDefinition
-     * 
+     *
      * @param processDefinitionId ID of processDefinition
      * @throws SParameterProcessNotFoundException
      *         error thrown if no parameters configuration file found in file system
@@ -91,7 +91,7 @@ public interface ParameterService {
 
     /**
      * Get parameters in a specific interval for specific process, this is used for pagination
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param fromIndex
@@ -110,7 +110,7 @@ public interface ParameterService {
 
     /**
      * Get parameter by name in specific process
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param parameterName
@@ -121,7 +121,7 @@ public interface ParameterService {
 
     /**
      * Get a list of parameters will null values in order in specific process
-     * 
+     *
      * @param processDefinitionId
      *        identifier of processDefinition
      * @param fromIndex
@@ -142,7 +142,7 @@ public interface ParameterService {
 
     /**
      * Check if the specific process contains null-valued parameter or not.
-     * 
+     *
      * @param processDefinitionId The ID of the process definition
      * @return true if at least one parameter contains a null value, false otherwise.
      * @throws SParameterProcessNotFoundException

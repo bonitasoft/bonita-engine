@@ -47,17 +47,20 @@ public class LivingApplicationAPIDelegate {
     private final ApplicationService applicationService;
     private final ApplicationTokenValidator tokenValidator;
 
-    public LivingApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
+    public LivingApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter,
+            final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
         this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();
         this.converter = converter;
         this.loggedUserId = loggedUserId;
     }
 
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
+    public Application createApplication(final ApplicationCreator applicationCreator)
+            throws AlreadyExistsException, CreationException {
         try {
             validateCreator(applicationCreator);
-            final SApplication sApplication = applicationService.createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
+            final SApplication sApplication = applicationService
+                    .createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
             return converter.toApplication(sApplication);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
@@ -96,7 +99,8 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public SearchResult<Application> searchApplications(final SearchApplications searchApplications) throws SearchException {
+    public SearchResult<Application> searchApplications(final SearchApplications searchApplications)
+            throws SearchException {
         try {
             searchApplications.execute();
             return searchApplications.getResult();
@@ -105,13 +109,15 @@ public class LivingApplicationAPIDelegate {
         }
     }
 
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws UpdateException,
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater)
+            throws UpdateException,
             AlreadyExistsException, ApplicationNotFoundException {
         try {
             validateUpdater(updater);
             SApplication sApplication;
             if (!updater.getFields().isEmpty()) {
-                sApplication = applicationService.updateApplication(applicationId, converter.toApplicationUpdateDescriptor(updater, loggedUserId));
+                sApplication = applicationService.updateApplication(applicationId,
+                        converter.toApplicationUpdateDescriptor(updater, loggedUserId));
             } else {
                 sApplication = applicationService.getApplication(applicationId);
             }

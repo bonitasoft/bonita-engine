@@ -16,14 +16,14 @@ package org.bonitasoft.engine.bpm.process.impl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.AutomaticTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 public class AutomaticTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
-    public AutomaticTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
+    public AutomaticTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
             final String name) {
         super(process, processDefinitionBuilder, new AutomaticTaskDefinitionImpl(name));
     }

@@ -36,7 +36,8 @@ public class BusinessDataModelConverterTest {
         sReference.setId(465L);
         sReference.setDataId(87997L);
 
-        final SimpleBusinessDataReference reference = BusinessDataModelConverter.toSimpleBusinessDataReference(sReference);
+        final SimpleBusinessDataReference reference = BusinessDataModelConverter
+                .toSimpleBusinessDataReference(sReference);
         assertThat(reference.getStorageId()).isEqualTo(87997L);
         assertThat(reference.getStorageIdAsString()).isEqualTo("87997");
         assertThat(reference.getName()).isEqualTo("employee");
@@ -44,7 +45,7 @@ public class BusinessDataModelConverterTest {
     }
 
     @Test
-    public void convertSMultiBusinessDataReferencetoClientObject_should_Create_a_correct_list_from_a_list_with_a_null(){
+    public void convertSMultiBusinessDataReferencetoClientObject_should_Create_a_correct_list_from_a_list_with_a_null() {
         //given
         List dataIDs = new LinkedList();
         dataIDs.add(25L);
@@ -52,16 +53,16 @@ public class BusinessDataModelConverterTest {
         dataIDs.add(3L);
         final SProcessMultiRefBusinessDataInstance sReference = new SProcessMultiRefBusinessDataInstance();
         sReference.setDataIds(dataIDs);
-        
+
         //when
-        final MultipleBusinessDataReference reference = BusinessDataModelConverter.toMultipleBusinessDataReference(sReference);
-        
+        final MultipleBusinessDataReference reference = BusinessDataModelConverter
+                .toMultipleBusinessDataReference(sReference);
+
         //then
         assertThat(reference).isNotNull();
-        
+
     }
-    
-    
+
     @Test
     public void convertSMultiBusinessDataReferencetoClientObject() throws Exception {
         final SProcessMultiRefBusinessDataInstance sReference = new SProcessMultiRefBusinessDataInstance();
@@ -70,7 +71,8 @@ public class BusinessDataModelConverterTest {
         sReference.setId(465L);
         sReference.setDataIds(Arrays.asList(87997L, 654312354L, 4786454L));
 
-        final MultipleBusinessDataReference reference = BusinessDataModelConverter.toMultipleBusinessDataReference(sReference);
+        final MultipleBusinessDataReference reference = BusinessDataModelConverter
+                .toMultipleBusinessDataReference(sReference);
         assertThat(reference.getStorageIds()).isEqualTo(Arrays.asList(87997L, 654312354L, 4786454L));
         assertThat(reference.getStorageIdsAsString()).isEqualTo(Arrays.asList("87997", "654312354", "4786454"));
         assertThat(reference.getName()).isEqualTo("employees");

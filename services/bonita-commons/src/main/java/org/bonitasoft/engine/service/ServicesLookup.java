@@ -32,7 +32,7 @@ public interface ServicesLookup {
 
     /**
      * lookup for a service on the tenant
-     * 
+     *
      * @param tenantId
      *        id of the tenant on which to look
      * @param serviceName

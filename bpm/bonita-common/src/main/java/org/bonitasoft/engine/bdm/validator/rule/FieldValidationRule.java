@@ -41,7 +41,8 @@ public class FieldValidationRule extends ValidationRule<Field, ValidationStatus>
     public ValidationStatus validate(final Field field) {
         final ValidationStatus status = new ValidationStatus();
         final String name = field.getName();
-        if (name == null || !SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
+        if (name == null || !SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name)
+                || isForbiddenIdentifier(name)) {
             status.addError(StatusCode.INVALID_FIELD_IDENTIFIER,
                     String.format("%s is not a valid field identifier", name),
                     Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
@@ -51,6 +52,7 @@ public class FieldValidationRule extends ValidationRule<Field, ValidationStatus>
     }
 
     private boolean isForbiddenIdentifier(final String name) {
-        return Field.PERSISTENCE_ID.equalsIgnoreCase(name) || Field.PERSISTENCE_VERSION.equalsIgnoreCase(name) || !sqlNameValidator.isValid(name);
+        return Field.PERSISTENCE_ID.equalsIgnoreCase(name) || Field.PERSISTENCE_VERSION.equalsIgnoreCase(name)
+                || !sqlNameValidator.isValid(name);
     }
 }

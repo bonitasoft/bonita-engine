@@ -43,13 +43,15 @@ public class ConfigurationFolderUtil {
     }
 
     public void buildInitialFolder(Path rootFolder) throws IOException {
-        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("platform_init_engine");
+        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                .resolve("platform_init_engine");
         Files.createDirectories(platform_init_engine);
         Files.write(platform_init_engine.resolve("initialConfig.properties"), "key=value".getBytes());
     }
 
     public Path buildCurrentFolder(Path rootFolder) throws IOException {
-        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current").resolve("platform_init_engine");
+        Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
+                .resolve("platform_init_engine");
         Files.createDirectories(platform_init_engine);
         Files.write(platform_init_engine.resolve("currentConfig.properties"), "key=value".getBytes());
         return platform_init_engine;
@@ -59,7 +61,8 @@ public class ConfigurationFolderUtil {
         Path sqlPath = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor);
         Files.createDirectories(sqlPath);
         for (String sqlFile : asList(ALL_SQL_FILES)) {
-            Files.copy(ConfigurationFolderUtil.class.getResourceAsStream("/sql/" + dbVendor + "/" + sqlFile), sqlPath.resolve(sqlFile));
+            Files.copy(ConfigurationFolderUtil.class.getResourceAsStream("/sql/" + dbVendor + "/" + sqlFile),
+                    sqlPath.resolve(sqlFile));
         }
     }
 

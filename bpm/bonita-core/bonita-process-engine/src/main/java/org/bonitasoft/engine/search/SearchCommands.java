@@ -28,7 +28,8 @@ public class SearchCommands extends AbstractCommandSearchEntity {
 
     private final CommandService commandService;
 
-    public SearchCommands(final CommandService commandService, final SearchCommandDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchCommands(final CommandService commandService, final SearchCommandDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.commandService = commandService;
     }

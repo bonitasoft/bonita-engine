@@ -27,6 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAAutomaticTaskInstance extends SAActivityInstance {
+
     public SAAutomaticTaskInstance(final SAutomaticTaskInstance sAutomaticTaskInstance) {
         super(sAutomaticTaskInstance);
     }

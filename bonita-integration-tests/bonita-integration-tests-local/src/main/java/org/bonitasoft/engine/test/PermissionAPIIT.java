@@ -75,7 +75,8 @@ public class PermissionAPIIT extends CommonAPILocalIT {
             }
         };
         //when
-        boolean processPermissionRule = getPermissionAPI().checkAPICallWithScript("org.bonitasoft.permissions.ProcessPermissionRule", apiCallContext, false);
+        boolean processPermissionRule = getPermissionAPI()
+                .checkAPICallWithScript("org.bonitasoft.permissions.ProcessPermissionRule", apiCallContext, false);
 
         //then
         assertThat(processPermissionRule).isTrue();
@@ -129,7 +130,8 @@ public class PermissionAPIIT extends CommonAPILocalIT {
         }
         path += fileName + ".groovy";
 
-        configurationService.storeTenantSecurityScripts(Collections.singletonList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
+        configurationService.storeTenantSecurityScripts(
+                Collections.singletonList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
                 getTenantAccessor().getTenantId());
 
         final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();

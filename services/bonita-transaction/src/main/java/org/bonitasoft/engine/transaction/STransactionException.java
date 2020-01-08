@@ -33,17 +33,17 @@ public class STransactionException extends SBonitaException {
 
     public STransactionException(final String message, final Throwable throwable) {
         super(message, throwable);
-        exceptions = Collections.<Throwable>emptyList();
+        exceptions = Collections.<Throwable> emptyList();
     }
 
     public STransactionException(final Throwable throwable) {
         super(throwable);
-        exceptions = Collections.<Throwable>emptyList();
+        exceptions = Collections.<Throwable> emptyList();
     }
 
     public STransactionException(final String message) {
         super(message);
-        exceptions = Collections.<Throwable>emptyList();
+        exceptions = Collections.<Throwable> emptyList();
     }
 
     public List<Throwable> getCommitExceptions() {

@@ -23,7 +23,8 @@ public class InequalityComparator {
             return null;
         }
         if (!(left instanceof Comparable) || !(right instanceof Comparable)) {
-            throw new SComparisonException("The following class must implement java.lang.Comparable: " + left.getClass().getName());
+            throw new SComparisonException(
+                    "The following class must implement java.lang.Comparable: " + left.getClass().getName());
         }
         return compare((Comparable) left, (Comparable) right);
     }

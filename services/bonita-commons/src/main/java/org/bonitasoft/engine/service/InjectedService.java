@@ -17,11 +17,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 
  * to tell the engine that a setter is used to inject services
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InjectedService {

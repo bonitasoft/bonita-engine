@@ -41,7 +41,8 @@ public class GetAssignedTasks implements TransactionContentWithResult<List<SHuma
 
     private List<SHumanTaskInstance> userTasks;
 
-    public GetAssignedTasks(final ActivityInstanceService instanceService, final long userId, final int fromIndex, final int maxResults,
+    public GetAssignedTasks(final ActivityInstanceService instanceService, final long userId, final int fromIndex,
+            final int maxResults,
             final String sortFieldName, final OrderByType order) {
         super();
         this.instanceService = instanceService;

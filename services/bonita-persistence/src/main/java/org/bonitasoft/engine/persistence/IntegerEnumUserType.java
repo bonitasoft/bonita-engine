@@ -28,8 +28,9 @@ import org.hibernate.usertype.UserType;
 
 /**
  * Use 'enumClass' to set the enum class type
- * use 'identifierMethod' param to set the method name returning the integer value of the enum. Defaults to 'order' method
- * 
+ * use 'identifierMethod' param to set the method name returning the integer value of the enum. Defaults to 'order'
+ * method
+ *
  * @author Emmanuel Duchastenier
  */
 public class IntegerEnumUserType implements UserType, ParameterizedType, Serializable {
@@ -86,7 +87,8 @@ public class IntegerEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session, final Object owner) throws HibernateException,
+    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session,
+            final Object owner) throws HibernateException,
             SQLException {
         final Object identifier = type.get(rs, names[0], session);
         if (identifier == null) {
@@ -105,7 +107,8 @@ public class IntegerEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final Object value, final int index, final SessionImplementor session) throws HibernateException {
+    public void nullSafeSet(final PreparedStatement st, final Object value, final int index,
+            final SessionImplementor session) throws HibernateException {
         try {
             if (value == null) {
                 st.setNull(index, type.sqlType());

@@ -93,19 +93,23 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     private LocalDate birthdate;
 
     private BusinessObjectModel buildCustomBOM() {
-        final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME).withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
-        final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee")
+        final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME)
+                .withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
+        final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME)
+                .withDescription("Describe final a simple employee")
                 .withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build())
                 .withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build())
                 .withField(aSimpleField().withName("birthdate").ofType(FieldType.LOCALDATE).nullable().build())
-                .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build())
+                .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO)
+                        .multiple().lazy().build())
                 .withQuery(
                         aQuery().withName("getNoEmployees")
                                 .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
                                 .withReturnType(List.class.getName()).build())
                 .withQuery(
                         aQuery().withName("getEmployeeByFirstNameAndLastName")
-                                .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName")
+                                .withContent(
+                                        "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName")
                                 .withReturnType(EMPLOYEE_QUALIF_CLASSNAME)
                                 .withQueryParameter("firstName", String.class.getName())
                                 .withQueryParameter("lastName", String.class.getName()).build())
@@ -166,7 +170,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     private void loadClientJars() throws Exception {
         contextClassLoader = Thread.currentThread().getContextClassLoader();
         final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
-        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader,
+        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip,
+                contextClassLoader,
                 EMPLOYEE_QUALIF_CLASSNAME, clientFolder);
         Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
     }
@@ -248,7 +253,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         //given
         final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("find", 2, 1);
 
-        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results")
+                .isEqualTo(getJsonContent("Employee.find.2.1.json"));
 
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(2);
@@ -271,7 +277,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         int maxResults = 1;
         final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("customQuery", startIndex, maxResults);
 
-        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results")
+                .isEqualTo(getJsonContent("Employee.find.2.1.json"));
 
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).isNotNull();
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
@@ -348,19 +355,23 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
     }
 
-    public void addEmployee(final String firstName, final String lastName, final LocalDate birthdate, final String... addresses) throws Exception {
+    public void addEmployee(final String firstName, final String lastName, final LocalDate birthdate,
+            final String... addresses) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 createNewEmployeeScriptContent(firstName, lastName, birthdate, addresses),
                 EMPLOYEE_QUALIF_CLASSNAME);
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
+                new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", businessUser);
         checkProcessInstanceIsArchived(instance);
@@ -368,7 +379,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    private String createNewEmployeeScriptContent(final String firstName, final String lastName, LocalDate birthdate, final String... addresses) {
+    private String createNewEmployeeScriptContent(final String firstName, final String lastName, LocalDate birthdate,
+            final String... addresses) {
         final StringBuilder sb = new StringBuilder();
         sb.append("import ");
         sb.append(EMPLOYEE_QUALIF_CLASSNAME);
@@ -410,12 +422,14 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     private Serializable deserializeSimpleResult(final byte[] result) throws Exception {
         return new BusinessDataObjectMapper().readValue(result,
-                (Class<Serializable>) Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME));
+                (Class<Serializable>) Thread.currentThread().getContextClassLoader()
+                        .loadClass(EMPLOYEE_QUALIF_CLASSNAME));
     }
 
     private List<?> deserializeListResult(final byte[] result) throws Exception {
         return new BusinessDataObjectMapper().readListValue(result,
-                (Class<Serializable>) Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME));
+                (Class<Serializable>) Thread.currentThread().getContextClassLoader()
+                        .loadClass(EMPLOYEE_QUALIF_CLASSNAME));
     }
 
     private String getJsonContent(final String jsonFileName) throws IOException {

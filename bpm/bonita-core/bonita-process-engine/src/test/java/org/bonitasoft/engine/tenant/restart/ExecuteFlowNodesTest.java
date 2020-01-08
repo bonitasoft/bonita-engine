@@ -48,7 +48,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ExecuteFlowNodesTest {
 
-
     private static final int ABORTING_STATE_ID = 1111;
     private static final int NORMAL_STATE_ID = 2222;
     private static final int CANCELLING_STATE_ID = 33333;
@@ -79,8 +78,6 @@ public class ExecuteFlowNodesTest {
     private WorkDescriptor executeFlowNodeWorkDescriptor;
     @InjectMocks
     private ExecuteFlowNodes executeFlowNodes;
-
-
 
     @Before
     public void before() {
@@ -129,7 +126,8 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
-    public final void should_execute_flownode_that_is_aborting_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category() throws Exception {
+    public final void should_execute_flownode_that_is_aborting_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category()
+            throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
         autoTask.setStateCategory(SStateCategory.ABORTING);
         autoTask.setTerminal(false);
@@ -142,7 +140,8 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
-    public final void should_execute_flownode_that_is_cancelling_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category() throws Exception {
+    public final void should_execute_flownode_that_is_cancelling_non_terminal_and_stable_when_the_FlowNodeState_is_not_in_the_same_state_category()
+            throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
         autoTask.setStateCategory(SStateCategory.CANCELLING);
         autoTask.setTerminal(false);
@@ -155,7 +154,8 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
-    public final void should_not_execute_flownode_that_is_aborting_non_terminal_and_stable_when_the_FlowNodeState_is_in_the_same_state_category() throws Exception {
+    public final void should_not_execute_flownode_that_is_aborting_non_terminal_and_stable_when_the_FlowNodeState_is_in_the_same_state_category()
+            throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
         autoTask.setStateCategory(SStateCategory.ABORTING);
         autoTask.setTerminal(false);
@@ -168,7 +168,8 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
-    public final void should_not_execute_flownode_that_is_cancelling_non_terminal_and_stable_when_the_FlowNodeState_is_in_the_same_state_category() throws Exception {
+    public final void should_not_execute_flownode_that_is_cancelling_non_terminal_and_stable_when_the_FlowNodeState_is_in_the_same_state_category()
+            throws Exception {
         SAutomaticTaskInstance autoTask = createTask(123L, false);
         autoTask.setStateCategory(SStateCategory.CANCELLING);
         autoTask.setTerminal(false);
@@ -180,7 +181,6 @@ public class ExecuteFlowNodesTest {
         verify(workService, never()).registerWork(any());
     }
 
-
     @Test
     public final void execute_21_flow_node_only_execute_20() throws Exception {
         ArrayList<SFlowNodeInstance> list = new ArrayList<>();
@@ -188,12 +188,11 @@ public class ExecuteFlowNodesTest {
             list.add(createTask(123 + i, false));
         }
 
-        executeFlowNodes.execute(flowNodeIds(list.toArray(new SFlowNodeInstance[]{})));
+        executeFlowNodes.execute(flowNodeIds(list.toArray(new SFlowNodeInstance[] {})));
 
         assertThat(list.size()).isEqualTo(21);
         verify(workService, times(20)).registerWork(executeFlowNodeWorkDescriptor);
     }
-
 
     @Test
     public void should_execute_gateway_when_merging_condition_is_true() throws Exception {
@@ -216,16 +215,15 @@ public class ExecuteFlowNodesTest {
         verify(workService, never()).registerWork(any());
     }
 
-
-   @Test
+    @Test
     public void should_execute_gateway_when_stateCategory_is_ABORTING() throws Exception {
-       SGatewayInstance gatewayInstance = new SGatewayInstance();
-       gatewayInstance.setId(333L);
-       gatewayInstance.setStateCategory(SStateCategory.ABORTING);
+        SGatewayInstance gatewayInstance = new SGatewayInstance();
+        gatewayInstance.setId(333L);
+        gatewayInstance.setStateCategory(SStateCategory.ABORTING);
 
-       executeFlowNodes.execute(flowNodeIds(gatewayInstance));
+        executeFlowNodes.execute(flowNodeIds(gatewayInstance));
 
-       verify(workService).registerWork(executeFlowNodeWorkDescriptor);
+        verify(workService).registerWork(executeFlowNodeWorkDescriptor);
     }
 
     @Test

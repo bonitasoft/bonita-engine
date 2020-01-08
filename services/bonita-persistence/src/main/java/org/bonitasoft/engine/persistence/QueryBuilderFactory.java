@@ -26,7 +26,8 @@ public class QueryBuilderFactory {
 
     private Vendor vendor;
 
-    public QueryBuilder createQueryBuilderFor(Query query, Class<? extends PersistentObject> entityType, OrderByBuilder orderByBuilder,
+    public QueryBuilder createQueryBuilderFor(Query query, Class<? extends PersistentObject> entityType,
+            OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings, char likeEscapeCharacter) {
         if (query instanceof SQLQuery) {
             return new SQLQueryBuilder(query.getQueryString(), vendor, entityType, orderByBuilder, classAliasMappings,

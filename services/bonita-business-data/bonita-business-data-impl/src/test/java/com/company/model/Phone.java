@@ -22,7 +22,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-
 /**
  *
  */
@@ -33,8 +32,7 @@ import javax.persistence.Version;
         @NamedQuery(name = "Phone.find", query = "SELECT p\nFROM Phone p\nORDER BY p.persistenceId")
 })
 public class Phone
-        implements org.bonitasoft.engine.bdm.Entity
-{
+        implements org.bonitasoft.engine.bdm.Entity {
 
     @Id
     @GeneratedValue
@@ -79,12 +77,12 @@ public class Phone
         if (obj == null) {
             return false;
         }
-        if (getClass()!= obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Phone other = ((Phone) obj);
         if (persistenceId == null) {
-            if (other.persistenceId!= null) {
+            if (other.persistenceId != null) {
                 return false;
             }
         } else {
@@ -93,7 +91,7 @@ public class Phone
             }
         }
         if (persistenceVersion == null) {
-            if (other.persistenceVersion!= null) {
+            if (other.persistenceVersion != null) {
                 return false;
             }
         } else {
@@ -102,7 +100,7 @@ public class Phone
             }
         }
         if (number == null) {
-            if (other.number!= null) {
+            if (other.number != null) {
                 return false;
             }
         } else {
@@ -118,20 +116,20 @@ public class Phone
         final int prime = 31;
         int result = 1;
         int persistenceIdCode = 0;
-        if (persistenceId!= null) {
+        if (persistenceId != null) {
             persistenceIdCode = persistenceId.hashCode();
         }
-        result = ((prime*result)+ persistenceIdCode);
+        result = ((prime * result) + persistenceIdCode);
         int persistenceVersionCode = 0;
-        if (persistenceVersion!= null) {
+        if (persistenceVersion != null) {
             persistenceVersionCode = persistenceVersion.hashCode();
         }
-        result = ((prime*result)+ persistenceVersionCode);
+        result = ((prime * result) + persistenceVersionCode);
         int numberCode = 0;
-        if (number!= null) {
+        if (number != null) {
             numberCode = number.hashCode();
         }
-        result = ((prime*result)+ numberCode);
+        result = ((prime * result) + numberCode);
         return result;
     }
 

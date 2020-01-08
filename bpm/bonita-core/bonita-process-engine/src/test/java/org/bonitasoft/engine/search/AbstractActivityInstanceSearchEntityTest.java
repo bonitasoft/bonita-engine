@@ -147,6 +147,7 @@ public class AbstractActivityInstanceSearchEntityTest {
     }
 
     private static class MyAbstractActivityInstanceSearchEntity extends AbstractActivityInstanceSearchEntity {
+
         public MyAbstractActivityInstanceSearchEntity(SearchOptionsImpl searchOptions) throws SBonitaReadException {
             super(null, searchOptions, null);
         }

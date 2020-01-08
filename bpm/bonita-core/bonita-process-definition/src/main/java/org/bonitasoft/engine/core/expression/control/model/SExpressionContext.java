@@ -74,7 +74,8 @@ public class SExpressionContext implements Serializable {
         this(containerId, containerType, processDefinitionId, null);
     }
 
-    public SExpressionContext(final long containerId, final String containerType, final Long processDefinitionId, final Map<String, Object> inputValues) {
+    public SExpressionContext(final long containerId, final String containerType, final Long processDefinitionId,
+            final Map<String, Object> inputValues) {
         this.containerId = containerId;
         this.containerType = containerType;
         this.processDefinitionId = processDefinitionId;
@@ -191,7 +192,10 @@ public class SExpressionContext implements Serializable {
     public String toString() {
         return "context [containerId=" + containerId + ", containerType=" + containerType + ", processDefinitionId="
                 + processDefinitionId
-                + (processDefinition != null ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion() : "") + "]";
+                + (processDefinition != null
+                        ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion()
+                        : "")
+                + "]";
     }
 
     public Long getParentProcessDefinitionId() {
@@ -224,7 +228,8 @@ public class SExpressionContext implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(containerId, containerType, containerState, time, processDefinitionId, parentProcessDefinitionId, processDefinition, inputValues,
+        return Objects.hash(containerId, containerType, containerState, time, processDefinitionId,
+                parentProcessDefinitionId, processDefinition, inputValues,
                 evaluateInDefinition, dataMap, invertedDataMap);
     }
 }

@@ -140,7 +140,8 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException,
+    public SPage addPage(final SPage page, final byte[] content)
+            throws SObjectCreationException, SObjectAlreadyExistsException,
             SInvalidPageZipException, SInvalidPageTokenException {
         try {
             checkZipContainsRequiredEntries(unzip(content));
@@ -161,45 +162,56 @@ public class PageServiceImpl implements PageService {
     public SPage addPage(final byte[] content, final String contentName, final long userId)
             throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipException,
             SInvalidPageTokenException {
-        return addPage(content, contentName, userId, false,false);
+        return addPage(content, contentName, userId, false, false);
     }
 
     @Override
-    public SPage getPageByNameAndProcessDefinitionId(final String name, final long processDefinitionId) throws SBonitaReadException {
+    public SPage getPageByNameAndProcessDefinitionId(final String name, final long processDefinitionId)
+            throws SBonitaReadException {
         final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("pageName", name);
         inputParameters.put("processDefinitionId", processDefinitionId);
-        return persistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID, inputParameters, SPage.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID,
+                inputParameters, SPage.class));
     }
 
     @Override
-    public List<SPage> getPageByProcessDefinitionId(final long processDefinitionId, final int fromIndex, final int numberOfResults)
+    public List<SPage> getPageByProcessDefinitionId(final long processDefinitionId, final int fromIndex,
+            final int numberOfResults)
             throws SBonitaReadException {
         final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("processDefinitionId", processDefinitionId);
         final OrderByOption orderByOption = new OrderByOption(SPage.class, SPageFields.PAGE_NAME, OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, Collections.singletonList(orderByOption));
-        return persistenceService.selectList(new SelectListDescriptor<>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
-                queryOptions));
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults,
+                Collections.singletonList(orderByOption));
+        return persistenceService.selectList(
+                new SelectListDescriptor<>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
+                        queryOptions));
     }
 
-    private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided, boolean hidden) throws SInvalidPageZipException,
+    private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided,
+            boolean hidden) throws SInvalidPageZipException,
             SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
         final Properties pageProperties = readPageZip(content, provided);
-        final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
+        final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME),
+                pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, hidden,
                 pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         return insertPage(page, content);
     }
 
     @Override
-    public Properties readPageZip(final byte[] content) throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
-            SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException {
+    public Properties readPageZip(final byte[] content)
+            throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
+            SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException,
+            SInvalidPageTokenException {
         return readPageZip(content, false);
     }
 
-    Properties readPageZip(final byte[] content, final boolean provided) throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
-            SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException {
+    Properties readPageZip(final byte[] content, final boolean provided)
+            throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
+            SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException,
+            SInvalidPageTokenException {
         final Properties pageProperties;
         if (content == null) {
             throw new SInvalidPageZipInconsistentException("Content can't be null");
@@ -234,7 +246,8 @@ public class PageServiceImpl implements PageService {
                 throw new SInvalidPageZipMissingAPropertyException(api.trim() + "." + CLASS_FILENAME);
             }
             if (!entrySet.contains(classFileName.trim())) {
-                throw new SInvalidPageZipInconsistentException(String.format("RestAPIController %s has not been found in archive.", classFileName.trim()));
+                throw new SInvalidPageZipInconsistentException(
+                        String.format("RestAPIController %s has not been found in archive.", classFileName.trim()));
             }
         }
     }
@@ -243,8 +256,10 @@ public class PageServiceImpl implements PageService {
         return Objects.equals(SContentType.API_EXTENSION, pageProperties.get(PageService.PROPERTIES_CONTENT_TYPE));
     }
 
-    SPage insertPage(final SPage page, final byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException {
-        final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, "Adding a new page with name " + page.getName());
+    SPage insertPage(final SPage page, final byte[] content)
+            throws SObjectAlreadyExistsException, SObjectCreationException {
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED,
+                "Adding a new page with name " + page.getName());
         try {
             final SPageWithContent pageContent = new SPageWithContent(page, content);
             final SPage pageByName = checkIfPageAlreadyExists(page);
@@ -289,15 +304,18 @@ public class PageServiceImpl implements PageService {
 
     private void checkPageNameIsValid(final String name, final boolean provided) throws SInvalidPageTokenException {
         if (name == null || name.isEmpty() || !provided && !name.matches(PAGE_TOKEN_PREFIX + "\\p{Alnum}+")) {
-            throw new SInvalidPageTokenException("Page name is not valid, it must contains only alpha numeric characters and start with " + PAGE_TOKEN_PREFIX);
+            throw new SInvalidPageTokenException(
+                    "Page name is not valid, it must contains only alpha numeric characters and start with "
+                            + PAGE_TOKEN_PREFIX);
         }
     }
 
-    void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingIndexException {
+    void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent)
+            throws SInvalidPageZipMissingIndexException {
         final Set<String> entrySet = zipContent.keySet();
         for (final String entry : entrySet) {
-            if (INDEX_GROOVY.equals(entry) 
-                    || INDEX_HTML.equalsIgnoreCase(entry) 
+            if (INDEX_GROOVY.equals(entry)
+                    || INDEX_HTML.equalsIgnoreCase(entry)
                     || RESOURCES_INDEX_HTML.equalsIgnoreCase(entry)
                     || THEME_CSS.equalsIgnoreCase(entry)) {
                 return;
@@ -306,10 +324,12 @@ public class PageServiceImpl implements PageService {
         throw new SInvalidPageZipMissingIndexException();
     }
 
-    private SPage buildPage(final String name, final String displayName, final String description, final String contentName, final long creatorUserId,
+    private SPage buildPage(final String name, final String displayName, final String description,
+            final String contentName, final long creatorUserId,
             final boolean provided, boolean hidden, final String contentType) {
         return BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, provided, hidden, contentName).setContentType(contentType).done();
+                System.currentTimeMillis(), creatorUserId, provided, hidden, contentName).setContentType(contentType)
+                .done();
     }
 
     SPageLogBuilder getPageLog(final ActionType actionType, final String message) {
@@ -330,8 +350,9 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
-        return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
-                pageName), SPage.class));
+        return persistenceService
+                .selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
+                        pageName), SPage.class));
     }
 
     @Override
@@ -363,20 +384,23 @@ public class PageServiceImpl implements PageService {
             }
             recorder.recordDelete(new DeleteRecord(sPage), PAGE);
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
-        } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException | SProfileEntryDeletionException | SDeletionException re) {
+        } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException
+                | SProfileEntryDeletionException | SDeletionException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         }
     }
 
-    private void deleteProfileEntry(final SPage sPage) throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
+    private void deleteProfileEntry(final SPage sPage)
+            throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PAGE, sPage.getName()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.CUSTOM, new Boolean(true)));
 
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
+                filters, null);
 
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
@@ -387,7 +411,8 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaReadException, SProfileEntryNotFoundException,
+    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry)
+            throws SBonitaReadException, SProfileEntryNotFoundException,
             SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
@@ -395,7 +420,8 @@ public class PageServiceImpl implements PageService {
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PROFILE_ID, sProfileEntry.getProfileId()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PARENT_ID, sProfileEntry.getParentId()));
 
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions,
+                filters, null);
 
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         if (null == searchProfileEntries || searchProfileEntries.isEmpty()) {
@@ -413,7 +439,8 @@ public class PageServiceImpl implements PageService {
         logBuilder.setActionType(actionType);
     }
 
-    void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -425,7 +452,8 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SPageWithContent page = persistenceService.selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, pageId));
+        final SPageWithContent page = persistenceService
+                .selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -442,7 +470,8 @@ public class PageServiceImpl implements PageService {
             if (page.getDescription() != null) {
                 pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
             }
-            contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties, "The name must start with 'custompage_'"));
+            contentAsMap.put("page.properties",
+                    IOUtil.getPropertyAsString(pageProperties, "The name must start with 'custompage_'"));
 
             return IOUtil.zip(contentAsMap);
         } catch (final IOException e) {
@@ -452,7 +481,8 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException,
+    public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor)
+            throws SObjectModificationException,
             SObjectAlreadyExistsException, SInvalidPageTokenException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with id " + pageId);
         final String logMethodName = METHOD_UPDATE_PAGE;
@@ -473,7 +503,8 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor, final String oldPageName)
+    protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor,
+            final String oldPageName)
             throws SInvalidPageTokenException,
             SBonitaReadException, SProfileEntryUpdateException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
@@ -496,7 +527,8 @@ public class PageServiceImpl implements PageService {
                 sPageName = entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString();
             }
             if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
-                sPageProcessDefinitionId = Long.parseLong(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_PROCESS_DEFINITION_ID).toString());
+                sPageProcessDefinitionId = Long.parseLong(
+                        entityUpdateDescriptor.getFields().get(SPageFields.PAGE_PROCESS_DEFINITION_ID).toString());
             }
 
             final SPage page;
@@ -512,14 +544,16 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void updateProfileEntry(final String oldPageName, final String newPageName) throws SBonitaReadException, SProfileEntryUpdateException {
+    private void updateProfileEntry(final String oldPageName, final String newPageName)
+            throws SBonitaReadException, SProfileEntryUpdateException {
         if (newPageName.equals(oldPageName)) {
             return;
         }
         final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntry.PAGE, oldPageName));
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC)), filters, null);
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC)), filters,
+                null);
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
@@ -537,7 +571,8 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void updatePageContent(final long pageId, final byte[] content, final String contentName) throws SObjectModificationException,
+    public void updatePageContent(final long pageId, final byte[] content, final String contentName)
+            throws SObjectModificationException,
             SInvalidPageZipException, SInvalidPageTokenException, SObjectAlreadyExistsException {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
@@ -625,7 +660,8 @@ public class PageServiceImpl implements PageService {
     }
 
     private byte[] getZipContent(final String zipName) throws IOException {
-        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(zipName)) {
+        try (final InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(zipName)) {
             if (inputStream == null) {
                 // no provided page
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG,

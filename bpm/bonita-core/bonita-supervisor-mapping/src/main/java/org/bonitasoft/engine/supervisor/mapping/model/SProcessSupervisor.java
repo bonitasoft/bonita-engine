@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,6 +43,5 @@ public class SProcessSupervisor implements PersistentObject {
     public SProcessSupervisor(final long processDefId) {
         this.processDefId = processDefId;
     }
-
 
 }

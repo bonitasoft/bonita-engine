@@ -26,10 +26,12 @@ import org.bonitasoft.engine.expression.Expression;
  */
 public class TimerEventTriggerDefinitionBuilder extends FlowElementContainerBuilder {
 
-    public TimerEventTriggerDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public TimerEventTriggerDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final CatchEventDefinitionImpl catchEvent, final TimerType timerType, final Expression timerValue) {
         super(container, processDefinitionBuilder);
-        final TimerEventTriggerDefinitionImpl timerEventTrigger = new TimerEventTriggerDefinitionImpl(timerType, timerValue);
+        final TimerEventTriggerDefinitionImpl timerEventTrigger = new TimerEventTriggerDefinitionImpl(timerType,
+                timerValue);
         catchEvent.addTimerEventTrigger(timerEventTrigger);
     }
 }

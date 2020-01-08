@@ -21,7 +21,7 @@ import org.bonitasoft.engine.expression.Expression;
  * A document list is a named element that define a list of document on a process
  * It contains 0 or more document and have a name to reference it in the process instance
  * It is initialized when the process start using the {@link #getExpression()} expression
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet

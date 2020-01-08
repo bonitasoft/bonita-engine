@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-
 import java.util.Map;
 
 public class SUpdateEvent extends SEvent {

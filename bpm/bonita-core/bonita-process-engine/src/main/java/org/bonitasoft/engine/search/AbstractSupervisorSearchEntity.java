@@ -23,7 +23,8 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractSupervisorSearchEntity extends AbstractSearchEntity<ProcessSupervisor, SProcessSupervisor> {
+public abstract class AbstractSupervisorSearchEntity
+        extends AbstractSearchEntity<ProcessSupervisor, SProcessSupervisor> {
 
     public AbstractSupervisorSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);

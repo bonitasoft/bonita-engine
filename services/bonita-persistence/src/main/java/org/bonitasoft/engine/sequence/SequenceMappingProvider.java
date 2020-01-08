@@ -25,7 +25,6 @@ public class SequenceMappingProvider {
     public SequenceMappingProvider() {
     }
 
-
     public void setSequenceMappings(final List<SequenceMapping> sequenceMappings) {
         this.sequenceMappings = sequenceMappings;
     }

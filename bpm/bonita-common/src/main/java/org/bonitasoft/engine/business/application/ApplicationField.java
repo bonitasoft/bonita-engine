@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.profile.Profile;
 
-
 /**
  * Contains fields that can be used by {@link ApplicationCreator} and {@link ApplicationUpdater}
  *
@@ -78,13 +77,16 @@ public enum ApplicationField {
 
     /**
      * References the identifier of the {@link ApplicationPage} defined as the {@link Application} home page
+     *
      * @see org.bonitasoft.engine.business.application.ApplicationPage
      * @see org.bonitasoft.engine.business.application.Application
      */
     HOME_PAGE_ID,
 
     /**
-     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} layout.
+     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application}
+     * layout.
+     *
      * @see org.bonitasoft.engine.page.Page
      * @see org.bonitasoft.engine.business.application.Application
      * @since 7.0.0
@@ -92,7 +94,9 @@ public enum ApplicationField {
     LAYOUT_ID,
 
     /**
-     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} theme.
+     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application}
+     * theme.
+     *
      * @see org.bonitasoft.engine.page.Page
      * @see org.bonitasoft.engine.business.application.Application
      * @since 7.0.0

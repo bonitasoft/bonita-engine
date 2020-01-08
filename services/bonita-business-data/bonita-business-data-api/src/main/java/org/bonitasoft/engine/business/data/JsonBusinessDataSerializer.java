@@ -21,9 +21,12 @@ public interface JsonBusinessDataSerializer {
 
     String EMPTY_OBJECT = "{}";
 
-    String serializeEntity(Entity entity, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
+    String serializeEntity(Entity entity, String businessDataURIPattern)
+            throws SBusinessDataRepositorySerializationException;
 
-    String serializeEntities(List<? extends Entity> entities, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
+    String serializeEntities(List<? extends Entity> entities, String businessDataURIPattern)
+            throws SBusinessDataRepositorySerializationException;
 
-    String serializeCountResult(List<Long> list, String entityClassName) throws SBusinessDataRepositorySerializationException;
+    String serializeCountResult(List<Long> list, String entityClassName)
+            throws SBusinessDataRepositorySerializationException;
 }

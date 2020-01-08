@@ -83,7 +83,8 @@ public class BusinessDataBusinessArchiveArtifactManagerTest {
 
     @Test
     public void checkResolution_returns_no_problem_with_a_valid_business_data() {
-        final SProcessDefinition processDefinition = buildProcessDefinition(buildBusinessDataDefinition("bizData", "com.bonitasoft.Employee"));
+        final SProcessDefinition processDefinition = buildProcessDefinition(
+                buildBusinessDataDefinition("bizData", "com.bonitasoft.Employee"));
 
         final List<Problem> problems = resolver.checkResolution(processDefinition);
 
@@ -92,7 +93,8 @@ public class BusinessDataBusinessArchiveArtifactManagerTest {
 
     @Test
     public void checkResolution_returns_a_problem_with_invalid_business_data() {
-        final SProcessDefinition processDefinition = buildProcessDefinition(buildBusinessDataDefinition("bizData1", "com.bonitasoft.Address"),
+        final SProcessDefinition processDefinition = buildProcessDefinition(
+                buildBusinessDataDefinition("bizData1", "com.bonitasoft.Address"),
                 buildBusinessDataDefinition("bizData2", Long.class.getName()));
 
         final List<Problem> problems = resolver.checkResolution(processDefinition);

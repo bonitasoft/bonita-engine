@@ -32,20 +32,23 @@ public class SearchWaitingEventSerchDescriptor extends SearchEntityDescriptor {
     private final Map<String, FieldDescriptor> activityInstanceDescriptorKeys;
 
     public SearchWaitingEventSerchDescriptor() {
-        final SWaitingEventKeyProviderBuilderFactory keyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
+        final SWaitingEventKeyProviderBuilderFactory keyProvider = BuilderFactory
+                .get(SWaitingEventKeyProviderBuilderFactory.class);
         activityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(6);
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.BPM_EVENT_TYPE,
                 new FieldDescriptor(SWaitingEvent.class, keyProvider.getEventTypeKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.FLOW_NODE_NAME,
                 new FieldDescriptor(SWaitingEvent.class, keyProvider.getFlowNodeNameKey()));
-        activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SWaitingEvent.class,
-                keyProvider.getParentProcessInstanceIdKey()));
+        activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SWaitingEvent.class,
+                        keyProvider.getParentProcessInstanceIdKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SWaitingEvent.class, keyProvider.getProcessDefinitionIdKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PROCESS_NAME,
                 new FieldDescriptor(SWaitingEvent.class, keyProvider.getProcessNameKey()));
-        activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SWaitingEvent.class,
-                keyProvider.getRootProcessInstanceIdKey()));
+        activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SWaitingEvent.class,
+                        keyProvider.getRootProcessInstanceIdKey()));
     }
 
     @Override

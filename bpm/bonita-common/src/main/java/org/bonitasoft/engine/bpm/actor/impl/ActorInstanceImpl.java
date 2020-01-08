@@ -31,7 +31,8 @@ public class ActorInstanceImpl extends NamedElementImpl implements ActorInstance
 
     private final String description;
 
-    public ActorInstanceImpl(final String name, final String description, final String displayName, final long processDefinitionId, final boolean initiator) {
+    public ActorInstanceImpl(final String name, final String description, final String displayName,
+            final long processDefinitionId, final boolean initiator) {
         super(name);
         this.description = description;
         this.processDefinitionId = processDefinitionId;

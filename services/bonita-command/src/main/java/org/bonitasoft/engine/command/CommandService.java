@@ -32,7 +32,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Create command by given command
-     * 
+     *
      * @param command
      *        command without Id
      * @throws SCommandAlreadyExistsException
@@ -44,7 +44,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Delete command by given command name
-     * 
+     *
      * @param name
      *        Name of command which will be deleted
      * @throws SCommandNotFoundException
@@ -56,7 +56,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Delete all commands
-     * 
+     *
      * @throws SCommandDeletionException
      *         Error thrown if has exception during the deleting command.
      */
@@ -64,7 +64,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Get command by given name
-     * 
+     *
      * @param name
      *        Name of command
      * @return a command object
@@ -75,7 +75,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Retrieves a paginated list of commands, The returned list is paginated
-     * 
+     *
      * @param startIndex
      *        Start index of command record
      * @param maxResults
@@ -86,11 +86,12 @@ public interface CommandService extends TenantLifecycleService {
      * @throws SCommandGettingException
      *         Error thrown if has exception during the command getting.
      */
-    List<SCommand> getAllCommands(int startIndex, int maxResults, SCommandCriterion sort) throws SCommandGettingException;
+    List<SCommand> getAllCommands(int startIndex, int maxResults, SCommandCriterion sort)
+            throws SCommandGettingException;
 
     /**
      * Update the command by its id
-     * 
+     *
      * @param command
      *        The command will be updated
      * @param updateDescriptor
@@ -100,11 +101,12 @@ public interface CommandService extends TenantLifecycleService {
      * @throws SCommandUpdateException
      *         Error thrown if has exception during the command updating.
      */
-    void update(SCommand command, EntityUpdateDescriptor updateDescriptor) throws SCommandNotFoundException, SCommandUpdateException;
+    void update(SCommand command, EntityUpdateDescriptor updateDescriptor)
+            throws SCommandNotFoundException, SCommandUpdateException;
 
     /**
      * Retrieves a paginated list of commands with System is false
-     * 
+     *
      * @param startIndex
      *        Start index of command record
      * @param maxResults
@@ -116,11 +118,12 @@ public interface CommandService extends TenantLifecycleService {
      *         Error thrown if has exception during the command getting.
      * @since 6.0
      */
-    List<SCommand> getUserCommands(int startIndex, int maxResults, SCommandCriterion sCommandCriterion) throws SCommandGettingException;
+    List<SCommand> getUserCommands(int startIndex, int maxResults, SCommandCriterion sCommandCriterion)
+            throws SCommandGettingException;
 
     /**
      * Get command by given id
-     * 
+     *
      * @param commandId
      *        identifier of command
      * @return a command object
@@ -132,7 +135,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Delete command by given command id
-     * 
+     *
      * @param commandId
      *        identifier of command which will be deleted
      * @throws SCommandNotFoundException
@@ -145,7 +148,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Get total number of commands according to the specific criteria
-     * 
+     *
      * @param options
      *        search criteria
      * @return total number of commands corresponding to the specific criteria
@@ -156,7 +159,7 @@ public interface CommandService extends TenantLifecycleService {
 
     /**
      * Get a list of commands according to the specific criteria
-     * 
+     *
      * @param options
      *        search criteria
      * @return a list of command objects

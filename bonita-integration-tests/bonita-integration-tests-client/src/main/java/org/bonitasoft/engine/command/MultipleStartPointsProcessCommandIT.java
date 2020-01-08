@@ -87,7 +87,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 2"));
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 2"));
 
         process.expect("step 2").toBeReady();
         process.expect("start", "step 1").toNotHaveArchives();
@@ -145,7 +146,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 1", "step 2"));
         process.execute(user, "step 1", "step 2");
         process.execute(user, "step 3");
 
@@ -167,7 +169,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2", "step 3"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 1", "step 2", "step 3"));
         process.execute(user, "step 1", "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
@@ -184,7 +187,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 2"), new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 1"));
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 1"));
         process.execute(user, "step 1", "step 2", "step 3");
 
         process.isExpected().toFinish();
@@ -192,7 +196,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
     }
 
     @Test
-    public void should_be_able_to_start_a_process_before_an_exclusive_merge_with_only_one_active_branch() throws Exception {
+    public void should_be_able_to_start_a_process_before_an_exclusive_merge_with_only_one_active_branch()
+            throws Exception {
         final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"), new UserTask("step 2"))
@@ -200,7 +205,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 2"));
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 2"));
         process.execute(user, "step 2", "step 3");
 
         process.isExpected().toFinish();
@@ -209,7 +215,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
     }
 
     @Test
-    public void should_be_able_to_start_a_process_before_an_exclusive_merge_with_execute_all_incoming_branches() throws Exception {
+    public void should_be_able_to_start_a_process_before_an_exclusive_merge_with_execute_all_incoming_branches()
+            throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"), new UserTask("step 2"))
@@ -217,7 +224,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 1", "step 2"));
         process.execute(user, "step 1", "step 2", "step 3", "step 3");
 
         process.isExpected().toFinish();
@@ -237,7 +245,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 5"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 1", "step 2"));
         process.execute(user, "step 1", "step 2", "step 3", "step 5");
 
         process.isExpected().toFinish();
@@ -257,7 +266,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                         new UserTask("step 3").when("exclusive", meet(condition)))
                 .end());
 
-        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 1"));
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 1"));
         process.execute(user, "step 1", "step 3");
 
         process.isExpected().toFinish();
@@ -276,7 +286,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 4"))
                 .end());
 
-        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 1"));
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 1"));
         process.execute(user, "step 1", "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
@@ -294,7 +305,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 2", "step 3"));
         process.execute(user, "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
@@ -313,7 +325,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("step 2"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("step 2"));
         process.execute(user, "step 2", "step 4");
 
         process.isExpected().toFinish();
@@ -335,7 +348,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .then(new UserTask("step 5"))
                 .end());
 
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Arrays.asList("step 2", "step 3"));
         process.expect("step 3").toBeReady();
         process.execute(user, "step 2");
         process.sendSignal("foo");
@@ -347,7 +361,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
     }
 
     private Operation createSetDataOperation(final String name, final String value) throws InvalidExpressionException {
-        return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
+        return new OperationBuilder().createSetDataOperation(name,
+                new ExpressionBuilder().createConstantStringExpression(value));
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {
@@ -358,17 +373,20 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         return builder;
     }
 
-    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final List<String> activityNames) throws Exception {
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId,
+            final List<String> activityNames) throws Exception {
         return startProcess(startedBy, processDefinitionId, activityNames, null, null);
     }
 
-    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final List<String> activityNames,
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId,
+            final List<String> activityNames,
             final List<Operation> operations,
             final Map<String, Serializable> context) throws Exception {
         return startProcess(startedBy, processDefinitionId, activityNames, operations, context, null);
     }
 
-    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final List<String> activityNames,
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId,
+            final List<String> activityNames,
             final List<Operation> operations,
             final Map<String, Serializable> context, Map<String, Serializable> processContractInputs) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
@@ -404,17 +422,20 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
 
     @Test
     public void advancedStartProcessCommandWithConnectorOnEnterOnProcess() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", null);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(),
+                        OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, user,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(
+                processDefinitionBuilder, ACTOR_NAME, user,
                 "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
         // Start the process with the command on the step2
@@ -436,7 +457,8 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("process1", "1.0");
         builder.addContract().addInput("input1", Type.TEXT, "text input");
         builder.addContract().addInput("input2", Type.INTEGER, "int input");
-        builder.addUserTask("user1", "actor").addDisplayName(new ExpressionBuilder().createDataExpression("calculatedTaskName", String.class.getName()));
+        builder.addUserTask("user1", "actor").addDisplayName(
+                new ExpressionBuilder().createDataExpression("calculatedTaskName", String.class.getName()));
         builder.addUserTask("user2", "actor");
         builder.addActor("actor", true);
         builder.addLongTextData("calculatedTaskName", null);
@@ -445,9 +467,11 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         Map<String, Serializable> processContractInputs = new HashMap<>();
         processContractInputs.put("input1", "the Input1 value");
         processContractInputs.put("input2", 145325);
-        List<Operation> operations = Collections.singletonList(new OperationBuilder().createSetDataOperation("calculatedTaskName",
-                new ExpressionBuilder().createContractInputExpression("input1", String.class.getName())));
-        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("user1"),
+        List<Operation> operations = Collections
+                .singletonList(new OperationBuilder().createSetDataOperation("calculatedTaskName",
+                        new ExpressionBuilder().createContractInputExpression("input1", String.class.getName())));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
+                Collections.singletonList("user1"),
                 operations,
                 null,
                 processContractInputs);

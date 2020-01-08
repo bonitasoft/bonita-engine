@@ -35,7 +35,7 @@ public interface EntityAction {
      * Executes an action against an entity.
      *
      * @param entity the entity
-     * @param businessDataContext the  business data context
+     * @param businessDataContext the business data context
      * @return the entity after the action execution.
      */
     Entity execute(Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException;
@@ -47,6 +47,7 @@ public interface EntityAction {
      * @param businessDataContext the business data context
      * @return the list of entities after the action execution.
      */
-    List<Entity> execute(List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException;
+    List<Entity> execute(List<Entity> entities, final BusinessDataContext businessDataContext)
+            throws SEntityActionExecutionException;
 
 }

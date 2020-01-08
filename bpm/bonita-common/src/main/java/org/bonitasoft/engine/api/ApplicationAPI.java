@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.result.ExecutionResult;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -28,7 +27,6 @@ import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.ApplicationDeploymentException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExportException;
@@ -71,7 +69,8 @@ public interface ApplicationAPI {
     Application getApplication(final long applicationId) throws ApplicationNotFoundException;
 
     /**
-     * Deletes an {@link Application} by its identifier. All related {@link org.bonitasoft.engine.business.application.ApplicationPage}s and
+     * Deletes an {@link Application} by its identifier. All related
+     * {@link org.bonitasoft.engine.business.application.ApplicationPage}s and
      * {@link org.bonitasoft.engine.business.application.ApplicationMenu}s will be automatically deleted.
      *
      * @param applicationId the <code>Application</code> identifier
@@ -98,7 +97,8 @@ public interface ApplicationAPI {
             throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
-     * Searches for {@link Application}s with specific search criteria. Use {@link org.bonitasoft.engine.business.application.ApplicationSearchDescriptor} to
+     * Searches for {@link Application}s with specific search criteria. Use
+     * {@link org.bonitasoft.engine.business.application.ApplicationSearchDescriptor} to
      * know the available filters.
      *
      * @param searchOptions the search criteria. See {@link SearchOptions} for details.
@@ -114,15 +114,19 @@ public interface ApplicationAPI {
     /**
      * Creates an {@link ApplicationPage}
      *
-     * @param applicationId the identifier of the {@link org.bonitasoft.engine.business.application.Application} to which the
+     * @param applicationId the identifier of the {@link org.bonitasoft.engine.business.application.Application} to
+     *        which the
      *        {@link org.bonitasoft.engine.page.Page} will be associated
      * @param pageId the identifier of <code>Page</code> to be associated to the <code>Application</code>
-     * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
-     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved
+     * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must
+     *        be unique for a given application and
+     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'. In
+     *        addition, the following words are reserved
      *        key words and cannot be used
      *        as token: 'api', 'content', 'theme'.
      * @return the created {@link ApplicationPage}
-     * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this <code>Application</code>
+     * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this
+     *         <code>Application</code>
      * @throws CreationException if an error occurs during the creation
      * @throws ApplicationNotFoundException if the referenced application does not exist.
      * @see ApplicationPage
@@ -139,7 +143,8 @@ public interface ApplicationAPI {
      * @param applicationToken the <code>Application</code> name
      * @param applicationPageToken the <code>ApplicationPage</code> token
      * @return the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given <code>Application</code> token and
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given
+     *         <code>Application</code> token and
      *         <code>ApplicationPage</code> token
      * @see ApplicationPage
      */
@@ -157,7 +162,8 @@ public interface ApplicationAPI {
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationPage} by its identifier. All related {@link org.bonitasoft.engine.business.application.ApplicationMenu} will be
+     * Deletes an {@link ApplicationPage} by its identifier. All related
+     * {@link org.bonitasoft.engine.business.application.ApplicationMenu} will be
      * automatically deleted.
      *
      * @param applicationPageId the {@code ApplicationPage} identifier
@@ -173,7 +179,8 @@ public interface ApplicationAPI {
      * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use
      *        {@link org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor} to know the available
      *        filters.
-     * @return a {@link SearchResult} containing the number and the list of {@code org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor}s
+     * @return a {@link SearchResult} containing the number and the list of
+     *         {@code org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor}s
      *         matching the search criteria.
      * @throws SearchException if an error occurs during the search execution
      * @see ApplicationPage
@@ -208,7 +215,8 @@ public interface ApplicationAPI {
     ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
 
     /**
-     * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}. The new created {@code ApplicationMenu} will be ordered at the
+     * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}. The new created
+     * {@code ApplicationMenu} will be ordered at the
      * last position of its level with an auto generated index.
      *
      * @param applicationMenuCreator creator describing the characteristics of the {@code ApplicationMenu} to be created
@@ -220,11 +228,14 @@ public interface ApplicationAPI {
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
     /**
-     * Updates an {@link org.bonitasoft.engine.business.application.ApplicationMenu} based on the information supplied by the
+     * Updates an {@link org.bonitasoft.engine.business.application.ApplicationMenu} based on the information supplied
+     * by the
      * {@link org.bonitasoft.engine.business.application.ApplicationMenuUpdater}.
      * <p>
-     * When the {@code ApplicationMenu} index is updated all other {@code ApplicationMenu}s in the same level will have indexes automatically updated in order
-     * to keep indexes coherency. For instance, when an {@code ApplicationMenu} is moved from index 4 to index 2, the {@code ApplicationMenu} previously at
+     * When the {@code ApplicationMenu} index is updated all other {@code ApplicationMenu}s in the same level will have
+     * indexes automatically updated in order
+     * to keep indexes coherency. For instance, when an {@code ApplicationMenu} is moved from index 4 to index 2, the
+     * {@code ApplicationMenu} previously at
      * index 2 will be moved to index 3 and the {@code ApplicationMenu} previously at index 3 will be moved to index 4.
      * </p>
      *
@@ -250,9 +261,11 @@ public interface ApplicationAPI {
     ApplicationMenu getApplicationMenu(long applicationMenuId) throws ApplicationMenuNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationMenu} by its identifier. All children {@code ApplicationMenu} will be automatically deleted.
+     * Deletes an {@link ApplicationMenu} by its identifier. All children {@code ApplicationMenu} will be automatically
+     * deleted.
      * <p>
-     * When an {@code ApplicationMenu} is deleted all others {@code ApplicationMenu}s having index greater than the index of deleted {@code ApplicationMenu} in
+     * When an {@code ApplicationMenu} is deleted all others {@code ApplicationMenu}s having index greater than the
+     * index of deleted {@code ApplicationMenu} in
      * the same level will be automatically updated in order to keep indexes coherency.
      * </p>
      *
@@ -268,7 +281,8 @@ public interface ApplicationAPI {
      * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use
      *        {@link org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor} to know the available
      *        filters
-     * @return a {@link SearchResult} containing the number and the list of {@code ApplicationMenu}s matching the search criteria.
+     * @return a {@link SearchResult} containing the number and the list of {@code ApplicationMenu}s matching the search
+     *         criteria.
      * @throws SearchException if an error occurs during search
      * @see ApplicationMenu
      * @see SearchOptions
@@ -304,7 +318,8 @@ public interface ApplicationAPI {
     List<String> getAllPagesForProfile(String profile);
 
     /**
-     * Exports the {@link org.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
+     * Exports the {@link org.bonitasoft.engine.business.application.Application}s which identifier is in
+     * {@code applicationIds}
      *
      * @param applicationIds the identifiers of {@code Application}s to be exported
      * @return a byte array representing the content of XML file containing the exported {@code Application}s
@@ -316,24 +331,33 @@ public interface ApplicationAPI {
     /**
      * Imports {@link org.bonitasoft.engine.business.application.Application}s based on a XML file content.
      * <p>
-     * Before importing {@code Application}s ensure that all {@link org.bonitasoft.engine.profile.Profile}s referenced by {@code Application}s and all
-     * {@link org.bonitasoft.engine.page.Page}s referenced by {@link org.bonitasoft.engine.business.application.ApplicationPage}s are available.
+     * Before importing {@code Application}s ensure that all {@link org.bonitasoft.engine.profile.Profile}s referenced
+     * by {@code Application}s and all
+     * {@link org.bonitasoft.engine.page.Page}s referenced by
+     * {@link org.bonitasoft.engine.business.application.ApplicationPage}s are available.
      * <ul>
-     * <li>When the {@code Profile} does not exist the {@code Application} will be imported, but no {@code Profile} will be associated to it. An
-     * {@link org.bonitasoft.engine.api.ImportError} will be added to the {@link org.bonitasoft.engine.api.ImportStatus} related to this {@code Application}.
+     * <li>When the {@code Profile} does not exist the {@code Application} will be imported, but no {@code Profile} will
+     * be associated to it. An
+     * {@link org.bonitasoft.engine.api.ImportError} will be added to the {@link org.bonitasoft.engine.api.ImportStatus}
+     * related to this {@code Application}.
      * </li>
-     * <li>When a {@code Page} does not exist the related {@code ApplicationPage} and {@link org.bonitasoft.engine.business.application.ApplicationMenu}s
-     * pointing to this {@code ApplicationPage} will not be created. An {@code ImportError} will be added to the {@code ImportStatus} related to the
+     * <li>When a {@code Page} does not exist the related {@code ApplicationPage} and
+     * {@link org.bonitasoft.engine.business.application.ApplicationMenu}s
+     * pointing to this {@code ApplicationPage} will not be created. An {@code ImportError} will be added to the
+     * {@code ImportStatus} related to the
      * {@code Application} containing this {@code ApplicationPage}.</li>
      * </ul>
      * </p>
      *
      * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
-     * @param policy the {@link org.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
-     * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported
+     * @param policy the {@link org.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the
+     *        import
+     * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the
+     *         {@code ImportStatus} for each imported
      *         {@code Application}
      * @throws ImportException if an error occurs during the import
-     * @throws org.bonitasoft.engine.exception.AlreadyExistsException if one of applications being imported already exists and the policy
+     * @throws org.bonitasoft.engine.exception.AlreadyExistsException if one of applications being imported already
+     *         exists and the policy
      *         {@code ApplicationImportPolicy.FAIL_ON_DUPLICATES} is used
      * @see org.bonitasoft.engine.business.application.Application
      * @see org.bonitasoft.engine.business.application.ApplicationImportPolicy

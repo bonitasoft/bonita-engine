@@ -18,12 +18,11 @@ import static org.mockito.Mockito.doReturn;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * @author Emmanuel Duchastenier

@@ -31,12 +31,15 @@ public class EndEventIT extends AbstractEventIT {
 
     @Test
     public void executeStartAndEndEvents() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0")
-                .addStartEvent("startEvent").addAutomaticTask("step1").addEndEvent("endEvent").addTransition("startEvent", "step1")
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My_Process", "1.0")
+                .addStartEvent("startEvent").addAutomaticTask("step1").addEndEvent("endEvent")
+                .addTransition("startEvent", "step1")
                 .addTransition("step1", "endEvent").getProcess();
 
         final ProcessDefinition definition = deployAndEnableProcess(designProcessDefinition);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -47,13 +50,15 @@ public class EndEventIT extends AbstractEventIT {
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void startEventCannotHaveIncomingTransition() throws BonitaException {
-        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent").addAutomaticTask("step1")
+        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent")
+                .addAutomaticTask("step1")
                 .addTransition("step1", "startEvent").getProcess();
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void endEventCannotHaveOutgoingTransition() throws BonitaException {
-        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1").addEndEvent("endEvent")
+        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1")
+                .addEndEvent("endEvent")
                 .addTransition("endEvent", "step1").getProcess();
     }
 
@@ -71,8 +76,10 @@ public class EndEventIT extends AbstractEventIT {
 
     @Test
     public void executeStartAndEndEventWithTask() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeStartAndEndEventWithTask", "1.0");
-        builder.addStartEvent("start").addAutomaticTask("step1").addEndEvent("stop").addTerminateEventTrigger().addTransition("start", "step1")
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("executeStartAndEndEventWithTask", "1.0");
+        builder.addStartEvent("start").addAutomaticTask("step1").addEndEvent("stop").addTerminateEventTrigger()
+                .addTransition("start", "step1")
                 .addTransition("step1", "stop");
         final ProcessDefinition process = deployAndEnableProcess(builder.done());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
@@ -160,8 +167,10 @@ public class EndEventIT extends AbstractEventIT {
 
     @Test
     public void terminateEventWithMultiInstanceParallel() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
-        builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("terminateEventWithMultiInstance", "1.0");
+        builder.addAutomaticTask("step1").addMultiInstance(false,
+                new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
         final ProcessDefinition process = deployAndEnableProcess(builder.done());
@@ -174,8 +183,10 @@ public class EndEventIT extends AbstractEventIT {
 
     @Test
     public void terminateEventWithMultiInstanceSequential() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
-        builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("terminateEventWithMultiInstance", "1.0");
+        builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true,
+                new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);

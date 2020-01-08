@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
- * 
+ *
  * @author Zhang Bole
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
@@ -37,7 +37,8 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext,
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
         if (operation.getLeftOperand().getType().equals(SLeftOperand.TYPE_DATA)) {
@@ -47,7 +48,8 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
         return value;
     }
 
-    private void checkReturnType(final Object value, final SOperation operation, final SExpressionContext expressionContext)
+    private void checkReturnType(final Object value, final SOperation operation,
+            final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         if (value != null) {
             final String name = operation.getLeftOperand().getName();
@@ -59,9 +61,12 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
             if (object != null) {
                 final Class<?> dataEffectiveType = object.getClass();
                 final Class<?> evaluatedReturnedType = value.getClass();
-                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType) || dataEffectiveType.equals(evaluatedReturnedType))) {
-                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType
-                            + " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + expressionContext + "'");
+                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType)
+                        || dataEffectiveType.equals(evaluatedReturnedType))) {
+                    throw new SOperationExecutionException(
+                            "Incompatible assignment operation type: Left operand " + dataEffectiveType
+                                    + " is not compatible with right operand " + evaluatedReturnedType
+                                    + " for expression with name '" + expressionContext + "'");
                 }
             }
         }

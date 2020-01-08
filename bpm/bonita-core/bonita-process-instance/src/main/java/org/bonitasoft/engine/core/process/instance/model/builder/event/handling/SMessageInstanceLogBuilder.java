@@ -16,10 +16,8 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.handling
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SMessageInstanceLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 

@@ -16,7 +16,8 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process definition cannot be enabled / disabled, or when a {@link org.bonitasoft.engine.api.ProcessAPI#startProcess(long)} (and its variants)
+ * Thrown when a process definition cannot be enabled / disabled, or when a
+ * {@link org.bonitasoft.engine.api.ProcessAPI#startProcess(long)} (and its variants)
  * cannot be performed
  * because the process definition is not enabled.
  *
@@ -38,9 +39,10 @@ public class ProcessActivationException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param e
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessActivationException(final Exception e) {
@@ -53,7 +55,8 @@ public class ProcessActivationException extends ExecutionException {
      * @param message
      *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessActivationException(final String message, final Throwable cause) {
@@ -71,8 +74,9 @@ public class ProcessActivationException extends ExecutionException {
     }
 
     /**
-     * Constructs a new exception and the message with the given informations of the process definition with the problem.
-     * 
+     * Constructs a new exception and the message with the given informations of the process definition with the
+     * problem.
+     *
      * @param processDefinitionId
      *        The identifier of the process definition
      * @param name

@@ -39,7 +39,7 @@ public interface DependencyService {
 
     /**
      * Delete the specific dependency
-     * 
+     *
      * @param dependency
      *        The dependency will be deleted
      * @throws SDependencyNotFoundException
@@ -51,7 +51,7 @@ public interface DependencyService {
 
     /**
      * Delete the dependency specified by name
-     * 
+     *
      * @param name
      * @throws SDependencyNotFoundException
      *         Error thrown if no dependency have a name corresponding to the parameter.
@@ -62,7 +62,7 @@ public interface DependencyService {
 
     /**
      * Get dependency by its id
-     * 
+     *
      * @param id
      *        Identifier of dependency
      * @return
@@ -71,10 +71,8 @@ public interface DependencyService {
      */
     AbstractSDependency getDependency(long id) throws SDependencyNotFoundException;
 
-
     /**
      * Get only the content and file name of a dependency.
-     *
      * This object will not be connected to the hibernate session and therefore will avoid
      * issues related to dirty checking mechanism, see https://bonitasoft.atlassian.net/browse/BS-19262
      *
@@ -86,7 +84,7 @@ public interface DependencyService {
 
     /**
      * Get dependencies for the specified ids
-     * 
+     *
      * @param ids
      *        Identifiers of dependencies
      * @return a list of SDependency object
@@ -96,7 +94,7 @@ public interface DependencyService {
 
     /**
      * Get all dependencyMappings for specific the queryOptions
-     * 
+     *
      * @param queryOptions
      *        QueryOptions object, it contains some query conditions.
      * @return a list of SDependencyMapping objects
@@ -108,7 +106,7 @@ public interface DependencyService {
 
     /**
      * Get all dependency ids for specific artifact
-     * 
+     *
      * @param artifactId
      *        Identifier of artifact
      * @param artifactType
@@ -118,7 +116,8 @@ public interface DependencyService {
      * @return a list of Long objects
      * @throws SDependencyException
      */
-    List<Long> getDependencyIds(long artifactId, ScopeType artifactType, int startIndex, int maxResult) throws SDependencyException;
+    List<Long> getDependencyIds(long artifactId, ScopeType artifactType, int startIndex, int maxResult)
+            throws SDependencyException;
 
     /**
      * @param id
@@ -127,11 +126,15 @@ public interface DependencyService {
      */
     void deleteDependencies(long id, ScopeType type) throws SDependencyException;
 
-    AbstractSDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
+    AbstractSDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId,
+            ScopeType scopeType) throws SDependencyException;
 
-    AbstractSDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
+    AbstractSDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId,
+            ScopeType scopeType) throws SDependencyException;
 
-    AbstractSDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
+    AbstractSDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName)
+            throws SBonitaReadException;
 
-    Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
+    Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName)
+            throws SBonitaReadException;
 }

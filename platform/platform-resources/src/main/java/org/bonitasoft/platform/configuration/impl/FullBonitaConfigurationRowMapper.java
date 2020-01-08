@@ -30,6 +30,7 @@ public class FullBonitaConfigurationRowMapper implements RowMapper<FullBonitaCon
 
     @Override
     public FullBonitaConfiguration mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new FullBonitaConfiguration(rs.getString(RESOURCE_NAME), rs.getBytes(RESOURCE_CONTENT), rs.getString(CONTENT_TYPE), rs.getLong(TENANT_ID));
+        return new FullBonitaConfiguration(rs.getString(RESOURCE_NAME), rs.getBytes(RESOURCE_CONTENT),
+                rs.getString(CONTENT_TYPE), rs.getLong(TENANT_ID));
     }
 }

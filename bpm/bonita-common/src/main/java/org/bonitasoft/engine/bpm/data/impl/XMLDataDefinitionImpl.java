@@ -36,7 +36,9 @@ public class XMLDataDefinitionImpl extends DataDefinitionImpl implements XMLData
     @XmlAttribute
     private String element;
 
-    public XMLDataDefinitionImpl(){}
+    public XMLDataDefinitionImpl() {
+    }
+
     public XMLDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name, defaultValueExpression);
     }
@@ -69,9 +71,12 @@ public class XMLDataDefinitionImpl extends DataDefinitionImpl implements XMLData
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         XMLDataDefinitionImpl that = (XMLDataDefinitionImpl) o;
         return Objects.equals(namespace, that.namespace) &&
                 Objects.equals(element, that.element);

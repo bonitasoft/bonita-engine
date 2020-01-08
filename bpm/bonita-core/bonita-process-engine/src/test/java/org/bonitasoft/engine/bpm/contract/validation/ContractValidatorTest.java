@@ -59,7 +59,8 @@ public class ContractValidatorTest {
     public void should_not_validate_rules_if_structure_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> inputs = aMap().build();
-        doThrow(new SContractViolationException("bad structure", new ArrayList<String>())).when(structureValidator).validate(contract, inputs);
+        doThrow(new SContractViolationException("bad structure", new ArrayList<String>())).when(structureValidator)
+                .validate(contract, inputs);
 
         expectedException.expect(SContractViolationException.class);
         try {
@@ -74,7 +75,8 @@ public class ContractValidatorTest {
     public void should_return_false_if_structure_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
-        doThrow(new SContractViolationException("bad structure", new ArrayList<String>())).when(structureValidator).validate(contract, variables);
+        doThrow(new SContractViolationException("bad structure", new ArrayList<String>())).when(structureValidator)
+                .validate(contract, variables);
 
         expectedException.expect(SContractViolationException.class);
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
@@ -84,8 +86,10 @@ public class ContractValidatorTest {
     public void should_populate_comments_with_validation_problems_when_structure_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
-        final List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
-        doThrow(new SContractViolationException("bad structure", problems)).when(structureValidator).validate(contract, variables);
+        final List<String> problems = Arrays.asList("There is problems with structure",
+                "Might have issue with types too");
+        doThrow(new SContractViolationException("bad structure", problems)).when(structureValidator).validate(contract,
+                variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
@@ -95,8 +99,9 @@ public class ContractValidatorTest {
     public void should_return_false_if_rule_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
-        doThrow(new SContractViolationException("rule failure", new ArrayList<String>())).when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract,
-                variables);
+        doThrow(new SContractViolationException("rule failure", new ArrayList<String>())).when(constraintValidator)
+                .validate(PROCESS_DEFINITION_ID, contract,
+                        variables);
 
         expectedException.expect(SContractViolationException.class);
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
@@ -107,7 +112,8 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
         final List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
-        doThrow(new SContractViolationException("rule failure", problems)).when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
+        doThrow(new SContractViolationException("rule failure", problems)).when(constraintValidator)
+                .validate(PROCESS_DEFINITION_ID, contract, variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
@@ -123,7 +129,8 @@ public class ContractValidatorTest {
 
         @Override
         public boolean matches(Object item) {
-            return (item instanceof SContractViolationException) && ((SContractViolationException) item).getExplanations().equals(problems);
+            return (item instanceof SContractViolationException)
+                    && ((SContractViolationException) item).getExplanations().equals(problems);
         }
 
         @Override

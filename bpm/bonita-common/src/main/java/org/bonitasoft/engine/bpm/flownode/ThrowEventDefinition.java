@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.Visitable;
 
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte

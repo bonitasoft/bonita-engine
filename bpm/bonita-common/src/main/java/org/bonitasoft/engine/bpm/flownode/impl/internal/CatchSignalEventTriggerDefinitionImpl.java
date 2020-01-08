@@ -19,7 +19,8 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 /**
  * @author Matthieu Chaffotte
  */
-public class CatchSignalEventTriggerDefinitionImpl extends SignalEventTriggerDefinitionImpl implements CatchSignalEventTriggerDefinition {
+public class CatchSignalEventTriggerDefinitionImpl extends SignalEventTriggerDefinitionImpl
+        implements CatchSignalEventTriggerDefinition {
 
     private static final long serialVersionUID = -933991836111559400L;
 
@@ -27,9 +28,10 @@ public class CatchSignalEventTriggerDefinitionImpl extends SignalEventTriggerDef
         super(signalName);
     }
 
-    public CatchSignalEventTriggerDefinitionImpl(){
+    public CatchSignalEventTriggerDefinitionImpl() {
         super();
     }
+
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         // nothing to do here:

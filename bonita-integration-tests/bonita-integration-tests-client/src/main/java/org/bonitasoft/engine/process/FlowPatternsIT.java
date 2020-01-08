@@ -76,7 +76,8 @@ public class FlowPatternsIT extends TestWithUser {
     }
 
     ProcessDefinition deployProcessWithInclusiveGateway() throws BonitaException {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("InclusiveProcess", PROCESS_VERSION);
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("InclusiveProcess",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addBooleanData("cond1", new ExpressionBuilder().createConstantBooleanExpression(true));
         builder.addBooleanData("cond2", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -95,10 +96,14 @@ public class FlowPatternsIT extends TestWithUser {
         builder.addEndEvent("End");
         builder.addTransition("Start", "Step0");
         builder.addTransition("Step0", "Gateway1");
-        builder.addTransition("Gateway1", "Step1", new ExpressionBuilder().createDataExpression("cond1", Boolean.class.getName()));
-        builder.addTransition("Gateway1", "Step2", new ExpressionBuilder().createDataExpression("cond2", Boolean.class.getName()));
-        builder.addTransition("Gateway1", "Step3", new ExpressionBuilder().createDataExpression("cond3", Boolean.class.getName()));
-        builder.addTransition("Gateway1", "Step4", new ExpressionBuilder().createDataExpression("cond4", Boolean.class.getName()));
+        builder.addTransition("Gateway1", "Step1",
+                new ExpressionBuilder().createDataExpression("cond1", Boolean.class.getName()));
+        builder.addTransition("Gateway1", "Step2",
+                new ExpressionBuilder().createDataExpression("cond2", Boolean.class.getName()));
+        builder.addTransition("Gateway1", "Step3",
+                new ExpressionBuilder().createDataExpression("cond3", Boolean.class.getName()));
+        builder.addTransition("Gateway1", "Step4",
+                new ExpressionBuilder().createDataExpression("cond4", Boolean.class.getName()));
         builder.addDefaultTransition("Gateway1", "Step5");
         builder.addTransition("Step1", "Gateway2");
         builder.addTransition("Step2", "Gateway2");
@@ -116,7 +121,8 @@ public class FlowPatternsIT extends TestWithUser {
         /*
          * step 1 and 2 are merged into step 4 by gateway 2 and step 3 and step4 are merged by gateway3
          */
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess", PROCESS_VERSION);
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("Start");
         builder.addUserTask("Step1", ACTOR_NAME);
@@ -140,25 +146,25 @@ public class FlowPatternsIT extends TestWithUser {
         builder.addTransition("Gateway3", "Step5");
         builder.addTransition("Step5", "End");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTaskAndExecuteIt("Step1",user);
-        waitForUserTaskAndExecuteIt("Step2",user);
-        waitForUserTaskAndExecuteIt("Step4",user);
-        waitForUserTaskAndExecuteIt("Step3",user);
-        waitForUserTaskAndExecuteIt("Step5",user);
+        waitForUserTaskAndExecuteIt("Step1", user);
+        waitForUserTaskAndExecuteIt("Step2", user);
+        waitForUserTaskAndExecuteIt("Step4", user);
+        waitForUserTaskAndExecuteIt("Step3", user);
+        waitForUserTaskAndExecuteIt("Step5", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);
 
-
     }
-
 
     @Test
     public void process_with_branch_out() throws Exception {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess", PROCESS_VERSION);
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("Start");
         builder.addUserTask("Step1", ACTOR_NAME);
@@ -179,23 +185,24 @@ public class FlowPatternsIT extends TestWithUser {
         builder.addTransition("Step4", "End1");
         builder.addTransition("Step3", "End2");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTaskAndExecuteIt("Step2", user);
-        waitForUserTaskAndExecuteIt("Step1",user);
-        waitForUserTaskAndExecuteIt("Step4",user);
-        waitForUserTaskAndExecuteIt("Step3",user);
+        waitForUserTaskAndExecuteIt("Step1", user);
+        waitForUserTaskAndExecuteIt("Step4", user);
+        waitForUserTaskAndExecuteIt("Step3", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);
 
     }
 
-
     @Test
     public void inclusive_merge_with_no_start() throws Exception {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess", PROCESS_VERSION);
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("Step1", ACTOR_NAME);
         builder.addUserTask("Step2", ACTOR_NAME);
@@ -205,12 +212,13 @@ public class FlowPatternsIT extends TestWithUser {
         builder.addTransition("Step2", "Gateway1");
         builder.addTransition("Gateway1", "Step3");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTaskAndExecuteIt("Step1",user);
-        waitForUserTaskAndExecuteIt("Step2",user);
-        waitForUserTaskAndExecuteIt("Step3",user);
+        waitForUserTaskAndExecuteIt("Step1", user);
+        waitForUserTaskAndExecuteIt("Step2", user);
+        waitForUserTaskAndExecuteIt("Step3", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);

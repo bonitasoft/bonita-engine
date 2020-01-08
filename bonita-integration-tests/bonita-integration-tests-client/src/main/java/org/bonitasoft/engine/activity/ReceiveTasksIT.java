@@ -82,21 +82,25 @@ public class ReceiveTasksIT extends TestWithUser {
     @SuppressWarnings("unchecked")
     @Test
     public void noMessageSentSoReceiveProcessIsWaiting() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess",
+                "waitForMessage", "userTask1",
                 "delivery", user, "m1", null, null, null);
 
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         // we check after that that the waiting event is still here
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
+        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                receiveMessageProcessInstance.getId());
 
         final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
-        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
 
         disableAndDeleteProcess(receiveMessageProcess);
@@ -104,27 +108,34 @@ public class ReceiveTasksIT extends TestWithUser {
 
     /*
      * 1 receiveProcess, 1 sendProcess, Message goes from EndEvent to ReceiveTask
-     * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess), startProcess(sendProcess)
-     * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess continue and halt on the user task, receive task is archived
+     * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess),
+     * startProcess(sendProcess)
+     * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess continue and halt on the
+     * user task, receive task is archived
      */
     @SuppressWarnings("unchecked")
     @Test
     public void receiveMessageSentAfterReceiveProcessIsWaiting() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m2", "receiveMessageProcess",
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess",
+                "m2", "receiveMessageProcess",
                 "waitForMessage", null, null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess",
+                "waitForMessage", "userTask1",
                 "delivery", user, "m2", null, null, null);
 
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
+        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                receiveMessageProcessInstance.getId());
 
         final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
-        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
@@ -135,9 +146,11 @@ public class ReceiveTasksIT extends TestWithUser {
         assertEquals(0, searchResult.getCount());
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
-        searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
+        searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                receiveMessageProcessInstance.getId());
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK);
-        final SearchResult<ArchivedActivityInstance> archivedActivityInstancesSearch = getProcessAPI().searchArchivedActivities(searchOptionsBuilder.done());
+        final SearchResult<ArchivedActivityInstance> archivedActivityInstancesSearch = getProcessAPI()
+                .searchArchivedActivities(searchOptionsBuilder.done());
         assertEquals(1, archivedActivityInstancesSearch.getCount());
         assertTrue(archivedActivityInstancesSearch.getResult().get(0) instanceof ArchivedReceiveTaskInstance);
 
@@ -148,34 +161,44 @@ public class ReceiveTasksIT extends TestWithUser {
     /*
      * Verify receiveProcess receive message targeting it, even if sent before its existence.
      * 1 receiveProcess, 1 sendProcess, Message goes from EndEvent to ReceiveTask
-     * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess)
-     * checks : sendProcess is finished, receiveProcess goes through receive task (found message sent by sendProcess) and reaches user task.
+     * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess),
+     * startProcess(receiveProcess)
+     * checks : sendProcess is finished, receiveProcess goes through receive task (found message sent by sendProcess)
+     * and reaches user task.
      */
     @Test
     public void receiveMessageSentBeforeReceiveProcessIsEnabled() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m3", "receiveMessageProcess",
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess",
+                "m3", "receiveMessageProcess",
                 "waitForMessage", null, null, null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess",
+                "waitForMessage", "userTask1",
                 "delivery", user, "m3", null, null, null);
 
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
 
         // No need to verify anything, if no exception, query exists
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId())
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                                receiveMessageProcessInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK).done());
 
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId())
-                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
+                                receiveMessageProcessInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK)
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         waitForUserTask(receiveMessageProcessInstance, "userTask1");
 
@@ -185,8 +208,10 @@ public class ReceiveTasksIT extends TestWithUser {
 
     /*
      * 1 receiveProcess, 2 sendProcess, 2 Messages go from EndEvent to ReceiveTask
-     * dynamic -> deployAndEnable(sendProcesses), startProcess(sendProcesses), deployAndEnable(receiveProcess), startProcess(receiveProcess)
-     * checks : sendProcesses are finished, receiveProcess goes through receive task (found one message sent by sendProcess) and reaches user task.
+     * dynamic -> deployAndEnable(sendProcesses), startProcess(sendProcesses), deployAndEnable(receiveProcess),
+     * startProcess(receiveProcess)
+     * checks : sendProcesses are finished, receiveProcess goes through receive task (found one message sent by
+     * sendProcess) and reaches user task.
      */
     @Test
     public void receiveMessageSentTwice() throws Exception {
@@ -194,21 +219,28 @@ public class ReceiveTasksIT extends TestWithUser {
         ProcessDefinition sendMessageProcess2 = null;
         ProcessDefinition receiveMessageProcess = null;
         try {
-            sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", "m4", "receiveMessageProcess",
+            sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", "m4",
+                    "receiveMessageProcess",
                     "waitForMessage", null, null, null, null);
-            sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", "m4", "receiveMessageProcess",
+            sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", "m4",
+                    "receiveMessageProcess",
                     "waitForMessage", null, null, null, null);
-            final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
-            final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
+            final ProcessInstance sendMessageProcessInstance1 = getProcessAPI()
+                    .startProcess(sendMessageProcess1.getId());
+            final ProcessInstance sendMessageProcessInstance2 = getProcessAPI()
+                    .startProcess(sendMessageProcess2.getId());
             waitForProcessToFinish(sendMessageProcessInstance1);
             waitForProcessToFinish(sendMessageProcessInstance2);
 
-            receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+            receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage",
+                    "userTask1",
                     "delivery", user, "m4", null, null, null);
-            final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                    .startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING);
             waitForUserTask(receiveMessageProcessInstance, "userTask1");
-            final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI()
+                    .startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", TestStates.WAITING);
             waitForUserTask(receiveMessageProcessInstance2, "userTask1");
         } finally {
@@ -220,26 +252,36 @@ public class ReceiveTasksIT extends TestWithUser {
 
     /*
      * 1 receiveProcess, 1 sendProcess, Message contains datas goes from EndEvent to ReceiveTask
-     * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess), startProcess(sendProcess)
-     * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess goes through receive task (found message sent by
+     * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess),
+     * startProcess(sendProcess)
+     * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess goes through receive task
+     * (found message sent by
      * sendProcess) and reaches user task, data is transmitted to
      * the receiveProcess.
      */
     @Test
     public void receiveMessageWithData() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m5", "receiveMessageProcess",
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess",
+                "m5", "receiveMessageProcess",
                 "waitForMessage", null, Collections.singletonMap("lastName", String.class.getName()),
-                Collections.singletonMap("lName", String.class.getName()), Collections.singletonMap("lName", "lastName"));
-        final List<Operation> receiveMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
-                ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
-                "delivery", user, "m5", null, Collections.singletonMap("name", String.class.getName()), receiveMessageOperations);
+                Collections.singletonMap("lName", String.class.getName()),
+                Collections.singletonMap("lName", "lastName"));
+        final List<Operation> receiveMessageOperations = Collections
+                .singletonList(buildAssignOperation("name", "lName", String.class.getName(),
+                        ExpressionType.TYPE_VARIABLE));
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess",
+                "waitForMessage", "userTask1",
+                "delivery", user, "m5", null, Collections.singletonMap("name", String.class.getName()),
+                receiveMessageOperations);
 
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
-                Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+                Arrays.asList(
+                        buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)),
+                null);
         waitForProcessToFinish(sendMessageProcessInstance);
         final HumanTaskInstance step1 = waitForUserTaskAndGetIt(receiveMessageProcessInstance, "userTask1");
 
@@ -252,36 +294,44 @@ public class ReceiveTasksIT extends TestWithUser {
 
     /*
      * dynamic -> deployAndEnable(receiveProcess), startProcess(receiveProcess), cancelProcessInstance(receiveProcess)
-     * checks : receiveProcess wait on receive task, 1 waiting event, receiveProcess is cancelled, receiveProcess is archived, no more waiting event
+     * checks : receiveProcess wait on receive task, 1 waiting event, receiveProcess is cancelled, receiveProcess is
+     * archived, no more waiting event
      */
     @SuppressWarnings("unchecked")
     @Test
     public void cancelInstanceShouldDeleteWaitingEvents() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess",
+                "waitForMessage", "userTask1",
                 "delivery", user, "m1", null, null, null);
 
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI()
+                .startProcess(receiveMessageProcess.getId());
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
+        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                receiveMessageProcessInstance.getId());
 
         final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
-        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveMessageProcessInstance.getId());
         waitForProcessToBeInState(receiveMessageProcessInstance, ProcessInstanceState.CANCELLED);
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
+        searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                receiveMessageProcessInstance.getId());
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK);
-        final SearchResult<ArchivedActivityInstance> archivedActivityInstancesSearch = getProcessAPI().searchArchivedActivities(searchOptionsBuilder.done());
+        final SearchResult<ArchivedActivityInstance> archivedActivityInstancesSearch = getProcessAPI()
+                .searchArchivedActivities(searchOptionsBuilder.done());
         assertEquals(1, archivedActivityInstancesSearch.getCount());
         assertTrue(archivedActivityInstancesSearch.getResult().get(0) instanceof ArchivedReceiveTaskInstance);
-        assertEquals(TestStates.CANCELLED.getStateName(), archivedActivityInstancesSearch.getResult().get(0).getState());
+        assertEquals(TestStates.CANCELLED.getStateName(),
+                archivedActivityInstancesSearch.getResult().get(0).getState());
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());
@@ -289,8 +339,10 @@ public class ReceiveTasksIT extends TestWithUser {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,
-            final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData,
+    private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName,
+            final String messageName, final String targetProcess,
+            final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations,
+            final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
@@ -298,10 +350,13 @@ public class ReceiveTasksIT extends TestWithUser {
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
         // create expression for target process/flowNode
-        final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
-        final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
-        final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = processBuilder.addEndEvent("endEvent").addMessageEventTrigger(messageName,
-                targetProcessExpression, targetFlowNodeExpression);
+        final Expression targetProcessExpression = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcess);
+        final Expression targetFlowNodeExpression = new ExpressionBuilder()
+                .createConstantStringExpression(targetFlowNode);
+        final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = processBuilder.addEndEvent("endEvent")
+                .addMessageEventTrigger(messageName,
+                        targetProcessExpression, targetFlowNodeExpression);
         addCorrelations(correlations, throwMessageEventTriggerBuilder);
         addMessageData(messageData, dataInputMapping, throwMessageEventTriggerBuilder);
         processBuilder.addTransition("startEvent", "auto1");
@@ -309,20 +364,24 @@ public class ReceiveTasksIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcess(designProcessDefinition);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(sendMessageProcess.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(sendMessageProcess.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         return sendMessageProcess;
     }
 
-    private ProcessDefinition deployAndEnableProcessWithReceivedTask(final String processName, final String receiveTaskName, final String userTaskName,
-            final String actorName, final User user, final String messageName, final List<BEntry<Expression, Expression>> correlations,
+    private ProcessDefinition deployAndEnableProcessWithReceivedTask(final String processName,
+            final String receiveTaskName, final String userTaskName,
+            final String actorName, final User user, final String messageName,
+            final List<BEntry<Expression, Expression>> correlations,
             final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
-        final ReceiveTaskDefinitionBuilder receiveTaskBuilder = processBuilder.addReceiveTask(receiveTaskName, messageName);
+        final ReceiveTaskDefinitionBuilder receiveTaskBuilder = processBuilder.addReceiveTask(receiveTaskName,
+                messageName);
         if (correlations != null) {
             for (final Entry<Expression, Expression> entry : correlations) {
                 receiveTaskBuilder.addCorrelation(entry.getKey(), entry.getValue());
@@ -347,12 +406,14 @@ public class ReceiveTasksIT extends TestWithUser {
         final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
         final ProcessDefinition receiveMessageProcess = deployProcess(receiveMessaceArchive);
 
-        final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1,
+                ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
 
         getProcessAPI().enableProcess(receiveMessageProcess.getId());
 
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(receiveMessageProcess.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(receiveMessageProcess.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         return receiveMessageProcess;
@@ -366,7 +427,8 @@ public class ReceiveTasksIT extends TestWithUser {
 
                 Expression defaultValue = null;
                 if (dataInputMapping.containsKey(entry.getKey())) {
-                    defaultValue = new ExpressionBuilder().createDataExpression(dataInputMapping.get(entry.getKey()), entry.getValue());
+                    defaultValue = new ExpressionBuilder().createDataExpression(dataInputMapping.get(entry.getKey()),
+                            entry.getValue());
                 }
                 throwMessageEventTriggerBuilder.addMessageContentExpression(displayName, defaultValue);
             }
@@ -391,13 +453,16 @@ public class ReceiveTasksIT extends TestWithUser {
         }
     }
 
-    private Operation buildAssignOperation(final String dataInstanceName, final String newConstantValue, final String className,
+    private Operation buildAssignOperation(final String dataInstanceName, final String newConstantValue,
+            final String className,
             final ExpressionType expressionType) throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(newConstantValue)
+        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName)
+                .setContent(newConstantValue)
                 .setExpressionType(expressionType.name()).setReturnType(className).done();
         final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         return operation;
     }

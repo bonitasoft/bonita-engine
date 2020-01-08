@@ -36,7 +36,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Restart flownodes that needs to be restarted in a single transaction, with a maximum of {@value #MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION}.
+ * Restart flownodes that needs to be restarted in a single transaction, with a maximum of
+ * {@value #MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION}.
  *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
@@ -126,11 +127,13 @@ public class ExecuteFlowNodes {
      * Determines if the found flownode should be relaunched at restart or not.
      * <ul>
      * <li>Gateways should only be started when they are 'merged'.</li>
-     * <li>Elements in state category cancelling or aborting must be restart only if the current state is not part of this statecategory.</li>
+     * <li>Elements in state category cancelling or aborting must be restart only if the current state is not part of
+     * this statecategory.</li>
      * </ul>
      *
      * @param sFlowNodeInstance the flownode to check
-     * @return true if the flownode should be relaunched because it has not finished its work in progress, false otherwise.
+     * @return true if the flownode should be relaunched because it has not finished its work in progress, false
+     *         otherwise.
      * @throws SBonitaException in case of error.
      */
     private boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {

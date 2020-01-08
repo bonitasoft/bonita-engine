@@ -13,10 +13,9 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor

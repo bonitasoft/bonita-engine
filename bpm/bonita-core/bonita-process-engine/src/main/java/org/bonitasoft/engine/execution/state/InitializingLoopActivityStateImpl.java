@@ -59,7 +59,8 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;
 
-    public InitializingLoopActivityStateImpl(final ExpressionResolverService expressionResolverService, final BPMInstancesCreator bpmInstancesCreator,
+    public InitializingLoopActivityStateImpl(final ExpressionResolverService expressionResolverService,
+            final BPMInstancesCreator bpmInstancesCreator,
             final ActivityInstanceService activityInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
@@ -68,13 +69,16 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         stateBehaviors.createAttachedBoundaryEvents(processDefinition, (SActivityInstance) flowNodeInstance);
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final Long processDefinitionId = processDefinition.getId();
-        final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        final SActivityDefinition activity = (SActivityDefinition) processContainer
+                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         try {
-            final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
+            final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService
+                    .getFlowNodeInstance(flowNodeInstance.getId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
             if (loopCharacteristics instanceof SStandardLoopCharacteristics) {
                 final SStandardLoopCharacteristics standardLoop = (SStandardLoopCharacteristics) loopCharacteristics;
@@ -82,18 +86,24 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
                 Integer intLoopMax;
 
                 if (loopMax != null) {
-                    intLoopMax = (Integer) expressionResolverService.evaluate(loopMax, new SExpressionContext(loopActivity.getId(),
-                            DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                            processDefinitionId));
+                    intLoopMax = (Integer) expressionResolverService.evaluate(loopMax,
+                            new SExpressionContext(loopActivity.getId(),
+                                    DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                                    processDefinitionId));
                     activityInstanceService.setLoopMax(loopActivity, intLoopMax);
                 }
                 final boolean loop = !standardLoop.isTestBefore() || evaluateLoop(standardLoop, loopActivity);
                 if (loop) {
-                    final SLoopActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SLoopActivityInstanceBuilderFactory.class);
-                    final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
-                    final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
-                    bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(), flowNodeInstance.getId(),
-                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1);
+                    final SLoopActivityInstanceBuilderFactory keyProvider = BuilderFactory
+                            .get(SLoopActivityInstanceBuilderFactory.class);
+                    final long rootProcessInstanceId = flowNodeInstance
+                            .getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
+                    final long parentProcessInstanceId = flowNodeInstance
+                            .getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
+                    bpmInstancesCreator.createFlowNodeInstance(processDefinitionId,
+                            flowNodeInstance.getRootContainerId(), flowNodeInstance.getId(),
+                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId,
+                            parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1);
                     activityInstanceService.incrementLoopCounter(loopActivity);
                     activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
                 }
@@ -104,13 +114,17 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
         return StateCode.DONE;
     }
 
-    private boolean evaluateLoop(final SStandardLoopCharacteristics standardLoop, final SLoopActivityInstance loopActivity)
-            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+    private boolean evaluateLoop(final SStandardLoopCharacteristics standardLoop,
+            final SLoopActivityInstance loopActivity)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException {
         final Map<String, Object> input = new HashMap<>(1);
         input.put(ExpressionConstants.LOOP_COUNTER.getEngineConstantName(), loopActivity.getLoopCounter());
-        final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+        final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 loopActivity.getProcessDefinitionId(), input);
-        return ((Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext)).booleanValue();
+        return ((Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext))
+                .booleanValue();
     }
 
     @Override
@@ -139,12 +153,14 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

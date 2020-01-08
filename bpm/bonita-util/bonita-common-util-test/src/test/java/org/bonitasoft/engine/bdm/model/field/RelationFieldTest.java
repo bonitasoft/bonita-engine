@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
 import static org.bonitasoft.engine.bdm.model.assertion.FieldAssert.assertThat;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;

@@ -13,18 +13,16 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
-import org.bonitasoft.engine.form.FormMappingType;
-import org.bonitasoft.engine.page.SPageMapping;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.profile.model.SProfile;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.form.FormMappingType;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
  * @author Baptiste Mesta

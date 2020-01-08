@@ -49,7 +49,8 @@ public class MeterRegistryFactory {
             LOGGER.info("Publishing monitoring metrics to : {}", meterRegistries.get(0).getClass().getName());
             return meterRegistries.get(0);
         } else {
-            LOGGER.info("Publishing monitoring metrics to : {}", meterRegistries.stream().map((m) -> m.getClass().getName()).collect(Collectors.joining(", ")));
+            LOGGER.info("Publishing monitoring metrics to : {}",
+                    meterRegistries.stream().map((m) -> m.getClass().getName()).collect(Collectors.joining(", ")));
             CompositeMeterRegistry compositeMeterRegistry = new CompositeMeterRegistry();
             meterRegistries.forEach(compositeMeterRegistry::add);
             return compositeMeterRegistry;

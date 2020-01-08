@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -64,6 +63,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Laurent Leseigneur
  */
 public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifactManager {
+
     public static final String ERROR_MESSAGE_FORM_NOT_SET = "Error while resolving form mapping for processDefinitionId=%s and task=%s. The target bonita form is not defined";
     public static final String ERROR_MESSAGE_FORM_NOT_FOUND = "Error while resolving form mapping %s. The target bonita form with ID %s does not exist.";
     public static final String ERROR_MESSAGE_FORM_UNDEFINED = "Error while resolving form mapping processDefinitionId=%s and task=%s. The target bonita form is explicitly not yet defined but IS necessary for the process to be resolved";
@@ -77,8 +77,10 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     private final ProcessDefinitionService processDefinitionService;
     public static final int NUMBER_OF_RESULTS = 100;
 
-    public FormMappingAndPageArtifactManager(SessionService sessionService, SessionAccessor sessionAccessor, PageService pageService,
-                                             TechnicalLoggerService technicalLoggerService, FormMappingService formMappingService, ProcessDefinitionService processDefinitionService) {
+    public FormMappingAndPageArtifactManager(SessionService sessionService, SessionAccessor sessionAccessor,
+            PageService pageService,
+            TechnicalLoggerService technicalLoggerService, FormMappingService formMappingService,
+            ProcessDefinitionService processDefinitionService) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.pageService = pageService;
@@ -91,7 +93,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     public boolean deploy(final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
             throws ProcessDeployException {
 
-        deployProcessPages(businessArchive, processDefinition.getId(), sessionService.getLoggedUserFromSession(sessionAccessor));
+        deployProcessPages(businessArchive, processDefinition.getId(),
+                sessionService.getLoggedUserFromSession(sessionAccessor));
         deployFormMappings(businessArchive, processDefinition.getId());
         return checkResolution(processDefinition).isEmpty();
     }
@@ -113,7 +116,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         return businessArchive.getResources(REGEX);
     }
 
-    private void deployPage(String resourcePath, byte[] pageContent, Long processDefinitionId, long userId, PageService pageService) throws SBonitaException {
+    private void deployPage(String resourcePath, byte[] pageContent, Long processDefinitionId, long userId,
+            PageService pageService) throws SBonitaException {
         final Matcher pathMatcher = getPathMatcher(resourcePath);
         if (pathMatcher.matches()) {
             final String pageName = pathMatcher.group(1);
@@ -124,9 +128,10 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                 pageService.updatePageContent(sPage.getId(), pageContent, contentName);
             } else {
                 final Properties pageProperties = pageService.readPageZip(pageContent);
-                final PageCreator pageCreator = new PageCreator(pageName, contentName, ContentType.FORM, processDefinitionId)
-                        .setDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
-                        .setDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
+                final PageCreator pageCreator = new PageCreator(pageName, contentName, ContentType.FORM,
+                        processDefinitionId)
+                                .setDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
+                                .setDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
                 final SPage newPage = new PageModelConverter().constructSPage(pageCreator, userId);
                 pageService.addPage(newPage, pageContent);
             }
@@ -144,7 +149,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         try {
             problems = checkPageProcessResolution(processDefinition);
         } catch (SBonitaReadException | SObjectNotFoundException e) {
-            problems.add(new ProblemImpl(Problem.Level.ERROR, null, null, "unable to resolve form mapping dependencies"));
+            problems.add(
+                    new ProblemImpl(Problem.Level.ERROR, null, null, "unable to resolve form mapping dependencies"));
         }
         return problems;
     }
@@ -155,17 +161,21 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
             deleteFormMapping(processDefinition.getId());
             deleteProcessPages(processDefinition.getId());
         } catch (SBonitaReadException | SObjectNotFoundException e) {
-            throw new SObjectModificationException("Unable to delete forms and pages of the process definition <" + processDefinition.getName() + ">", e);
+            throw new SObjectModificationException(
+                    "Unable to delete forms and pages of the process definition <" + processDefinition.getName() + ">",
+                    e);
         }
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
         // TODO: when custom pages stop being external resources, add them here:
         final FormMappingModel formMappingModel = new FormMappingModel();
         final List<SFormMapping> formMappings = formMappingService.list(processDefinitionId, 0, Integer.MAX_VALUE);
         for (SFormMapping sFormMapping : formMappings) {
-            final FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping, new FormRequiredAnalyzer(processDefinitionService));
+            final FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping,
+                    new FormRequiredAnalyzer(processDefinitionService));
             String form = null;
             switch (formMapping.getTarget()) {
                 case INTERNAL:
@@ -178,13 +188,15 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                     form = formMapping.getURL();
                     break;
             }
-            final FormMappingDefinition mapping = new FormMappingDefinition(form, formMapping.getType(), formMapping.getTarget(), formMapping.getTask());
+            final FormMappingDefinition mapping = new FormMappingDefinition(form, formMapping.getType(),
+                    formMapping.getTarget(), formMapping.getTask());
             formMappingModel.addFormMapping(mapping);
         }
         businessArchiveBuilder.setFormMappings(formMappingModel);
     }
 
-    protected void deleteFormMapping(Long processDefinitionId) throws SBonitaReadException, SObjectModificationException {
+    protected void deleteFormMapping(Long processDefinitionId)
+            throws SBonitaReadException, SObjectModificationException {
         List<SFormMapping> formMappings;
         do {
             formMappings = formMappingService.list(processDefinitionId, 0, NUMBER_OF_RESULTS);
@@ -194,7 +206,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         } while (formMappings.size() == NUMBER_OF_RESULTS);
     }
 
-    private void deleteProcessPages(Long processDefinitionId) throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
+    private void deleteProcessPages(Long processDefinitionId)
+            throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
         List<SPage> sPages;
         do {
             sPages = pageService.getPageByProcessDefinitionId(processDefinitionId, 0, NUMBER_OF_RESULTS);
@@ -204,7 +217,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         } while (sPages.size() == NUMBER_OF_RESULTS);
     }
 
-    protected List<Problem> checkPageProcessResolution(SProcessDefinition sProcessDefinition) throws SBonitaReadException,
+    protected List<Problem> checkPageProcessResolution(SProcessDefinition sProcessDefinition)
+            throws SBonitaReadException,
             SObjectNotFoundException {
         final List<Problem> problems = new ArrayList<>();
         List<SFormMapping> formMappings;
@@ -223,7 +237,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         if (isMappingRelatedToCustomPage(formMapping)) {
             SPageMapping pageMapping = formMapping.getPageMapping();
             if (pageMapping == null) {
-                errorMessage = String.format(ERROR_MESSAGE_FORM_NOT_SET, formMapping.getProcessDefinitionId(), formMapping.getTask());
+                errorMessage = String.format(ERROR_MESSAGE_FORM_NOT_SET, formMapping.getProcessDefinitionId(),
+                        formMapping.getTask());
                 addProblem(formMapping, problems, errorMessage);
                 return;
             }
@@ -233,13 +248,15 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                 addProblem(formMapping, problems, errorMessage);
             }
         } else if (isUndefined(formMapping)) {
-            errorMessage =  String.format(ERROR_MESSAGE_FORM_UNDEFINED, formMapping.getProcessDefinitionId(), formMapping.getTask());
+            errorMessage = String.format(ERROR_MESSAGE_FORM_UNDEFINED, formMapping.getProcessDefinitionId(),
+                    formMapping.getTask());
             addProblem(formMapping, problems, errorMessage);
         }
     }
 
     private void addProblem(SFormMapping formMapping, List<Problem> problems, String errorMessage) {
-        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", errorMessage));
+        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping",
+                errorMessage));
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
@@ -253,7 +270,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     public void deployFormMappings(final BusinessArchive businessArchive, final long processDefinitionId)
             throws ProcessDeployException {
         final List<FormMappingDefinition> formMappings = businessArchive.getFormMappingModel().getFormMappings();
-        final FlowElementContainerDefinition flowElementContainer = businessArchive.getProcessDefinition().getFlowElementContainer();
+        final FlowElementContainerDefinition flowElementContainer = businessArchive.getProcessDefinition()
+                .getFlowElementContainer();
         final List<ActivityDefinition> activities = flowElementContainer.getActivities();
         try {
             // Deals with human tasks declared in process definition:
@@ -261,18 +279,22 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
                 createFormMapping(processDefinitionId, formMappingService, formMappings, activity);
             }
             // Deals with the process start / process overview forms:
-            createFormMapping(formMappingService, processDefinitionId, getFormMappingForType(formMappings, PROCESS_START), PROCESS_START.getId(), null);
-            createFormMapping(formMappingService, processDefinitionId, getFormMappingForType(formMappings, PROCESS_OVERVIEW), PROCESS_OVERVIEW.getId(), null);
+            createFormMapping(formMappingService, processDefinitionId,
+                    getFormMappingForType(formMappings, PROCESS_START), PROCESS_START.getId(), null);
+            createFormMapping(formMappingService, processDefinitionId,
+                    getFormMappingForType(formMappings, PROCESS_OVERVIEW), PROCESS_OVERVIEW.getId(), null);
         } catch (final SObjectCreationException | SBonitaReadException e) {
             throw new ProcessDeployException(e);
         }
     }
 
-    void createFormMapping(long processDefinitionId, FormMappingService formMappingService, List<FormMappingDefinition> formMappings,
-                           ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
+    void createFormMapping(long processDefinitionId, FormMappingService formMappingService,
+            List<FormMappingDefinition> formMappings,
+            ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
         if (isHumanTask(activity)) {
             // create mapping as declared in form mapping:
-            createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
+            createFormMapping(formMappingService, processDefinitionId,
+                    getFormMappingForHumanTask(activity.getName(), formMappings),
                     FormMappingType.TASK.getId(), activity.getName());
         } else if (activity instanceof SubProcessDefinition) {
             final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
@@ -283,8 +305,9 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         }
     }
 
-    private void createFormMapping(FormMappingService formMappingService, long processDefinitionId, FormMappingDefinition formMappingDefinition, Integer type,
-                                   String taskName)
+    private void createFormMapping(FormMappingService formMappingService, long processDefinitionId,
+            FormMappingDefinition formMappingDefinition, Integer type,
+            String taskName)
             throws SObjectCreationException, SBonitaReadException {
         if (formMappingDefinition != null) {
             createSFormMapping(formMappingService, processDefinitionId, formMappingDefinition);
@@ -293,10 +316,12 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         }
     }
 
-    private SFormMapping createSFormMapping(FormMappingService formMappingService, long processDefinitionId, FormMappingDefinition formMappingDefinition)
+    private SFormMapping createSFormMapping(FormMappingService formMappingService, long processDefinitionId,
+            FormMappingDefinition formMappingDefinition)
             throws SObjectCreationException,
             SBonitaReadException {
-        return formMappingService.create(processDefinitionId, formMappingDefinition.getTaskname(), formMappingDefinition.getType().getId(),
+        return formMappingService.create(processDefinitionId, formMappingDefinition.getTaskname(),
+                formMappingDefinition.getType().getId(),
                 formMappingDefinition.getTarget().name(), formMappingDefinition.getForm());
     }
 
@@ -307,7 +332,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     /**
      * @return the found mapping for the given human task, or null is not found
      */
-    private FormMappingDefinition getFormMappingForHumanTask(final String name, final List<FormMappingDefinition> formMappings) {
+    private FormMappingDefinition getFormMappingForHumanTask(final String name,
+            final List<FormMappingDefinition> formMappings) {
         for (final FormMappingDefinition formMapping : formMappings) {
             if (name.equals(formMapping.getTaskname())) {
                 return formMapping;
@@ -316,7 +342,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         return null;
     }
 
-    private FormMappingDefinition getFormMappingForType(final List<FormMappingDefinition> formMappings, final FormMappingType type) {
+    private FormMappingDefinition getFormMappingForType(final List<FormMappingDefinition> formMappings,
+            final FormMappingType type) {
         for (final FormMappingDefinition formMapping : formMappings) {
             if (type == formMapping.getType()) {
                 return formMapping;

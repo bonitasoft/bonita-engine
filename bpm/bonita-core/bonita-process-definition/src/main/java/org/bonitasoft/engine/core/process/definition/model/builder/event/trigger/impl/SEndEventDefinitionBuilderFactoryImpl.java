@@ -26,7 +26,8 @@ public class SEndEventDefinitionBuilderFactoryImpl implements SEndEventDefinitio
 
     @Override
     public SEndEventDefinitionBuilder createNewInstance(final String name) {
-        final SEndEventDefinitionImpl entity = new SEndEventDefinitionImpl(UUID.randomUUID().getLeastSignificantBits(), name);
+        final SEndEventDefinitionImpl entity = new SEndEventDefinitionImpl(UUID.randomUUID().getLeastSignificantBits(),
+                name);
         return new SEndEventDefinitionBuilderImpl(entity);
     }
 

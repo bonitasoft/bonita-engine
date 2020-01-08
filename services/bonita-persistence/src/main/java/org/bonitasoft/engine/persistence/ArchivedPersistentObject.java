@@ -15,7 +15,7 @@ package org.bonitasoft.engine.persistence;
 
 /**
  * All archived SObjects must implement this interface.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
@@ -25,7 +25,7 @@ public interface ArchivedPersistentObject extends PersistentObject {
 
     /**
      * Get the source object id from which this <code>ArchivedPersistentObject</code> originates.
-     * 
+     *
      * @return the id of the source object
      */
     long getSourceObjectId();

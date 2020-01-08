@@ -28,7 +28,8 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 public abstract class AuthorizationRuleWithParameters {
 
     protected Long getLongParameter(Map<String, Serializable> context, String parameterKey) {
-        final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
+        final Map<String, String[]> queryParameters = (Map<String, String[]>) context
+                .get(URLAdapterConstants.QUERY_PARAMETERS);
         if (queryParameters != null) {
             String[] idParamValue = queryParameters.get(parameterKey);
             if (idParamValue != null && idParamValue.length > 0) {
@@ -37,8 +38,9 @@ public abstract class AuthorizationRuleWithParameters {
         }
         return null;
     }
-    
-    protected long getLoggedUserId(SessionAccessor sessionAccessor, SessionService sessionService) throws SExecutionException {
+
+    protected long getLoggedUserId(SessionAccessor sessionAccessor, SessionService sessionService)
+            throws SExecutionException {
         try {
             return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
         } catch (SSessionNotFoundException e) {

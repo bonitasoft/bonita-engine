@@ -15,20 +15,14 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Collections.singletonList;
 import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
-import static org.bonitasoft.engine.scheduler.impl.JobUtils.jobThatSucceed;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.verify;
 
-import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.BonitaJobListener;
-import org.bonitasoft.engine.scheduler.JobIdentifier;
-import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -82,10 +76,13 @@ public class QuartzJobListenerTest {
         final JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.getWrappedMap().put("jobId", "96");
         jobDataMap.getWrappedMap().put("tenantId", String.valueOf(TENANT_ID));
-        final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap).ofType(LogJob.class).build();
+        final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap)
+                .ofType(LogJob.class).build();
 
-        final OperableTrigger trigger = new CalendarIntervalTriggerImpl("name", "group", "jobName", "jobGroup", new Date(), new Date(), IntervalUnit.DAY, 6);
-        final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true, new Date(), new Date(),
+        final OperableTrigger trigger = new CalendarIntervalTriggerImpl("name", "group", "jobName", "jobGroup",
+                new Date(), new Date(), IntervalUnit.DAY, 6);
+        final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true,
+                new Date(), new Date(),
                 new Date(), new Date());
         final Job job = new LogJob();
         context = new JobExecutionContextImpl(scheduler, firedBundle, job);
@@ -111,14 +108,17 @@ public class QuartzJobListenerTest {
         final JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.getWrappedMap().put("jobId", "96");
         jobDataMap.getWrappedMap().put("tenantId", "86");
-        final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap).ofType(LogJob.class).build();
+        final JobDetail jobDetail = JobBuilder.newJob().withIdentity("jobName", "jobGroup").setJobData(jobDataMap)
+                .ofType(LogJob.class).build();
 
-        final OperableTrigger trigger = new CalendarIntervalTriggerImpl("name", "group", "jobName", "jobGroup", new Date(), new Date(), IntervalUnit.DAY, 6);
-        final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true, new Date(), new Date(),
+        final OperableTrigger trigger = new CalendarIntervalTriggerImpl("name", "group", "jobName", "jobGroup",
+                new Date(), new Date(), IntervalUnit.DAY, 6);
+        final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true,
+                new Date(), new Date(),
                 new Date(), new Date());
         final ConcurrentQuartzJob job = new ConcurrentQuartzJob();
         job.setSchedulerService(schedulerService);
-        job.setJobDetails(createJobDetails(1,2));
+        job.setJobDetails(createJobDetails(1, 2));
         final JobExecutionContext context = new JobExecutionContextImpl(scheduler, firedBundle, job);
 
         // When

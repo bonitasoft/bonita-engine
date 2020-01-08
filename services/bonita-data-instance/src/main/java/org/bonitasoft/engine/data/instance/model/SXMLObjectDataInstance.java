@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
 /**
@@ -46,7 +45,6 @@ public final class SXMLObjectDataInstance extends SDataInstance {
     public void setValue(final Serializable value) {
         this.value = convert(value);
     }
-
 
     private String convert(final Serializable value) {
         return XStreamFactory.getXStream().toXML(value);

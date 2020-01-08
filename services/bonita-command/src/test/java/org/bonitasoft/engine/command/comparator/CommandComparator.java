@@ -24,7 +24,8 @@ public class CommandComparator implements Comparator<SCommand> {
 
     @Override
     public int compare(final SCommand o1, final SCommand o2) {
-        if (o1.getName().equals(o2.getName()) && o1.getDescription().equals(o2.getDescription()) && o1.getImplementation().equals(o2.getImplementation())) {
+        if (o1.getName().equals(o2.getName()) && o1.getDescription().equals(o2.getDescription())
+                && o1.getImplementation().equals(o2.getImplementation())) {
             return 0;
         }
         return 1;

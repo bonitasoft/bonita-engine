@@ -53,7 +53,8 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
         try {
             validateInputs(serviceAccessor, processDefinitionId, activityNames, processContractInputs);
 
-            return startProcess(processDefinitionId, activityNames, startedBy, context, operations, processContractInputs);
+            return startProcess(processDefinitionId, activityNames, startedBy, context, operations,
+                    processContractInputs);
         } catch (final SCommandExecutionException e) {
             throw e;
         } catch (final Exception e) {
@@ -61,18 +62,23 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
         }
     }
 
-    private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
-            final Map<String, Serializable> context, final List<Operation> operations, Map<String, Serializable> processContractInputs)
+    private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames,
+            final long startedBy,
+            final Map<String, Serializable> context, final List<Operation> operations,
+            Map<String, Serializable> processContractInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException,
             ProcessExecutionException, ContractViolationException {
-        final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames, processContractInputs);
+        final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context,
+                activityNames, processContractInputs);
         return starter.start();
     }
 
-    private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId, final List<String> activityNames,
+    private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId,
+            final List<String> activityNames,
             Map<String, Serializable> processContractInputs)
             throws SBonitaException {
-        final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId,
+        final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(
+                serviceAccessor.getProcessDefinitionService(), processDefinitionId,
                 serviceAccessor.getTechnicalLoggerService(), serviceAccessor.getExpressionService());
         final List<String> problems = validator.validate(activityNames, processContractInputs);
         handleProblems(problems);
@@ -93,21 +99,26 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
         return getLongMandadoryParameter(parameters, STARTED_BY);
     }
 
-    private Long getProcessDefinitionId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private Long getProcessDefinitionId(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID);
     }
 
-    private List<Operation> getOperations(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private List<Operation> getOperations(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getParameter(parameters, OPERATIONS);
     }
 
-    private Map<String, Serializable> getContext(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private Map<String, Serializable> getContext(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getParameter(parameters, CONTEXT);
     }
 
-    private Map<String, Serializable> getProcessContractInputs(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private Map<String, Serializable> getProcessContractInputs(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getParameter(parameters, PROCESS_CONTRACT_INPUTS);
     }
 
-    protected abstract List<String> getActivityNames(Map<String, Serializable> parameters) throws SCommandParameterizationException;
+    protected abstract List<String> getActivityNames(Map<String, Serializable> parameters)
+            throws SCommandParameterizationException;
 }

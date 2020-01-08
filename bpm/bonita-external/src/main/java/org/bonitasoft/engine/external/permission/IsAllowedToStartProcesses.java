@@ -51,8 +51,9 @@ public class IsAllowedToStartProcesses extends CommandWithParameters {
         final ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
         final Map<Long, Boolean> resMap = new HashMap<Long, Boolean>();
 
-        final List<Long> processDefinitionIds = getMandatoryParameter(parameters, PROCESSDEFINITION_IDS_KEY, "Mandatory parameter " + PROCESSDEFINITION_IDS_KEY
-                + " is missing or not convertible to List<Long>.");
+        final List<Long> processDefinitionIds = getMandatoryParameter(parameters, PROCESSDEFINITION_IDS_KEY,
+                "Mandatory parameter " + PROCESSDEFINITION_IDS_KEY
+                        + " is missing or not convertible to List<Long>.");
         final long userId = getLongMandadoryParameter(parameters, USER_ID_KEY);
 
         checkIfUserExists(userId);
@@ -60,7 +61,8 @@ public class IsAllowedToStartProcesses extends CommandWithParameters {
         if (!processDefinitionIds.isEmpty()) {
             for (final Long processDefinitionId : processDefinitionIds) {
                 try {
-                    resMap.put(processDefinitionId, actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId));
+                    resMap.put(processDefinitionId,
+                            actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId));
                 } catch (final SBonitaReadException e) {
                     e.setProcessDefinitionIdOnContext(processDefinitionId);
                     throw new SCommandExecutionException("No actor of user who can start the processDefinition.", e);

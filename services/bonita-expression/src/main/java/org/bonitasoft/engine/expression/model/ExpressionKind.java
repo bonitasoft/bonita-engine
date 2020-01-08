@@ -20,7 +20,7 @@ import java.io.Serializable;
  * e.g.
  * for constant kind is : [ type = TYPE_CONSTANT, interpreter = null ]
  * for groovy kind is : [ type = TYPE_READ_SCRIPT, interpreter = GROOVY ]
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ExpressionKind implements Serializable {

@@ -36,7 +36,8 @@ public class ManagerInvolvedAuthorizationRuleMappingImpl implements Authorizatio
 
     @Override
     public List<String> getProcessOverviewRuleKeys() {
-        return Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE,
+        return Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER,
+                IS_INVOLVED_IN_PROCESS_INSTANCE,
                 IS_MANAGER_OF_USER_INVOLVED_IN_PROCESS_INSTANCE);
     }
 

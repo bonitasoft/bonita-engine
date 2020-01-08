@@ -51,7 +51,8 @@ public class VersionServiceImplTest {
     @Test
     public void should_return_platform_database_version() throws Exception {
         //given
-        Mockito.doReturn(Arrays.asList("a.b.c")).when(jdbcTemplate).query(ArgumentMatchers.anyString(), ArgumentMatchers.any(PlatformRowMapper.class));
+        Mockito.doReturn(Arrays.asList("a.b.c")).when(jdbcTemplate).query(ArgumentMatchers.anyString(),
+                ArgumentMatchers.any(PlatformRowMapper.class));
 
         //when
         final String platformVersion = versionService.getPlatformVersion();

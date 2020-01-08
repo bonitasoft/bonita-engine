@@ -39,7 +39,8 @@ public class GetChildInstanceIdsOfProcessInstance implements TransactionContentW
 
     private List<Long> childInstanceIds;
 
-    public GetChildInstanceIdsOfProcessInstance(final ProcessInstanceService processInstanceService, final long processInstanceId, final int pageIndex,
+    public GetChildInstanceIdsOfProcessInstance(final ProcessInstanceService processInstanceService,
+            final long processInstanceId, final int pageIndex,
             final int numberPerPage, final String field, final OrderByType order) {
         this.processInstanceService = processInstanceService;
         this.processInstanceId = processInstanceId;
@@ -51,7 +52,8 @@ public class GetChildInstanceIdsOfProcessInstance implements TransactionContentW
 
     @Override
     public void execute() throws SBonitaException {
-        this.childInstanceIds = this.processInstanceService.getChildInstanceIdsOfProcessInstance(this.processInstanceId, this.pageIndex * this.numberPerPage,
+        this.childInstanceIds = this.processInstanceService.getChildInstanceIdsOfProcessInstance(this.processInstanceId,
+                this.pageIndex * this.numberPerPage,
                 this.numberPerPage, this.sortingField, this.sortingOrder);
     }
 

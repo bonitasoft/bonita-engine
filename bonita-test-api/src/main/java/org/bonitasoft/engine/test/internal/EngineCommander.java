@@ -271,7 +271,8 @@ public class EngineCommander {
         if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
             for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
-                messageBuilder.append("{").append(flowNodeInstance.getName()).append(" - ").append(flowNodeInstance.getType()).append("}").append(", ");
+                messageBuilder.append("{").append(flowNodeInstance.getName()).append(" - ")
+                        .append(flowNodeInstance.getType()).append("}").append(", ");
             }
             messages.add(messageBuilder.toString());
         }
@@ -281,7 +282,8 @@ public class EngineCommander {
     public List<String> checkNoArchivedFlowNodes() throws SearchException {
         final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
-        final SearchResult<ArchivedFlowNodeInstance> searchResult = getProcessAPI().searchArchivedFlowNodeInstances(build.done());
+        final SearchResult<ArchivedFlowNodeInstance> searchResult = getProcessAPI()
+                .searchArchivedFlowNodeInstances(build.done());
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = searchResult.getResult();
         if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("Archived flowNodes are still present: ");
@@ -325,7 +327,8 @@ public class EngineCommander {
 
     public List<String> checkNoProcessDefinitions() throws BonitaException {
         final List<String> messages = new ArrayList<>();
-        final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
+        final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200,
+                ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
             final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
             for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
@@ -346,11 +349,13 @@ public class EngineCommander {
         parameters.put("searchOptions", new SearchOptionsBuilder(0, 200).done());
 
         @SuppressWarnings("unchecked")
-        final List<WaitingEvent> waitingEvents = ((SearchResult<WaitingEvent>) getCommandAPI().execute("searchWaitingEventsCommand", parameters)).getResult();
+        final List<WaitingEvent> waitingEvents = ((SearchResult<WaitingEvent>) getCommandAPI()
+                .execute("searchWaitingEventsCommand", parameters)).getResult();
         if (waitingEvents.size() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("Waiting Event are still present: ");
             for (final WaitingEvent waitingEvent : waitingEvents) {
-                messageBuilder.append("[process instance:").append(waitingEvent.getProcessName()).append(", flow node instance:")
+                messageBuilder.append("[process instance:").append(waitingEvent.getProcessName())
+                        .append(", flow node instance:")
                         .append(waitingEvent.getFlowNodeInstanceId()).append("]").append(
                                 ", ");
             }
@@ -363,7 +368,8 @@ public class EngineCommander {
         final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 200);
         builder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
-        final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done()).getResult();
+        final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done())
+                .getResult();
 
         if (supervisors.size() > 0) {
             final StringBuilder processBuilder = new StringBuilder("Process Supervisors are still active: ");
@@ -378,7 +384,8 @@ public class EngineCommander {
 
     public List<String> checkNoProcessIntances() throws DeletionException {
         final List<String> messages = new ArrayList<>();
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000,
+                ProcessInstanceCriterion.DEFAULT);
         if (!processInstances.isEmpty()) {
             final StringBuilder stb = new StringBuilder("Process instances are still present: ");
             for (final ProcessInstance processInstance : processInstances) {
@@ -392,7 +399,8 @@ public class EngineCommander {
 
     public List<String> checkNoArchivedProcessIntances() throws DeletionException {
         final List<String> messages = new ArrayList<>();
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0,
+                1000, ProcessInstanceCriterion.DEFAULT);
         if (!archivedProcessInstances.isEmpty()) {
             final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
             for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
@@ -408,7 +416,8 @@ public class EngineCommander {
         final List<String> messages = new ArrayList<>();
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
         if (numberOfGroups > 0) {
-            final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(), GroupCriterion.NAME_ASC);
+            final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(),
+                    GroupCriterion.NAME_ASC);
             final StringBuilder groupBuilder = new StringBuilder("Groups are still present: ");
             for (final Group group : groups) {
                 groupBuilder.append(group.getId()).append(", ");
@@ -423,7 +432,8 @@ public class EngineCommander {
         final List<String> messages = new ArrayList<>();
         final long numberOfRoles = getIdentityAPI().getNumberOfRoles();
         if (numberOfRoles > 0) {
-            final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(), RoleCriterion.NAME_ASC);
+            final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(),
+                    RoleCriterion.NAME_ASC);
             final StringBuilder roleBuilder = new StringBuilder("Roles are still present: ");
             for (final Role role : roles) {
                 roleBuilder.append(role.getId()).append(", ");
@@ -438,7 +448,8 @@ public class EngineCommander {
         final List<String> messages = new ArrayList<>();
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         if (numberOfUsers > 0) {
-            final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(), UserCriterion.USER_NAME_ASC);
+            final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(),
+                    UserCriterion.USER_NAME_ASC);
             final StringBuilder userBuilder = new StringBuilder("Users are still present: ");
             for (final User user : users) {
                 userBuilder.append(user.getId()).append(", ");
@@ -455,7 +466,8 @@ public class EngineCommander {
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
-        final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());
+        final SearchResult<CommandDescriptor> searchCommands = getCommandAPI()
+                .searchCommands(searchOptionsBuilder.done());
         final List<CommandDescriptor> commands = searchCommands.getResult();
         if (searchCommands.getCount() > 0) {
             final StringBuilder commandBuilder = new StringBuilder("Commands are still present: ");

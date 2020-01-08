@@ -39,7 +39,8 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     private final TransientDataService transientDataService;
     private final TechnicalLoggerService logger;
 
-    public TransientDataLeftOperandHandler(final TransientDataService transientDataService, final TechnicalLoggerService logger) {
+    public TransientDataLeftOperandHandler(final TransientDataService transientDataService,
+            final TechnicalLoggerService logger) {
         this.transientDataService = transientDataService;
         this.logger = logger;
     }
@@ -50,13 +51,14 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue,
+            final long containerId, final String containerType)
             throws SOperationExecutionException {
         SDataInstance dataInstance;
         try {
 
             dataInstance = (SDataInstance) inputValues.get(TRANSIENT_DATA + sLeftOperand.getName());
-            if(dataInstance == null){
+            if (dataInstance == null) {
                 dataInstance = retrieve(sLeftOperand, containerId, containerType);
             }
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -80,12 +82,15 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting a transient data is not supported");
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SBonitaReadException {
         String name = sLeftOperand.getName();
         SDataInstance dataInstance = retrieve(sLeftOperand, leftOperandContainerId, leftOperandContainerType);
         expressionContext.getInputValues().put(TRANSIENT_DATA + name, dataInstance);
@@ -94,7 +99,8 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-    private SDataInstance retrieve(final SLeftOperand sLeftOperand, final Long containerId, final String containerType) throws SBonitaReadException {
+    private SDataInstance retrieve(final SLeftOperand sLeftOperand, final Long containerId, final String containerType)
+            throws SBonitaReadException {
         try {
             return transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
         } catch (final SDataInstanceException e) {
@@ -102,12 +108,12 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-
-
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final long leftOperandContainerId,
+            final String leftOperandContainerType, final SExpressionContext expressionContext)
+            throws SBonitaReadException {
         for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand,leftOperandContainerId, leftOperandContainerType, expressionContext);
+            loadLeftOperandInContext(leftOperand, leftOperandContainerId, leftOperandContainerType, expressionContext);
         }
     }
 

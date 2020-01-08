@@ -39,7 +39,8 @@ public class BusinessObjectDAOExpressionStrategyTest {
 
     @Test
     public void instantiateDAOShouldWorkAndInjectBizDataRepo() throws Exception {
-        DummyServerDAO daoInstance = (DummyServerDAO) businessObjectDAOExpressionStrategy.instantiateDAO(ORG_BONITASOFT_ENGINE_EXPRESSION_DUMMY_SERVER_DAO);
+        DummyServerDAO daoInstance = (DummyServerDAO) businessObjectDAOExpressionStrategy
+                .instantiateDAO(ORG_BONITASOFT_ENGINE_EXPRESSION_DUMMY_SERVER_DAO);
 
         assertThat(daoInstance).isInstanceOf(DummyServerDAO.class);
         assertThat(daoInstance.getBusinessDataRepository()).isNotNull();
@@ -47,14 +48,16 @@ public class BusinessObjectDAOExpressionStrategyTest {
 
     @Test
     public void getDAOServerImplementationShouldReturnProperImplemNameFromInterface() {
-        String implemClassName = businessObjectDAOExpressionStrategy.getDAOServerImplementationFromInterface("org.package.MyObjectDAO");
+        String implemClassName = businessObjectDAOExpressionStrategy
+                .getDAOServerImplementationFromInterface("org.package.MyObjectDAO");
 
         assertThat(implemClassName).isEqualTo("org.package.server.MyObjectDAOImpl");
     }
 
     @Test
     public void getDAOServerImplementationShouldReturnProperImplemNameForDefaultPackageName() {
-        String implemClassName = businessObjectDAOExpressionStrategy.getDAOServerImplementationFromInterface("BusinessDAO");
+        String implemClassName = businessObjectDAOExpressionStrategy
+                .getDAOServerImplementationFromInterface("BusinessDAO");
 
         assertThat(implemClassName).isEqualTo("server.BusinessDAOImpl");
     }
@@ -63,10 +66,12 @@ public class BusinessObjectDAOExpressionStrategyTest {
     public void evaluateShouldComputeImplementationClassName() throws Exception {
         // given:
         String daoClassName = "SomeDAOInterfaceName";
-        SExpressionImpl expression = new SExpressionImpl("name", "myDAO", "dummyExpressionType", daoClassName, null, null);
+        SExpressionImpl expression = new SExpressionImpl("name", "myDAO", "dummyExpressionType", daoClassName, null,
+                null);
         Map<String, Object> context = Collections.emptyMap();
         BusinessObjectDAOExpressionStrategy spy = spy(businessObjectDAOExpressionStrategy);
-        doReturn(ORG_BONITASOFT_ENGINE_EXPRESSION_DUMMY_SERVER_DAO).when(spy).getDAOServerImplementationFromInterface(daoClassName);
+        doReturn(ORG_BONITASOFT_ENGINE_EXPRESSION_DUMMY_SERVER_DAO).when(spy)
+                .getDAOServerImplementationFromInterface(daoClassName);
 
         // when:
         spy.evaluate(expression, context, null, null);
@@ -79,7 +84,8 @@ public class BusinessObjectDAOExpressionStrategyTest {
     public void evaluateShouldInstantiateDAOImplementationClassName() throws Exception {
         // given:
         String daoClassName = "SomeDAOInterfaceName";
-        SExpressionImpl expression = new SExpressionImpl("name", "myDAO", "dummyExpressionType", daoClassName, null, null);
+        SExpressionImpl expression = new SExpressionImpl("name", "myDAO", "dummyExpressionType", daoClassName, null,
+                null);
         Map<String, Object> context = Collections.emptyMap();
         BusinessObjectDAOExpressionStrategy spy = spy(businessObjectDAOExpressionStrategy);
         String daoImplClassName = ORG_BONITASOFT_ENGINE_EXPRESSION_DUMMY_SERVER_DAO;
@@ -94,6 +100,7 @@ public class BusinessObjectDAOExpressionStrategyTest {
 
     @Test
     public void getExpressionKindShouldReturn_BUSINESS_OBJECT_DAO_kind() {
-        assertThat(businessObjectDAOExpressionStrategy.getExpressionKind()).isEqualTo(ExpressionExecutorStrategy.KIND_BUSINESS_OBJECT_DAO);
+        assertThat(businessObjectDAOExpressionStrategy.getExpressionKind())
+                .isEqualTo(ExpressionExecutorStrategy.KIND_BUSINESS_OBJECT_DAO);
     }
 }

@@ -33,13 +33,15 @@ public class GetArchivedActivityInstance implements TransactionContentWithResult
 
     private SAActivityInstance activity;
 
-    public GetArchivedActivityInstance(final ActivityInstanceService activityInstanceService, final long activityInstanceId) {
+    public GetArchivedActivityInstance(final ActivityInstanceService activityInstanceService,
+            final long activityInstanceId) {
         this.activityInstanceService = activityInstanceService;
         this.activityInstanceId = activityInstanceId;
         stateId = -1;
     }
 
-    public GetArchivedActivityInstance(final long activityInstanceId, final int stateId, final ActivityInstanceService activityInstanceService) {
+    public GetArchivedActivityInstance(final long activityInstanceId, final int stateId,
+            final ActivityInstanceService activityInstanceService) {
         this.activityInstanceId = activityInstanceId;
         this.stateId = stateId;
         this.activityInstanceService = activityInstanceService;

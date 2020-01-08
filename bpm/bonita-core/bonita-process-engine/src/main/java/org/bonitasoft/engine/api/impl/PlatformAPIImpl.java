@@ -120,7 +120,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         initializePlatform();
     }
 
-    protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+    protected PlatformServiceAccessor getPlatformAccessor()
+            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
@@ -144,16 +145,16 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new StartNodeException("Platform starting failed.", e);
         }
         if (!isStarted) {
-            throw new StartNodeException("Platform is in state " + platformManager.getState() + " and cannot be started");
+            throw new StartNodeException(
+                    "Platform is in state " + platformManager.getState() + " and cannot be started");
         }
     }
 
-    SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
+    SessionAccessor createSessionAccessor()
+            throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
             IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
-
-
 
     @Override
     @CustomTransactions
@@ -238,7 +239,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ModelConvertor.toPlatform(sPlatform);
     }
 
-    private void createDefaultTenant(final PlatformServiceAccessor platformAccessor, final PlatformService platformService,
+    private void createDefaultTenant(final PlatformServiceAccessor platformAccessor,
+            final PlatformService platformService,
             final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
@@ -248,7 +250,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             // add tenant to database
             final String createdBy = "defaultUser";
-            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(System.currentTimeMillis()).status(STenant.ACTIVATED).defaultTenant(true).description(description).build();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy)
+                    .created(System.currentTimeMillis()).status(STenant.ACTIVATED).defaultTenant(true)
+                    .description(description).build();
             tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();
@@ -276,7 +280,9 @@ public class PlatformAPIImpl implements PlatformAPI {
                 try {
                     deleteTenant(tenantId);
                 } catch (DeletionException ex) {
-                    throw new STenantCreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", ex);
+                    throw new STenantCreationException(
+                            "Unable to delete default tenant (after a STenantCreationException) that was being created",
+                            ex);
                 }
             }
             throw e;
@@ -349,7 +355,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             PlatformService platformService = platformAccessor.getPlatformService();
-            return platformAccessor.getTransactionService().executeInTransaction(platformService::isDefaultTenantCreated);
+            return platformAccessor.getTransactionService()
+                    .executeInTransaction(platformService::isDefaultTenantCreated);
         } catch (final Exception e) {
             throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
         }
@@ -415,7 +422,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                         getBonitaHomeServer().getClientTenantConfigurations(tenant.getId()));
             }
             return conf;
-        } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException | InstantiationException | STenantException e) {
+        } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException
+                | InstantiationException | STenantException e) {
             throw new RetrieveException(e);
         }
     }

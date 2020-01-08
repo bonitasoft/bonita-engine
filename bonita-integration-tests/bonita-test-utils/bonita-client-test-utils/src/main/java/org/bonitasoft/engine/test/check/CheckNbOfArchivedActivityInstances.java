@@ -31,7 +31,8 @@ public final class CheckNbOfArchivedActivityInstances extends WaitUntil {
     private final int expected;
 
     @Deprecated
-    public CheckNbOfArchivedActivityInstances(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int expected,
+    public CheckNbOfArchivedActivityInstances(final int repeatEach, final int timeout,
+            final ProcessInstance processInstance, final int expected,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout, false);
         this.processInstance1 = processInstance;
@@ -41,6 +42,8 @@ public final class CheckNbOfArchivedActivityInstances extends WaitUntil {
 
     @Override
     protected boolean check() {
-        return processAPI.getArchivedActivityInstances(processInstance1.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT).size() == expected;
+        return processAPI
+                .getArchivedActivityInstances(processInstance1.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT)
+                .size() == expected;
     }
 }

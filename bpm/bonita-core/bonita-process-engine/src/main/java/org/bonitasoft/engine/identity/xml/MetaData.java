@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 class MetaData {
+
     @XmlAttribute
     String name;
     @XmlAttribute

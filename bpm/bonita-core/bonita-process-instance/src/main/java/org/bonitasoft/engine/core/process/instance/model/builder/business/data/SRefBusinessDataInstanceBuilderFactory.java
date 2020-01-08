@@ -20,10 +20,13 @@ import java.util.List;
  */
 public interface SRefBusinessDataInstanceBuilderFactory {
 
-    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, Long dataId, String dataClassName);
+    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, Long dataId,
+            String dataClassName);
 
-    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, List<Long> dataIds, String dataClassName);
+    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, List<Long> dataIds,
+            String dataClassName);
 
-    SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(String name, long flowNodeInstanceId, Long dataId, String dataClassName);
+    SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(String name, long flowNodeInstanceId, Long dataId,
+            String dataClassName);
 
 }

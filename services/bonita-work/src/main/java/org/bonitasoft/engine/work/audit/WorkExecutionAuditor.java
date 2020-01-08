@@ -62,8 +62,8 @@ public class WorkExecutionAuditor {
      * <li>large number of executions after a duration threshold since registration has elapsed</li>
      * <li>large duration since the work has been registered</li>
      * </ul>
-     *
      * <b>NOTE</b>: the listener receives the 'abnormal execution' status only once to avoid flooding it.
+     *
      * @param work the work descriptor to inspect
      */
     public void detectAbnormalExecutionAndNotify(WorkDescriptor work) {
@@ -97,7 +97,8 @@ public class WorkExecutionAuditor {
     // Visible for Testing
     ExecutionStatus executionStatus(WorkDescriptor work) {
         Duration durationSinceWorkRegistration = Duration.between(work.getRegistrationDate(), engineClock.now());
-        if (durationSinceWorkRegistration.compareTo(executionCountDurationThreshold) >= 0 && work.getExecutionCount() >= executionCountThreshold) {
+        if (durationSinceWorkRegistration.compareTo(executionCountDurationThreshold) >= 0
+                && work.getExecutionCount() >= executionCountThreshold) {
             return TOO_MANY_EXECUTIONS;
         }
         if (durationSinceWorkRegistration.compareTo(registrationDurationElapsedThreshold) >= 0) {

@@ -17,10 +17,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.assertj.core.data.MapEntry;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import org.assertj.core.data.MapEntry;
 
 public class MapBuilder {
 

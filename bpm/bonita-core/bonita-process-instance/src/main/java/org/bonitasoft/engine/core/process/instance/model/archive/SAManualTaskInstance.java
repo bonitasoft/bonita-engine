@@ -27,6 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAManualTaskInstance extends SAHumanTaskInstance {
+
     public SAManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {
         super(sManualTaskInstance);
     }

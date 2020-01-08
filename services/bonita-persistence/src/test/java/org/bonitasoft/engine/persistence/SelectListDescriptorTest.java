@@ -29,7 +29,8 @@ public class SelectListDescriptorTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public final void throw_exception_when_contruct_object_without_query_options() {
-        new SelectListDescriptor<Object>("queryName", Collections.<String, Object> emptyMap(), PersistentObject.class, null);
+        new SelectListDescriptor<Object>("queryName", Collections.<String, Object> emptyMap(), PersistentObject.class,
+                null);
     }
 
     /**
@@ -39,7 +40,8 @@ public class SelectListDescriptorTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public final void throw_exception_when_contruct_object_without_query_options2() {
-        new SelectListDescriptor<Object>("queryName", Collections.<String, Object> emptyMap(), PersistentObject.class, Object.class, null);
+        new SelectListDescriptor<Object>("queryName", Collections.<String, Object> emptyMap(), PersistentObject.class,
+                Object.class, null);
     }
 
 }

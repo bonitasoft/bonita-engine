@@ -46,14 +46,16 @@ public class BDMQueryUtil {
         return queries;
     }
 
-    protected static void createProvidedQueriesForBusinessObject(BusinessObject businessObject, List<Query> queries, QueryGenerator queryGenerator) {
+    protected static void createProvidedQueriesForBusinessObject(BusinessObject businessObject, List<Query> queries,
+            QueryGenerator queryGenerator) {
         final Set<String> queryNames = new HashSet<>();
         if (!containsQueryWithName(businessObject, queryGenerator.getQueryName(Field.PERSISTENCE_ID))) {
             addQueryAndNameIfNotNull(queries, queryNames, queryGenerator.createQueryForPersistenceId(businessObject));
         }
 
         for (final UniqueConstraint uniqueConstraint : businessObject.getUniqueConstraints()) {
-            addQueryAndNameIfNotNull(queries, queryNames, queryGenerator.createQueryForUniqueConstraint(businessObject, uniqueConstraint));
+            addQueryAndNameIfNotNull(queries, queryNames,
+                    queryGenerator.createQueryForUniqueConstraint(businessObject, uniqueConstraint));
 
         }
         for (final Field field : businessObject.getFields()) {
@@ -100,7 +102,7 @@ public class BDMQueryUtil {
             }
 
             for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
-                if(uc.getFieldNames() != null){
+                if (uc.getFieldNames() != null) {
                     queryNames.add(queryGenerator.createQueryNameForUniqueConstraint(uc));
                 }
             }
@@ -127,17 +129,20 @@ public class BDMQueryUtil {
     }
 
     public static String getCountQueryName(String selectQueryName) {
-        return new StringBuilder(QueryGenerator.COUNT_PREFIX).append(selectQueryName.substring(0, 1).toUpperCase()).append(selectQueryName.substring(1)).toString();
+        return new StringBuilder(QueryGenerator.COUNT_PREFIX).append(selectQueryName.substring(0, 1).toUpperCase())
+                .append(selectQueryName.substring(1)).toString();
     }
 
-    public static List<Query> createProvidedQueriesForLazyField(final BusinessObjectModel bom, final BusinessObject bo) {
+    public static List<Query> createProvidedQueriesForLazyField(final BusinessObjectModel bom,
+            final BusinessObject bo) {
         final List<Query> queries = new ArrayList<>();
         for (QueryGenerator queryGenerator : getQueryGenerators()) {
             for (final BusinessObject businessObject : bom.getBusinessObjects()) {
                 for (final Field f : businessObject.getFields()) {
                     if (f instanceof RelationField && ((RelationField) f).isLazy()) {
                         if (((RelationField) f).getReference().equals(bo)) {
-                            final Query query = queryGenerator.createQueryForLazyField(businessObject, (RelationField) f);
+                            final Query query = queryGenerator.createQueryForLazyField(businessObject,
+                                    (RelationField) f);
                             if (query != null) {
                                 queries.add(query);
                             }

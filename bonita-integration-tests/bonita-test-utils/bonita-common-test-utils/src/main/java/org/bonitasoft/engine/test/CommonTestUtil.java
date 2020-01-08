@@ -31,9 +31,11 @@ public class CommonTestUtil {
      * @return
      * @throws IOException
      */
-    public static byte[] createTestPageContent(final String pageName, final String displayName, final String description, final String... extraProperties)
+    public static byte[] createTestPageContent(final String pageName, final String displayName,
+            final String description, final String... extraProperties)
             throws IOException {
-        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(baos)) {
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ZipOutputStream zos = new ZipOutputStream(baos)) {
             zos.putNextEntry(new ZipEntry("Index.groovy"));
             zos.write("return \"\";".getBytes());
 

@@ -25,8 +25,10 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SSendTaskInstance extends SActivityInstance {
-    public SSendTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                 final long logicalGroup1, final long logicalGroup2) {
+
+    public SSendTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 

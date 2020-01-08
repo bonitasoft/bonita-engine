@@ -43,7 +43,8 @@ public class UserTaskDefinitionBuilderTest {
     @Test
     public void should_addExpectedDuration_as_long_create_expression() throws Exception {
         //given
-        UserTaskDefinitionBuilder userTaskDefinitionBuilder = new UserTaskDefinitionBuilder(processDefinitionBuilder, container, "task", "actor");
+        UserTaskDefinitionBuilder userTaskDefinitionBuilder = new UserTaskDefinitionBuilder(processDefinitionBuilder,
+                container, "task", "actor");
 
         //when
         userTaskDefinitionBuilder.addExpectedDuration(123L);
@@ -56,7 +57,8 @@ public class UserTaskDefinitionBuilderTest {
     @Test
     public void should_addExpectedDuration_create_expression_with_new_id() throws Exception {
         //given
-        UserTaskDefinitionBuilder userTaskDefinitionBuilder = new UserTaskDefinitionBuilder(processDefinitionBuilder, container, "task", "actor");
+        UserTaskDefinitionBuilder userTaskDefinitionBuilder = new UserTaskDefinitionBuilder(processDefinitionBuilder,
+                container, "task", "actor");
 
         //when
         userTaskDefinitionBuilder.addExpectedDuration(expression);
@@ -64,7 +66,8 @@ public class UserTaskDefinitionBuilderTest {
         //then
         UserTaskDefinition userTaskDefinition = getUserTaskDefinition(userTaskDefinitionBuilder);
         checkExpressionIsCreated(userTaskDefinition);
-        assertThat(userTaskDefinition.getExpectedDuration().getId()).as("should have a new ID for xsd validation").isNotEqualTo(expression.getId());
+        assertThat(userTaskDefinition.getExpectedDuration().getId()).as("should have a new ID for xsd validation")
+                .isNotEqualTo(expression.getId());
 
     }
 
@@ -74,7 +77,8 @@ public class UserTaskDefinitionBuilderTest {
 
     public void checkExpressionIsCreated(UserTaskDefinition userTaskDefinition) {
         assertThat(userTaskDefinition.getExpectedDuration()).as("should add expression").isNotNull();
-        assertThat(userTaskDefinition.getExpectedDuration().getId()).as("should have a unique ID for xsd validation").isGreaterThan(0);
+        assertThat(userTaskDefinition.getExpectedDuration().getId()).as("should have a unique ID for xsd validation")
+                .isGreaterThan(0);
     }
 
 }

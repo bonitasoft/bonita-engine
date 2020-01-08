@@ -37,8 +37,10 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
     SearchDocumentDescriptor() {
         searchEntityKeys = new HashMap<>(9);
 
-        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, new FieldDescriptor(SMappedDocument.class, "documentId"));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_AUTHOR, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.AUTHOR));
+        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID,
+                new FieldDescriptor(SMappedDocument.class, "documentId"));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_AUTHOR,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.AUTHOR));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME,
                 new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.FILENAME));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE,
@@ -47,12 +49,18 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.CREATION_DATE));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
                 new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.HAS_CONTENT));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, SDocument.NAME));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SMappedDocument.class, SDocument.DESCRIPTION));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SMappedDocument.class, SDocument.VERSION));
-        searchEntityKeys.put(DocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SMappedDocument.class, SDocument.INDEX));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.URL));
-        searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME,
+                new FieldDescriptor(SMappedDocument.class, SDocument.NAME));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_DESCRIPTION,
+                new FieldDescriptor(SMappedDocument.class, SDocument.DESCRIPTION));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_VERSION,
+                new FieldDescriptor(SMappedDocument.class, SDocument.VERSION));
+        searchEntityKeys.put(DocumentsSearchDescriptor.LIST_INDEX,
+                new FieldDescriptor(SMappedDocument.class, SDocument.INDEX));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + SDocument.URL));
+        searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID,
+                new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 
         documentAllFields = new HashMap<>(1);
         final Set<String> documentFields = new HashSet<>(8);

@@ -91,7 +91,8 @@ public class ServerBDMCodeGeneratorTest {
         serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
-        assertThat(serverDaoImplContent).contains("public EmployeeDAOImpl(BusinessDataRepository businessDataRepository)",
+        assertThat(serverDaoImplContent).contains(
+                "public EmployeeDAOImpl(BusinessDataRepository businessDataRepository)",
                 "this.businessDataRepository = businessDataRepository;");
     }
 
@@ -153,7 +154,8 @@ public class ServerBDMCodeGeneratorTest {
         serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
-        assertThat(serverDaoImplContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)",
+        assertThat(serverDaoImplContent).contains(
+                "public List<Employee> findByName(String name, int startIndex, int maxResults)",
                 "return businessDataRepository.findListByNamedQuery(\"Employee.findByName\", Employee.class, queryParameters, startIndex, maxResults);");
     }
 

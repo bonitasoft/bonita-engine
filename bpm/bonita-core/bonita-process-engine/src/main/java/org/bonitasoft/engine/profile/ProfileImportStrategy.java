@@ -17,12 +17,11 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public abstract class ProfileImportStrategy {
 

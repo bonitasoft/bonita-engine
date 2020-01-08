@@ -215,7 +215,8 @@ public class BusinessObject {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(description).append(fields).append(indexes).append(qualifiedName).append(queries).append(uniqueConstraints)
+        return new HashCodeBuilder(17, 37).append(description).append(fields).append(indexes).append(qualifiedName)
+                .append(queries).append(uniqueConstraints)
                 .toHashCode();
     }
 
@@ -223,8 +224,10 @@ public class BusinessObject {
     public boolean equals(final Object obj) {
         if (obj instanceof BusinessObject) {
             final BusinessObject other = (BusinessObject) obj;
-            return new EqualsBuilder().append(description, other.description).append(fields, other.fields).append(indexes, other.indexes)
-                    .append(qualifiedName, other.qualifiedName).append(queries, other.queries).append(uniqueConstraints, other.uniqueConstraints).isEquals();
+            return new EqualsBuilder().append(description, other.description).append(fields, other.fields)
+                    .append(indexes, other.indexes)
+                    .append(qualifiedName, other.qualifiedName).append(queries, other.queries)
+                    .append(uniqueConstraints, other.uniqueConstraints).isEquals();
         }
         return false;
     }

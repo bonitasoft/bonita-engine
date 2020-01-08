@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.search;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -28,11 +26,13 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractHumanTaskInstanceSearchEntity extends AbstractSearchEntity<HumanTaskInstance, SHumanTaskInstance> {
+public abstract class AbstractHumanTaskInstanceSearchEntity
+        extends AbstractSearchEntity<HumanTaskInstance, SHumanTaskInstance> {
 
     private final FlowNodeStateManager flowNodeStateManager;
 
-    public AbstractHumanTaskInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+    public AbstractHumanTaskInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
             final FlowNodeStateManager flowNodeStateManager) {
         super(searchDescriptor, options);
         this.flowNodeStateManager = flowNodeStateManager;
@@ -47,18 +47,21 @@ public abstract class AbstractHumanTaskInstanceSearchEntity extends AbstractSear
      * factory to create a search human task descriptor
      */
     public static AbstractHumanTaskInstanceSearchEntity searchHumanTaskInstance(SearchEntityDescriptor searchDescriptor,
-                                                                                SearchOptions options,
-                                                                                FlowNodeStateManager flowNodeStateManager,
-                                                                                BonitaReadFunction<QueryOptions, Long> count,
-                                                                                BonitaReadFunction<QueryOptions, List<SHumanTaskInstance>> search) {
+            SearchOptions options,
+            FlowNodeStateManager flowNodeStateManager,
+            BonitaReadFunction<QueryOptions, Long> count,
+            BonitaReadFunction<QueryOptions, List<SHumanTaskInstance>> search) {
         return new HumanTaskInstanceSearchEntity(searchDescriptor, options, flowNodeStateManager, count, search);
     }
 
     private static class HumanTaskInstanceSearchEntity extends AbstractHumanTaskInstanceSearchEntity {
+
         private final BonitaReadFunction<QueryOptions, Long> count;
         private final BonitaReadFunction<QueryOptions, List<SHumanTaskInstance>> search;
 
-        HumanTaskInstanceSearchEntity(SearchEntityDescriptor searchDescriptor, SearchOptions options, FlowNodeStateManager flowNodeStateManager, BonitaReadFunction<QueryOptions, Long> count, BonitaReadFunction<QueryOptions, List<SHumanTaskInstance>> search) {
+        HumanTaskInstanceSearchEntity(SearchEntityDescriptor searchDescriptor, SearchOptions options,
+                FlowNodeStateManager flowNodeStateManager, BonitaReadFunction<QueryOptions, Long> count,
+                BonitaReadFunction<QueryOptions, List<SHumanTaskInstance>> search) {
             super(searchDescriptor, options, flowNodeStateManager);
             this.count = count;
             this.search = search;

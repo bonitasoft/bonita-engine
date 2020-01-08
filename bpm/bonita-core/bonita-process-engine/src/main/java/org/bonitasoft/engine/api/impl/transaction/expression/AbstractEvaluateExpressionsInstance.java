@@ -39,7 +39,8 @@ public abstract class AbstractEvaluateExpressionsInstance {
         return value;
     }
 
-    protected Map<String, Serializable> getPartialContext(final Map<Expression, Map<String, Serializable>> expressions, final Expression exp) {
+    protected Map<String, Serializable> getPartialContext(final Map<Expression, Map<String, Serializable>> expressions,
+            final Expression exp) {
         Map<String, Serializable> partialContext = expressions.get(exp);
         if (partialContext == null || partialContext.isEmpty()) {
             return partialContext;

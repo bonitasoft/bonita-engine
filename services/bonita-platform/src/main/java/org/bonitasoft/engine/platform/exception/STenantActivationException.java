@@ -17,7 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Exception related to the platform module
- * 
+ *
  * @author Lu Kai
  */
 public class STenantActivationException extends SBonitaException {

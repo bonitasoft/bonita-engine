@@ -15,7 +15,7 @@ package org.bonitasoft.engine.identity.recorder;
 
 /**
  * List all possible change of elements of the identity service
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */

@@ -51,7 +51,6 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(ExecutingCallActivityStateImpl.class);
     }
 
-
     @Test
     public void getFirstState_for_automatic_task_return_ExecutingAutomaticActivityStateImpl() throws Exception {
         //when
@@ -70,16 +69,15 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingBoundaryEventStateImpl.class);
     }
 
-
     @Test
-    public void getFirstState_for_call_activity_should_InitializingActivityWithBoundaryEventsStateImpl() throws Exception {
+    public void getFirstState_for_call_activity_should_InitializingActivityWithBoundaryEventsStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.CALL_ACTIVITY);
 
         //then
         assertThat(firstState).isInstanceOf(InitializingActivityWithBoundaryEventsStateImpl.class);
     }
-
 
     @Test
     public void getFirstState_for_end_event_should_return_ExecutingThrowEventStateImpl() throws Exception {
@@ -99,7 +97,6 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingAndExecutingFlowNodeStateImpl.class);
     }
 
-
     @Test
     public void getFirstState_for_intermadiate_catch_should_return_InitializingActivityStateImpl() throws Exception {
         //when
@@ -109,9 +106,9 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingActivityStateImpl.class);
     }
 
-
     @Test
-    public void getFirstState_for_intermediate_throw_event_should_return_ExecutingThrowEventStateImpl() throws Exception {
+    public void getFirstState_for_intermediate_throw_event_should_return_ExecutingThrowEventStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.INTERMEDIATE_THROW_EVENT);
 
@@ -128,7 +125,6 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingLoopActivityStateImpl.class);
     }
 
-
     @Test
     public void getFirstState_for_manual_task_should_return_InitializingActivityStateImpl() throws Exception {
         //when
@@ -138,9 +134,9 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingActivityStateImpl.class);
     }
 
-
     @Test
-    public void getFirstState_for_multi_instance_should_return_InitializingMultiInstanceActivityStateImpl() throws Exception {
+    public void getFirstState_for_multi_instance_should_return_InitializingMultiInstanceActivityStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.MULTI_INSTANCE_ACTIVITY);
 
@@ -148,9 +144,9 @@ public class FlowNodeStateManagerImplTest {
         assertThat(firstState).isInstanceOf(InitializingMultiInstanceActivityStateImpl.class);
     }
 
-
     @Test
-    public void getFirstState_for_receive_task_should_return_InitializingActivityWithBoundaryEventsStateImpl() throws Exception {
+    public void getFirstState_for_receive_task_should_return_InitializingActivityWithBoundaryEventsStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.RECEIVE_TASK);
 
@@ -168,7 +164,8 @@ public class FlowNodeStateManagerImplTest {
     }
 
     @Test
-    public void getFirstState_for_start_event_should_return_InitializingAndExecutingFlowNodeStateImpl() throws Exception {
+    public void getFirstState_for_start_event_should_return_InitializingAndExecutingFlowNodeStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.START_EVENT);
 
@@ -177,7 +174,8 @@ public class FlowNodeStateManagerImplTest {
     }
 
     @Test
-    public void getFirstState_for_user_task_should_return_InitializingActivityWithBoundaryEventsStateImpl() throws Exception {
+    public void getFirstState_for_user_task_should_return_InitializingActivityWithBoundaryEventsStateImpl()
+            throws Exception {
         //when
         FlowNodeState firstState = stateManager.getFirstState(SFlowNodeType.USER_TASK);
 

@@ -79,7 +79,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     private final IdentityService identityService;
 
-    public ActorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public ActorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService,
             final QueriableLoggerService queriableLoggerService, final IdentityService identityService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -189,7 +190,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         try {
             final SActor actor = persistenceService.selectOne(selectOneDescriptor);
             if (actor == null) {
-                throw new SActorNotFoundException("Actor not found with name: " + actorName + " of scopeId: " + scopeId);
+                throw new SActorNotFoundException(
+                        "Actor not found with name: " + actorName + " of scopeId: " + scopeId);
             }
             return actor;
         } catch (final SBonitaReadException bre) {
@@ -198,7 +200,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActor updateActor(final long actorId, final EntityUpdateDescriptor descriptor) throws SActorNotFoundException, SActorUpdateException,
+    public SActor updateActor(final long actorId, final EntityUpdateDescriptor descriptor)
+            throws SActorNotFoundException, SActorUpdateException,
             SBonitaReadException {
         final SActor actor = getActor(actorId);
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating an actor");
@@ -256,7 +259,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public List<SActor> getActors(final Set<Long> scopeIds, final Long userId) throws SBonitaReadException {
-        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getFullActorsListOfUser(scopeIds, userId);
+        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getFullActorsListOfUser(scopeIds,
+                userId);
         return persistenceService.selectList(descriptor);
     }
 
@@ -281,7 +285,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember addGroupToActor(final long actorId, final long groupId) throws SActorNotFoundException, SActorMemberCreationException {
+    public SActorMember addGroupToActor(final long actorId, final long groupId)
+            throws SActorNotFoundException, SActorMemberCreationException {
         try {
             final SActorMember addActorMember = addOnlyThisGroupToActor(actorId, groupId);
             int i = 0;
@@ -304,7 +309,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         }
     }
 
-    private SActorMember addOnlyThisGroupToActor(final long actorId, final long groupId) throws SActorMemberCreationException {
+    private SActorMember addOnlyThisGroupToActor(final long actorId, final long groupId)
+            throws SActorMemberCreationException {
         final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setGroupId(groupId);
@@ -320,7 +326,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws SActorNotFoundException,
+    public SActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId)
+            throws SActorNotFoundException,
             SActorMemberCreationException {
         try {
             final SActorMember addActorMember = addOnlyThisRoleAndGroupToActor(actorId, roleId, groupId);
@@ -339,7 +346,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         }
     }
 
-    private SActorMember addOnlyThisRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws SActorMemberCreationException {
+    private SActorMember addOnlyThisRoleAndGroupToActor(final long actorId, final long roleId, final long groupId)
+            throws SActorMemberCreationException {
         final SActorMember actorMember = new SActorMember();
         actorMember.setActorId(actorId);
         actorMember.setRoleId(roleId);
@@ -348,7 +356,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember deleteActorMember(final long actorMemberId) throws SActorMemberNotFoundException, SActorMemberDeletionException {
+    public SActorMember deleteActorMember(final long actorMemberId)
+            throws SActorMemberNotFoundException, SActorMemberDeletionException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting an actor member");
         try {
             final SActorMember actorMember = getActorMember(actorMemberId);
@@ -373,8 +382,10 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         }
     }
 
-    private SActorMember getActorMember(final long actorMemberId) throws SActorMemberNotFoundException, SBonitaReadException {
-        final SelectByIdDescriptor<SActorMember> selectByIdDescriptor = SelectDescriptorBuilder.getActorMember(actorMemberId);
+    private SActorMember getActorMember(final long actorMemberId)
+            throws SActorMemberNotFoundException, SBonitaReadException {
+        final SelectByIdDescriptor<SActorMember> selectByIdDescriptor = SelectDescriptorBuilder
+                .getActorMember(actorMemberId);
         final SActorMember actor = persistenceService.selectById(selectByIdDescriptor);
         if (actor == null) {
             throw new SActorMemberNotFoundException(actorMemberId + " does not refer to any actor member");
@@ -383,8 +394,10 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember getActorMember(final long actorId, final long userId, final long groupId, final long roleId) throws SBonitaReadException {
-        final SelectOneDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMember(actorId, userId, groupId, roleId);
+    public SActorMember getActorMember(final long actorId, final long userId, final long groupId, final long roleId)
+            throws SBonitaReadException {
+        final SelectOneDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMember(actorId, userId,
+                groupId, roleId);
         return persistenceService.selectOne(descriptor);
     }
 
@@ -395,44 +408,57 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public List<SActorMember> getActorMembers(final long actorId, final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
-        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembers(actorId, fromIndex, numberOfActorMembers);
+    public List<SActorMember> getActorMembers(final long actorId, final int fromIndex, final int numberOfActorMembers)
+            throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembers(actorId,
+                fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
 
     @Override
-    public List<SActorMember> getActorMembersOfUser(final long userId, final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
-        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfUser(userId, fromIndex, numberOfActorMembers);
+    public List<SActorMember> getActorMembersOfUser(final long userId, final int fromIndex,
+            final int numberOfActorMembers) throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfUser(userId,
+                fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
 
     @Override
-    public List<SActorMember> getActorMembersOfGroup(final long groupId, final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
-        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfGroup(groupId, fromIndex, numberOfActorMembers);
+    public List<SActorMember> getActorMembersOfGroup(final long groupId, final int fromIndex,
+            final int numberOfActorMembers) throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfGroup(groupId,
+                fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
 
-    private long getNumberOfActorMembersOfGroupWithActor(final long groupId, final long actorId) throws SBonitaReadException {
-        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.getNumberOfActorMembersOfGroupWithActor(groupId, actorId);
+    private long getNumberOfActorMembersOfGroupWithActor(final long groupId, final long actorId)
+            throws SBonitaReadException {
+        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder
+                .getNumberOfActorMembersOfGroupWithActor(groupId, actorId);
         return persistenceService.selectOne(descriptor);
     }
 
     @Override
-    public List<SActorMember> getActorMembersOfRole(final long roleId, final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
-        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfRole(roleId, fromIndex, numberOfActorMembers);
+    public List<SActorMember> getActorMembersOfRole(final long roleId, final int fromIndex,
+            final int numberOfActorMembers) throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfRole(roleId,
+                fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
 
     @Override
-    public boolean canUserStartProcessDefinition(final long userId, final long processDefinitionId) throws SBonitaReadException {
-        final SelectListDescriptor<Long> descriptor = SelectDescriptorBuilder.getActorMembersInitiatorForProcess(processDefinitionId, 0,
+    public boolean canUserStartProcessDefinition(final long userId, final long processDefinitionId)
+            throws SBonitaReadException {
+        final SelectListDescriptor<Long> descriptor = SelectDescriptorBuilder.getActorMembersInitiatorForProcess(
+                processDefinitionId, 0,
                 QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         final List<Long> actorMembersForProcess = persistenceService.selectList(descriptor);
         final int BATCH_SIZE = 80;
         boolean found = false;
         while (!found && actorMembersForProcess.size() > 0) {
-            found = 0 < persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUserMembersForUserOrManagerForActorMembers(userId,
-                    retrieveFirstResultsAndRemoveFromOriginalList(BATCH_SIZE, actorMembersForProcess)));
+            found = 0 < persistenceService
+                    .selectOne(SelectDescriptorBuilder.getNumberOfUserMembersForUserOrManagerForActorMembers(userId,
+                            retrieveFirstResultsAndRemoveFromOriginalList(BATCH_SIZE, actorMembersForProcess)));
         }
         return found;
     }
@@ -446,12 +472,15 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public List<SActor> getActors(final long processDefinitionId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getActorsOfScope(processDefinitionId, queryOptions);
+    public List<SActor> getActors(final long processDefinitionId, final QueryOptions queryOptions)
+            throws SBonitaReadException {
+        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getActorsOfScope(processDefinitionId,
+                queryOptions);
         return persistenceService.selectList(descriptor);
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus,
+            final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -472,10 +501,12 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public List<Long> getPossibleUserIdsOfActorId(final long actorId, final int startIndex, final int maxResults) throws SBonitaReadException {
+    public List<Long> getPossibleUserIdsOfActorId(final long actorId, final int startIndex, final int maxResults)
+            throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfActorId", parameters, SActor.class, new QueryOptions(
-                startIndex, maxResults));
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfActorId",
+                parameters, SActor.class, new QueryOptions(
+                        startIndex, maxResults));
         return persistenceService.selectList(descriptor);
     }
 

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
-
 public class SupervisorBuilder extends PersistentObjectBuilder<SProcessSupervisor, SupervisorBuilder> {
 
     private long processDefId;

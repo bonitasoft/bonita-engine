@@ -42,7 +42,7 @@ public class ThemeActionCalculator {
     }
 
     public ThemeAction calculateAction(STheme currentTheme, byte[] newContent) {
-        if(!hasContent(newContent)) {
+        if (!hasContent(newContent)) {
             return ThemeAction.NONE;
         }
         if (currentTheme == null) {
@@ -61,7 +61,9 @@ public class ThemeActionCalculator {
         } catch (NoSuchAlgorithmException e) {
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                        "Unable to verify if default theme '" + currentTheme.getType() + "' has changed. It will not be updated.", e);
+                        "Unable to verify if default theme '" + currentTheme.getType()
+                                + "' has changed. It will not be updated.",
+                        e);
             }
         }
         return changed;

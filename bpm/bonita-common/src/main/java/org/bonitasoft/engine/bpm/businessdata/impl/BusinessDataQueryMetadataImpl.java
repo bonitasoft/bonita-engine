@@ -21,8 +21,8 @@ public class BusinessDataQueryMetadataImpl implements BusinessDataQueryMetadata 
     private final Integer maxResults;
     private final Long count;
 
-    public BusinessDataQueryMetadataImpl(){
-        this(null,null,null);
+    public BusinessDataQueryMetadataImpl() {
+        this(null, null, null);
     };
 
     public BusinessDataQueryMetadataImpl(Integer startIndex, Integer maxResults, Long count) {

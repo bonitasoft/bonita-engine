@@ -18,8 +18,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.Arrays;
-
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +61,7 @@ public class FlowNodeIdFilterTest {
 
         assertTrue(result);
     }
+
     @Test
     public void should_return_false_if_flow_node_is_not_in_the_expected_list() {
         doReturn(3L).when(flownode).getId();

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.connector;
 import java.io.Serializable;
 import java.util.Map;
 
-
 /**
  * @author Baptiste Mesta
  */

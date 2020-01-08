@@ -25,9 +25,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @EqualsAndHashCode(callSuper = true)
 public class SADoubleDataInstance extends SADataInstance {
 
-
     private Double value;
-
 
     public SADoubleDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

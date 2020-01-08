@@ -25,9 +25,7 @@ import org.bonitasoft.engine.commons.PlatformLifecycleService;
  */
 public class BonitaTaskExecutor implements PlatformLifecycleService {
 
-
     private ExecutorService bonitaTaskExecutor;
-
 
     private void checkStarted() {
         if (bonitaTaskExecutor == null) {
@@ -41,7 +39,6 @@ public class BonitaTaskExecutor implements PlatformLifecycleService {
             return null;
         });
     }
-
 
     public <T> Future<T> execute(Callable<T> callable) {
         checkStarted();

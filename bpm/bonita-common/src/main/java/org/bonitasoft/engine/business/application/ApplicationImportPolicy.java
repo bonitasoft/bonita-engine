@@ -15,7 +15,7 @@ package org.bonitasoft.engine.business.application;
 
 /**
  * Contains available policies during {@link Application}s import
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @see org.bonitasoft.engine.business.application.Application
  */

@@ -17,6 +17,7 @@ package com.company.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javassist.util.proxy.MethodHandler;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,8 +40,6 @@ import com.company.model.javassist.MethodHandlerImpl;
 import com.company.model.javassist.ProxyImpl;
 import com.company.model.javassist.ProxyObjectImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javassist.util.proxy.MethodHandler;
 
 @javax.persistence.Entity(name = "Person")
 @Table(name = "PERSON")

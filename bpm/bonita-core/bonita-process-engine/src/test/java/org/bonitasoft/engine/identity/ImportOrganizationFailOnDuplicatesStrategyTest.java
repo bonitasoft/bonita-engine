@@ -37,7 +37,8 @@ public class ImportOrganizationFailOnDuplicatesStrategyTest {
             fail("exception expected");
         } catch (ImportDuplicateInOrganizationException e) {
             // then
-            assertThat(e.getMessage()).isEqualTo("There's already a custom user info definition with the name : '" + name + "'");
+            assertThat(e.getMessage())
+                    .isEqualTo("There's already a custom user info definition with the name : '" + name + "'");
         }
 
     }

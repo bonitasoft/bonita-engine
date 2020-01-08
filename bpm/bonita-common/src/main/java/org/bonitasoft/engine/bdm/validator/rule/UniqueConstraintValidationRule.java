@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
-
 import static java.util.Collections.singletonMap;
 
 import java.util.List;
@@ -44,7 +43,8 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
             return status;
         }
         if (!sqlNameValidator.isValid(name)) {
-            status.addError(StatusCode.INVALID_SQL_IDENTIFIER_NAME, String.format("%s is not a valid SQL identifier", name),
+            status.addError(StatusCode.INVALID_SQL_IDENTIFIER_NAME,
+                    String.format("%s is not a valid SQL identifier", name),
                     singletonMap(StatusContext.INVALID_NAME_KEY, name));
         }
 

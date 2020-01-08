@@ -22,11 +22,13 @@ public class SNotSerializableException extends SBonitaException {
 
     private static final long serialVersionUID = -229226043369898514L;
 
-    public SNotSerializableException(final String connectorDefinitionId, final String connectorDefinitionVersion, final String key, final Object value) {
+    public SNotSerializableException(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final String key, final Object value) {
         super(createMessage(connectorDefinitionId, connectorDefinitionVersion, key, value));
     }
 
-    private static String createMessage(final String connectorDefinitionId, final String connectorDefinitionVersion, final String key, final Object value) {
+    private static String createMessage(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final String key, final Object value) {
         final StringBuilder stringBuilder = new StringBuilder("the connector ");
         stringBuilder.append(connectorDefinitionId);
         stringBuilder.append(' ');

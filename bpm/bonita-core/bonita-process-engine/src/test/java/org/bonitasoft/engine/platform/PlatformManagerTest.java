@@ -82,9 +82,11 @@ public class PlatformManagerTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(asList(platformRestartHandler1, platformRestartHandler2)).when(nodeConfiguration).getPlatformRestartHandlers();
+        doReturn(asList(platformRestartHandler1, platformRestartHandler2)).when(nodeConfiguration)
+                .getPlatformRestartHandlers();
         platformManager = spy(new PlatformManager(nodeConfiguration, transactionService, platformService,
-                asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider, bonitaTaskExecutor));
+                asList(platformLifecycleService1, platformLifecycleService2), platformStateProvider,
+                bonitaTaskExecutor));
         when(transactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
         when(bonitaTaskExecutor.execute(any(RunnableWithException.class)))
@@ -152,7 +154,7 @@ public class PlatformManagerTest {
     }
 
     @Test
-    public void start_should_execute_platform_restart_handlers_in_an_other_thread() throws Exception{
+    public void start_should_execute_platform_restart_handlers_in_an_other_thread() throws Exception {
         doReturn(true).when(platformStateProvider).initializeStart();
 
         platformManager.start();
@@ -161,7 +163,6 @@ public class PlatformManagerTest {
         verify(platformRestartHandler2).execute();
         verify(bonitaTaskExecutor, times(2)).execute(any(RunnableWithException.class));
     }
-
 
     @Test
     public void should_activate_tenant_using_tenantManager() throws Exception {

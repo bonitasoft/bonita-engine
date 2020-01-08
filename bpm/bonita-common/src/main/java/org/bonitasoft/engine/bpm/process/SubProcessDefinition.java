@@ -35,7 +35,8 @@ public interface SubProcessDefinition extends ActivityDefinition {
      * Gets the definition of the "container" of this sub-process.
      *
      * @return the definition of the "container" of this sub-process.
-     * @deprecated since 6.2.3 In a later version, {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition} will be used instead.
+     * @deprecated since 6.2.3 In a later version,
+     *             {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition} will be used instead.
      */
     @Deprecated
     FlowElementContainerDefinition getSubProcessContainer();

@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -58,8 +57,9 @@ public class SApplication implements PersistentObject {
     private Long layoutId;
     private Long themeId;
 
-    public SApplication(final String token, final String displayName, final String version, final long creationDate, final long createdBy,
-                            final String state, final Long layoutId, final Long themeId) {
+    public SApplication(final String token, final String displayName, final String version, final long creationDate,
+            final long createdBy,
+            final String state, final Long layoutId, final Long themeId) {
         super();
         this.token = token;
         this.displayName = displayName;
@@ -72,6 +72,5 @@ public class SApplication implements PersistentObject {
         this.layoutId = layoutId;
         this.themeId = themeId;
     }
-
 
 }

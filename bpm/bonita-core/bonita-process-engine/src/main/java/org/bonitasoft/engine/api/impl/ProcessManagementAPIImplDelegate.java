@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
@@ -67,7 +68,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-    public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
+    public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId,
+            final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SBonitaReadException {
         return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
@@ -76,14 +78,16 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         return APIUtils.getTenantAccessor();
     }
 
-    public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
+    public void deleteProcessDefinition(final long processDefinitionId)
+            throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
-                    + processDefinitionId + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
+                            + processDefinitionId + ">");
         }
     }
 
@@ -95,7 +99,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, getConfigurationService(),
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId,
+                eventInstanceService, getConfigurationService(),
                 schedulerService,
                 logger, SessionInfos.getUserNameFromSession(), SessionInfos.getSession().getTenantId());
         disableProcess.execute();
@@ -110,20 +115,24 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     }
 
-    public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
+    public void purgeClassLoader(final long processDefinitionId)
+            throws ProcessDefinitionNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+            final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService
+                    .getProcessDeploymentInfo(processDefinitionId);
             if (!ActivationState.DISABLED.name().equals(processDeploymentInfo.getActivationState())) {
                 throw new UpdateException("Purge can only be done on a disabled process");
             }
             final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-            final long numberOfProcessInstances = processInstanceService.getNumberOfProcessInstances(processDefinitionId);
+            final long numberOfProcessInstances = processInstanceService
+                    .getNumberOfProcessInstances(processDefinitionId);
             if (numberOfProcessInstances != 0) {
                 throw new UpdateException("Purge can only be done on a disabled process with no running instances");
             }
-            tenantAccessor.getClassLoaderService().removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+            tenantAccessor.getClassLoaderService().removeLocalClassLoader(ScopeType.PROCESS.name(),
+                    processDefinitionId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaReadException e) {
@@ -133,7 +142,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex,
+            final int maxResults,
             final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
@@ -149,11 +159,13 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
                     break;
             }
 
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId,
+                    processDefinitionService);
             if (sProcessDefinition.getParameters().isEmpty()) {
                 return Collections.emptyList();
             }
-            final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults, order);
+            final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults,
+                    order);
             final List<ParameterInstance> paramterInstances = new ArrayList<>();
             for (int i = 0; i < parameters.size(); i++) {
                 final SParameter parameter = parameters.get(i);
@@ -174,22 +186,26 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId,
+                    processDefinitionService);
             return sProcessDefinition.getParameters().size();
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }
 
-    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws NotFoundException {
+    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName)
+            throws NotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId,
+                    processDefinitionService);
             final SParameter parameter = parameterService.get(processDefinitionId, parameterName);
             if (parameter == null) {
-                throw new NotFoundException("the parameter with name " + parameterName + " and process with id " + processDefinitionId + " was not found.");
+                throw new NotFoundException("the parameter with name " + parameterName + " and process with id "
+                        + processDefinitionId + " was not found.");
             }
             final String name = parameter.getName();
             final String value = parameter.getValue();

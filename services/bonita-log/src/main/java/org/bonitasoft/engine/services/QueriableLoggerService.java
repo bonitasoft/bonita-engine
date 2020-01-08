@@ -30,7 +30,7 @@ public interface QueriableLoggerService {
     /**
      * Log the given queriable logs. Only logs having the action type and the severity configured
      * to as loggable will be logged
-     * 
+     *
      * @param queriableLogs
      * @since 6.0
      */
@@ -38,11 +38,11 @@ public interface QueriableLoggerService {
 
     /**
      * Verify if the given action type and severity are loggable
-     * 
+     *
      * @param actionType
-     *            the action type
+     *        the action type
      * @param severity
-     *            the severity
+     *        the severity
      * @return true if the log is active for the given action type and severity; false otherwise
      * @since 6.0
      */
@@ -50,7 +50,7 @@ public interface QueriableLoggerService {
 
     /**
      * Get the queriable log from its id.
-     * 
+     *
      * @param logId
      * @return the queriable log
      * @throws SQueriableLogException
@@ -60,7 +60,7 @@ public interface QueriableLoggerService {
 
     /**
      * Get total number of queriable logs
-     * 
+     *
      * @return the number of queriable logs
      * @since 6.0
      */
@@ -68,24 +68,25 @@ public interface QueriableLoggerService {
 
     /**
      * Get the queriable logs having the given value for the given int index
-     * 
+     *
      * @param fromIndex
-     *            first result to be considered(>=0)
+     *        first result to be considered(>=0)
      * @param numberOfLogs
-     *            the max number of queriable logs to be returned (>=0)
+     *        the max number of queriable logs to be returned (>=0)
      * @param field
      * @param order
      * @return the queriable logs having the given value for the given int index
      * @throws SQueriableLogException
      * @since 6.0
      */
-    List<SQueriableLog> getLogs(int startIndex, int maxResults, final String field, final OrderByType order) throws SBonitaReadException;
+    List<SQueriableLog> getLogs(int startIndex, int maxResults, final String field, final OrderByType order)
+            throws SBonitaReadException;
 
     /**
      * Gets the queriable logs number matching to the given QueryOptions.
-     * 
+     *
      * @param QueryOptions
-     *            The criterion used to search sQueriableLog
+     *        The criterion used to search sQueriableLog
      * @return queriable logs number matching to the given searchOptions.
      * @throws SBonitaReadException
      * @since 6.0
@@ -94,9 +95,9 @@ public interface QueriableLoggerService {
 
     /**
      * Gets the queriable logs matching to the given searchOptions.
-     * 
+     *
      * @param searchOptions
-     *            The criterion used to search sQueriableLog
+     *        The criterion used to search sQueriableLog
      * @return logs list matching to the given searchOptions.
      * @throws SBonitaReadException
      * @since 6.0

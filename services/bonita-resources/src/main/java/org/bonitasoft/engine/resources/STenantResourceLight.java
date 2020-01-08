@@ -23,6 +23,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class STenantResourceLight implements PersistentObject {
+
     protected String name;
     protected TenantResourceType type;
     private long tenantId;
@@ -32,7 +33,7 @@ public class STenantResourceLight implements PersistentObject {
     protected STenantResourceState state;
 
     public STenantResourceLight(String name, TenantResourceType type, long lastUpdatedBy, long lastUpdateDate,
-                                STenantResourceState state) {
+            STenantResourceState state) {
         this.name = name;
         this.type = type;
         this.lastUpdatedBy = lastUpdatedBy;

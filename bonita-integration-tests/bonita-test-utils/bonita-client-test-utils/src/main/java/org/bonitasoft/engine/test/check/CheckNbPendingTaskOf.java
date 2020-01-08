@@ -39,12 +39,14 @@ public final class CheckNbPendingTaskOf extends WaitUntil {
 
     private final ActivityInstanceCriterion orderBy;
 
-    public CheckNbPendingTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions, final int nbActivities,
+    public CheckNbPendingTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions, final int nbActivities,
             final User user) {
         this(processAPI, repeatEach, timeout, throwExceptions, nbActivities, user, ActivityInstanceCriterion.NAME_ASC);
     }
 
-    public CheckNbPendingTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions, final int nbActivities,
+    public CheckNbPendingTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions, final int nbActivities,
             final User user, final ActivityInstanceCriterion orderBy) {
         super(repeatEach, timeout, throwExceptions);
         this.nbActivities = nbActivities;
@@ -55,7 +57,8 @@ public final class CheckNbPendingTaskOf extends WaitUntil {
 
     @Override
     protected boolean check() {
-        pendingHumanTaskInstances = processAPI.getPendingHumanTaskInstances(user.getId(), 0, Math.max(nbActivities, 20), orderBy);
+        pendingHumanTaskInstances = processAPI.getPendingHumanTaskInstances(user.getId(), 0, Math.max(nbActivities, 20),
+                orderBy);
         return pendingHumanTaskInstances.size() == nbActivities;
     }
 

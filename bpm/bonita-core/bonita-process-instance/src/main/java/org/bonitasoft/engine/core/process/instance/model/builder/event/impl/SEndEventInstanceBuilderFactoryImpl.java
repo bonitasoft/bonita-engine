@@ -21,12 +21,16 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SEndEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl implements SEndEventInstanceBuilderFactory {
+public class SEndEventInstanceBuilderFactoryImpl extends SEventInstanceBuilderFactoryImpl
+        implements SEndEventInstanceBuilderFactory {
 
     @Override
-    public SEndEventInstanceBuilder createNewEndEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SEndEventInstance entity = new SEndEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
+    public SEndEventInstanceBuilder createNewEndEventInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+            final long parentProcessInstanceId) {
+        final SEndEventInstance entity = new SEndEventInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, processDefinitionId, rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SEndEventInstanceBuilderImpl(entity);
     }

@@ -28,7 +28,8 @@ public class OrderByOption implements Serializable {
 
     private final OrderByType orderByType;
 
-    public OrderByOption(final Class<? extends PersistentObject> clazz, final String fieldName, final OrderByType orderByType) {
+    public OrderByOption(final Class<? extends PersistentObject> clazz, final String fieldName,
+            final OrderByType orderByType) {
         super();
         this.clazz = clazz;
         this.fieldName = fieldName;

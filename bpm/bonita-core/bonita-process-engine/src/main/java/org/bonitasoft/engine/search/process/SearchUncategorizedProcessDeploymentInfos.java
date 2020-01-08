@@ -42,7 +42,8 @@ public class SearchUncategorizedProcessDeploymentInfos extends AbstractProcessDe
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return processDefinitionService.searchUncategorizedProcessDeploymentInfos(searchOptions);
     }
 

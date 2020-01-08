@@ -105,7 +105,8 @@ public class ExpressionBuilderTest {
 
     @Test
     public void createContractInputExpressionShouldConstructARightExpression() throws Exception {
-        final Expression expression = new ExpressionBuilder().createContractInputExpression("comment", String.class.getName());
+        final Expression expression = new ExpressionBuilder().createContractInputExpression("comment",
+                String.class.getName());
         assertThat(expression.getName()).isEqualTo("comment");
         assertThat(expression.getContent()).isEqualTo("comment");
         assertThat(expression.getReturnType()).isEqualTo(String.class.getName());
@@ -121,7 +122,8 @@ public class ExpressionBuilderTest {
     }
 
     @Test
-    public void createConstantStringExpressionShouldSetADefaultNameIfNotProvidedEvenIfTheExpressionIsEmpty() throws Exception {
+    public void createConstantStringExpressionShouldSetADefaultNameIfNotProvidedEvenIfTheExpressionIsEmpty()
+            throws Exception {
         final Expression expression = new ExpressionBuilder().createConstantStringExpression("");
         assertThat(expression.getName()).isEqualTo("empty_expression");
     }

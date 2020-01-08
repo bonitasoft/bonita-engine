@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * Category forms part of the ProcessDefinition.
- * 
+ *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet

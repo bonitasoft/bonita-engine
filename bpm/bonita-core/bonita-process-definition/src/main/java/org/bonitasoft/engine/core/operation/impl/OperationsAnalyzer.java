@@ -27,12 +27,15 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class OperationsAnalyzer {
 
     /**
-     * Finds the index of operation of type {@link SLeftOperand#TYPE_BUSINESS_DATA} that references the expression of type
-     * {@link ExpressionType#TYPE_BUSINESS_DATA} with given name directly on the right operand or in transitive dependencies.
-     * 
+     * Finds the index of operation of type {@link SLeftOperand#TYPE_BUSINESS_DATA} that references the expression of
+     * type
+     * {@link ExpressionType#TYPE_BUSINESS_DATA} with given name directly on the right operand or in transitive
+     * dependencies.
+     *
      * @param businessDataName the expression content
      * @param fromIndex index of operation from which the analyse must begins
-     * @param operations list of operations @return the index of operation that references the expression with given name and type.
+     * @param operations list of operations @return the index of operation that references the expression with given
+     *        name and type.
      */
     public int findBusinessDataDependencyIndex(String businessDataName, int fromIndex,
             final List<SOperation> operations) {
@@ -53,7 +56,8 @@ public class OperationsAnalyzer {
         if (expression == null) {
             return false;
         }
-        boolean matches = SLeftOperand.TYPE_BUSINESS_DATA.equals(operation.getLeftOperand().getType()) && businessDataName.equals(expression.getContent())
+        boolean matches = SLeftOperand.TYPE_BUSINESS_DATA.equals(operation.getLeftOperand().getType())
+                && businessDataName.equals(expression.getContent())
                 && ExpressionType.TYPE_BUSINESS_DATA.name().equals(expression.getExpressionType());
         if (!matches && expression.hasDependencies()) {
             Iterator<SExpression> iterator = expression.getDependencies().iterator();
@@ -66,7 +70,7 @@ public class OperationsAnalyzer {
 
     /**
      * Calculates the next and the last indexes where the left operand located at the given index is used
-     * 
+     *
      * @param indexOfCurrentOperation index of current operation
      * @param operations all operations
      * @return the next and the last indexes where the left operand located at the given index is used

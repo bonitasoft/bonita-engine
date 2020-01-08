@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManua
 /**
  * @author Baptiste Mesta
  */
-public class SAManualTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAManualTaskInstanceBuilderFactory {
+public class SAManualTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAManualTaskInstanceBuilderFactory {
 
     @Override
     public SAManualTaskInstanceBuilder createNewManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {

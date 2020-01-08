@@ -75,7 +75,8 @@ public class FindQueryGeneratorTest {
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
 
         //when
-        final String countQueryNameForUniqueConstraint = queryGenerator.createQueryNameForUniqueConstraint(uniqueConstraint);
+        final String countQueryNameForUniqueConstraint = queryGenerator
+                .createQueryNameForUniqueConstraint(uniqueConstraint);
 
         //then
         assertThat(countQueryNameForUniqueConstraint).isEqualTo("findByName");
@@ -131,9 +132,11 @@ public class FindQueryGeneratorTest {
         //given
         BusinessObject employeeBo = BusinessObjectBuilder.aBO(EMPLOYEE_QUALIFIED_CLASS_NAME).build();
         BusinessObject addressBo = BusinessObjectBuilder.aBO(ADDRESS_QUALIFIED_CLASS_NAME).build();
-        RelationField multipleRelation = aRelationField().withName("addresses").ofType(RelationField.Type.AGGREGATION).lazy().referencing(addressBo).multiple()
+        RelationField multipleRelation = aRelationField().withName("addresses").ofType(RelationField.Type.AGGREGATION)
+                .lazy().referencing(addressBo).multiple()
                 .build();
-        RelationField singleRelation = aRelationField().withName("address").ofType(RelationField.Type.AGGREGATION).lazy().referencing(addressBo).build();
+        RelationField singleRelation = aRelationField().withName("address").ofType(RelationField.Type.AGGREGATION)
+                .lazy().referencing(addressBo).build();
 
         //when
         final Query queryForMultipleLazyField = queryGenerator.createQueryForLazyField(employeeBo, multipleRelation);
@@ -149,7 +152,8 @@ public class FindQueryGeneratorTest {
         QueryAssert.assertThat(queryForSingleLazyField)
                 .hasName("findAddressByEmployeePersistenceId")
                 .hasReturnType(ADDRESS_QUALIFIED_CLASS_NAME)
-                .hasContent("SELECT address_1 FROM Employee employee_0 JOIN employee_0.address as address_1 WHERE employee_0.persistenceId= :persistenceId");
+                .hasContent(
+                        "SELECT address_1 FROM Employee employee_0 JOIN employee_0.address as address_1 WHERE employee_0.persistenceId= :persistenceId");
 
     }
 

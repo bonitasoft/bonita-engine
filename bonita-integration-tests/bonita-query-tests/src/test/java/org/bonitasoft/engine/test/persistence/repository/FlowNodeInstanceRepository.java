@@ -49,7 +49,8 @@ public class FlowNodeInstanceRepository extends TestRepository {
         return (SGatewayInstance) namedQuery.uniqueResult();
     }
 
-    public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {
+    public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId,
+            final long userId) {
         getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
         namedQuery.setParameter("userId", userId);
@@ -58,7 +59,8 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {
+    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(
+            final long rootProcessDefinitionId, final long userId) {
         getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
         namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
@@ -75,7 +77,8 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcess(final long rootProcessDefinitionId) {
+    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcess(
+            final long rootProcessDefinitionId) {
         getSessionWithTenantFilter();
         Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcess");
         namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");

@@ -16,12 +16,10 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -47,7 +45,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     private final Boolean aborting;
     private final Boolean canceling;
 
-    ExecuteFlowNodeWork(final long flowNodeInstanceId, Integer stateId, Boolean executing, Boolean aborting, Boolean canceling) {
+    ExecuteFlowNodeWork(final long flowNodeInstanceId, Integer stateId, Boolean executing, Boolean aborting,
+            Boolean canceling) {
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.stateId = stateId;
         this.executing = executing;
@@ -57,7 +56,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": flowNodeInstanceId: " + flowNodeInstanceId + " (" + stateId + ", " + executing + ", " + aborting + ", " + canceling + ")";
+        return getClass().getSimpleName() + ": flowNodeInstanceId: " + flowNodeInstanceId + " (" + stateId + ", "
+                + executing + ", " + aborting + ", " + canceling + ")";
     }
 
     @Override
@@ -74,7 +74,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
         return CompletableFuture.completedFuture(null);
     }
 
-    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor) throws SFlowNodeReadException, SWorkPreconditionException {
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor)
+            throws SFlowNodeReadException, SWorkPreconditionException {
         SFlowNodeInstance flowNodeInstance;
         try {
             flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
@@ -87,10 +88,13 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
                 || canceling != flowNodeInstance.isCanceling()) {
             throw new SWorkPreconditionException(
                     String.format("Unable to execute flow node %d because it is not in the expected state " +
-                            "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)." +
+                            "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)."
+                            +
                             " Someone probably already called execute on it.",
-                            flowNodeInstance.getId(), stateId, executing, aborting, canceling, flowNodeInstance.getStateId(),
-                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(), flowNodeInstance.isCanceling()));
+                            flowNodeInstance.getId(), stateId, executing, aborting, canceling,
+                            flowNodeInstance.getStateId(),
+                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(),
+                            flowNodeInstance.isCanceling()));
         }
         return flowNodeInstance;
     }
@@ -100,9 +104,11 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
-        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(tenantAccessor.getEventInstanceService(),
+        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
+                tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), loggerService);
-        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter, tenantAccessor.getActivityInstanceService(),
+        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
+                tenantAccessor.getActivityInstanceService(),
                 tenantAccessor.getFlowNodeStateManager(), loggerService);
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }

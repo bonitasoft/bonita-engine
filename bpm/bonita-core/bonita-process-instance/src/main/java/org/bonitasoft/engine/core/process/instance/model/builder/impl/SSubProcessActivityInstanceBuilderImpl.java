@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActi
  * @author Celine Souchet
  * @author Elias Ricken de Medeiros
  */
-public class SSubProcessActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SSubProcessActivityInstanceBuilder {
+public class SSubProcessActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl
+        implements SSubProcessActivityInstanceBuilder {
 
     public SSubProcessActivityInstanceBuilderImpl(final SSubProcessActivityInstance entity) {
         super(entity);

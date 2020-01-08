@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.filter.model;
 
 import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,8 +49,9 @@ public class UserFilterImplementationDescriptor implements Serializable {
     @XmlElement
     private String description;
 
-    public UserFilterImplementationDescriptor(final String implementationClassName, final String id, final String version, final String definitionId,
-                                              final String definitionVersion, final JarDependencies jarDependencies) {
+    public UserFilterImplementationDescriptor(final String implementationClassName, final String id,
+            final String version, final String definitionId,
+            final String definitionVersion, final JarDependencies jarDependencies) {
         super();
         this.implementationClassName = implementationClassName;
         this.id = id;
@@ -109,7 +111,7 @@ public class UserFilterImplementationDescriptor implements Serializable {
     public void setJarDependencies(final JarDependencies jarDependencies) {
         this.jarDependencies = jarDependencies;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserFilterImplementationDescriptor{");

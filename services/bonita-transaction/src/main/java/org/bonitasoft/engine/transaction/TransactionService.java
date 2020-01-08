@@ -45,7 +45,6 @@ public interface TransactionService extends UserTransactionService {
      */
     TransactionState getState() throws STransactionException;
 
-
     /**
      * Modify the transaction associated with the current thread such that
      * the only possible outcome of the transaction is to roll back the

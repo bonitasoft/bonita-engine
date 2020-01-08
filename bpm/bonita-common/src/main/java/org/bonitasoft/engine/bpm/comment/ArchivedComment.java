@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * The archived comment associated to a process instance
- * 
+ *
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  * @author Celine Souchet

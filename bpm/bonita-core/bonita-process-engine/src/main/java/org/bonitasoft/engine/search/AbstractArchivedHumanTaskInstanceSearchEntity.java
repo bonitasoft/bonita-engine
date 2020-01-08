@@ -24,11 +24,13 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractArchivedHumanTaskInstanceSearchEntity extends AbstractSearchEntity<ArchivedHumanTaskInstance, SAHumanTaskInstance> {
+public abstract class AbstractArchivedHumanTaskInstanceSearchEntity
+        extends AbstractSearchEntity<ArchivedHumanTaskInstance, SAHumanTaskInstance> {
 
     private final FlowNodeStateManager flowNodeStateManager;
 
-    public AbstractArchivedHumanTaskInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+    public AbstractArchivedHumanTaskInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
             final FlowNodeStateManager flowNodeStateManager) {
         super(searchDescriptor, options);
         this.flowNodeStateManager = flowNodeStateManager;

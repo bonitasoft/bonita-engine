@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
@@ -87,12 +88,14 @@ public class ImportOrganization {
         }
     }
 
-    private void excludeGroupsWithInvalidCharactersInName(List<ExportedGroup> groups) throws OrganizationImportException {
+    private void excludeGroupsWithInvalidCharactersInName(List<ExportedGroup> groups)
+            throws OrganizationImportException {
         for (ExportedGroup group : groups) {
             String groupName = group.getName();
             if (groupName.contains("/")) {
                 groups.remove(group);
-                warnings.add("The group name " + groupName + " contains the character '/' which is not supported. The group has not been imported");
+                warnings.add("The group name " + groupName
+                        + " contains the character '/' which is not supported. The group has not been imported");
             }
         }
     }
@@ -116,8 +119,9 @@ public class ImportOrganization {
             excludeGroupsWithInvalidCharactersInName(groups);
             final List<ExportedUserMembership> memberships = organization.getMemberships();
             // custom user info definitions
-            final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization
-                    .getCustomUserInfoDefinition());
+            final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(
+                    organization
+                            .getCustomUserInfoDefinition());
             // Users
             final Map<String, SUser> userNameToSUsers = importUsers(users, customUserInfoDefinitions);
             updateManagerId(users, userNameToSUsers);
@@ -138,13 +142,16 @@ public class ImportOrganization {
     private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(
             final List<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators)
             throws SIdentityException, ImportDuplicateInOrganizationException {
-        final CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
+        final CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor,
+                strategy);
         return importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
 
-    private void importMemberships(final List<ExportedUserMembership> memberships, final Map<String, SUser> userNameToSUsers,
-                                   final Map<String, Long> roleNameToIdMap,
-                                   final Map<String, Long> groupPathToIdMap) throws SIdentityException, ImportDuplicateInOrganizationException {
+    private void importMemberships(final List<ExportedUserMembership> memberships,
+            final Map<String, SUser> userNameToSUsers,
+            final Map<String, Long> roleNameToIdMap,
+            final Map<String, Long> groupPathToIdMap)
+            throws SIdentityException, ImportDuplicateInOrganizationException {
         for (final ExportedUserMembership newMembership : memberships) {
             final Long userId = getUserId(userNameToSUsers, newMembership);
             final Long groupId = getGroupId(groupPathToIdMap, newMembership);
@@ -182,7 +189,8 @@ public class ImportOrganization {
 
     private Long getGroupId(final Map<String, Long> groupPathToIdMap, final ExportedUserMembership newMembership) {
         final String groupParentPath = newMembership.getGroupParentPath();
-        final String groupFullPath = (groupParentPath == null ? '/' : groupParentPath + '/') + newMembership.getGroupName();
+        final String groupFullPath = (groupParentPath == null ? '/' : groupParentPath + '/')
+                + newMembership.getGroupName();
         return groupPathToIdMap.get(groupFullPath);
     }
 
@@ -210,7 +218,8 @@ public class ImportOrganization {
         return -1L;
     }
 
-    private Map<String, Long> importGroups(final List<ExportedGroup> groupCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
+    private Map<String, Long> importGroups(final List<ExportedGroup> groupCreators)
+            throws ImportDuplicateInOrganizationException, SIdentityException {
         final Map<String, Long> groupPathToIdMap = new HashMap<>(groupCreators.size());
         for (final ExportedGroup groupCreator : groupCreators) {
             SGroup sGroup;
@@ -235,7 +244,8 @@ public class ImportOrganization {
         return parentPath + "/" + name;
     }
 
-    private Map<String, Long> importRoles(final List<ExportedRole> roleCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
+    private Map<String, Long> importRoles(final List<ExportedRole> roleCreators)
+            throws ImportDuplicateInOrganizationException, SIdentityException {
         final Map<String, Long> roleNameToIdMap = new HashMap<>(roleCreators.size());
         for (final ExportedRole roleCreator : roleCreators) {
             SRole sRole;
@@ -250,30 +260,37 @@ public class ImportOrganization {
         return roleNameToIdMap;
     }
 
-    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers) throws SUserUpdateException {
+    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers)
+            throws SUserUpdateException {
         for (final ExportedUser user : users) {
             final String managerUserName = user.getManagerUserName();
             if (managerUserName != null && managerUserName.trim().length() > 0) {
                 SUser manager = userNameToSUsers.get(managerUserName.trim());
                 if (manager != null) {
                     identityService.updateUser(userNameToSUsers.get(user.getUserName()),
-                            BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(manager.getId()).done());
+                            BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
+                                    .updateManagerUserId(manager.getId()).done());
                 } else {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The user " + user.getUserName() + " has a manager with username "
-                            + managerUserName + ", but this one does not exist. Please set it manually.");
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                            "The user " + user.getUserName() + " has a manager with username "
+                                    + managerUserName + ", but this one does not exist. Please set it manually.");
                 }
             }
         }
     }
 
-    private Map<String, SUser> importUsers(final List<ExportedUser> users, final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions)
+    private Map<String, SUser> importUsers(final List<ExportedUser> users,
+            final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions)
             throws SBonitaException {
-        final CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI, customUserInfoDefinitions);
-        final UserImporter userImporter = new UserImporter(serviceAccessor, strategy, SessionInfos.getUserIdFromSession(), userInfoValueImporter);
+        final CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI,
+                customUserInfoDefinitions);
+        final UserImporter userImporter = new UserImporter(serviceAccessor, strategy,
+                SessionInfos.getUserIdFromSession(), userInfoValueImporter);
         return userImporter.importUsers(users);
     }
 
-    private void addMembership(final ExportedUserMembership newMembership, final Long userId, final Long groupId, final Long roleId, final Long assignedBy)
+    private void addMembership(final ExportedUserMembership newMembership, final Long userId, final Long groupId,
+            final Long roleId, final Long assignedBy)
             throws SUserMembershipCreationException {
         final long assignedDateAsLong = getAssignedDate(newMembership);
         final SUserMembership sUserMembership = SUserMembership.builder().userId(userId).groupId(groupId).roleId(roleId)

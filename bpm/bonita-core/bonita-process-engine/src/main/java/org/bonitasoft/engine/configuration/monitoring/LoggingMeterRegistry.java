@@ -58,7 +58,8 @@ public class LoggingMeterRegistry extends StepMeterRegistry {
         this(config, clock, new NamedThreadFactory("metrics-logger"), null);
     }
 
-    private LoggingMeterRegistry(LoggingRegistryConfig config, Clock clock, ThreadFactory threadFactory, @Nullable Function<Meter, String> meterIdPrinter) {
+    private LoggingMeterRegistry(LoggingRegistryConfig config, Clock clock, ThreadFactory threadFactory,
+            @Nullable Function<Meter, String> meterIdPrinter) {
         super(config, clock);
         this.config = config;
         config().namingConvention(NamingConvention.dot);
@@ -82,7 +83,6 @@ public class LoggingMeterRegistry extends StepMeterRegistry {
         }
         super.start(threadFactory);
     }
-
 
     @Override
     protected Counter newCounter(Meter.Id id) {
@@ -127,18 +127,21 @@ public class LoggingMeterRegistry extends StepMeterRegistry {
     }
 
     @Override
-    protected Timer newTimer(Meter.Id id, DistributionStatisticConfig distributionStatisticConfig, PauseDetector pauseDetector) {
+    protected Timer newTimer(Meter.Id id, DistributionStatisticConfig distributionStatisticConfig,
+            PauseDetector pauseDetector) {
         return new StepTimer(id, clock, distributionStatisticConfig, pauseDetector, getBaseTimeUnit(),
                 this.config.step().toMillis(), false);
     }
 
     @Override
-    protected DistributionSummary newDistributionSummary(Meter.Id id, DistributionStatisticConfig distributionStatisticConfig, double scale) {
+    protected DistributionSummary newDistributionSummary(Meter.Id id,
+            DistributionStatisticConfig distributionStatisticConfig, double scale) {
         return new StepDistributionSummary(id, clock, distributionStatisticConfig, scale,
                 config.step().toMillis(), false);
     }
 
     class Printer {
+
         private final Meter meter;
 
         Printer(Meter meter) {
@@ -150,7 +153,8 @@ public class LoggingMeterRegistry extends StepMeterRegistry {
         }
 
         String time(double time) {
-            return TimeUtils.format(Duration.ofNanos((long) TimeUtils.convert(time, getBaseTimeUnit(), TimeUnit.NANOSECONDS)));
+            return TimeUtils
+                    .format(Duration.ofNanos((long) TimeUtils.convert(time, getBaseTimeUnit(), TimeUnit.NANOSECONDS)));
         }
 
         String rate(double rate) {

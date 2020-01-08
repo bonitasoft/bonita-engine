@@ -67,7 +67,8 @@ public class LoginAPIImpl implements LoginAPI {
 
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    protected APISession login(final String userName, final String password, final Long tenantId) throws LoginException {
+    protected APISession login(final String userName, final String password, final Long tenantId)
+            throws LoginException {
         try {
             return loginInternal(userName, password, tenantId);
         } catch (final LoginException e) {
@@ -83,8 +84,11 @@ public class LoginAPIImpl implements LoginAPI {
     public APISession login(final Map<String, Serializable> credentials) throws LoginException, UnknownUserException {
         checkCredentialsAreNotNullOrEmpty(credentials);
         try {
-            final Long tenantId = NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) ? NumberUtils.toLong(String
-                    .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
+            final Long tenantId = NumberUtils
+                    .isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))
+                            ? NumberUtils.toLong(String
+                                    .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))
+                            : null;
             return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
             throw e;
@@ -93,7 +97,8 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected APISession loginInternal(final String userName, final String password, final Long tenantId) throws Exception {
+    protected APISession loginInternal(final String userName, final String password, final Long tenantId)
+            throws Exception {
         checkUsernameAndPassword(userName, password);
         final Map<String, Serializable> credentials = new HashMap<>();
         credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
@@ -101,10 +106,14 @@ public class LoginAPIImpl implements LoginAPI {
         return loginInternal(tenantId, credentials);
     }
 
-    protected APISession loginInternal(final Long tenantId, final Map<String, Serializable> credentials) throws Exception {
-        final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null ? String.valueOf(credentials
-                .get(AuthenticationConstants.BASIC_USERNAME)) : null;
-        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+    protected APISession loginInternal(final Long tenantId, final Map<String, Serializable> credentials)
+            throws Exception {
+        final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null
+                ? String.valueOf(credentials
+                        .get(AuthenticationConstants.BASIC_USERNAME))
+                : null;
+        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance()
+                .createPlatformServiceAccessor();
         final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
 
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(sTenant.getId());
@@ -117,7 +126,8 @@ public class LoginAPIImpl implements LoginAPI {
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
         sessionAccessor.setTenantId(sTenant.getId());
         try {
-            final SSession sSession = transactionService.executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
+            final SSession sSession = transactionService
+                    .executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
             return ModelConvertor.toAPISession(sSession, sTenant.getName());
         } catch (Exception e) {
             //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
@@ -126,7 +136,8 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor) throws SBonitaException {
+    protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor)
+            throws SBonitaException {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
         // first call before create session: put the platform in cache if necessary
@@ -153,13 +164,15 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected void checkCredentialsAreNotNullOrEmpty(final Map<String, Serializable> credentials) throws LoginException {
+    protected void checkCredentialsAreNotNullOrEmpty(final Map<String, Serializable> credentials)
+            throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
             throw new LoginException("Credentials are null or empty !!");
         }
     }
 
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser) throws LoginException {
+    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser)
+            throws LoginException {
         if (sTenant.isDeactivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }

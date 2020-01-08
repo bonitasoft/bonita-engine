@@ -48,8 +48,7 @@ public class STransitionDefinitionImplTest {
     }
 
     @Test
-    public void constructor_should_correctly_set_the_id(){
-
+    public void constructor_should_correctly_set_the_id() {
 
         //given
         STransitionDefinitionImpl transition = new STransitionDefinitionImpl(new TransitionDefinitionImpl());

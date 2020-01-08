@@ -22,7 +22,7 @@ import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 /**
  * @author Baptiste Mesta
  */
-public class WaitForIncrementJobToHaveValue  {
+public class WaitForIncrementJobToHaveValue {
 
     private final int value;
     private final int timeout;
@@ -34,7 +34,7 @@ public class WaitForIncrementJobToHaveValue  {
         this.timeout = timeout;
         this.value = value;
     }
-    
+
     /**
      * @param timeout
      * @param value

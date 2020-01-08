@@ -83,7 +83,8 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session, final Object owner) throws HibernateException,
+    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session,
+            final Object owner) throws HibernateException,
             SQLException {
         final Object identifier = type.get(rs, names[0], session);
         if (identifier == null) {
@@ -102,7 +103,8 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final Object value, final int index, final SessionImplementor session) throws HibernateException {
+    public void nullSafeSet(final PreparedStatement st, final Object value, final int index,
+            final SessionImplementor session) throws HibernateException {
         try {
             if (value == null) {
                 st.setNull(index, type.sqlType());

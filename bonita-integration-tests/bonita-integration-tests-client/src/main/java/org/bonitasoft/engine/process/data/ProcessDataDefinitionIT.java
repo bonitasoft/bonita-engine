@@ -39,14 +39,17 @@ public class ProcessDataDefinitionIT extends TestWithUser {
         final String strDataName = "luckyColor";
         final Expression strDefaultExp = new ExpressionBuilder().createConstantStringExpression("blue");
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0,
+                5);
         assertEquals(2, dataDefList.size());
 
         final DataDefinition dataDef1 = dataDefList.get(0);
@@ -68,15 +71,18 @@ public class ProcessDataDefinitionIT extends TestWithUser {
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
         final String strDataName = "color";
         final Expression strDefaultExp = new ExpressionBuilder().createConstantStringExpression("blue");
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         for (int i = 1; i <= 10; i++) {
             processDefinitionBuilder.addShortTextData(strDataName + i, strDefaultExp);
         }
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        List<DataDefinition> processDataDefinitions = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
+        List<DataDefinition> processDataDefinitions = getProcessAPI()
+                .getProcessDataDefinitions(processDefinition.getId(), 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
         assertThat(processDataDefinitions.get(1), nameIs("color1"));
@@ -105,14 +111,16 @@ public class ProcessDataDefinitionIT extends TestWithUser {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final int i = getProcessAPI().getNumberOfProcessDataDefinitions(processDefinition.getId());
         assertEquals(2, i);
 
@@ -128,14 +136,16 @@ public class ProcessDataDefinitionIT extends TestWithUser {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         try {
             getProcessAPI().getProcessDataDefinitions(processDefinition.getId() + 1, 0, 5);
         } finally {
@@ -145,7 +155,8 @@ public class ProcessDataDefinitionIT extends TestWithUser {
 
     @Test
     public void executeProcessWithNotInitializedData() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addAutomaticTask("step1");
         processDefinitionBuilder.addIntegerData("intdata", null);
         processDefinitionBuilder.addShortTextData("stringData", null);
@@ -161,7 +172,8 @@ public class ProcessDataDefinitionIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
-        final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 15);
+        final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0,
+                15);
         assertEquals(10, dataDefList.size());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());

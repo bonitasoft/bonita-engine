@@ -97,7 +97,8 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     public void shouldThrowSExecutionExceptionIfExceptionOccurs() throws Exception {
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, USER_ID);
         final SBonitaReadException exception = new SBonitaReadException("message");
-        doThrow(exception).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
+        doThrow(exception).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(USER_ID,
+                PROCESS_INSTANCE_ID);
 
         //expect
         expectedException.expect(SExecutionException.class);

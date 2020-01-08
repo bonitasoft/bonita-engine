@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
@@ -62,7 +62,8 @@ public class LivingApplicationExporterDelegateTest {
     }
 
     @Test(expected = ExportException.class)
-    public void exportApplications_should_throw_SBonitaExportException_when_applicationService_throwsSBonitaReadException() throws Exception {
+    public void exportApplications_should_throw_SBonitaExportException_when_applicationService_throwsSBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.searchApplications(any(QueryOptions.class))).willThrow(new SBonitaReadException(""));
 

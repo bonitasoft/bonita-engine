@@ -72,7 +72,8 @@ public class InequalityComparatorTest {
     }
 
     @Test(expected = SComparisonException.class)
-    public void compareTo_should_return_throw_SComparisonException_when_parameters_does_not_implement_comparable() throws Exception {
+    public void compareTo_should_return_throw_SComparisonException_when_parameters_does_not_implement_comparable()
+            throws Exception {
         //given
 
         //when

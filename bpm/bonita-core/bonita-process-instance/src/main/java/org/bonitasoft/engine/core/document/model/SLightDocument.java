@@ -21,7 +21,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 public class SLightDocument implements PersistentObject {
 
-
     private long id;
     private long tenantId;
     private long author;

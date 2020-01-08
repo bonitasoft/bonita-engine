@@ -102,7 +102,8 @@ public class ExpressionFinder implements ModelFinderVisitor {
         if (flowNodeDefinition != null) {
             findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayName(), expressionDefinitionId);
             findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayDescription(), expressionDefinitionId);
-            findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayDescriptionAfterCompletion(), expressionDefinitionId);
+            findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayDescriptionAfterCompletion(),
+                    expressionDefinitionId);
 
             findExpressionFromNotNullContainer(flowNodeDefinition.getDefaultTransition(), expressionDefinitionId);
 
@@ -258,14 +259,18 @@ public class ExpressionFinder implements ModelFinderVisitor {
     }
 
     @Override
-    public void find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition, long expressionDefinitionId) {
+    public void find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition,
+            long expressionDefinitionId) {
         getExpressionFromOperationList(catchMessageEventTriggerDefinition.getOperations(), expressionDefinitionId);
     }
 
     @Override
-    public void find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition, long expressionDefinitionId) {
-        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetFlowNode(), expressionDefinitionId);
-        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetProcess(), expressionDefinitionId);
+    public void find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition,
+            long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetFlowNode(),
+                expressionDefinitionId);
+        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetProcess(),
+                expressionDefinitionId);
         for (DataDefinition dataDefinition : throwMessageEventTriggerDefinition.getDataDefinitions()) {
             findExpressionFromNotNullContainer(dataDefinition, expressionDefinitionId);
         }
@@ -297,17 +302,20 @@ public class ExpressionFinder implements ModelFinderVisitor {
 
     @Override
     public void find(ThrowEventDefinition throwEventDefinition, long expressionDefinitionId) {
-        for (ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition : throwEventDefinition.getMessageEventTriggerDefinitions()) {
+        for (ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition : throwEventDefinition
+                .getMessageEventTriggerDefinitions()) {
             findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition, expressionDefinitionId);
         }
     }
 
     @Override
     public void find(CatchEventDefinition catchEventDefinition, long expressionDefinitionId) {
-        for (TimerEventTriggerDefinition timerEventTriggerDefinition : catchEventDefinition.getTimerEventTriggerDefinitions()) {
+        for (TimerEventTriggerDefinition timerEventTriggerDefinition : catchEventDefinition
+                .getTimerEventTriggerDefinitions()) {
             findExpressionFromNotNullContainer(timerEventTriggerDefinition, expressionDefinitionId);
         }
-        for (CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition : catchEventDefinition.getMessageEventTriggerDefinitions()) {
+        for (CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition : catchEventDefinition
+                .getMessageEventTriggerDefinitions()) {
             findExpressionFromNotNullContainer(catchMessageEventTriggerDefinition, expressionDefinitionId);
         }
     }
@@ -338,7 +346,9 @@ public class ExpressionFinder implements ModelFinderVisitor {
 
     @Override
     public void find(MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics, long expressionDefinitionId) {
-        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getCompletionCondition(), expressionDefinitionId);
-        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getLoopCardinality(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getCompletionCondition(),
+                expressionDefinitionId);
+        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getLoopCardinality(),
+                expressionDefinitionId);
     }
 }

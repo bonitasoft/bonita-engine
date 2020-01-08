@@ -23,7 +23,8 @@ public class FailOnDuplicateApplicationImportStrategy implements ApplicationImpo
 
     @Override
     public void whenApplicationExists(SApplication existing, SApplication toBeImported) throws AlreadyExistsException {
-        throw new AlreadyExistsException("An application with token '" + existing.getToken() + "' already exists", existing.getToken());
+        throw new AlreadyExistsException("An application with token '" + existing.getToken() + "' already exists",
+                existing.getToken());
     }
 
 }

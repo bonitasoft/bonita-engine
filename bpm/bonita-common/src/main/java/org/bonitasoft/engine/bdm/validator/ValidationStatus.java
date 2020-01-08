@@ -48,7 +48,6 @@ public class ValidationStatus {
         statusList.add(Status.errorStatus(code, error, context));
     }
 
-
     public void addWarning(StatusCode code, final String warning) {
         if (warning == null || warning.isEmpty()) {
             throw new IllegalArgumentException("warning message cannot be null or empty");

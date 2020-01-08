@@ -27,7 +27,8 @@ class StringUtilsTest {
 
     @Test
     void uniformizePathPatternShouldLeaveNoDoubleSeparator() {
-        final String uniformized = StringUtils.uniformizePathPattern("C:///toto//my path/////full_slashes/my file.bak.txt");
+        final String uniformized = StringUtils
+                .uniformizePathPattern("C:///toto//my path/////full_slashes/my file.bak.txt");
         assertThat(uniformized).isEqualTo("C:/toto/my path/full_slashes/my file.bak.txt");
     }
 

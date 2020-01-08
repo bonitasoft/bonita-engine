@@ -29,6 +29,7 @@ public class EvaluatedTransitions {
 
     /**
      * Add a transition to unconditional transitions
+     *
      * @param transitionDefinition unconditional transition
      */
     void addUnconditionalTransition(STransitionDefinition transitionDefinition) {
@@ -37,6 +38,7 @@ public class EvaluatedTransitions {
 
     /**
      * Add a transition to transitions having conditions evaluated to true
+     *
      * @param transitionDefinition the transition which condition was evaluated to true
      */
     void addTrueTransition(STransitionDefinition transitionDefinition) {
@@ -45,6 +47,7 @@ public class EvaluatedTransitions {
 
     /**
      * Add a transition to transitions having conditions evaluated to false
+     *
      * @param transitionDefinition the transition which condition was evaluated to false
      */
     void addFalseTransition(STransitionDefinition transitionDefinition) {

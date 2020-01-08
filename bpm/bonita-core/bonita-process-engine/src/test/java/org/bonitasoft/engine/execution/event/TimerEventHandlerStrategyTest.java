@@ -84,7 +84,8 @@ public class TimerEventHandlerStrategyTest {
         processDefinition = new SProcessDefinitionImpl("test", "1.0");
         processDefinition.setId(PROCESS_DEFINITION_ID);
         eventDefintion = new SStartEventDefinitionImpl(6543721L, "startevent");
-        timerExpression = new SExpressionImpl("duration", "12342", "constant", "long", "", Collections.<SExpression> emptyList());
+        timerExpression = new SExpressionImpl("duration", "12342", "constant", "long", "",
+                Collections.<SExpression> emptyList());
 
         processInstance = new SProcessInstance("proceInst", PROCESS_DEFINITION_ID);
         processInstance.setId(PROCESS_INSTANCE_ID);
@@ -92,14 +93,17 @@ public class TimerEventHandlerStrategyTest {
     }
 
     @Test
-    public void should_trigger_timer_for_event_subprocess_evaluate_trigger_using_process_instance_context() throws Exception {
+    public void should_trigger_timer_for_event_subprocess_evaluate_trigger_using_process_instance_context()
+            throws Exception {
         doReturn(5000L).when(expressionResolverService).evaluate(timerExpression,
                 new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
         eventTriggerDefinition = new STimerEventTriggerDefinitionImpl(STimerType.DURATION, timerExpression);
         //when
-        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition, SUB_PROCESS_ID, processInstance);
+        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition,
+                SUB_PROCESS_ID, processInstance);
         //then
-        verify(expressionResolverService).evaluate(timerExpression, new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
+        verify(expressionResolverService).evaluate(timerExpression,
+                new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
     }
 
     @Test
@@ -108,12 +112,15 @@ public class TimerEventHandlerStrategyTest {
                 new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
         eventTriggerDefinition = new STimerEventTriggerDefinitionImpl(STimerType.DURATION, timerExpression);
         //when
-        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition, SUB_PROCESS_ID, processInstance);
+        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition,
+                SUB_PROCESS_ID, processInstance);
         long now = System.currentTimeMillis();
         //then
-        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(), triggerArgumentCaptor.capture());
+        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(),
+                triggerArgumentCaptor.capture());
         assertThat(triggerArgumentCaptor.getValue()).isInstanceOf(OneShotTrigger.class);
-        assertThat(triggerArgumentCaptor.getValue().getStartDate()).isBetween(new Date(now - 200), new Date(now + 5200));
+        assertThat(triggerArgumentCaptor.getValue().getStartDate()).isBetween(new Date(now - 200),
+                new Date(now + 5200));
     }
 
     @Test
@@ -122,10 +129,12 @@ public class TimerEventHandlerStrategyTest {
                 new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
         eventTriggerDefinition = new STimerEventTriggerDefinitionImpl(STimerType.CYCLE, timerExpression);
         //when
-        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition, SUB_PROCESS_ID, processInstance);
+        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition,
+                SUB_PROCESS_ID, processInstance);
         long now = System.currentTimeMillis();
         //then
-        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(), triggerArgumentCaptor.capture());
+        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(),
+                triggerArgumentCaptor.capture());
         assertThat(triggerArgumentCaptor.getValue()).isInstanceOf(UnixCronTrigger.class);
         assertThat(((UnixCronTrigger) triggerArgumentCaptor.getValue()).getExpression()).isEqualTo("theCron");
     }
@@ -137,10 +146,12 @@ public class TimerEventHandlerStrategyTest {
                 new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS_INSTANCE", PROCESS_DEFINITION_ID));
         eventTriggerDefinition = new STimerEventTriggerDefinitionImpl(STimerType.DATE, timerExpression);
         //when
-        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition, SUB_PROCESS_ID, processInstance);
+        timerEventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefintion, eventTriggerDefinition,
+                SUB_PROCESS_ID, processInstance);
         long now = System.currentTimeMillis();
         //then
-        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(), triggerArgumentCaptor.capture());
+        verify(schedulerService).schedule(jobDescriptorArgumentCaptor.capture(), listArgumentCaptor.capture(),
+                triggerArgumentCaptor.capture());
         assertThat(triggerArgumentCaptor.getValue()).isInstanceOf(OneShotTrigger.class);
         assertThat(triggerArgumentCaptor.getValue().getStartDate()).isEqualTo(startDate);
     }

@@ -52,7 +52,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     private final LogicalComplementExecutor logicalComplementExecutor;
     private final BinaryComparatorExecutor binaryComparatorExecutor;
 
-    public ConditionExpressionExecutorStrategy(LogicalComplementExecutor logicalComplementExecutor, BinaryComparatorExecutor binaryComparatorExecutor) {
+    public ConditionExpressionExecutorStrategy(LogicalComplementExecutor logicalComplementExecutor,
+            BinaryComparatorExecutor binaryComparatorExecutor) {
         this.logicalComplementExecutor = logicalComplementExecutor;
         this.binaryComparatorExecutor = binaryComparatorExecutor;
         validOperators = new ArrayList<String>(7);
@@ -66,7 +67,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String content = expression.getContent();
         Object result;
@@ -82,7 +84,9 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         super.validate(expression);
         if (!validOperators.contains(expression.getContent())) {
-            throw new SInvalidExpressionException("The content of expression must be among: " + validOperators + " for expression: " + expression.toString(),
+            throw new SInvalidExpressionException(
+                    "The content of expression must be among: " + validOperators + " for expression: "
+                            + expression.toString(),
                     expression.getName());
         }
     }
@@ -93,7 +97,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState)
             throws SExpressionEvaluationException {
         final List<Object> evaluatedExpressions = new ArrayList<Object>(expressions.size());

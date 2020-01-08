@@ -30,7 +30,8 @@ import org.bonitasoft.engine.bdm.model.NamedElement;
  */
 public class UniqueNameValidator {
 
-    public ValidationStatus validate(Collection<? extends NamedElement> namedElements,  String namedElementTypePluralForm) {
+    public ValidationStatus validate(Collection<? extends NamedElement> namedElements,
+            String namedElementTypePluralForm) {
         ValidationStatus status = new ValidationStatus();
         Set<String> duplicateNames = findDuplicateNames(namedElements);
         Map<String, Serializable> context = new HashMap<>();
@@ -38,7 +39,8 @@ public class UniqueNameValidator {
         for (String name : duplicateNames) {
             context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, name);
             status.addError(StatusCode.DUPLICATE_CONSTRAINT_OR_INDEX_NAME,
-                    String.format("There are at least two %s with the same name : %s", namedElementTypePluralForm, name),
+                    String.format("There are at least two %s with the same name : %s", namedElementTypePluralForm,
+                            name),
                     context);
         }
         return status;

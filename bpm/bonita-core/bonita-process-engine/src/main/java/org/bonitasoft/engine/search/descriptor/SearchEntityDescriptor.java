@@ -39,7 +39,8 @@ public abstract class SearchEntityDescriptor {
         final String key = filter.getField();
         final FieldDescriptor fieldDescriptor = getEntityKeys().get(key);
         if (fieldDescriptor == null && !filter.isUndefinedFieldNameAuthorized()) {
-            throw new IllegalArgumentException("the field '" + key + "' is unknown for the entity searched using " + this.getClass().getSimpleName());
+            throw new IllegalArgumentException("the field '" + key + "' is unknown for the entity searched using "
+                    + this.getClass().getSimpleName());
         }
         return constructFilterOption(filter, fieldDescriptor);
     }
@@ -83,13 +84,15 @@ public abstract class SearchEntityDescriptor {
     }
 
     public FilterOption constructFilterOption(final SearchFilter filter, final FieldDescriptor fieldDescriptor) {
-        final Class<? extends PersistentObject> clazz = fieldDescriptor != null ? fieldDescriptor.getPersistentClass() : null;
+        final Class<? extends PersistentObject> clazz = fieldDescriptor != null ? fieldDescriptor.getPersistentClass()
+                : null;
         final String fieldName = fieldDescriptor != null ? fieldDescriptor.getValue() : null;
         final Serializable value = convertFilterValue(filter.getField(), filter.getValue());
         switch (filter.getOperation()) {
             case BETWEEN:
-                return new FilterOption(clazz, fieldName, convertFilterValue(filter.getField(), filter.getFrom()), convertFilterValue(filter.getField(),
-                        filter.getTo()));
+                return new FilterOption(clazz, fieldName, convertFilterValue(filter.getField(), filter.getFrom()),
+                        convertFilterValue(filter.getField(),
+                                filter.getTo()));
             case DIFFERENT:
                 return new FilterOption(clazz, fieldName, value, FilterOperationType.DIFFERENT);
             case EQUALS:

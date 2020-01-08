@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,8 +39,8 @@ public class SApplicationMenu implements PersistentObject {
     private Long parentId;
     private int index;
 
-
-    public SApplicationMenu(final String displayName, long applicationId, final Long applicationPageId, final int index) {
+    public SApplicationMenu(final String displayName, long applicationId, final Long applicationPageId,
+            final int index) {
         this.displayName = displayName;
         this.applicationId = applicationId;
         this.applicationPageId = applicationPageId;

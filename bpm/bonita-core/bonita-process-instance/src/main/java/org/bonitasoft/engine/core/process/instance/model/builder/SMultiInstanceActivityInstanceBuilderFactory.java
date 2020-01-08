@@ -13,15 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface SMultiInstanceActivityInstanceBuilderFactory extends SActivityInstanceBuilderFactory {
 
-    SMultiInstanceActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId, boolean isSequential);
+    SMultiInstanceActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId,
+            boolean isSequential);
 
     String getLoopCardinalityKey();
 

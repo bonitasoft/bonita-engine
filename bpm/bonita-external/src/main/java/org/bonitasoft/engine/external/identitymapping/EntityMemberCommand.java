@@ -30,17 +30,22 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityMemberDescriptor;
  */
 public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand {
 
-    protected SearchResult<EntityMember> searchEntityMembersInvolvingUser(final String kind, final long userId, final String externalId,
+    protected SearchResult<EntityMember> searchEntityMembersInvolvingUser(final String kind, final long userId,
+            final String externalId,
             final SearchOptions searchOptions) throws SBonitaException {
-        EntityMemberSearchEntityForUser transactionContent = new EntityMemberSearchEntityForUser(serviceAccessor.getSearchEntitiesDescriptor()
-                .getSearchEntityMemberUserDescriptor(), kind, userId, externalId, searchOptions);
+        EntityMemberSearchEntityForUser transactionContent = new EntityMemberSearchEntityForUser(
+                serviceAccessor.getSearchEntitiesDescriptor()
+                        .getSearchEntityMemberUserDescriptor(),
+                kind, userId, externalId, searchOptions);
         transactionContent.execute();
         return transactionContent.getResult();
     }
 
-    protected SearchResult<EntityMember> searchEntityMembers(final SearchEntityMemberDescriptor searchDescriptor, final String kind,
+    protected SearchResult<EntityMember> searchEntityMembers(final SearchEntityMemberDescriptor searchDescriptor,
+            final String kind,
             final SearchOptions searchOptions, final String querySuffix) throws SBonitaException {
-        EntityMemberSearchEntity transactionContent = new EntityMemberSearchEntity(searchDescriptor, kind, searchOptions, querySuffix);
+        EntityMemberSearchEntity transactionContent = new EntityMemberSearchEntity(searchDescriptor, kind,
+                searchOptions, querySuffix);
         transactionContent.execute();
         return transactionContent.getResult();
     }
@@ -51,7 +56,8 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
 
         private final String externalId;
 
-        public EntityMemberSearchEntityForUser(final SearchEntityDescriptor searchDescriptor, final String kind, final long userId, final String externalId,
+        public EntityMemberSearchEntityForUser(final SearchEntityDescriptor searchDescriptor, final String kind,
+                final long userId, final String externalId,
                 final SearchOptions options) {
             super(searchDescriptor, kind, options);
             this.userId = userId;
@@ -60,13 +66,16 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
 
         @Override
         public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-            return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappingsForUser(kind, userId, externalId, searchOptions,
+            return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappingsForUser(kind,
+                    userId, externalId, searchOptions,
                     "Involving");
         }
 
         @Override
-        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-            return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappingsForUser(kind, userId, externalId, searchOptions,
+        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions)
+                throws SBonitaReadException {
+            return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappingsForUser(kind,
+                    userId, externalId, searchOptions,
                     "Involving");
         }
 
@@ -76,7 +85,8 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
 
         private final String querySuffix;
 
-        public EntityMemberSearchEntity(final SearchEntityMemberDescriptor searchDescriptor, final String kind, final SearchOptions options,
+        public EntityMemberSearchEntity(final SearchEntityMemberDescriptor searchDescriptor, final String kind,
+                final SearchOptions options,
                 final String querySuffix) {
             super(searchDescriptor, kind, options);
             this.querySuffix = querySuffix;
@@ -84,12 +94,15 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
 
         @Override
         public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-            return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappings(kind, searchOptions, querySuffix);
+            return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappings(kind,
+                    searchOptions, querySuffix);
         }
 
         @Override
-        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-            return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappings(kind, searchOptions, querySuffix);
+        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions)
+                throws SBonitaReadException {
+            return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappings(kind,
+                    searchOptions, querySuffix);
         }
 
     }

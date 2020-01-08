@@ -45,14 +45,17 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
 
     private ParentContainerResolver parentContainerResolver;
 
-    public DataExpressionExecutorStrategy(final DataInstanceService dataService, final ParentContainerResolver parentContainerResolver) {
+    public DataExpressionExecutorStrategy(final DataInstanceService dataService,
+            final ParentContainerResolver parentContainerResolver) {
         this.dataService = dataService;
         this.parentContainerResolver = parentContainerResolver;
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         return evaluate(Collections.singletonList(expression), context, resolvedExpressions, containerState).get(0);
     }
 
@@ -61,7 +64,9 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         // $ can be part of variable name
         super.validate(expression);
         if (!SourceVersion.isIdentifier(expression.getContent())) {
-            throw new SInvalidExpressionException(expression.getContent() + " is not a valid data name in expression : " + expression, expression.getName());
+            throw new SInvalidExpressionException(
+                    expression.getContent() + " is not a valid data name in expression : " + expression,
+                    expression.getName());
         }
     }
 
@@ -71,8 +76,10 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final int maxExpressionSize = expressions.size();
         final List<String> dataNames = new ArrayList<>(maxExpressionSize);
         final Map<String, Serializable> results = new HashMap<>(maxExpressionSize);
@@ -90,20 +97,23 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
             return buildExpressionResultSameOrderAsInputList(expressions, results);
         }
         if (context == null || !context.containsKey(CONTAINER_ID_KEY) || !context.containsKey(CONTAINER_TYPE_KEY)) {
-            throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
+            throw new SExpressionDependencyMissingException(
+                    "The context to evaluate the data '" + dataNames + "' was not set");
         }
         try {
             final long containerId = (Long) context.get(CONTAINER_ID_KEY);
             final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
             final Long time = (Long) context.get(TIME);
             if (time != null) {
-                final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, parentContainerResolver, dataNames, time);
+                final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType,
+                        parentContainerResolver, dataNames, time);
                 for (final SADataInstance dataInstance : dataInstances) {
                     dataNames.remove(dataInstance.getName());
                     results.put(dataInstance.getName(), dataInstance.getValue());
                 }
             }
-            final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId, containerType, parentContainerResolver);
+            final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId,
+                    containerType, parentContainerResolver);
             for (final SDataInstance dataInstance : dataInstances) {
                 dataNames.remove(dataInstance.getName());
                 results.put(dataInstance.getName(), dataInstance.getValue());
@@ -117,7 +127,8 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         }
     }
 
-    private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
+    private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions,
+            final Map<String, Serializable> results) {
         final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(results.get(expression.getContent()));

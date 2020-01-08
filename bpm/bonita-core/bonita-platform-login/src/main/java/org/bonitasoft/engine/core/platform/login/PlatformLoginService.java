@@ -25,31 +25,32 @@ public interface PlatformLoginService {
 
     /**
      * login to the platform by userName and password
-     * 
+     *
      * @param userName
-     *            name of user
+     *        name of user
      * @param password
-     *            password of user
+     *        password of user
      * @return an SPlatformSession object
      * @see SPlatformSession
      * @throws SPlatformLoginException
      */
-    SPlatformSession login(String userName, String password) throws SPlatformLoginException, SInvalidPlatformCredentialsException;
+    SPlatformSession login(String userName, String password)
+            throws SPlatformLoginException, SInvalidPlatformCredentialsException;
 
     /**
      * logout the platform by sessionId
-     * 
+     *
      * @param sessionId
-     *            identifier of platform session
+     *        identifier of platform session
      * @throws SSessionNotFoundException
      */
     void logout(final long sessionId) throws SSessionNotFoundException;
 
     /**
      * Verify if a session is valid
-     * 
+     *
      * @param sessionId
-     *            identifier of platform session
+     *        identifier of platform session
      * @return true if session is valid, false otherwise.
      */
     boolean isValid(final long sessionId);

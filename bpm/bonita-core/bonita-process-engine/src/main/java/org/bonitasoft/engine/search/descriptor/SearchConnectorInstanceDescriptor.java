@@ -33,18 +33,22 @@ public class SearchConnectorInstanceDescriptor extends SearchEntityDescriptor {
 
     SearchConnectorInstanceDescriptor() {
         searchEntityKeys = new HashMap<>(7);
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.NAME_KEY));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.NAME,
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.NAME_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.ACTIVATION_EVENT,
                 new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.ACTIVATION_EVENT_KEY));
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID, new FieldDescriptor(SConnectorInstance.class,
-                SConnectorInstance.CONNECTOR_ID_KEY));
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_VERSION, new FieldDescriptor(SConnectorInstance.class,
-                SConnectorInstance.VERSION_KEY));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID,
+                new FieldDescriptor(SConnectorInstance.class,
+                        SConnectorInstance.CONNECTOR_ID_KEY));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_VERSION,
+                new FieldDescriptor(SConnectorInstance.class,
+                        SConnectorInstance.VERSION_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONTAINER_ID,
                 new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.CONTAINER_ID_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE,
                 new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.CONTAINER_TYPE_KEY));
-        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.STATE, new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.STATE_KEY));
+        searchEntityKeys.put(ConnectorInstancesSearchDescriptor.STATE,
+                new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.STATE_KEY));
         searchEntityKeys.put(ConnectorInstancesSearchDescriptor.EXECUTION_ORDER,
                 new FieldDescriptor(SConnectorInstance.class, SConnectorInstance.EXECUTION_ORDER));
 

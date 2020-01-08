@@ -95,7 +95,8 @@ public class ProfileMemberUtils {
         return profileMemeber;
     }
 
-    public static List<Map<String, Serializable>> membersAsProfileMembersMapList(final List<SProfileMember> serverObjects) {
+    public static List<Map<String, Serializable>> membersAsProfileMembersMapList(
+            final List<SProfileMember> serverObjects) {
         final List<Map<String, Serializable>> profileMemberMaps = new ArrayList<Map<String, Serializable>>();
         for (final SProfileMember profileMember : serverObjects) {
             profileMemberMaps.add(memberAsProfileMembersMap(profileMember));

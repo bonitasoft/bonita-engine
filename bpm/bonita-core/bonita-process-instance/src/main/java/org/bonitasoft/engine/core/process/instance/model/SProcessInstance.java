@@ -84,7 +84,8 @@ public class SProcessInstance implements PersistentObject {
      */
     private SFlowNodeType callerType;
     /**
-     * Id of the end error event that interrupted the process instance or -1 if the process was not interrupted by a end error event
+     * Id of the end error event that interrupted the process instance or -1 if the process was not interrupted by a end
+     * error event
      */
     @Builder.Default
     private long interruptingEventId = DEFAULT_INTERRUPTING_EVENT_ID;
@@ -96,15 +97,13 @@ public class SProcessInstance implements PersistentObject {
     private String stringIndex4;
     private String stringIndex5;
 
-
-
     public SProcessInstance(final String name, final long processDefinitionId) {
         this.name = name;
         this.processDefinitionId = processDefinitionId;
     }
 
     public SProcessInstance(final SProcessDefinition definition) {
-        name= definition.getName();
+        name = definition.getName();
         processDefinitionId = definition.getId();
         description = definition.getDescription();
     }
@@ -121,14 +120,14 @@ public class SProcessInstance implements PersistentObject {
         return SFlowElementsContainerType.PROCESS;
     }
 
-
     public boolean hasBeenInterruptedByEvent() {
         return getInterruptingEventId() != -1;
     }
 
-
     /**
-     * Determines if this instance is a root process instance. That is, it is neither a process called by a call activity, neither a sub-process
+     * Determines if this instance is a root process instance. That is, it is neither a process called by a call
+     * activity, neither a sub-process
+     *
      * @return true if it's a root process instance; false otherwise.
      */
     public boolean isRootInstance() {

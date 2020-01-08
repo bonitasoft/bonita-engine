@@ -50,5 +50,4 @@ public class SASubProcessActivityInstance extends SAActivityInstance {
         return SSubProcessActivityInstance.class;
     }
 
-
 }

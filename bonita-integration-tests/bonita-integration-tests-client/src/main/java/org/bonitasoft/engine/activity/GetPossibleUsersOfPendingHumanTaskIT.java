@@ -74,11 +74,14 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskUserActor() throws Exception {
-        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -93,9 +96,11 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskUserActorWithoutMembership() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -109,11 +114,14 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskRoleActor() throws Exception {
-        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, role);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                role);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -128,11 +136,14 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskGroupActor() throws Exception {
-        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -156,9 +167,11 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
             userMembershipIds.add(createUserMembership(newUser.getUserName(), role.getName(), group.getName()).getId());
         }
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, users);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                users);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -177,12 +190,16 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
     @Test
     public void getPossibleUsersOfTaskSubGroupActor() throws Exception {
         final Group group2 = createGroup("gr", group.getPath());
-        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
-        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId()).getId();
+        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
+        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -205,18 +222,25 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
     @Test
     public void getPossibleUsersOfFilteredTask() throws Exception {
         final Group group2 = createGroup("gr", group.getPath());
-        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group2.getId(), role.getId()).getId();
-        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId()).getId();
+        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group2.getId(), role.getId())
+                .getId();
+        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId())
+                .getId();
 
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.2");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("assign", "5.2");
         designProcessDefinition.addActor(ACTOR_NAME);
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        taskDefinitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = designProcessDefinition.addUserTask("step1",
+                ACTOR_NAME);
+        taskDefinitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput(
+                "userId",
                 new ExpressionBuilder().createConstantLongExpression(john.getId()));
         final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+        definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput(
+                "userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilter");
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, jack.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -241,17 +265,21 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskDefinitionUserActor() throws Exception {
-        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
 
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("assign", "5.0");
         designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addActor("emca");
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addUserTask("step2", "emca");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), Arrays.asList(ACTOR_NAME, "emca"),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                Arrays.asList(ACTOR_NAME, "emca"),
                 Arrays.asList(john, jack));
 
-        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1",
+                0, 10);
         assertEquals(1, possibleUsers.size());
         assertEquals(john, possibleUsers.get(0));
 
@@ -262,13 +290,17 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfTaskDefinitionRoleActor() throws Exception {
-        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, role);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                role);
 
-        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1",
+                0, 10);
         assertEquals(1, possibleUsers.size());
         assertEquals(jack, possibleUsers.get(0));
 
@@ -280,16 +312,22 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
     @Test
     public void getPossibleUsersOfTaskDefinitionGroupActor() throws Exception {
         //given
-        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
-        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId()).getId();
+        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
+        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                group);
 
         //when
-        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
-        final List<Long> userIdsForActor = getProcessAPI().getUserIdsForActor(processDefinition.getId(), ACTOR_NAME, 0, 10);
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1",
+                0, 10);
+        final List<Long> userIdsForActor = getProcessAPI().getUserIdsForActor(processDefinition.getId(), ACTOR_NAME, 0,
+                10);
 
         //then
         assertThat(possibleUsers).containsOnly(jack, john);
@@ -304,14 +342,19 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
     @Test
     public void getPossibleUsersOfTaskDefinitionSubGroupActor() throws Exception {
         final Group group2 = createGroup("gr", group.getPath());
-        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId()).getId();
-        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId()).getId();
+        final long userMembershipId1 = getIdentityAPI().addUserMembership(jack.getId(), group.getId(), role.getId())
+                .getId();
+        final long userMembershipId2 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId())
+                .getId();
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                group);
 
-        List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
+        List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0,
+                10);
         assertEquals(2, possibleUsers.size());
         assertEquals(jack, possibleUsers.get(0));
         assertEquals(john, possibleUsers.get(1));
@@ -335,11 +378,14 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfUnknownTaskDefinition() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                        Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                jack);
 
-        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step83", 0, 10);
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(),
+                "step83", 0, 10);
         assertEquals(0, possibleUsers.size());
 
         disableAndDeleteProcess(processDefinition);
@@ -347,11 +393,13 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
 
     @Test
     public void getPossibleUsersOfSystemTaskDefinition() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("auto"),
-                Arrays.asList(false));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("auto"),
+                        Arrays.asList(false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
 
-        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "auto", 0, 10);
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "auto",
+                0, 10);
         assertEquals(0, possibleUsers.size());
 
         disableAndDeleteProcess(processDefinition);
@@ -360,21 +408,29 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
     @Test
     public void getPossibleUsersOfTaskDefinitionWithAFilter() throws Exception {
         final Group group2 = createGroup("gr", group.getPath());
-        final long userMembershipId1 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId()).getId();
-        final long userMembershipId2 = getIdentityAPI().addUserMembership(jack.getId(), group2.getId(), role.getId()).getId();
+        final long userMembershipId1 = getIdentityAPI().addUserMembership(john.getId(), group2.getId(), role.getId())
+                .getId();
+        final long userMembershipId2 = getIdentityAPI().addUserMembership(jack.getId(), group2.getId(), role.getId())
+                .getId();
 
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.2");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("assign", "5.2");
         designProcessDefinition.addActor(ACTOR_NAME);
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        taskDefinitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = designProcessDefinition.addUserTask("step1",
+                ACTOR_NAME);
+        taskDefinitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput(
+                "userId",
                 new ExpressionBuilder().createConstantLongExpression(john.getId()));
         final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+        definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput(
+                "userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilter");
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, jack.getId());
 
-        List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 2);
+        List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0,
+                2);
         assertEquals(2, possibleUsers.size());
         assertEquals(jack, possibleUsers.get(0));
         assertEquals(john, possibleUsers.get(1));

@@ -50,7 +50,7 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
 
     @Override
     public void foundExistingCustomUserInfoDefinition(final SCustomUserInfoDefinition existingUserInfoDefinition,
-                                                      final ExportedCustomUserInfoDefinition newUserInfoDefinition) {
+            final ExportedCustomUserInfoDefinition newUserInfoDefinition) {
     }
 
 }

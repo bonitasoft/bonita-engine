@@ -34,39 +34,45 @@ public class InclusiveExclusiveTransitionEvaluator {
     private final TransitionConditionEvaluator evaluator;
     private final DefaultTransitionGetter defaultTransitionGetter;
 
-    public InclusiveExclusiveTransitionEvaluator(TransitionEvaluationStrategy strategy, TransitionConditionEvaluator evaluator, DefaultTransitionGetter defaultTransitionGetter) {
+    public InclusiveExclusiveTransitionEvaluator(TransitionEvaluationStrategy strategy,
+            TransitionConditionEvaluator evaluator, DefaultTransitionGetter defaultTransitionGetter) {
         this.strategy = strategy;
         this.evaluator = evaluator;
         this.defaultTransitionGetter = defaultTransitionGetter;
     }
 
-    public List<STransitionDefinition> evaluateTransitions(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
-                                                               FlowNodeTransitionsWrapper transitions, final SExpressionContext sExpressionContext) throws SBonitaException {
-        List<STransitionDefinition> outgoingTransitionDefinitions = transitions.getNonDefaultOutgoingTransitionDefinitions();
-        final List<STransitionDefinition> chosenTransitions = evaluateNonDefaultTransitions(sExpressionContext, outgoingTransitionDefinitions);
+    public List<STransitionDefinition> evaluateTransitions(final SProcessDefinition sDefinition,
+            final SFlowNodeInstance flowNodeInstance,
+            FlowNodeTransitionsWrapper transitions, final SExpressionContext sExpressionContext)
+            throws SBonitaException {
+        List<STransitionDefinition> outgoingTransitionDefinitions = transitions
+                .getNonDefaultOutgoingTransitionDefinitions();
+        final List<STransitionDefinition> chosenTransitions = evaluateNonDefaultTransitions(sExpressionContext,
+                outgoingTransitionDefinitions);
 
         if (chosenTransitions.isEmpty()) {
-            STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(transitions, sDefinition, flowNodeInstance);
+            STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(transitions,
+                    sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
         }
 
         return chosenTransitions;
     }
 
-    private List<STransitionDefinition> evaluateNonDefaultTransitions(final SExpressionContext sExpressionContext, final List<STransitionDefinition> outgoingTransitionDefinitions) throws SBonitaException {
+    private List<STransitionDefinition> evaluateNonDefaultTransitions(final SExpressionContext sExpressionContext,
+            final List<STransitionDefinition> outgoingTransitionDefinitions) throws SBonitaException {
         final List<STransitionDefinition> chosenTransitions = new ArrayList<>(outgoingTransitionDefinitions.size());
         boolean found = false;
         Iterator<STransitionDefinition> iterator = outgoingTransitionDefinitions.iterator();
         while (iterator.hasNext() && strategy.shouldContinue(found)) {
             STransitionDefinition transitionDefinition = iterator.next();
             Boolean shouldTakeTransition = evaluator.evaluateCondition(transitionDefinition, sExpressionContext);
-            if(!transitionDefinition.hasCondition() || (shouldTakeTransition != null && shouldTakeTransition)) {
+            if (!transitionDefinition.hasCondition() || (shouldTakeTransition != null && shouldTakeTransition)) {
                 chosenTransitions.add(transitionDefinition);
                 found = true;
             }
         }
         return chosenTransitions;
     }
-
 
 }

@@ -18,7 +18,7 @@ import java.time.Instant;
 /**
  * The {@link EngineClock} give the current time to the engine.
  * It can be overridden mainly for testing purpose
- * 
+ *
  * @author Baptiste Mesta.
  */
 public interface EngineClock {

@@ -46,11 +46,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 /**
  * @author Aurelien Pupier
  * @author Celine Souchet
- *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class BPMWorkFactoryTest {
-
 
     @InjectMocks
     private BPMWorkFactory workFactory;
@@ -59,9 +57,11 @@ public class BPMWorkFactoryTest {
     public void createExecuteMessageCoupleWorkHasNoLockProcessInstanceWorkIfNoTargetProcess() {
         SWaitingMessageEvent waitingMessageEvent = createWaitingMessage();
         SMessageInstance messageInstance = createMessageInstance();
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
-        Assert.assertFalse("A lock Process Instance Work is used although there is no Target process", containsLockProcessInstance);
+        Assert.assertFalse("A lock Process Instance Work is used although there is no Target process",
+                containsLockProcessInstance);
     }
 
     @Test
@@ -69,28 +69,34 @@ public class BPMWorkFactoryTest {
         SWaitingMessageEvent waitingMessageEvent = createWaitingMessage();
         waitingMessageEvent.setParentProcessInstanceId(5L);
         SMessageInstance messageInstance = createMessageInstance();
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
-        Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process", containsLockProcessInstance);
+        Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process",
+                containsLockProcessInstance);
     }
 
     @Test
     public void createExecuteMessageCoupleWork() {
         SWaitingMessageEvent waitingMessageEvent = createWaitingMessage();
         SMessageInstance messageInstance = createMessageInstance();
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing",
+                containsFailureHandlingProcessDefinition(work));
     }
 
     private SMessageInstance createMessageInstance() {
-        SMessageInstance sMessageInstance = new SMessageInstance("message", "myProcess", "flowNode", 1L, "throwFlowNode");
+        SMessageInstance sMessageInstance = new SMessageInstance("message", "myProcess", "flowNode", 1L,
+                "throwFlowNode");
         sMessageInstance.setId(543L);
         return sMessageInstance;
     }
 
     private SWaitingMessageEvent createWaitingMessage() {
-        SWaitingMessageEvent sWaitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2, "flowNode", "message");
+        SWaitingMessageEvent sWaitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L,
+                "myProcess", 2, "flowNode", "message");
         sWaitingMessageEvent.setId(1234L);
         return sWaitingMessageEvent;
     }
@@ -99,7 +105,8 @@ public class BPMWorkFactoryTest {
     public void createExecuteFlowNode() {
         SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance("task", 5432L, 631L, 52311, 33L, 441L);
         flowNodeInstance.setLogicalGroup4(3452L);
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
@@ -107,8 +114,9 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createExecuteConnectorOfProcess() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
-                null));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                        null));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
@@ -123,19 +131,25 @@ public class BPMWorkFactoryTest {
         processContainer.addEvent(start1);
         processContainer.addEvent(start2);
         processContainer.addEvent(start3);
-        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition, new FlowNodeNameFilter(Arrays.asList("start1", "start2")));
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition,
+                new FlowNodeNameFilter(Arrays.asList("start1", "start2")));
 
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
-                flowNodeSelector));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory
+                .createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                        flowNodeSelector));
 
-        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1)).isTrue();
-        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start2)).isTrue();
-        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start3)).isFalse();
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1))
+                .isTrue();
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start2))
+                .isTrue();
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start3))
+                .isFalse();
     }
 
     @Test
     public void createExecuteConnectorOfActivity() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 4L, 5L, 6, "connectorDefName"));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 4L, 5L, 6, "connectorDefName"));
 
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
@@ -148,7 +162,8 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createNotifyChildFinishedWork() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createNotifyChildFinishedWorkDescriptor(new SAutomaticTaskInstance()));
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createNotifyChildFinishedWorkDescriptor(new SAutomaticTaskInstance()));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
@@ -156,9 +171,11 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createTriggerSignalWork() {
-        SWaitingSignalEvent listeningSignal = new SWaitingSignalEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2L, "myFlowNode", "mySignal");
+        SWaitingSignalEvent listeningSignal = new SWaitingSignalEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L,
+                "myProcess", 2L, "myFlowNode", "mySignal");
         listeningSignal.setId(123L);
-        WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
+        WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
 
         assertThat(getWorkOfClass(work, TriggerSignalWork.class).getDescription()).contains("waitingSignalEvent: 123");
         assertThat(containsLockProcessInstanceWork(work)).isFalse();
@@ -166,10 +183,12 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createTriggerSignalWork_in_a_process_instance() {
-        SWaitingSignalEvent listeningSignal = new SWaitingSignalEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2L, "myFlowNode", "mySignal");
+        SWaitingSignalEvent listeningSignal = new SWaitingSignalEvent(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L,
+                "myProcess", 2L, "myFlowNode", "mySignal");
         listeningSignal.setId(123L);
         listeningSignal.setParentProcessInstanceId(456L);
-        WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
+        WrappingBonitaWork work = (WrappingBonitaWork) workFactory
+                .create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
 
         assertThat(getWorkOfClass(work, TriggerSignalWork.class).getDescription()).contains("waitingSignalEvent: 123");
         assertThat(getWorkOfClass(work, LockProcessInstanceWork.class).processInstanceId).isEqualTo(456L);

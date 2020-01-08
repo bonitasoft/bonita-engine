@@ -26,11 +26,13 @@ import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescripto
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks
+        extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final ProcessDefinitionService processDefinitionService,
+    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(
+            final ProcessDefinitionService processDefinitionService,
             final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -42,7 +44,8 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks extends
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions)
+            throws SBonitaReadException {
         return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(queryOptions);
     }
 

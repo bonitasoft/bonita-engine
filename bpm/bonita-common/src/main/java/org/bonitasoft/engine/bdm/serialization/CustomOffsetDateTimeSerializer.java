@@ -37,6 +37,7 @@ public class CustomOffsetDateTimeSerializer extends StdSerializer<OffsetDateTime
 
     @Override
     public void serialize(OffsetDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeString((value != null) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value.withOffsetSameInstant(ZoneOffset.UTC)) : null);
+        jgen.writeString((value != null)
+                ? DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value.withOffsetSameInstant(ZoneOffset.UTC)) : null);
     }
 }

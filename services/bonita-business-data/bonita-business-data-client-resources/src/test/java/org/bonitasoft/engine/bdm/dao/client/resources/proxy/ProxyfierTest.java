@@ -45,21 +45,21 @@ public class ProxyfierTest {
     @Test
     public void should_return_null_when_entity_is_null() throws Exception {
         TestEntity entity = null;
-        
+
         TestEntity proxy = proxyfier.proxify(entity);
-        
+
         ProxyAssert.assertThat(proxy).isNull();
     }
-    
+
     @Test
     public void should_return_null_when_list_of_entities_is_null() throws Exception {
         List<TestEntity> entities = null;
-        
+
         List<TestEntity> proxies = proxyfier.proxify(entities);
-        
+
         ProxyAssert.assertThat(proxies).isNull();
     }
-    
+
     @Test
     public void should_proxify_an_entity() {
         final TestEntity entity = new TestEntity();
@@ -99,7 +99,8 @@ public class ProxyfierTest {
         final EmployeeForTesting proxify = proxyfier.proxify(employee);
 
         //then
-        final List<?> lazyAddresses = (List<?>) proxify.getClass().getMethod("getAddresses", new Class[0]).invoke(proxify);
+        final List<?> lazyAddresses = (List<?>) proxify.getClass().getMethod("getAddresses", new Class[0])
+                .invoke(proxify);
         ProxyAssert.assertThat(proxify).isAProxy();
         Assertions.assertThat(lazyAddresses).hasSize(2);
 

@@ -84,7 +84,8 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
             if (isTraceLoggable) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                        "Beginning transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction());
+                        "Beginning transaction in thread " + Thread.currentThread().getId() + " "
+                                + txManager.getTransaction());
                 txContext.stackTraceThatMadeLastBegin = generateCurrentStack();
             }
             txManager.begin();
@@ -107,16 +108,20 @@ public class JTATransactionServiceImpl implements TransactionService {
             try {
                 txManager.rollback();
             } catch (SystemException e) {
-                throw new STransactionCreationException("A transaction was already associated with the thread. We tried to " +
-                        " rollback it but without success. If the transaction manager does not disassociate the thread with the transaction," +
-                        " restart the server. Status of the transaction was " + status, e);
+                throw new STransactionCreationException(
+                        "A transaction was already associated with the thread. We tried to " +
+                                " rollback it but without success. If the transaction manager does not disassociate the thread with the transaction,"
+                                +
+                                " restart the server. Status of the transaction was " + status,
+                        e);
             }
         }
     }
 
     private void handleNumberOfActiveTransactions() throws RollbackException, SystemException {
         numberOfActiveTransactions.getAndIncrement();
-        txManager.getTransaction().registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
+        txManager.getTransaction()
+                .registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
     }
 
     private void initTxContext(TransactionServiceContext txContext, int status) {
@@ -125,9 +130,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         txContext.beforeCommitCallables.clear();
     }
 
-    private void checkForNestedBonitaTransaction(TransactionServiceContext txContext, int status) throws STransactionCreationException {
+    private void checkForNestedBonitaTransaction(TransactionServiceContext txContext, int status)
+            throws STransactionCreationException {
         if (txContext.isInScopeOfBonitaTransaction) {
-            String message = "We do not support nested calls to the transaction service. Current state is: " + status + ". ";
+            String message = "We do not support nested calls to the transaction service. Current state is: " + status
+                    + ". ";
             if (isTraceLoggable) {
                 message += "Last begin made by: " + txContext.stackTraceThatMadeLastBegin;
             }
@@ -153,7 +160,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             if (isTraceLoggable) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                        "Completing transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
+                        "Completing transaction in thread " + Thread.currentThread().getId() + " "
+                                + txManager.getTransaction().toString());
             }
             final int status = txManager.getStatus();
             if (status == Status.STATUS_NO_TRANSACTION) {
@@ -165,7 +173,8 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 if (isTraceLoggable) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction().toString());
+                            "Rolling back transaction in thread " + Thread.currentThread().getId() + " "
+                                    + txManager.getTransaction().toString());
                 }
                 txManager.rollback();
             } else {
@@ -218,7 +227,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             return txManager.getStatus() == Status.STATUS_ACTIVE;
         } catch (final Throwable e) {
-            logger.log(JTATransactionServiceImpl.class, TechnicalLogSeverity.WARNING, "Unable to check if there is an active transaction {}", e.getMessage());
+            logger.log(JTATransactionServiceImpl.class, TechnicalLogSeverity.WARNING,
+                    "Unable to check if there is an active transaction {}", e.getMessage());
             return false;
         }
     }
@@ -242,7 +252,8 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync)
+            throws STransactionNotFoundException {
         try {
             final Transaction transaction = txManager.getTransaction();
             if (transaction == null) {
@@ -287,8 +298,10 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private <T> void log(Callable<T> callable, Throwable e) {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
-                    + "' has thrown an exception: " + e.getMessage(), e);
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                    "Setting rollbackOnly on current transaction because callable '" + callable
+                            + "' has thrown an exception: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -320,7 +333,8 @@ public class JTATransactionServiceImpl implements TransactionService {
     static class TransactionServiceContext {
 
         /*
-         * this flag means that we already called begin on the bonita transaction service whether or not the transaction is managed externally
+         * this flag means that we already called begin on the bonita transaction service whether or not the transaction
+         * is managed externally
          */
         boolean isInScopeOfBonitaTransaction = false;
         /*
@@ -329,7 +343,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         boolean externallyManaged = false;
 
         /**
-         * We maintain a list of Callables that must be executed just before the real commit (and before the beforeCompletion method is called), so that we
+         * We maintain a list of Callables that must be executed just before the real commit (and before the
+         * beforeCompletion method is called), so that we
          * ensure
          * that Hibernate has not already flushed its session.
          */

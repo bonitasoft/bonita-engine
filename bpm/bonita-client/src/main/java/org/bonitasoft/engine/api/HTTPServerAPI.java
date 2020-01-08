@@ -57,7 +57,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = -3375874140999200702L;
 
-    private static final ContentType XML_UTF_8  = ContentType.create("application/xml", UTF_8);
+    private static final ContentType XML_UTF_8 = ContentType.create("application/xml", UTF_8);
 
     private static final String CLASS_NAME_PARAMETERS = "classNameParameters";
 
@@ -124,13 +124,15 @@ public class HTTPServerAPI implements ServerAPI {
             builder.setMaxConnPerRoute(connectionsMax);
             builder.setMaxConnTotal(connectionsMax);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Client connection pool size '" + CONNECTIONS_MAX + "' must be set to a number");
+            throw new IllegalArgumentException(
+                    "Client connection pool size '" + CONNECTIONS_MAX + "' must be set to a number");
         }
         return builder.build();
     }
 
     @Override
-    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         String response = null;
         try {
@@ -158,7 +160,8 @@ public class HTTPServerAPI implements ServerAPI {
     }
 
     // package-private for testing purpose
-    String executeHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    String executeHttpPost(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws IOException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters,
                 parametersValues);
@@ -175,11 +178,13 @@ public class HTTPServerAPI implements ServerAPI {
         }
     }
 
-    private final HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    private final HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws IOException {
         final HttpEntity httpEntity = buildEntity(options, classNameParameters, parametersValues);
         final StringBuilder sBuilder = new StringBuilder(serverUrl);
-        sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
+        sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH)
+                .append(methodName);
         final HttpPost httpPost = new HttpPost(sBuilder.toString());
         httpPost.setEntity(httpEntity);
 
@@ -199,13 +204,15 @@ public class HTTPServerAPI implements ServerAPI {
     final HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters,
             final Object[] parametersValues) throws IOException {
         final HttpEntity httpEntity;
-         // if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
-        if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
+        // if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
+        if (classNameParameters.contains(BusinessArchive.class.getName())
+                || classNameParameters.contains(byte[].class.getName())) {
             final List<Object> bytearrayParameters = new ArrayList<>();
 
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create().setBoundary(null).setCharset(UTF_8);
             entityBuilder.addPart(OPTIONS, new StringBody(xmlConverter.toXML(options), XML_UTF_8));
-            entityBuilder.addPart(CLASS_NAME_PARAMETERS, new StringBody(xmlConverter.toXML(classNameParameters), XML_UTF_8));
+            entityBuilder.addPart(CLASS_NAME_PARAMETERS,
+                    new StringBody(xmlConverter.toXML(classNameParameters), XML_UTF_8));
             for (int i = 0; i < parametersValues.length; i++) {
                 final Object parameterValue = parametersValues[i];
                 if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {

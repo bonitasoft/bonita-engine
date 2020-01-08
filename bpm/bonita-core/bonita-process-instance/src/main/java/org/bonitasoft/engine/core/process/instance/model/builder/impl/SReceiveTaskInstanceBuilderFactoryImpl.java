@@ -20,13 +20,16 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SReceiveTaskIns
 /**
  * @author Julien Molinaro
  */
-public class SReceiveTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl implements SReceiveTaskInstanceBuilderFactory {
+public class SReceiveTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl
+        implements SReceiveTaskInstanceBuilderFactory {
 
     @Override
-    public SReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+    public SReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
             final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SReceiveTaskInstance activityInstanceImpl = new SReceiveTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId,
+        final SReceiveTaskInstance activityInstanceImpl = new SReceiveTaskInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId,
                 processDefinitionId, rootProcessInstanceId);
         activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SReceiveTaskInstanceBuilderImpl(activityInstanceImpl);

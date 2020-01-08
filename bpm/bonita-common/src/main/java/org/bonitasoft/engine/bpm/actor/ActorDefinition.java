@@ -16,7 +16,8 @@ package org.bonitasoft.engine.bpm.actor;
 import java.io.Serializable;
 
 /**
- * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to design an actor in the context of a process.
+ * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to design an actor in
+ * the context of a process.
  *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
@@ -48,7 +49,6 @@ public interface ActorDefinition extends Serializable {
      * @return <code>true</code>} if this actor can start the process, <code>false</code> otherwise.
      */
     boolean isInitiator();
-
 
     void setInitiator(final boolean initiator);
 }

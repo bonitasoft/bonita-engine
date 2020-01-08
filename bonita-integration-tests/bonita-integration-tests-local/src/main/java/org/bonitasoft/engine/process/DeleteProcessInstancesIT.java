@@ -61,7 +61,8 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 .createNewInstance("mainProcess", "1.0");
         mainProcessBuilder.addContract().addInput("simpleInput1", Type.TEXT, "a simple input");
         mainProcessBuilder.addActor("actor");
-        mainProcessBuilder.addUserTask("userTask1", "actor").addContract().addInput("simpleInputTask", Type.TEXT, "a simple task input");
+        mainProcessBuilder.addUserTask("userTask1", "actor").addContract().addInput("simpleInputTask", Type.TEXT,
+                "a simple task input");
         ActorMapping actorMapping = new ActorMapping();
         Actor actor = new Actor("actor");
         actorMapping.addActor(actor);
@@ -70,7 +71,8 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
                 .addStartEvent("start1")
                 .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector").addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
                 .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
                 .addCallActivity("call1", s("subProcess"), s("1.0"))
                 .addCallActivity("call2", s("subProcess"), s("2.0"))
@@ -80,7 +82,8 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
                 .addStartEvent("start1")
                 .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector").addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
                 .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue"))
                 .addCallActivity("sub2", s("subProcess"), s("2.0")).getProcess()).done());
 
@@ -89,30 +92,36 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 .addDocumentDefinition("myDoc").addInitialValue(docValueExpr())
                 .addStartEvent("start1")
                 .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithConnector").addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue")).getProcess()).done());
-
+                .addAutomaticTask("autoWithConnector")
+                .addConnector("connector1", "myConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addAutomaticTask("autoWithData").addShortTextData("activityData", s("activityDataValue")).getProcess())
+                        .done());
 
         List<Long> processInstances = new ArrayList<>();
         List<Long> userTaskInstances = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            long id = getProcessAPI().startProcessWithInputs(mainProcess.getId(), Collections.singletonMap("simpleInput1", "singleInputValue")).getId();
+            long id = getProcessAPI().startProcessWithInputs(mainProcess.getId(),
+                    Collections.singletonMap("simpleInput1", "singleInputValue")).getId();
             long userTask1 = waitForUserTask(id, "userTask1");
             userTaskInstances.add(userTask1);
             getProcessAPI().assignUserTask(userTask1, user.getId());
-            getProcessAPI().executeUserTask(userTask1, Collections.singletonMap("simpleInputTask", "simpleInputTaskValue"));
+            getProcessAPI().executeUserTask(userTask1,
+                    Collections.singletonMap("simpleInputTask", "simpleInputTaskValue"));
             waitForProcessToFinish(id);
             processInstances.add(id);
         }
-        final List<SAFlowNodeInstance> allArchFlowNodesBeforeDelete = getTenantAccessor().getUserTransactionService().executeInTransaction(this::searchAllArchFlowNodes);
-        final List<SAProcessInstance> allArchProcessInstancesBeforeDelete = getTenantAccessor().getUserTransactionService().executeInTransaction(this::searchAllArchProcessInstances);
+        final List<SAFlowNodeInstance> allArchFlowNodesBeforeDelete = getTenantAccessor().getUserTransactionService()
+                .executeInTransaction(this::searchAllArchFlowNodes);
+        final List<SAProcessInstance> allArchProcessInstancesBeforeDelete = getTenantAccessor()
+                .getUserTransactionService().executeInTransaction(this::searchAllArchProcessInstances);
 
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(processInstances);
 
         getTenantAccessor().getUserTransactionService().executeInTransaction((Callable<Void>) () -> {
             for (Long userTaskInstance : userTaskInstances) {
                 try {
-                    getTenantAccessor().getContractDataService().getArchivedUserTaskDataValue(userTaskInstance, "simpleInputTask");
+                    getTenantAccessor().getContractDataService().getArchivedUserTaskDataValue(userTaskInstance,
+                            "simpleInputTask");
                     fail("should have deleted archived contract data on activity instance");
                 } catch (SContractDataNotFoundException e) {
                     //ok
@@ -120,7 +129,8 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
             }
             for (Long processInstance : processInstances) {
                 try {
-                    getTenantAccessor().getContractDataService().getArchivedProcessDataValue(processInstance, "simpleInput1");
+                    getTenantAccessor().getContractDataService().getArchivedProcessDataValue(processInstance,
+                            "simpleInput1");
                     fail("should have deleted archived contract data on process instance");
                 } catch (SContractDataNotFoundException e) {
                     //ok
@@ -130,14 +140,21 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
                 try {
                     soft.assertThat(searchAllArchProcessInstances()).isEmpty();
                     soft.assertThat(searchAllArchFlowNodes()).isEmpty();
-                    soft.assertThat(getTenantAccessor().getCommentService().searchArchivedComments(new QueryOptions(0, 1000))).isEmpty();
-                    soft.assertThat(getTenantAccessor().getConnectorInstanceService().searchArchivedConnectorInstance(new QueryOptions(0, 100, SAConnectorInstance.class, null, null), getTenantAccessor().getReadPersistenceService())).isEmpty();
-                    soft.assertThat(getTenantAccessor().getDocumentService().getNumberOfArchivedDocuments(new QueryOptions(0, 100))).isEqualTo(0);
+                    soft.assertThat(
+                            getTenantAccessor().getCommentService().searchArchivedComments(new QueryOptions(0, 1000)))
+                            .isEmpty();
+                    soft.assertThat(getTenantAccessor().getConnectorInstanceService().searchArchivedConnectorInstance(
+                            new QueryOptions(0, 100, SAConnectorInstance.class, null, null),
+                            getTenantAccessor().getReadPersistenceService())).isEmpty();
+                    soft.assertThat(getTenantAccessor().getDocumentService()
+                            .getNumberOfArchivedDocuments(new QueryOptions(0, 100))).isEqualTo(0);
                     for (SAFlowNodeInstance flowNodeInstance : allArchFlowNodesBeforeDelete) {
-                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(flowNodeInstance.getSourceObjectId(), ACTIVITY_INSTANCE.toString(), 0, 1)).isEmpty();
+                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(
+                                flowNodeInstance.getSourceObjectId(), ACTIVITY_INSTANCE.toString(), 0, 1)).isEmpty();
                     }
                     for (SAProcessInstance processInstance : allArchProcessInstancesBeforeDelete) {
-                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(processInstance.getSourceObjectId(), PROCESS_INSTANCE.toString(), 0, 1)).isEmpty();
+                        soft.assertThat(getTenantAccessor().getDataInstanceService().getLocalSADataInstances(
+                                processInstance.getSourceObjectId(), PROCESS_INSTANCE.toString(), 0, 1)).isEmpty();
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -150,11 +167,14 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
     }
 
     private List<SAProcessInstance> searchAllArchProcessInstances() throws SBonitaReadException {
-        return getTenantAccessor().getProcessInstanceService().searchArchivedProcessInstances(new QueryOptions(0, 1000));
+        return getTenantAccessor().getProcessInstanceService()
+                .searchArchivedProcessInstances(new QueryOptions(0, 1000));
     }
 
-    private List<SAFlowNodeInstance> searchAllArchFlowNodes() throws org.bonitasoft.engine.persistence.SBonitaReadException {
-        return getTenantAccessor().getActivityInstanceService().searchArchivedFlowNodeInstances(SAFlowNodeInstance.class, new QueryOptions(0, 1000));
+    private List<SAFlowNodeInstance> searchAllArchFlowNodes()
+            throws org.bonitasoft.engine.persistence.SBonitaReadException {
+        return getTenantAccessor().getActivityInstanceService()
+                .searchArchivedFlowNodeInstances(SAFlowNodeInstance.class, new QueryOptions(0, 1000));
     }
 
     private Expression docValueExpr() throws InvalidExpressionException {
@@ -164,7 +184,8 @@ public class DeleteProcessInstancesIT extends CommonAPILocalIT {
     }
 
     private BusinessArchiveBuilder barWithConnector(DesignProcessDefinition process) throws Exception {
-        byte[] connectorImplementationFile = BuildTestUtil.buildConnectorImplementationFile("myConnector", "1.0", "impl1", "1.0", AddCommentConnector.class.getName());
+        byte[] connectorImplementationFile = BuildTestUtil.buildConnectorImplementationFile("myConnector", "1.0",
+                "impl1", "1.0", AddCommentConnector.class.getName());
         return new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(process)
                 .addConnectorImplementation(new BarResource("connector.impl", connectorImplementationFile));

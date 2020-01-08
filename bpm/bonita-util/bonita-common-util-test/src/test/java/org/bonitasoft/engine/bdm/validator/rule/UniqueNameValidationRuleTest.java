@@ -107,7 +107,8 @@ public class UniqueNameValidationRuleTest {
     public void should_concatenate_validation_errors() {
         final Index index = anIndex().withName("index").build();
         final UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("constraint").build();
-        final BusinessObjectModel bom = aBOM().withBO(aBO("bo").withIndex(index).withUniqueConstraint(uniqueConstraint).build()).build();
+        final BusinessObjectModel bom = aBOM()
+                .withBO(aBO("bo").withIndex(index).withUniqueConstraint(uniqueConstraint).build()).build();
         when(uniqueNameValidator.validate(eq(asList(index)), anyString())).thenReturn(anErrorStatus());
         when(uniqueNameValidator.validate(eq(asList(uniqueConstraint)), anyString())).thenReturn(anErrorStatus());
 

@@ -29,7 +29,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * <b>Manage the platform.</b>
  * <p>
  * The platform is the base on which runs the engine.<br>
- * It mainly handles the creation of tables in database and also allow to start/stop a Node which is the current Virtual machine on which runs the engine. There
+ * It mainly handles the creation of tables in database and also allow to start/stop a Node which is the current Virtual
+ * machine on which runs the engine. There
  * is only one platform for a running Bonita Engine.
  * </p>
  *
@@ -63,8 +64,9 @@ public interface PlatformAPI {
     /**
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
-     * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
-     * 
+     * Business elements linked to the execution are initialized, after this step the technical user will be able to
+     * connect to the engine and to import the
+     *
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
@@ -91,7 +93,8 @@ public interface PlatformAPI {
      * <p>
      * The node is the currently Java Virtual Machine on which Bonita Engine is running
      * <p>
-     * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work service on the previous shutdown.
+     * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work
+     * service on the previous shutdown.
      *
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs if API Session is invalid, e.g session has expired.
@@ -117,7 +120,8 @@ public interface PlatformAPI {
     /**
      * <b>Clean the platform.</b>
      * <p>
-     * Empty all execution informations, i.e. database tables are cleaned and a new execution environment can be initialized.
+     * Empty all execution informations, i.e. database tables are cleaned and a new execution environment can be
+     * initialized.
      * <p>
      * /!\Please remember that <b>all data will be DELETED</b>/!\
      * <p>
@@ -236,7 +240,7 @@ public interface PlatformAPI {
     /**
      * INTERNAL USE ONLY
      * get client configuration files of the platform
-     * 
+     *
      * @return the client platform configuration files as a map containing file name and file content
      * @since 7.3
      */
@@ -246,8 +250,9 @@ public interface PlatformAPI {
     /**
      * INTERNAL USE ONLY
      * get client configuration files of the tenants
-     * 
-     * @return the client tenants configuration files as a map containing for each tenant id a map with file name and file content
+     *
+     * @return the client tenants configuration files as a map containing for each tenant id a map with file name and
+     *         file content
      * @since 7.3
      */
     @Internal

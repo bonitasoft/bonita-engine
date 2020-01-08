@@ -34,19 +34,19 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 
 class ClassLoaderUpdater {
 
-
     private BonitaTaskExecutor bonitaTaskExecutor;
     private SessionAccessor sessionAccessor;
     private UserTransactionService userTransactionService;
 
     public ClassLoaderUpdater(BonitaTaskExecutor bonitaTaskExecutor,
-                              SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
+            SessionAccessor sessionAccessor, UserTransactionService userTransactionService) {
         this.bonitaTaskExecutor = bonitaTaskExecutor;
         this.sessionAccessor = sessionAccessor;
         this.userTransactionService = userTransactionService;
     }
 
-    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Long tenantId, Set<Pair<ScopeType, Long>> ids) {
+    public void refreshClassloaders(ClassLoaderServiceImpl classLoaderService, Long tenantId,
+            Set<Pair<ScopeType, Long>> ids) {
 
         execute(tenantId, () -> {
             for (Pair<ScopeType, Long> id : ids) {
@@ -56,17 +56,23 @@ class ClassLoaderUpdater {
         });
     }
 
-    void initializeClassLoader(ClassLoaderServiceImpl classLoaderService, VirtualClassLoader virtualClassLoader, ClassLoaderIdentifier identifier) {
+    void initializeClassLoader(ClassLoaderServiceImpl classLoaderService, VirtualClassLoader virtualClassLoader,
+            ClassLoaderIdentifier identifier) {
         execute(getTenantId(), () -> {
             doInitializeClassLoader(classLoaderService, virtualClassLoader, identifier);
             return null;
         });
     }
 
-    private void doInitializeClassLoader(ClassLoaderServiceImpl classLoaderService, VirtualClassLoader virtualClassLoader, ClassLoaderIdentifier identifier) throws SClassLoaderException, BonitaHomeNotSetException, IOException {
-        Stream<BonitaResource> dependencies = classLoaderService.getDependencies(identifier.getScopeType(), identifier.getId());
-        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier.getType(), identifier.getId(),
-                classLoaderService.getLocalTemporaryFolder(identifier.getType(), identifier.getId()), virtualClassLoader.getParent());
+    private void doInitializeClassLoader(ClassLoaderServiceImpl classLoaderService,
+            VirtualClassLoader virtualClassLoader, ClassLoaderIdentifier identifier)
+            throws SClassLoaderException, BonitaHomeNotSetException, IOException {
+        Stream<BonitaResource> dependencies = classLoaderService.getDependencies(identifier.getScopeType(),
+                identifier.getId());
+        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(dependencies, identifier.getType(),
+                identifier.getId(),
+                classLoaderService.getLocalTemporaryFolder(identifier.getType(), identifier.getId()),
+                virtualClassLoader.getParent());
         virtualClassLoader.replaceClassLoader(bonitaClassLoader);
     }
 

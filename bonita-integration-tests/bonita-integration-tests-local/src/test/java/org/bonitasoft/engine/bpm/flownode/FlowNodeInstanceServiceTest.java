@@ -53,22 +53,27 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {
-        return userTransactionService.executeInTransaction(() -> activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions));
+        return userTransactionService.executeInTransaction(
+                () -> activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions));
     }
 
     @Test
     public void searchFlowNodeInstances() throws Exception {
-        final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class);
+        final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory
+                .get(SStartEventInstanceBuilderFactory.class);
         final SProcessInstance procInst1 = createSProcessInstance();
         final SProcessInstance procInst2 = createSProcessInstance();
 
-        final OrderByOption oderByOption = new OrderByOption(SFlowNodeInstance.class, startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
+        final OrderByOption oderByOption = new OrderByOption(SFlowNodeInstance.class,
+                startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
         final List<FilterOption> filterOptions = Collections.emptyList();
-        final QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(oderByOption), filterOptions, null);
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(oderByOption),
+                filterOptions, null);
 
         // search: no result expected
         List<SFlowNodeInstance> flowNodeInstances = searchFlowNodeInstances(queryOptions);
-        assertTrue("There should not be any flownode instance instead of " + flowNodeInstances.size(), flowNodeInstances.isEmpty());
+        assertTrue("There should not be any flownode instance instead of " + flowNodeInstances.size(),
+                flowNodeInstances.isEmpty());
 
         // create flow nodes
         createFlowNodeInstances(procInst1, procInst2);
@@ -87,13 +92,17 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void searchFlowNodeInstancesWithFilter() throws Exception {
-        final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class);
+        final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory
+                .get(SStartEventInstanceBuilderFactory.class);
         final SProcessInstance procInst1 = createSProcessInstance();
         final SProcessInstance procInst2 = createSProcessInstance();
 
-        final OrderByOption oderByOption = new OrderByOption(SFlowNodeInstance.class, startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
-        final FilterOption filterOption = new FilterOption(SFlowNodeInstance.class, startEventInstanceBuilder.getParentProcessInstanceKey(), procInst1.getId());
-        final QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(oderByOption), Collections.singletonList(filterOption), null);
+        final OrderByOption oderByOption = new OrderByOption(SFlowNodeInstance.class,
+                startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SFlowNodeInstance.class,
+                startEventInstanceBuilder.getParentProcessInstanceKey(), procInst1.getId());
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(oderByOption),
+                Collections.singletonList(filterOption), null);
         final QueryOptions countOptions = new QueryOptions(0, 10, null, Collections.singletonList(filterOption), null);
 
         // search: no result expected
@@ -116,7 +125,8 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     }
 
-    private void createFlowNodeInstances(final SProcessInstance procInst1, final SProcessInstance procInst2) throws SBonitaException {
+    private void createFlowNodeInstances(final SProcessInstance procInst1, final SProcessInstance procInst2)
+            throws SBonitaException {
         // add flow nodes to procInst 1
         createSStartEventInstance("startEvent", 1, procInst1.getId(), 5, procInst1.getId());
         createSIntermediateCatchEventInstance("intermediateCatchEvent", 2, procInst1.getId(), 5, procInst1.getId());
@@ -124,7 +134,8 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         createSEndEventInstance("endEvent", 4, procInst1.getId(), 5, procInst1.getId());
 
         final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
-                .createNewInstance("Gateway1", 5, procInst1.getId(), procInst1.getId(), SGatewayType.EXCLUSIVE, 2, procInst1.getId(), procInst1.getId())
+                .createNewInstance("Gateway1", 5, procInst1.getId(), procInst1.getId(), SGatewayType.EXCLUSIVE, 2,
+                        procInst1.getId(), procInst1.getId())
                 .setStateId(1).setHitBys("a,b,c").done();
         insertGatewayInstance(gatewayInstance);
 
@@ -143,11 +154,13 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         long processDefinitionId = 123445566L;
         long rootProcessInstanceID = 7754L;
         long actorId = 5589L;
-        SUserTaskInstance step1 = createSUserTaskInstance("step1", flowNodeDefinitionId, -1, processDefinitionId, rootProcessInstanceID, actorId);
+        SUserTaskInstance step1 = createSUserTaskInstance("step1", flowNodeDefinitionId, -1, processDefinitionId,
+                rootProcessInstanceID, actorId);
         long userId = 4411L;
         //given
         getTransactionService().begin();
-        final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(step1.getId()).userId(userId).build();
+        final SPendingActivityMapping mapping = SPendingActivityMapping.builder().activityId(step1.getId())
+                .userId(userId).build();
         activityInstanceService.addPendingActivityMappings(mapping);
         getTransactionService().complete();
         //

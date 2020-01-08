@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 
 /**
  * @author Baptiste Mesta
@@ -53,6 +52,5 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     public boolean shouldClearSessions() {
         return true;
     }
-
 
 }

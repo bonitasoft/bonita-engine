@@ -26,17 +26,16 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau
@@ -111,7 +110,8 @@ public class CodeGeneratorTest {
         assertThat(privateField).isNotNull().isInstanceOf(JFieldVar.class);
         assertThat(privateField.name()).isEqualTo("name");
         assertThat(privateField.type().name()).isEqualTo(String.class.getSimpleName());
-        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").fields()).containsEntry("name", privateField);
+        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").fields()).containsEntry("name",
+                privateField);
     }
 
     @Test
@@ -122,12 +122,14 @@ public class CodeGeneratorTest {
         assertThat(privateField).isNotNull().isInstanceOf(JFieldVar.class);
         assertThat(privateField.name()).isEqualTo("employee");
         assertThat(privateField.type().name()).isEqualTo("Employee");
-        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").fields()).containsEntry("employee", privateField);
+        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").fields()).containsEntry("employee",
+                privateField);
 
         final JClass stringList = codeGenerator.getModel().ref(List.class).narrow(String.class);
         final JFieldVar collectionField = codeGenerator.addField(definedClass, "skills", stringList);
         assertThat(collectionField).isNotNull();
-        assertThat(collectionField.type().name()).isEqualTo(List.class.getSimpleName() + "<" + String.class.getSimpleName() + ">");
+        assertThat(collectionField.type().name())
+                .isEqualTo(List.class.getSimpleName() + "<" + String.class.getSimpleName() + ">");
     }
 
     @Test
@@ -198,7 +200,8 @@ public class CodeGeneratorTest {
     public void shoulAddInterface_AddInterface_ToADefinedClass() throws Exception {
         JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
         definedClass = codeGenerator.addInterface(definedClass, Serializable.class.getName());
-        assertThat(definedClass._implements()).isNotEmpty().contains(codeGenerator.getModel().ref(Serializable.class.getName()));
+        assertThat(definedClass._implements()).isNotEmpty()
+                .contains(codeGenerator.getModel().ref(Serializable.class.getName()));
     }
 
     @Test
@@ -214,7 +217,8 @@ public class CodeGeneratorTest {
         final JFieldVar booleanSingleField = codeGenerator.addField(definedClass, "bool", booleanField);
 
         final JFieldVar skillField = codeGenerator.addField(definedClass, "skills", stringList);
-        final JFieldVar dateField = codeGenerator.addField(definedClass, "returnDate", codeGenerator.getModel().ref(Date.class));
+        final JFieldVar dateField = codeGenerator.addField(definedClass, "returnDate",
+                codeGenerator.getModel().ref(Date.class));
         final JAnnotationUse tAnnotation = codeGenerator.addAnnotation(dateField, Temporal.class);
         tAnnotation.param("value", TemporalType.TIMESTAMP);
 

@@ -46,7 +46,8 @@ public class TimerEventIT extends TestWithUser {
         final String step2Name = "step2";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000); // the timer intermediate catch event will wait one
                                                                                                        // second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name,
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION,
+                timerExpression, step1Name,
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -77,10 +78,12 @@ public class TimerEventIT extends TestWithUser {
         final String step1Name = "step1";
         final String step2Name = "step2";
         final long expectedDate = System.currentTimeMillis() + 5000;
-        final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerIntermediateCatchEventDate", "return new Date("
-                + expectedDate + "l)", Date.class.getName()); // the timer intermediate catch
+        final Expression timerExpression = new ExpressionBuilder()
+                .createGroovyScriptExpression("testTimerIntermediateCatchEventDate", "return new Date("
+                        + expectedDate + "l)", Date.class.getName()); // the timer intermediate catch
         // event will wait one second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name,
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE,
+                timerExpression, step1Name,
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -101,12 +104,15 @@ public class TimerEventIT extends TestWithUser {
     public void timerStartEventDate() throws Exception {
         final String stepName = "step1";
         final long expectedDate = System.currentTimeMillis() + 1000;
-        final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerStartEventDate", "return new Date(" + expectedDate
-                + "l);", Date.class.getName()); // the new instance must be
+        final Expression timerExpression = new ExpressionBuilder()
+                .createGroovyScriptExpression("testTimerStartEventDate", "return new Date(" + expectedDate
+                        + "l);", Date.class.getName()); // the new instance must be
         // created in one second
-        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DATE, timerExpression, stepName);
+        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DATE,
+                timerExpression, stepName);
 
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.CREATION_DATE_DESC);
         assertTrue(processInstances.isEmpty());
 
         // wait for process instance creation
@@ -119,15 +125,18 @@ public class TimerEventIT extends TestWithUser {
     public void timerStartEventDuration() throws Exception {
         final String stepName = "step1";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1500); // the new instance must be created in one second
-        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DURATION, timerExpression, stepName);
+        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DURATION,
+                timerExpression, stepName);
         waitForInitializingProcess();
 
         waitForUserTask(stepName);
         disableAndDeleteProcess(definition);
     }
 
-    private EventInstance getEventInstance(final long processInstanceId, final String eventName) throws RetrieveException {
-        final List<EventInstance> eventInstances = getProcessAPI().getEventInstances(processInstanceId, 0, 10, EventCriterion.NAME_ASC);
+    private EventInstance getEventInstance(final long processInstanceId, final String eventName)
+            throws RetrieveException {
+        final List<EventInstance> eventInstances = getProcessAPI().getEventInstances(processInstanceId, 0, 10,
+                EventCriterion.NAME_ASC);
         EventInstance searchedEventInstance = null;
         final Iterator<EventInstance> iterator = eventInstances.iterator();
         while (iterator.hasNext() && searchedEventInstance == null) {
@@ -139,7 +148,8 @@ public class TimerEventIT extends TestWithUser {
         return searchedEventInstance;
     }
 
-    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
+    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName,
+            final TestStates state) {
         assertTrue(eventInstance instanceof IntermediateCatchEventInstance);
         checkEventInstance(eventInstance, eventName, state);
     }
@@ -152,29 +162,39 @@ public class TimerEventIT extends TestWithUser {
         // }
     }
 
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEventAndUserTask(final TimerType timerType, final Expression timerValue,
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEventAndUserTask(final TimerType timerType,
+            final Expression timerValue,
             final String step1Name, final String step2Name) throws BonitaException {
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
-                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent").addUserTask(step1Name, ACTOR_NAME)
-                .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
-                .addEndEvent("endEvent").addTransition("startEvent", step1Name).addTransition(step1Name, "intermediateCatchEvent")
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My Process with start event", "1.0")
+                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent")
+                .addUserTask(step1Name, ACTOR_NAME)
+                .addIntermediateCatchEvent("intermediateCatchEvent")
+                .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
+                .addEndEvent("endEvent").addTransition("startEvent", step1Name)
+                .addTransition(step1Name, "intermediateCatchEvent")
                 .addTransition("intermediateCatchEvent", step2Name).addTransition(step2Name, "endEvent").getProcess();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
     }
 
-    private ProcessDefinition deployProcessWithTimerStartEventAndUserTask(final TimerType timerType, final Expression timerValue, final String stepName)
+    private ProcessDefinition deployProcessWithTimerStartEventAndUserTask(final TimerType timerType,
+            final Expression timerValue, final String stepName)
             throws BonitaException {
         final String delivery = "Delivery men";
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My Process with start event", "1.0")
                 .addActor(delivery).addDescription("Delivery all day and night long").addStartEvent("startEvent")
-                .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(stepName, delivery).addEndEvent("endEvent")
+                .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(stepName, delivery)
+                .addEndEvent("endEvent")
                 .addTransition("startEvent", stepName).addTransition(stepName, "endEvent").getProcess();
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, delivery, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
     }

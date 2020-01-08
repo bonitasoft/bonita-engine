@@ -44,7 +44,8 @@ public class ThemeServiceStartupHelper {
     private final ThemeRetriever themeRetriever;
     private final ThemeActionCalculator themeActionCalculator;
 
-    public ThemeServiceStartupHelper(final ThemeService themeService, ThemeRetriever themeRetriever, ThemeActionCalculator themeActionCalculator) {
+    public ThemeServiceStartupHelper(final ThemeService themeService, ThemeRetriever themeRetriever,
+            ThemeActionCalculator themeActionCalculator) {
         this.themeService = themeService;
         this.themeRetriever = themeRetriever;
         this.themeActionCalculator = themeActionCalculator;
@@ -52,7 +53,7 @@ public class ThemeServiceStartupHelper {
 
     /**
      * Create the default Portal and Mobile themes if they do not already exist else do nothing
-     * 
+     *
      * @throws IOException
      * @throws SBonitaException
      */
@@ -79,8 +80,10 @@ public class ThemeServiceStartupHelper {
         themeService.createTheme(sTheme);
     }
 
-    void updateDefaultTheme(STheme theme, byte[] defaultThemeZip, SThemeType mobile) throws IOException, SThemeUpdateException {
-        final SThemeUpdateBuilder updateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+    void updateDefaultTheme(STheme theme, byte[] defaultThemeZip, SThemeType mobile)
+            throws IOException, SThemeUpdateException {
+        final SThemeUpdateBuilder updateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class)
+                .createNewInstance();
         updateBuilder.setContent(defaultThemeZip);
         updateBuilder.setCSSContent(getCssContent(mobile));
         updateBuilder.setLastUpdateDate(System.currentTimeMillis());
@@ -96,7 +99,8 @@ public class ThemeServiceStartupHelper {
 
     STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
-        final STheme.SThemeBuilder sThemeBuilder = STheme.builder().content(defaultThemeZip).isDefault(true).type(type).lastUpdateDate(lastUpdateDate);
+        final STheme.SThemeBuilder sThemeBuilder = STheme.builder().content(defaultThemeZip).isDefault(true).type(type)
+                .lastUpdateDate(lastUpdateDate);
         sThemeBuilder.cssContent(defaultThemeCss);
         return sThemeBuilder.build();
     }

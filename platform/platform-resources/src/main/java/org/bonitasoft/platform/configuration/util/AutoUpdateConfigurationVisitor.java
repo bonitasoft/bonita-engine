@@ -39,7 +39,8 @@ public class AutoUpdateConfigurationVisitor extends SimpleFileVisitor<Path> {
         this.bonitaConfigurations = bonitaConfigurations;
     }
 
-    private static final List<String> AUTO_UPDATE_CONFIGURATION_FILES = Arrays.asList("compound-permissions-mapping.properties",
+    private static final List<String> AUTO_UPDATE_CONFIGURATION_FILES = Arrays.asList(
+            "compound-permissions-mapping.properties",
             "dynamic-permissions-checks.properties", "resources-permissions-mapping.properties");
 
     @Override

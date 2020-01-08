@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
-
-
 /**
  * @author Julien Reboul
- *
  */
 public enum NaiveEqualityResult {
     CONTINUE, RETURN_FALSE, RETURN_TRUE;

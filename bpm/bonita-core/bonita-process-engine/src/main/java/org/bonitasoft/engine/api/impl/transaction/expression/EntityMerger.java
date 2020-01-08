@@ -21,10 +21,8 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
-
 /**
  * @author Romain Bioteau
- *
  */
 public class EntityMerger {
 
@@ -40,7 +38,7 @@ public class EntityMerger {
             try {
                 @SuppressWarnings("unchecked")
                 final Collection<Entity> newCollection = collection.getClass().newInstance();
-                
+
                 ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(bdrService));
                 for (final Object item : collection) {
                     newCollection.add(proxyfier.proxify((Entity) item));
@@ -62,7 +60,8 @@ public class EntityMerger {
     }
 
     protected boolean isACollectionOfEntities(final Serializable value) {
-        return value instanceof Collection<?> && !((Collection<?>) value).isEmpty() && ((Collection<?>) value).iterator().next() instanceof Entity;
+        return value instanceof Collection<?> && !((Collection<?>) value).isEmpty()
+                && ((Collection<?>) value).iterator().next() instanceof Entity;
     }
 
 }

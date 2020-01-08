@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.process;
 
 /**
  * Thrown when a process fails to deploy because of V6 form presence in the bar to deploy.
- * 
+ *
  * @author Danila Mazour
  * @since 7.8.0
  */
@@ -25,12 +25,12 @@ public class V6FormDeployException extends ProcessDeployException {
      * Constructs a new exception with the specified detail cause.
      *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public V6FormDeployException(final Throwable cause) {
         super(cause);
     }
-
 
 }

@@ -35,7 +35,8 @@ public class GetUserMembership implements TransactionContentWithResult<SUserMemb
 
     private final long userMembershipId;
 
-    public GetUserMembership(final long userId, final long groupId, final long roleId, final IdentityService identityService) {
+    public GetUserMembership(final long userId, final long groupId, final long roleId,
+            final IdentityService identityService) {
         this.userId = userId;
         this.groupId = groupId;
         this.roleId = roleId;

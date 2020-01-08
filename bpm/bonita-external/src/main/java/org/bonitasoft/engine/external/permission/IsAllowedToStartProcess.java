@@ -52,13 +52,15 @@ public class IsAllowedToStartProcess extends CommandWithParameters {
         final ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
         final ProcessDefinitionService processDefinitionService = this.serviceAccessor.getProcessDefinitionService();
 
-        final Set<Long> actorIds = getMandatoryParameter(parameters, ACTOR_IDS_KEY, "Mandatory parameter " + ACTOR_IDS_KEY
-                + " is missing or not convertible to Set<Long>.");
+        final Set<Long> actorIds = getMandatoryParameter(parameters, ACTOR_IDS_KEY,
+                "Mandatory parameter " + ACTOR_IDS_KEY
+                        + " is missing or not convertible to Set<Long>.");
         final long processDefinitionId = getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID_KEY);
 
         try {
             final SProcessDefinition definition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            final SActor sActor = actorMappingService.getActor(definition.getActorInitiator().getName(), processDefinitionId);
+            final SActor sActor = actorMappingService.getActor(definition.getActorInitiator().getName(),
+                    processDefinitionId);
             if (sActor != null) {
                 for (final long actorId : actorIds) {
                     if (sActor.getId() == actorId) {

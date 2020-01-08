@@ -17,6 +17,7 @@ package org.bonitasoft.engine.exception;
  * @author Baptiste Mesta
  */
 public class FormMappingNotFoundException extends NotFoundException {
+
     public FormMappingNotFoundException(String message) {
         super(message);
     }

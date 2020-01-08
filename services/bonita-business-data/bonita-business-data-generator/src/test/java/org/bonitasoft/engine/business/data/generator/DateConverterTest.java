@@ -51,7 +51,8 @@ public class DateConverterTest {
     public void dateConverter_should_generate_the_same_object_in_and_out() {
         DateConverter dateConverter = new DateConverter();
         LocalDate localDate = LocalDate.of(2017, 02, 24);
-        LocalDate localDateResult = dateConverter.convertToEntityAttribute(dateConverter.convertToDatabaseColumn(localDate));
+        LocalDate localDateResult = dateConverter
+                .convertToEntityAttribute(dateConverter.convertToDatabaseColumn(localDate));
         assertThat(localDateResult).isNotNull();
         assertThat(localDateResult).isEqualTo(localDate);
     }
@@ -72,7 +73,7 @@ public class DateConverterTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    
+
     @Test
     public void convertToEntityAttribute_should_throw_an_exception_when_given_a_faulty_string() {
         DateConverter dateConverter = new DateConverter();
