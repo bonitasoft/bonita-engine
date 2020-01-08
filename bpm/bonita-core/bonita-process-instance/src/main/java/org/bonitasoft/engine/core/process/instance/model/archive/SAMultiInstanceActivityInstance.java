@@ -60,7 +60,6 @@ public class SAMultiInstanceActivityInstance extends SAActivityInstance {
         return numberOfActiveInstances + numberOfCompletedInstances + numberOfTerminatedInstances;
     }
 
-
     @Override
     public String getKind() {
         return "multi";

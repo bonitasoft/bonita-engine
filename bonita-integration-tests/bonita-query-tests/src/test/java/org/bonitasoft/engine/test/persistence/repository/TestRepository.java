@@ -79,7 +79,8 @@ public class TestRepository {
     }
 
     /**
-     * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
+     * Need to replicate add method for each object because we don't have any superclass or interface providing
+     * getTenantId method
      */
     public SUser add(final SUser user) {
         getSession().save(user);
@@ -93,7 +94,8 @@ public class TestRepository {
 
     public SGroup add(final SGroup sGroup) {
         getSession().save(sGroup);
-        return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
+        return (SGroup) getSession().get(sGroup.getClass(),
+                new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
     }
 
     public SConnectorInstance add(final SConnectorInstance sConnectorInstance) {
@@ -110,7 +112,8 @@ public class TestRepository {
 
     public SActorMember add(final SActorMember actorMember) {
         getSession().save(actorMember);
-        return (SActorMember) getSession().get(actorMember.getClass(), new PersistentObjectId(actorMember.getId(), actorMember.getTenantId()));
+        return (SActorMember) getSession().get(actorMember.getClass(),
+                new PersistentObjectId(actorMember.getId(), actorMember.getTenantId()));
     }
 
     public SActor add(final SActor actor) {
@@ -120,17 +123,20 @@ public class TestRepository {
 
     public SUserMembership add(final SUserMembership membership) {
         getSession().save(membership);
-        return (SUserMembership) getSession().get(membership.getClass(), new PersistentObjectId(membership.getId(), membership.getTenantId()));
+        return (SUserMembership) getSession().get(membership.getClass(),
+                new PersistentObjectId(membership.getId(), membership.getTenantId()));
     }
 
     public SMessageInstance add(final SMessageInstance message) {
         getSession().save(message);
-        return (SMessageInstance) getSession().get(message.getClass(), new PersistentObjectId(message.getId(), message.getTenantId()));
+        return (SMessageInstance) getSession().get(message.getClass(),
+                new PersistentObjectId(message.getId(), message.getTenantId()));
     }
 
     public SWaitingMessageEvent add(final SWaitingMessageEvent waitingEvent) {
         getSession().save(waitingEvent);
-        return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(), new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
+        return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(),
+                new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
     }
 
     public SProcessSupervisor add(final SProcessSupervisor sProcessSupervisor) {
@@ -142,7 +148,8 @@ public class TestRepository {
     public SProcessDefinitionDeployInfo add(final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo) {
         getSession().save(sProcessDefinitionDeployInfo);
         return (SProcessDefinitionDeployInfo) getSession().get(sProcessDefinitionDeployInfo.getClass(),
-                new PersistentObjectId(sProcessDefinitionDeployInfo.getId(), sProcessDefinitionDeployInfo.getTenantId()));
+                new PersistentObjectId(sProcessDefinitionDeployInfo.getId(),
+                        sProcessDefinitionDeployInfo.getTenantId()));
     }
 
     public SProcessInstance add(final SProcessInstance sProcessInstance) {
@@ -159,12 +166,14 @@ public class TestRepository {
 
     public SFlowNodeInstance add(final SFlowNodeInstance sFlowNode) {
         getSession().save(sFlowNode);
-        return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
+        return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(),
+                new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
 
     public SAFlowNodeInstance add(final SAFlowNodeInstance saFlowNode) {
         getSession().save(saFlowNode);
-        return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
+        return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(),
+                new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
     }
 
     public STimerEventTriggerInstance add(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
@@ -175,31 +184,37 @@ public class TestRepository {
 
     public SCustomUserInfoDefinition add(final SCustomUserInfoDefinition infoDef) {
         getSession().save(infoDef);
-        return (SCustomUserInfoDefinition) getSession().get(infoDef.getClass(), new PersistentObjectId(infoDef.getId(), infoDef.getTenantId()));
+        return (SCustomUserInfoDefinition) getSession().get(infoDef.getClass(),
+                new PersistentObjectId(infoDef.getId(), infoDef.getTenantId()));
     }
 
     public SCustomUserInfoValue add(final SCustomUserInfoValue infoValue) {
         getSession().save(infoValue);
-        return (SCustomUserInfoValue) getSession().get(infoValue.getClass(), new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
+        return (SCustomUserInfoValue) getSession().get(infoValue.getClass(),
+                new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
     }
 
     public SJobLog addJobLog(final SJobLog jobLog) {
         getSession().save(jobLog);
-        return (SJobLog) getSession().get(jobLog.getClass(), new PersistentObjectId(jobLog.getId(), jobLog.getTenantId()));
+        return (SJobLog) getSession().get(jobLog.getClass(),
+                new PersistentObjectId(jobLog.getId(), jobLog.getTenantId()));
     }
 
     public SJobDescriptor addJobDescriptor(final SJobDescriptor jobDescriptor) {
         getSession().save(jobDescriptor);
-        return (SJobDescriptor) getSession().get(jobDescriptor.getClass(), new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
+        return (SJobDescriptor) getSession().get(jobDescriptor.getClass(),
+                new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
     }
 
     public SADataInstance add(final SADataInstance dataInstance) {
         getSession().save(dataInstance);
-        return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
+        return (SADataInstance) getSession().get(dataInstance.getClass(),
+                new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
     }
 
     /**
-     * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
+     * Need to replicate add method for each object because we don't have any superclass or interface providing
+     * getTenantId method
      */
     public SPageWithContent add(final SPageWithContent sPageWithContent) {
         getSession().save(sPageWithContent);
@@ -259,13 +274,13 @@ public class TestRepository {
         getSession().update(application);
     }
 
-    public SDependency add(SDependency dependency){
+    public SDependency add(SDependency dependency) {
         getSession().save(dependency);
-        return (SDependency)getSession().get(dependency.getClass(),
+        return (SDependency) getSession().get(dependency.getClass(),
                 new PersistentObjectId(dependency.getId(), dependency.getTenantId()));
     }
 
-    public SDependencyMapping add(SDependencyMapping dependencyMapping){
+    public SDependencyMapping add(SDependencyMapping dependencyMapping) {
         getSession().save(dependencyMapping);
         return (SDependencyMapping) getSession().get(dependencyMapping.getClass(),
                 new PersistentObjectId(dependencyMapping.getId(), dependencyMapping.getTenantId()));

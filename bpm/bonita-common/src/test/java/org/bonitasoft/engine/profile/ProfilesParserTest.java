@@ -20,8 +20,8 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.junit.Test;
 
@@ -35,7 +35,8 @@ public class ProfilesParserTest {
     @Test
     public void should_be_able_to_parse_AllProfilesXml_file() throws Exception {
         //given
-        String allProfilesXml = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream("/AllProfiles.xml")));
+        String allProfilesXml = new String(
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("/AllProfiles.xml")));
         //when
         ProfilesNode exportedProfiles = profilesParser.convert(allProfilesXml);
 
@@ -64,7 +65,8 @@ public class ProfilesParserTest {
         assertThat(adminProfile.getProfileMapping().getUsers()).containsOnly("userName1");
         assertThat(adminProfile.getProfileMapping().getRoles()).containsOnly("role1", "role2");
         assertThat(adminProfile.getProfileMapping().getGroups()).isEmpty();
-        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(new MembershipNode("/group1", "role2"),
+        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(
+                new MembershipNode("/group1", "role2"),
                 new MembershipNode("/group2", "role2"));
     }
 

@@ -89,13 +89,15 @@ public class SpringBeanAccessorTest {
         //when
         BonitaSpringContext context = (BonitaSpringContext) springBeanAccessor.getContext();
         //then: the resources in spring context are ClassPathResources with path as follow
-        assertThat(asList(context.getConfigResources())).extracting("path").containsExactly("classpathresource1", "classpathresource2");
+        assertThat(asList(context.getConfigResources())).extracting("path").containsExactly("classpathresource1",
+                "classpathresource2");
     }
 
     @Test
     public void should_create_context_using_BonitaConfiguration_as_byte_array_resources() {
         //given
-        String xmlFile = "<beans xmlns=\"http://www.springframework.org/schema/beans\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+        String xmlFile = "<beans xmlns=\"http://www.springframework.org/schema/beans\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                +
                 "xsi:schemaLocation=\"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd\"/>";
         BonitaConfiguration res1 = new BonitaConfiguration("res1", xmlFile.getBytes());
         BonitaConfiguration res2 = new BonitaConfiguration("res2", xmlFile.getBytes());
@@ -146,7 +148,8 @@ public class SpringBeanAccessorTest {
         //given
         createSpringContext();
         Properties properties = new Properties();
-        properties.setProperty("myTestProperty", "${system.test.property:default value if not set in system properties}");
+        properties.setProperty("myTestProperty",
+                "${system.test.property:default value if not set in system properties}");
         System.setProperty("system.test.property", "the value set in syst properties");
         //when
         String value = springBeanAccessor.getPropertyWithPlaceholder(properties, "myTestProperty", "default");
@@ -160,7 +163,8 @@ public class SpringBeanAccessorTest {
         //given
         createSpringContext();
         Properties properties = new Properties();
-        properties.setProperty("myTestProperty", "${system.test.property2:default value if not set in system properties}");
+        properties.setProperty("myTestProperty",
+                "${system.test.property2:default value if not set in system properties}");
         //when
         String value = springBeanAccessor.getPropertyWithPlaceholder(properties, "myTestProperty", "default");
 
@@ -192,6 +196,5 @@ public class SpringBeanAccessorTest {
         //then
         assertThat(value).isEqualTo("toto}");
     }
-
 
 }

@@ -18,11 +18,9 @@ import java.io.IOException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * 
  * content of the page is not valid
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public abstract class SInvalidPageZipException extends SBonitaException {
 

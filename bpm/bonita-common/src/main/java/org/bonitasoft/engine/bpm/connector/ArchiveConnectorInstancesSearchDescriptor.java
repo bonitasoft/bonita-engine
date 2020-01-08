@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.connector;
 
 /**
  * The fields on which a search can be made for the archived connectors.
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */

@@ -56,7 +56,8 @@ public class TCPServerAPI implements ServerAPI {
     }
 
     @Override
-    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         try {
             Socket remoteServerAPI = null;
@@ -67,7 +68,8 @@ public class TCPServerAPI implements ServerAPI {
                 remoteServerAPI = new Socket(tcpDestination.getHost(), tcpDestination.getPort());
                 final InputStream socketInputStream = remoteServerAPI.getInputStream();
                 oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
-                final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+                final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters,
+                        parametersValues);
                 oos.writeObject(methodCall);
                 oos.flush();
                 ois = new ObjectInputStream(socketInputStream);

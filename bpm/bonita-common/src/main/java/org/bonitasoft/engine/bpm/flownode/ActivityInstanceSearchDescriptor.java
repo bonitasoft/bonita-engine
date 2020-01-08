@@ -46,16 +46,16 @@ public class ActivityInstanceSearchDescriptor {
      * Use this field to match a specific type of flow node. <br>
      * Activity type filter can only be used once per query. <br>
      * Example of invalid query:<br>
-     *          <ul>
-     *              <li>
-     *                  .leftParenthesis()
-     *                  .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.USER_TASK)
-     *                  .or()
-     *                  .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK)
-     *                  .rightParenthesis()
-     *                  .done();
-     *              </li>
-     *          </ul>
+     * <ul>
+     * <li>
+     * .leftParenthesis()
+     * .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.USER_TASK)
+     * .or()
+     * .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK)
+     * .rightParenthesis()
+     * .done();
+     * </li>
+     * </ul>
      */
     public static final String ACTIVITY_TYPE = "activityType";
 

@@ -50,21 +50,26 @@ public class BinaryComparatorExecutor {
         numericTypes.add(byte.class.getName());
     }
 
-    public Boolean evaluate(final Map<Integer, Object> resolvedExpressions, SExpression expression) throws SExpressionEvaluationException {
+    public Boolean evaluate(final Map<Integer, Object> resolvedExpressions, SExpression expression)
+            throws SExpressionEvaluationException {
         validate(expression);
         BinaryComparator evaluator = mapper.getEvaluator(expression.getContent());
         if (evaluator == null) {
-            throw new SExpressionEvaluationException("Unable to find evaluator for operator '" + expression.getContent() + "'", expression.getName());
+            throw new SExpressionEvaluationException(
+                    "Unable to find evaluator for operator '" + expression.getContent() + "'", expression.getName());
         }
         SExpression leftExpression = expression.getDependencies().get(0);
         SExpression rightExpression = expression.getDependencies().get(1);
-        final Object resolvedLeftExpr = transtypeIfApplicable(leftExpression.getReturnType(), resolvedExpressions.get(leftExpression.getDiscriminant()));
-        final Object resolvedRightExpr = transtypeIfApplicable(rightExpression.getReturnType(), resolvedExpressions.get(rightExpression.getDiscriminant()));
+        final Object resolvedLeftExpr = transtypeIfApplicable(leftExpression.getReturnType(),
+                resolvedExpressions.get(leftExpression.getDiscriminant()));
+        final Object resolvedRightExpr = transtypeIfApplicable(rightExpression.getReturnType(),
+                resolvedExpressions.get(rightExpression.getDiscriminant()));
 
         try {
             return evaluator.evaluate(resolvedLeftExpr, resolvedRightExpr);
         } catch (SComparisonException e) {
-            throw new SExpressionEvaluationException("Unable to evaluate expression '" + expression.getName() + "'", e, expression.getName());
+            throw new SExpressionEvaluationException("Unable to evaluate expression '" + expression.getName() + "'", e,
+                    expression.getName());
         }
     }
 
@@ -89,8 +94,11 @@ public class BinaryComparatorExecutor {
 
     private void validateReturnType(final SExpression expression) throws SExpressionEvaluationException {
         List<SExpression> dependencies = expression.getDependencies();
-        if (!areReturnTypeCompatible(dependencies.get(0).getReturnType(), dependencies.get(1).getReturnType(), expression.getContent())) {
-            throw new SExpressionEvaluationException("The two dependencies of expression '" + expression.getContent() + "' must have the same return type.",
+        if (!areReturnTypeCompatible(dependencies.get(0).getReturnType(), dependencies.get(1).getReturnType(),
+                expression.getContent())) {
+            throw new SExpressionEvaluationException(
+                    "The two dependencies of expression '" + expression.getContent()
+                            + "' must have the same return type.",
                     expression.getName());
         }
     }
@@ -112,7 +120,8 @@ public class BinaryComparatorExecutor {
     }
 
     protected boolean areReturnTypeCompatible(String leftReturnType, String rightReturnType, final String content) {
-        return (numericTypes.contains(leftReturnType) && numericTypes.contains(rightReturnType)) || leftReturnType.equals(rightReturnType)
+        return (numericTypes.contains(leftReturnType) && numericTypes.contains(rightReturnType))
+                || leftReturnType.equals(rightReturnType)
                 || ConditionExpressionExecutorStrategy.EQUALS_COMPARATOR.equals(content);
     }
 

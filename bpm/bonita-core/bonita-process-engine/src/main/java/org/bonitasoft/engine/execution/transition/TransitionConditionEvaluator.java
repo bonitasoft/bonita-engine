@@ -38,7 +38,8 @@ public class TransitionConditionEvaluator {
             return null;
         }
         if (!Boolean.class.getName().equals(condition.getReturnType())) {
-            throw new SExpressionEvaluationException("Condition expression must return a boolean, on transition: " + sTransitionDefinition.getName(),
+            throw new SExpressionEvaluationException(
+                    "Condition expression must return a boolean, on transition: " + sTransitionDefinition.getName(),
                     condition.getName());
         }
         return (Boolean) resolverService.evaluate(condition, contextDependency);

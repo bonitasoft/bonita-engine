@@ -51,9 +51,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -120,12 +120,14 @@ public class IdentityServiceImplForUserTest {
 
     @Test(expected = SIdentityException.class)
     public void getNumberOfUsersThrowException() throws Exception {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SUser>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SUser>> any()))
+                .thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers();
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
      */
     @Test
     public void getNumberOfUsersWithOptions() throws Exception {
@@ -139,7 +141,8 @@ public class IdentityServiceImplForUserTest {
     public void getNumberOfUsersWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
 
-        when(persistenceService.getNumberOfEntities(SUser.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SUser.class, options, null))
+                .thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers(options);
     }
 
@@ -158,19 +161,22 @@ public class IdentityServiceImplForUserTest {
     public void getNumberOfUsersByGroupThrowException() throws Exception {
         final long groupId = 1;
 
-        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId)))
+                .thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByGroup(groupId);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByMembership(long, long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByMembership(long, long)}.
      */
     @Test
     public void getNumberOfUsersByMembership() throws Exception {
         final long groupId = 1;
         final long roleId = 2;
 
-        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenReturn(3L);
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId)))
+                .thenReturn(3L);
         Assert.assertEquals(3L, identityServiceImpl.getNumberOfUsersByMembership(groupId, roleId));
     }
 
@@ -179,7 +185,8 @@ public class IdentityServiceImplForUserTest {
         final long groupId = 1;
         final long roleId = 2;
 
-        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId)))
+                .thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByMembership(groupId, roleId);
     }
 
@@ -198,7 +205,8 @@ public class IdentityServiceImplForUserTest {
     public void getNumberOfUsersByRoleThrowException() throws Exception {
         final long roleId = 2;
 
-        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId)))
+                .thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByRole(roleId);
     }
 
@@ -209,7 +217,8 @@ public class IdentityServiceImplForUserTest {
     public void getUserById() throws SBonitaReadException, SUserNotFoundException {
         final long userId = 1;
         final SUser sUser = mock(SUser.class);
-        when(persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId))).thenReturn(sUser);
+        when(persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId)))
+                .thenReturn(sUser);
 
         Assert.assertEquals(sUser, identityServiceImpl.getUser(userId));
     }
@@ -217,7 +226,8 @@ public class IdentityServiceImplForUserTest {
     @Test(expected = SUserNotFoundException.class)
     public void getUserByIdNotExist() throws SBonitaReadException, SUserNotFoundException {
         final long userId = 455;
-        doReturn(null).when(persistenceService).selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+        doReturn(null).when(persistenceService)
+                .selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
 
         identityServiceImpl.getUser(userId);
     }
@@ -225,7 +235,8 @@ public class IdentityServiceImplForUserTest {
     @Test(expected = SUserNotFoundException.class)
     public void getUserByIdThrowException() throws SBonitaReadException, SUserNotFoundException {
         final long userId = 1;
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
 
         identityServiceImpl.getUser(userId);
     }
@@ -240,7 +251,8 @@ public class IdentityServiceImplForUserTest {
         final SUser sUser3 = mock(SUser.class);
         final List<SUser> users = Arrays.asList(sUser1, sUser2, sUser3);
         final List<Long> ids = Arrays.asList(1l, 2l, 3l);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", ids))).thenReturn(users);
+        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", ids)))
+                .thenReturn(users);
 
         Assert.assertEquals(users, identityServiceImpl.getUsers(ids));
     }
@@ -288,12 +300,14 @@ public class IdentityServiceImplForUserTest {
     @SuppressWarnings("unchecked")
     @Test(expected = SIdentityException.class)
     public void getUsersByNamesThrowException() throws Exception {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("plop"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("plop"));
         identityServiceImpl.getUsersByUsername(Arrays.asList("hannu"));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#searchUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#searchUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
      */
     @Test
     public void searchUsers() throws Exception {
@@ -364,7 +378,8 @@ public class IdentityServiceImplForUserTest {
         verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", NEW_ICON_ID));
-        assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(new SIcon("image/jpeg", "updated content".getBytes()),
+        assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(
+                new SIcon("image/jpeg", "updated content".getBytes()),
                 "id");
         assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
     }

@@ -49,7 +49,8 @@ public class ApplicationNodeTest {
         app.setVersion(version);
 
         //then
-        assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage).hasIconPath(iconPath)
+        assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage)
+                .hasIconPath(iconPath)
                 .hasLayout(layout)
                 .hasTheme(theme).hasProfile(profile).hasState(state).hasToken(token).hasVersion(version);
     }

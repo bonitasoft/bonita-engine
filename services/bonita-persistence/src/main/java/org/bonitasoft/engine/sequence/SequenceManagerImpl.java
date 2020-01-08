@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.sequence;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -43,10 +42,9 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final Map<Long, TenantSequenceManagerImpl> sequenceManagers = new HashMap<>();
 
-
     public SequenceManagerImpl(final LockService lockService,
-                               final SequenceMappingProvider sequenceMappingProvider,
-                               final DataSource datasource, final int retries, final int delay, final int delayFactor) {
+            final SequenceMappingProvider sequenceMappingProvider,
+            final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.lockService = lockService;
         this.sequenceMappingProvider = sequenceMappingProvider;
         this.retries = retries;
@@ -77,7 +75,8 @@ public class SequenceManagerImpl implements SequenceManager {
     }
 
     TenantSequenceManagerImpl createTenantSequenceManager(long tenantId) {
-        return new TenantSequenceManagerImpl(tenantId, lockService, getSequenceIdToRangeSizeMap(), getClassNameToSequenceIdMap(), datasource, retries, delay,
+        return new TenantSequenceManagerImpl(tenantId, lockService, getSequenceIdToRangeSizeMap(),
+                getClassNameToSequenceIdMap(), datasource, retries, delay,
                 delayFactor);
     }
 
@@ -111,7 +110,8 @@ public class SequenceManagerImpl implements SequenceManager {
         for (SequenceMapping sequenceMapping : sequenceMappingProvider.getSequenceMappings()) {
             final long sequenceId = sequenceMapping.getSequenceId();
             if (result.containsKey(sequenceId)) {
-                throw new RuntimeException("SequenceMapping for id <" + sequenceId + "> is duplicated. Please make sure there is only one configuration for this sequence.");
+                throw new RuntimeException("SequenceMapping for id <" + sequenceId
+                        + "> is duplicated. Please make sure there is only one configuration for this sequence.");
             }
             result.put(sequenceId, sequenceMapping.getRangeSize());
         }

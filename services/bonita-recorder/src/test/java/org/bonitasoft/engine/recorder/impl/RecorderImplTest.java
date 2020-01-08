@@ -89,7 +89,6 @@ public class RecorderImplTest {
         return new DeleteRecord(entity);
     }
 
-
     private MyPersistentObject entity() {
         return new MyPersistentObject();
     }

@@ -73,10 +73,12 @@ public class SInputDefinitionImplTest {
 
         final SInputDefinition city = new SInputDefinitionImpl("city", SType.TEXT, DESCRIPTION);
         final SInputDefinition zip = new SInputDefinitionImpl("zip", SType.INTEGER, DESCRIPTION);
-        final SInputDefinition adress = new SInputDefinitionImpl("adress", DESCRIPTION, false, Arrays.asList(city, zip));
+        final SInputDefinition adress = new SInputDefinitionImpl("adress", DESCRIPTION, false,
+                Arrays.asList(city, zip));
 
         //when
-        final SInputDefinitionImpl sComplexInputDefinitionImpl = new SInputDefinitionImpl(NAME, DESCRIPTION, false, Arrays.asList(name,adress));
+        final SInputDefinitionImpl sComplexInputDefinitionImpl = new SInputDefinitionImpl(NAME, DESCRIPTION, false,
+                Arrays.asList(name, adress));
 
         //then
         assertThat(sComplexInputDefinitionImpl.isMultiple()).isFalse();
@@ -96,7 +98,8 @@ public class SInputDefinitionImplTest {
         assertThat(sComplexInputDefinitionImpl.getName()).isEqualTo("expense");
         assertThat(sComplexInputDefinitionImpl.getDescription()).isEqualTo(DESCRIPTION);
 
-        assertThat(sComplexInputDefinitionImpl.getInputDefinitions()).as("should contain name, amount and date").isNotEmpty().hasSize(4);
+        assertThat(sComplexInputDefinitionImpl.getInputDefinitions()).as("should contain name, amount and date")
+                .isNotEmpty().hasSize(4);
 
     }
 
@@ -110,7 +113,8 @@ public class SInputDefinitionImplTest {
 
         final InputDefinition adress = new InputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip));
 
-        final InputDefinition expense = new InputDefinitionImpl("expense", DESCRIPTION, true, Arrays.asList(name, amount, date, adress));
+        final InputDefinition expense = new InputDefinitionImpl("expense", DESCRIPTION, true,
+                Arrays.asList(name, amount, date, adress));
         return expense;
     }
 
@@ -137,7 +141,8 @@ public class SInputDefinitionImplTest {
     @Test
     public void constructor_with_multiple() throws Exception {
         //given
-        final SInputDefinitionImpl sInputDefinitionImpl = new SInputDefinitionImpl(NAME, SType.BOOLEAN, DESCRIPTION, true);
+        final SInputDefinitionImpl sInputDefinitionImpl = new SInputDefinitionImpl(NAME, SType.BOOLEAN, DESCRIPTION,
+                true);
 
         //then
         assertThat(sInputDefinitionImpl.isMultiple()).as("should be multiple").isTrue();

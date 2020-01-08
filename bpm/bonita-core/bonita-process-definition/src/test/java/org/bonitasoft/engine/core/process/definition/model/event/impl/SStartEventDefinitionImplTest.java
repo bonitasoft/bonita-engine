@@ -24,7 +24,7 @@ import org.junit.Test;
  * Created by Vincent Elcrin
  * Date: 18/12/13
  * Time: 14:50
- * 
+ *
  * @author Celine Souchet
  */
 public class SStartEventDefinitionImplTest {

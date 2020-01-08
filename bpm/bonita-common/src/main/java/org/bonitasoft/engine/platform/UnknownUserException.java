@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.platform;
 
-
 /**
  * Indicates that the user trying to login is unknown to bonita
  *

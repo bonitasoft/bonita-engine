@@ -31,7 +31,7 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
     private long tenantId;
 
     WorkSynchronization(final WorkExecutorService workExecutorService, final SessionAccessor sessionAccessor,
-                        WorkServiceImpl workService) {
+            WorkServiceImpl workService) {
         super();
         this.workService = workService;
         works = new HashSet<>();

@@ -96,13 +96,15 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         return expressionService;
     }
 
-    private Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    private Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues,
+            final Map<Integer, Object> resolvedExpressions)
             throws Exception {
         return getTransactionService().executeInTransaction(new Callable<Object>() {
 
             @Override
             public Object call() throws Exception {
-                return expressionService.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
+                return expressionService.evaluate(expression, dependencyValues, resolvedExpressions,
+                        ContainerState.ACTIVE);
             }
         });
     }
@@ -111,7 +113,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateStrConstant() throws Exception {
         // string
         final String strContent = "aabb*&^%$#@()!~><?|}{+_0123456789";// "''" or"/"/""
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, String.class.getName(), null, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, String.class.getName(), null,
+                null);
         evaluateAndCheckResult(strExpr, strContent, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
@@ -119,7 +122,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateStrEmptyConstant() throws Exception {
         // string
         final String strContent = " ";
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, String.class.getName(), null, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, String.class.getName(), null,
+                null);
         evaluateAndCheckResult(strExpr, strContent, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
@@ -133,7 +137,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         dependencyValues.put("containerType", containerType);
         try {
             final String dataName = "abcd";
-            final SDataInstance dataInstance = buildDataInstance(dataName, String.class.getName(), "data_description", "'some data initial value'",
+            final SDataInstance dataInstance = buildDataInstance(dataName, String.class.getName(), "data_description",
+                    "'some data initial value'",
                     containerId, containerType, false);
             insertDataInstance(dataInstance);
             dataExpr = buildExpression(dataName, SExpression.TYPE_VARIABLE, Integer.class.getName(), null, null);
@@ -146,14 +151,16 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluateWrongTypeGroovyExpression() throws Exception {
         final String strContent = "return new ArrayList();";
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, Boolean.class.getName(), SExpression.GROOVY, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT,
+                Boolean.class.getName(), SExpression.GROOVY, null);
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
     @Test
     public void evaluateCorrectSuperTypeGroovyExpression() throws Exception {
         final String strContent = "return new ArrayList();";
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, List.class.getName(), SExpression.GROOVY, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, List.class.getName(),
+                SExpression.GROOVY, null);
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
@@ -161,15 +168,18 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void checkGroovyScriptStrategyUsesCache() throws Exception {
         //given
         final String strContent = "return \"junit test checkGroovyScriptStrategyUsesCache\"";
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, String.class.getName(), SExpression.GROOVY, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT,
+                String.class.getName(), SExpression.GROOVY, null);
         final String cacheKey = GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY + strContent.hashCode();
-        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey)).as("should not contains key").isNull();
+        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey))
+                .as("should not contains key").isNull();
 
         //when
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
 
         //then
-        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey)).as("should contains key").isNotNull();
+        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey))
+                .as("should contains key").isNotNull();
     }
 
     @Test
@@ -180,11 +190,15 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         final String dataValue = "ManuDataValue";
         final long containerId = 1498674654675968768L;
         final String containerType = "localEvaluationContext";
-        insertDataInstance(buildDataInstance(dataName, String.class.getName(), "Some dummy data description", "'" + dataValue + "'", containerId,
+        insertDataInstance(buildDataInstance(dataName, String.class.getName(), "Some dummy data description",
+                "'" + dataValue + "'", containerId,
                 containerType, false));
-        final SExpression exprConstant = buildExpression(strConstant, SExpression.TYPE_CONSTANT, String.class.getName(), null, null);
-        final SExpression exprData = buildExpression(dataName, SExpression.TYPE_VARIABLE, String.class.getName(), null, null);
-        final SExpression expr = buildExpression(null, SExpression.TYPE_LIST, List.class.getName(), null, Arrays.asList(exprConstant, exprData));
+        final SExpression exprConstant = buildExpression(strConstant, SExpression.TYPE_CONSTANT, String.class.getName(),
+                null, null);
+        final SExpression exprData = buildExpression(dataName, SExpression.TYPE_VARIABLE, String.class.getName(), null,
+                null);
+        final SExpression expr = buildExpression(null, SExpression.TYPE_LIST, List.class.getName(), null,
+                Arrays.asList(exprConstant, exprData));
         final Map<String, Object> ctx = new HashMap<>(2);
         ctx.put("containerId", containerId);
         ctx.put("containerType", containerType);
@@ -200,7 +214,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateDoubleConstant() throws Exception {
         // Double
         final String doubleContent = "10.3";
-        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
+        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(),
+                null, null);
         final Object expressionResult = evaluate(doubExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals(10.3, expressionResult);
     }
@@ -208,7 +223,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     @Test(expected = SInvalidExpressionException.class)
     public void evaluateDoubleEmptyConstant() throws Exception {
         final String strContent = "";
-        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
+        final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_CONSTANT, Double.class.getName(), null,
+                null);
         evaluateAndCheckResult(strExpr, strContent, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
@@ -216,7 +232,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateDoubleTypeNoDecimal() throws Exception {
         // Double
         final String doubleContent = "10.";
-        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
+        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(),
+                null, null);
         final Object expressionResult = evaluate(doubExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals(10.0, expressionResult);
     }
@@ -225,7 +242,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateDoubleTypeNoRadical() throws Exception {
         // Double
         final String doubleContent = ".3";
-        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
+        final SExpression doubExpr = buildExpression(doubleContent, SExpression.TYPE_CONSTANT, Double.class.getName(),
+                null, null);
         final Object expressionResult = evaluate(doubExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals(0.3, expressionResult);
     }
@@ -234,7 +252,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateLongConstant() throws Exception {
         // Long
         final String longContent = "123000000";
-        final SExpression longExpr = buildExpression(longContent, SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
+        final SExpression longExpr = buildExpression(longContent, SExpression.TYPE_CONSTANT, Long.class.getName(), null,
+                null);
         final Object expressionResult = evaluate(longExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals(123000000L, expressionResult);
     }
@@ -242,7 +261,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     @Test(expected = SInvalidExpressionException.class)
     public void evaluateLongEmptyConstant() throws Exception {
         final String longContent = "";
-        final SExpression longExpr = buildExpression(longContent, SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
+        final SExpression longExpr = buildExpression(longContent, SExpression.TYPE_CONSTANT, Long.class.getName(), null,
+                null);
         evaluate(longExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
@@ -250,7 +270,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluatePatternExpressionWithException() throws Exception {
         final String expressionContent = "Expression with missing dependencies";
         final List<SExpression> dependencies = new ArrayList<>(1);
-        dependencies.add(buildExpression("value_will_be_missing", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null));
+        dependencies.add(buildExpression("value_will_be_missing", SExpression.TYPE_CONSTANT, Double.class.getName(),
+                null, null));
         final SExpression simplePatternExpression = newPatternExpression(expressionContent, dependencies);
         evaluate(simplePatternExpression, EMPTY_RESOLVED_EXPRESSIONS);
     }
@@ -267,12 +288,15 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateEmptyPatternExpression() throws Exception {
         final long processInstanceId = 123456L;
         final String data1Content = "emptyPatternData";
-        insertDataInstance(buildDataInstance(data1Content, String.class.getName(), "emptyPatternData_description", "'EXPRESSION'", processInstanceId,
+        insertDataInstance(buildDataInstance(data1Content, String.class.getName(), "emptyPatternData_description",
+                "'EXPRESSION'", processInstanceId,
                 "process", false));
-        final SExpression data1Expr = buildExpression(data1Content, SExpression.TYPE_VARIABLE, String.class.getName(), null, null);
+        final SExpression data1Expr = buildExpression(data1Content, SExpression.TYPE_VARIABLE, String.class.getName(),
+                null, null);
 
         final String constant2Content = "123456789";
-        final SExpression intExpr = buildExpression(constant2Content, SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
+        final SExpression intExpr = buildExpression(constant2Content, SExpression.TYPE_CONSTANT,
+                Integer.class.getName(), null, null);
 
         final List<SExpression> dependencyExpresssions = new ArrayList<>(2);
         dependencyExpresssions.add(data1Expr);
@@ -290,7 +314,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateStrGroovy() throws Exception {
         // String
         final String groovyContentStr = "'a'+1+'b'";
-        final SExpression groovyContentExpr = buildExpression(groovyContentStr, SExpression.TYPE_READ_ONLY_SCRIPT, String.class.getName(), SExpression.GROOVY,
+        final SExpression groovyContentExpr = buildExpression(groovyContentStr, SExpression.TYPE_READ_ONLY_SCRIPT,
+                String.class.getName(), SExpression.GROOVY,
                 null);
         final Object expressionResult = evaluate(groovyContentExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals("a1b", expressionResult);
@@ -300,7 +325,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateNumericGroovy() throws Exception {
         // numeric
         final String groovyContentNum = "((1+2)*2)/3";
-        final SExpression groovyNumExpr = buildExpression(groovyContentNum, SExpression.TYPE_READ_ONLY_SCRIPT, BigDecimal.class.getName(), SExpression.GROOVY,
+        final SExpression groovyNumExpr = buildExpression(groovyContentNum, SExpression.TYPE_READ_ONLY_SCRIPT,
+                BigDecimal.class.getName(), SExpression.GROOVY,
                 null);
         final Object expressionResult = evaluate(groovyNumExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals(new BigDecimal(2), expressionResult);
@@ -310,7 +336,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateStrEmptyGroovy() throws Exception {
         // String
         final String groovyContentStr = " ";
-        final SExpression groovyContentExpr = buildExpression(groovyContentStr, SExpression.TYPE_READ_ONLY_SCRIPT, String.class.getName(), SExpression.GROOVY,
+        final SExpression groovyContentExpr = buildExpression(groovyContentStr, SExpression.TYPE_READ_ONLY_SCRIPT,
+                String.class.getName(), SExpression.GROOVY,
                 null);
         final Object expressionResult = evaluate(groovyContentExpr, EMPTY_RESOLVED_EXPRESSIONS);
         assertEquals("a1b", expressionResult);
@@ -319,7 +346,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     @Test(expected = SExpressionTypeUnknownException.class)
     public void evaluateUnkonwnExpressionType() throws Exception {
         final String expressionContent = "str";
-        final SExpression expression = buildExpression(expressionContent, "TYPE_UNKNOWN", Boolean.class.getName(), null, null);
+        final SExpression expression = buildExpression(expressionContent, "TYPE_UNKNOWN", Boolean.class.getName(), null,
+                null);
         final Map<String, Object> map = new HashMap<>();
         map.put(expressionContent, "abc");
         evaluate(expression, map, EMPTY_RESOLVED_EXPRESSIONS);
@@ -329,7 +357,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
     public void evaluateUnknownProperty() throws Exception {
         // numeric
         final String groovyContentNum = "variable1";
-        final SExpression groovyNumExpr = buildExpression(groovyContentNum, SExpression.TYPE_READ_ONLY_SCRIPT, BigDecimal.class.getName(), SExpression.GROOVY,
+        final SExpression groovyNumExpr = buildExpression(groovyContentNum, SExpression.TYPE_READ_ONLY_SCRIPT,
+                BigDecimal.class.getName(), SExpression.GROOVY,
                 null);
         evaluate(groovyNumExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
@@ -338,14 +367,17 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         return buildExpression(content, SExpression.TYPE_PATTERN, String.class.getName(), null, dependencies);
     }
 
-    private void initializeBuilder(final SDataDefinitionBuilder dataDefinitionBuilder, final String description, final String content,
+    private void initializeBuilder(final SDataDefinitionBuilder dataDefinitionBuilder, final String description,
+            final String content,
             final boolean isTransient, final String defaultValueReturnType) {
         SExpression expression = null;
         if (content != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class)
+                    .createNewInstance();
             // this discrimination'll be changed.
-            expreBuilder.setContent(content).setExpressionType(SExpression.TYPE_READ_ONLY_SCRIPT).setInterpreter(SExpression.GROOVY)
+            expreBuilder.setContent(content).setExpressionType(SExpression.TYPE_READ_ONLY_SCRIPT)
+                    .setInterpreter(SExpression.GROOVY)
                     .setReturnType(defaultValueReturnType);
             try {
                 expression = expreBuilder.done();
@@ -359,10 +391,12 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         dataDefinitionBuilder.setDefaultValue(expression);
     }
 
-    private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
+    private SDataInstance buildDataInstance(final String instanceName, final String className, final String description,
+            final String content,
             final long containerId, final String containerType, final boolean isTransient) throws Exception {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class)
+                .createNewInstance(instanceName, className);
         initializeBuilder(dataDefinitionBuilder, description, content, isTransient, className);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create datainstance
@@ -371,7 +405,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
 
-    private void evaluateDefaultValueOf(final SDataDefinition dataDefinition, final SDataInstanceBuilder dataInstanceBuilder) throws Exception {
+    private void evaluateDefaultValueOf(final SDataDefinition dataDefinition,
+            final SDataInstanceBuilder dataInstanceBuilder) throws Exception {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         if (expression != null) {
             dataInstanceBuilder.setValue((Serializable) evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS));
@@ -389,15 +424,19 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         });
     }
 
-    private void verifyEvaluateVariable(final String expressionContent, final Class<?> classType, final String description, final Long containerId,
-            final String containerType, final String value, final Boolean isTransient, final Serializable hopeValue) throws Exception {
+    private void verifyEvaluateVariable(final String expressionContent, final Class<?> classType,
+            final String description, final Long containerId,
+            final String containerType, final String value, final Boolean isTransient, final Serializable hopeValue)
+            throws Exception {
         // create data
-        final SDataInstance dataInstance = buildDataInstance(expressionContent, classType.getName(), description, value, containerId, containerType,
+        final SDataInstance dataInstance = buildDataInstance(expressionContent, classType.getName(), description, value,
+                containerId, containerType,
                 isTransient);
         // insert data
         insertDataInstance(dataInstance);
         // definite expression
-        final SExpression variableExpr = buildExpression(expressionContent, SExpression.TYPE_VARIABLE, classType.getName(), null, null);
+        final SExpression variableExpr = buildExpression(expressionContent, SExpression.TYPE_VARIABLE,
+                classType.getName(), null, null);
         final Map<String, Object> dependencyValues = new HashMap<>();
         dependencyValues.put("containerId", containerId);
         dependencyValues.put("containerType", containerType);
@@ -416,7 +455,8 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void evaluateShortTextVariableDBWithNoDefaultValue() throws Exception {
-        verifyEvaluateVariable("nullableData", String.class, "data that is possibly null", 21L, "process", null, false, null);
+        verifyEvaluateVariable("nullableData", String.class, "data that is possibly null", 21L, "process", null, false,
+                null);
     }
 
     @Test
@@ -426,25 +466,30 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void evaluateNumericVariableDB() throws Exception {
-        verifyEvaluateVariable("pageSum", Integer.class, "evaluate Numeric Variable DB", 12L, "task", "100", false, 100);
+        verifyEvaluateVariable("pageSum", Integer.class, "evaluate Numeric Variable DB", 12L, "task", "100", false,
+                100);
     }
 
     @Test
     public void evaluateNumericVariableCache() throws Exception {
-        verifyEvaluateVariable("pageSum", Integer.class, "evaluate Numeric Variabl eCache", 13L, "task", "100", true, 100);
+        verifyEvaluateVariable("pageSum", Integer.class, "evaluate Numeric Variabl eCache", 13L, "task", "100", true,
+                100);
     }
 
     @Test(expected = SInvalidExpressionException.class)
     public void evaluateShortTextEmptyVariableDB() throws Exception {
-        verifyEvaluateVariable("", String.class, "evaluate ShortText Empty Variable DB", 23456L, "container_16", "'Edward'", false, "Edward");
+        verifyEvaluateVariable("", String.class, "evaluate ShortText Empty Variable DB", 23456L, "container_16",
+                "'Edward'", false, "Edward");
     }
 
     @Test(expected = SInvalidExpressionException.class)
     public void evaluateShortTextEmptyVariableCache() throws Exception {
-        verifyEvaluateVariable("  ", String.class, "evaluate ShortText Empty Variable Cache", 34567L, "container_17", "'Edward'", true, "Edward");
+        verifyEvaluateVariable("  ", String.class, "evaluate ShortText Empty Variable Cache", 34567L, "container_17",
+                "'Edward'", true, "Edward");
     }
 
-    private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
+    private SExpression buildExpression(final String content, final String expressionType, final String returnType,
+            final String interpreter,
             final List<SExpression> dependencies) {
         final SExpressionBuilder eb = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         eb.setName(content);
@@ -460,19 +505,22 @@ public class ExpressionServiceTest extends CommonBPMServicesTest {
         }
     }
 
-    private Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions) throws Exception {
+    private Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions)
+            throws Exception {
         return getTransactionService().executeInTransaction(new Callable<Object>() {
 
             @Override
             public Object call() throws Exception {
                 final Map<String, Object> dependencyValues = new HashMap<>();
                 dependencyValues.put(ExpressionExecutorStrategy.DEFINITION_ID, DEFINITION_ID_VALUE);
-                return getExpressionService().evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
+                return getExpressionService().evaluate(expression, dependencyValues, resolvedExpressions,
+                        ContainerState.ACTIVE);
             }
         });
     }
 
-    private void evaluateAndCheckResult(final SExpression expression, final Object expectedValue, final Map<Integer, Object> resolvedExpression)
+    private void evaluateAndCheckResult(final SExpression expression, final Object expectedValue,
+            final Map<Integer, Object> resolvedExpression)
             throws Exception {
         final Object expressionResult = evaluate(expression, resolvedExpression);
         assertEquals(expectedValue, expressionResult);

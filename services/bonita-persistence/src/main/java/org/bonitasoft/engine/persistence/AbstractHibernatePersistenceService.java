@@ -75,7 +75,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private int stat_display_count;
     private QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory();
 
-    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
+    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory,
+            final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
             throws ClassNotFoundException {
@@ -90,9 +91,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         orderByBuilder = new DefaultOrderByBuilder();
     }
 
-    public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties, final char likeEscapeCharacter, final TechnicalLoggerService logger,
-            final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+    public AbstractHibernatePersistenceService(final String name,
+            final HibernateConfigurationProvider hbmConfigurationProvider,
+            final Properties extraHibernateProperties, final char likeEscapeCharacter,
+            final TechnicalLoggerService logger,
+            final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings)
             throws SPersistenceException, ClassNotFoundException {
         super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
@@ -129,7 +133,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             } else if (dialect.toLowerCase().contains("mysql")) {
                 configuration.registerTypeOverride(new XMLType());
                 queryBuilderFactory.setVendor(MYSQL);
-            }else{
+            } else {
                 configuration.registerTypeOverride(new XMLType());
             }
         }
@@ -164,7 +168,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private OrderByCheckingMode getOrderByCheckingMode() {
         final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
-        return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property) : OrderByCheckingMode.NONE;
+        return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property)
+                : OrderByCheckingMode.NONE;
     }
 
     /**
@@ -174,7 +179,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         if (!statistics.isStatisticsEnabled()) {
             return;
         }
-        if (stat_display_count == 10 || stat_display_count == 100 || stat_display_count == 1000 || stat_display_count % 10000 == 0) {
+        if (stat_display_count == 10 || stat_display_count == 100 || stat_display_count == 1000
+                || stat_display_count % 10000 == 0) {
             final long query_cache_hit = statistics.getQueryCacheHitCount();
             final long query_cache_miss = statistics.getQueryCacheMissCount();
             final long query_cahe_put = statistics.getQueryCachePutCount();
@@ -183,10 +189,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final long level_2_put = statistics.getSecondLevelCachePutCount();
 
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Query Cache Ratio "
-                    + (int) ((double) query_cache_hit / (query_cache_hit + query_cache_miss) * 100) + "% " + query_cache_hit + " hits " + query_cache_miss
+                    + (int) ((double) query_cache_hit / (query_cache_hit + query_cache_miss) * 100) + "% "
+                    + query_cache_hit + " hits " + query_cache_miss
                     + " miss " + query_cahe_put + " puts");
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "2nd Level Cache Ratio "
-                    + (int) ((double) level_2_cache_hit / (level_2_cache_hit + level_2_cache_miss) * 100) + "% " + level_2_cache_hit + " hits "
+                    + (int) ((double) level_2_cache_hit / (level_2_cache_hit + level_2_cache_miss) * 100) + "% "
+                    + level_2_cache_hit + " hits "
                     + level_2_cache_miss + " miss " + level_2_put + " puts");
 
         }
@@ -236,7 +244,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public int update(final String updateQueryName, final Map<String, Object> inputParameters) throws SPersistenceException {
+    public int update(final String updateQueryName, final Map<String, Object> inputParameters)
+            throws SPersistenceException {
         final Query query = getSession(true).getNamedQuery(updateQueryName);
         try {
             if (inputParameters != null) {
@@ -304,7 +313,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
+    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue)
+            throws SPersistenceException {
         Long id = null;
         try {
             id = entity.getId();
@@ -323,7 +333,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass)
+            throws SPersistenceException {
         if (classMapping.contains(entityClass)) {
             return entityClass;
         }
@@ -337,7 +348,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor)
+            throws SBonitaReadException {
         try {
             final Session session = getSession(true);
             final T object = this.selectById(session, selectDescriptor);
@@ -362,7 +374,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @SuppressWarnings("unchecked")
-    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
+            throws SBonitaReadException {
         Class<? extends PersistentObject> mappedClass;
         try {
             mappedClass = getMappedClass(selectDescriptor.getEntityType());
@@ -417,16 +430,19 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final Session session = getSession(true);
 
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(query, selectDescriptor.getEntityType(), orderByBuilder,
+            QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(query,
+                    selectDescriptor.getEntityType(), orderByBuilder,
                     classAliasMappings,
                     likeEscapeCharacter);
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
                 final boolean enableWordSearch = isWordSearchEnabled(selectDescriptor.getEntityType());
-                queryBuilder.appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
+                queryBuilder.appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(),
+                        enableWordSearch);
             }
             if (selectDescriptor.hasOrderByParameters()) {
-                queryBuilder.appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(), selectDescriptor.getEntityType());
+                queryBuilder.appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(),
+                        selectDescriptor.getEntityType());
             }
 
             if (queryBuilder.hasChanged()) {
@@ -510,7 +526,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    public void delete(final long id, final Class<? extends PersistentObject> entityClass)
+            throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
         query.setLong("id", id);
@@ -524,7 +541,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass)
+            throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
         query.setParameterList("ids", ids);
@@ -538,7 +556,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     public void destroy() {
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
+        logger.log(getClass(), TechnicalLogSeverity.INFO,
+                "Closing Hibernate session factory of " + getClass().getName());
         sessionFactory.close();
     }
 

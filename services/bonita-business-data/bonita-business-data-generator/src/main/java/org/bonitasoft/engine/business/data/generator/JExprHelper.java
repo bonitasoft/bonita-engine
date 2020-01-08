@@ -24,6 +24,7 @@ public class JExprHelper {
 
     /**
      * Build a {@link JFieldRef} prefixed by {@code 'this.'}
+     *
      * @param fieldVar field to be referenced via {@code 'this.'}
      * @return a {@link JFieldRef} prefixed by {@code 'this.'}
      */

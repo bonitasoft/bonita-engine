@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Hongwen Zang
- * 
  */
 public class SCommentException extends SBonitaException {
 

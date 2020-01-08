@@ -21,9 +21,10 @@ import org.hibernate.type.descriptor.sql.BinaryTypeDescriptor;
  * @author Guillaume Rosinosky
  */
 public class PostgresMaterializedBlobType extends AbstractSingleColumnStandardBasicType<byte[]> {
+
     public PostgresMaterializedBlobType() {
         // mapping binary to byte[] (for bytea type in Postgres)
-        super(BinaryTypeDescriptor.INSTANCE , PrimitiveByteArrayTypeDescriptor.INSTANCE);
+        super(BinaryTypeDescriptor.INSTANCE, PrimitiveByteArrayTypeDescriptor.INSTANCE);
     }
 
     @Override

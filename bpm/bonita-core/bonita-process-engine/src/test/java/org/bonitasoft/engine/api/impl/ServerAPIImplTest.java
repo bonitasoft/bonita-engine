@@ -81,8 +81,10 @@ public class ServerAPIImplTest {
 
     private static final long TENANT_SESSION_ID = 54335453241L;
     private static final long PLATFORM_SESSION_ID = 54335453241L;
-    private APISession tenantSession = new APISessionImpl(TENANT_SESSION_ID, new Date(), 10000, "john", 14L, "theTenant", 42L);
-    private PlatformSession platformSession = new PlatformSessionImpl(PLATFORM_SESSION_ID, new Date(), 10000, "john", 14L);
+    private APISession tenantSession = new APISessionImpl(TENANT_SESSION_ID, new Date(), 10000, "john", 14L,
+            "theTenant", 42L);
+    private PlatformSession platformSession = new PlatformSessionImpl(PLATFORM_SESSION_ID, new Date(), 10000, "john",
+            14L);
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
@@ -126,7 +128,8 @@ public class ServerAPIImplTest {
     @Before
     public void createServerAPI() throws Exception {
         doReturn(true).when(platformApi).isNodeStarted();
-        when(userTransactionService.executeInTransaction(any())).thenAnswer(invocation -> ((Callable<?>) invocation.getArgument(0)).call());
+        when(userTransactionService.executeInTransaction(any()))
+                .thenAnswer(invocation -> ((Callable<?>) invocation.getArgument(0)).call());
         doReturn(platformServiceAccessor).when(serviceAccessorFactory).createPlatformServiceAccessor();
         doReturn(sessionAccessor).when(serviceAccessorFactory).createSessionAccessor();
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
@@ -144,6 +147,7 @@ public class ServerAPIImplTest {
         doAnswer(invocation -> isTenantPaused).when(tenantAdministrationApi).isPaused();
 
         accessResolver = new APIAccessResolver() {
+
             @Override
             public <T> T getAPIImplementation(Class<T> apiInterface) throws APIImplementationNotFoundException {
                 if (apiInterface.isAssignableFrom(MyApi.class)) {
@@ -163,8 +167,11 @@ public class ServerAPIImplTest {
             }
         };
         serverAPIImpl = new ServerAPIImpl(accessResolver) {
+
             @Override
-            UserTransactionService selectUserTransactionService(Session session, SessionType sessionType) throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            UserTransactionService selectUserTransactionService(Session session, SessionType sessionType)
+                    throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
                 return userTransactionService;
             }
 
@@ -182,12 +189,15 @@ public class ServerAPIImplTest {
     public void should_throw_ClassNotFoundException_when_api_is_not_known() throws Throwable {
 
         expectedException.expect(ServerWrappedException.class);
-        expectedException.expectCause(new CustomTypeSafeMatcher<Throwable>("should be a runtime caused by a ClassNotFoundException") {
-            @Override
-            protected boolean matchesSafely(Throwable throwable) {
-                return throwable instanceof BonitaRuntimeException && throwable.getCause() instanceof ClassNotFoundException;
-            }
-        });
+        expectedException.expectCause(
+                new CustomTypeSafeMatcher<Throwable>("should be a runtime caused by a ClassNotFoundException") {
+
+                    @Override
+                    protected boolean matchesSafely(Throwable throwable) {
+                        return throwable instanceof BonitaRuntimeException
+                                && throwable.getCause() instanceof ClassNotFoundException;
+                    }
+                });
 
         serverAPIImpl.invokeMethod(options(tenantSession), "UnknownApi", "someMethod", emptyList(), null);
     }
@@ -195,7 +205,8 @@ public class ServerAPIImplTest {
     @Test
     public void should_not_open_transaction_on_CustomTransaction_annotated_methods() throws Throwable {
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "customTxAPIMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "customTxAPIMethod", emptyList(),
+                null);
 
         assertThat(myApi.customTxAPIMethodCalled).isTrue();
         //only one call: "tenantAdministrationApi.isTenantPaused"
@@ -213,7 +224,8 @@ public class ServerAPIImplTest {
     @Test
     public void should_call_normal_method_in_transaction() throws Throwable {
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
 
         assertThat(myApi.notAnnotatedMethodCalled).isTrue();
         verify(userTransactionService).executeInTransaction(any());
@@ -231,41 +243,50 @@ public class ServerAPIImplTest {
         isTenantPaused = true;
 
         expectedException.expectCause(instanceOf(TenantStatusException.class));
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
     }
 
     @Test
-    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_paused() throws Exception {
+    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_paused()
+            throws Exception {
         isTenantPaused = true;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused",
+                emptyList(), null);
 
         assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
     }
 
     @Test
-    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_not_paused() throws Exception {
+    public void should_be_able_to_call_method_with_AvailableWhenTenantIsPaused_when_tenant_is_not_paused()
+            throws Exception {
         isTenantPaused = false;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "availableWhenTenantIsPaused",
+                emptyList(), null);
 
         assertThat(myApi.availableWhenTenantIsPausedCalled).isTrue();
     }
 
     @Test
-    public void should_not_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_not_paused() throws Exception {
+    public void should_not_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_not_paused()
+            throws Exception {
         isTenantPaused = false;
 
         expectedException.expectCause(instanceOf(TenantStatusException.class));
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused",
+                emptyList(), null);
     }
 
     @Test
-    public void should_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_paused() throws Exception {
+    public void should_be_able_to_call_method_with_OnlyAvailableWhenTenantIsPaused_when_tenant_is_paused()
+            throws Exception {
         isTenantPaused = true;
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "onlyAvailableWhenTenantIsPaused",
+                emptyList(), null);
 
         assertThat(myApi.onlyAvailableWhenTenantIsPausedCalled).isTrue();
     }
@@ -275,7 +296,8 @@ public class ServerAPIImplTest {
         isTenantPaused = true;
 
         //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
-        serverAPIImpl.invokeMethod(options(tenantSession), ApiFullyAccessibleWhenTenantIsPaused.class.getName(), "aMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), ApiFullyAccessibleWhenTenantIsPaused.class.getName(),
+                "aMethod", emptyList(), null);
 
         assertThat(myApiFullyAccessibleWhenTenantIsPaused.aMethodCalled).isTrue();
     }
@@ -285,7 +307,8 @@ public class ServerAPIImplTest {
         isTenantPaused = true;
 
         //There is no real check in server API whether it is a tenant or a platform api, we only check the type of session
-        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
 
         assertThat(myApi.notAnnotatedMethodCalled).isTrue();
     }
@@ -295,7 +318,8 @@ public class ServerAPIImplTest {
         doReturn(false).when(tenantLoginService).isValid(TENANT_SESSION_ID);
 
         expectedException.expectCause(instanceOf(InvalidSessionException.class));
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
     }
 
     @Test
@@ -303,24 +327,27 @@ public class ServerAPIImplTest {
         doReturn(false).when(platformLoginService).isValid(PLATFORM_SESSION_ID);
 
         expectedException.expectCause(instanceOf(InvalidSessionException.class));
-        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
     }
 
     @Test
     public void should_renew_tenant_session_when_call_is_ok() throws Exception {
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
 
         verify(sessionService).renewSession(TENANT_SESSION_ID);
     }
+
     @Test
     public void should_renew_platform_session_when_call_is_ok() throws Exception {
 
-        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(platformSession), MyApi.class.getName(), "notAnnotatedMethod", emptyList(),
+                null);
 
         verify(platformSessionService).renewSession(PLATFORM_SESSION_ID);
     }
-
 
     @Test
     public void should_checkMethodAccessibility_do_not_warn_user_when_method_is_not_deprecated() throws Throwable {
@@ -345,7 +372,8 @@ public class ServerAPIImplTest {
 
         //then
 
-        assertThat(systemOutRule.getLog()).contains("The API method " + this.getClass().getName() + "$MyApi.callMeOld is deprecated.");
+        assertThat(systemOutRule.getLog())
+                .contains("The API method " + this.getClass().getName() + "$MyApi.callMeOld is deprecated.");
     }
 
     @Test
@@ -353,7 +381,8 @@ public class ServerAPIImplTest {
         expectedException.expect(ServerWrappedException.class);
         expectedException.expectCause(instanceOf(BonitaRuntimeException.class));
 
-        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "methodThatThrowRuntimeException", emptyList(), null);
+        serverAPIImpl.invokeMethod(options(tenantSession), MyApi.class.getName(), "methodThatThrowRuntimeException",
+                emptyList(), null);
     }
 
     private Map<String, Serializable> options(Session session) {
@@ -361,7 +390,6 @@ public class ServerAPIImplTest {
         options.put("session", session);
         return options;
     }
-
 
     // ----
     // APIS for tests
@@ -441,17 +469,16 @@ public class ServerAPIImplTest {
         public void availableWhenTenantIsPaused() {
             availableWhenTenantIsPausedCalled = true;
         }
+
         @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
         public void onlyAvailableWhenTenantIsPaused() {
             onlyAvailableWhenTenantIsPausedCalled = true;
         }
 
-
         @CustomTransactions
         public void customTxAPIMethod() {
             customTxAPIMethodCalled = true;
         }
-
 
         public void notAnnotatedMethod() {
             notAnnotatedMethodCalled = true;

@@ -21,5 +21,5 @@ import org.bonitasoft.engine.platform.model.SPlatform;
  */
 public interface PlatformRetriever {
 
-   SPlatform getPlatform() throws SPlatformNotFoundException;
+    SPlatform getPlatform() throws SPlatformNotFoundException;
 }

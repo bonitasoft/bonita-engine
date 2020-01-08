@@ -54,9 +54,11 @@ class ConfigurationChecker {
             Class.forName(driverClassName);
         } catch (ClassNotFoundException e) {
             throw new PlatformException("The driver class named '" + driverClassName
-                    + "' specified in 'internal.properties' configuration file, to connect to your '" + dbConfiguration.getDbVendor()
+                    + "' specified in 'internal.properties' configuration file, to connect to your '"
+                    + dbConfiguration.getDbVendor()
                     + "' database, cannot be found." +
-                    " Either there is an error in the name of the class or the class is not available in the classpath." +
+                    " Either there is an error in the name of the class or the class is not available in the classpath."
+                    +
                     " Make sure the driver class name is correct and that the suitable driver is available in the lib/ folder and then try again.",
                     e);
         }

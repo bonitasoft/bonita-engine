@@ -60,8 +60,10 @@ public class TriggerSignalWorkTest {
         context.put("tenantAccessor", tenantServiceAccessor);
         doReturn(eventInstanceService).when(tenantServiceAccessor).getEventInstanceService();
         doReturn(eventsHandler).when(tenantServiceAccessor).getEventsHandler();
-        waitingSignalEvent = new SWaitingSignalEvent(SBPMEventType.EVENT_SUB_PROCESS, 654223L, "proc", 54362L, "flownode", SIGNAL_NAME);
-        doThrow(SEventTriggerInstanceNotFoundException.class).when(eventInstanceService).getWaitingSignalEvent(anyLong());
+        waitingSignalEvent = new SWaitingSignalEvent(SBPMEventType.EVENT_SUB_PROCESS, 654223L, "proc", 54362L,
+                "flownode", SIGNAL_NAME);
+        doThrow(SEventTriggerInstanceNotFoundException.class).when(eventInstanceService)
+                .getWaitingSignalEvent(anyLong());
         doReturn(waitingSignalEvent).when(eventInstanceService).getWaitingSignalEvent(SIGNAL_ID);
     }
 
@@ -83,7 +85,8 @@ public class TriggerSignalWorkTest {
 
     @Test(expected = SEventTriggerInstanceReadException.class)
     public void should_throw_exception_when_we_are_unable_to_read_the_signal() throws Exception {
-        doThrow(SEventTriggerInstanceReadException.class).when(eventInstanceService).getWaitingSignalEvent(UNREADABLE_SIGNAL_ID);
+        doThrow(SEventTriggerInstanceReadException.class).when(eventInstanceService)
+                .getWaitingSignalEvent(UNREADABLE_SIGNAL_ID);
         triggerSignalWork = new TriggerSignalWork(UNREADABLE_SIGNAL_ID, SIGNAL_NAME);
         //when
         triggerSignalWork.work(context);

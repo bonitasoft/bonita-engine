@@ -37,16 +37,21 @@ public class CommentIT extends TestWithUser {
 
     @Test
     public void should_be_able_to_add_search_and_archive_comments() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
         String taskName = "userTask1";
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(taskName, ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(taskName, ACTOR_NAME)
+                .getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         // get comments before add new.
         final List<Comment> originalComments = getProcessAPI().searchComments(
-                new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
+                new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId())
+                        .done())
+                .getResult();
         // add comments
         final String commentContent = "added comment 0";
         final Comment comment = getProcessAPI().addProcessComment(pi0.getId(), commentContent);
@@ -69,19 +74,24 @@ public class CommentIT extends TestWithUser {
         waitForProcessToFinish(pi0);
 
         final SearchResult<ArchivedComment> searchArchivedComments = getProcessAPI().searchArchivedComments(
-                new SearchOptionsBuilder(0, 10).filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done());
-        assertThat(searchArchivedComments.getCount()).as("At least 3 comments should have been retrieved (+ possible automatic comments)")
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done());
+        assertThat(searchArchivedComments.getCount())
+                .as("At least 3 comments should have been retrieved (+ possible automatic comments)")
                 .isGreaterThanOrEqualTo(3);
 
         // ensure we can retrieve archived comments using the SOURCE_OBJECT_ID field
-        final SearchResult<ArchivedComment> searchArchivedCommentsBySourceObjectId = getProcessAPI().searchArchivedComments(
-                new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, comment2.getId()).done());
+        final SearchResult<ArchivedComment> searchArchivedCommentsBySourceObjectId = getProcessAPI()
+                .searchArchivedComments(
+                        new SearchOptionsBuilder(0, 30)
+                                .filter(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, comment2.getId()).done());
         assertThat(searchArchivedCommentsBySourceObjectId.getCount()).isEqualTo(1);
         assertThat(searchArchivedCommentsBySourceObjectId.getResult().get(0).getContent()).isEqualTo("added comment 2");
 
         // ensure we can retrieve archived comments using the CONTENT field
         final SearchResult<ArchivedComment> searchArchivedCommentsByContent = getProcessAPI().searchArchivedComments(
-                new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.CONTENT, "added comment 2").done());
+                new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.CONTENT, "added comment 2")
+                        .done());
         assertThat(searchArchivedCommentsByContent.getCount()).isEqualTo(1);
         assertThat(searchArchivedCommentsByContent.getResult().get(0).getSourceObjectId()).isEqualTo(comment2.getId());
 

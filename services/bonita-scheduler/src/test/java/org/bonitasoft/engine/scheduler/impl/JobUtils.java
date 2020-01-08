@@ -23,11 +23,9 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.impl.JobDetailImpl;
 
 public class JobUtils {
-
 
     static JobDetailImpl createJobDetails(long tenantId, long jobDescriptorId) {
         JobDetailImpl jobDetail = new JobDetailImpl();
@@ -42,6 +40,7 @@ public class JobUtils {
 
     static StatelessJob jobThatFails() {
         return new StatelessJob() {
+
             @Override
             public String getName() {
                 return null;
@@ -63,8 +62,10 @@ public class JobUtils {
             }
         };
     }
+
     static StatelessJob jobThatSucceed() {
         return new StatelessJob() {
+
             @Override
             public String getName() {
                 return null;
@@ -86,8 +87,10 @@ public class JobUtils {
             }
         };
     }
+
     static StatelessJob jobThatThrowASRetryableException() {
         return new StatelessJob() {
+
             @Override
             public String getName() {
                 return null;

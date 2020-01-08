@@ -30,7 +30,8 @@ public class WaitForArchivedActivity extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
-    public WaitForArchivedActivity(final int repeatEach, final int timeout, final long activityId, final TestStates state, final ProcessAPI processAPI) {
+    public WaitForArchivedActivity(final int repeatEach, final int timeout, final long activityId,
+            final TestStates state, final ProcessAPI processAPI) {
         super(repeatEach, timeout, false);
         this.activityId = activityId;
         this.stateName = state.getStateName();

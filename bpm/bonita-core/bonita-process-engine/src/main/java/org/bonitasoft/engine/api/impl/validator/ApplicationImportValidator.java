@@ -28,7 +28,7 @@ public class ApplicationImportValidator {
 
     public void validate(String token) throws ImportException {
         ValidationStatus validationStatus = tokenValidator.validate(token);
-        if(!validationStatus.isValid()) {
+        if (!validationStatus.isValid()) {
             throw new ImportException(validationStatus.getMessage());
         }
     }

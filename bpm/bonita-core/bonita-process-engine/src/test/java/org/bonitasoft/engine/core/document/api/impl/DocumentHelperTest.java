@@ -91,9 +91,11 @@ public class DocumentHelperTest {
     public void should_isDefinedInDefinition_throw_not_found_when_not_existing_instance() throws Exception {
         //given
         initDefinition("list1", "list2");
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
+                .getProcessInstance(PROCESS_INSTANCE_ID);
         exception.expect(org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException.class);
-        exception.expectMessage("Unable to find the list theList, nothing in database and the process instance 45 is not found");
+        exception.expectMessage(
+                "Unable to find the list theList, nothing in database and the process instance 45 is not found");
         //when
         documentHelper.isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
         //then exception
@@ -104,7 +106,8 @@ public class DocumentHelperTest {
         initDefinition("list1", "list2");
         doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getProcessDefinition(154l);
         exception.expect(org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException.class);
-        exception.expectMessage("Unable to find the list theList on process instance 45, nothing in database and the process definition is not found");
+        exception.expectMessage(
+                "Unable to find the list theList on process instance 45, nothing in database and the process definition is not found");
         //when
         documentHelper.isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
     }
@@ -112,7 +115,8 @@ public class DocumentHelperTest {
     @Test
     public void should_isDefinedInDefinition_throw_read_ex_when_not_existing_instance() throws Exception {
         initDefinition("list1", "list2");
-        doThrow(SProcessInstanceReadException.class).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+        doThrow(SProcessInstanceReadException.class).when(processInstanceService)
+                .getProcessInstance(PROCESS_INSTANCE_ID);
         exception.expect(SBonitaReadException.class);
         documentHelper.isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
     }
@@ -133,13 +137,15 @@ public class DocumentHelperTest {
         assertThat(documentHelper.isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID)).isTrue();
     }
 
-    private void initDefinition(String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SProcessDefinitionNotFoundException,
+    private void initDefinition(String... names) throws SProcessInstanceNotFoundException,
+            SProcessInstanceReadException, SProcessDefinitionNotFoundException,
             SBonitaReadException {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
         doReturn(154l).when(processInstance).getProcessDefinitionId();
         doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
         doReturn(flowElementContainerDefinition).when(processDefinition).getProcessContainer();
-        doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition).getDocumentListDefinitions();
+        doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition)
+                .getDocumentListDefinitions();
     }
 
     private List<SDocumentListDefinition> createListOfDocumentListDefinition(String... names) {
@@ -189,7 +195,8 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void should_delete_document_removeCurrentVersion() throws SObjectModificationException, SObjectNotFoundException {
+    public void should_delete_document_removeCurrentVersion()
+            throws SObjectModificationException, SObjectNotFoundException {
         //when
         documentHelper.deleteDocument("myDoc", PROCESS_INSTANCE_ID);
         //then
@@ -197,18 +204,22 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void should_delete_document_be_quiet_when_not_found() throws SObjectModificationException, SObjectNotFoundException {
+    public void should_delete_document_be_quiet_when_not_found()
+            throws SObjectModificationException, SObjectNotFoundException {
         //given
-        doThrow(SObjectNotFoundException.class).when(documentService).removeCurrentVersion(PROCESS_INSTANCE_ID, "myDoc");
+        doThrow(SObjectNotFoundException.class).when(documentService).removeCurrentVersion(PROCESS_INSTANCE_ID,
+                "myDoc");
         //when
         documentHelper.deleteDocument("myDoc", PROCESS_INSTANCE_ID);
         //no exception
     }
 
     @Test(expected = SObjectModificationException.class)
-    public void should_delete_document_throw_SObjectModificationException() throws SObjectModificationException, SObjectNotFoundException {
+    public void should_delete_document_throw_SObjectModificationException()
+            throws SObjectModificationException, SObjectNotFoundException {
         //given
-        doThrow(SObjectModificationException.class).when(documentService).removeCurrentVersion(PROCESS_INSTANCE_ID, "myDoc");
+        doThrow(SObjectModificationException.class).when(documentService).removeCurrentVersion(PROCESS_INSTANCE_ID,
+                "myDoc");
         //when
         documentHelper.deleteDocument("myDoc", PROCESS_INSTANCE_ID);
     }
@@ -234,7 +245,8 @@ public class DocumentHelperTest {
         DocumentValue docValue = new DocumentValue("myUrl");
         documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"), nullable(String.class));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID),
+                eq("myDoc"), nullable(String.class));
     }
 
     @Test
@@ -247,8 +259,10 @@ public class DocumentHelperTest {
         DocumentValue docValue2 = new DocumentValue("url2");
         documentHelperSpy.setDocumentList(asList(docValue1, docValue2), "theList", PROCESS_INSTANCE_ID, AUTHOR_ID);
 
-        verify(documentHelperSpy).processDocumentOnIndex(docValue1, "theList", PROCESS_INSTANCE_ID, existingList, 0, AUTHOR_ID);
-        verify(documentHelperSpy).processDocumentOnIndex(docValue2, "theList", PROCESS_INSTANCE_ID, existingList, 1, AUTHOR_ID);
+        verify(documentHelperSpy).processDocumentOnIndex(docValue1, "theList", PROCESS_INSTANCE_ID, existingList, 0,
+                AUTHOR_ID);
+        verify(documentHelperSpy).processDocumentOnIndex(docValue2, "theList", PROCESS_INSTANCE_ID, existingList, 1,
+                AUTHOR_ID);
         verify(documentHelperSpy).removeOthersDocuments(existingList);
     }
 
@@ -268,7 +282,8 @@ public class DocumentHelperTest {
     public void should_getExistingDocumentList_return_empty_if_in_def() throws Exception {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        doReturn(Collections.emptyList()).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
+        doReturn(Collections.emptyList()).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID,
+                "theList");
         doReturn(true).when(documentHelperSpy).isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
         //when
         List<SMappedDocument> theList = documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
@@ -280,7 +295,8 @@ public class DocumentHelperTest {
     public void should_getExistingDocumentList_return_throw_exception_if_not_in_def() throws Exception {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        doReturn(Collections.emptyList()).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID, "theList");
+        doReturn(Collections.emptyList()).when(documentHelperSpy).getAllDocumentOfTheList(PROCESS_INSTANCE_ID,
+                "theList");
         doReturn(false).when(documentHelperSpy).isListDefinedInDefinition("theList", PROCESS_INSTANCE_ID);
         //when
         documentHelperSpy.getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
@@ -295,7 +311,8 @@ public class DocumentHelperTest {
         //when
         documentHelper.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"), nullable(String.class), eq(3));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID),
+                eq("theList"), nullable(String.class), eq(3));
     }
 
     @Test
@@ -361,7 +378,7 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_return_the_original_mime_type_if_not_null() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, "myMimeType", "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, "myMimeType", "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -376,7 +393,8 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain")).as("mimetype should be text/plain or null on mac").isTrue();
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain"))
+                .as("mimetype should be text/plain or null on mac").isTrue();
     }
 
     @Test
@@ -386,7 +404,8 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain")).as("mimetype should be text/plain or null on mac").isTrue();
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain"))
+                .as("mimetype should be text/plain or null on mac").isTrue();
     }
 
     @Test
@@ -412,17 +431,18 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/octet-stream")).as("mimetype should be application/octet-stream or null on mac").isTrue();
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/octet-stream"))
+                .as("mimetype should be application/octet-stream or null on mac").isTrue();
     }
 
     @Test
     public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "the\0File.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "the\0File.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -431,11 +451,13 @@ public class DocumentHelperTest {
 
     @Test
     public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
-        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "contentType", "It's my file".getBytes());
+        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "contentType",
+                "It's my file".getBytes());
 
         final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(fileInputValue);
 
-        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, "contentType", "theFile.txt"), "content");
+        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, "contentType", "theFile.txt"),
+                "content");
         assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
     }
 
@@ -462,7 +484,8 @@ public class DocumentHelperTest {
 
     @Test
     public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
-        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "contentType", "The report content".getBytes()));
+        final List<FileInputValue> inputList = Collections
+                .singletonList(new FileInputValue("report.pdf", "contentType", "The report content".getBytes()));
         final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
         assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
@@ -471,21 +494,26 @@ public class DocumentHelperTest {
 
     @Test
     public void should_convert_FileInputValue_to_DocumentValue() {
-        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes());
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType",
+                "The report content".getBytes());
 
         DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
 
-        assertThat(result).isEqualToComparingFieldByField(new DocumentValue("The report content".getBytes(), "contentType", "report.pdf"));
+        assertThat(result).isEqualToComparingFieldByField(
+                new DocumentValue("The report content".getBytes(), "contentType", "report.pdf"));
     }
+
     @Test
     public void should_convert_FileInputValue_having_id_and_updated_content_to_DocumentValue() {
-        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes(), "55");
+        FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", "The report content".getBytes(),
+                "55");
 
         DocumentValue result = documentHelper.toDocumentValue(fileInputValue);
 
         DocumentValue expected = new DocumentValue(55L, "The report content".getBytes(), "contentType", "report.pdf");
         assertThat(result).isEqualToComparingFieldByField(expected);
     }
+
     @Test
     public void should_convert_FileInputValue_having_id_and_unchanged_content_to_DocumentValue() {
         FileInputValue fileInputValue = new FileInputValue("report.pdf", "contentType", null, "55");
@@ -507,7 +535,6 @@ public class DocumentHelperTest {
         doReturn("the pdf content".getBytes()).when(documentService).getDocumentContent("the storage ID");
 
         final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
-
 
         assertThat(result.get(0).getContent()).isEqualTo("the pdf content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("myPdf.pdf");
@@ -536,12 +563,11 @@ public class DocumentHelperTest {
         final List<DocumentImpl> inputList = Collections.singletonList(documentWithContent);
         doThrow(SObjectNotFoundException.class).when(documentService).getDocumentContent("the storage ID");
 
-
         exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Unable to execute set document operation because the content of the document to use is not found");
+        exception.expectMessage(
+                "Unable to execute set document operation because the content of the document to use is not found");
 
         documentHelper.toCheckedList(inputList);
     }
-
 
 }

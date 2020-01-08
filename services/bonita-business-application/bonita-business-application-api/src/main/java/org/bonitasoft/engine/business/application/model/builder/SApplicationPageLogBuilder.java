@@ -16,10 +16,8 @@ package org.bonitasoft.engine.business.application.model.builder;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplicationPageLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 

@@ -24,8 +24,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SThrowEventInstance extends SEventInstance {
-    public SThrowEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                   final long logicalGroup1, final long logicalGroup2) {
+
+    public SThrowEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 

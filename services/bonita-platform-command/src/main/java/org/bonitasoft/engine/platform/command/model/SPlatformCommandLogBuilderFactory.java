@@ -16,12 +16,11 @@ package org.bonitasoft.engine.platform.command.model;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEActionFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilderFactory;
 
-
 /**
  * @author Zhang Bole
  */
 public interface SPlatformCommandLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
     SPlatformCommandLogBuilder createNewInstance();
-    
+
 }

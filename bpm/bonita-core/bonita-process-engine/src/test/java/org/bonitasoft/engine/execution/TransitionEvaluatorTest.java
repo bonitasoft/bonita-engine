@@ -56,7 +56,8 @@ public class TransitionEvaluatorTest {
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
         transitions.setAllOutgoingTransitionDefinitions(Lists.<STransitionDefinition> newArrayList());
 
-        List<STransitionDefinition> results = transitionEvaluator.evaluateOutgoingTransitions(transitions, processDefinition, flowNodeInstance);
+        List<STransitionDefinition> results = transitionEvaluator.evaluateOutgoingTransitions(transitions,
+                processDefinition, flowNodeInstance);
         assertThat(results).isEmpty();
     }
 

@@ -70,7 +70,7 @@ public enum ActivityInstanceCriterion {
     PRIORITY_DESC,
 
     /**
-     * 
+     *
      */
     DEFAULT
 

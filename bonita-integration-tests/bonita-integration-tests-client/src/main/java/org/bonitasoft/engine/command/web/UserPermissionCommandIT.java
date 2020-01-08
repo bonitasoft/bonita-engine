@@ -70,7 +70,8 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         actorUsers1.put(actor13, Arrays.asList(d1));
 
         // First process definition:
-        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("FirstProcess", "1.0");
+        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder()
+                .createNewInstance("FirstProcess", "1.0");
         processBuilder1.addActor(actor11, true).addDescription("Killing daily").addUserTask("userTask1", actor11);
         processBuilder1.addActor(actor12).addDescription("Slaying vampires").addUserTask("userTask2", actor12);
         processBuilder1.addActor(actor13).addDescription("Classify files").addUserTask("userTask3", actor13);
@@ -83,7 +84,8 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         actorUsers2.put(actor22, Arrays.asList(x3));
 
         // Second process definition:
-        final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("SecondProcess", "1.0");
+        final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder()
+                .createNewInstance("SecondProcess", "1.0");
         processBuilder2.addActor(actor21, true).addDescription("deliveryService1").addUserTask("userTask21", actor21);
         processBuilder2.addActor(actor22).addDescription("deliveryService2").addUserTask("userTask22", actor22);
         final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(processBuilder2.done(), actorUsers2);

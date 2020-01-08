@@ -42,8 +42,10 @@ public class SearchArchivedProcessInstancesDescriptor extends SearchEntityDescri
     protected final Set<String> processInstanceFields;
 
     public SearchArchivedProcessInstancesDescriptor() {
-        final SAProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
-        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+        final SAProcessInstanceBuilderFactory instanceBuilder = BuilderFactory
+                .get(SAProcessInstanceBuilderFactory.class);
+        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory
+                .get(SUserTaskInstanceBuilderFactory.class);
 
         searchEntityKeys = new HashMap<>();
         searchEntityKeys.put(NAME, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getNameKey()));

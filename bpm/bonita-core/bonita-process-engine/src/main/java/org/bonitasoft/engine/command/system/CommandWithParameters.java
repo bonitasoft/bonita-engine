@@ -26,7 +26,8 @@ import org.bonitasoft.engine.command.TenantCommand;
 public abstract class CommandWithParameters extends TenantCommand {
 
     @SuppressWarnings("unchecked")
-    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName, final String message)
+    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName,
+            final String message)
             throws SCommandParameterizationException {
         try {
             return (T) parameters.get(parameterName);
@@ -35,11 +36,13 @@ public abstract class CommandWithParameters extends TenantCommand {
         }
     }
 
-    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName) throws SCommandParameterizationException {
+    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName)
+            throws SCommandParameterizationException {
         return getParameter(parameters, parameterName, "An error occurred while parsing " + parameterName);
     }
 
-    protected Long getLongMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {
+    protected Long getLongMandadoryParameter(final Map<String, Serializable> parameters, final String field)
+            throws SCommandParameterizationException {
         final String message = "Parameters map must contain an entry " + field + " with a long value.";
         final Long mandatoryParameter = getMandatoryParameter(parameters, field, message);
         if (mandatoryParameter == 0L) {
@@ -48,17 +51,20 @@ public abstract class CommandWithParameters extends TenantCommand {
         return mandatoryParameter;
     }
 
-    protected Integer getIntegerMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {
+    protected Integer getIntegerMandadoryParameter(final Map<String, Serializable> parameters, final String field)
+            throws SCommandParameterizationException {
         final String message = "Parameters map must contain an entry " + field + " with a int value.";
         return getMandatoryParameter(parameters, field, message);
     }
 
-    protected String getStringMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {
+    protected String getStringMandadoryParameter(final Map<String, Serializable> parameters, final String field)
+            throws SCommandParameterizationException {
         final String message = "Parameters map must contain an entry " + field + " with a String value.";
         return getMandatoryParameter(parameters, field, message);
     }
 
-    protected <T> T getMandatoryParameter(final Map<String, Serializable> parameters, final String field, final String message)
+    protected <T> T getMandatoryParameter(final Map<String, Serializable> parameters, final String field,
+            final String message)
             throws SCommandParameterizationException {
         final T value = getParameter(parameters, field, message);
         if (value == null) {

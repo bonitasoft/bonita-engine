@@ -107,7 +107,7 @@ public class ApplicationIT extends TestWithTechnicalUser {
         assertThat(insertedApplicationList.get(1).getDisplayName()).isEqualToIgnoringCase("Leave request application"); // token Tahiti
 
         // We must be able to redeploy the same application:
-//        result = getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
+        //        result = getApiClient().getApplicationAPI().deployApplication(completeApplicationZip);
 
         // then:
         assertThat(result.hasErrors()).isFalse();

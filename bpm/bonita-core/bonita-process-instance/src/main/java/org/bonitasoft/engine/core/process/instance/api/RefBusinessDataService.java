@@ -38,12 +38,14 @@ public interface RefBusinessDataService {
     SRefBusinessDataInstance getRefBusinessDataInstance(String name, long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
-    List<SRefBusinessDataInstance> getRefBusinessDataInstances(long processInstanceId, int startIndex, int maxResults) throws SBonitaReadException;
+    List<SRefBusinessDataInstance> getRefBusinessDataInstances(long processInstanceId, int startIndex, int maxResults)
+            throws SBonitaReadException;
 
     SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
-    SRefBusinessDataInstance addRefBusinessDataInstance(SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException;
+    SRefBusinessDataInstance addRefBusinessDataInstance(SRefBusinessDataInstance instance)
+            throws SRefBusinessDataInstanceCreationException;
 
     void updateRefBusinessDataInstance(SSimpleRefBusinessDataInstance refBusinessDataInstance, Long dataId)
             throws SRefBusinessDataInstanceModificationException;
@@ -59,8 +61,10 @@ public interface RefBusinessDataService {
     SARefBusinessDataInstance getSAFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
-    void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SObjectModificationException; // TODO; specific exception
+    void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance)
+            throws SObjectModificationException; // TODO; specific exception
 
     void deleteArchivedRefBusinessDataInstance(long processInstanceId) throws SObjectModificationException;
+
     void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds) throws SObjectModificationException;
 }

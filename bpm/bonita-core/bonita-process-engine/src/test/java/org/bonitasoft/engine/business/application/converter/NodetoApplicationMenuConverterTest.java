@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.ImportError;
@@ -40,7 +40,6 @@ public class NodetoApplicationMenuConverterTest {
 
     @InjectMocks
     private NodeToApplicationMenuConverter converter;
-
 
     @Test
     public void toSApplicationMenu_should_convert_all_fields() throws Exception {
@@ -120,7 +119,8 @@ public class NodetoApplicationMenuConverterTest {
     }
 
     @Test
-    public void toSApplicationMenu_should_have_null_applicationPageId_when_applicationPage_is_null_in_xml() throws Exception {
+    public void toSApplicationMenu_should_have_null_applicationPageId_when_applicationPage_is_null_in_xml()
+            throws Exception {
         //given
         long applicationId = 3L;
         SApplication application = mock(SApplication.class);

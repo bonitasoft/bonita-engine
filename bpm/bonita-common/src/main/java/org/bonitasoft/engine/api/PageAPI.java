@@ -104,7 +104,8 @@ public interface PageAPI {
      * Searches for pages with specific search criteria.
      *
      * @param searchOptions
-     *        the search options for the search. See {@link org.bonitasoft.engine.search.SearchOptions} for search option details.
+     *        the search options for the search. See {@link org.bonitasoft.engine.search.SearchOptions} for search
+     *        option details.
      * @return the <code>SearchResult</code> containing
      * @throws org.bonitasoft.engine.exception.SearchException
      *         if a problem occurs during the search.
@@ -125,7 +126,8 @@ public interface PageAPI {
      * @throws org.bonitasoft.engine.exception.CreationException
      *         if an error occurs during the creation.
      */
-    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    Page createPage(final PageCreator pageCreator, final byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
 
     /**
@@ -141,7 +143,8 @@ public interface PageAPI {
      * @throws org.bonitasoft.engine.exception.AlreadyExistsException
      *         if a page with this name already exists.
      */
-    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
+    Page updatePage(final long pageId, final PageUpdater pageUpdater)
+            throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
 
     /**
@@ -155,7 +158,8 @@ public interface PageAPI {
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         if an error occurs during the update.
      */
-    void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
+    void updatePageContent(final long pageId, final byte[] content)
+            throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
 
     /**
@@ -183,7 +187,8 @@ public interface PageAPI {
      * the content must contain a page.properties file that contains information on the page:
      * name, displayName and description. Be aware that this method does not update your web permission-mappings.
      * It means that rest api extensions created with this method will not be accessible from the portal.
-     * To avoid the problem, either use the <a href="https://documentation.bonitasoft.com/?page=portal-api#toc0">create page rest api</a> or upload the extensions directly from Bonita Portal.
+     * To avoid the problem, either use the <a href="https://documentation.bonitasoft.com/?page=portal-api#toc0">create
+     * page rest api</a> or upload the extensions directly from Bonita Portal.
      * Note that if called from an operation in a task, the author of the page will always be the user System.
      *
      * @param contentName
@@ -197,7 +202,8 @@ public interface PageAPI {
      * @throws org.bonitasoft.engine.exception.CreationException
      * @since 6.3.1
      */
-    Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    Page createPage(String contentName, byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
 
     /**
@@ -210,7 +216,8 @@ public interface PageAPI {
      * @since 6.4.0
      */
     Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
-            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
+            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException,
+            InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException;
 
     /**
@@ -221,6 +228,7 @@ public interface PageAPI {
      * @throws NotFoundException if the key does not match anything.
      * @see PageURL the structured PageURL that points to the Page or URL
      */
-    PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
+    PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules)
+            throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
 }

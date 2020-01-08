@@ -56,7 +56,8 @@ public class BusinessDataAPIImplTest {
         when(serviceAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
     }
 
-    private SProcessSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String name, final String dataClassName, final Long dataId) {
+    private SProcessSimpleRefBusinessDataInstance buildSimpleRefBusinessData(final String name,
+            final String dataClassName, final Long dataId) {
         final SProcessSimpleRefBusinessDataInstance reference = new SProcessSimpleRefBusinessDataInstance();
         reference.setId(64645L);
         reference.setName(name);
@@ -65,7 +66,8 @@ public class BusinessDataAPIImplTest {
         return reference;
     }
 
-    private SProcessMultiRefBusinessDataInstance buildMultiRefBusinessData(final String name, final String dataClassName, final List<Long> dataIds) {
+    private SProcessMultiRefBusinessDataInstance buildMultiRefBusinessData(final String name,
+            final String dataClassName, final List<Long> dataIds) {
         final SProcessMultiRefBusinessDataInstance reference = new SProcessMultiRefBusinessDataInstance();
         reference.setId(64645L);
         reference.setName(name);
@@ -109,7 +111,8 @@ public class BusinessDataAPIImplTest {
     @Test(expected = RetrieveException.class)
     public void getProcessBusinessDataShouldThrowARuntimeException() throws Exception {
         final String name = "myEmployees";
-        when(refBusinessDataService.getRefBusinessDataInstance(name, 487654L)).thenThrow(new SBonitaReadException("exception"));
+        when(refBusinessDataService.getRefBusinessDataInstance(name, 487654L))
+                .thenThrow(new SBonitaReadException("exception"));
 
         businessDataAPI.getProcessBusinessDataReference(name, 487654L);
     }
@@ -117,7 +120,8 @@ public class BusinessDataAPIImplTest {
     @Test(expected = DataNotFoundException.class)
     public void getProcessBusinessDataShouldThrowADataNotFoundException() throws Exception {
         final String name = "myEmployees";
-        when(refBusinessDataService.getRefBusinessDataInstance(name, 487654L)).thenThrow(new SRefBusinessDataInstanceNotFoundException(487654L, name));
+        when(refBusinessDataService.getRefBusinessDataInstance(name, 487654L))
+                .thenThrow(new SRefBusinessDataInstanceNotFoundException(487654L, name));
 
         businessDataAPI.getProcessBusinessDataReference(name, 487654L);
     }
@@ -128,9 +132,12 @@ public class BusinessDataAPIImplTest {
         final String dataClassName = "com.bonitasoft.Address";
         final Long dataId = 6873654654L;
         final List<Long> dataIds = Arrays.asList(8735468463748L, 87634386731L);
-        final SProcessSimpleRefBusinessDataInstance sReference1 = buildSimpleRefBusinessData(name, dataClassName, dataId);
-        final SProcessMultiRefBusinessDataInstance sReference2 = buildMultiRefBusinessData(name, dataClassName, dataIds);
-        when(refBusinessDataService.getRefBusinessDataInstances(487654L, 0, 10)).thenReturn(Arrays.asList(sReference1, sReference2));
+        final SProcessSimpleRefBusinessDataInstance sReference1 = buildSimpleRefBusinessData(name, dataClassName,
+                dataId);
+        final SProcessMultiRefBusinessDataInstance sReference2 = buildMultiRefBusinessData(name, dataClassName,
+                dataIds);
+        when(refBusinessDataService.getRefBusinessDataInstances(487654L, 0, 10))
+                .thenReturn(Arrays.asList(sReference1, sReference2));
 
         final List<BusinessDataReference> references = businessDataAPI.getProcessBusinessDataReferences(487654L, 0, 10);
 
@@ -149,7 +156,8 @@ public class BusinessDataAPIImplTest {
 
     @Test(expected = RetrieveException.class)
     public void getProcessBusinessDataReferencesShouldThrowAnException() throws Exception {
-        when(refBusinessDataService.getRefBusinessDataInstances(487654L, 0, 10)).thenThrow(new SBonitaReadException("exception"));
+        when(refBusinessDataService.getRefBusinessDataInstances(487654L, 0, 10))
+                .thenThrow(new SBonitaReadException("exception"));
 
         businessDataAPI.getProcessBusinessDataReferences(487654L, 0, 10);
     }

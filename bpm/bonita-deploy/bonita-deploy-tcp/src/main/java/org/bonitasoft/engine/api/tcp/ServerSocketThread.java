@@ -84,8 +84,10 @@ public class ServerSocketThread extends Thread {
         }
     }
 
-    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName,
+            final String methodName,
+            final List<String> classNameParameters, final Object[] parametersValues)
+            throws ServerWrappedException, RemoteException {
         return serverApi.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 }

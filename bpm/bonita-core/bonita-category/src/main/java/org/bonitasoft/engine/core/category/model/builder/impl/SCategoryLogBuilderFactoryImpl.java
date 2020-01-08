@@ -25,7 +25,7 @@ public class SCategoryLogBuilderFactoryImpl extends CRUDELogBuilderFactory imple
     public SCategoryLogBuilderImpl createNewInstance() {
         return new SCategoryLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SCategoryLogIndexesMapper.CATEGORY_INDEX_NAME;

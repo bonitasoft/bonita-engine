@@ -66,8 +66,10 @@ public class ContextEntryImpl implements ContextEntry {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ContextEntryImpl that = (ContextEntryImpl) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(expression, that.expression);

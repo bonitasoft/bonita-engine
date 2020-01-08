@@ -19,7 +19,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ReturnLogBuilder implements Answer<Object> {
 

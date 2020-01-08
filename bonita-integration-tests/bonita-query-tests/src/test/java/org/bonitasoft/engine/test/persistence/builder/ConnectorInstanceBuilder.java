@@ -55,7 +55,6 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnector
         return this;
     }
 
-
     @Override
     SConnectorInstance _build() {
         SConnectorInstance connectorInstance;
@@ -63,8 +62,7 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnector
             connectorInstance = new SConnectorInstanceWithFailureInfo();
             ((SConnectorInstanceWithFailureInfo) connectorInstance).setExceptionMessage(exceptionMessage);
             ((SConnectorInstanceWithFailureInfo) connectorInstance).setStackTrace(stackTrace);
-        }
-        else {
+        } else {
             connectorInstance = new SConnectorInstance();
         }
         connectorInstance.setState(state);

@@ -23,7 +23,8 @@ import org.xml.sax.SAXException;
 
 public class Marshaller {
 
-    public static BusinessObjectModel marshallUnmarshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException {
+    public static BusinessObjectModel marshallUnmarshall(final BusinessObjectModel bom)
+            throws JAXBException, IOException, SAXException {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final byte[] marshall = convertor.marshall(bom);
         return convertor.unmarshall(marshall);

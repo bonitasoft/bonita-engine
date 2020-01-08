@@ -48,8 +48,10 @@ public abstract class BaseDefinitionElementImpl implements BaseElement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         BaseDefinitionElementImpl that = (BaseDefinitionElementImpl) o;
         return Objects.equals(id, that.id);
     }

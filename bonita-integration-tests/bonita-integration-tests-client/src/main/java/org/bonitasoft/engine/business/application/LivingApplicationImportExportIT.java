@@ -38,30 +38,37 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     }
 
     @Test
-    public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
+    public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications()
+            throws Exception {
         //given
         Profile userProfile = getProfileUser();
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("applications.xml"));
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
+        final byte[] applicationsByteArray = IOUtils
+                .toByteArray(LivingApplicationIT.class.getResourceAsStream("applications.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter
+                .xmlPrettyFormat(new String(applicationsByteArray));
 
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
 
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard",
+                "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
         final Application hr = getLivingApplicationAPI().createApplication(hrCreator);
 
         // Associate a new page to application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
                 IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final ApplicationPage appPage = getLivingApplicationAPI().createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
+        final ApplicationPage appPage = getLivingApplicationAPI().createApplicationPage(hr.getId(), myPage.getId(),
+                "my-new-custom-page");
 
         // Add menus:
-        final ApplicationMenu menu = getLivingApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
-        final ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
+        final ApplicationMenu menu = getLivingApplicationAPI()
+                .createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
+        final ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up",
+                appPage.getId());
         subMenuCreator.setParentId(menu.getId());
         getLivingApplicationAPI().createApplicationMenu(subMenuCreator);
 
@@ -85,19 +92,23 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     }
 
     @Test
-    public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok_() throws Exception {
+    public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok_()
+            throws Exception {
         //given
         final Profile profile = getProfileUser();
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
-        final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
         final Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
         final Page defaultTheme = getPageAPI().getPageByName(DEFAULT_THEME_NAME);
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("applications.xml"));
+        final byte[] applicationsByteArray = IOUtils
+                .toByteArray(LivingApplicationIT.class.getResourceAsStream("applications.xml"));
 
         //when
-        final List<ImportStatus> importStatus = getLivingApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = getLivingApplicationAPI().importApplications(applicationsByteArray,
+                ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(2);
@@ -105,7 +116,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         assertIsAddOkStatus(importStatus.get(1), "My");
 
         // check applications ware created
-        final SearchResult<Application> searchResult = getLivingApplicationAPI().searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = getLivingApplicationAPI()
+                .searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
         assertIsHRApplication(profile, defaultLayout, defaultTheme, hrApp);
@@ -114,7 +126,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         //check pages were created
         SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationPage> pageSearchResult = getLivingApplicationAPI().searchApplicationPages(builder.done());
+        SearchResult<ApplicationPage> pageSearchResult = getLivingApplicationAPI()
+                .searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
         assertIsMyNewCustomPage(myPage, hrApp, myNewCustomPage);
@@ -125,7 +138,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         //check menu is created
         builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationMenu> menuSearchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
+        SearchResult<ApplicationMenu> menuSearchResult = getLivingApplicationAPI()
+                .searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         ApplicationMenu hrFollowUpMenu = menuSearchResult.getResult().get(0);
         assertIsHrFollowUpMenu(hrFollowUpMenu);
@@ -138,7 +152,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     }
 
     @Test
-    public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_if_there_is_unavailable_info() throws Exception {
+    public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_if_there_is_unavailable_info()
+            throws Exception {
         //given
         final byte[] applicationsByteArray = IOUtils.toByteArray(LivingApplicationIT.class
                 .getResourceAsStream("applicationWithUnavailableInfo.xml"));
@@ -148,7 +163,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
                 IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
         //when
-        final List<ImportStatus> importStatus = getLivingApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = getLivingApplicationAPI().importApplications(applicationsByteArray,
+                ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(1);
@@ -158,10 +174,12 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
         ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
         ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1,
+                appPageError2);
 
         // check applications ware created
-        final SearchResult<Application> searchResult = getLivingApplicationAPI().searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = getLivingApplicationAPI()
+                .searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(1);
         final Application app1 = searchResult.getResult().get(0);
         assertThat(app1.getToken()).isEqualTo("HR-dashboard");
@@ -175,7 +193,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         //check only one application page was created
         SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
-        SearchResult<ApplicationPage> pageSearchResult = getLivingApplicationAPI().searchApplicationPages(builder.done());
+        SearchResult<ApplicationPage> pageSearchResult = getLivingApplicationAPI()
+                .searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
@@ -183,7 +202,8 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created
-        SearchResult<ApplicationMenu> menuSearchResult = getLivingApplicationAPI().searchApplicationMenus(builder.done());
+        SearchResult<ApplicationMenu> menuSearchResult = getLivingApplicationAPI()
+                .searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         assertThat(menuSearchResult.getResult().get(0).getDisplayName()).isEqualTo("HR follow-up");
         assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(1);
@@ -201,18 +221,21 @@ public class LivingApplicationImportExportIT extends TestWithLivingApplication {
     public void export_after_import_should_return_the_same_xml_file() throws Exception {
         //given
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
-        final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(LivingApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
         final byte[] importedByteArray = IOUtils.toByteArray(LivingApplicationIT.class
                 .getResourceAsStream("applications.xml"));
 
         getLivingApplicationAPI().importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
-        final SearchResult<Application> searchResult = getLivingApplicationAPI().searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = getLivingApplicationAPI()
+                .searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
 
         //when
         Application hrApplication = searchResult.getResult().get(0);
-        byte[] exportedByteArray = getLivingApplicationAPI().exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
+        byte[] exportedByteArray = getLivingApplicationAPI().exportApplications(hrApplication.getId(),
+                searchResult.getResult().get(1).getId());
 
         //then
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(importedByteArray));

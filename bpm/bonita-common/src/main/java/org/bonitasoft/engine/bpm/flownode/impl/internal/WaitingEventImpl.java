@@ -43,7 +43,8 @@ public abstract class WaitingEventImpl implements WaitingEvent {
     public WaitingEventImpl() {
     }
 
-    public WaitingEventImpl(final BPMEventType eventType, final long processDefinitionId, final String processName, final long flowNodeDefinitionId) {
+    public WaitingEventImpl(final BPMEventType eventType, final long processDefinitionId, final String processName,
+            final long flowNodeDefinitionId) {
         this.eventType = eventType;
         this.processName = processName;
         this.flowNodeDefinitionId = flowNodeDefinitionId;

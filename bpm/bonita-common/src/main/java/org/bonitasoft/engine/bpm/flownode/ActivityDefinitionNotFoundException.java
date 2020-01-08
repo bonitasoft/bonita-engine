@@ -17,12 +17,14 @@ import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * Thrown when it's not possible to find the activity definition.
- * 
- * The class ActivityDefinitionNotFoundException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class ActivityDefinitionNotFoundException that is not also subclasses of {@link RuntimeException} are checked exceptions.
- * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * The class ActivityDefinitionNotFoundException is a form of Throwable that indicates conditions that a reasonable
+ * application might want to catch.
+ * The class ActivityDefinitionNotFoundException that is not also subclasses of {@link RuntimeException} are checked
+ * exceptions.
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by
+ * the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -32,9 +34,9 @@ public class ActivityDefinitionNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message.
-     * 
+     *
      * @param activityName
-     *            The name of the searched activity definition
+     *        The name of the searched activity definition
      */
     public ActivityDefinitionNotFoundException(final String activityName) {
         super("Activity '" + activityName + "' not found");

@@ -318,7 +318,8 @@ public class PlatformSetupIT {
 
         // then
         assertThat(setupFolder.listFiles()).hasSize(1);
-        List backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles()).filter(it -> it.getName().contains("backup")).collect(Collectors.toList());
+        List backupDirectory = Arrays.stream(setupFolder.listFiles()[0].listFiles())
+                .filter(it -> it.getName().contains("backup")).collect(Collectors.toList());
         assertThat(backupDirectory).hasSize(1);
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
         assertThat(log).contains("Backup directory created:");

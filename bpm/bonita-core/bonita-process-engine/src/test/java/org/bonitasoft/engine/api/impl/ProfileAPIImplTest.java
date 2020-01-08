@@ -105,7 +105,8 @@ public class ProfileAPIImplTest {
         final Long groupId = 3L;
         final Long roleId = 4L;
 
-        doNothing().when(profileAPIImpl).checkIfProfileMemberExists(any(TenantServiceAccessor.class), any(ProfileService.class), any(Long.class),
+        doNothing().when(profileAPIImpl).checkIfProfileMemberExists(any(TenantServiceAccessor.class),
+                any(ProfileService.class), any(Long.class),
                 any(Long.class), any(Long.class), any(Long.class),
                 any(MemberType.class));
 
@@ -149,7 +150,8 @@ public class ProfileAPIImplTest {
 
     @Test
     public void should_profile_api_be_available_when_tenant_is_paused() throws Exception {
-        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as("should profile api be available when tenant is paused")
+        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class))
+                .as("should profile api be available when tenant is paused")
                 .isTrue();
     }
 }

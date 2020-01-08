@@ -40,9 +40,9 @@ public class SPage implements PersistentObject {
     private long processDefinitionId;
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
-                     final long installedBy,
-                     final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
-                     final String contentName) {
+            final long installedBy,
+            final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
@@ -52,9 +52,9 @@ public class SPage implements PersistentObject {
     }
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
-                     final long installedBy,
-                     final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
-                     final String contentName) {
+            final long installedBy,
+            final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
@@ -77,7 +77,7 @@ public class SPage implements PersistentObject {
     }
 
     public SPage(final String name, final long installationDate, final long installedBy, final boolean provided,
-                     final String contentName) {
+            final String contentName) {
         setName(name);
         setInstallationDate(installationDate);
         setInstalledBy(installedBy);

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * When the activity is created we insert one or more of this object:
  * - if the activity is not filtered we insert one of them for each actor of the activity with inside the actorId
  * - if the activity is filtered we execute those filter and insert a one of them for each user that is filtered
- * 
+ *
  * @author Baptiste Mesta
  */
 @Data

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import net.sf.ehcache.CacheManager;
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -25,8 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import net.sf.ehcache.CacheManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommonEhCacheCacheServiceTest {

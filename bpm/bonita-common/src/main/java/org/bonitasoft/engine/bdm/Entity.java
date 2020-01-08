@@ -15,7 +15,9 @@ package org.bonitasoft.engine.bdm;
 
 /**
  * Generic interface for a Business Object.
- * <p>This class extends deprecated {@link com.bonitasoft.engine.bdm.Entity} to avoid an API break of Bonita Engine Subscription version. This inheritance will be removed in next releases</p>
+ * <p>This class extends deprecated {@link com.bonitasoft.engine.bdm.Entity} to avoid an API break of Bonita Engine
+ * Subscription version. This inheritance will be removed in next releases</p>
+ *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
  * @since 7.0

@@ -28,7 +28,7 @@ public class ExpressionEvaluationException extends BonitaException {
     /**
      * @param cause
      * @param expressionName
-     *            The expression's name that failed on the evaluation.
+     *        The expression's name that failed on the evaluation.
      */
     public ExpressionEvaluationException(final Throwable cause, final String expressionName) {
         super(cause);
@@ -41,7 +41,7 @@ public class ExpressionEvaluationException extends BonitaException {
 
     /**
      * Return empty or null, when the context of evaluation is wrong.
-     * 
+     *
      * @return The expression's name that failed on the evaluation.
      */
     public String getExpressionName() {

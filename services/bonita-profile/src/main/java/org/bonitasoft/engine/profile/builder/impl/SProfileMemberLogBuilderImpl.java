@@ -27,7 +27,7 @@ public class SProfileMemberLogBuilderImpl extends CRUDELogBuilder implements SPe
     private static final String PREFIX = "PROFILE_MEMBER";
 
     private static final int PROFILE_MEMBER_INDEX = 2;
-    
+
     // TODO: add index for user, group and role
 
     @Override

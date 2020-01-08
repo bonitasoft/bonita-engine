@@ -13,11 +13,12 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
 /**
  * @author Danila Mazour

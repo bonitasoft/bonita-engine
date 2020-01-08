@@ -15,7 +15,7 @@ package org.bonitasoft.engine.expression;
 
 /**
  * Supported return types of the XPath read expression executor strategy.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 public enum XPathReturnType {

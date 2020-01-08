@@ -19,12 +19,12 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class SBoundaryEventDefinitionImplTest {
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isBoundaryEvent()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isBoundaryEvent()}.
      */
     @Test
     public void boundary_if_is_a_boundary() {

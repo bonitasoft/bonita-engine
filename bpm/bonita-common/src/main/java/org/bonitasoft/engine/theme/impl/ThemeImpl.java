@@ -41,7 +41,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     private ThemeType type;
 
-    public ThemeImpl(final byte[] content, final byte[] cssContent, final boolean isDefault, final ThemeType type, final Date lastUpdateDate) {
+    public ThemeImpl(final byte[] content, final byte[] cssContent, final boolean isDefault, final ThemeType type,
+            final Date lastUpdateDate) {
         super();
         this.content = content;
         this.cssContent = cssContent;
@@ -144,7 +145,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     @Override
     public String toString() {
-        return "ThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent=" + Arrays.toString(cssContent) + ", isDefault="
+        return "ThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent="
+                + Arrays.toString(cssContent) + ", isDefault="
                 + isDefault + ", lastUpdateDate=" + lastUpdateDate + ", type=" + type + "]";
     }
 

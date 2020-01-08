@@ -20,17 +20,17 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
 /**
  * @author Zhang Bole
  */
-public class SPlatformCommandLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SPlatformCommandLogBuilderFactory {
+public class SPlatformCommandLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SPlatformCommandLogBuilderFactory {
 
     @Override
     public SPlatformCommandLogBuilder createNewInstance() {
         return new SPlatformCommandLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SPlatformCommandLogIndexesMapper.COMMAND_INDEX_NAME;
     }
-
 
 }

@@ -41,7 +41,8 @@ public class BDMSimpleNameProviderTest {
     }
 
     @Test
-    public void getSimpleBusinessObjectName_should_return_the_entire_name_when_package_name_is_absent() throws Exception {
+    public void getSimpleBusinessObjectName_should_return_the_entire_name_when_package_name_is_absent()
+            throws Exception {
         //given
         String businessObjectQualifiedName = "Employee";
 

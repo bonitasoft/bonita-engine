@@ -23,15 +23,16 @@ import io.micrometer.core.instrument.MeterRegistry;
  */
 public class NoOpExecutorServiceMetricsProvider implements ExecutorServiceMetricsProvider {
 
-
     @Override
-    public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId) {
+    public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
+            String executorServiceName, long tenantId) {
         return executorService;
 
     }
 
     @Override
-    public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId) {
+    public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
+            String executorServiceName, long tenantId) {
 
     }
 

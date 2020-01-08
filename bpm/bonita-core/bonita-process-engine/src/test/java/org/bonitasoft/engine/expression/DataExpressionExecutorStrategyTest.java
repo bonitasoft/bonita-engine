@@ -57,7 +57,8 @@ public class DataExpressionExecutorStrategyTest {
     private DataExpressionExecutorStrategy dataExpressionExecutorStrategy;
 
     @Test
-    public void evaluateListOfEmptyDataExpressionDoesNotThrowException() throws SExpressionDependencyMissingException, SExpressionEvaluationException,
+    public void evaluateListOfEmptyDataExpressionDoesNotThrowException()
+            throws SExpressionDependencyMissingException, SExpressionEvaluationException,
             SDataInstanceException {
         when(expressionList.size()).thenReturn(1);
         when(expressionList.iterator()).thenReturn(exprIterator);
@@ -65,7 +66,8 @@ public class DataExpressionExecutorStrategyTest {
         final HashMap<String, Object> dependencyValues = new HashMap<>(2);
         dependencyValues.put("containerId", 17L);
         dependencyValues.put("containerType", "process");
-        dataExpressionExecutorStrategy.evaluate(expressionList, dependencyValues, new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
+        dataExpressionExecutorStrategy.evaluate(expressionList, dependencyValues, new HashMap<Integer, Object>(0),
+                ContainerState.ACTIVE);
     }
 
 }

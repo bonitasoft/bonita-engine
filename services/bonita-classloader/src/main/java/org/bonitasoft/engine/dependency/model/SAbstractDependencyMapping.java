@@ -20,6 +20,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class SAbstractDependencyMapping implements PersistentObject {
+
     private long id;
     private long artifactId;
     private ScopeType artifactType;

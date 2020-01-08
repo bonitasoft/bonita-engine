@@ -31,7 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "connectorImplementation")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {})
-public class SConnectorImplementationDescriptor implements Serializable, Comparable<SConnectorImplementationDescriptor> {
+public class SConnectorImplementationDescriptor
+        implements Serializable, Comparable<SConnectorImplementationDescriptor> {
 
     private static final long serialVersionUID = 1262691234201780432L;
     public static final String IMPLEMENTATION_CLASS_NAME = "implementationClassName";
@@ -54,7 +55,7 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
     @XmlElement
     private Boolean hasSources;
     @XmlElementWrapper(name = "jarDependencies")
-    @XmlElement(type = String.class,name = "jarDependency")
+    @XmlElement(type = String.class, name = "jarDependency")
     private List<String> jarDependencies = new ArrayList<>();
     //can be in xsd
     @XmlElement
@@ -66,7 +67,8 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
         super();
     }
 
-    public SConnectorImplementationDescriptor(final String implementationClassName, final String id, final String version, final String definitionId,
+    public SConnectorImplementationDescriptor(final String implementationClassName, final String id,
+            final String version, final String definitionId,
             final String definitionVersion, final ArrayList<String> jarDependencies) {
         super();
         this.implementationClassName = implementationClassName;
@@ -105,8 +107,10 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
 
     @Override
     public String toString() {
-        return "ConnectorImplementation [implementationClassName=" + implementationClassName + ", id=" + id + ", version=" + version + ", definitionId="
-                + definitionId + ", definitionVersion=" + definitionVersion + ", jarDependencies=" + jarDependencies + "]";
+        return "ConnectorImplementation [implementationClassName=" + implementationClassName + ", id=" + id
+                + ", version=" + version + ", definitionId="
+                + definitionId + ", definitionVersion=" + definitionVersion + ", jarDependencies=" + jarDependencies
+                + "]";
     }
 
     /*

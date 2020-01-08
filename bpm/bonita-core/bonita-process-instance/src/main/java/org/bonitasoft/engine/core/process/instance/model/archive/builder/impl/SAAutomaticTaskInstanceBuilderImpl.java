@@ -19,8 +19,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutom
 /**
  * @author Baptiste Mesta
  */
-public class SAAutomaticTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAAutomaticTaskInstanceBuilder {
-    
+public class SAAutomaticTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl
+        implements SAAutomaticTaskInstanceBuilder {
+
     public SAAutomaticTaskInstanceBuilderImpl(final SAAutomaticTaskInstance entity) {
         super(entity);
     }

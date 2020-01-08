@@ -57,7 +57,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService,
             final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -66,7 +67,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public SProcessSupervisor createProcessSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
+    public SProcessSupervisor createProcessSupervisor(final SProcessSupervisor supervisor)
+            throws SSupervisorCreationException {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
         try {
             recorder.recordInsert(new InsertRecord(supervisor), SUPERVISOR);
@@ -80,7 +82,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     @Override
     public SProcessSupervisor getProcessSupervisor(final long supervisorId) throws SSupervisorNotFoundException {
-        final SelectByIdDescriptor<SProcessSupervisor> selectByIdDescriptor = SelectDescriptorBuilder.getSupervisor(supervisorId);
+        final SelectByIdDescriptor<SProcessSupervisor> selectByIdDescriptor = SelectDescriptorBuilder
+                .getSupervisor(supervisorId);
         try {
             final SProcessSupervisor supervisor = persistenceService.selectById(selectByIdDescriptor);
             if (supervisor == null) {
@@ -93,7 +96,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public void deleteProcessSupervisor(final long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException {
+    public void deleteProcessSupervisor(final long supervisorId)
+            throws SSupervisorNotFoundException, SSupervisorDeletionException {
         final SProcessSupervisor sSupervisor = getProcessSupervisor(supervisorId);
         deleteProcessSupervisor(sSupervisor);
     }
@@ -121,7 +125,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     private SProcessSupervisorLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SProcessSupervisorLogBuilder logBuilder = BuilderFactory.get(SProcessSupervisorLogBuilderFactory.class).createNewInstance();
+        final SProcessSupervisorLogBuilder logBuilder = BuilderFactory.get(SProcessSupervisorLogBuilderFactory.class)
+                .createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
@@ -137,13 +142,15 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     @Override
     public Boolean isProcessSupervisor(final long processDefinitionId, final long userId) throws SBonitaReadException {
-        final SelectOneDescriptor<SProcessSupervisor> descriptor = SelectDescriptorBuilder.getSupervisor(processDefinitionId, userId);
+        final SelectOneDescriptor<SProcessSupervisor> descriptor = SelectDescriptorBuilder
+                .getSupervisor(processDefinitionId, userId);
         final SProcessSupervisor supervisor = persistenceService.selectOne(descriptor);
         return supervisor != null;
     }
 
     @Override
-    public List<SProcessSupervisor> searchProcessSupervisors(final QueryOptions queryOptions) throws SBonitaReadException {
+    public List<SProcessSupervisor> searchProcessSupervisors(final QueryOptions queryOptions)
+            throws SBonitaReadException {
         return persistenceService.searchEntity(SProcessSupervisor.class, null, queryOptions, null);
     }
 
@@ -152,7 +159,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

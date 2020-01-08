@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 
 public class ContractVariableHelper {
 
@@ -56,20 +56,23 @@ public class ContractVariableHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<? extends Map<String, Serializable>> buildRecursiveComplexVariableList(final Map<String, Serializable> currentVariables,
+    private Collection<? extends Map<String, Serializable>> buildRecursiveComplexVariableList(
+            final Map<String, Serializable> currentVariables,
             final List<Map<String, Serializable>> constraintVariablesList, final String inputName) {
         for (final Entry<String, Serializable> variableEntry : currentVariables.entrySet()) {
             final Object variableValue = variableEntry.getValue();
             if (variableValue instanceof Map<?, ?>) {
                 //complex case
-                buildRecursiveVariableList((Map<String, Serializable>) variableValue, constraintVariablesList, inputName);
+                buildRecursiveVariableList((Map<String, Serializable>) variableValue, constraintVariablesList,
+                        inputName);
             }
             if (variableValue instanceof List<?>) {
                 //multiple case
                 for (final Serializable variableValueItem : (List<Serializable>) variableValue) {
                     if (variableValueItem instanceof Map<?, ?>) {
                         //complex case
-                        buildRecursiveVariableList((Map<String, Serializable>) variableValueItem, constraintVariablesList, inputName);
+                        buildRecursiveVariableList((Map<String, Serializable>) variableValueItem,
+                                constraintVariablesList, inputName);
                     }
                 }
             }

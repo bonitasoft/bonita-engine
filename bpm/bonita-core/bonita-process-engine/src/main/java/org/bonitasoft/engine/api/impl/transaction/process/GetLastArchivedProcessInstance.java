@@ -29,7 +29,7 @@ import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
 
 /**
  * Returns the most recent archived process instance from the archives.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @author Matthieu Chaffotte
@@ -46,7 +46,8 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public GetLastArchivedProcessInstance(final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService,
+    public GetLastArchivedProcessInstance(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService,
             final long processInstanceId, final SearchEntitiesDescriptor searchEntitiesDescriptor) {
         this.processInstanceService = processInstanceService;
         this.processDefinitionService = processDefinitionService;
@@ -61,8 +62,10 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
         searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.END_DATE, Order.DESC);
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
 
-        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                processDefinitionService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptionsBuilder.done());
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(
+                processInstanceService,
+                processDefinitionService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(),
+                searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
         final List<ArchivedProcessInstance> processInstances = searchArchivedProcessInstances.getResult().getResult();
         if (processInstances.isEmpty()) {

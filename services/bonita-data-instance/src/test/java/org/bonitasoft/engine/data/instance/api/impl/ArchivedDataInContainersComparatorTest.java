@@ -70,7 +70,6 @@ public class ArchivedDataInContainersComparatorTest {
         assertThat(list).containsExactly(data2, data1);
     }
 
-
     @Test
     public void should_compare_very_different_date_in_same_container() throws Exception {
         //given

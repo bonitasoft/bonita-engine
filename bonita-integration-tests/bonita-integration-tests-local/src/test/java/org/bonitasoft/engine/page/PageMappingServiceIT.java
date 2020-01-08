@@ -57,9 +57,12 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void getByKey() throws Exception {
         transactionService.begin();
-        final SPageMapping internal = pageMappingService.create("getByKey/process1/12.0", PAGE_ID, Collections.<String> emptyList());
-        final SPageMapping external = pageMappingService.create("getByKey/process2/12.0", "http://www.google.com", null, Collections.<String> emptyList());
-        final SPageMapping externalWithAdapter = pageMappingService.create("getByKey/process3/12.0", "http://www.google.com", "theAdapter",
+        final SPageMapping internal = pageMappingService.create("getByKey/process1/12.0", PAGE_ID,
+                Collections.<String> emptyList());
+        final SPageMapping external = pageMappingService.create("getByKey/process2/12.0", "http://www.google.com", null,
+                Collections.<String> emptyList());
+        final SPageMapping externalWithAdapter = pageMappingService.create("getByKey/process3/12.0",
+                "http://www.google.com", "theAdapter",
                 Collections.<String> emptyList());
 
         transactionService.complete();
@@ -84,7 +87,8 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void delete() throws Exception {
         transactionService.begin();
-        final SPageMapping internal = pageMappingService.create("delete/process1/12.0", PAGE_ID, Collections.<String> emptyList());
+        final SPageMapping internal = pageMappingService.create("delete/process1/12.0", PAGE_ID,
+                Collections.<String> emptyList());
         transactionService.complete();
 
         transactionService.begin();

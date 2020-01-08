@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
@@ -65,12 +70,6 @@ import org.bonitasoft.engine.page.PageSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Main entry point to deploy an {@link ApplicationArchive}.
@@ -113,7 +112,8 @@ public class Deployer {
         }
     }
 
-    private ApplicationArchive readApplicationArchiveFile(byte[] applicationArchiveFile) throws ApplicationDeploymentException {
+    private ApplicationArchive readApplicationArchiveFile(byte[] applicationArchiveFile)
+            throws ApplicationDeploymentException {
         ApplicationArchive applicationArchive;
         try {
             applicationArchive = applicationArchiveReader.read(applicationArchiveFile);

@@ -44,8 +44,7 @@ public class TestEngineImplTest {
         testEngine.start();
 
         //then
-        verify(engineStarter,times(1)).start();
+        verify(engineStarter, times(1)).start();
     }
-
 
 }

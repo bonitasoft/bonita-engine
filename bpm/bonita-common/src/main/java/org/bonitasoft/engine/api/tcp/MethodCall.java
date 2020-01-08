@@ -21,14 +21,15 @@ import java.util.Map;
 public class MethodCall implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private final Map<String, Serializable> options;
     private final String apiInterfaceName;
     private final String methodName;
     private final List<String> classNameParameters;
     private final Object[] parametersValues;
 
-    public MethodCall(Map<String, Serializable> options, String apiInterfaceName, String methodName, List<String> classNameParameters, Object[] parametersValues) {
+    public MethodCall(Map<String, Serializable> options, String apiInterfaceName, String methodName,
+            List<String> classNameParameters, Object[] parametersValues) {
         this.options = options;
         this.apiInterfaceName = apiInterfaceName;
         this.methodName = methodName;
@@ -65,5 +66,4 @@ public class MethodCall implements Serializable {
                 + "]";
     }
 
-    
 }

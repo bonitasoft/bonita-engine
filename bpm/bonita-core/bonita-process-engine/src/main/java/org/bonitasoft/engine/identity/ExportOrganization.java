@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -83,9 +84,12 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         final List<ExportedGroup> clientGroups = ModelConvertor.toExportedGroups(groups);
 
         // improvement: user server object to avoid useless conversion;
-        final List<ExportedUserMembership> clientUserMemberships = ModelConvertor.toExportedUserMembership(userMemberships, userNames, groupIdParentPath);
-        List<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators = ModelConvertor.toExportedCustomUserInfoDefinition(customUserInfoDefinitions);
-        final Organization organization = new Organization(users, roles, clientGroups, clientUserMemberships, customUserInfoDefinitionCreators);
+        final List<ExportedUserMembership> clientUserMemberships = ModelConvertor
+                .toExportedUserMembership(userMemberships, userNames, groupIdParentPath);
+        List<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators = ModelConvertor
+                .toExportedCustomUserInfoDefinition(customUserInfoDefinitions);
+        final Organization organization = new Organization(users, roles, clientGroups, clientUserMemberships,
+                customUserInfoDefinitionCreators);
         try {
             xmlOrganization = new OrganizationParser().convert(organization);
         } catch (JAXBException e) {
@@ -93,7 +97,8 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         }
     }
 
-    private static Map<Long, String> getUserInfoDefinitionNames(final List<SCustomUserInfoDefinition> userInfoDefinitions) {
+    private static Map<Long, String> getUserInfoDefinitionNames(
+            final List<SCustomUserInfoDefinition> userInfoDefinitions) {
         final Map<Long, String> names = new HashMap<>(userInfoDefinitions.size());
         for (final SCustomUserInfoDefinition userInfoDefinition : userInfoDefinitions) {
             names.put(userInfoDefinition.getId(), userInfoDefinition.getName());
@@ -156,7 +161,8 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return users;
     }
 
-    private List<ExportedUser> getNextUsersPage(final int startIndex, final int numberPerPage, final Map<Long, String> userInfoDefinitionNames)
+    private List<ExportedUser> getNextUsersPage(final int startIndex, final int numberPerPage,
+            final Map<Long, String> userInfoDefinitionNames)
             throws SBonitaException {
         final List<ExportedUser> currentUsersPage = new ArrayList<>(numberPerPage);
         final List<SUser> sUsers = identityService.getUsers(startIndex, numberPerPage);
@@ -167,10 +173,12 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return currentUsersPage;
     }
 
-    protected ExportedUser toExportedUser(final SUser sUser, final Map<Long, String> userInfoDefinitionNames) throws SBonitaException {
+    protected ExportedUser toExportedUser(final SUser sUser, final Map<Long, String> userInfoDefinitionNames)
+            throws SBonitaException {
         final String managerUserName = getManagerUsername(sUser);
 
-        final ExportedUserBuilder clientUserbuilder = ExportedUserBuilderFactory.createNewInstance(sUser.getUserName(), sUser.getPassword());
+        final ExportedUserBuilder clientUserbuilder = ExportedUserBuilderFactory.createNewInstance(sUser.getUserName(),
+                sUser.getPassword());
         // Do not export dates and id
         clientUserbuilder.setPasswordEncrypted(true);
         clientUserbuilder.setFirstName(sUser.getFirstName());
@@ -186,12 +194,14 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return clientUserbuilder.done();
     }
 
-    protected void addCustomUserInfoValues(final long userId, final ExportedUserBuilder clientUserbuilder, final Map<Long, String> userInfoDefinitionNames)
+    protected void addCustomUserInfoValues(final long userId, final ExportedUserBuilder clientUserbuilder,
+            final Map<Long, String> userInfoDefinitionNames)
             throws SBonitaReadException {
         final List<SCustomUserInfoValue> userInfoValues = getAllCustomUserInfoForUser(userId);
         for (final SCustomUserInfoValue infoValue : userInfoValues) {
             final String definitionName = userInfoDefinitionNames.get(infoValue.getDefinitionId());
-            clientUserbuilder.addCustomUserInfoValue(new ExportedCustomUserInfoValue(definitionName, infoValue.getValue()));
+            clientUserbuilder
+                    .addCustomUserInfoValue(new ExportedCustomUserInfoValue(definitionName, infoValue.getValue()));
         }
     }
 
@@ -209,19 +219,24 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     private QueryOptions getQueryOptions(final long userId, final int fromIndex) {
-        final OrderByOption orderByOption = new OrderByOption(SCustomUserInfoValue.class, SCustomUserInfoValue.ID, OrderByType.ASC);
-        final FilterOption filterOption = new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID, userId);
-        return new QueryOptions(fromIndex, maxResults, Collections.singletonList(orderByOption), Collections.singletonList(filterOption), null);
+        final OrderByOption orderByOption = new OrderByOption(SCustomUserInfoValue.class, SCustomUserInfoValue.ID,
+                OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID,
+                userId);
+        return new QueryOptions(fromIndex, maxResults, Collections.singletonList(orderByOption),
+                Collections.singletonList(filterOption), null);
     }
 
-    private void setPersonalContactInfo(final SUser sUser, final ExportedUserBuilder clientUserbuilder) throws SIdentityException {
+    private void setPersonalContactInfo(final SUser sUser, final ExportedUserBuilder clientUserbuilder)
+            throws SIdentityException {
         final SContactInfo persoInfo = identityService.getUserContactInfo(sUser.getId(), true);
         if (persoInfo != null) {
             clientUserbuilder.setPersonalData(ModelConvertor.toUserContactData(persoInfo));
         }
     }
 
-    private void setProfessionalContactInfo(final SUser sUser, final ExportedUserBuilder clientUserbuilder) throws SIdentityException {
+    private void setProfessionalContactInfo(final SUser sUser, final ExportedUserBuilder clientUserbuilder)
+            throws SIdentityException {
         final SContactInfo proInfo = identityService.getUserContactInfo(sUser.getId(), false);
         if (proInfo != null) {
             clientUserbuilder.setProfessionalData(ModelConvertor.toUserContactData(proInfo));

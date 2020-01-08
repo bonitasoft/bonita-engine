@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.incident;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class Incident {
 
@@ -28,7 +26,8 @@ public class Incident {
 
     private final Throwable exceptionWhenHandlingFailure;
 
-    public Incident(final String description, final String recoveryProcedure, final Throwable cause, final Throwable exceptionWhenHandlingFailure) {
+    public Incident(final String description, final String recoveryProcedure, final Throwable cause,
+            final Throwable exceptionWhenHandlingFailure) {
         super();
         this.description = description;
         this.recoveryProcedure = recoveryProcedure;

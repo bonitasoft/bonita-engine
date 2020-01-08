@@ -28,7 +28,8 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
 
     private final EndEventDefinitionImpl endEvent;
 
-    EndEventDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container, final String name) {
+    EndEventDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container, final String name) {
         super(container, processDefinitionBuilder);
         endEvent = new EndEventDefinitionImpl(name);
         container.addEndEvent(endEvent);
@@ -36,6 +37,7 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Adds a signal on this event
+     *
      * @param signalName name of the signal to be thrown
      * @return
      */
@@ -45,27 +47,34 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Adds a message on this event
+     *
      * @param messageName name of message to be sent
      * @param targetProcess target process
      * @param targetFlowNode target flow node
      * @return
      */
-    public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName, final Expression targetProcess, final Expression targetFlowNode) {
-        return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), endEvent, messageName, targetProcess, targetFlowNode);
+    public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName,
+            final Expression targetProcess, final Expression targetFlowNode) {
+        return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), endEvent, messageName,
+                targetProcess, targetFlowNode);
     }
 
     /**
      * Adds a message on this event
+     *
      * @param messageName name of message to be sent
      * @param targetProcess target process
      * @return
      */
-    public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName, final Expression targetProcess) {
-        return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), endEvent, messageName, targetProcess);
+    public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName,
+            final Expression targetProcess) {
+        return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), endEvent, messageName,
+                targetProcess);
     }
 
     /**
-     * Adds an error on this event 
+     * Adds an error on this event
+     *
      * @param errorCode error code of the error to be thrown
      * @return
      */
@@ -75,6 +84,7 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Marks this event as a terminate event
+     *
      * @return
      */
     public EndEventDefinitionBuilder addTerminateEventTrigger() {
@@ -90,12 +100,12 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-    * Sets the display description on this event
-    * 
-    * @param displayDescription
-    *            expression representing the display description
-    * @return
-    */
+     * Sets the display description on this event
+     *
+     * @param displayDescription
+     *        expression representing the display description
+     * @return
+     */
     public EndEventDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
         endEvent.setDisplayDescription(displayDescription);
         return this;
@@ -103,9 +113,9 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Sets the display name on this event
-     * 
+     *
      * @param displayName
-     *            expression representing the display name
+     *        expression representing the display name
      * @return
      */
     public EndEventDefinitionBuilder addDisplayName(final Expression displayName) {
@@ -113,16 +123,17 @@ public class EndEventDefinitionBuilder extends FlowElementContainerBuilder imple
         return this;
     }
 
-
     /**
-     * Sets the display description after completion on this event. This will be used to updated the display description when the event completes its
+     * Sets the display description after completion on this event. This will be used to updated the display description
+     * when the event completes its
      * execution
-     * 
+     *
      * @param displayDescriptionAfterCompletion
-     *            expression representing the new display description after the event completion.
+     *        expression representing the new display description after the event completion.
      * @return
      */
-    public EndEventDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
+    public EndEventDefinitionBuilder addDisplayDescriptionAfterCompletion(
+            final Expression displayDescriptionAfterCompletion) {
         endEvent.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;
     }

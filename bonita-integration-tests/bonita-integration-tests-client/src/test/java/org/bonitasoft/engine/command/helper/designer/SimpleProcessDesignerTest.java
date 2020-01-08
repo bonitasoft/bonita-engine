@@ -88,7 +88,8 @@ public class SimpleProcessDesignerTest {
 
         assertEquals("[B, C1 (C1_->_D), C2]", DesignerTestUtils.getActivities(design));
         assertEquals("[D]", DesignerTestUtils.getGateways(design));
-        assertEquals("[A_->_B, B_->_C1, B_->_C2, C1_->_D, C2_->_D (true), D_->_F]", DesignerTestUtils.getTransitions(design));
+        assertEquals("[A_->_B, B_->_C1, B_->_C2, C1_->_D, C2_->_D (true), D_->_F]",
+                DesignerTestUtils.getTransitions(design));
     }
 
     @Test
@@ -106,7 +107,8 @@ public class SimpleProcessDesignerTest {
 
         assertEquals("[B, D1, D2]", DesignerTestUtils.getActivities(design));
         assertEquals("[C (C_->_D1)]", DesignerTestUtils.getGateways(design));
-        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_D2 (true), D1_->_E, D2_->_E]", DesignerTestUtils.getTransitions(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_D2 (true), D1_->_E, D2_->_E]",
+                DesignerTestUtils.getTransitions(design));
     }
 
     @Test
@@ -124,7 +126,8 @@ public class SimpleProcessDesignerTest {
 
         assertEquals("[B, D1, D2, E]", DesignerTestUtils.getActivities(design));
         assertEquals("[C, F]", DesignerTestUtils.getGateways(design));
-        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_E, D1_->_D2, D2_->_F, E_->_F, F_->_G]", DesignerTestUtils.getTransitions(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_E, D1_->_D2, D2_->_F, E_->_F, F_->_G]",
+                DesignerTestUtils.getTransitions(design));
     }
 
     @Test
@@ -142,7 +145,8 @@ public class SimpleProcessDesignerTest {
                 .then(new EndEvent("I"))
                 .done();
 
-        assertEquals("[A_->_B, A_->_C, B_->_G, C_->_D, C_->_E, D_->_F, E_->_F, F_->_G, G_->_H, H_->_I]", DesignerTestUtils.getTransitions(design));
+        assertEquals("[A_->_B, A_->_C, B_->_G, C_->_D, C_->_E, D_->_F, E_->_F, F_->_G, G_->_H, H_->_I]",
+                DesignerTestUtils.getTransitions(design));
     }
 
     private ProcessDefinitionBuilder createProcessDefinitionBuilder() {

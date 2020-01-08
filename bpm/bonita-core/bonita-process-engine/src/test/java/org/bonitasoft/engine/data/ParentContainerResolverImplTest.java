@@ -64,7 +64,8 @@ public class ParentContainerResolverImplTest {
                 .getContainerHierarchy(new DataContainer(5L, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(5L, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(5L, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
@@ -75,7 +76,8 @@ public class ParentContainerResolverImplTest {
                 .getContainerHierarchy(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
     }
 
     @Test
@@ -85,14 +87,18 @@ public class ParentContainerResolverImplTest {
         activityWithType(CALLER_ID, SFlowNodeType.CALL_ACTIVITY, 0, 0, 0, 0);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getContainerHierarchy(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+                .getContainerHierarchy(
+                        new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
-    private void activityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId, final long parentActivityInstanceId,
-            final long parentContainerId, final long rootContainerId) throws SFlowNodeReadException, SFlowNodeNotFoundException {
+    private void activityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId,
+            final long parentActivityInstanceId,
+            final long parentContainerId, final long rootContainerId)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException {
         SActivityInstance activity = new SUserTaskInstance() {
 
             @Override
@@ -108,7 +114,8 @@ public class ParentContainerResolverImplTest {
         activity.setRootContainerId(rootContainerId);
     }
 
-    private void processWithCaller(long processInstanceId, long callerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+    private void processWithCaller(long processInstanceId, long callerId)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
         SProcessInstance processInstance = new SProcessInstance();
         processInstance.setCallerId(callerId);
         doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -122,40 +129,52 @@ public class ParentContainerResolverImplTest {
         activityWithType(CALLER_ID, SFlowNodeType.SUB_PROCESS, 45l, -1, 45l, 45l);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getContainerHierarchy(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+                .getContainerHierarchy(
+                        new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(2);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
     public void getContainerHierarchy_on_activity() throws Exception {
         //given
         processWithCaller(PROCESS_INSTANCE_ID, -1);
-        activityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        activityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID,
+                PROCESS_INSTANCE_ID);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getContainerHierarchy(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+                .getContainerHierarchy(
+                        new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(2);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(1)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(1))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
     public void getContainerHierarchy_on_sub_activity() throws Exception {
         //given
         processWithCaller(PROCESS_INSTANCE_ID, -1);
-        activityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
-        activityWithType(SUB_ACTIVITY_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, ACTIVITY_INSTANCE_ID, ACTIVITY_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        activityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID,
+                PROCESS_INSTANCE_ID);
+        activityWithType(SUB_ACTIVITY_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, ACTIVITY_INSTANCE_ID,
+                ACTIVITY_INSTANCE_ID, PROCESS_INSTANCE_ID);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getContainerHierarchy(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+                .getContainerHierarchy(
+                        new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(3);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(1)).isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(2)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(1))
+                .isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(2))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     //// archived
@@ -167,7 +186,8 @@ public class ParentContainerResolverImplTest {
                 .getArchivedContainerHierarchy(new DataContainer(5l, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(5l, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(5l, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
@@ -178,7 +198,8 @@ public class ParentContainerResolverImplTest {
                 .getArchivedContainerHierarchy(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(5l, DataInstanceContainer.MESSAGE_INSTANCE.name()));
     }
 
     @Test
@@ -188,14 +209,18 @@ public class ParentContainerResolverImplTest {
         activityWithType(CALLER_ID, SFlowNodeType.CALL_ACTIVITY, 0, 0, 0, 0);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getArchivedContainerHierarchy(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+                .getArchivedContainerHierarchy(
+                        new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(1);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
-    private void archivedActivityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId, final long parentActivityInstanceId,
-            final long parentContainerId, final long rootContainerId) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
+    private void archivedActivityWithType(long id, final SFlowNodeType type, final long parentProcessInstanceId,
+            final long parentActivityInstanceId,
+            final long parentContainerId, final long rootContainerId)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
         SAActivityInstance activity = new SAUserTaskInstance() {
 
             @Override
@@ -226,41 +251,53 @@ public class ParentContainerResolverImplTest {
         archivedActivityWithType(CALLER_ID, SFlowNodeType.SUB_PROCESS, 45l, -1, 45l, 45l);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getArchivedContainerHierarchy(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+                .getArchivedContainerHierarchy(
+                        new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(2);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
     public void getArchivedContainerHierarchy_on_activity() throws Exception {
         //given
         archivedProcessWithCaller(PROCESS_INSTANCE_ID, -1);
-        archivedActivityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        archivedActivityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1,
+                PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getArchivedContainerHierarchy(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+                .getArchivedContainerHierarchy(
+                        new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(2);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(1)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(1))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
     @Test
     public void getArchivedContainerHierarchy_on_sub_activity() throws Exception {
         //given
         archivedProcessWithCaller(PROCESS_INSTANCE_ID, -1);
-        archivedActivityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
-        archivedActivityWithType(SUB_ACTIVITY_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, ACTIVITY_INSTANCE_ID, ACTIVITY_INSTANCE_ID,
+        archivedActivityWithType(ACTIVITY_INSTANCE_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, -1,
+                PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        archivedActivityWithType(SUB_ACTIVITY_ID, SFlowNodeType.USER_TASK, PROCESS_INSTANCE_ID, ACTIVITY_INSTANCE_ID,
+                ACTIVITY_INSTANCE_ID,
                 PROCESS_INSTANCE_ID);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
-                .getArchivedContainerHierarchy(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+                .getArchivedContainerHierarchy(
+                        new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
         //then
         assertThat(containerHierarchy).hasSize(3);
-        assertThat(containerHierarchy.get(0)).isEqualTo(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(1)).isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
-        assertThat(containerHierarchy.get(2)).isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
+        assertThat(containerHierarchy.get(0))
+                .isEqualTo(new DataContainer(SUB_ACTIVITY_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(1))
+                .isEqualTo(new DataContainer(ACTIVITY_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name()));
+        assertThat(containerHierarchy.get(2))
+                .isEqualTo(new DataContainer(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name()));
     }
 
 }

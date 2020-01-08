@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity.xml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -68,7 +69,6 @@ public class ExportedUser {
     @XmlElement(name = "metaData")
     protected List<MetaData> metaDatas = new ArrayList<>();
 
-
     public ExportedUser() {
     }
 
@@ -109,11 +109,9 @@ public class ExportedUser {
         customUserInfoValues = user.getCustomUserInfoValues();
     }
 
-
     public ExportedUserPassword getPasswordObject() {
         return passwordObject;
     }
-
 
     public boolean isPasswordEncrypted() {
         return getPasswordObject().isPasswordEncrypted();

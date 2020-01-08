@@ -22,7 +22,6 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
@@ -89,7 +88,8 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
     }
 
     private EntityUpdateDescriptor getUpdateDescriptor(String newDescription) {
-        SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
+        SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory
+                .get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
         builder.updateDescription(newDescription);
         return builder.done();
     }
@@ -106,6 +106,5 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
         // then
         verify(userInfoValueAPI, times(1)).set(DEFINITION_ID, USER_ID, SKILLS_VALUE);
     }
-
 
 }

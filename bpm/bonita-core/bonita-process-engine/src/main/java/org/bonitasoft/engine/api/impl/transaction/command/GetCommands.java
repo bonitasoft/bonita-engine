@@ -38,7 +38,8 @@ public class GetCommands implements TransactionContentWithResult<List<SCommand>>
 
     private List<SCommand> commands;
 
-    public GetCommands(final CommandService commandService, final int startIndex, final int maxResults, final CommandCriterion sort) {
+    public GetCommands(final CommandService commandService, final int startIndex, final int maxResults,
+            final CommandCriterion sort) {
         super();
         this.commandService = commandService;
         this.startIndex = startIndex;

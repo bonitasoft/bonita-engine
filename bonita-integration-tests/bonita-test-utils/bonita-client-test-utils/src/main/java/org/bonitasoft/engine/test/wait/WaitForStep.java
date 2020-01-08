@@ -38,7 +38,8 @@ public class WaitForStep extends WaitUntil {
     private final ProcessAPI processAPI;
 
     @Deprecated
-    public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId, final ProcessAPI processAPI) {
+    public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId,
+            final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.stepName = stepName;
         this.processInstanceId = processInstanceId;
@@ -46,7 +47,8 @@ public class WaitForStep extends WaitUntil {
     }
 
     @Deprecated
-    public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId, final TestStates state,
+    public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId,
+            final TestStates state,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.stepName = stepName;
@@ -57,7 +59,8 @@ public class WaitForStep extends WaitUntil {
 
     @Override
     protected boolean check() {
-        final List<ActivityInstance> openedActivityInstances = processAPI.getOpenActivityInstances(processInstanceId, 0, 10,
+        final List<ActivityInstance> openedActivityInstances = processAPI.getOpenActivityInstances(processInstanceId, 0,
+                10,
                 ActivityInstanceCriterion.DEFAULT);
         final Iterator<ActivityInstance> iterator = openedActivityInstances.iterator();
         boolean found = false;

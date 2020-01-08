@@ -18,14 +18,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SearchApplicationMenuDescriptor extends SearchEntityDescriptor {
 
@@ -36,11 +34,16 @@ public class SearchApplicationMenuDescriptor extends SearchEntityDescriptor {
     SearchApplicationMenuDescriptor() {
         keys = new HashMap<String, FieldDescriptor>(6);
         keys.put(ApplicationMenuSearchDescriptor.ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.ID));
-        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID));
-        keys.put(ApplicationMenuSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.DISPLAY_NAME));
-        keys.put(ApplicationMenuSearchDescriptor.INDEX, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.INDEX));
-        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID));
-        keys.put(ApplicationMenuSearchDescriptor.PARENT_ID, new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.PARENT_ID));
+        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID,
+                new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID));
+        keys.put(ApplicationMenuSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.DISPLAY_NAME));
+        keys.put(ApplicationMenuSearchDescriptor.INDEX,
+                new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.INDEX));
+        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID,
+                new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID));
+        keys.put(ApplicationMenuSearchDescriptor.PARENT_ID,
+                new FieldDescriptor(SApplicationMenu.class, SApplicationMenu.PARENT_ID));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 

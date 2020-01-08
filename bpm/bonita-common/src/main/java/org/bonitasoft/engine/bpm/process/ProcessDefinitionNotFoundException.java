@@ -40,9 +40,10 @@ public class ProcessDefinitionNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessDefinitionNotFoundException(final Throwable cause) {
@@ -50,12 +51,14 @@ public class ProcessDefinitionNotFoundException extends NotFoundException {
     }
 
     /**
-     * Constructs a new exception with the specified detail cause, and constructs the message with the identifier of the process definition.
-     * 
+     * Constructs a new exception with the specified detail cause, and constructs the message with the identifier of the
+     * process definition.
+     *
      * @param processDefinitionId
      *        The identifier of the process definition
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessDefinitionNotFoundException(final long processDefinitionId, final Throwable cause) {

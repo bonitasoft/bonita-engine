@@ -30,7 +30,8 @@ public class WaitForEventSynchronization implements BonitaTransactionSynchroniza
 
     private final SynchroService synchroService;
 
-    public WaitForEventSynchronization(final Map<String, Serializable> event, final Long id, final SynchroService synchroService) {
+    public WaitForEventSynchronization(final Map<String, Serializable> event, final Long id,
+            final SynchroService synchroService) {
         this.event = event;
         this.id = id;
         this.synchroService = synchroService;

@@ -20,13 +20,14 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
 /**
  * @author Yanyan Liu
  */
-public class SDependencyMappingLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SDependencyMappingLogBuilderFactory {
+public class SDependencyMappingLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SDependencyMappingLogBuilderFactory {
 
     @Override
     public SDependencyMappingLogBuilder createNewInstance() {
         return new SDependencyMappingLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SDependencyLogIndexesMapper.DEPENDENCY_MAPPING_INDEX_NAME;

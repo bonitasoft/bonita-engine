@@ -19,11 +19,14 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class IntermediateCatchEventDefinitionImpl extends CatchEventDefinitionImpl implements IntermediateCatchEventDefinition {
+public class IntermediateCatchEventDefinitionImpl extends CatchEventDefinitionImpl
+        implements IntermediateCatchEventDefinition {
 
     private static final long serialVersionUID = 640463416063488502L;
 
-    public IntermediateCatchEventDefinitionImpl(){}
+    public IntermediateCatchEventDefinitionImpl() {
+    }
+
     public IntermediateCatchEventDefinitionImpl(final String name) {
         super(name);
     }

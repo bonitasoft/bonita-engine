@@ -26,11 +26,11 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 @EqualsAndHashCode(callSuper = true)
 public class SWaitingSignalEvent extends SWaitingEvent {
 
-
     private String signalName;
 
-    public SWaitingSignalEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
-                                   final String flowNodeName, final String signalName) {
+    public SWaitingSignalEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
+            final String flowNodeName, final String signalName) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
         this.signalName = signalName;
     }

@@ -49,17 +49,20 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
 
     private final TechnicalLoggerService logger;
 
-    public PlatformCommandServiceImpl(final PersistenceService platformPersistenceService, final TechnicalLoggerService logger) {
+    public PlatformCommandServiceImpl(final PersistenceService platformPersistenceService,
+            final TechnicalLoggerService logger) {
         super();
         this.platformPersistenceService = platformPersistenceService;
         this.logger = logger;
     }
 
     @Override
-    public void create(final SPlatformCommand platformCommand) throws SPlatformCommandAlreadyExistsException, SPlatformCommandCreationException,
+    public void create(final SPlatformCommand platformCommand)
+            throws SPlatformCommandAlreadyExistsException, SPlatformCommandCreationException,
             SPlatformCommandGettingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "create"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "create"));
         }
         NullCheckingUtil.checkArgsNotNull(platformCommand);
         SPlatformCommand existedPlatformCommand = null;
@@ -67,7 +70,8 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
             existedPlatformCommand = getPlatformCommand(platformCommand.getName());
         } catch (final SPlatformCommandNotFoundException e1) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "create", e1));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "create", e1));
             }
         } finally {
             if (existedPlatformCommand != null) {
@@ -77,50 +81,60 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
         try {
             platformPersistenceService.insert(platformCommand);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "create"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "create"));
             }
         } catch (final SPersistenceException pe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "create", pe));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "create", pe));
             }
             throw new SPlatformCommandCreationException(pe);
         }
     }
 
-    public void deletePlatformCommand(final SPlatformCommand sPlatformCommand) throws SPlatformCommandDeletionException {
+    public void deletePlatformCommand(final SPlatformCommand sPlatformCommand)
+            throws SPlatformCommandDeletionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deletePlatformCommand"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "deletePlatformCommand"));
         }
         try {
             platformPersistenceService.delete(sPlatformCommand);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deletePlatformCommand"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "deletePlatformCommand"));
             }
         } catch (final SPersistenceException pe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatformCommand", pe));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatformCommand", pe));
             }
             throw new SPlatformCommandDeletionException(pe);
         }
     }
 
     @Override
-    public void delete(final String platformCommandName) throws SPlatformCommandNotFoundException, SPlatformCommandDeletionException,
+    public void delete(final String platformCommandName)
+            throws SPlatformCommandNotFoundException, SPlatformCommandDeletionException,
             SPlatformCommandGettingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
         }
         final SPlatformCommand sPlatformCommand = getPlatformCommand(platformCommandName);
         deletePlatformCommand(sPlatformCommand);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "delete"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "delete"));
         }
     }
 
     @Override
     public void deleteAll() throws SPlatformCommandDeletionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAll"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "deleteAll"));
         }
         final QueryOptions queryOptions = new QueryOptions(0, 100, SPlatformCommand.class, "id", OrderByType.ASC);
         List<SPlatformCommand> sPlatformCommands = null;
@@ -129,7 +143,8 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
                 sPlatformCommands = getPlatformCommands(queryOptions);
             } catch (final SPlatformCommandGettingException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteAll", e));
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                            LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteAll", e));
                 }
                 throw new SPlatformCommandDeletionException(e);
             }
@@ -138,70 +153,86 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
             }
         } while (sPlatformCommands.size() == queryOptions.getNumberOfResults());
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteAll"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "deleteAll"));
         }
     }
 
     @Override
-    public List<SPlatformCommand> getPlatformCommands(final QueryOptions queryOptions) throws SPlatformCommandGettingException {
+    public List<SPlatformCommand> getPlatformCommands(final QueryOptions queryOptions)
+            throws SPlatformCommandGettingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatformCommands"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "getPlatformCommands"));
         }
         final Map<String, Object> parameters = Collections.emptyMap();
         try {
-            final List<SPlatformCommand> sPlatformCommands = platformPersistenceService.selectList(new SelectListDescriptor<SPlatformCommand>(
-                    "getPlatformCommands", parameters, SPlatformCommand.class, queryOptions));
+            final List<SPlatformCommand> sPlatformCommands = platformPersistenceService
+                    .selectList(new SelectListDescriptor<SPlatformCommand>(
+                            "getPlatformCommands", parameters, SPlatformCommand.class, queryOptions));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPlatformCommands"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "getPlatformCommands"));
             }
             return sPlatformCommands;
         } catch (final SBonitaReadException bre) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatformCommands", bre));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatformCommands", bre));
             }
             throw new SPlatformCommandGettingException(bre);
         }
     }
 
     @Override
-    public SPlatformCommand getPlatformCommand(final String platformCommandName) throws SPlatformCommandNotFoundException, SPlatformCommandGettingException {
+    public SPlatformCommand getPlatformCommand(final String platformCommandName)
+            throws SPlatformCommandNotFoundException, SPlatformCommandGettingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatformCommand"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "getPlatformCommand"));
         }
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) platformCommandName);
         try {
-            final SPlatformCommand sPlatformCommand = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatformCommand>(
-                    "getPlatformCommandByName", parameters, SPlatformCommand.class));
+            final SPlatformCommand sPlatformCommand = platformPersistenceService
+                    .selectOne(new SelectOneDescriptor<SPlatformCommand>(
+                            "getPlatformCommandByName", parameters, SPlatformCommand.class));
             if (sPlatformCommand == null) {
-                throw new SPlatformCommandNotFoundException("No platformCommand exists using name: " + platformCommandName);
+                throw new SPlatformCommandNotFoundException(
+                        "No platformCommand exists using name: " + platformCommandName);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPlatformCommand"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "getPlatformCommand"));
             }
             return sPlatformCommand;
         } catch (final SBonitaReadException bre) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatformCommand", bre));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatformCommand", bre));
             }
             throw new SPlatformCommandGettingException(bre);
         }
     }
 
     @Override
-    public void update(final SPlatformCommand platformCommand, final EntityUpdateDescriptor updateDescriptor) throws SPlatformCommandUpdateException {
+    public void update(final SPlatformCommand platformCommand, final EntityUpdateDescriptor updateDescriptor)
+            throws SPlatformCommandUpdateException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "update"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "update"));
         }
         final UpdateDescriptor desc = new UpdateDescriptor(platformCommand);
         desc.addFields(updateDescriptor.getFields());
         try {
             platformPersistenceService.update(desc);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "update"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), "update"));
             }
         } catch (final SPersistenceException pe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "update", pe));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "update", pe));
             }
             throw new SPlatformCommandUpdateException(pe);
         }

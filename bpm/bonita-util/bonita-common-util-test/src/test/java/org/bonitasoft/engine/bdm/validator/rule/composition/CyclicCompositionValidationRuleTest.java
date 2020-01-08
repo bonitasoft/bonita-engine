@@ -18,12 +18,11 @@ import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aCompositionField;
 import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Colin PUY
@@ -61,17 +60,20 @@ public class CyclicCompositionValidationRuleTest {
 
         assertThat(validationStatus).isNotOk();
     }
-    
+
     @Test
-    public void should_validate_that_a_bom_with_the_same_bo_composed_two_times_is_invalid(){
+    public void should_validate_that_a_bom_with_the_same_bo_composed_two_times_is_invalid() {
         //given
         final BusinessObject wheel = aBO("wheel").build();
-        final BusinessObject bycicle = aBO("bicycle").withField(aCompositionField("frontwheel",wheel)).withField(aCompositionField("backwheel",wheel)).build();
-        final BusinessObjectModel bom = aBOM().withBOs(wheel,bycicle).build();
+        final BusinessObject bycicle = aBO("bicycle").withField(aCompositionField("frontwheel", wheel))
+                .withField(aCompositionField("backwheel", wheel)).build();
+        final BusinessObjectModel bom = aBOM().withBOs(wheel, bycicle).build();
         //when
         ValidationStatus validationStatus = rule.validate(bom);
         //then
         assertThat(validationStatus).isNotOk();
-        assertThat(validationStatus).hasError("Business object " + "wheel" + " has a circular composition reference to itself or is referenced several times in the object " + "bicycle");
+        assertThat(validationStatus).hasError("Business object " + "wheel"
+                + " has a circular composition reference to itself or is referenced several times in the object "
+                + "bicycle");
     }
 }

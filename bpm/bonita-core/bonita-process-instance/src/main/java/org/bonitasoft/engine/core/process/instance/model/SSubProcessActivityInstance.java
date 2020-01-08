@@ -28,8 +28,9 @@ public class SSubProcessActivityInstance extends SActivityInstance {
 
     private boolean triggeredByEvent;
 
-    public SSubProcessActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                           final long logicalGroup1, final long logicalGroup2, final boolean triggeredByEvent) {
+    public SSubProcessActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2, final boolean triggeredByEvent) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
         this.triggeredByEvent = triggeredByEvent;
     }

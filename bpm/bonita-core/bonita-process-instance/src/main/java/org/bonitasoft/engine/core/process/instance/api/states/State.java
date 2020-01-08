@@ -26,17 +26,16 @@ public interface State<T> {
     int ID_ACTIVITY_READY = 4;
     int ID_ACTIVITY_FAILED = 3;
 
-
     StateCode execute(SProcessDefinition processDefinition, T instance) throws SActivityStateExecutionException;
 
     /**
-     *
      * Called when a children of the flow node parentInstance finish
      *
      * @return
      *         true if the state is finished (the execution will continue automatically)
      */
-    boolean hit(SProcessDefinition processDefinition, T parentInstance, T childInstance) throws SActivityStateExecutionException;
+    boolean hit(SProcessDefinition processDefinition, T parentInstance, T childInstance)
+            throws SActivityStateExecutionException;
 
     int getId();
 
@@ -55,14 +54,14 @@ public interface State<T> {
 
     /**
      * Checks whether the state is a terminal one.
-     * 
+     *
      * @return true is the state is a terminal one; false otherwise
      */
     boolean isTerminal();
 
     /**
      * Get the state's category
-     * 
+     *
      * @return the state's category
      */
     SStateCategory getStateCategory();

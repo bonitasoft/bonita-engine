@@ -30,7 +30,8 @@ public class StackTraceTransformerTest {
 
     @Test
     public void merge_stack_keep_only_current_exception() {
-        ServerWrappedException e = new ServerWrappedException(new IllegalStateException(new NoClassDefFoundError("org.Unknown")));
+        ServerWrappedException e = new ServerWrappedException(
+                new IllegalStateException(new NoClassDefFoundError("org.Unknown")));
 
         ServerWrappedException newE = StackTraceTransformer.mergeStackTraces(e);
 
@@ -65,7 +66,8 @@ public class StackTraceTransformerTest {
         HashSet<StackTraceElement> hashSet = new HashSet<StackTraceElement>();
         for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
             if (!hashSet.add(stackTraceElement) && stackTraceElement.toString().contains("org.bonitasoft")) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "the stacktrace contains 2 times " + stackTraceElement, throwable);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
+                        "the stacktrace contains 2 times " + stackTraceElement, throwable);
                 throw new Exception("the stacktrace contains 2 times " + stackTraceElement, throwable);
             }
         }

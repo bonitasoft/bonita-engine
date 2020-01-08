@@ -54,14 +54,16 @@ public class BusinessObjectDAOUsingAPIClientTest {
     }
 
     @Test
-    public void should_create_dao_throw_IllegalArgmumentException_if_daoInterface_is_not_an_interface() throws Exception {
+    public void should_create_dao_throw_IllegalArgmumentException_if_daoInterface_is_not_an_interface()
+            throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("DummyDAOImpl is not an interface");
         client.getDAO(DummyDAOImpl.class);
     }
 
     @Test
-    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_not_in_classpath() throws Exception {
+    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_not_in_classpath()
+            throws Exception {
         Mockito.doThrow(ClassNotFoundException.class).when(client).loadClass(BusinessObjectDAO.class);
 
         expectedEx.expect(BusinessObjectDaoCreationException.class);
@@ -71,8 +73,10 @@ public class BusinessObjectDAOUsingAPIClientTest {
     }
 
     @Test
-    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session() throws Exception {
-        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(client).loadClass(ArgumentMatchers.any(Class.class));
+    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session()
+            throws Exception {
+        Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(client)
+                .loadClass(ArgumentMatchers.any(Class.class));
 
         expectedEx.expect(BusinessObjectDaoCreationException.class);
         expectedEx.expectMessage("");

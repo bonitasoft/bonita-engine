@@ -21,10 +21,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopA
 /**
  * @author Baptiste Mesta
  */
-public class SALoopActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SALoopActivityInstanceBuilderFactory {
+public class SALoopActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SALoopActivityInstanceBuilderFactory {
 
     @Override
-    public SALoopActivityInstanceBuilder createNewLoopActivityInstance(final SLoopActivityInstance sLoopActivityInstance) {
+    public SALoopActivityInstanceBuilder createNewLoopActivityInstance(
+            final SLoopActivityInstance sLoopActivityInstance) {
         final SALoopActivityInstance entity = new SALoopActivityInstance(sLoopActivityInstance);
         return new SALoopActivityInstanceBuilderImpl(entity);
     }

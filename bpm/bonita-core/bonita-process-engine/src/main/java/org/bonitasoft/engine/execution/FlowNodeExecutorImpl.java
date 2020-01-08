@@ -78,15 +78,16 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final ContractDataService contractDataService;
     private final ProcessInstanceInterruptor processInstanceInterruptor;
 
-    public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-             final ArchiveService archiveService,
+    public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager,
+            final ActivityInstanceService activityInstanceManager,
+            final ArchiveService archiveService,
             final DataInstanceService dataInstanceService,
             final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final SCommentService commentService,
             final ProcessInstanceService processInstanceService,
             final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
-            final ContractDataService contractDataService, ProcessInstanceInterruptor processInstanceInterruptor){
+            final ContractDataService contractDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
         this.archiveService = archiveService;
@@ -106,7 +107,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public StateCode executeState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final FlowNodeState state)
+    public StateCode executeState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final FlowNodeState state)
             throws SActivityStateExecutionException, SActivityExecutionException {
         try {
             // if state is part of normal state and the flowNode state category is aborting or canceling it's not necessary to execute the state
@@ -122,19 +124,25 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         }
     }
 
-    private void addSystemComment(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state) throws SCommentAddException {
-        if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE) && state.mustAddSystemComment(flowNodeInstance)) {
-            commentService.addSystemComment(flowNodeInstance.getRootContainerId(), state.getSystemComment(flowNodeInstance));
+    private void addSystemComment(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state)
+            throws SCommentAddException {
+        if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)
+                && state.mustAddSystemComment(flowNodeInstance)) {
+            commentService.addSystemComment(flowNodeInstance.getRootContainerId(),
+                    state.getSystemComment(flowNodeInstance));
         }
     }
 
     @Override
-    public FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
+    public FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId)
+            throws SFlowNodeExecutionException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long processDefinitionId = flowNodeInstance.getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
-                    .getProcessDefinitionIndex());
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+            final long processDefinitionId = flowNodeInstance
+                    .getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
+                            .getProcessDefinitionIndex());
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
+                    processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
 
             if (!flowNodeInstance.isStateExecuting()) {
@@ -143,7 +151,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 setExecutedBySubstitute(executerSubstituteId, flowNodeInstance);
             }
 
-            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            final SProcessDefinition processDefinition = processDefinitionService
+                    .getProcessDefinition(processDefinitionId);
             final FlowNodeState state = updateState(flowNodeInstance, processDefinition);
             if (!flowNodeInstance.isStateExecuting() && state != null) {
                 registerWork(state, flowNodeInstance);
@@ -158,9 +167,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         }
     }
 
-    private FlowNodeState updateState(final SFlowNodeInstance sFlowNodeInstance, final SProcessDefinition processDefinition)
+    private FlowNodeState updateState(final SFlowNodeInstance sFlowNodeInstance,
+            final SProcessDefinition processDefinition)
             throws SActivityStateExecutionException, SActivityExecutionException, SFlowNodeModificationException {
-        final StateCode stateCode = executeState(processDefinition, sFlowNodeInstance, flowNodeStateManager.getState(sFlowNodeInstance.getStateId()));
+        final StateCode stateCode = executeState(processDefinition, sFlowNodeInstance,
+                flowNodeStateManager.getState(sFlowNodeInstance.getStateId()));
         if (StateCode.DONE.equals(stateCode)) {
             return getNextNormalState(sFlowNodeInstance, processDefinition);
         } else if (StateCode.EXECUTING.equals(stateCode)) {
@@ -170,10 +181,12 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         return null;
     }
 
-    private FlowNodeState getNextNormalState(final SFlowNodeInstance sFlowNodeInstance, final SProcessDefinition processDefinition)
+    private FlowNodeState getNextNormalState(final SFlowNodeInstance sFlowNodeInstance,
+            final SProcessDefinition processDefinition)
             throws SActivityExecutionException,
             SFlowNodeModificationException {
-        final FlowNodeState state = flowNodeStateManager.getNextNormalState(processDefinition, sFlowNodeInstance, sFlowNodeInstance.getStateId());
+        final FlowNodeState state = flowNodeStateManager.getNextNormalState(processDefinition, sFlowNodeInstance,
+                sFlowNodeInstance.getStateId());
         if (sFlowNodeInstance.getStateId() != state.getId()) {
             // this also unset the executing flag
             activityInstanceService.setState(sFlowNodeInstance, state);
@@ -193,13 +206,15 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance));
     }
 
-    private void setExecutedBySubstitute(final Long executerSubstituteId, final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeModificationException {
+    private void setExecutedBySubstitute(final Long executerSubstituteId, final SFlowNodeInstance sFlowNodeInstance)
+            throws SFlowNodeModificationException {
         if (isNotNullOrEmptyAndDifferentOf(sFlowNodeInstance.getExecutedBySubstitute(), executerSubstituteId)) {
             activityInstanceService.setExecutedBySubstitute(sFlowNodeInstance, executerSubstituteId);
         }
     }
 
-    private void setExecutedBy(final Long executerId, final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeModificationException {
+    private void setExecutedBy(final Long executerId, final SFlowNodeInstance sFlowNodeInstance)
+            throws SFlowNodeModificationException {
         if (isNotNullOrEmptyAndDifferentOf(sFlowNodeInstance.getExecutedBy(), executerId)) {
             activityInstanceService.setExecutedBy(sFlowNodeInstance, executerId);
         }
@@ -223,7 +238,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     registerNotifyFinishWork(sFlowNodeInstance);
                 }
                 if (sFlowNodeInstance instanceof SActivityInstance) {
-                    flowNodeStateManager.getStateBehaviors().interruptAttachedBoundaryEvent(processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId()),
+                    flowNodeStateManager.getStateBehaviors().interruptAttachedBoundaryEvent(
+                            processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId()),
                             ((SActivityInstance) sFlowNodeInstance), ABORTING);
                 }
             }
@@ -242,16 +258,21 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance flowNodeInstance) throws SFlowNodeNotFoundException,
-            SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException, SFlowNodeModificationException,
+    public void childFinished(final long processDefinitionId, final long parentId, SFlowNodeInstance flowNodeInstance)
+            throws SFlowNodeNotFoundException,
+            SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException,
+            SFlowNodeModificationException,
             SFlowNodeExecutionException, SWorkRegisterException {
         // TODO check deletion here
         archiveFlowNodeInstance(flowNodeInstance, true, processDefinitionId);
 
-        final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService.getFlowNodeInstance(parentId);
+        final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService
+                .getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        final boolean hit = flowNodeStateManager.getState(activityInstanceParent.getStateId()).hit(sProcessDefinition, activityInstanceParent,
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinition(processDefinitionId);
+        final boolean hit = flowNodeStateManager.getState(activityInstanceParent.getStateId()).hit(sProcessDefinition,
+                activityInstanceParent,
                 flowNodeInstance);
         if (hit) {// we continue parent if hit of the parent return true
             if (activityInstanceParent.isTerminal()) {
@@ -268,18 +289,21 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childReachedState(final SProcessInstance childProcInst, final ProcessInstanceState childState, final boolean hasActionsToExecute)
+    public void childReachedState(final SProcessInstance childProcInst, final ProcessInstanceState childState,
+            final boolean hasActionsToExecute)
             throws SBonitaException {
         final long callerId = childProcInst.getCallerId();
         if (isTerminalState(childState) && callerId > 0) {
-            final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
+            final SActivityInstance callActivityInstance = activityInstanceService
+                    .getActivityInstance(childProcInst.getCallerId());
             decrementToken(callActivityInstance);
             executeFlowNodeIfHasActionsToExecute(hasActionsToExecute, callActivityInstance);
         }
 
     }
 
-    private void executeFlowNodeIfHasActionsToExecute(final boolean hasActionsToExecute, final SActivityInstance callActivityInstance)
+    private void executeFlowNodeIfHasActionsToExecute(final boolean hasActionsToExecute,
+            final SActivityInstance callActivityInstance)
             throws SWorkRegisterException {
         if (!hasActionsToExecute) {
             containerRegistry.executeFlowNode(callActivityInstance);
@@ -297,15 +321,19 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException {
+    public FlowNodeState executeFlowNode(SFlowNodeInstance flowNodeInstance, Long executerId, Long executerSubstituteId)
+            throws SFlowNodeExecutionException {
         return stepForward(flowNodeInstance, executerId, executerSubstituteId);
     }
 
     @Override
-    public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
+    public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
+            final long processDefinitionId)
             throws SArchivingException {
-        new ProcessArchiver().archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService,
-                processDefinitionService, archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataService);
+        new ProcessArchiver().archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId,
+                processInstanceService,
+                processDefinitionService, archiveService, dataInstanceService, activityInstanceService,
+                connectorInstanceService, contractDataService);
     }
 
 }

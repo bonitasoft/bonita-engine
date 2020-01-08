@@ -22,5 +22,4 @@ public interface SLogBuilderFactory {
 
     SLogBuilder createNewInstance();
 
-
 }

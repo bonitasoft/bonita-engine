@@ -31,7 +31,7 @@ import org.bonitasoft.engine.work.SWorkPreconditionException;
 /**
  * Work that notify a container that a flow node is in completed state
  * e.g. when a flow node of a process finish we evaluate the outgoing transitions of this flow node.
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
@@ -44,7 +44,8 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     private final Boolean aborting;
     private final Boolean canceling;
 
-    NotifyChildFinishedWork(long processDefinitionId, long flowNodeInstanceId, Integer stateId, Boolean executing, Boolean aborting, Boolean canceling) {
+    NotifyChildFinishedWork(long processDefinitionId, long flowNodeInstanceId, Integer stateId, Boolean executing,
+            Boolean aborting, Boolean canceling) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.stateId = stateId;
@@ -54,7 +55,8 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
-        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(ScopeType.PROCESS.name(),
+                processDefinitionId);
     }
 
     @Override
@@ -73,12 +75,14 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return CompletableFuture.completedFuture(null);
     }
 
-    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor) throws SWorkPreconditionException, SFlowNodeReadException {
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor)
+            throws SWorkPreconditionException, SFlowNodeReadException {
         SFlowNodeInstance flowNodeInstance;
         try {
             flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         } catch (SFlowNodeNotFoundException e) {
-            throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is already completed ( not found )");
+            throw new SWorkPreconditionException(
+                    "Flow node " + flowNodeInstanceId + " is already completed ( not found )");
         }
         if (stateId != flowNodeInstance.getStateId()
                 || executing != flowNodeInstance.isStateExecuting()
@@ -86,10 +90,12 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
                 || canceling != flowNodeInstance.isCanceling()) {
             throw new SWorkPreconditionException(
                     String.format("Unable to execute flow node %d because it is not in the expected state " +
-                                    "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)." +
-                                    " Someone probably already called execute on it.",
+                            "( expected state: %d, transitioning: %s, aborting: %s, canceling: %s, but got  state: %d, transitioning: %s, aborting: %s, canceling: %s)."
+                            +
+                            " Someone probably already called execute on it.",
                             flowNodeInstanceId, stateId, executing, aborting, canceling, flowNodeInstance.getStateId(),
-                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(), flowNodeInstance.isCanceling()));
+                            flowNodeInstance.isStateExecuting(), flowNodeInstance.isAborting(),
+                            flowNodeInstance.isCanceling()));
         }
         if (!flowNodeInstance.isTerminal()) {
             throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is not yet completed");
@@ -107,9 +113,11 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
-        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(tenantAccessor.getEventInstanceService(),
+        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(
+                tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), loggerService);
-        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter, tenantAccessor.getActivityInstanceService(),
+        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter,
+                tenantAccessor.getActivityInstanceService(),
                 tenantAccessor.getFlowNodeStateManager(), loggerService);
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }

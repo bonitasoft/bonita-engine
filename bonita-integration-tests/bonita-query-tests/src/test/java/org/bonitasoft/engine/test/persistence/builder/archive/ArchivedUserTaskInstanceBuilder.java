@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInsta
 /**
  * @author Emmanuel Duchastenier
  */
-public class ArchivedUserTaskInstanceBuilder extends ArchivedFlowNodeInstanceBuilder<SAUserTaskInstance, ArchivedUserTaskInstanceBuilder> {
+public class ArchivedUserTaskInstanceBuilder
+        extends ArchivedFlowNodeInstanceBuilder<SAUserTaskInstance, ArchivedUserTaskInstanceBuilder> {
 
     public static ArchivedUserTaskInstanceBuilder anArchivedUserTask() {
         return new ArchivedUserTaskInstanceBuilder();

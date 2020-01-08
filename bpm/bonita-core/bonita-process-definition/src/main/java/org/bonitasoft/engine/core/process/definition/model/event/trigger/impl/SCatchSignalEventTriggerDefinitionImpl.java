@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchS
 /**
  * @author Matthieu Chaffotte
  */
-public class SCatchSignalEventTriggerDefinitionImpl extends SSignalEventTriggerDefinitionImpl implements SCatchSignalEventTriggerDefinition {
+public class SCatchSignalEventTriggerDefinitionImpl extends SSignalEventTriggerDefinitionImpl
+        implements SCatchSignalEventTriggerDefinition {
 
     private static final long serialVersionUID = 6910759554558831366L;
 

@@ -29,9 +29,9 @@ public abstract class WaitUntil {
 
     /**
      * @param repeatEach
-     *            time to wait for before retrying, if condition not fullfilled, in milliseconds
+     *        time to wait for before retrying, if condition not fullfilled, in milliseconds
      * @param timeout
-     *            max time to wait for, in milliseconds
+     *        max time to wait for, in milliseconds
      */
     public WaitUntil(final int repeatEach, final int timeout) {
         this(repeatEach, timeout, true);
@@ -39,11 +39,11 @@ public abstract class WaitUntil {
 
     /**
      * @param repeatEach
-     *            time to wait for before retrying, if condition not fullfilled, in milliseconds
+     *        time to wait for before retrying, if condition not fullfilled, in milliseconds
      * @param timeout
-     *            max time to wait for, in milliseconds
+     *        max time to wait for, in milliseconds
      * @param throwExceptions
-     *            can the check condition throw exceptions?
+     *        can the check condition throw exceptions?
      */
     public WaitUntil(final int repeatEach, final int timeout, final boolean throwExceptions) {
         this.throwExceptions = throwExceptions;
@@ -79,7 +79,7 @@ public abstract class WaitUntil {
 
     /**
      * Condition to check for.
-     * 
+     *
      * @return true if condition is true, false otherwise.
      * @throws Exception
      */

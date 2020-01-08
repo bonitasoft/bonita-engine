@@ -35,7 +35,8 @@ public class FailedStateSetter {
 
     private final TechnicalLoggerService loggerService;
 
-    public FailedStateSetter(WaitingEventsInterrupter waitingEventsInterrupter, final ActivityInstanceService activityInstanceService,
+    public FailedStateSetter(WaitingEventsInterrupter waitingEventsInterrupter,
+            final ActivityInstanceService activityInstanceService,
             final FlowNodeStateManager flowNodeStateManager, TechnicalLoggerService loggerService) {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.activityInstanceService = activityInstanceService;
@@ -56,7 +57,8 @@ public class FailedStateSetter {
         } catch (SFlowNodeNotFoundException e) {
             if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                        "Impossible to put flow node instance in failed state: flow node instance with id '" + flowNodeInstanceId + "' not found.");
+                        "Impossible to put flow node instance in failed state: flow node instance with id '"
+                                + flowNodeInstanceId + "' not found.");
             }
         }
     }

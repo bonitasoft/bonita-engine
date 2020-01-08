@@ -42,7 +42,8 @@ import org.bonitasoft.engine.search.impl.SearchResultImpl;
  * @param <S>
  *        The server object
  */
-public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject> implements TransactionContentWithResult<SearchResult<C>> {
+public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject>
+        implements TransactionContentWithResult<SearchResult<C>> {
 
     private final SearchOptions options;
 
@@ -98,10 +99,12 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             final OrderByOption order = searchDescriptor.getEntityOrder(sort);
             orderOptions.add(order);
         }
-        final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, userSearchTerm);
+        final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null,
+                filterOptions, userSearchTerm);
         count = executeCount(countOptions);
         if (count > 0 && numberOfResults != 0) {
-            final QueryOptions searchOptions = new QueryOptions(fromIndex, numberOfResults, orderOptions, filterOptions, userSearchTerm);
+            final QueryOptions searchOptions = new QueryOptions(fromIndex, numberOfResults, orderOptions, filterOptions,
+                    userSearchTerm);
             serverObjects = executeSearch(searchOptions);
         } else {
             serverObjects = Collections.emptyList();
@@ -166,7 +169,6 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
         return null;
     }
 
-
     public static <C extends Serializable, S extends PersistentObject> SearchResult<C> search(
             SearchEntityDescriptor searchDescriptor,
             SearchOptions options,
@@ -174,6 +176,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             BonitaReadFunction<QueryOptions, Long> count,
             BonitaReadFunction<QueryOptions, List<S>> search) throws SearchException {
         return new AbstractSearchEntity<C, S>(searchDescriptor, options) {
+
             @Override
             public long executeCount(QueryOptions queryOptions) throws SBonitaReadException {
                 return count.apply(queryOptions);
@@ -183,7 +186,6 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             public List<S> executeSearch(QueryOptions queryOptions) throws SBonitaReadException {
                 return search.apply(queryOptions);
             }
-
 
             @Override
             public List<C> convertToClientObjects(List<S> serverObjects) throws SBonitaException {

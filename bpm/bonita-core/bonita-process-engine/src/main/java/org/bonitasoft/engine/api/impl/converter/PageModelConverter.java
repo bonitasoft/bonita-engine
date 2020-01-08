@@ -44,7 +44,8 @@ public class PageModelConverter {
         if (hidden == null) {
             hidden = false;
         }
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId, hidden);
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId,
+                hidden);
     }
 
     public SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
@@ -59,12 +60,15 @@ public class PageModelConverter {
         if (hidden == null) {
             hidden = false;
         }
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId, hidden);
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId,
+                hidden);
     }
 
-    private SPage buildSPage(long creatorUserId, String name, String description, String displayName, String contentName, String contentType,
+    private SPage buildSPage(long creatorUserId, String name, String description, String displayName,
+            String contentName, String contentType,
             Long processDefinitionId, boolean hidden) {
-        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
+        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name,
+                description, displayName,
                 System.currentTimeMillis(), creatorUserId, false, hidden, contentName);
         newSPageBuilder.setContentType(contentType);
         newSPageBuilder.setProcessDefinitionId(processDefinitionId);
@@ -73,8 +77,10 @@ public class PageModelConverter {
 
     public Page toPage(final SPage sPage) {
         Long processDefinitionId = sPage.getProcessDefinitionId() > 0 ? sPage.getProcessDefinitionId() : null;
-        return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.isHidden(), sPage.getDescription(),
-                sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName(),
+        return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(),
+                sPage.isHidden(), sPage.getDescription(),
+                sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(),
+                sPage.getLastUpdatedBy(), sPage.getContentName(),
                 sPage.getContentType(), processDefinitionId);
     }
 

@@ -31,7 +31,8 @@ public class SearchArchivedDocuments extends AbstractArchivedDocumentSearchEntit
 
     private final DocumentService documentService;
 
-    public SearchArchivedDocuments(final DocumentService documentService, final SearchArchivedDocumentDescriptor searchDescriptor,
+    public SearchArchivedDocuments(final DocumentService documentService,
+            final SearchArchivedDocumentDescriptor searchDescriptor,
             final SearchOptions options) {
         super(searchDescriptor, options, documentService);
         this.documentService = documentService;

@@ -52,14 +52,12 @@ public class SSession implements Serializable {
     private boolean technicalUser;
     private List<String> profiles;
 
-
     /**
      * @return the expiration date (GMT+0)
      */
     public Date getExpirationDate() {
         return new Date(lastRenewDate.getTime() + duration);
     }
-
 
     /**
      * @return true if the session is still valid

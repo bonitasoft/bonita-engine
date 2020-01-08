@@ -21,40 +21,41 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
 /**
  * The execution of this filter returns a list of userId.
  * It is used for the filtering of who can claim a UserTask based on its actorId
- * 
+ *
  * @author Baptiste Mesta
  */
 public interface UserFilter {
 
     /**
      * Set the input parameter for the filter.
-     * 
+     *
      * @param parameters
-     *            parameters is a map with parameter names and their value.
+     *        parameters is a map with parameter names and their value.
      */
     void setInputParameters(Map<String, Object> parameters);
 
     /**
      * Validate the input parameters. Check the parameters types and boundaries.
-     * 
+     *
      * @throws ConnectorValidationException
      */
     void validateInputParameters() throws ConnectorValidationException;
 
     /**
      * Execute the filter.
-     * 
+     *
      * @param actorName
-     *            the actor name of the task
+     *        the actor name of the task
      * @return the connector outputs map corresponding to the output definition.
      * @throws UserFilterException
      */
     List<Long> filter(String actorName) throws UserFilterException;
 
     /**
-     * This method make the engine assign automatically the task if the result of {@link #filter(String)} is only one element.
+     * This method make the engine assign automatically the task if the result of {@link #filter(String)} is only one
+     * element.
      * i.e. when the task is filtered only for a single user
-     * 
+     *
      * @return true if we should assign task when there is only one result.
      */
     boolean shouldAutoAssignTaskIfSingleResult();

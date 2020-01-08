@@ -58,6 +58,4 @@ public class SProfile implements PersistentObject {
         lastUpdatedBy = profile.getLastUpdatedBy();
     }
 
-
-
 }

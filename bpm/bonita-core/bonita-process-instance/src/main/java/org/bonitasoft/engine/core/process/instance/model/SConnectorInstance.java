@@ -53,8 +53,9 @@ public class SConnectorInstance implements PersistentObject {
     private String containerType;
     private int executionOrder;
 
-    public SConnectorInstance(final String name, final long containerId, final String containerType, final String connectorId, final String version,
-                                  final ConnectorEvent activationEvent) {
+    public SConnectorInstance(final String name, final long containerId, final String containerType,
+            final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
         this.name = name;
         this.containerId = containerId;
         this.containerType = containerType;

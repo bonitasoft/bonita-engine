@@ -35,8 +35,10 @@ public class SearchCommentDescriptor extends SearchEntityDescriptor {
 
     public SearchCommentDescriptor() {
         commentKeys = new HashMap<>();
-        commentKeys.put(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SComment.class, SComment.PROCESSINSTANCEID_KEY));
-        commentKeys.put(SearchCommentsDescriptor.POSTED_BY_ID, new FieldDescriptor(SComment.class, SComment.USERID_KEY));
+        commentKeys.put(SearchCommentsDescriptor.PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SComment.class, SComment.PROCESSINSTANCEID_KEY));
+        commentKeys.put(SearchCommentsDescriptor.POSTED_BY_ID,
+                new FieldDescriptor(SComment.class, SComment.USERID_KEY));
         commentKeys.put(SearchCommentsDescriptor.ID, new FieldDescriptor(SComment.class, SComment.ID_KEY));
         commentKeys.put(SearchCommentsDescriptor.POSTDATE, new FieldDescriptor(SComment.class, SComment.POSTDATE_KEY));
         commentKeys.put(SearchCommentsDescriptor.CONTENT, new FieldDescriptor(SComment.class, SComment.CONTENT_KEY));

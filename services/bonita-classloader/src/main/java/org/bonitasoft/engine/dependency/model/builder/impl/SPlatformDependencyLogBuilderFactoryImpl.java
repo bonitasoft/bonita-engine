@@ -19,11 +19,12 @@ import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyLogBuil
 /**
  * @author Matthieu Chaffotte
  */
-public class SPlatformDependencyLogBuilderFactoryImpl extends SDependencyLogBuilderFactoryImpl implements SPlatformDependencyLogBuilderFactory {
+public class SPlatformDependencyLogBuilderFactoryImpl extends SDependencyLogBuilderFactoryImpl
+        implements SPlatformDependencyLogBuilderFactory {
 
     @Override
     public SDependencyLogBuilder createNewInstance() {
         return new SDependencyLogBuilderImpl();
     }
-    
+
 }

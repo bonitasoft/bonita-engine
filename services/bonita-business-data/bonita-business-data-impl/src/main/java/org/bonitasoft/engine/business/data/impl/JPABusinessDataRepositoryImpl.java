@@ -186,9 +186,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     @Override
-    public <T extends Entity> T findById(final Class<T> entityClass, final Long primaryKey) throws SBusinessDataNotFoundException {
+    public <T extends Entity> T findById(final Class<T> entityClass, final Long primaryKey)
+            throws SBusinessDataNotFoundException {
         if (primaryKey == null) {
-            throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with a null identifier");
+            throw new SBusinessDataNotFoundException(
+                    "Impossible to get data of type " + entityClass.getName() + " with a null identifier");
         }
         final EntityManager em = getEntityManager();
         final T entity;
@@ -199,7 +201,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             throw new SRetryableException(e);
         }
         if (entity == null) {
-            throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
+            throw new SBusinessDataNotFoundException(
+                    "Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
         }
         return entity;
     }
@@ -238,7 +241,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         return entities;
     }
 
-    protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
+    protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query,
+            final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         if (query == null) {
             throw new IllegalArgumentException("query is null");
@@ -270,7 +274,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     @Override
-    public <T extends Serializable> T find(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters)
+    public <T extends Serializable> T find(final Class<T> resultClass, final String jpqlQuery,
+            final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         try {
@@ -281,7 +286,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     @Override
-    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters,
+    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery,
+            final Map<String, Serializable> parameters,
             final int startIndex, final int maxResults) {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         try {
@@ -292,7 +298,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     @Override
-    public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
+    public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass,
+            final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
         try {
@@ -321,7 +328,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         return getEntityManager().createQuery(jpqlQuery, resultClass);
     }
 
-    protected <T extends Serializable> List<T> findList(final TypedQuery<T> query, final Map<String, Serializable> parameters, final int startIndex,
+    protected <T extends Serializable> List<T> findList(final TypedQuery<T> query,
+            final Map<String, Serializable> parameters, final int startIndex,
             final int maxResults) {
         if (query == null) {
             throw new IllegalArgumentException("query is null");

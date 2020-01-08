@@ -18,7 +18,7 @@ import java.util.Date;
 
 /**
  * Informations concerning the connected user
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet

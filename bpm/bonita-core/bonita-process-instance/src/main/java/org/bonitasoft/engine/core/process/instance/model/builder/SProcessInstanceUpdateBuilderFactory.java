@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -21,5 +20,5 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
 public interface SProcessInstanceUpdateBuilderFactory {
 
     SProcessInstanceUpdateBuilder createNewInstance();
-    
+
 }

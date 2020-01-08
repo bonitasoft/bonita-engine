@@ -20,7 +20,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.WeakHashMap;
-
 import javassist.util.proxy.ProxyFactory;
 
 public class ProxyCacheManager {
@@ -85,7 +84,8 @@ public class ProxyCacheManager {
         }
     }
 
-    public WeakHashMap/* <Classloader,HashMap<String,ProxyDetails>> */ get() throws NoSuchFieldException, IllegalAccessException {
+    public WeakHashMap/* <Classloader,HashMap<String,ProxyDetails>> */ get()
+            throws NoSuchFieldException, IllegalAccessException {
         final Field proxyCacheField = getDeclaredField(ProxyFactory.class, "proxyCache");
         setAccessible(proxyCacheField, true);
         return (WeakHashMap) get(proxyCacheField, null);

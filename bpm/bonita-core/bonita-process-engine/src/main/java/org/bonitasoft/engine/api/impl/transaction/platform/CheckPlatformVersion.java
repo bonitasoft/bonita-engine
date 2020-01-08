@@ -51,7 +51,8 @@ public class CheckPlatformVersion implements Callable<Boolean> {
         final String propertiesMinorVersion = format(jarVersion);
         boolean same = platformMinorVersion.equals(propertiesMinorVersion);
         if (!same) {
-            errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <" + jarVersion
+            errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <"
+                    + jarVersion
                     + "> and database version is <" + dbVersion + ">";
         }
         return same;
@@ -69,7 +70,6 @@ public class CheckPlatformVersion implements Callable<Boolean> {
     public SPlatform getPlatform() {
         return platform;
     }
-
 
     public String getErrorMessage() {
         return errorMessage;

@@ -38,22 +38,21 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AdvancedStartProcessCommandTest {
-    
+
     private static final long PROCESS_DEFINITION_ID = 1234L;
 
     @Mock
     private TenantServiceAccessor serviceAccessor;
-    
+
     @Mock
     private ProcessDefinitionService processDefinitionService;
-    
+
     @Mock
     private SProcessDefinition procDef;
-    
+
     @Mock
     private SFlowElementContainerDefinition container;
 
@@ -62,26 +61,26 @@ public class AdvancedStartProcessCommandTest {
 
     @Mock
     private SUserTaskDefinition userTask;
-    
+
     private Map<String, Serializable> parameters;
-    
+
     @Before
     public void setUp() throws Exception {
         parameters = new HashMap<String, Serializable>(2);
         parameters.put(AdvancedStartProcessCommand.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID);
         parameters.put(AdvancedStartProcessCommand.STARTED_BY, 123L);
         parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAME, "");
-        
+
         Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>();
         flowNodes.add(userTask);
         flowNodes.add(boundary);
-        
+
         doReturn(processDefinitionService).when(serviceAccessor).getProcessDefinitionService();
         doReturn(procDef).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_ID);
         doReturn(container).when(procDef).getProcessContainer();
         doReturn(flowNodes).when(container).getFlowNodes();
     }
-    
+
     @Test
     public void execute_command_throws_SCommandExecutionException_if_validation_returns_problems() throws Exception {
         AdvancedStartProcessCommand command = new AdvancedStartProcessCommand();

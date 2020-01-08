@@ -35,7 +35,7 @@ public interface SequenceManager {
 
     /**
      * clear in memory sequence for only one tenant
-     * 
+     *
      * @param tenantId
      */
     void clear(long tenantId);

@@ -39,13 +39,15 @@ public class ContractInputExpressionExecutorStrategy implements ExpressionExecut
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState)
-                    throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
         final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
         if (containerId == null) {
-            throw new SExpressionEvaluationException("Unable to evaluate contract input without container id", expression.getName());
+            throw new SExpressionEvaluationException("Unable to evaluate contract input without container id",
+                    expression.getName());
         }
         try {
             if ("PROCESS_INSTANCE".equals(containerType)) {
@@ -69,8 +71,10 @@ public class ContractInputExpressionExecutorStrategy implements ExpressionExecut
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> results = new ArrayList<Object>();
         for (final SExpression expression : expressions) {
             results.add(evaluate(expression, context, resolvedExpressions, containerState));

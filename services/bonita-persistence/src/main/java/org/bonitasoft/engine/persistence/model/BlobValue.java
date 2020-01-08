@@ -21,7 +21,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * Represent a Blob value store in the persistence layer.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Data

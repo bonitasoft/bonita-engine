@@ -75,7 +75,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public CategoryServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public CategoryServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService,
             final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
             final QueriableLoggerService queriableLoggerService) {
         super();
@@ -88,7 +89,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public SCategory createCategory(final String name, final String description) throws SCategoryAlreadyExistsException, SCategoryCreationException {
+    public SCategory createCategory(final String name, final String description)
+            throws SCategoryAlreadyExistsException, SCategoryCreationException {
         if (name == null) {
             throw new SCategoryCreationException("Category name can not be null!");
         }
@@ -101,7 +103,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private SCategory addCategory(final String name, final String description) throws SCategoryCreationException {
-        final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new category with name " + name);
+        final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED,
+                "Creating a new category with name " + name);
         final long creator;
         creator = getCreator();
         final long now = System.currentTimeMillis();
@@ -153,7 +156,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void updateCategory(final long categoryId, final EntityUpdateDescriptor descriptor) throws SCategoryException {
+    public void updateCategory(final long categoryId, final EntityUpdateDescriptor descriptor)
+            throws SCategoryException {
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating category");
         final SCategory persistedCategory = getCategory(categoryId);
         try {
@@ -183,16 +187,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public long getNumberOfCategories() throws SCategoryException {
         try {
-            return persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
+            return persistenceService
+                    .selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
         } catch (final SBonitaReadException e) {
             throw new SCategoryException("Can't get the number of process category", e);
         }
     }
 
     @Override
-    public List<SCategory> getCategories(final int fromIndex, final int numberOfCategories, final String field, final OrderByType order)
+    public List<SCategory> getCategories(final int fromIndex, final int numberOfCategories, final String field,
+            final OrderByType order)
             throws SCategoryException {
-        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategories(field, order, fromIndex, numberOfCategories);
+        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategories(field, order,
+                fromIndex, numberOfCategories);
         try {
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
@@ -201,15 +208,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws SCategoryException {
+    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId)
+            throws SCategoryException {
         final SCategory category = getCategory(categoryId);
         if (isCategoryExistsInProcess(categoryId, processDefinitionId)) {
-            throw new SCategoryInProcessAlreadyExistsException("The category '" + category.getName() + "' with the id = " + categoryId
-                    + " is already in process  with the id = " + processDefinitionId);
+            throw new SCategoryInProcessAlreadyExistsException(
+                    "The category '" + category.getName() + "' with the id = " + categoryId
+                            + " is already in process  with the id = " + processDefinitionId);
         }
         final SProcessCategoryMapping mapping = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class)
                 .createNewInstance(categoryId, processDefinitionId).done();
-        final String logMessage = "Creating a new category mapping {categoryId:" + categoryId + " --> processDefinitionId:" + processDefinitionId + "}";
+        final String logMessage = "Creating a new category mapping {categoryId:" + categoryId
+                + " --> processDefinitionId:" + processDefinitionId + "}";
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, logMessage);
         try {
             recorder.recordInsert(new InsertRecord(mapping), CATEGORY);
@@ -220,8 +230,10 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private boolean isCategoryExistsInProcess(final long categoryId, final long processDefinitionId) throws SCategoryException {
-        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.isCategoryExistsInProcess(categoryId, processDefinitionId);
+    private boolean isCategoryExistsInProcess(final long categoryId, final long processDefinitionId)
+            throws SCategoryException {
+        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.isCategoryExistsInProcess(categoryId,
+                processDefinitionId);
         try {
             return persistenceService.selectOne(descriptor) == 0 ? false : true;
         } catch (final SBonitaReadException e) {
@@ -230,7 +242,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws SCategoryException {
+    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds)
+            throws SCategoryException {
         for (final long processDefinitionId : processDefinitionIds) {
             addProcessDefinitionToCategory(categoryId, processDefinitionId);
         }
@@ -238,7 +251,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public long getNumberOfCategoriesOfProcess(final long processDefinitionId) throws SCategoryException {
-        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.getNumberOfCategoriesOfProcess(processDefinitionId);
+        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder
+                .getNumberOfCategoriesOfProcess(processDefinitionId);
         try {
             return persistenceService.selectOne(descriptor);
         } catch (final SBonitaReadException e) {
@@ -248,7 +262,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public long getNumberOfCategoriesUnrelatedToProcess(final long processDefinitionId) throws SCategoryException {
-        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.getNumberOfCategoriesUnrelatedToProcess(processDefinitionId);
+        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder
+                .getNumberOfCategoriesUnrelatedToProcess(processDefinitionId);
         try {
             return persistenceService.selectOne(descriptor);
         } catch (final SBonitaReadException e) {
@@ -257,9 +272,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<SCategory> getCategoriesOfProcessDefinition(final long processDefinitionId, final int fromIndex, final int numberOfCategories,
+    public List<SCategory> getCategoriesOfProcessDefinition(final long processDefinitionId, final int fromIndex,
+            final int numberOfCategories,
             final OrderByType order) throws SCategoryException {
-        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories,
+        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategoriesOfProcess(
+                processDefinitionId, fromIndex, numberOfCategories,
                 order);
         try {
             return persistenceService.selectList(descriptor);
@@ -269,9 +286,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<SCategory> getCategoriesUnrelatedToProcessDefinition(final long processDefinitionId, final int fromIndex, final int numberOfCategories,
+    public List<SCategory> getCategoriesUnrelatedToProcessDefinition(final long processDefinitionId,
+            final int fromIndex, final int numberOfCategories,
             final OrderByType order) throws SCategoryException {
-        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategoriesUnrelatedToProcess(processDefinitionId, fromIndex,
+        final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategoriesUnrelatedToProcess(
+                processDefinitionId, fromIndex,
                 numberOfCategories, order);
         try {
             return persistenceService.selectList(descriptor);
@@ -281,9 +300,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void removeCategoriesFromProcessDefinition(final long processDefinitionId, final List<Long> categoryIds) throws SCategoryException {
-        final SelectListDescriptor<SProcessCategoryMapping> descriptor = SelectDescriptorBuilder.getCategoryMappingOfProcessAndCategories(processDefinitionId,
-                categoryIds, 0, 100);
+    public void removeCategoriesFromProcessDefinition(final long processDefinitionId, final List<Long> categoryIds)
+            throws SCategoryException {
+        final SelectListDescriptor<SProcessCategoryMapping> descriptor = SelectDescriptorBuilder
+                .getCategoryMappingOfProcessAndCategories(processDefinitionId,
+                        categoryIds, 0, 100);
         try {
             List<SProcessCategoryMapping> mappings = persistenceService.selectList(descriptor);
             while (!mappings.isEmpty()) {
@@ -296,7 +317,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<SProcessCategoryMapping> searchProcessCategoryMappings(final QueryOptions queryOptions) throws SBonitaReadException {
+    public List<SProcessCategoryMapping> searchProcessCategoryMappings(final QueryOptions queryOptions)
+            throws SBonitaReadException {
         return persistenceService.searchEntity(SProcessCategoryMapping.class, queryOptions, null);
     }
 
@@ -315,7 +337,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void deleteProcessCategoryMapping(final SProcessCategoryMapping mapping) throws SCategoryException {
-        final String logMessage = "Deleting a category mapping {processDefinitionId:" + mapping.getProcessId() + " --> categoryId" + mapping.getCategoryId()
+        final String logMessage = "Deleting a category mapping {processDefinitionId:" + mapping.getProcessId()
+                + " --> categoryId" + mapping.getCategoryId()
                 + "}";
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, logMessage);
         try {
@@ -347,7 +370,8 @@ public class CategoryServiceImpl implements CategoryService {
         if (processIds == null || processIds.size() <= 0) {
             return 0; // Should return 0 or throw Exception?
         }
-        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder.getNumberOfCategorizedProcessIds(processIds);
+        final SelectOneDescriptor<Long> descriptor = SelectDescriptorBuilder
+                .getNumberOfCategorizedProcessIds(processIds);
         try {
             return persistenceService.selectOne(descriptor);
         } catch (final SBonitaReadException e) {
@@ -358,13 +382,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public long getNumberOfProcessDeploymentInfosOfCategory(final long categoryId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
-        final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitionsOfCategory", parameters,
+        final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>(
+                "getNumberOfProcessDefinitionsOfCategory", parameters,
                 SProcessCategoryMapping.class, Long.class);
 
         return persistenceService.selectOne(descriptor);
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus,
+            final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

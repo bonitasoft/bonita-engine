@@ -46,5 +46,4 @@ public class ValidationStatusTest {
         assertThat(status).isNotValid().hasMessage("'content' is a reserved keyword");
     }
 
-
 }

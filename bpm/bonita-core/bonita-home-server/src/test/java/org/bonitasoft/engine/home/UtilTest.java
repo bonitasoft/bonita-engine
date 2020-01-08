@@ -24,7 +24,6 @@ import org.junit.Test;
  */
 public class UtilTest {
 
-
     @Test
     public void generateRelativeResourcePathShouldHandleBackslashOS() {
         // given:
@@ -32,8 +31,9 @@ public class UtilTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
+        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname),
+                new File(pathname + File.separator
+                        + resourceRelativePath));
 
         // then:
         assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
@@ -46,8 +46,9 @@ public class UtilTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
+        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname),
+                new File(pathname + File.separator
+                        + resourceRelativePath));
 
         // then:
         assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
@@ -60,8 +61,9 @@ public class UtilTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
+        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname),
+                new File(pathname + File.separator
+                        + resourceRelativePath));
 
         // then:
         assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
@@ -74,8 +76,9 @@ public class UtilTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
+        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname),
+                new File(pathname + File.separator
+                        + resourceRelativePath));
 
         // then:
         assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);

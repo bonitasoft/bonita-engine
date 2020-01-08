@@ -42,10 +42,6 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDataImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionState;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -62,7 +58,7 @@ public class QuartzJobListener implements JobListener {
     private final List<BonitaJobListener> bonitaJobListeners;
 
     QuartzJobListener(final List<BonitaJobListener> bonitaJobListeners,
-                      final SessionAccessor sessionAccessor, final TechnicalLoggerService logger) {
+            final SessionAccessor sessionAccessor, final TechnicalLoggerService logger) {
         this.logger = logger.asLogger(QuartzJobListener.class);
         this.bonitaJobListeners = bonitaJobListeners;
         this.sessionAccessor = sessionAccessor;

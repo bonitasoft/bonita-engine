@@ -24,7 +24,6 @@ public interface TenantRestartHandler {
 
     /**
      * called in a transaction during {@link PlatformAPI#startNode()}
-     *
      */
     void beforeServicesStart() throws RestartException;
 

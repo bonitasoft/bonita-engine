@@ -27,7 +27,8 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
 
     private final StartEventDefinitionImpl startEvent;
 
-    StartEventDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    StartEventDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String eventName) {
         super(container, processDefinitionBuilder);
         startEvent = new StartEventDefinitionImpl(eventName);
@@ -36,44 +37,48 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
 
     /**
      * Adds a timer trigger on this event.
-     * 
+     *
      * @param timerType
-     *            timer type.
+     *        timer type.
      * @param timerValue
-     *            expression representing the timer value.
+     *        expression representing the timer value.
      * @return
      */
-    public TimerEventTriggerDefinitionBuilder addTimerEventTriggerDefinition(final TimerType timerType, final Expression timerValue) {
-        return new TimerEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent, timerType, timerValue);
+    public TimerEventTriggerDefinitionBuilder addTimerEventTriggerDefinition(final TimerType timerType,
+            final Expression timerValue) {
+        return new TimerEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent, timerType,
+                timerValue);
     }
 
     /**
      * Adds a message trigger on this event.
-     * 
+     *
      * @param messageName
-     *            name of the message to be received.
+     *        name of the message to be received.
      * @return
      */
     public CatchMessageEventTriggerDefinitionBuilder addMessageEventTrigger(final String messageName) {
-        return new CatchMessageEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent, messageName);
+        return new CatchMessageEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent,
+                messageName);
     }
 
     /**
      * Adds a signal trigger on this event.
-     * 
+     *
      * @param signalName
-     *            name of the signal to be received.
+     *        name of the signal to be received.
      * @return
      */
     public CatchSignalEventTriggerDefinitionBuilder addSignalEventTrigger(final String signalName) {
-        return new CatchSignalEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent, signalName);
+        return new CatchSignalEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), startEvent,
+                signalName);
     }
 
     /**
      * Adds an error trigger on this event.
-     * 
+     *
      * @param errorCode
-     *            the error code to be caught.
+     *        the error code to be caught.
      * @return
      */
     public CatchErrorEventTiggerDefinitionBuilder addErrorEventTrigger(final String errorCode) {
@@ -82,7 +87,7 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
 
     /**
      * Adds an error trigger on this boundary event. As no error code is specified all errors will be caught
-     * 
+     *
      * @return
      */
     public CatchErrorEventTiggerDefinitionBuilder addErrorEventTrigger() {
@@ -97,9 +102,9 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
 
     /**
      * Sets the display description on this element.
-     * 
+     *
      * @param displayDescription
-     *            expression representing the display description.
+     *        expression representing the display description.
      * @return
      */
     public StartEventDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
@@ -109,9 +114,9 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
 
     /**
      * Sets the display name on this element.
-     * 
+     *
      * @param displayName
-     *            expression representing the display name.
+     *        expression representing the display name.
      * @return
      */
     public StartEventDefinitionBuilder addDisplayName(final Expression displayName) {
@@ -120,14 +125,16 @@ public class StartEventDefinitionBuilder extends FlowElementContainerBuilder imp
     }
 
     /**
-     * Sets the display description after completion on this event. This will be used to updated the display description when the activity completes its
+     * Sets the display description after completion on this event. This will be used to updated the display description
+     * when the activity completes its
      * execution.
-     * 
+     *
      * @param displayDescriptionAfterCompletion
-     *            expression representing the new display description after the event completion.
+     *        expression representing the new display description after the event completion.
      * @return
      */
-    public StartEventDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
+    public StartEventDefinitionBuilder addDisplayDescriptionAfterCompletion(
+            final Expression displayDescriptionAfterCompletion) {
         startEvent.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;
     }

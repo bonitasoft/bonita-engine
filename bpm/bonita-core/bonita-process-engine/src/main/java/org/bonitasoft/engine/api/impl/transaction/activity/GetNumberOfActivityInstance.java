@@ -28,7 +28,8 @@ public class GetNumberOfActivityInstance implements TransactionContentWithResult
 
     private final long processInstanceId;
 
-    public GetNumberOfActivityInstance(final long processInstanceId, final ActivityInstanceService activityInstanceService) {
+    public GetNumberOfActivityInstance(final long processInstanceId,
+            final ActivityInstanceService activityInstanceService) {
         this.processInstanceId = processInstanceId;
         this.activityInstanceService = activityInstanceService;
     }

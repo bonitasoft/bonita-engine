@@ -74,12 +74,14 @@ public class ErrorEventHandlerStrategyTest {
 
     @Before
     public void setUp() {
-        spyStrategy = spy(new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
+        spyStrategy = spy(new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService,
+                flowNodeInstanceService,
                 containerRegistry, processDefinitionService, eventsHandler, logger, processInstanceInterruptor));
     }
 
     @Test
-    public void getWaitingErrorEventFromBoundary_should_find_matching_event_in_multiple_instance_activity() throws Exception {
+    public void getWaitingErrorEventFromBoundary_should_find_matching_event_in_multiple_instance_activity()
+            throws Exception {
         final long processDefinitionId = 7845475L;
         final long flowNodeDefinitionId = 357L;
         final long rootContainerId = 951L;
@@ -87,12 +89,16 @@ public class ErrorEventHandlerStrategyTest {
         final long logicalGroup2 = 78454646L;
         final long parentActivityInstanceId = 7897L;
         final String errorCode = "mistake";
-        final SProcessDefinition definition = buildProcessDefinitionWithAMultipleInstanceUserTask(flowNodeDefinitionId, errorCode);
-        final SMultiInstanceActivityInstance multiInstanceInstance = buildMultiInstanceActivity(processDefinitionId, flowNodeDefinitionId, rootContainerId,
+        final SProcessDefinition definition = buildProcessDefinitionWithAMultipleInstanceUserTask(flowNodeDefinitionId,
+                errorCode);
+        final SMultiInstanceActivityInstance multiInstanceInstance = buildMultiInstanceActivity(processDefinitionId,
+                flowNodeDefinitionId, rootContainerId,
                 parentContainerId);
-        final SEndEventInstance eventInstance = buildEventInstance(processDefinitionId, flowNodeDefinitionId, rootContainerId, parentContainerId,
+        final SEndEventInstance eventInstance = buildEventInstance(processDefinitionId, flowNodeDefinitionId,
+                rootContainerId, parentContainerId,
                 logicalGroup2);
-        final SUserTaskInstance instance = buildSUserTaskInstance(processDefinitionId, flowNodeDefinitionId, rootContainerId, parentContainerId,
+        final SUserTaskInstance instance = buildSUserTaskInstance(processDefinitionId, flowNodeDefinitionId,
+                rootContainerId, parentContainerId,
                 logicalGroup2, parentActivityInstanceId);
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(definition);
         when(flowNodeInstanceService.getFlowNodeInstance(parentActivityInstanceId)).thenReturn(multiInstanceInstance);
@@ -102,37 +108,47 @@ public class ErrorEventHandlerStrategyTest {
         verify(spyStrategy).getWaitingErrorEventFromBoundary(eq(errorCode), eq(multiInstanceInstance), anyList());
     }
 
-    private SMultiInstanceActivityInstance buildMultiInstanceActivity(final long processDefinitionId, final long flowNodeDefinitionId,
-                                                                      final long rootContainerId,
-                                                                      final long parentContainerId) {
-        final SMultiInstanceActivityInstance multiInstanceInstance = new SMultiInstanceActivityInstance("MIActivity", flowNodeDefinitionId,
+    private SMultiInstanceActivityInstance buildMultiInstanceActivity(final long processDefinitionId,
+            final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId) {
+        final SMultiInstanceActivityInstance multiInstanceInstance = new SMultiInstanceActivityInstance("MIActivity",
+                flowNodeDefinitionId,
                 rootContainerId, parentContainerId, processDefinitionId, rootContainerId, false);
         return multiInstanceInstance;
     }
 
-    private SUserTaskInstance buildSUserTaskInstance(final long processDefinitionId, final long flowNodeDefinitionId, final long rootContainerId,
-                                                     final long parentContainerId, final long logicalGroup2, final long parentActivityInstanceId) {
-        final SUserTaskInstance instance = new SUserTaskInstance("usertTask", flowNodeDefinitionId, rootContainerId, parentContainerId, 457L,
+    private SUserTaskInstance buildSUserTaskInstance(final long processDefinitionId, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long logicalGroup2, final long parentActivityInstanceId) {
+        final SUserTaskInstance instance = new SUserTaskInstance("usertTask", flowNodeDefinitionId, rootContainerId,
+                parentContainerId, 457L,
                 STaskPriority.NORMAL, processDefinitionId, logicalGroup2);
         instance.setLogicalGroup(2, parentActivityInstanceId);
         return instance;
     }
 
-    private SEndEventInstance buildEventInstance(final long processDefinitionId, final long flowNodeDefinitionId, final long rootContainerId,
-                                                 final long parentContainerId, final long logicalGroup2) {
-        final SEndEventInstance eventInstance = new SEndEventInstance("ErrorEvent", flowNodeDefinitionId, rootContainerId, parentContainerId,
+    private SEndEventInstance buildEventInstance(final long processDefinitionId, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long logicalGroup2) {
+        final SEndEventInstance eventInstance = new SEndEventInstance("ErrorEvent", flowNodeDefinitionId,
+                rootContainerId, parentContainerId,
                 processDefinitionId, logicalGroup2);
         eventInstance.setLogicalGroup(2, 9L);
         return eventInstance;
     }
 
-    private SProcessDefinition buildProcessDefinitionWithAMultipleInstanceUserTask(final long flowNodeDefinitionId, final String errorCode) {
+    private SProcessDefinition buildProcessDefinitionWithAMultipleInstanceUserTask(final long flowNodeDefinitionId,
+            final String errorCode) {
         final SProcessDefinitionImpl definition = new SProcessDefinitionImpl("test", "2.0");
         final SStandardLoopCharacteristicsImpl loopCharacteristics = new SStandardLoopCharacteristicsImpl(null, true);
-        final SUserTaskDefinitionImpl taskDefinition = new SUserTaskDefinitionImpl(flowNodeDefinitionId, "usertTask", "employee");
+        final SUserTaskDefinitionImpl taskDefinition = new SUserTaskDefinitionImpl(flowNodeDefinitionId, "usertTask",
+                "employee");
         taskDefinition.setLoopCharacteristics(loopCharacteristics);
-        final SBoundaryEventDefinitionImpl boundaryEventDefinition = new SBoundaryEventDefinitionImpl(786768768L, "error");
-        final SCatchErrorEventTriggerDefinitionImpl errorEventTrigger = new SCatchErrorEventTriggerDefinitionImpl(errorCode);
+        final SBoundaryEventDefinitionImpl boundaryEventDefinition = new SBoundaryEventDefinitionImpl(786768768L,
+                "error");
+        final SCatchErrorEventTriggerDefinitionImpl errorEventTrigger = new SCatchErrorEventTriggerDefinitionImpl(
+                errorCode);
         boundaryEventDefinition.addErrorEventTrigger(errorEventTrigger);
         taskDefinition.addBoundaryEventDefinition(boundaryEventDefinition);
         final SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();

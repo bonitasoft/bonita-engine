@@ -38,7 +38,8 @@ public class ContractDefinitionImplTest {
         expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
         expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
 
-        complexInput = new InputDefinitionImpl("expense item", "description", Arrays.asList(expenseType, expenseDate, expenseAmount));
+        complexInput = new InputDefinitionImpl("expense item", "description",
+                Arrays.asList(expenseType, expenseDate, expenseAmount));
 
     }
 

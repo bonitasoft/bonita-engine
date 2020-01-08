@@ -60,8 +60,9 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final long created = System.currentTimeMillis();
         final String description = "description";
 
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
-        .description(description).build();
+        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
+                .description(description).build();
 
         assertThat(tenant.getName()).isEqualTo(name);
         assertThat(tenant.getCreatedBy()).isEqualTo(createdBy);
@@ -71,7 +72,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test(expected = STenantAlreadyExistException.class)
     public void cannotCreateSecondTenantWithSameName() throws Exception {
-        STenant sTenant = STenant.builder().name(PlatformUtil.DEFAULT_TENANT_NAME).createdBy("anyone").created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
+        STenant sTenant = STenant.builder().name(PlatformUtil.DEFAULT_TENANT_NAME).createdBy("anyone")
+                .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
         getTransactionService().begin();
         try {
             platformService.createTenant(sTenant);
@@ -88,7 +90,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false).build();
+        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
 
         getTransactionService().begin();
         long tenantId = platformService.createTenant(tenant);
@@ -109,7 +112,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
     public void deletedTenantShouldNotBeAvailableAnymore() throws Exception {
         getTransactionService().begin();
         long tenantId = platformService.createTenant(
-                STenant.builder().name("deletedTenantShouldNotBeAvailableAnymore").createdBy("created by me").created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false)
+                STenant.builder().name("deletedTenantShouldNotBeAvailableAnymore").createdBy("created by me")
+                        .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false)
                         .build());
         getTransactionService().complete();
 
@@ -129,7 +133,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false).build();
+        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
 
         getTransactionService().begin();
         platformService.createTenant(tenant);
@@ -157,7 +162,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test(expected = STenantUpdateException.class)
     public void updateInexistantTenantShouldFail() throws Exception {
-        final STenant tenant = STenant.builder().name("tenant1").createdBy("mycreatedBy").created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
+        final STenant tenant = STenant.builder().name("tenant1").createdBy("mycreatedBy")
+                .created(System.currentTimeMillis()).status(STATUS_DEACTIVATED).defaultTenant(false).build();
 
         getTransactionService().begin();
         final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
@@ -177,9 +183,11 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
 
         getTransactionService().begin();
@@ -220,7 +228,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "myCreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false).build();
+        final STenant tenant = STenant.builder().name(name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false).build();
 
         getTransactionService().begin();
         platformService.createTenant(tenant);
@@ -242,9 +251,11 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "myCreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
 
         getTransactionService().begin();
@@ -256,7 +267,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
             final List<OrderByOption> orderByOptions = new ArrayList<>();
             orderByOptions.add(new OrderByOption(STenant.class, STenant.ID, OrderByType.DESC));
             final QueryOptions queryOptions = new QueryOptions(0, 20, orderByOptions,
-                    Collections.singletonList(new FilterOption(STenant.class, "name").like("tTenantsShouldFilter")), null);
+                    Collections.singletonList(new FilterOption(STenant.class, "name").like("tTenantsShouldFilter")),
+                    null);
 
             getTransactionService().begin();
             List<STenant> readTenants = platformService.getTenants(queryOptions);
@@ -316,9 +328,11 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant1 = STenant.builder().name(tenant1Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
-        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created).status(STATUS_DEACTIVATED).defaultTenant(false)
+        final STenant tenant2 = STenant.builder().name(tenant2Name).createdBy(createdBy).created(created)
+                .status(STATUS_DEACTIVATED).defaultTenant(false)
                 .build();
 
         getTransactionService().begin();

@@ -17,19 +17,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -73,7 +69,7 @@ public class FlowNodeExecutorImplTest {
     public void before() throws Exception {
         flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService, archiveService,
                 null, containerRegistry, processDefinitionService, null, null, null, null, workService, workFactory,
-                null,processInstanceInterruptor);
+                null, processInstanceInterruptor);
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
         doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();
@@ -95,11 +91,12 @@ public class FlowNodeExecutorImplTest {
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 
-        verify(stateBehaviors).interruptAttachedBoundaryEvent(any(),eq(sUserTaskInstance),eq(ABORTING));
+        verify(stateBehaviors).interruptAttachedBoundaryEvent(any(), eq(sUserTaskInstance), eq(ABORTING));
     }
 
     @Test
-    public void should_register_notifyFinish_when_setting_activity_to_a_terminal_state_with_no_children() throws Exception {
+    public void should_register_notifyFinish_when_setting_activity_to_a_terminal_state_with_no_children()
+            throws Exception {
         aTask(1L, true);
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);

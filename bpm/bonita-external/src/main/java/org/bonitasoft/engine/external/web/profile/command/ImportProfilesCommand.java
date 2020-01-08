@@ -38,7 +38,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class ImportProfilesCommand extends TenantCommand {
 
     /**
-     * @return a List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
+     * @return a List<String> is a warning message list in case of non-existing User, Group or Role to map the profile
+     *         to.
      */
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
@@ -48,11 +49,13 @@ public class ImportProfilesCommand extends TenantCommand {
         try {
             byte[] xmlContent = (byte[]) parameters.get("xmlContent");
             if (xmlContent == null) {
-                throw new SCommandParameterizationException("Parameters map must contain an entry  xmlContent with a byte array value.");
+                throw new SCommandParameterizationException(
+                        "Parameters map must contain an entry  xmlContent with a byte array value.");
             }
             final ProfilesNode profiles = profilesImporter.convertFromXml(new String(xmlContent));
             return (Serializable) profilesImporter
-                    .toWarnings(profilesImporter.importProfiles(profiles, ImportPolicy.DELETE_EXISTING, SessionInfos.getUserIdFromSession()));
+                    .toWarnings(profilesImporter.importProfiles(profiles, ImportPolicy.DELETE_EXISTING,
+                            SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException | IOException e) {
             throw new SCommandExecutionException(e);
         }

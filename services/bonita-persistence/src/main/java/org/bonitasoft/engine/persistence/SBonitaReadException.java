@@ -29,7 +29,8 @@ public class SBonitaReadException extends SBonitaException {
         this.selectDescriptor = selectDescriptor;
     }
 
-    public SBonitaReadException(final String message, final Throwable cause, final AbstractSelectDescriptor<?> selectDescriptor) {
+    public SBonitaReadException(final String message, final Throwable cause,
+            final AbstractSelectDescriptor<?> selectDescriptor) {
         super(message, cause);
         this.selectDescriptor = selectDescriptor;
     }

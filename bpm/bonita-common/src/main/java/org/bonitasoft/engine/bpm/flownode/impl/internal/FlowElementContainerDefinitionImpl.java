@@ -63,7 +63,8 @@ import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlowElementContainerDefinitionImpl extends BaseDefinitionElementImpl implements FlowElementContainerDefinition, Visitable {
+public class FlowElementContainerDefinitionImpl extends BaseDefinitionElementImpl
+        implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
     @XmlElements({
@@ -355,7 +356,9 @@ public class FlowElementContainerDefinitionImpl extends BaseDefinitionElementImp
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), activities, transitions, gateways, startEvents, intermediateCatchEvents, intermediateThrowEvents, endEvents,
-                dataDefinitions, businessDataDefinitions, documentDefinitions, documentListDefinitions, connectors, elementFinder);
+        return Objects.hash(super.hashCode(), activities, transitions, gateways, startEvents, intermediateCatchEvents,
+                intermediateThrowEvents, endEvents,
+                dataDefinitions, businessDataDefinitions, documentDefinitions, documentListDefinitions, connectors,
+                elementFinder);
     }
 }

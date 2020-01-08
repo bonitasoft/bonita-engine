@@ -79,7 +79,7 @@ public enum ProcessInstanceState {
 
     /**
      * Get the identifier corresponding to the state.
-     * 
+     *
      * @return The identifier corresponding to the state.
      * @since 6.3.5
      */
@@ -89,7 +89,7 @@ public enum ProcessInstanceState {
 
     /**
      * Get the {@link ProcessInstanceState} corresponding to the identifier.
-     * 
+     *
      * @return The {@link ProcessInstanceState} corresponding to the identifier.
      * @since 6.3.5
      */
@@ -100,12 +100,12 @@ public enum ProcessInstanceState {
         return map.get(id);
     }
 
-	private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
-		for (final ProcessInstanceState state : values()) {
-			if (id == state.getId()) {
-				return state;
-			}
-		}
-		return null;
-	}
+    private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
+        for (final ProcessInstanceState state : values()) {
+            if (id == state.getId()) {
+                return state;
+            }
+        }
+        return null;
+    }
 }

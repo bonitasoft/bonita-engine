@@ -24,6 +24,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAStartEventInstance extends SACatchEventInstance {
+
     public SAStartEventInstance(final SStartEventInstance startEventInstance) {
         super(startEventInstance);
     }

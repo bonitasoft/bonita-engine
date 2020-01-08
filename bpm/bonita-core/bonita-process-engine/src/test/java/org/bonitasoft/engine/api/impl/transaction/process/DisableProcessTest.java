@@ -67,14 +67,16 @@ public class DisableProcessTest {
     private BonitaConfiguration bonitaConfiguration;
 
     @Test
-    public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances() throws SBonitaException {
+    public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances()
+            throws SBonitaException {
         final long processDefinitionId = 1;
         when(configurationService.getTenantPortalConfiguration(anyLong(), anyString())).thenReturn(bonitaConfiguration);
         when(bonitaConfiguration.getResourceContent()).thenReturn("[]".getBytes());
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
         when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
         when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId, eventInstanceService, configurationService,
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId,
+                eventInstanceService, configurationService,
                 scheduler,
                 logger, "matti", 1L);
 

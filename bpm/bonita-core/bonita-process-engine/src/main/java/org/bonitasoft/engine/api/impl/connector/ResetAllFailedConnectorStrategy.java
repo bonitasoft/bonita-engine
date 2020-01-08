@@ -32,17 +32,20 @@ public class ResetAllFailedConnectorStrategy implements ConnectorResetStrategy {
     private final ConnectorReseter connectorReseter;
     private final int maxResults;
 
-    public ResetAllFailedConnectorStrategy(ConnectorInstanceService connectorInstanceService, ConnectorReseter connectorReseter, int maxResults) {
+    public ResetAllFailedConnectorStrategy(ConnectorInstanceService connectorInstanceService,
+            ConnectorReseter connectorReseter, int maxResults) {
         this.connectorInstanceService = connectorInstanceService;
         this.connectorReseter = connectorReseter;
         this.maxResults = maxResults;
     }
 
     /**
-     * Reset all {@link org.bonitasoft.engine.core.process.instance.model.SConnectorInstance}s related to the given activity that are in the failed state
+     * Reset all {@link org.bonitasoft.engine.core.process.instance.model.SConnectorInstance}s related to the given
+     * activity that are in the failed state
      * to the state {@link org.bonitasoft.engine.bpm.connector.ConnectorStateReset#TO_RE_EXECUTE}
      *
-     * @param flowNodeInstanceId the identifier of the {@link org.bonitasoft.engine.core.process.instance.model.SActivityInstance} where the connectors are
+     * @param flowNodeInstanceId the identifier of the
+     *        {@link org.bonitasoft.engine.core.process.instance.model.SActivityInstance} where the connectors are
      *        attached to.
      */
     @Override
@@ -51,7 +54,8 @@ public class ResetAllFailedConnectorStrategy implements ConnectorResetStrategy {
             int startIndex = 0;
             List<SConnectorInstanceWithFailureInfo> failedConnectors;
             do {
-                failedConnectors = connectorInstanceService.getConnectorInstancesWithFailureInfo(flowNodeInstanceId, SConnectorInstance.FLOWNODE_TYPE,
+                failedConnectors = connectorInstanceService.getConnectorInstancesWithFailureInfo(flowNodeInstanceId,
+                        SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorState.FAILED.name(), startIndex, maxResults);
                 resetCurrentPage(failedConnectors);
                 startIndex += maxResults;
@@ -61,7 +65,8 @@ public class ResetAllFailedConnectorStrategy implements ConnectorResetStrategy {
         }
     }
 
-    private void resetCurrentPage(final List<SConnectorInstanceWithFailureInfo> failedConnectors) throws ActivityExecutionException {
+    private void resetCurrentPage(final List<SConnectorInstanceWithFailureInfo> failedConnectors)
+            throws ActivityExecutionException {
         for (SConnectorInstanceWithFailureInfo failedConnector : failedConnectors) {
             connectorReseter.resetState(failedConnector, ConnectorStateReset.TO_RE_EXECUTE);
         }

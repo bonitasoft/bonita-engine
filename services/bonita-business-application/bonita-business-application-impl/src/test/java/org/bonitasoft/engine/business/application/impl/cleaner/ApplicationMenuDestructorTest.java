@@ -46,6 +46,7 @@ public class ApplicationMenuDestructorTest {
         destructor.onDeleteApplicationMenu(menu);
 
         //then
-        verify(cleaner, times(1)).deleteRelatedApplicationMenus(new ChildrenMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationMenuId));
+        verify(cleaner, times(1)).deleteRelatedApplicationMenus(new ChildrenMenusFilterBuilder(
+                new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationMenuId));
     }
 }

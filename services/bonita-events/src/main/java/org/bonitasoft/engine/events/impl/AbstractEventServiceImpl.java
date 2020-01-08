@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.events.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
@@ -22,11 +27,6 @@ import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class AbstractEventServiceImpl implements EventService {
 
@@ -53,8 +53,9 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
             if (handlers.size() > 0) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Found " + handlers.size() + " for event " + event.getType()
-                            + ". All handlers: " + handlers);
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                            "Found " + handlers.size() + " for event " + event.getType()
+                                    + ". All handlers: " + handlers);
                 }
                 SFireEventException sFireEventException = null;
                 for (final SHandler<SEvent> handler : handlers) {
@@ -88,15 +89,18 @@ public abstract class AbstractEventServiceImpl implements EventService {
      * No handler duplication in a list for a given event type
      */
     @Override
-    public final void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+    public final void addHandler(final String eventType, final SHandler<SEvent> handler)
+            throws HandlerRegistrationException {
         if (handler != null && eventType != null) {
             addHandlerFor(eventType, handler);
         } else {
-            throw new HandlerRegistrationException("One of the parameters is null : " + " eventType: " + eventType + " handler:" + handler);
+            throw new HandlerRegistrationException(
+                    "One of the parameters is null : " + " eventType: " + eventType + " handler:" + handler);
         }
     }
 
-    protected abstract void addHandlerFor(String eventType, SHandler<SEvent> handler) throws HandlerRegistrationException;
+    protected abstract void addHandlerFor(String eventType, SHandler<SEvent> handler)
+            throws HandlerRegistrationException;
 
     @Override
     public final void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
@@ -109,7 +113,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
     protected abstract void removeAllHandlersFor(SHandler<SEvent> handler);
 
     @Override
-    public final void removeHandler(final String eventType, final SHandler<SEvent> h) throws HandlerUnregistrationException {
+    public final void removeHandler(final String eventType, final SHandler<SEvent> h)
+            throws HandlerUnregistrationException {
         if (h == null || eventType == null) {
             throw new HandlerUnregistrationException("Unable to remove a null handler");
         }
@@ -121,7 +126,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
      * @param h
      * @throws HandlerUnregistrationException
      */
-    protected abstract void removeHandlerFor(final String eventType, final SHandler<SEvent> h) throws HandlerUnregistrationException;
+    protected abstract void removeHandlerFor(final String eventType, final SHandler<SEvent> h)
+            throws HandlerUnregistrationException;
 
     @Override
     public final Set<SHandler<SEvent>> getHandlers(final String eventType) {

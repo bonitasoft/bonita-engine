@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.business.application.impl;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -68,12 +68,17 @@ public class IndexUpdaterTest {
     @Test
     public void incrementIndexes_should_increment_indexes_of_all_elements_in_the_specified_interval() throws Exception {
         //given
-        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
-        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, 3, 5), new FilterOption(
-                SApplicationMenu.class, SApplicationMenu.PARENT_ID, 1L));
+        List<OrderByOption> orderBy = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
+        List<FilterOption> filters = Arrays
+                .asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, 3, 5), new FilterOption(
+                        SApplicationMenu.class, SApplicationMenu.PARENT_ID, 1L));
 
-        given(applicationService.searchApplicationMenus(new QueryOptions(0, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu3, menu4));
-        given(applicationService.searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu5));
+        given(applicationService.searchApplicationMenus(new QueryOptions(0, MAX_RESULTS, orderBy, filters, null)))
+                .willReturn(Arrays.asList(menu3, menu4));
+        given(applicationService
+                .searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null)))
+                        .willReturn(Arrays.asList(menu5));
 
         //when
         indexUpdater.incrementIndexes(1L, 3, 5);
@@ -92,7 +97,8 @@ public class IndexUpdaterTest {
 
         //then
         verify(applicationService, never()).searchApplicationMenus(any(QueryOptions.class));
-        verify(applicationService, never()).updateApplicationMenu(any(SApplicationMenu.class), any(EntityUpdateDescriptor.class), anyBoolean());
+        verify(applicationService, never()).updateApplicationMenu(any(SApplicationMenu.class),
+                any(EntityUpdateDescriptor.class), anyBoolean());
     }
 
     private EntityUpdateDescriptor getUpdateDescriptorForIndex(int newIndex) {
@@ -104,12 +110,17 @@ public class IndexUpdaterTest {
     @Test
     public void decrementIndexes_should_decrement_indexes_of_all_elements_in_the_specified_interval() throws Exception {
         //given
-        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
-        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, 3, 5), new FilterOption(
-                SApplicationMenu.class, SApplicationMenu.PARENT_ID, 1L));
+        List<OrderByOption> orderBy = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
+        List<FilterOption> filters = Arrays
+                .asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, 3, 5), new FilterOption(
+                        SApplicationMenu.class, SApplicationMenu.PARENT_ID, 1L));
 
-        given(applicationService.searchApplicationMenus(new QueryOptions(0, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu3, menu4));
-        given(applicationService.searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu5));
+        given(applicationService.searchApplicationMenus(new QueryOptions(0, MAX_RESULTS, orderBy, filters, null)))
+                .willReturn(Arrays.asList(menu3, menu4));
+        given(applicationService
+                .searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null)))
+                        .willReturn(Arrays.asList(menu5));
 
         //when
         indexUpdater.decrementIndexes(1L, 3, 5);

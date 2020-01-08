@@ -92,7 +92,8 @@ public class CategoryImpl implements Category {
 
     @Override
     public String toString() {
-        return "CategoryImpl [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator + ", creationDate=" + creationDate
+        return "CategoryImpl [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator
+                + ", creationDate=" + creationDate
                 + ", lastUpdate=" + lastUpdate + "]";
     }
 

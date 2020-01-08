@@ -53,7 +53,9 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT TOTO FROM STUFF");
         //when
-        queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
+        queryBuilder.appendOrderByClause(
+                Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)),
+                TestObject.class);
         //then
         assertThat(queryBuilder.hasChanged()).isTrue();
     }
@@ -63,9 +65,12 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
+        queryBuilder.appendOrderByClause(
+                Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)),
+                TestObject.class);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj ORDER BY testObj.theValue ASC,testObj.id ASC");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj ORDER BY testObj.theValue ASC,testObj.id ASC");
     }
 
     @Test
@@ -74,11 +79,13 @@ public class QueryBuilderTest {
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendOrderByClause(Arrays.asList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC),
-                new OrderByOption(TestObject.class, "id", OrderByType.ASC), new OrderByOption(TestObject.class, "lastName", OrderByType.DESC_NULLS_LAST)),
+                new OrderByOption(TestObject.class, "id", OrderByType.ASC),
+                new OrderByOption(TestObject.class, "lastName", OrderByType.DESC_NULLS_LAST)),
                 TestObject.class);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj ORDER BY testObj.theValue ASC,testObj.id ASC,testObj.lastName DESC NULLS LAST");
+                .isEqualTo(
+                        "SELECT testObj.* FROM test_object testObj ORDER BY testObj.theValue ASC,testObj.id ASC,testObj.lastName DESC NULLS LAST");
 
     }
 
@@ -87,9 +94,11 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
+                false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = 12)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = 12)");
     }
 
     @Test
@@ -97,29 +106,40 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Arrays.asList(new FilterOption(TestObject.class, "age", 25), new FilterOption(TestObject.class, "lastname", "John")), null,
+        queryBuilder.appendFilters(
+                Arrays.asList(new FilterOption(TestObject.class, "age", 25),
+                        new FilterOption(TestObject.class, "lastname", "John")),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age = 25 AND testObj.lastname = 'John')");
+        assertThat(queryBuilder.getQuery()).isEqualTo(
+                "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = 25 AND testObj.lastname = 'John')");
     }
 
     @Test
     public void should_generate_query_with_filter_on_query_containing_filters_already() throws Exception {
         //given
-        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
+        QueryBuilder queryBuilder = createQueryBuilder(
+                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
+                false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = 12)");
+        assertThat(queryBuilder.getQuery()).isEqualTo(
+                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = 12)");
     }
 
     @Test
     public void should_generate_query_with_filter_and_order_clause() throws Exception {
         //given
-        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
+        QueryBuilder queryBuilder = createQueryBuilder(
+                "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
-        queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
+        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null,
+                false);
+        queryBuilder.appendOrderByClause(
+                Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)),
+                TestObject.class);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
                 "SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true AND (testObj.theValue = 12) ORDER BY testObj.theValue ASC,testObj.id ASC");
@@ -130,8 +150,11 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Collections.singletonList("toto"),
-                Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), false);
+        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(),
+                new SearchFields(Collections.singletonList("toto"),
+                        Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class,
+                                aSet("field1", "field2"))),
+                false);
         //then
         assertThat(queryBuilder.getQuery()).matches(
                 "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field(1|2) LIKE 'toto%' ESCAPE '§' OR testObj.field(1|2) LIKE 'toto%' ESCAPE '§'\\)");
@@ -142,8 +165,11 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Arrays.asList("toto", "tata"),
-                Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), false);
+        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(),
+                new SearchFields(Arrays.asList("toto", "tata"),
+                        Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class,
+                                aSet("field1", "field2"))),
+                false);
         //then
         assertThat(queryBuilder.getQuery()).matches(
                 "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field(1|2) LIKE 'toto%' ESCAPE '§' " +
@@ -157,8 +183,11 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Collections.singletonList("toto"),
-                Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), true);
+        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(),
+                new SearchFields(Collections.singletonList("toto"),
+                        Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class,
+                                aSet("field1", "field2"))),
+                true);
         //then
         assertThat(queryBuilder.getQuery()).matches(
                 "SELECT testObj\\.\\* FROM test_object testObj WHERE \\(testObj.field(1|2) LIKE 'toto%' ESCAPE '§' " +
@@ -190,9 +219,12 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", "the'value%with_special:_§§")), null, false);
+        queryBuilder.appendFilters(
+                Collections.singletonList(new FilterOption(TestObject.class, "theValue", "the'value%with_special:_§§")),
+                null, false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = 'the''value%with_special:_§§')");
+        assertThat(queryBuilder.getQuery()).isEqualTo(
+                "SELECT testObj.* FROM test_object testObj WHERE (testObj.theValue = 'the''value%with_special:_§§')");
     }
 
     @Test
@@ -200,11 +232,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.emptyList(), new SearchFields(Collections.singletonList("the'value%with_special:_§§"),
-                Collections.singletonMap(TestObject.class, aSet("field1"))), false);
+        queryBuilder.appendFilters(Collections.emptyList(),
+                new SearchFields(Collections.singletonList("the'value%with_special:_§§"),
+                        Collections.singletonMap(TestObject.class, aSet("field1"))),
+                false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE 'the''value§%with§_special:§_§§§§%' ESCAPE '§')");
+                .isEqualTo(
+                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE 'the''value§%with§_special:§_§§§§%' ESCAPE '§')");
     }
 
     @Test
@@ -212,10 +247,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER_OR_EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER_OR_EQUALS)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age >= 25)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age >= 25)");
     }
 
     @Test
@@ -223,10 +262,13 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age > 25)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age > 25)");
     }
 
     @Test
@@ -234,10 +276,13 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < 25)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age < 25)");
     }
 
     @Test
@@ -281,10 +326,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS_OR_EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS_OR_EQUALS)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age <= 25)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age <= 25)");
     }
 
     @Test
@@ -292,10 +341,13 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.DIFFERENT)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.DIFFERENT)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age != 25)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age != 25)");
     }
 
     @Test
@@ -306,7 +358,8 @@ public class QueryBuilderTest {
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, 27)), null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE ((25 <= testObj.age AND testObj.age <= 27))");
+        assertThat(queryBuilder.getQuery()).isEqualTo(
+                "SELECT testObj.* FROM test_object testObj WHERE ((25 <= testObj.age AND testObj.age <= 27))");
     }
 
     @Test
@@ -339,7 +392,8 @@ public class QueryBuilderTest {
                 false);
         //then
         assertThat(queryBuilder.getQuery())
-                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.age = 12 AND  (testObj.lastname = 'john' OR testObj.lastname = 'jack' ))");
+                .isEqualTo(
+                        "SELECT testObj.* FROM test_object testObj WHERE (testObj.age = 12 AND  (testObj.lastname = 'john' OR testObj.lastname = 'jack' ))");
     }
 
     @Test
@@ -347,10 +401,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", "jack", FilterOperationType.LIKE)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "lastname", "jack", FilterOperationType.LIKE)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname LIKE '%jack%')");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname LIKE '%jack%')");
     }
 
     @Test
@@ -358,10 +416,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", null, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "lastname", null, FilterOperationType.EQUALS)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname IS NULL)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname IS NULL)");
     }
 
     @Test
@@ -369,10 +431,14 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", TEST_ENUM.TEST1, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "lastname", TEST_ENUM.TEST1, FilterOperationType.EQUALS)),
+                null,
                 false);
         //then
-        assertThat(queryBuilder.getQuery()).isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname = 0)");
+        assertThat(queryBuilder.getQuery())
+                .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.lastname = 0)");
     }
 
     @Test(expected = SBonitaReadException.class)
@@ -380,7 +446,8 @@ public class QueryBuilderTest {
         //given
         QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(PersistentObject.class, "theValue", OrderByType.ASC)),
+        queryBuilder.appendOrderByClause(
+                Collections.singletonList(new OrderByOption(PersistentObject.class, "theValue", OrderByType.ASC)),
                 PersistentObject.class);
         queryBuilder.getQuery();
     }

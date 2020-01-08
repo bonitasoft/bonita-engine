@@ -119,7 +119,8 @@ public class ProblemImpl implements Problem {
 
     @Override
     public String toString() {
-        return "ProblemImpl [level=" + level + ", resourceId=" + resourceId + ", resource=" + resource + ", description=" + description + "]";
+        return "ProblemImpl [level=" + level + ", resourceId=" + resourceId + ", resource=" + resource
+                + ", description=" + description + "]";
     }
 
 }

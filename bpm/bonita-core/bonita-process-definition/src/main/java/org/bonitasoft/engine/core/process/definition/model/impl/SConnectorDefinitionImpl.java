@@ -73,7 +73,8 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
         // setId(connector.getId()); TODO : Implement generation of id
     }
 
-    public SConnectorDefinitionImpl(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {
+    public SConnectorDefinitionImpl(final String name, final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
         super(name);
         this.connectorId = connectorId;
         this.version = version;

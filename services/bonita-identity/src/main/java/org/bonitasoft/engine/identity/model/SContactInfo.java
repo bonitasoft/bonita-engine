@@ -21,7 +21,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * User contact info: can be personal or professional contact information.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Data

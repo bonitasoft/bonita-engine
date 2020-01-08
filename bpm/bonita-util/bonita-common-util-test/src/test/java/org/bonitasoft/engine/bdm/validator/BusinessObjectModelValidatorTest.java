@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm.validator;
 
-import static org.bonitasoft.engine.bdm.validator.assertion.RuleOfCondition.ruleOf;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.bonitasoft.engine.bdm.validator.assertion.RuleOfCondition.ruleOf;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -25,6 +22,8 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.rule.composition.CyclicCompositionValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositionValidationRule;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau

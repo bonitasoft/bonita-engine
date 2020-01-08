@@ -55,7 +55,8 @@ public class RestartProcessHandlerTest {
     @Test
     public void handleCompletionShouldDoNothingIfNoCallerId() throws Exception {
 
-        restartProcessHandler.handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+        restartProcessHandler.handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService,
+                workService, flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -67,7 +68,8 @@ public class RestartProcessHandlerTest {
         doReturn(callActivity).when(activityInstanceService).getActivityInstance(anyLong());
         SProcessInstance processInstance = mock(SProcessInstance.class);
         when(processInstance.getCallerId()).thenReturn(5L);
-        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService,
+                flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -80,6 +82,7 @@ public class RestartProcessHandlerTest {
         SProcessInstance processInstance = mock(SProcessInstance.class);
         //        when(processInstance.getId()).thenReturn(1654534L);
         when(processInstance.getCallerId()).thenReturn(5L);
-        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
+        restartProcessHandler.handleCompletion(processInstance, logger, activityInstanceService, workService,
+                flowNodeStateManager, workFactory);
     }
 }

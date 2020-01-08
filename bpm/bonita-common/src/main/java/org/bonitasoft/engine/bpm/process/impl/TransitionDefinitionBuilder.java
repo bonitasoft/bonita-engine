@@ -27,19 +27,22 @@ public class TransitionDefinitionBuilder extends FlowElementContainerBuilder {
 
     private TransitionDefinitionImpl transition;
 
-    TransitionDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    TransitionDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String source, final String target, final Boolean isDefaultTransition) {
         super(container, processDefinitionBuilder);
         addTransition(source, target, null, isDefaultTransition);
     }
 
-    TransitionDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    TransitionDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String source, final String target, final Expression expression, final Boolean isDefaultTransition) {
         super(container, processDefinitionBuilder);
         addTransition(source, target, expression, isDefaultTransition);
     }
 
-    private void addTransition(final String source, final String target, final Expression condition, final Boolean isDefaultTransition) {
+    private void addTransition(final String source, final String target, final Expression condition,
+            final Boolean isDefaultTransition) {
         // Retrieve source and target flowNode
         final FlowNodeDefinitionImpl from = (FlowNodeDefinitionImpl) getContainer().getFlowNode(source);
         final FlowNodeDefinitionImpl to = (FlowNodeDefinitionImpl) getContainer().getFlowNode(target);

@@ -34,7 +34,8 @@ import org.bonitasoft.engine.search.SearchResult;
 
 /**
  * Profiles are a notion used in Bonita Portal to give and control access to some specific features of the Bonita suite.
- * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships. <code>ProfileAPI</code> gives access to some of the
+ * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships.
+ * <code>ProfileAPI</code> gives access to some of the
  * profile administration: adding / removing members to / from a profile, retrieving / searching for profiles. <br>
  * Full control on profiles is part of <b>Subscription</b> editions of Bonita suite.
  *
@@ -117,12 +118,14 @@ public interface ProfileAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 7.6.1
      */
-    List<Profile> getProfilesWithNavigationForUser(long userId, int startIndex, int maxResults, ProfileCriterion criterion);
+    List<Profile> getProfilesWithNavigationForUser(long userId, int startIndex, int maxResults,
+            ProfileCriterion criterion);
 
     /**
-     * Searches for {@link Profile}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileSearchDescriptor} to
+     * Searches for {@link Profile}s with specific search criteria. Use
+     * {@link org.bonitasoft.engine.profile.ProfileSearchDescriptor} to
      * know the available filters.
-     * 
+     *
      * @param options
      *        The search criteria
      * @return a {@link SearchResult} containing the list of {@code Profile}s matching the search criteria.
@@ -138,11 +141,12 @@ public interface ProfileAPI {
     SearchResult<Profile> searchProfiles(SearchOptions options) throws SearchException;
 
     /**
-     * Retrieves the number of profile members for the profiles. The map contains the couples profileId/numberOfProfileMembers.
+     * Retrieves the number of profile members for the profiles. The map contains the couples
+     * profileId/numberOfProfileMembers.
      * <p>
      * If a profile does not exist, no exception is thrown and no value is added in the map.
      * </p>
-     * 
+     *
      * @param profileIds
      *        The identifiers of the profiles
      * @return the number of profile members for the profiles
@@ -155,7 +159,8 @@ public interface ProfileAPI {
     Map<Long, Long> getNumberOfProfileMembers(List<Long> profileIds);
 
     /**
-     * Searches for {@link ProfileMember}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor} to
+     * Searches for {@link ProfileMember}s with specific search criteria. Use
+     * {@link org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor} to
      * know the available filters.
      *
      * @param memberType
@@ -175,7 +180,8 @@ public interface ProfileAPI {
     SearchResult<ProfileMember> searchProfileMembers(String memberType, SearchOptions options) throws SearchException;
 
     /**
-     * Searches for {@link ProfileEntry}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor} to
+     * Searches for {@link ProfileEntry}s with specific search criteria. Use
+     * {@link org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor} to
      * know the available filters.
      *
      * @param options
@@ -205,7 +211,6 @@ public interface ProfileAPI {
      */
     @Experimental
     List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException;
-
 
     /**
      * Returns a profile entry according to its identifier.
@@ -254,14 +259,15 @@ public interface ProfileAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
-    ProfileMember createProfileMember(Long profileId, Long userId, Long groupId, Long roleId) throws CreationException, AlreadyExistsException;
+    ProfileMember createProfileMember(Long profileId, Long userId, Long groupId, Long roleId)
+            throws CreationException, AlreadyExistsException;
 
     /**
      * Creates a profile member.
      * <p>
      * It takes the values of the creator in order to create the profile member.
      * </p>
-     * 
+     *
      * @param creator
      *        The profile member to create
      * @return the created profile member

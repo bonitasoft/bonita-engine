@@ -21,6 +21,9 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.ProxyFactory;
+import javassist.util.proxy.ProxyObject;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.junit.Before;
@@ -28,10 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javassist.util.proxy.MethodHandler;
-import javassist.util.proxy.ProxyFactory;
-import javassist.util.proxy.ProxyObject;
 
 /**
  * @author Romain Bioteau
@@ -72,7 +71,8 @@ public class ServerProxyfierTest {
         final Entity aProxy = (Entity) factory.create(new Class[0], new Object[0], new MethodHandler() {
 
             @Override
-            public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) {
+            public Object invoke(final Object self, final Method thisMethod, final Method proceed,
+                    final Object[] args) {
                 return null;
             }
         });

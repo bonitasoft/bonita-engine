@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
@@ -96,7 +96,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test
-    public void setApplicationHomePage_should_call_applicationService_update_application_with_homePageId_key() throws Exception {
+    public void setApplicationHomePage_should_call_applicationService_update_application_with_homePageId_key()
+            throws Exception {
         //when
         delegate.setApplicationHomePage(APPLICATION_ID, APPLICATION_PAGE_ID);
 
@@ -105,9 +106,11 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void setApplicationHomePage_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void setApplicationHomePage_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         //given
-        given(applicationService.updateApplication(anyLong(), any(EntityUpdateDescriptor.class))).willThrow(new SObjectModificationException(""));
+        given(applicationService.updateApplication(anyLong(), any(EntityUpdateDescriptor.class)))
+                .willThrow(new SObjectModificationException(""));
 
         //when
         delegate.setApplicationHomePage(APPLICATION_ID, APPLICATION_PAGE_ID);
@@ -116,7 +119,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test
-    public void createApplicationPage_should_call_applicationService_createApplicationPage_and_return_created_applicationPage() throws Exception {
+    public void createApplicationPage_should_call_applicationService_createApplicationPage_and_return_created_applicationPage()
+            throws Exception {
         //given
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
@@ -154,7 +158,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = CreationException.class)
-    public void createApplicationPage_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
+    public void createApplicationPage_should_throw_CreationException_when_applicationService_throws_SObjectCreationException()
+            throws Exception {
         //given
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectCreationException());
@@ -166,7 +171,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void createApplicationPage_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
+    public void createApplicationPage_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException()
+            throws Exception {
         //given
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectAlreadyExistsException());
@@ -191,7 +197,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test
-    public void getApplicationPage_byNameAndAppName_should_return_the_result_of_applicationService_getApplicationPage() throws Exception {
+    public void getApplicationPage_byNameAndAppName_should_return_the_result_of_applicationService_getApplicationPage()
+            throws Exception {
         //given
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
@@ -206,7 +213,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getApplicationPage_byNameAndAppName_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void getApplicationPage_byNameAndAppName_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willThrow(new SBonitaReadException(""));
 
@@ -220,7 +228,8 @@ public class LivingApplicationPageAPIDelegateTest {
     public void getApplicationPage_byNameAndAppName_should_throw_SObjectNotFoundException_when_applicationService_throws_SObjectNotFoundException()
             throws Exception {
         //given
-        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willThrow(new SObjectNotFoundException());
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN))
+                .willThrow(new SObjectNotFoundException());
 
         //when
         delegate.getApplicationPage(APP_NAME, APP_PAGE_TOKEN);
@@ -229,7 +238,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test
-    public void getApplicationPage_byId_should_return_the_result_of_applicationService_getApplicationPage_byId() throws Exception {
+    public void getApplicationPage_byId_should_return_the_result_of_applicationService_getApplicationPage_byId()
+            throws Exception {
         //given
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
@@ -244,7 +254,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getApplicationPage_byId_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void getApplicationPage_byId_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willThrow(new SBonitaReadException(""));
 
@@ -281,7 +292,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         doThrow(new SObjectModificationException()).when(applicationService).deleteApplicationPage(APPLICATION_PAGE_ID);
 
         //when
@@ -291,7 +303,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         doThrow(new SObjectNotFoundException()).when(applicationService).deleteApplicationPage(APPLICATION_PAGE_ID);
 
         //when
@@ -301,7 +314,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test
-    public void getApplicationHomePage_should_return_the_result_of_applicationService_getApplicationHomePage() throws Exception {
+    public void getApplicationHomePage_should_return_the_result_of_applicationService_getApplicationHomePage()
+            throws Exception {
         //given
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPage sAppPage = new SApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
@@ -316,7 +330,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getApplicationHomePage_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void getApplicationHomePage_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.getApplicationHomePage(APPLICATION_ID)).willThrow(new SBonitaReadException(""));
 
@@ -327,7 +342,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = ApplicationPageNotFoundException.class)
-    public void getApplicationHomePage_should_throw_ApplicationPageNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void getApplicationHomePage_should_throw_ApplicationPageNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         given(applicationService.getApplicationHomePage(APPLICATION_ID)).willThrow(new SObjectNotFoundException(""));
 
@@ -343,7 +359,8 @@ public class LivingApplicationPageAPIDelegateTest {
         given(searchApplicationPages.getResult()).willReturn(appPageSearchResult);
 
         //when
-        final SearchResult<ApplicationPage> retrievedSearchResult = delegate.searchApplicationPages(searchApplicationPages);
+        final SearchResult<ApplicationPage> retrievedSearchResult = delegate
+                .searchApplicationPages(searchApplicationPages);
 
         //then
         assertThat(retrievedSearchResult).isEqualTo(appPageSearchResult);
@@ -351,7 +368,8 @@ public class LivingApplicationPageAPIDelegateTest {
     }
 
     @Test(expected = SearchException.class)
-    public void searchApplicationPages_should_throw_SearchException_when_searchApplicationPages_throws_SBonitaException() throws Exception {
+    public void searchApplicationPages_should_throw_SearchException_when_searchApplicationPages_throws_SBonitaException()
+            throws Exception {
         //given
         doThrow(new SBonitaReadException("")).when(searchApplicationPages).execute();
 

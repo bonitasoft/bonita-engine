@@ -37,7 +37,8 @@ public class SQLQueryBuilder extends QueryBuilder {
     private final Vendor vendor;
     private Class<? extends PersistentObject> entityType;
 
-    SQLQueryBuilder(String baseQuery, Vendor vendor, Class<? extends PersistentObject> entityType, OrderByBuilder orderByBuilder,
+    SQLQueryBuilder(String baseQuery, Vendor vendor, Class<? extends PersistentObject> entityType,
+            OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings, char likeEscapeCharacter) {
         super(baseQuery, orderByBuilder, classAliasMappings, likeEscapeCharacter);
         this.vendor = vendor;

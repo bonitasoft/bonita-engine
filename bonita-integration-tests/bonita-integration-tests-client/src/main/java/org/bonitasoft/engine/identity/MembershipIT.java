@@ -73,7 +73,8 @@ public class MembershipIT extends TestWithTechnicalUser {
     @Test
     public void getUserMembershipsWithPageOutOfRangeException() throws BonitaException {
         final User u = getIdentityAPI().createUser("u", "engine");
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), 0, 3,
+                UserMembershipCriterion.ROLE_NAME_ASC);
         assertTrue(userMemberships.isEmpty());
         getIdentityAPI().deleteUser(u.getId());
     }
@@ -121,7 +122,8 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User userM = getIdentityAPI().createUser("userM", "engine");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(),
+                roleM.getId());
         try {
             assertNotNull(userMembership);
             assertEquals(getSession().getUserId(), userMembership.getAssignedBy());
@@ -163,7 +165,8 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User userM = getIdentityAPI().createUser("userM", "engine");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(),
+                roleM.getId());
 
         final Group group = getIdentityAPI().getGroup(userMembership.getGroupId());
         final Role role = getIdentityAPI().getRole(userMembership.getRoleId());
@@ -183,7 +186,8 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User userM = getIdentityAPI().createUser("userM", "engine");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(),
+                roleM.getId());
         try {
             final UserMembership membership2 = getIdentityAPI().getUserMembership(userMembership.getId());
             assertNotNull(membership2);
@@ -211,15 +215,20 @@ public class MembershipIT extends TestWithTechnicalUser {
         loginOnDefaultTenantWith(plop.getUserName(), "bpm");
         final Date beforeDate = new Date();
         Thread.sleep(10);
-        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(),
+                roleM.getId());
         Thread.sleep(10);
         final Date afterDate = new Date();
         try {
             final UserMembership membership2 = getIdentityAPI().getUserMembership(userMembership.getId());
             assertNotNull(membership2);
             assertEquals(plop.getId(), membership2.getAssignedBy());
-            assertTrue("exprected date between <" + beforeDate + "> and <" + afterDate + "> but was <" + membership2.getAssignedDate() + ">", membership2
-                    .getAssignedDate().compareTo(beforeDate) > 0 && membership2.getAssignedDate().compareTo(afterDate) < 0);
+            assertTrue(
+                    "exprected date between <" + beforeDate + "> and <" + afterDate + "> but was <"
+                            + membership2.getAssignedDate() + ">",
+                    membership2
+                            .getAssignedDate().compareTo(beforeDate) > 0
+                            && membership2.getAssignedDate().compareTo(afterDate) < 0);
             assertEquals(userM.getId(), membership2.getUserId());
             assertEquals(roleM.getId(), membership2.getRoleId());
             assertEquals(groupM.getId(), membership2.getGroupId());
@@ -243,11 +252,13 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User userM = getIdentityAPI().createUser("userM", "engine");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(),
+                roleM.getId());
         assertEquals(groupM.getId(), userMembership.getGroupId());
         assertEquals(roleM.getId(), userMembership.getRoleId());
 
-        final UserMembership newMembership = getIdentityAPI().updateUserMembership(userMembership.getId(), group4.getId(), role3.getId());
+        final UserMembership newMembership = getIdentityAPI().updateUserMembership(userMembership.getId(),
+                group4.getId(), role3.getId());
         assertEquals(group4.getId(), newMembership.getGroupId());
         assertEquals(role3.getId(), newMembership.getRoleId());
         getIdentityAPI().deleteUserMembership(newMembership.getId());
@@ -287,7 +298,8 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getUserMembershipsOrderByRoleNameAsc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.ROLE_NAME_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(role1.getName(), userMemberships.get(0).getRoleName());
         assertEquals(role2.getName(), userMemberships.get(1).getRoleName());
@@ -296,7 +308,8 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getUserMembershipsOrderByRoleNameDesc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_DESC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.ROLE_NAME_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(role4.getName(), userMemberships.get(0).getRoleName());
         assertEquals(role3.getName(), userMemberships.get(1).getRoleName());
@@ -305,7 +318,8 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getUserMembershipsByGroupNameAsc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.GROUP_NAME_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.GROUP_NAME_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(group1.getName(), userMemberships.get(0).getGroupName());
         assertEquals(group2.getName(), userMemberships.get(1).getGroupName());
@@ -314,7 +328,8 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getUserMembershipsByGroupNameDesc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.GROUP_NAME_DESC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.GROUP_NAME_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(group4.getName(), userMemberships.get(0).getGroupName());
         assertEquals(group3.getName(), userMemberships.get(1).getGroupName());
@@ -323,13 +338,15 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getAssignedBy() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_DESC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.ASSIGNED_DATE_DESC);
         assertEquals(user1.getId(), userMemberships.get(0).getAssignedBy());
     }
 
     @Test
     public void getUserMembershipsByAssignedDateAsc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.ASSIGNED_DATE_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(role1.getName(), userMemberships.get(0).getRoleName());
         assertEquals(role2.getName(), userMemberships.get(1).getRoleName());
@@ -338,7 +355,8 @@ public class MembershipIT extends TestWithTechnicalUser {
 
     @Test
     public void getUserMembershipsByAssignedDateDesc() {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_DESC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3,
+                UserMembershipCriterion.ASSIGNED_DATE_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(role4.getName(), userMemberships.get(0).getRoleName());
         assertEquals(role3.getName(), userMemberships.get(1).getRoleName());
@@ -365,7 +383,8 @@ public class MembershipIT extends TestWithTechnicalUser {
         final User userT = getIdentityAPI().createUser("userT", "engine");
         final Role roleT = getIdentityAPI().createRole("roleT");
         final Group groupT = getIdentityAPI().createGroup("groupT", null);
-        final UserMembership membership1 = getIdentityAPI().addUserMembership(userT.getId(), groupT.getId(), roleT.getId());
+        final UserMembership membership1 = getIdentityAPI().addUserMembership(userT.getId(), groupT.getId(),
+                roleT.getId());
         assertEquals(1, getIdentityAPI().getNumberOfUserMemberships(userT.getId()));
 
         final UserMembership membership2 = getIdentityAPI().getUserMembership(membership1.getId());

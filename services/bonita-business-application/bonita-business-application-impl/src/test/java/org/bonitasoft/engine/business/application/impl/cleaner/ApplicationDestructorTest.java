@@ -53,7 +53,8 @@ public class ApplicationDestructorTest {
         applicationDestructor.onDeleteApplication(application);
 
         //then
-        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(new ApplicationRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), APPLICATION_ID));
+        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(new ApplicationRelatedMenusFilterBuilder(
+                new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), APPLICATION_ID));
     }
 
 }

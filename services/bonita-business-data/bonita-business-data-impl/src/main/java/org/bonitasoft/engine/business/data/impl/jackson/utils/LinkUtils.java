@@ -15,11 +15,10 @@ package org.bonitasoft.engine.business.data.impl.jackson.utils;
 
 import java.util.LinkedHashSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkUtils {
 

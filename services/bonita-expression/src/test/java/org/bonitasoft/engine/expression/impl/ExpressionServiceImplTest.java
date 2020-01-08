@@ -61,7 +61,8 @@ public class ExpressionServiceImplTest {
         final TimeTracker timeTracker = mock(TimeTracker.class);
         expressionService = new ExpressionServiceImpl(logger, true, timeTracker);
         expressionService.setExpressionExecutorStrategy(Arrays.asList(expressionExecutorStrategy));
-        expressionService.evaluate(expression, Collections.<String,Object>singletonMap("processDefinitionId", 546l), new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
+        expressionService.evaluate(expression, Collections.<String, Object> singletonMap("processDefinitionId", 546l),
+                new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
         verify(expressionExecutorStrategy, times(1)).validate(any(SExpression.class));
     }
 }

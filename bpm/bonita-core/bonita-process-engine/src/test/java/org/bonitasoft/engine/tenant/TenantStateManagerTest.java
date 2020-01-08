@@ -15,7 +15,6 @@ package org.bonitasoft.engine.tenant;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 

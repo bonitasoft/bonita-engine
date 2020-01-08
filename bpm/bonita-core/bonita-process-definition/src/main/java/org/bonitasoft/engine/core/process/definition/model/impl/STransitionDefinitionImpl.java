@@ -115,6 +115,6 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
 
     @Override
     public String toString() {
-        return "["+getName()+"]";
+        return "[" + getName() + "]";
     }
 }

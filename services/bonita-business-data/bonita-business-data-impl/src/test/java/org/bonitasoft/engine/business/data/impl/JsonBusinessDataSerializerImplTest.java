@@ -27,12 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javassist.util.proxy.MethodHandler;
 
 import com.company.model.Address;
 import com.company.model.Person;
 import com.company.model.PersonWithDetails;
 import com.company.model.Phone;
-import javassist.util.proxy.MethodHandler;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -58,7 +58,8 @@ public class JsonBusinessDataSerializerImplTest {
         Entity person = initPerson(1L);
 
         // when
-        final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
         assertThatJson(jsonPerson).as("entity serialization").isEqualTo(getJsonContent("singlePerson.json"));
@@ -68,7 +69,8 @@ public class JsonBusinessDataSerializerImplTest {
     public void count_result_should_be_serialized() throws Exception {
 
         // when
-        final String countJson = jsonBusinessDataSerializer.serializeCountResult(Collections.singletonList(59L), Person.class.getName());
+        final String countJson = jsonBusinessDataSerializer.serializeCountResult(Collections.singletonList(59L),
+                Person.class.getName());
 
         // then
         assertThatJson(countJson).isEqualTo("[59]");
@@ -80,7 +82,8 @@ public class JsonBusinessDataSerializerImplTest {
         PersonWithDetails person = initPersonWithDetails(666L);
 
         // when
-        final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
         assertThatJson(jsonPerson).as("entity with nested entity fields serialization")
@@ -93,7 +96,8 @@ public class JsonBusinessDataSerializerImplTest {
         List<Entity> persons = IntStream.range(1, 3).mapToObj(i -> initPerson(i)).collect(Collectors.toList());
 
         // when
-        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntities(persons, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntities(persons,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
         assertThatJson(jsonPersonList).as("entity list serialization").isEqualTo(getJsonContent("multiplePerson.json"));
@@ -126,7 +130,8 @@ public class JsonBusinessDataSerializerImplTest {
         entitySerializerPojo.setADate(new Date(123L));
         entitySerializerPojo.setALocalDate(LocalDate.of(2017, 3, 6));
         entitySerializerPojo.setALocalDateTime(LocalDateTime.of(1945, 5, 8, 12, 31, 17));
-        entitySerializerPojo.setAnOffsetDateTime(OffsetDateTime.of(LocalDateTime.of(1949, 4, 9, 12, 14, 5), ZoneOffset.ofHours(1)));
+        entitySerializerPojo
+                .setAnOffsetDateTime(OffsetDateTime.of(LocalDateTime.of(1949, 4, 9, 12, 14, 5), ZoneOffset.ofHours(1)));
         entitySerializerPojo.setADouble(Double.MAX_VALUE);
         entitySerializerPojo.setAFloat(Float.MAX_VALUE);
         entitySerializerPojo.setAInteger(Integer.MAX_VALUE);

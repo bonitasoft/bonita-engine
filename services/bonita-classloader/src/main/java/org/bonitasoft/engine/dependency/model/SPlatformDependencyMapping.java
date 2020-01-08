@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.dependency.model;
 
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

@@ -274,12 +274,14 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public List<String> getStringIndexLabels() {
-        return Arrays.asList(getStringIndexLabel(1), getStringIndexLabel(2), getStringIndexLabel(3), getStringIndexLabel(4), getStringIndexLabel(5));
+        return Arrays.asList(getStringIndexLabel(1), getStringIndexLabel(2), getStringIndexLabel(3),
+                getStringIndexLabel(4), getStringIndexLabel(5));
     }
 
     @Override
     public List<Expression> getStringIndexValues() {
-        return Arrays.asList(getStringIndexValue(1), getStringIndexValue(2), getStringIndexValue(3), getStringIndexValue(4), getStringIndexValue(5));
+        return Arrays.asList(getStringIndexValue(1), getStringIndexValue(2), getStringIndexValue(3),
+                getStringIndexValue(4), getStringIndexValue(5));
     }
 
     /*
@@ -311,7 +313,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), displayName, displayDescription, parameters, actors, actorInitiator, flowElementContainer, listIndex, contract,
+        return Objects.hash(super.hashCode(), displayName, displayDescription, parameters, actors, actorInitiator,
+                flowElementContainer, listIndex, contract,
                 context);
     }
 

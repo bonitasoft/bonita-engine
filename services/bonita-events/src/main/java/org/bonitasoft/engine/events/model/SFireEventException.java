@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Christophe Havard
@@ -45,10 +45,9 @@ public class SFireEventException extends SBonitaException {
         return handlerExceptions;
     }
 
-
     @Override
     public String getMessage() {
-        return super.getMessage() +  handlerExceptions.stream()
+        return super.getMessage() + handlerExceptions.stream()
                 .map(e -> e.getClass().getName() + ": " + e.getMessage())
                 .collect(Collectors.joining("\n", " [", "]"));
     }

@@ -42,7 +42,7 @@ public abstract class AbstractProfileIT extends TestWithTechnicalUser {
     protected static final String IMPORT_PROFILES_CMD = "importProfilesCommand";
 
     protected static final String EXPORT_DEFAULT_PROFILES_CMD = "exportDefaultProfilesCommand";
-    
+
     protected static final int ADMIN_PROFILE_ENTRY_COUNT = 24;
 
     protected static final int USER_PROFILE_ENTRY_COUNT = 17;
@@ -100,7 +100,8 @@ public abstract class AbstractProfileIT extends TestWithTechnicalUser {
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
         // search for the newly created profile IDs:
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, Integer.MAX_VALUE).sort(ProfileSearchDescriptor.NAME, Order.ASC);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                .sort(ProfileSearchDescriptor.NAME, Order.ASC);
         final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
         assertEquals(4, profiles.size());
         for (final Profile map : profiles) {
@@ -134,7 +135,8 @@ public abstract class AbstractProfileIT extends TestWithTechnicalUser {
     public static void restorDefaultProfiles() throws Exception {
         final APITestUtil testUtil = new APITestUtil();
         testUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
-        final byte[] xmlContent = (byte[]) testUtil.getCommandAPI().execute(EXPORT_DEFAULT_PROFILES_CMD, Collections.<String, Serializable>emptyMap());
+        final byte[] xmlContent = (byte[]) testUtil.getCommandAPI().execute(EXPORT_DEFAULT_PROFILES_CMD,
+                Collections.<String, Serializable> emptyMap());
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         testUtil.getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);

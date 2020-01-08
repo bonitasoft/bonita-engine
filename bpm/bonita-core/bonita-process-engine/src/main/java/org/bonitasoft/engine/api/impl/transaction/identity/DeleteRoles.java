@@ -30,7 +30,8 @@ public class DeleteRoles extends DeleteWithActorMembers implements TransactionCo
 
     private final List<Long> roleIds;
 
-    public DeleteRoles(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteRoles(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final List<Long> roleIds) {
         super(actorMappingService, profileService, identityService);
         this.roleIds = roleIds;

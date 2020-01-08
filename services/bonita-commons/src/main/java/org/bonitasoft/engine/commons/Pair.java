@@ -108,6 +108,7 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
         this.right = right;
         return oldRight;
     }
+
     public L setKey(final L left) {
         final L oldLeft = this.left;
         this.left = left;

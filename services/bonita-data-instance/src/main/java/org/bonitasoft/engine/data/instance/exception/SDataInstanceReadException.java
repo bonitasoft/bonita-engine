@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.data.instance.exception;
 
-
 /**
  * @author Celine Souchet
  */

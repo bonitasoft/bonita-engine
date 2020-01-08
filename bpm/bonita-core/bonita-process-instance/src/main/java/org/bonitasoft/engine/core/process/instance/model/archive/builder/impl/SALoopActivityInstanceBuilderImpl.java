@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopA
 /**
  * @author Baptiste Mesta
  */
-public class SALoopActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SALoopActivityInstanceBuilder {
+public class SALoopActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl
+        implements SALoopActivityInstanceBuilder {
 
     public SALoopActivityInstanceBuilderImpl(final SALoopActivityInstance entity) {
         super(entity);

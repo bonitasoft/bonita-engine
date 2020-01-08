@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.profile;
 
-import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 
 /**
  * @author Baptiste Mesta
@@ -31,7 +31,8 @@ public class IgnoreDuplicateImportStrategy extends ProfileImportStrategy {
     }
 
     @Override
-    public SProfile whenProfileExists(final long importerId, final ProfileNode profile, final SProfile existingProfile) {
+    public SProfile whenProfileExists(final long importerId, final ProfileNode profile,
+            final SProfile existingProfile) {
         // will be skipped
         return null;
     }

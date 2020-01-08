@@ -35,7 +35,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance.getId(), "step1");
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+        getProcessAPI().sendMessage("MyMessage",
+                new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
@@ -56,7 +57,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         final long step2Id = waitForUserTask(processInstance.getId(), "step2");
 
-        getProcessAPI().sendMessage("MyMessage1", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+        getProcessAPI().sendMessage("MyMessage1",
+                new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression("step1"), null);
 
         assignAndExecuteStep(step2Id, user);
@@ -73,9 +75,11 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance calledStep = waitForUserTaskAndGetIt(processInstance.getId(), "calledTask");
-            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+            final ProcessInstance calledProcessInstance = getProcessAPI()
+                    .getProcessInstance(calledStep.getParentProcessInstanceId());
 
-            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+            getProcessAPI().sendMessage("MyMessage",
+                    new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                     new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
             waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
@@ -98,12 +102,14 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance calledStep = waitForUserTaskAndGetIt(processInstance.getId(), "calledTask");
-            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+            final ProcessInstance calledProcessInstance = getProcessAPI()
+                    .getProcessInstance(calledStep.getParentProcessInstanceId());
             assignAndExecuteStep(calledStep, user.getId());
 
             final long step2Id = waitForUserTask(processInstance.getId(), "step2");
 
-            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+            getProcessAPI().sendMessage("MyMessage",
+                    new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                     new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
             waitForProcessToFinish(calledProcessInstance);
@@ -120,12 +126,15 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     public void messageBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance.getId(), "step1");
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
+        getProcessAPI().sendMessage("MyMessage",
+                new ExpressionBuilder()
+                        .createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
@@ -142,7 +151,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     public void messageBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
@@ -150,7 +160,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         }
         final long step2Id = waitForUserTask(processInstance.getId(), "step2");
 
-        getProcessAPI().sendMessage("MyMessage1", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+        getProcessAPI().sendMessage("MyMessage1",
+                new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression("step1"), null);
 
         assignAndExecuteStep(step2Id, user);
@@ -164,7 +175,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     public void messageBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(user, loopCardinality);
@@ -172,7 +184,9 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
             assertEquals("step1", humanTaskInstance.getName());
         }
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
+        getProcessAPI().sendMessage("MyMessage",
+                new ExpressionBuilder()
+                        .createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
@@ -192,7 +206,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         final int loopCardinality = 3;
         final boolean isSequential = false;
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(
+                loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
@@ -200,7 +215,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         }
         final long step2Id = waitForUserTask(processInstance.getId(), "step2");
 
-        getProcessAPI().sendMessage("MyMessage1", new ExpressionBuilder().createConstantStringExpression("processWithMultiInstanceAndBoundaryEvent"),
+        getProcessAPI().sendMessage("MyMessage1",
+                new ExpressionBuilder().createConstantStringExpression("processWithMultiInstanceAndBoundaryEvent"),
                 new ExpressionBuilder().createConstantStringExpression("step1"), null);
 
         assignAndExecuteStep(step2Id, user);
@@ -215,12 +231,14 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     public void messageBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 3;
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(loopMax);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(
+                loopMax);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance.getId(), "step1");
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithLoopActivityAndBoundaryEvent"),
+        getProcessAPI().sendMessage("MyMessage",
+                new ExpressionBuilder().createConstantStringExpression("processWithLoopActivityAndBoundaryEvent"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
@@ -236,7 +254,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     @Test
     public void messageBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 2;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(loopMax);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(
+                loopMax);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopMax; i++) {
@@ -244,7 +263,8 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         }
         final long step2Id = waitForUserTask(processInstance.getId(), "step2");
 
-        getProcessAPI().sendMessage("MyMessage1", new ExpressionBuilder().createConstantStringExpression("processWithLoopActivityAndBoundaryEvent"),
+        getProcessAPI().sendMessage("MyMessage1",
+                new ExpressionBuilder().createConstantStringExpression("processWithLoopActivityAndBoundaryEvent"),
                 new ExpressionBuilder().createConstantStringExpression("step1"), null);
 
         assignAndExecuteStep(step2Id, user);

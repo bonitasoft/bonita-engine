@@ -19,6 +19,7 @@ import java.io.Serializable;
  * @author Laurent Leseigneur
  */
 public interface BusinessDataQueryMetadata extends Serializable {
+
     Integer getStartIndex();
 
     Integer getMaxResults();

@@ -31,7 +31,8 @@ public class ArchivedDataNotFoundException extends NotFoundException {
      * Constructs a new exception with the specified detail cause.
      *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ArchivedDataNotFoundException(final Throwable cause) {

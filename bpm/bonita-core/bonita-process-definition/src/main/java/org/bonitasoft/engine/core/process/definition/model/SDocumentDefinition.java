@@ -23,14 +23,14 @@ public interface SDocumentDefinition extends SNamedElement {
 
     /**
      * URL for an external document
-     * 
+     *
      * @return
      */
     String getUrl();
 
     /**
      * File reference in the process resources
-     * 
+     *
      * @return
      */
     String getFile();

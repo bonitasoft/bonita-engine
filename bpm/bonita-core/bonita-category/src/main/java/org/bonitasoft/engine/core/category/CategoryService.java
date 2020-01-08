@@ -42,7 +42,7 @@ public interface CategoryService {
 
     /**
      * Create a category by give name and description
-     * 
+     *
      * @param name
      *        The name of category
      * @param description
@@ -53,11 +53,12 @@ public interface CategoryService {
      * @throws SCategoryCreationException
      *         Error thrown if has exceptions during the category creation.
      */
-    SCategory createCategory(String name, String description) throws SCategoryAlreadyExistsException, SCategoryCreationException;
+    SCategory createCategory(String name, String description)
+            throws SCategoryAlreadyExistsException, SCategoryCreationException;
 
     /**
      * Get category by its id
-     * 
+     *
      * @param id
      *        Identifier of the category
      * @return a category object
@@ -68,7 +69,7 @@ public interface CategoryService {
 
     /**
      * Get category by its name
-     * 
+     *
      * @param name
      *        Name of the category
      * @return a category object
@@ -79,7 +80,7 @@ public interface CategoryService {
 
     /**
      * Update a category by its id
-     * 
+     *
      * @param categoryId
      *        Identifier of the category
      * @param newCategory
@@ -89,11 +90,12 @@ public interface CategoryService {
      * @throws SCategoryException
      *         Error thrown if has exception during the category update
      */
-    void updateCategory(long categoryId, EntityUpdateDescriptor descriptor) throws SCategoryNotFoundException, SCategoryException;
+    void updateCategory(long categoryId, EntityUpdateDescriptor descriptor)
+            throws SCategoryNotFoundException, SCategoryException;
 
     /**
      * Delete a category by its id
-     * 
+     *
      * @param categoryId
      *        Identifier of the category
      * @throws SCategoryNotFoundException
@@ -105,7 +107,7 @@ public interface CategoryService {
 
     /**
      * Get the total number of categories
-     * 
+     *
      * @return The total number of Categories
      * @throws SCategoryException
      */
@@ -113,7 +115,7 @@ public interface CategoryService {
 
     /**
      * Retrieves a list of categories, The returned list is paginated
-     * 
+     *
      * @param fromIndex
      *        Index of the record to be returned. First record has index 0.
      * @param numberOfCategories
@@ -128,11 +130,12 @@ public interface CategoryService {
      * @throws SCategoryException
      *         Error thrown if has exception during the category retrieve
      */
-    List<SCategory> getCategories(int fromIndex, int numberOfCategories, String field, OrderByType order) throws SPageOutOfRangeException, SCategoryException;
+    List<SCategory> getCategories(int fromIndex, int numberOfCategories, String field, OrderByType order)
+            throws SPageOutOfRangeException, SCategoryException;
 
     /**
      * Add a process definition to a category
-     * 
+     *
      * @param categoryId
      *        Identifier of the category
      * @param processDefinitionId
@@ -142,12 +145,13 @@ public interface CategoryService {
      * @throws SCategoryException
      *         Error thrown if has exception during the adding action
      */
-    void addProcessDefinitionToCategory(long categoryId, long processDefinitionId) throws SCategoryNotFoundException, SCategoryInProcessAlreadyExistsException,
+    void addProcessDefinitionToCategory(long categoryId, long processDefinitionId)
+            throws SCategoryNotFoundException, SCategoryInProcessAlreadyExistsException,
             SCategoryException;
 
     /**
      * Add process definitions to a category
-     * 
+     *
      * @param categoryId
      *        Identifier of the category
      * @param processDefinitionIds
@@ -158,12 +162,13 @@ public interface CategoryService {
      *         Error thrown if has exception during the adding action
      * @throws SCategoryInProcessAlreadyExistsException
      */
-    void addProcessDefinitionsToCategory(long categoryId, List<Long> processDefinitionIds) throws SCategoryNotFoundException, SCategoryException,
+    void addProcessDefinitionsToCategory(long categoryId, List<Long> processDefinitionIds)
+            throws SCategoryNotFoundException, SCategoryException,
             SCategoryInProcessAlreadyExistsException;
 
     /**
      * Get number of categories of the specific process definition
-     * 
+     *
      * @param processDefinitionId
      *        Identifier of the process definition
      * @return number of categories
@@ -174,7 +179,7 @@ public interface CategoryService {
 
     /**
      * Get categories for specific process definition, the result list is paginated
-     * 
+     *
      * @param processId
      *        Identifier of the process definition
      * @param fromIndex
@@ -189,12 +194,13 @@ public interface CategoryService {
      * @throws SIndexOutOfRangeException
      *         Error thrown if index is out of the range.
      */
-    List<SCategory> getCategoriesOfProcessDefinition(long processId, int fromIndex, int numberOfCategories, OrderByType order) throws SCategoryException,
+    List<SCategory> getCategoriesOfProcessDefinition(long processId, int fromIndex, int numberOfCategories,
+            OrderByType order) throws SCategoryException,
             SIndexOutOfRangeException;
 
     /**
      * Get number of categorized processes
-     * 
+     *
      * @param processIds
      *        Identifier of the process definition
      * @return the number of categorized processes
@@ -204,7 +210,7 @@ public interface CategoryService {
 
     /**
      * Get the number of process definition for specific category
-     * 
+     *
      * @param categoryId
      *        Identifier of the category
      * @return The number of process definition for specific category
@@ -217,7 +223,7 @@ public interface CategoryService {
 
     /**
      * Remove specific categories for specific process definition
-     * 
+     *
      * @param processId
      *        Identifier of the process definition
      * @param categoryIds
@@ -228,7 +234,7 @@ public interface CategoryService {
 
     /**
      * Get categories not attached for specific process definition, the result list is paginated
-     * 
+     *
      * @param processDefinitionId
      * @param fromIndex
      * @param numberOfCategories
@@ -236,12 +242,13 @@ public interface CategoryService {
      * @return The matching list of category
      * @throws SCategoryException
      */
-    List<SCategory> getCategoriesUnrelatedToProcessDefinition(long processDefinitionId, int fromIndex, int numberOfCategories, OrderByType order)
+    List<SCategory> getCategoriesUnrelatedToProcessDefinition(long processDefinitionId, int fromIndex,
+            int numberOfCategories, OrderByType order)
             throws SCategoryException;
 
     /**
      * Get number of categories not attached of the specific process definition
-     * 
+     *
      * @param processDefinitionId
      * @return number of categories
      * @throws SCategoryException
@@ -251,7 +258,7 @@ public interface CategoryService {
 
     /**
      * Search process category mappings corresponding to criteria
-     * 
+     *
      * @param queryOptions
      * @return List of process category mappings
      * @throws SBonitaReadException

@@ -23,7 +23,8 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 public interface ThemeRetriever {
 
     /**
-     * Retrieves the default or current theme for the specific type. If no theme is found for the given information the result will be null
+     * Retrieves the default or current theme for the specific type. If no theme is found for the given information the
+     * result will be null
      *
      * @param type
      *        The type of the theme

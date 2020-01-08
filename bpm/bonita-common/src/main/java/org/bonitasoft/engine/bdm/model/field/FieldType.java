@@ -23,21 +23,11 @@ import java.util.Date;
  */
 public enum FieldType {
 
-    STRING(String.class),
-    TEXT(String.class),
-    INTEGER(Integer.class),
-    DOUBLE(Double.class),
-    LONG(Long.class),
-    FLOAT(Float.class),
-    DATE(Date.class),
-    BOOLEAN(Boolean.class),
-    BYTE(Byte.class),
-    SHORT(Short.class),
-    CHAR(Character.class),
-    LOCALDATETIME(LocalDateTime.class),
-    LOCALDATE(LocalDate.class),
-    OFFSETDATETIME(OffsetDateTime.class);
-    
+    STRING(String.class), TEXT(String.class), INTEGER(Integer.class), DOUBLE(Double.class), LONG(Long.class), FLOAT(
+            Float.class), DATE(Date.class), BOOLEAN(Boolean.class), BYTE(Byte.class), SHORT(
+                    Short.class), CHAR(Character.class), LOCALDATETIME(
+                            LocalDateTime.class), LOCALDATE(LocalDate.class), OFFSETDATETIME(OffsetDateTime.class);
+
     private Class<?> clazz;
 
     private FieldType(final Class<?> clazz) {

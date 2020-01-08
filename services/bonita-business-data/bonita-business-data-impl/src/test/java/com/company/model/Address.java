@@ -20,9 +20,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
-import org.bonitasoft.engine.bdm.Entity;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bonitasoft.engine.bdm.Entity;
 
 public class Address implements Entity {
 

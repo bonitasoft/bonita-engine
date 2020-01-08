@@ -39,7 +39,8 @@ public class SchemaManagerUpdate implements SchemaManager {
 
     private final Map<String, Object> configuration;
 
-    public SchemaManagerUpdate(final Map<String, Object> configuration, final TechnicalLoggerService loggerService) throws HibernateException {
+    public SchemaManagerUpdate(final Map<String, Object> configuration, final TechnicalLoggerService loggerService)
+            throws HibernateException {
         this.log = loggerService.asLogger(getClass());
         this.configuration = new HashMap<>(configuration);
         final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
@@ -58,7 +59,6 @@ public class SchemaManagerUpdate implements SchemaManager {
         cfg.setProperties(properties);
         return cfg;
     }
-
 
     public Class<?> getMappedClass(final String className) throws MappingException {
         if (className == null) {

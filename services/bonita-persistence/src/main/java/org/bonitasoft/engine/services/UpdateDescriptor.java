@@ -36,7 +36,8 @@ public class UpdateDescriptor {
         this.entity = entity;
     }
 
-    public static UpdateDescriptor buildSetField(final PersistentObject entity, final String fieldName, final Object fieldValue) {
+    public static UpdateDescriptor buildSetField(final PersistentObject entity, final String fieldName,
+            final Object fieldValue) {
         final UpdateDescriptor updateDescriptor = new UpdateDescriptor(entity);
         updateDescriptor.addField(fieldName, fieldValue);
         return updateDescriptor;

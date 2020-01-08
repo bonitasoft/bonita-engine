@@ -46,7 +46,8 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
 
     private static final Logger logger = LoggerFactory.getLogger(AbortProcessInstanceIT.class);
 
-    private ProcessDefinition deployProcessWithMultiInstanceCallActivity(final int loopCardinality, final String targetProcess, final String targetVersion)
+    private ProcessDefinition deployProcessWithMultiInstanceCallActivity(final int loopCardinality,
+            final String targetProcess, final String targetVersion)
             throws BonitaException {
         final Expression targetProcExpr = string(targetProcess);
         final Expression targetVersionExpr = string(targetVersion);
@@ -57,9 +58,13 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         builder.addCallActivity("callActivity", targetProcExpr, targetVersionExpr)
                 .addMultiInstance(false, intExpr(loopCardinality))
                 .addCompletionCondition(
-                        new ExpressionBuilder().createGroovyScriptExpression("deployProcessWithMultiInstanceCallActivity",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
-                                new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
+                        new ExpressionBuilder()
+                                .createGroovyScriptExpression("deployProcessWithMultiInstanceCallActivity",
+                                        ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName()
+                                                + " == 1 ",
+                                        Boolean.class.getName(),
+                                        new ExpressionBuilder().createEngineConstant(
+                                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
         builder.addEndEvent("end");
         builder.addTransition("start", "callActivity");
         builder.addTransition("callActivity", "end");
@@ -72,14 +77,17 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
         final String autoTaskName = "auto1";
-        final ProcessDefinition targetProcess = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, autoTaskName);
+        final ProcessDefinition targetProcess = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2,
+                autoTaskName);
         final int loopCardinality = 2;
-        final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality, targetProcess.getName(), targetProcess.getVersion());
+        final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality,
+                targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
         checkNbOfProcessInstances(loopCardinality + 1);
 
         // execute task1 of a target process instance
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(true, 2 * loopCardinality, user).getPendingHumanTaskInstances();
+        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(true, 2 * loopCardinality, user)
+                .getPendingHumanTaskInstances();
         final HumanTaskInstance humanTaskInst1ToExecute = pendingHumanTaskInstances.get(0);
         assertEquals(taskName1, humanTaskInst1ToExecute.getName());
         assignAndExecuteStep(humanTaskInst1ToExecute, user);
@@ -94,7 +102,8 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         assertEquals(taskName2, humanTaskInst2ToExecute.getName());
         HumanTaskInstance humanTaskInst2ToAbort = pendingHumanTaskInstances.get(3);
         assertEquals(taskName2, humanTaskInst2ToAbort.getName());
-        if (humanTaskInst1ToExecute.getParentProcessInstanceId() != humanTaskInst2ToExecute.getParentProcessInstanceId()) { // ensure tasks are in the same
+        if (humanTaskInst1ToExecute.getParentProcessInstanceId() != humanTaskInst2ToExecute
+                .getParentProcessInstanceId()) { // ensure tasks are in the same
             humanTaskInst2ToAbort = humanTaskInst2ToExecute;
             humanTaskInst2ToExecute = pendingHumanTaskInstances.get(3);
         }
@@ -137,9 +146,9 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         shouldNotHaveFailedTasks();
         shouldAllCompleteWithAbortedOrCompleted();
         assertThat(getAllCompletedArchivedFlowNodeInstances().stream().map(NamedElement::getName))
-                .containsOnly("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10");
+                .containsOnly("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9",
+                        "step10");
     }
-
 
     @Test
     public void should_abort_executing_loops() throws Exception {
@@ -161,17 +170,20 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         shouldNotHaveFailedTasks();
         shouldAllCompleteWithAbortedOrCompleted();
         assertThat(getAllCompletedArchivedFlowNodeInstances().stream().map(NamedElement::getName))
-                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10", "step_before_abort");
+                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10",
+                        "step_before_abort");
     }
 
     private void shouldAllCompleteWithAbortedOrCompleted() throws SearchException {
-        assertThat(getAllCompletedArchivedFlowNodeInstances()).allSatisfy(a -> assertThat(a.getState()).isIn("aborted", "completed"));
+        assertThat(getAllCompletedArchivedFlowNodeInstances())
+                .allSatisfy(a -> assertThat(a.getState()).isIn("aborted", "completed"));
     }
 
     @Test
     public void should_abort_executing_multiInstances() throws Exception {
         executeAndVerifyCompleted(() -> {
-            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate", "1.0");
+            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate",
+                    "1.0");
             builder.addAutomaticTask("step1").addMultiInstance(false, intExpr(5));
             builder.addAutomaticTask("step2").addMultiInstance(false, intExpr(5));
             builder.addAutomaticTask("step3").addMultiInstance(false, intExpr(5));
@@ -191,27 +203,32 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         shouldNotHaveFailedTasks();
         shouldAllCompleteWithAbortedOrCompleted();
         assertThat(getAllCompletedArchivedFlowNodeInstances().stream().map(NamedElement::getName))
-                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10", "step_before_abort");
+                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10",
+                        "step_before_abort");
     }
 
     @Test
     @Ignore("not working")
     public void should_abort_call_activities_from_calledProcess_with_event_subprocess() throws Exception {
-        ProcessDefinition calledProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "4.0")
-                .addAutomaticTask("sub1")
-                .addAutomaticTask("sub2")
-                .addAutomaticTask("sub3")
-                .addAutomaticTask("sub4").getProcess());
-        ProcessDefinition endErrorProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("endErrorProcess", "4.0")
-                .addAutomaticTask("sub1")
-                .addEndEvent("terminate").addErrorEventTrigger("theError")
-                .addTransition("sub1", "terminate")
-                .getProcess());
+        ProcessDefinition calledProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "4.0")
+                        .addAutomaticTask("sub1")
+                        .addAutomaticTask("sub2")
+                        .addAutomaticTask("sub3")
+                        .addAutomaticTask("sub4").getProcess());
+        ProcessDefinition endErrorProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("endErrorProcess", "4.0")
+                        .addAutomaticTask("sub1")
+                        .addEndEvent("terminate").addErrorEventTrigger("theError")
+                        .addTransition("sub1", "terminate")
+                        .getProcess());
         ProcessDefinition processDefinition = executeAndVerifyAborted(() -> {
 
-            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate", "4.0");
+            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate",
+                    "4.0");
             builder.addCallActivity("step1", string("calledProcess"), string("4.0"));
-            builder.addCallActivity("step2", string("calledProcess"), string("4.0")).addMultiInstance(false, intExpr(5));
+            builder.addCallActivity("step2", string("calledProcess"), string("4.0")).addMultiInstance(false,
+                    intExpr(5));
             builder.addCallActivity("step3", string("calledProcess"), string("4.0"));//.addLoop(false, bool(true));
             builder.addCallActivity("step4", string("calledProcess"), string("4.0"));
             builder.addCallActivity("step5", string("calledProcess"), string("4.0"));
@@ -237,19 +254,20 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-
     @Test
     @Ignore("not working")
     public void should_abort_elements_from_calledProcess_with_event_subprocess() throws Exception {
 
-        ProcessDefinition endErrorProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("endErrorProcess", "2.0")
-                .addAutomaticTask("sub1")
-                .addEndEvent("terminate").addErrorEventTrigger("theError")
-                .addTransition("sub1", "terminate")
-                .getProcess());
+        ProcessDefinition endErrorProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("endErrorProcess", "2.0")
+                        .addAutomaticTask("sub1")
+                        .addEndEvent("terminate").addErrorEventTrigger("theError")
+                        .addTransition("sub1", "terminate")
+                        .getProcess());
         ProcessDefinition processDefinition = executeAndVerifyAborted(() -> {
 
-            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithCalledProcess", "2.0");
+            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                    .createNewInstance("processWithCalledProcess", "2.0");
             builder.addAutomaticTask("step1");
             builder.addAutomaticTask("step2").addMultiInstance(false, intExpr(5));
             builder.addAutomaticTask("step3").addLoop(false, bool(true));
@@ -280,16 +298,19 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     @Test
     @Ignore("not working")
     public void should_abort_call_activities_from_parent_processes() throws Exception {
-        ProcessDefinition calledProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
-                .addAutomaticTask("sub1")
-                .addAutomaticTask("sub2")
-                .addAutomaticTask("sub3")
-                .addAutomaticTask("sub4").getProcess());
+        ProcessDefinition calledProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
+                        .addAutomaticTask("sub1")
+                        .addAutomaticTask("sub2")
+                        .addAutomaticTask("sub3")
+                        .addAutomaticTask("sub4").getProcess());
         executeAndVerifyCompleted(() -> {
 
-            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate", "1.0");
+            ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTerminate",
+                    "1.0");
             builder.addCallActivity("step1", string("calledProcess"), string("1.0"));
-            builder.addCallActivity("step2", string("calledProcess"), string("1.0")).addMultiInstance(false, intExpr(5));
+            builder.addCallActivity("step2", string("calledProcess"), string("1.0")).addMultiInstance(false,
+                    intExpr(5));
             builder.addCallActivity("step3", string("calledProcess"), string("1.0")).addLoop(false, bool(true));
             builder.addCallActivity("step4", string("calledProcess"), string("1.0"));
             builder.addCallActivity("step5", string("calledProcess"), string("1.0"));
@@ -306,7 +327,8 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
 
         shouldNotHaveFailedTasks();
         assertThat(getAllCompletedArchivedFlowNodeInstances().stream().map(NamedElement::getName))
-                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10", "step_before_abort");
+                .contains("step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9", "step10",
+                        "step_before_abort");
         shouldAllCompleteWithAbortedOrCompleted();
         disableAndDeleteProcess(calledProcess);
     }
@@ -319,8 +341,10 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
             waitForProcessToFinish(processInstance);
         } catch (Exception e) {
             logger.error("error while waiting for process to finish");
-            ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
-            logger.error("final archive: {}, {}" , finalArchivedProcessInstance.getState(), finalArchivedProcessInstance.getEndDate());
+            ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI()
+                    .getFinalArchivedProcessInstance(processInstance.getId());
+            logger.error("final archive: {}, {}", finalArchivedProcessInstance.getState(),
+                    finalArchivedProcessInstance.getEndDate());
             getProcessAPI().searchProcessInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
                     .forEach(a -> logger.error("process found at the end: {}", a));
             getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
@@ -328,16 +352,19 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
             throw e;
         }
     }
+
     private ProcessDefinition executeAndVerifyAborted(Callable<DesignProcessDefinition> callable) throws Exception {
         ProcessDefinition processDefinition = getProcessAPI().deployAndEnableProcess(callable.call());
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         try {
 
-            waitForProcessToBeInState(processInstance,ProcessInstanceState.ABORTED);
+            waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
         } catch (Exception e) {
             logger.error("error while waiting for process to finish");
-            ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
-            logger.error("final archive: {}, {}" , finalArchivedProcessInstance.getState(), finalArchivedProcessInstance.getEndDate());
+            ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI()
+                    .getFinalArchivedProcessInstance(processInstance.getId());
+            logger.error("final archive: {}, {}", finalArchivedProcessInstance.getState(),
+                    finalArchivedProcessInstance.getEndDate());
             getProcessAPI().searchProcessInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
                     .forEach(a -> logger.error("process found at the end: {}", a));
             getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 100).done()).getResult()
@@ -360,15 +387,16 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     private void shouldNotHaveFailedTasks() throws SearchException {
-        assertThat(getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 1000).done()).getResult().stream().map(ArchivedFlowNodeInstance::getState))
-                .doesNotContain("failed");
+        assertThat(getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 1000).done()).getResult()
+                .stream().map(ArchivedFlowNodeInstance::getState))
+                        .doesNotContain("failed");
     }
 
     private List<ArchivedFlowNodeInstance> getAllCompletedArchivedFlowNodeInstances() throws SearchException {
         return getProcessAPI()
                 .searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 100)
-                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done()).getResult();
+                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done())
+                .getResult();
     }
 
 }
-

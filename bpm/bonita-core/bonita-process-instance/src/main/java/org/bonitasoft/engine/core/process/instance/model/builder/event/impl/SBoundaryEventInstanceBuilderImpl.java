@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SBoundaryEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SBoundaryEventInstanceBuilder {
+public class SBoundaryEventInstanceBuilderImpl extends SEventInstanceBuilderImpl
+        implements SBoundaryEventInstanceBuilder {
 
     protected SBoundaryEventInstanceBuilderImpl(final SBoundaryEventInstance entity) {
         super(entity);

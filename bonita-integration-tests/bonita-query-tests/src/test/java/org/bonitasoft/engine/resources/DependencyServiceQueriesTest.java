@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.dependency.model.DependencyContent;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Danila Mazour
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class DependencyServiceQueriesTest {
 

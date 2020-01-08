@@ -85,7 +85,8 @@ public class BusinessDataLeftOperandHandlerTest {
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", 987L, inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
         // when:
-        spy.loadLeftOperandInContext(leftOperand,expressionContext.getContainerId(),expressionContext.getContainerType(), expressionContext);
+        spy.loadLeftOperandInContext(leftOperand, expressionContext.getContainerId(),
+                expressionContext.getContainerType(), expressionContext);
 
         // then:
         assertThat(expressionContext.getInputValues()).containsOnly(entry("myTravel", myTravel));
@@ -107,12 +108,14 @@ public class BusinessDataLeftOperandHandlerTest {
         final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
-        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
+        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName,
+                new Container(processInstanceId, PROCESS_INSTANCE));
         when(refBusinessDataRetriever.getRefBusinessDataInstance(eq(businessDataContext))).thenReturn(refInstance);
         when(refInstance.getDataId()).thenReturn(null);
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
-        final Employee employee = (Employee) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
+        final Employee employee = (Employee) leftOperandHandler.getBusinessData(bizDataName, processInstanceId,
+                PROCESS_INSTANCE);
 
         assertThat(employee).isNotNull();
         assertThat(employee.getPersistenceId()).isNull();
@@ -130,7 +133,8 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsAnInterface() throws Exception {
+    public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsAnInterface()
+            throws Exception {
         leftOperandHandler.getBusinessData("employee", 457, PROCESS_INSTANCE);
     }
 
@@ -155,8 +159,9 @@ public class BusinessDataLeftOperandHandlerTest {
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
 
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(leftOperand.getName(), new Container(45, PROCESS_INSTANCE))))
-                .willThrow(new SFlowNodeNotFoundException(45));
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(
+                new BusinessDataContext(leftOperand.getName(), new Container(45, PROCESS_INSTANCE))))
+                        .willThrow(new SFlowNodeNotFoundException(45));
 
         //then
         expectedException.expect(SOperationExecutionException.class);
@@ -185,7 +190,8 @@ public class BusinessDataLeftOperandHandlerTest {
         final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
-        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
+        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName,
+                new Container(processInstanceId, PROCESS_INSTANCE));
         when(refBusinessDataRetriever.getRefBusinessDataInstance(eq(businessDataContext))).thenReturn(refInstance);
         when(refInstance.getDataIds()).thenReturn(Arrays.asList(45l));
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
@@ -206,7 +212,8 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataIds()).thenReturn(new ArrayList<>());
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
-        final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
+        final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName,
+                processInstanceId, PROCESS_INSTANCE);
         assertThat(employees).isEmpty();
     }
 
@@ -217,12 +224,14 @@ public class BusinessDataLeftOperandHandlerTest {
         String businessDataName = "address";
         long containerId = 1L;
         String containerType = "PROCESS";
-        BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName, new Container(containerId, containerType));
+        BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName,
+                new Container(containerId, containerType));
         given(actionsExecutor.executeAction(eq(address), eq(businessDataContext), eq(action)))
                 .willReturn(address);
 
         //when
-        Object result = leftOperandHandler.update(createLeftOperand(businessDataName), Collections.<String, Object> emptyMap(), address, containerId,
+        Object result = leftOperandHandler.update(createLeftOperand(businessDataName),
+                Collections.<String, Object> emptyMap(), address, containerId,
                 containerType);
 
         //then
@@ -236,12 +245,14 @@ public class BusinessDataLeftOperandHandlerTest {
         String businessDataName = "address";
         long containerId = 1L;
         String containerType = "PROCESS";
-        BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName, new Container(containerId, containerType));
+        BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName,
+                new Container(containerId, containerType));
         given(actionsExecutor.executeAction(eq(address), eq(businessDataContext), eq(action))).willThrow(
                 new SEntityActionExecutionException(""));
 
         //when
-        leftOperandHandler.update(createLeftOperand(businessDataName), Collections.<String, Object> emptyMap(), address, containerId, containerType);
+        leftOperandHandler.update(createLeftOperand(businessDataName), Collections.<String, Object> emptyMap(), address,
+                containerId, containerType);
 
         //then exception
     }

@@ -13,17 +13,18 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
-import javax.persistence.AttributeConverter;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import javax.persistence.AttributeConverter;
+
 /**
  * @author Danila Mazour
  */
 public class OffsetDateTimeConverter implements AttributeConverter<OffsetDateTime, String> {
-    
+
     @Override
     public String convertToDatabaseColumn(OffsetDateTime offsetDateTime) {
         if (offsetDateTime != null) {
@@ -32,15 +33,16 @@ public class OffsetDateTimeConverter implements AttributeConverter<OffsetDateTim
             return null;
         }
     }
-    
+
     @Override
     public OffsetDateTime convertToEntityAttribute(String dbData) {
-        if (dbData != null){
-           try {
-               return OffsetDateTime.parse(dbData,DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-           } catch (DateTimeParseException e) {
-               throw new RuntimeException("Database OffsetDate&Time format must be ISO-8601 compliant yyyy-MM-dd'T'HH:mm:ss(.SSS)Z ", e);
-           }
+        if (dbData != null) {
+            try {
+                return OffsetDateTime.parse(dbData, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException(
+                        "Database OffsetDate&Time format must be ISO-8601 compliant yyyy-MM-dd'T'HH:mm:ss(.SSS)Z ", e);
+            }
         } else {
             return null;
         }

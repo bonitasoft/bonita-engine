@@ -25,7 +25,8 @@ public class ActorDefinitionBuilder extends ProcessBuilder implements Descriptio
 
     private final ActorDefinitionImpl actor;
 
-    ActorDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl process, final String actorName,
+    ActorDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final DesignProcessDefinitionImpl process, final String actorName,
             final boolean initiator) {
         super(process, processDefinitionBuilder);
         // Do not create if the actor already exists:

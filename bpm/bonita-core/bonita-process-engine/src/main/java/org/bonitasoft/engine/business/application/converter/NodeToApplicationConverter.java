@@ -38,22 +38,27 @@ public class NodeToApplicationConverter {
     private final PageService pageService;
     private final ApplicationImportValidator validator;
 
-    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService, final ApplicationImportValidator validator) {
+    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService,
+            final ApplicationImportValidator validator) {
         this.profileService = profileService;
         this.pageService = pageService;
         this.validator = validator;
     }
 
-    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
+    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy)
+            throws SBonitaReadException, ImportException {
         String token = applicationNode.getToken();
         validator.validate(token);
         final ImportStatus importStatus = new ImportStatus(token);
         Long layoutId = getLayoutId(getLayoutName(applicationNode), token, importStatus);
         Long themeId = getThemeId(getThemeName(applicationNode), token, importStatus);
         final long currentDate = System.currentTimeMillis();
-        final SApplication.SApplicationBuilder builder = SApplication.builder().token(token).displayName(applicationNode.getDisplayName()).version(applicationNode.getVersion()).creationDate(currentDate).lastUpdateDate(currentDate)
+        final SApplication.SApplicationBuilder builder = SApplication.builder().token(token)
+                .displayName(applicationNode.getDisplayName()).version(applicationNode.getVersion())
+                .creationDate(currentDate).lastUpdateDate(currentDate)
                 .createdBy(createdBy).state(SApplicationState.ACTIVATED.name()).layoutId(layoutId).themeId(themeId)
-                .iconPath(applicationNode.getIconPath()).description(applicationNode.getDescription()).state(applicationNode.getState());
+                .iconPath(applicationNode.getIconPath()).description(applicationNode.getDescription())
+                .state(applicationNode.getState());
 
         final ImportError importError = setProfile(applicationNode, builder);
         if (importError != null) {
@@ -64,7 +69,8 @@ public class NodeToApplicationConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long getLayoutId(final String layoutName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+    private Long getLayoutId(final String layoutName, final String applicationToken, final ImportStatus importStatus)
+            throws SBonitaReadException, ImportException {
         SPage layout = pageService.getPageByName(layoutName);
         if (layout == null) {
             return handleMissingLayout(layoutName, applicationToken, importStatus);
@@ -72,7 +78,8 @@ public class NodeToApplicationConverter {
         return layout.getId();
     }
 
-    private Long getThemeId(final String themeName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+    private Long getThemeId(final String themeName, final String applicationToken, final ImportStatus importStatus)
+            throws SBonitaReadException, ImportException {
         SPage theme = pageService.getPageByName(themeName);
         if (theme == null) {
             return handleMissingTheme(themeName, applicationToken, importStatus);
@@ -80,25 +87,31 @@ public class NodeToApplicationConverter {
         return theme.getId();
     }
 
-    protected Long handleMissingLayout(final String layoutName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
-        throw new ImportException(String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
-                applicationToken, layoutName));
+    protected Long handleMissingLayout(final String layoutName, final String applicationToken,
+            final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        throw new ImportException(
+                String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
+                        applicationToken, layoutName));
     }
 
-    protected Long handleMissingTheme(final String themeName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
-        throw new ImportException(String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
-                applicationToken, themeName));
+    protected Long handleMissingTheme(final String themeName, final String applicationToken,
+            final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        throw new ImportException(
+                String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
+                        applicationToken, themeName));
     }
 
     protected String getLayoutName(final ApplicationNode applicationNode) {
-        return applicationNode.getLayout() != null ? applicationNode.getLayout() : ApplicationService.DEFAULT_LAYOUT_NAME;
+        return applicationNode.getLayout() != null ? applicationNode.getLayout()
+                : ApplicationService.DEFAULT_LAYOUT_NAME;
     }
 
     protected String getThemeName(final ApplicationNode applicationNode) {
         return applicationNode.getTheme() != null ? applicationNode.getTheme() : ApplicationService.DEFAULT_THEME_NAME;
     }
 
-    private ImportError setProfile(final ApplicationNode applicationNode, final SApplication.SApplicationBuilder builder) {
+    private ImportError setProfile(final ApplicationNode applicationNode,
+            final SApplication.SApplicationBuilder builder) {
         ImportError importError = null;
         if (applicationNode.getProfile() != null) {
             try {

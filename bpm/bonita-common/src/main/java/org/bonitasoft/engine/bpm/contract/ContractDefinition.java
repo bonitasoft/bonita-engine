@@ -19,9 +19,11 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
 /**
- * A <code>ContractDefinition</code> defines what the {@link UserTaskInstance} needs to be executed, or the Process to be started.
+ * A <code>ContractDefinition</code> defines what the {@link UserTaskInstance} needs to be executed, or the Process to
+ * be started.
  * <p>
- * A <code>ContractDefinition</code> is part of a {@link UserTaskDefinition} or a of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} </p>
+ * A <code>ContractDefinition</code> is part of a {@link UserTaskDefinition} or a of the
+ * {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} </p>
  *
  * @author Matthieu Chaffotte
  * @since 7.0

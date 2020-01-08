@@ -30,7 +30,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionalStateTransitionsManagerTest {
@@ -81,8 +80,10 @@ public class ExceptionalStateTransitionsManagerTest {
     }
 
     @Test
-    public void getNextState_returns_next_state_from_map_using_current_state_id_key_if_current_state_is_not_in_normal_category() throws SIllegalStateTransition {
-        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions, flowNodeInstance);
+    public void getNextState_returns_next_state_from_map_using_current_state_id_key_if_current_state_is_not_in_normal_category()
+            throws SIllegalStateTransition {
+        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(
+                stateTransitions, flowNodeInstance);
         final FlowNodeState nextState = statesManager.getNextState(abortingNonTerminalState);
         assertEquals(abortingTerminalState, nextState);
     }
@@ -90,14 +91,17 @@ public class ExceptionalStateTransitionsManagerTest {
     @Test
     public void getNextState_returns_next_state_from_map_using_minus_one_if_current_state_is_in_normal_category_and_is_not_terminal()
             throws SIllegalStateTransition {
-        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions, flowNodeInstance);
+        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(
+                stateTransitions, flowNodeInstance);
         final FlowNodeState nextState = statesManager.getNextState(normalNonTerminalState);
         assertEquals(abortingNonTerminalState, nextState);
     }
 
     @Test(expected = SIllegalStateTransition.class)
-    public void getNextState_throws_SIllegalStateTransition_if_current_is_in_normal_category_and_is_terminal() throws SIllegalStateTransition {
-        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions, flowNodeInstance);
+    public void getNextState_throws_SIllegalStateTransition_if_current_is_in_normal_category_and_is_terminal()
+            throws SIllegalStateTransition {
+        final ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(
+                stateTransitions, flowNodeInstance);
         statesManager.getNextState(normalTerminalState);
     }
 

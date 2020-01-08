@@ -20,6 +20,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Data
 @NoArgsConstructor
 public class SProcessDefinitionDesignContent implements PersistentObject {
+
     private long tenantId;
     private long id;
     private String content;

@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api.impl.livingapplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
@@ -102,7 +102,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void createApplication_should_call_applicationService_createApplication_and_return_created_application() throws Exception {
+    public void createApplication_should_call_applicationService_createApplication_and_return_created_application()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
@@ -126,7 +127,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
+    public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         final SApplication sApp = buildDefaultApplication();
@@ -140,7 +142,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = CreationException.class)
-    public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
+    public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         final SApplication sApp = buildDefaultApplication();
@@ -154,7 +157,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void createApplication_should_throw_InvalidCharacterException_when_token_contains_invalid_character() throws Exception {
+    public void createApplication_should_throw_InvalidCharacterException_when_token_contains_invalid_character()
+            throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("invalid token", APP_DISP_NAME, VERSION);
         given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "invalid character"));
@@ -200,7 +204,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         doThrow(new SObjectModificationException()).when(applicationService).deleteApplication(APPLICATION_ID);
 
         //when
@@ -210,7 +215,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         doThrow(new SObjectNotFoundException()).when(applicationService).deleteApplication(APPLICATION_ID);
 
         //when
@@ -220,7 +226,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
+    public void getApplication_should_return_the_application_returned_by_applicationService_coverted()
+            throws Exception {
         final SApplication sApp = buildDefaultApplication();
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
@@ -235,7 +242,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void getApplication_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+    public void getApplication_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException()
+            throws Exception {
         //given
         given(applicationService.getApplication(APPLICATION_ID)).willThrow(new SBonitaReadException(""));
 
@@ -246,7 +254,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = ApplicationNotFoundException.class)
-    public void getApplication_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+    public void getApplication_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         given(applicationService.getApplication(APPLICATION_ID)).willThrow(new SObjectNotFoundException());
 
@@ -276,7 +285,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateApplication_should_return_result_of_applicationservice_getApplication_when_updater_is_empty() throws Exception {
+    public void updateApplication_should_return_result_of_applicationservice_getApplication_when_updater_is_empty()
+            throws Exception {
         //given
         final SApplication sApplication = mock(SApplication.class);
         final Application application = mock(Application.class);
@@ -293,13 +303,15 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
-        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willThrow(new SObjectModificationException());
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
@@ -308,13 +320,15 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectAlreadyExistsException()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
-        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willThrow(new SObjectAlreadyExistsException());
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
@@ -323,13 +337,15 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = ApplicationNotFoundException.class)
-    public void updateApplication_should_throw_ApplicationNotFoundException_when_applicationservice_throws_SObjectNotFoundException() throws Exception {
+    public void updateApplication_should_throw_ApplicationNotFoundException_when_applicationservice_throws_SObjectNotFoundException()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
-        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectNotFoundException());
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor))
+                .willThrow(new SObjectNotFoundException());
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
@@ -338,7 +354,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateApplication_should_throw_UpdateException_when_applicationService_token_is_invalid() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_token_is_invalid()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("invalid token");
@@ -354,7 +371,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_empty() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_empty()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setDisplayName("");
@@ -366,7 +384,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_null() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_null()
+            throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setDisplayName(null);
@@ -391,7 +410,8 @@ public class LivingApplicationAPIDelegateTest {
     }
 
     @Test(expected = SearchException.class)
-    public void searchApplications_should_throw_SearchException_when_searchApplications_throws_SBonitaException() throws Exception {
+    public void searchApplications_should_throw_SearchException_when_searchApplications_throws_SBonitaException()
+            throws Exception {
         //given
         doThrow(new SBonitaReadException("")).when(searchApplications).execute();
 

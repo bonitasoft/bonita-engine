@@ -26,7 +26,8 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
  */
 public class OperationMockBuilder {
 
-    public static SExpressionImpl buildExpression(final String content, final ExpressionType type, final List<SExpression> dependencies) {
+    public static SExpressionImpl buildExpression(final String content, final ExpressionType type,
+            final List<SExpression> dependencies) {
         return new SExpressionImpl(content, content, type.name(), "", null, dependencies);
     }
 

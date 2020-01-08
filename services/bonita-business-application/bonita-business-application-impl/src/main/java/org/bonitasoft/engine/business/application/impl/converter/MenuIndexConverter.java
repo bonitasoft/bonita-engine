@@ -35,7 +35,8 @@ public class MenuIndexConverter {
         return new MenuIndex(appMenu.getParentId(), appMenu.getIndex(), lastUsedIndex);
     }
 
-    public MenuIndex toMenuIndex(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException {
+    public MenuIndex toMenuIndex(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor)
+            throws SBonitaReadException {
         Long parentId = getParentId(oldAppMenu, updateDescriptor);
         Integer indexValue = getIndexValue(oldAppMenu, updateDescriptor);
         int lastUsedIndex = applicationService.getLastUsedIndex(parentId);
@@ -46,7 +47,7 @@ public class MenuIndexConverter {
     private Integer getIndexValue(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) {
         Integer indexValue;
         indexValue = (Integer) updateDescriptor.getFields().get(SApplicationMenu.INDEX);
-        if(indexValue == null) {
+        if (indexValue == null) {
             indexValue = oldAppMenu.getIndex();
         }
         return indexValue;
@@ -54,7 +55,7 @@ public class MenuIndexConverter {
 
     private Long getParentId(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) {
         Long parentId;
-        if(updateDescriptor.getFields().containsKey(SApplicationMenu.PARENT_ID)) {
+        if (updateDescriptor.getFields().containsKey(SApplicationMenu.PARENT_ID)) {
             parentId = (Long) updateDescriptor.getFields().get(SApplicationMenu.PARENT_ID);
         } else {
             parentId = oldAppMenu.getParentId();

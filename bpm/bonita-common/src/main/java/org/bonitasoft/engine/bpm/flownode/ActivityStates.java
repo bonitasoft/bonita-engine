@@ -18,7 +18,7 @@ import java.util.Set;
 
 /**
  * Temporary class to be substituted by ActivityStateService.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */

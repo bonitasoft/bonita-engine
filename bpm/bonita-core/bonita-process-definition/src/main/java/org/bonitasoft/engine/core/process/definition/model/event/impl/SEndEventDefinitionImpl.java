@@ -45,14 +45,18 @@ public class SEndEventDefinitionImpl extends SThrowEventDefinitionImpl implement
     public SEndEventDefinitionImpl(final EndEventDefinition eventDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
         super(eventDefinition, transitionsMap);
-        final TerminateEventTriggerDefinition terminateEventTriggerDefinition = eventDefinition.getTerminateEventTriggerDefinition();
+        final TerminateEventTriggerDefinition terminateEventTriggerDefinition = eventDefinition
+                .getTerminateEventTriggerDefinition();
         if (terminateEventTriggerDefinition != null) {
             setTerminateEventTriggerDefinition(new STerminateEventTriggerDefinitionImpl());
         }
-        final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions = eventDefinition.getErrorEventTriggerDefinitions();
-        sErrorEventTriggerDefinitions = new ArrayList<SThrowErrorEventTriggerDefinition>(errorEventTriggerDefinitions.size());
+        final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions = eventDefinition
+                .getErrorEventTriggerDefinitions();
+        sErrorEventTriggerDefinitions = new ArrayList<SThrowErrorEventTriggerDefinition>(
+                errorEventTriggerDefinitions.size());
         for (final ThrowErrorEventTriggerDefinition throwErrorEventTriggerDefinition : errorEventTriggerDefinitions) {
-            addErrorEventTriggerDefinition(new SThrowErrorEventTriggerDefinitionImpl(throwErrorEventTriggerDefinition.getErrorCode()));
+            addErrorEventTriggerDefinition(
+                    new SThrowErrorEventTriggerDefinitionImpl(throwErrorEventTriggerDefinition.getErrorCode()));
         }
     }
 
@@ -71,7 +75,8 @@ public class SEndEventDefinitionImpl extends SThrowEventDefinitionImpl implement
         return sTerminateEventTriggerDefinition;
     }
 
-    public void setTerminateEventTriggerDefinition(final STerminateEventTriggerDefinition sTerminateEventTriggerDefinition) {
+    public void setTerminateEventTriggerDefinition(
+            final STerminateEventTriggerDefinition sTerminateEventTriggerDefinition) {
         this.sTerminateEventTriggerDefinition = sTerminateEventTriggerDefinition;
         if (sTerminateEventTriggerDefinition != null) {
             addEventTriggerDefinition(sTerminateEventTriggerDefinition);

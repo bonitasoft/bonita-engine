@@ -36,7 +36,8 @@ public class UpdateConfigurationInTransactionForAllTenants extends TransactionCa
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateConfigurationInTransactionForAllTenants.class);
 
-    public UpdateConfigurationInTransactionForAllTenants(JdbcTemplate jdbcTemplate, String dbVendor, List<BonitaConfiguration> bonitaConfigurations,
+    public UpdateConfigurationInTransactionForAllTenants(JdbcTemplate jdbcTemplate, String dbVendor,
+            List<BonitaConfiguration> bonitaConfigurations,
             ConfigurationType type) {
 
         this.jdbcTemplate = jdbcTemplate;
@@ -48,7 +49,8 @@ public class UpdateConfigurationInTransactionForAllTenants extends TransactionCa
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
         LOGGER.debug(
-                "Updating configuration files " + bonitaConfigurations.toString() + " of type:" + type.name() + " for all tenants");
+                "Updating configuration files " + bonitaConfigurations.toString() + " of type:" + type.name()
+                        + " for all tenants");
 
         jdbcTemplate.batchUpdate(BonitaConfigurationTenantUpdater.UPDATE_ALL_TENANTS_CONFIGURATION,
                 new BonitaConfigurationTenantUpdater(bonitaConfigurations, dbVendor, type));

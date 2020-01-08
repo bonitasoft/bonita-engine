@@ -23,10 +23,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class SProcessDefinitionDeployInfoUpdateBuilderFactoryImpl implements SProcessDefinitionDeployInfoUpdateBuilderFactory {
+public class SProcessDefinitionDeployInfoUpdateBuilderFactoryImpl
+        implements SProcessDefinitionDeployInfoUpdateBuilderFactory {
 
     public SProcessDefinitionDeployInfoUpdateBuilder createNewInstance() {
         return new SProcessDefinitionDeployInfoUpdateBuilderImpl(new EntityUpdateDescriptor());
     }
-    
+
 }

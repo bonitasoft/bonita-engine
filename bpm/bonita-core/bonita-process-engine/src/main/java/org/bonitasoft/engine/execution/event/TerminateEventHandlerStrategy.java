@@ -34,7 +34,6 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
-
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public TerminateEventHandlerStrategy(ProcessInstanceInterruptor processInstanceInterruptor) {
@@ -43,14 +42,17 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
+    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
+        processInstanceInterruptor.interruptChildrenOfProcessInstance(eventInstance.getParentContainerId(),
+                SStateCategory.ABORTING, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }
 
     @Override
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SCatchEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) {
         // No catch of terminate
 
@@ -67,22 +69,27 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance) {
+    public void handleEventSubProcess(final SProcessDefinition processDefinition,
+            final SEventDefinition eventDefinition,
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance) {
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
+            final SProcessInstance parentProcessIsnstance) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
+            final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition,
+            final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

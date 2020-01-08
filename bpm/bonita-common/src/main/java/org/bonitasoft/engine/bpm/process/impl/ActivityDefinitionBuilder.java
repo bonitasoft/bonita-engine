@@ -27,7 +27,6 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -35,7 +34,8 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     private final ActivityDefinitionImpl activity;
 
-    public ActivityDefinitionBuilder(final FlowElementContainerDefinitionImpl container, final ProcessDefinitionBuilder processDefinitionBuilder,
+    public ActivityDefinitionBuilder(final FlowElementContainerDefinitionImpl container,
+            final ProcessDefinitionBuilder processDefinitionBuilder,
             final ActivityDefinitionImpl activity) {
         super(container, processDefinitionBuilder);
         this.activity = activity;
@@ -61,13 +61,15 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     @Override
     public DataDefinitionBuilder addShortTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new TextDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className, defaultValue);
+        return new TextDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className,
+                defaultValue);
     }
 
     @Override
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new TextDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className, defaultValue).isLongText();
+        return new TextDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className,
+                defaultValue).isLongText();
     }
 
     @Override
@@ -85,7 +87,8 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     @Override
     public XMLDataDefinitionBuilder addXMLData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new XMLDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className, defaultValue);
+        return new XMLDataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className,
+                defaultValue);
     }
 
     @Override
@@ -106,8 +109,10 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     @Override
-    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {
-        return new ConnectorDefinitionBuilder(getProcessBuilder(), getContainer(), name, connectorId, version, activationEvent, activity);
+    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
+        return new ConnectorDefinitionBuilder(getProcessBuilder(), getContainer(), name, connectorId, version,
+                activationEvent, activity);
     }
 
     @Override
@@ -141,20 +146,23 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Sets the display description after completion on this activity. This will be used to updated the display description when the activity completes its
+     * Sets the display description after completion on this activity. This will be used to updated the display
+     * description when the activity completes its
      * execution
      *
      * @param displayDescriptionAfterCompletion
      *        expression representing the new display description after the activity completion.
      * @return
      */
-    public ActivityDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
+    public ActivityDefinitionBuilder addDisplayDescriptionAfterCompletion(
+            final Expression displayDescriptionAfterCompletion) {
         activity.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;
     }
 
     /**
-     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
+     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH.
+     * In the case of human tasks, operations
      * are executed after calling the method {@link org.bonitasoft.engine.api.ProcessAPI#executeFlowNode(long)}
      *
      * @param leftOperand
@@ -167,17 +175,21 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      *        expression representing the right operand
      * @return
      */
-    public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type, final String operator, final Expression rightOperand) {
-        activity.addOperation(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
+    public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type,
+            final String operator, final Expression rightOperand) {
+        activity.addOperation(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type)
+                .setOperator(operator)
                 .setLeftOperand(leftOperand).done());
         if (rightOperand == null) {
-            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
+            getProcessBuilder()
+                    .addError("operation on activity " + activity.getName() + " has no expression in right operand");
         }
         return this;
     }
 
     /**
-     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
+     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH.
+     * In the case of human tasks, operations
      * are executed after calling the method {@link org.bonitasoft.engine.api.ProcessAPI#executeFlowNode(long)}
      *
      * @param leftOperand
@@ -192,9 +204,11 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      *        expression representing the right operand
      * @return
      */
-    public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type, final String operator,
+    public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type,
+            final String operator,
             final String operatorInputType, final Expression rightOperand) {
-        final Operation operation = new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
+        final Operation operation = new OperationBuilder().createNewInstance().setRightOperand(rightOperand)
+                .setType(type).setOperator(operator)
                 .setOperatorInputType(operatorInputType).setLeftOperand(leftOperand).done();
         return addOperation(operation);
     }
@@ -214,7 +228,8 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     private void checkRightOperand(final Operation operation) {
         if (operation.getRightOperand() == null && operation.getType() != OperatorType.DELETION) {
-            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
+            getProcessBuilder()
+                    .addError("operation on activity " + activity.getName() + " has no expression in right operand");
         }
     }
 
@@ -222,30 +237,37 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      * Defines this activity as a loop. The loop will finish when the condition is evaluated to false
      *
      * @param testBefore
-     *        true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
+     *        true if the condition must be check before execute the first iteration; false if the condition must be
+     *        checked only after the first iteration
      * @param condition
      *        condition determining whether the activity must loop again
      * @return
      */
     public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition) {
-        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition, testBefore);
+        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition,
+                testBefore);
         activity.setLoopCharacteristics(loopCharacteristics);
         return this;
     }
 
     /**
-     * Defines this activity as a loop. The loop will finish when the condition is evaluated to false or when the max iterations number is reached
+     * Defines this activity as a loop. The loop will finish when the condition is evaluated to false or when the max
+     * iterations number is reached
      *
      * @param testBefore
-     *        true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
+     *        true if the condition must be check before execute the first iteration; false if the condition must be
+     *        checked only after the first iteration
      * @param condition
-     *        condition determining whether the activity must loop again. The loop will finish when the condition is evaluated to false
+     *        condition determining whether the activity must loop again. The loop will finish when the condition is
+     *        evaluated to false
      * @param loopMax
      *        expression representing the max iterations number. The expression must return an Integer
      * @return
      */
-    public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition, final Expression loopMax) {
-        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition, testBefore, loopMax);
+    public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition,
+            final Expression loopMax) {
+        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition,
+                testBefore, loopMax);
         activity.setLoopCharacteristics(loopCharacteristics);
         return this;
     }
@@ -279,19 +301,25 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     /**
      * Defines this activity as a multi-instance by suppling the cardinality
      *
-     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all
+     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created
+     *        iteration by iteration; otherwise all
      *        instances will be created during the activity initialization.
-     * @param loopCardinality expression representing how many instances must be created. The expression return type must be Integer
+     * @param loopCardinality expression representing how many instances must be created. The expression return type
+     *        must be Integer
      * @return
      */
-    public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential, final Expression loopCardinality) {
-        return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential, loopCardinality);
+    public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential,
+            final Expression loopCardinality) {
+        return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential,
+                loopCardinality);
     }
 
     /**
-     * Defines this activity as a multi-instance by suppling a collection of elements. One instance will be created for each element in the collection.
+     * Defines this activity as a multi-instance by suppling a collection of elements. One instance will be created for
+     * each element in the collection.
      *
-     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all
+     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created
+     *        iteration by iteration; otherwise all
      *        instances will be created during the activity initialization.
      * @param loopDataInput name of process data representing the collection of elements used to create the instances
      * @return
@@ -299,12 +327,14 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      * @see MultiInstanceLoopCharacteristicsBuilder#addDataInputItemRef(String)
      * @see MultiInstanceLoopCharacteristicsBuilder#addDataOutputItemRef(String)
      */
-    public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential, final String loopDataInput) {
+    public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential,
+            final String loopDataInput) {
         return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential, loopDataInput);
     }
 
     /**
-     * Adds a Business Data on the activity. The activity must contain a {@link org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
+     * Adds a Business Data on the activity. The activity must contain a
+     * {@link org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
      *
      * @param name the name of the business data
      * @param className complete name of class defining the Business Data Type

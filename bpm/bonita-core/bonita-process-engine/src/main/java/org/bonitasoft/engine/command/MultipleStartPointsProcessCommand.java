@@ -24,12 +24,17 @@ import java.util.Map;
  * Parameters:
  * <ul>
  * <li> started_by: the user id (long) is used as the process starter. It's a mandatory parameter.</li>
- * <li> process_definition_id: the process definition id (long) identifies the process to start. It's a mandatory parameter.</li>
- * <li> activity_names: list of activity names (ArrayList<String>) defining where the process will start the execution. It's a mandatory parameter.</li>
- * <li> operations: the operations (ArrayList<Operation>) are executed when the process starts (set variables and documents). It's an optional parameter.</li>
- * <li> context: the context (HashMap<String, Serializable>) is used during operations execution. It's an optional parameter.</li>
+ * <li> process_definition_id: the process definition id (long) identifies the process to start. It's a mandatory
+ * parameter.</li>
+ * <li> activity_names: list of activity names (ArrayList<String>) defining where the process will start the execution.
+ * It's a mandatory parameter.</li>
+ * <li> operations: the operations (ArrayList<Operation>) are executed when the process starts (set variables and
+ * documents). It's an optional parameter.</li>
+ * <li> context: the context (HashMap<String, Serializable>) is used during operations execution. It's an optional
+ * parameter.</li>
  * </ul>
- * Limitations: It is not possible to start the execution of a process from a gateway, a boundary event or an event sub-process
+ * Limitations: It is not possible to start the execution of a process from a gateway, a boundary event or an event
+ * sub-process
  * <p>Use this command carefully: note that no validation will be done concerning the start points coherence.</p>
  *
  * @author Elias Ricken de Medeiros
@@ -40,7 +45,8 @@ public class MultipleStartPointsProcessCommand extends AbstractStartProcessComma
     public static final String ACTIVITY_NAMES = "activity_names";
 
     @Override
-    protected List<String> getActivityNames(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected List<String> getActivityNames(final Map<String, Serializable> parameters)
+            throws SCommandParameterizationException {
         return getMandatoryParameter(parameters, ACTIVITY_NAMES, "Missing mandatory field: " + ACTIVITY_NAMES);
     }
 

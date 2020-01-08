@@ -34,7 +34,8 @@ public final class CheckNbOfHumanTasks extends WaitUntil {
     private SearchResult<HumanTaskInstance> humanTaskInstances;
 
     @Deprecated
-    public CheckNbOfHumanTasks(final int repeatEach, final int timeout, final boolean throwExceptions, final long nbOfHumanTasks,
+    public CheckNbOfHumanTasks(final int repeatEach, final int timeout, final boolean throwExceptions,
+            final long nbOfHumanTasks,
             final SearchOptions searchOptions, final ProcessAPI processAPI) {
         super(repeatEach, timeout, throwExceptions);
         this.nbOfHumanTasks = nbOfHumanTasks;

@@ -22,7 +22,8 @@ import org.bonitasoft.engine.expression.Expression;
 /**
  * Design-time object of a UserFilter (also known as actor filter).
  * A UserFilter is a derogation of the standard actor mapping mechanism.
- * If a human task has a userfilter, its execution determines the list of users that the task is pending for. Other users will not see it as available for them.
+ * If a human task has a userfilter, its execution determines the list of users that the task is pending for. Other
+ * users will not see it as available for them.
  * <code>UserFilter</code>s have many similarities to connector in their definition and execution.
  *
  * @author Baptiste Mesta

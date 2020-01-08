@@ -69,7 +69,7 @@ public class XPathReadExpressionExecutorStrategyTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy#evaluate(org.bonitasoft.engine.expression.model.SExpression, java.util.Map, java.util.Map)}
-     * 
+     *
      * @throws SExpressionException
      */
     @Test
@@ -81,15 +81,18 @@ public class XPathReadExpressionExecutorStrategyTest {
     @Test
     public void evaluateXPathExpressionWithDataAsContent() throws SExpressionException {
         final String dataName = "myVariable";
-        final SExpressionImpl dep = new SExpressionImpl(dataName, dataName, SExpressionType.TYPE_VARIABLE.name(), String.class.getName(), null, null);
+        final SExpressionImpl dep = new SExpressionImpl(dataName, dataName, SExpressionType.TYPE_VARIABLE.name(),
+                String.class.getName(), null, null);
         final String xPathSelector = "//article/@nom";
-        final SExpression expression = new SExpressionImpl("expName1", xPathSelector, getXPathType(), String.class.getName(), null,
+        final SExpression expression = new SExpressionImpl("expName1", xPathSelector, getXPathType(),
+                String.class.getName(), null,
                 Arrays.<SExpression> asList(dep));
 
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(1);
         resolvedExpressions.put(dep.getDiscriminant(), XML_CONTENT_AUTHOR);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
-        final Object result = strategy.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
+        final Object result = strategy.evaluate(expression, dependencyValues, resolvedExpressions,
+                ContainerState.ACTIVE);
         assertEquals("XPath", result);
     }
 
@@ -101,8 +104,10 @@ public class XPathReadExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluateXpathInvalidReturnType() throws SExpressionException {
-        final SExpressionImpl dep = new SExpressionImpl(null, XML_CONTENT_AUTHOR, SExpressionType.TYPE_CONSTANT.name(), String.class.getName(), null, null);
-        final SExpression expression = new SExpressionImpl("expName1", "//article", getXPathType(), "InvalidReturnType", null, Arrays.<SExpression> asList(dep));
+        final SExpressionImpl dep = new SExpressionImpl(null, XML_CONTENT_AUTHOR, SExpressionType.TYPE_CONSTANT.name(),
+                String.class.getName(), null, null);
+        final SExpression expression = new SExpressionImpl("expName1", "//article", getXPathType(), "InvalidReturnType",
+                null, Arrays.<SExpression> asList(dep));
         final Map<Integer, Object> resolvedExpressions = getResolvedExpressionMap(expression);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
         strategy.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
@@ -159,13 +164,17 @@ public class XPathReadExpressionExecutorStrategyTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T evaluate(final String content, final Class<T> returnType, final String selector) throws SExpressionEvaluationException,
+    private <T> T evaluate(final String content, final Class<T> returnType, final String selector)
+            throws SExpressionEvaluationException,
             SExpressionDependencyMissingException {
-        final SExpressionImpl dep = new SExpressionImpl(null, content, SExpressionType.TYPE_CONSTANT.name(), String.class.getName(), null, null);
-        final SExpression expression = new SExpressionImpl("expName1", selector, getXPathType(), returnType.getName(), null, Arrays.<SExpression> asList(dep));
+        final SExpressionImpl dep = new SExpressionImpl(null, content, SExpressionType.TYPE_CONSTANT.name(),
+                String.class.getName(), null, null);
+        final SExpression expression = new SExpressionImpl("expName1", selector, getXPathType(), returnType.getName(),
+                null, Arrays.<SExpression> asList(dep));
         final Map<Integer, Object> resolvedExpressions = getResolvedExpressionMap(expression);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
-        final Object result = strategy.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
+        final Object result = strategy.evaluate(expression, dependencyValues, resolvedExpressions,
+                ContainerState.ACTIVE);
         return (T) result;
     }
 
@@ -185,19 +194,23 @@ public class XPathReadExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluateInvalidDependencies() throws SExpressionException {
-        final SExpression expression = new SExpressionImpl("expName1", "//article/@nom", getXPathType(), String.class.getName(), null, null);
+        final SExpression expression = new SExpressionImpl("expName1", "//article/@nom", getXPathType(),
+                String.class.getName(), null, null);
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(0);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(0);
         strategy.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy#validate(SExpression)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy#validate(SExpression)}.
      */
     @Test(expected = SInvalidExpressionException.class)
     public void validateNullExpressionContent() throws Exception {
-        final SExpressionImpl dep = new SExpressionImpl(null, XML_CONTENT_AUTHOR, SExpressionType.TYPE_CONSTANT.name(), String.class.getName(), null, null);
-        final SExpression expression = new SExpressionImpl("expName1", null, getXPathType(), Double.class.getName(), null, Arrays.<SExpression> asList(dep));
+        final SExpressionImpl dep = new SExpressionImpl(null, XML_CONTENT_AUTHOR, SExpressionType.TYPE_CONSTANT.name(),
+                String.class.getName(), null, null);
+        final SExpression expression = new SExpressionImpl("expName1", null, getXPathType(), Double.class.getName(),
+                null, Arrays.<SExpression> asList(dep));
         strategy.validate(expression);
     }
 

@@ -40,13 +40,15 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Yanyan Liu
  * @author Celine Souchet
  */
-public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearchEntity<ActivityInstance, SActivityInstance> {
+public abstract class AbstractActivityInstanceSearchEntity
+        extends AbstractSearchEntity<ActivityInstance, SActivityInstance> {
 
     private final FlowNodeStateManager flowNodeStateManager;
 
     private final Class<? extends PersistentObject> entityClass;
 
-    public AbstractActivityInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
+    public AbstractActivityInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions options,
             final FlowNodeStateManager flowNodeStateManager) throws SBonitaReadException {
         super(searchDescriptor, options);
         this.flowNodeStateManager = flowNodeStateManager;
@@ -59,9 +61,11 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
         return ModelConvertor.toActivityInstances(serverObjects, flowNodeStateManager);
     }
 
-    private Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) throws SBonitaReadException {
+    private Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions)
+            throws SBonitaReadException {
         Class<? extends PersistentObject> entityClass = SActivityInstance.class;
-        final SearchFilter searchFilter = getSearchFilter(searchOptions, ActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
+        final SearchFilter searchFilter = getSearchFilter(searchOptions,
+                ActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
         if (searchFilter != null) {
             final FlowNodeType activityType = (FlowNodeType) searchFilter.getValue();
             if (activityType != null) {
@@ -97,7 +101,8 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
                         entityClass = SLoopActivityInstance.class;
                         break;
                     default:
-                        throw new SBonitaReadException("You're searching for a " + activityType.name() + " which is not an activity type, using the ActivityInstanceSearch feature. Ensure you are using the correct search method for your needs.");
+                        throw new SBonitaReadException("You're searching for a " + activityType.name()
+                                + " which is not an activity type, using the ActivityInstanceSearch feature. Ensure you are using the correct search method for your needs.");
                 }
                 searchOptions.getFilters().remove(searchFilter);
             }
@@ -113,7 +118,8 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
     private void validateActivityTypeFilterUnicity(SearchOptions searchOptions) throws SBonitaReadException {
         for (final SearchFilter searchFilter : searchOptions.getFilters()) {
             if (ActivityInstanceSearchDescriptor.ACTIVITY_TYPE.equals(searchFilter.getField())) {
-                throw new SBonitaReadException("Invalid query, filtering several times on 'ActivityInstanceSearchDescriptor.ACTIVITY_TYPE' is not supported.");
+                throw new SBonitaReadException(
+                        "Invalid query, filtering several times on 'ActivityInstanceSearchDescriptor.ACTIVITY_TYPE' is not supported.");
             }
         }
     }

@@ -49,5 +49,4 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
         return SContractData.class;
     }
 
-
 }

@@ -38,7 +38,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RestartFlowNodesHandlerTest {
 
-
     @Mock
     private TechnicalLoggerService logger;
     @Mock
@@ -51,13 +50,15 @@ public class RestartFlowNodesHandlerTest {
 
     @Before
     public void before() {
-        restartFlowNodesHandler = new RestartFlowNodesHandler(123L, logger, flowNodeInstanceService, transactionService, executeFlowNodes);
+        restartFlowNodesHandler = new RestartFlowNodesHandler(123L, logger, flowNodeInstanceService, transactionService,
+                executeFlowNodes);
     }
 
     @Test
     public final void do_nothing_if_no_flownode() throws Exception {
         //given
-        doReturn(Collections.EMPTY_LIST).when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+        doReturn(Collections.EMPTY_LIST).when(flowNodeInstanceService)
+                .getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
 
         //when
         restartFlowNodesHandler.beforeServicesStart();
@@ -69,7 +70,8 @@ public class RestartFlowNodesHandlerTest {
     @Test(expected = RestartException.class)
     public final void throw_exception_if_error_when_get_flownode() throws Exception {
         //given
-        doThrow(new SBonitaReadException("plop")).when(flowNodeInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+        doThrow(new SBonitaReadException("plop")).when(flowNodeInstanceService)
+                .getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
 
         //when
         restartFlowNodesHandler.beforeServicesStart();

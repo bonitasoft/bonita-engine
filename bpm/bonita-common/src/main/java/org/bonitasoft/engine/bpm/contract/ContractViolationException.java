@@ -36,7 +36,8 @@ public class ContractViolationException extends BonitaException {
      * @param message the specified detail message
      * @param explanations the explanations
      */
-    public ContractViolationException(final String simpleMessage, final String message, final List<String> explanations, final Throwable e) {
+    public ContractViolationException(final String simpleMessage, final String message, final List<String> explanations,
+            final Throwable e) {
         super(message, e);
         this.simpleMessage = simpleMessage;
         this.explanations = explanations;

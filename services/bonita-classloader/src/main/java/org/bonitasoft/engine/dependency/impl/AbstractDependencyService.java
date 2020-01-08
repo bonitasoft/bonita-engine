@@ -51,16 +51,17 @@ public abstract class AbstractDependencyService implements DependencyService {
 
     protected abstract List<AbstractSDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException;
 
-    protected abstract AbstractSDependency getDependency(String name) throws SDependencyNotFoundException, SDependencyDeletionException;
+    protected abstract AbstractSDependency getDependency(String name)
+            throws SDependencyNotFoundException, SDependencyDeletionException;
 
     @Override
     public void deleteDependency(final String name) throws SDependencyException {
         deleteDependency(getDependency(name));
     }
 
-
     @Override
-    public Stream<BonitaResource> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
+    public Stream<BonitaResource> getDependenciesResources(final ScopeType type, final long id)
+            throws SDependencyException {
         List<Long> dependencyIds = getDependencyIds(id, type, 0, Integer.MAX_VALUE);
         return dependencyIds.stream()
                 .map(dependencyId -> {
@@ -74,14 +75,18 @@ public abstract class AbstractDependencyService implements DependencyService {
                 .map(dependency -> resource(dependency.getFileName(), dependency.getContent()));
     }
 
-    protected abstract void createDependencyMapping(SAbstractDependencyMapping dependencyMapping) throws SDependencyException;
+    protected abstract void createDependencyMapping(SAbstractDependencyMapping dependencyMapping)
+            throws SDependencyException;
 
-    protected abstract void deleteDependencyMapping(SAbstractDependencyMapping dependencyMapping) throws SDependencyException;
+    protected abstract void deleteDependencyMapping(SAbstractDependencyMapping dependencyMapping)
+            throws SDependencyException;
 
-    protected abstract List<SAbstractDependencyMapping> getDependencyMappings(long dependencyId, QueryOptions queryOptions) throws SDependencyException;
+    protected abstract List<SAbstractDependencyMapping> getDependencyMappings(long dependencyId,
+            QueryOptions queryOptions) throws SDependencyException;
 
     @Override
-    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final int startIndex, final int maxResult)
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final int startIndex,
+            final int maxResult)
             throws SDependencyException {
         NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
         final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult);
@@ -96,13 +101,15 @@ public abstract class AbstractDependencyService implements DependencyService {
         }
     }
 
-    protected abstract SelectListDescriptor<Long> getSelectDescriptorForDependencyIds(QueryOptions queryOptions, Map<String, Object> parameters);
+    protected abstract SelectListDescriptor<Long> getSelectDescriptorForDependencyIds(QueryOptions queryOptions,
+            Map<String, Object> parameters);
 
     protected abstract QueryOptions getDefaultQueryOptionForDependencyMapping();
 
     @Override
     public void deleteDependency(final AbstractSDependency dependency) throws SDependencyException {
-        for (SAbstractDependencyMapping dependencyMapping : getDependencyMappings(dependency.getId(), getDefaultQueryOptionForDependencyMapping())) {
+        for (SAbstractDependencyMapping dependencyMapping : getDependencyMappings(dependency.getId(),
+                getDefaultQueryOptionForDependencyMapping())) {
             deleteDependencyMapping(dependencyMapping);
         }
         delete(dependency);
@@ -114,7 +121,8 @@ public abstract class AbstractDependencyService implements DependencyService {
         List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
         while (!dependencyIds.isEmpty()) {
             for (final Long dependencyId : dependencyIds) {
-                final List<SAbstractDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, getDefaultQueryOptionForDependencyMapping());
+                final List<SAbstractDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId,
+                        getDefaultQueryOptionForDependencyMapping());
                 if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
                     final SAbstractDependencyMapping dependencyMapping = dependencyMappings.get(0);
                     deleteDependencyMapping(dependencyMapping);

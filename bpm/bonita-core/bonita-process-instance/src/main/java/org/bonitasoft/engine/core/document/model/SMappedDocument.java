@@ -27,7 +27,6 @@ public class SMappedDocument extends SDocumentMapping {
 
     private SLightDocument document;
 
-
     public SMappedDocument(SDocumentMapping documentMapping, SLightDocument document) {
         this.setId(documentMapping.getId());
         this.setName(documentMapping.getName());

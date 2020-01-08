@@ -43,9 +43,11 @@ public class GetBusinessDataByQueryCommand extends CommandWithParameters {
         final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
         final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
         final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
-        String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
+        String businessDataURIPattern = getStringMandadoryParameter(parameters,
+                BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         try {
-            return serviceAccessor.getBusinessDataService().getJsonQueryEntities(entityClassName, queryName, queryParameters, startIndex, maxResults,
+            return serviceAccessor.getBusinessDataService().getJsonQueryEntities(entityClassName, queryName,
+                    queryParameters, startIndex, maxResults,
                     businessDataURIPattern);
         } catch (SBusinessDataRepositoryException e) {
             throw new SCommandExecutionException(e);

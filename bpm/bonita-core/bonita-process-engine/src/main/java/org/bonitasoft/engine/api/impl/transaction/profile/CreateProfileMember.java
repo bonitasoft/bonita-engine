@@ -51,7 +51,8 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
 
     private SProfileMember sProfileMember;
 
-    public CreateProfileMember(final ProfileService profileService, final IdentityService identityService, final long profileId, final Long userId,
+    public CreateProfileMember(final ProfileService profileService, final IdentityService identityService,
+            final long profileId, final Long userId,
             final Long groupId, final Long roleId, final MemberType memberType) {
         super();
         this.profileService = profileService;
@@ -92,12 +93,14 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         }
     }
 
-    private void addRoleAndGroupToProfile() throws SGroupNotFoundException, SRoleNotFoundException, SProfileMemberCreationException {
+    private void addRoleAndGroupToProfile()
+            throws SGroupNotFoundException, SRoleNotFoundException, SProfileMemberCreationException {
         final SGroup group = identityService.getGroup(groupId);
         final SRole role = identityService.getRole(roleId);
         if (group != null && role != null) {
             sProfileMember = profileService
-                    .addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
+                    .addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(),
+                            group.getParentPath());
         }
     }
 
@@ -113,7 +116,8 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         final SGroup group = identityService.getGroup(groupId);
 
         if (group != null) {
-            sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(), group.getParentPath());
+            sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(),
+                    group.getParentPath());
         }
     }
 
@@ -121,7 +125,8 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         final SUser user = identityService.getUser(userId);
 
         if (user != null) {
-            sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(), user.getUserName());
+            sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(),
+                    user.getUserName());
         }
     }
 

@@ -37,7 +37,8 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
 
     private final ThreadLocal<SSession> localSession = new ThreadLocal<SSession>();
 
-    public QueriableLogSessionProviderImpl(final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
+    public QueriableLogSessionProviderImpl(final SessionService sessionService,
+            final ReadSessionAccessor sessionAccessor,
             final TechnicalLoggerService technicalLoggerService) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;

@@ -29,14 +29,17 @@ public class ApplicationPageImporter {
     private final ApplicationService applicationService;
     private final NodeToApplicationPageConverter nodeToApplicationPageConverter;
 
-    public ApplicationPageImporter(ApplicationService applicationService, NodeToApplicationPageConverter nodeToApplicationPageConverter) {
+    public ApplicationPageImporter(ApplicationService applicationService,
+            NodeToApplicationPageConverter nodeToApplicationPageConverter) {
         this.applicationService = applicationService;
         this.nodeToApplicationPageConverter = nodeToApplicationPageConverter;
     }
 
-    public ImportError importApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws ImportException {
+    public ImportError importApplicationPage(ApplicationPageNode applicationPageNode, SApplication application)
+            throws ImportException {
         try {
-            ApplicationPageImportResult importResult = nodeToApplicationPageConverter.toSApplicationPage(applicationPageNode, application);
+            ApplicationPageImportResult importResult = nodeToApplicationPageConverter
+                    .toSApplicationPage(applicationPageNode, application);
             if (importResult.getError() == null) {
                 applicationService.createApplicationPage(importResult.getApplicationPage());
             }

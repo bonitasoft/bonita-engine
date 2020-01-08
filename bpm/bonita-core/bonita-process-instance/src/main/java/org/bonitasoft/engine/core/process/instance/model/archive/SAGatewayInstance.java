@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -35,6 +34,7 @@ public class SAGatewayInstance extends SAFlowNodeInstance {
         gatewayType = sGatewayInstance.getGatewayType();
         hitBys = sGatewayInstance.getHitBys();
     }
+
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.GATEWAY;

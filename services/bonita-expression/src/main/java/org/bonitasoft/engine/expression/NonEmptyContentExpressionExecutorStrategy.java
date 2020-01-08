@@ -30,7 +30,8 @@ public abstract class NonEmptyContentExpressionExecutorStrategy implements Expre
         final String expressionContent = expression.getContent();
 
         if (expressionContent == null || expressionContent.trim().isEmpty()) {
-            throw new SInvalidExpressionException("The expression content cannot be null or empty. Expression : " + expression, expression.getName());
+            throw new SInvalidExpressionException(
+                    "The expression content cannot be null or empty. Expression : " + expression, expression.getName());
         }
     }
 

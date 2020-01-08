@@ -30,9 +30,10 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * GroupAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Groups: creation, deletion, updating,
+ * GroupAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on
+ * Groups: creation, deletion, updating,
  * search, etc...
- * 
+ *
  * @author Zhao Na
  * @author Bole Zhang
  * @author Matthieu Chaffotte
@@ -46,7 +47,7 @@ public interface GroupAPI {
      * <p>
      * If the group is a top level one, the parent path must be null.
      * </p>
-     * 
+     *
      * @param name
      *        the name of the group
      * @param parentPath
@@ -67,7 +68,7 @@ public interface GroupAPI {
      * <p>
      * It takes the values of the creator in order to create a group.
      * </p>
-     * 
+     *
      * @param creator
      *        the group creator
      * @return the created group
@@ -85,10 +86,11 @@ public interface GroupAPI {
      * Updates the group according to the updater values.
      * <p>
      * This method also allow to update the icon of the group.
-     * When you update it, the iconId will be set on the group and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * When you update it, the iconId will be set on the group and you can later get it using
+     * {@link IdentityAPI#getIcon(long)}.
      * Changing the content of the icon will create a new icon and change the iconId of the group.
      * </p>
-     * 
+     *
      * @param groupId
      *        the identifier of the group
      * @param updater
@@ -102,11 +104,12 @@ public interface GroupAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
-    Group updateGroup(long groupId, GroupUpdater updater) throws GroupNotFoundException, UpdateException, AlreadyExistsException;
+    Group updateGroup(long groupId, GroupUpdater updater)
+            throws GroupNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Deletes the group.
-     * 
+     *
      * @param groupId
      *        the identifier of the group
      * @throws DeletionException
@@ -119,7 +122,7 @@ public interface GroupAPI {
 
     /**
      * Deletes the groups.
-     * 
+     *
      * @param groupIds
      *        the list of group identifiers
      * @throws DeletionException
@@ -132,7 +135,7 @@ public interface GroupAPI {
 
     /**
      * Retrieves the group.
-     * 
+     *
      * @param groupId
      *        the group identifier
      * @return the group
@@ -148,7 +151,7 @@ public interface GroupAPI {
 
     /**
      * Retrieves the group according to its full path.
-     * 
+     *
      * @param groupPath
      *        the full path of the group (parentPath/name)
      * @return the group
@@ -164,7 +167,7 @@ public interface GroupAPI {
 
     /**
      * Returns the total number of groups.
-     * 
+     *
      * @return the total number of groups
      * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the count retrieving
@@ -179,7 +182,7 @@ public interface GroupAPI {
      * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * </p>
-     * 
+     *
      * @param startIndex
      *        the start index
      * @param maxResults
@@ -201,7 +204,7 @@ public interface GroupAPI {
      * The map contains the couples groupId/Group.
      * If a group does not exists, no exception is thrown and no value is added in the map.
      * </p>
-     * 
+     *
      * @param groupIds
      *        the identifiers of the groups
      * @return the groups
@@ -215,7 +218,7 @@ public interface GroupAPI {
 
     /**
      * Searches groups according to the criteria containing in the options.
-     * 
+     *
      * @param options
      *        the search criteria
      * @return the search result

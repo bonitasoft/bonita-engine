@@ -30,15 +30,15 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.profile.xml.MembershipNode;
 import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
-import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
  * @author Baptiste Mesta
@@ -54,7 +54,8 @@ public class ProfilesExporter {
     private ProfileService profileService;
     private ProfilesParser profilesParser;
 
-    public ProfilesExporter(IdentityService identityService, ProfileService profileService, ProfilesParser profilesParser) {
+    public ProfilesExporter(IdentityService identityService, ProfileService profileService,
+            ProfilesParser profilesParser) {
         this.identityService = identityService;
         this.profileService = profileService;
         this.profilesParser = profilesParser;
@@ -94,7 +95,8 @@ public class ProfilesExporter {
         }
     }
 
-    ProfilesNode toProfiles(List<SProfile> sProfile) throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
+    ProfilesNode toProfiles(List<SProfile> sProfile)
+            throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
         ArrayList<ProfileNode> profiles = new ArrayList<>();
         for (SProfile profile : sProfile) {
             profiles.add(toProfile(profile));
@@ -102,7 +104,8 @@ public class ProfilesExporter {
         return new ProfilesNode(profiles);
     }
 
-    private ProfileNode toProfile(SProfile sProfile) throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
+    private ProfileNode toProfile(SProfile sProfile)
+            throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
         ProfileNode profile = new ProfileNode(sProfile.getName(), sProfile.isDefault());
         profile.setDescription(sProfile.getDescription());
         profile.setParentProfileEntries(getProfilesEntries(sProfile));
@@ -149,7 +152,8 @@ public class ProfilesExporter {
         return profileEntry;
     }
 
-    protected List<SProfileEntry> searchProfileEntries(final long profileId, final long parentId) throws SBonitaReadException {
+    protected List<SProfileEntry> searchProfileEntries(final long profileId, final long parentId)
+            throws SBonitaReadException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntry.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<>();
@@ -211,7 +215,8 @@ public class ProfilesExporter {
         return roles;
     }
 
-    private List<MembershipNode> getMemberships(SProfile profile) throws SBonitaReadException, SRoleNotFoundException, SGroupNotFoundException {
+    private List<MembershipNode> getMemberships(SProfile profile)
+            throws SBonitaReadException, SRoleNotFoundException, SGroupNotFoundException {
         ArrayList<MembershipNode> memberships = new ArrayList<>();
         int pageIndex = 0;
         List<SProfileMember> sProfileMembers;
@@ -226,9 +231,12 @@ public class ProfilesExporter {
         return memberships;
     }
 
-    private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaReadException {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
-                SProfileMember.class, SProfileMember.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
+    private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId,
+            final String querySuffix) throws SBonitaReadException {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS,
+                Collections.singletonList(new OrderByOption(
+                        SProfileMember.class, SProfileMember.ID, OrderByType.ASC)),
+                Collections.singletonList(new FilterOption(SProfileMember.class,
                         SProfileEntry.PROFILE_ID, profileId)),
                 null);
         return profileService.searchProfileMembers(querySuffix, queryOptions);

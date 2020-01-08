@@ -52,7 +52,8 @@ public class FormRequiredAnalyzerTest {
     @Test
     public void findActivityWithNameShouldReturnNullForNullTaskName() throws Exception {
         final UserTaskDefinition userTaskDefinition = formRequiredAnalyzer.findActivityWithName(
-                Collections.<ActivityDefinition> singletonList(new UserTaskDefinitionImpl("tarea", "someActorName")), null);
+                Collections.<ActivityDefinition> singletonList(new UserTaskDefinitionImpl("tarea", "someActorName")),
+                null);
         assertThat(userTaskDefinition).isNull();
     }
 
@@ -80,14 +81,17 @@ public class FormRequiredAnalyzerTest {
 
     @Test
     public void isFormRequiredShouldBeFalseForOverview() throws Exception {
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(1L, SFormMapping.TYPE_PROCESS_OVERVIEW, null, ""));
+        final boolean formRequired = formRequiredAnalyzer
+                .isFormRequired(new SFormMapping(1L, SFormMapping.TYPE_PROCESS_OVERVIEW, null, ""));
         assertThat(formRequired).isFalse();
     }
 
     @Test
     public void isFormRequiredShouldBeFalseIfExceptionOccurs() throws Exception {
-        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getDesignProcessDefinition(157L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(157L, SFormMapping.TYPE_PROCESS_START, null, ""));
+        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService)
+                .getDesignProcessDefinition(157L);
+        final boolean formRequired = formRequiredAnalyzer
+                .isFormRequired(new SFormMapping(157L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 
@@ -96,7 +100,8 @@ public class FormRequiredAnalyzerTest {
         final DesignProcessDefinition definition = mock(DesignProcessDefinition.class);
         doReturn(null).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer
+                .isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 
@@ -107,7 +112,8 @@ public class FormRequiredAnalyzerTest {
         contractDefinition.addInput(new InputDefinitionImpl("input1", "theInput"));
         doReturn(contractDefinition).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer
+                .isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isTrue();
     }
 
@@ -117,7 +123,8 @@ public class FormRequiredAnalyzerTest {
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
         doReturn(contractDefinition).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
-        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
+        final boolean formRequired = formRequiredAnalyzer
+                .isFormRequired(new SFormMapping(111L, SFormMapping.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isFalse();
     }
 

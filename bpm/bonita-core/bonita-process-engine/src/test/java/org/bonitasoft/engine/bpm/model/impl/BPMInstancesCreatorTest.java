@@ -102,8 +102,10 @@ public class BPMInstancesCreatorTest {
 
         bpmInstancesCreator.createConnectorInstances(container, connectors, SConnectorInstance.FLOWNODE_TYPE);
 
-        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class), eq(0));
-        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class), eq(1));
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(),
+                any(SConnectorDefinition.class), eq(0));
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(),
+                any(SConnectorDefinition.class), eq(1));
     }
 
     @Test
@@ -122,7 +124,8 @@ public class BPMInstancesCreatorTest {
         op2.setType(SOperatorType.ASSIGNMENT);
         op2.setLeftOperand(leftOp2);
         // when
-        SOperation operationToSetData = bpmInstancesCreator.getOperationToSetData("Plop2", Arrays.<SOperation> asList(op1, op2));
+        SOperation operationToSetData = bpmInstancesCreator.getOperationToSetData("Plop2",
+                Arrays.<SOperation> asList(op1, op2));
 
         // then
         assertThat(operationToSetData).isEqualTo(op2);
@@ -140,9 +143,11 @@ public class BPMInstancesCreatorTest {
     @Test
     public void createManualTaskInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
         doReturn(mock(SManualTaskInstance.class)).when(activityInstanceService).getFlowNodeInstance(anyLong());
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.MANUAL_TASK);
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+                .getFirstState(SFlowNodeType.MANUAL_TASK);
 
-        final SManualTaskInstance manualTaskInstance = bpmInstancesCreator.createManualTaskInstance(2345L, "task", 964854854L, "disp", 78L, "desc",
+        final SManualTaskInstance manualTaskInstance = bpmInstancesCreator.createManualTaskInstance(2345L, "task",
+                964854854L, "disp", 78L, "desc",
                 987968744446L, STaskPriority.HIGHEST);
 
         assertThat(manualTaskInstance.getReachedStateDate()).isNotEqualTo(0L);
@@ -151,10 +156,13 @@ public class BPMInstancesCreatorTest {
 
     @Test
     public void createFlownodeInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.GATEWAY);
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+                .getFirstState(SFlowNodeType.GATEWAY);
 
-        final SGatewayInstance gatewayInstance = (SGatewayInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 999L, 888L,
-                SFlowElementsContainerType.FLOWNODE, new SGatewayDefinitionImpl(222L, "myGate", SGatewayType.EXCLUSIVE), 964854854L, 78L, true, 0,
+        final SGatewayInstance gatewayInstance = (SGatewayInstance) bpmInstancesCreator.createFlowNodeInstance(2345L,
+                999L, 888L,
+                SFlowElementsContainerType.FLOWNODE, new SGatewayDefinitionImpl(222L, "myGate", SGatewayType.EXCLUSIVE),
+                964854854L, 78L, true, 0,
                 SStateCategory.NORMAL, 987968744446L);
 
         assertThat(gatewayInstance.getReachedStateDate()).isNotEqualTo(0L);
@@ -164,7 +172,8 @@ public class BPMInstancesCreatorTest {
     @Test
     public void create_user_task_should_not_evaluate_setExpectedEndDate_expression() throws Exception {
         //given
-        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.USER_TASK);
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager)
+                .getFirstState(SFlowNodeType.USER_TASK);
         doReturn(USER_TASK).when(sHumanTaskDefinition).getType();
         doReturn("actor").when(sHumanTaskDefinition).getActorName();
         doReturn(actor).when(actorMappingService).getActor(anyString(), anyLong());
@@ -173,7 +182,8 @@ public class BPMInstancesCreatorTest {
         expressionBuilder.createConstantLongExpression(3600L);
 
         //when
-        final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 456L, 987L,
+        final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) bpmInstancesCreator.createFlowNodeInstance(
+                2345L, 456L, 987L,
                 SFlowElementsContainerType.FLOWNODE,
                 sHumanTaskDefinition, 964854854L, 547, false, 0, SStateCategory.NORMAL, 0);
 

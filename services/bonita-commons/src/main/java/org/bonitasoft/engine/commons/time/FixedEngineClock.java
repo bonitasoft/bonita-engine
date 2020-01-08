@@ -18,7 +18,6 @@ import java.time.temporal.TemporalUnit;
 
 /**
  * This is a fixed clock with some methods to change this fixed time
- *
  * Only used for testing purpose
  *
  * @author Baptiste Mesta.

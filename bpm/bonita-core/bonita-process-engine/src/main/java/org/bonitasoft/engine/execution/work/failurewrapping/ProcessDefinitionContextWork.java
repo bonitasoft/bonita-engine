@@ -23,7 +23,7 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Adding context information about Process definition to exception for better logging
- * 
+ *
  * @author Celine Souchet
  */
 public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork {
@@ -34,9 +34,9 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
 
     /**
      * @param wrappedWork
-     *            The work to wrap
+     *        The work to wrap
      * @param processDefinitionId
-     *            The identifier of the process definition
+     *        The identifier of the process definition
      */
     public ProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
         super(wrappedWork);
@@ -44,10 +44,12 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
     }
 
     @Override
-    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
+    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context)
+            throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+        final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService
+                .getProcessDeploymentInfo(processDefinitionId);
 
         sBonitaException.setProcessDefinitionIdOnContext(processDefinitionId);
         sBonitaException.setProcessDefinitionNameOnContext(processDeploymentInfo.getName());
@@ -64,7 +66,7 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
 
     /**
      * @param processDefinitionId
-     *            The identifier of the process definition
+     *        The identifier of the process definition
      * @since 6.3
      */
     protected void setProcessDefinitionId(long processDefinitionId) {

@@ -13,13 +13,10 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
-import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -29,6 +26,8 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau

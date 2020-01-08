@@ -52,7 +52,8 @@ public class PlatformTestUtil {
         return TenantAPIAccessor.getLoginAPI();
     }
 
-    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public PlatformAPI getPlatformAPI(final PlatformSession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformAPI(session);
     }
 
@@ -63,7 +64,8 @@ public class PlatformTestUtil {
         logoutOnPlatform(session);
     }
 
-    public void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    public void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands)
+            throws BonitaException {
         platformAPI.initializePlatform();
         platformAPI.startNode();
 

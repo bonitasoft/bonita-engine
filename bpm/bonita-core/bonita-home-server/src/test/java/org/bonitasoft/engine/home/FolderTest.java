@@ -58,7 +58,8 @@ public class FolderTest {
         doReturn(true).when(f).exists();
         doReturn(true).when(f).isDirectory();
         doReturn(new byte[1]).when(folder).getFileContent(file);
-        doThrow(new RuntimeException("Directories should be filtered by Folder.listFilesAsResources() method")).when(folder).getFileContent(directory);
+        doThrow(new RuntimeException("Directories should be filtered by Folder.listFilesAsResources() method"))
+                .when(folder).getFileContent(directory);
 
         // should not fail:
         final Map<String, byte[]> map = folder.listFilesAsResources();

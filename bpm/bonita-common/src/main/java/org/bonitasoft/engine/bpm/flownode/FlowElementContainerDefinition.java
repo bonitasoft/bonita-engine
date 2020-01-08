@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * Allows to access all flow elements (activities, gateways, events and transitions) of a process or sub-process.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */

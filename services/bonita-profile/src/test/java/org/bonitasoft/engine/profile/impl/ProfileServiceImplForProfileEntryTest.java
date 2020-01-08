@@ -46,8 +46,8 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -76,7 +76,8 @@ public class ProfileServiceImplForProfileEntryTest {
     private ProfileServiceImpl profileServiceImpl;
 
     /**
-     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
      *
      * @throws SRecorderException
      * @throws SProfileEntryCreationException
@@ -95,6 +96,7 @@ public class ProfileServiceImplForProfileEntryTest {
     private SProfileEntry createProfileEntry(final long id) {
         return SProfileEntry.builder().id(id).build();
     }
+
     private SProfile profile(String name) {
         return SProfile.builder()
                 .id(UUID.randomUUID().getLeastSignificantBits())
@@ -110,7 +112,8 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void createProfileThrowException() throws SRecorderException, SProfileEntryCreationException {
         final SProfileEntry sProfileEntry = createProfileEntry(1);
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         profileServiceImpl.createProfileEntry(sProfileEntry);
     }
@@ -124,17 +127,21 @@ public class ProfileServiceImplForProfileEntryTest {
      * @throws SRecorderException
      */
     @Test
-    public final void deleteProfileEntryById() throws SProfileEntryNotFoundException, SProfileEntryDeletionException, SBonitaReadException, SRecorderException {
+    public final void deleteProfileEntryById() throws SProfileEntryNotFoundException, SProfileEntryDeletionException,
+            SBonitaReadException, SRecorderException {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
-        doReturn(sProfileEntry).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
+        doReturn(sProfileEntry).when(persistenceService)
+                .selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
 
         profileServiceImpl.deleteProfileEntry(1);
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
-    public final void deleteNoProfileEntryById() throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
-        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
+    public final void deleteNoProfileEntryById()
+            throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any()))
+                .thenReturn(null);
 
         profileServiceImpl.deleteProfileEntry(1);
     }
@@ -144,13 +151,15 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(any());
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         profileServiceImpl.deleteProfileEntry(1);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
      *
      * @throws SRecorderException
      * @throws SProfileEntryDeletionException
@@ -171,7 +180,8 @@ public class ProfileServiceImplForProfileEntryTest {
     public void deleteProfileEntryByObjectThrowException() throws Exception {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         profileServiceImpl.deleteProfileEntry(sProfileEntry);
     }
@@ -207,7 +217,8 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
      *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
@@ -215,7 +226,8 @@ public class ProfileServiceImplForProfileEntryTest {
     @Test
     public final void getNumberOfProfileEntries() throws SBonitaReadException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.emptyMap())).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.emptyMap()))
+                .thenReturn(1L);
 
         assertEquals(1L, profileServiceImpl.getNumberOfProfileEntries(options));
     }
@@ -239,27 +251,31 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void getProfileEntryById() throws SProfileEntryNotFoundException, SBonitaReadException {
         final SProfileEntry sProfileEntry = createProfileEntry(1);
 
-        doReturn(sProfileEntry).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
+        doReturn(sProfileEntry).when(persistenceService)
+                .selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any());
 
         assertEquals(sProfileEntry, profileServiceImpl.getProfileEntry(1));
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
     public void getNoProfileEntryById() throws Exception {
-        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any()))
+                .thenReturn(null);
 
         profileServiceImpl.getProfileEntry(1);
     }
 
     @Test(expected = SProfileEntryNotFoundException.class)
     public void getProfileEntryByIdThrowException() throws Exception {
-        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SProfileEntry>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getProfileEntry(1);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
      *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
@@ -267,7 +283,8 @@ public class ProfileServiceImplForProfileEntryTest {
     @Test
     public final void searchProfileEntries() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfileEntry>());
+        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap()))
+                .thenReturn(new ArrayList<SProfileEntry>());
 
         assertNotNull(profileServiceImpl.searchProfileEntries(options));
     }
@@ -275,7 +292,8 @@ public class ProfileServiceImplForProfileEntryTest {
     @Test(expected = SBonitaReadException.class)
     public void searchProfileEntriesThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap()))
+                .thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.searchProfileEntries(options);
     }
@@ -291,11 +309,13 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void updateProfileEntry() throws SProfileEntryUpdateException {
         final SProfileEntry sProfileEntry = createProfileEntry(3);
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
-        sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setCustom(true).setPage("page").setParentId(5858)
+        sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setCustom(true)
+                .setPage("page").setParentId(5858)
                 .setProfileId(9)
                 .setType("type");
 
-        final SProfileEntry result = profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
+        final SProfileEntry result = profileServiceImpl.updateProfileEntry(sProfileEntry,
+                sProfileEntryUpdateBuilder.done());
         assertNotNull(result);
     }
 
@@ -319,7 +339,8 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
         sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
     }

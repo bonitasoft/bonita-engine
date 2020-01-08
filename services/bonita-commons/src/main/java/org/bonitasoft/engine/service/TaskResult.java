@@ -17,11 +17,9 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
  * result of the execution of a task using the broadcast service
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public class TaskResult<T> {
 
@@ -105,11 +103,12 @@ public class TaskResult<T> {
         return timeunit;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TaskResult<?> that = (TaskResult<?>) o;
         return Objects.equals(throwable, that.throwable) &&
                 Objects.equals(result, that.result) &&

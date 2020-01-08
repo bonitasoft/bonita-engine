@@ -32,16 +32,19 @@ public class GetContractOfUserTaskInstance implements TransactionContentWithResu
 
     private SContractDefinition contract;
 
-    public GetContractOfUserTaskInstance(final ProcessDefinitionService definitionService, final SUserTaskInstance userTaskInstance) {
+    public GetContractOfUserTaskInstance(final ProcessDefinitionService definitionService,
+            final SUserTaskInstance userTaskInstance) {
         this.definitionService = definitionService;
         this.userTaskInstance = userTaskInstance;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        final SProcessDefinition processDefinition = definitionService.getProcessDefinition(userTaskInstance.getProcessDefinitionId());
-        final SUserTaskDefinition userTaskDefinition = (SUserTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
-                userTaskInstance.getFlowNodeDefinitionId());
+        final SProcessDefinition processDefinition = definitionService
+                .getProcessDefinition(userTaskInstance.getProcessDefinitionId());
+        final SUserTaskDefinition userTaskDefinition = (SUserTaskDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(
+                        userTaskInstance.getFlowNodeDefinitionId());
         contract = userTaskDefinition.getContract();
     }
 

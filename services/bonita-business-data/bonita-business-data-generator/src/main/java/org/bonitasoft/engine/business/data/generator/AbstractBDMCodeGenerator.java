@@ -19,6 +19,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClass;
+import com.sun.codemodel.JClassAlreadyExistsException;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.BusinessObjectModelValidationException;
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
@@ -31,15 +39,6 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
-
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
@@ -93,7 +92,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         methodBody._return(instanceRef);
     }
 
-    private void callSetter(final JBlock methodBody, final JVar param, final JVar instanceRef, final JDefinedClass entity) {
+    private void callSetter(final JBlock methodBody, final JVar param, final JVar instanceRef,
+            final JDefinedClass entity) {
         final JMethod setter = getSetterForParam(param, entity);
         if (setter == null) {
             throw new IllegalStateException("No setter found for parameter " + param.name());
@@ -169,7 +169,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return newInstanceMethod;
     }
 
-    protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) {
+    protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass,
+            final Query query) {
         final String methodName = query.getName();
         final JMethod queryMethod = createQueryMethod(entity, targetClass, methodName, query.getReturnType());
         for (final QueryParameter param : query.getQueryParameters()) {

@@ -33,7 +33,8 @@ public class IsTaskPerformerRule extends AuthorizationRuleWithParameters impleme
 
     private final TaskInvolvementDelegate taskInvolvementDelegate;
 
-    public IsTaskPerformerRule(SessionService sessionService, SessionAccessor sessionAccessor, TaskInvolvementDelegate taskInvolvementDelegate) {
+    public IsTaskPerformerRule(SessionService sessionService, SessionAccessor sessionAccessor,
+            TaskInvolvementDelegate taskInvolvementDelegate) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.taskInvolvementDelegate = taskInvolvementDelegate;

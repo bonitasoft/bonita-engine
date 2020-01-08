@@ -16,6 +16,8 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import java.util.List;
 import java.util.Optional;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -49,9 +51,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-
 public class EventInstanceServiceImpl implements EventInstanceService {
 
     private final DataInstanceService dataInstanceService;
@@ -60,9 +59,8 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     private EventInstanceRepository eventInstanceRepository;
 
-
     public EventInstanceServiceImpl(EventInstanceRepository eventInstanceRepository,
-                                    DataInstanceService dataInstanceService, MeterRegistry meterRegistry, Long tenantId) {
+            DataInstanceService dataInstanceService, MeterRegistry meterRegistry, Long tenantId) {
         this.eventInstanceRepository = eventInstanceRepository;
         this.dataInstanceService = dataInstanceService;
         messageSentCounter = meterRegistry.counter(BONITA_BPMENGINE_MESSAGE_SENT, "tenant", tenantId.toString());
@@ -98,8 +96,10 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
-    public void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId) throws SBonitaReadException, SEventTriggerInstanceDeletionException {
-        Optional<STimerEventTriggerInstance> timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+    public void deleteEventTriggerInstanceOfFlowNode(long flowNodeInstanceId)
+            throws SBonitaReadException, SEventTriggerInstanceDeletionException {
+        Optional<STimerEventTriggerInstance> timerEventTriggerInstanceOfFlowNode = getTimerEventTriggerInstanceOfFlowNode(
+                flowNodeInstanceId);
         if (!timerEventTriggerInstanceOfFlowNode.isPresent()) {
             return;
         }
@@ -131,7 +131,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long id, int fromIndex,
-                                                                          int maxResults) throws SEventInstanceReadException {
+            int maxResults) throws SEventInstanceReadException {
         return this.eventInstanceRepository.getActivityBoundaryEventInstances(id, fromIndex, maxResults);
     }
 
@@ -143,14 +143,14 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName,
-                                                  OrderByType orderByType) throws SEventInstanceReadException {
+            OrderByType orderByType) throws SEventInstanceReadException {
         return this.eventInstanceRepository.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName,
                 orderByType);
     }
 
     @Override
     public <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass,
-                                                                            long eventTriggerInstanceId) throws SEventTriggerInstanceReadException {
+            long eventTriggerInstanceId) throws SEventTriggerInstanceReadException {
         return this.eventInstanceRepository.getEventTriggerInstance(entityClass, eventTriggerInstanceId);
     }
 
@@ -177,7 +177,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> sWaitingEventClass,
-                                         QueryOptions searchOptions) throws SBonitaReadException {
+            QueryOptions searchOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.getNumberOfWaitingEvents(sWaitingEventClass, searchOptions);
     }
 
@@ -218,14 +218,14 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId,
-                                                                             QueryOptions searchOptions) throws SBonitaReadException {
+            QueryOptions searchOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId,
                 QueryOptions.countQueryOptions());
     }
 
     @Override
     public <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> waitingEventClass,
-                                                                 QueryOptions queryOptions) throws SBonitaReadException {
+            QueryOptions queryOptions) throws SBonitaReadException {
         return this.eventInstanceRepository.searchWaitingEvents(waitingEventClass, queryOptions);
     }
 
@@ -243,7 +243,7 @@ public class EventInstanceServiceImpl implements EventInstanceService {
 
     @Override
     public Integer deleteMessageAndDataInstanceOlderThanCreationDate(long creationDate,
-                                                                     QueryOptions queryOptions)
+            QueryOptions queryOptions)
             throws SMessageModificationException {
 
         try {
@@ -266,13 +266,14 @@ public class EventInstanceServiceImpl implements EventInstanceService {
     }
 
     @Override
-    public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions) throws SEventTriggerInstanceReadException, SMessageInstanceReadException {
+    public List<Long> getMessageInstanceIdOlderThanCreationDate(long creationDate, QueryOptions queryOptions)
+            throws SEventTriggerInstanceReadException, SMessageInstanceReadException {
         return this.eventInstanceRepository.getMessageInstanceIdOlderThanCreationDate(creationDate, queryOptions);
     }
 
     @Override
     public void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance,
-                                           EntityUpdateDescriptor descriptor) throws SEventTriggerInstanceModificationException {
+            EntityUpdateDescriptor descriptor) throws SEventTriggerInstanceModificationException {
         this.eventInstanceRepository.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
     }
 }

@@ -24,7 +24,8 @@ public class SInvalidConnectorImplementationException extends SBonitaException {
 
     private static final long serialVersionUID = -3113075377405323282L;
 
-    public SInvalidConnectorImplementationException(final String message, final SConnectorImplementationDescriptor connectorImplementationDescriptor) {
+    public SInvalidConnectorImplementationException(final String message,
+            final SConnectorImplementationDescriptor connectorImplementationDescriptor) {
         this(message);
         setConnectorImplementationClassNameOnContext(connectorImplementationDescriptor.getImplementationClassName());
         setConnectorDefinitionIdOnContext(connectorImplementationDescriptor.getDefinitionId());

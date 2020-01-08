@@ -51,12 +51,13 @@ public interface JobService {
      * Create a new job descriptor for a specific tenant
      *
      * @param sJobDescriptor JobDescriptor to create
-     * @param tenantId       Identifier of tenant
+     * @param tenantId Identifier of tenant
      * @return The created jobDescriptor
      * @throws SJobDescriptorCreationException
      * @since 6.1
      */
-    SJobDescriptor createJobDescriptor(SJobDescriptor sJobDescriptor, long tenantId) throws SJobDescriptorCreationException;
+    SJobDescriptor createJobDescriptor(SJobDescriptor sJobDescriptor, long tenantId)
+            throws SJobDescriptorCreationException;
 
     /**
      * Delete the specified job descriptor
@@ -67,7 +68,8 @@ public interface JobService {
      * @throws SJobDescriptorDeletionException
      * @since 6.1
      */
-    void deleteJobDescriptor(long id) throws SJobDescriptorNotFoundException, SJobDescriptorReadException, SJobDescriptorDeletionException;
+    void deleteJobDescriptor(long id)
+            throws SJobDescriptorNotFoundException, SJobDescriptorReadException, SJobDescriptorDeletionException;
 
     /**
      * Delete the specified job descriptor
@@ -126,17 +128,19 @@ public interface JobService {
     /**
      * Create new job parameters for a specific tenant
      *
-     * @param parameters      JobParameters to create
-     * @param tenantId        Identifier of tenant
+     * @param parameters JobParameters to create
+     * @param tenantId Identifier of tenant
      * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
      */
-    List<SJobParameter> createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+    List<SJobParameter> createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId)
+            throws SJobParameterCreationException;
 
     /**
-     * Delete jobs parameters corresponding to tenant and job descriptor, if exist. After, create new job parameters for a specific tenant
+     * Delete jobs parameters corresponding to tenant and job descriptor, if exist. After, create new job parameters for
+     * a specific tenant
      *
      * @param tenantId
      * @param jobDescriptorId
@@ -145,19 +149,21 @@ public interface JobService {
      * @throws SJobParameterCreationException
      * @since 6.1
      */
-    List<SJobParameter> setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters) throws SJobParameterCreationException;
+    List<SJobParameter> setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters)
+            throws SJobParameterCreationException;
 
     /**
      * Create a new job parameter for a specific tenant
      *
-     * @param sJobParameter   JobParameter to create
-     * @param tenantId        Identifier of tenant
+     * @param sJobParameter JobParameter to create
+     * @param tenantId Identifier of tenant
      * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
      */
-    SJobParameter createJobParameter(SJobParameter sJobParameter, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+    SJobParameter createJobParameter(SJobParameter sJobParameter, long tenantId, long jobDescriptorId)
+            throws SJobParameterCreationException;
 
     /**
      * Delete the specified job parameter
@@ -168,7 +174,8 @@ public interface JobService {
      * @throws SJobParameterDeletionException
      * @since 6.1
      */
-    void deleteJobParameter(long id) throws SJobParameterNotFoundException, SJobParameterReadException, SJobParameterDeletionException;
+    void deleteJobParameter(long id)
+            throws SJobParameterNotFoundException, SJobParameterReadException, SJobParameterDeletionException;
 
     /**
      * Delete the specified job parameter
@@ -189,7 +196,6 @@ public interface JobService {
      * @since 6.1
      */
     SJobParameter getJobParameter(long id) throws SJobParameterNotFoundException, SJobParameterReadException;
-
 
     /**
      * get parameters of a job
@@ -268,7 +274,7 @@ public interface JobService {
     /**
      * Update a {@link SJobLog}
      *
-     * @param jobLog     The log to update
+     * @param jobLog The log to update
      * @param descriptor
      * @since 6.4.0
      */
@@ -288,8 +294,8 @@ public interface JobService {
      * Get all {@link SJobLog} of a specific {@link SJobDescriptor}
      *
      * @param jobDescriptorId The identifier of the {@link SJobDescriptor}
-     * @param fromIndex       The index of the first element of the list
-     * @param maxResults      The nulber max of elements of the list
+     * @param fromIndex The index of the first element of the list
+     * @param maxResults The nulber max of elements of the list
      * @return A list of {@link SJobLog}
      * @throws SBonitaReadException
      * @since 6.4.0
@@ -299,7 +305,7 @@ public interface JobService {
     /**
      * log an error on a job
      *
-     * @param jobException    the exception
+     * @param jobException the exception
      * @param jobDescriptorId the id of the job
      * @throws SBonitaReadException
      * @throws SJobLogUpdatingException
@@ -307,6 +313,7 @@ public interface JobService {
      * @throws SJobDescriptorReadException
      * @since 7.2.0
      */
-    void logJobError(final Throwable jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+    void logJobError(final Throwable jobException, final Long jobDescriptorId)
+            throws SBonitaReadException, SJobLogUpdatingException,
             SJobLogCreationException, SJobDescriptorReadException;
 }

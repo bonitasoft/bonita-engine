@@ -25,8 +25,10 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SEventInstance extends SFlowNodeInstance {
-    public SEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                              final long logicalGroup1, final long logicalGroup2) {
+
+    public SEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 }

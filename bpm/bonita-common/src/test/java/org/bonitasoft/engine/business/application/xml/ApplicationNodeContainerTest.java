@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.application.xml;
 
-
 import static org.bonitasoft.engine.business.application.xml.ApplicationNodeContainerAssert.assertThat;
 
 import org.junit.Test;

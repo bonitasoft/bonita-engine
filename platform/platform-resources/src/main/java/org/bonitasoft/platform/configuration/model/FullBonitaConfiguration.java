@@ -27,7 +27,8 @@ public class FullBonitaConfiguration extends BonitaConfiguration {
 
     private final Long tenantId;
 
-    public FullBonitaConfiguration(String resourceName, byte[] resourceContent, String configurationType, Long tenantId) {
+    public FullBonitaConfiguration(String resourceName, byte[] resourceContent, String configurationType,
+            Long tenantId) {
         super(resourceName, resourceContent);
         this.configurationType = configurationType;
         this.tenantId = tenantId;

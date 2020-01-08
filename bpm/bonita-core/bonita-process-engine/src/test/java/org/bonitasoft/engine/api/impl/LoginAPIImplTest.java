@@ -28,7 +28,6 @@ public class LoginAPIImplTest {
 
     private LoginAPIImpl loginAPI = new LoginAPIImpl();
 
-
     @Test
     public void checkThatWeCanLogin_should_allow_technical_user() throws Exception {
         //given

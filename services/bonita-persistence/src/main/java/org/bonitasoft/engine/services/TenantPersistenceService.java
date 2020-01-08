@@ -13,13 +13,10 @@
  **/
 package org.bonitasoft.engine.services;
 
-import java.io.IOException;
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface TenantPersistenceService extends PersistenceService {
-
 
 }

@@ -24,9 +24,10 @@ import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, USER_ID_KEY: -1 is not needed, ROLE_ID_KEY: -1 is not needed,
+ * Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, USER_ID_KEY: -1 is not needed,
+ * ROLE_ID_KEY: -1 is not needed,
  * GROUP_ID_KEY: -1 is not needed, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
@@ -43,7 +44,8 @@ public class AddEntityMemberCommand extends EntityMemberCommand {
         final Long roleId = getRoleIdParameter(parameters);
 
         if (userId == null && groupId == null && roleId == null) {
-            throw new SCommandParameterizationException("At least one of the following parameters must be set : userId, groupId, roleId");
+            throw new SCommandParameterizationException(
+                    "At least one of the following parameters must be set : userId, groupId, roleId");
         }
 
         final long lUserId = userId != null ? userId : -1;
@@ -52,7 +54,8 @@ public class AddEntityMemberCommand extends EntityMemberCommand {
 
         try {
             final MemberType memberType = getMemberType(userId, groupId, roleId);
-            SExternalIdentityMapping mapp = addExternalIdentityMapping(externalId, lUserId, lRoleId, lGroupId, kind, memberType);
+            SExternalIdentityMapping mapp = addExternalIdentityMapping(externalId, lUserId, lRoleId, lGroupId, kind,
+                    memberType);
             return toEntityMember(mapp);
         } catch (SCommandExecutionException e) {
             throw e;

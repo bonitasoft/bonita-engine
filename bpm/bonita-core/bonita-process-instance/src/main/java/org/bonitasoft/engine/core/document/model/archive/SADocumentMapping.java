@@ -43,8 +43,9 @@ public class SADocumentMapping extends SDocumentMapping implements ArchivedPersi
     private long archiveDate;
     private long sourceObjectId;
 
-    public SADocumentMapping(final long documentId, final long processInstanceId, final long archiveDate, final long sourceObjectId, final String name,
-                                 final String description, final String version) {
+    public SADocumentMapping(final long documentId, final long processInstanceId, final long archiveDate,
+            final long sourceObjectId, final String name,
+            final String description, final String version) {
         super(documentId, processInstanceId, name);
         setDescription(description);
         setVersion(version);

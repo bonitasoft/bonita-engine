@@ -122,7 +122,8 @@ public class SOperationImpl implements SOperation {
 
     @Override
     public String toString() {
-        return "SOperationImpl [leftOperand=" + leftOperand + ", type=" + type + ", operator=" + operator + ", rightOperand=" + rightOperand + "]";
+        return "SOperationImpl [leftOperand=" + leftOperand + ", type=" + type + ", operator=" + operator
+                + ", rightOperand=" + rightOperand + "]";
     }
 
 }

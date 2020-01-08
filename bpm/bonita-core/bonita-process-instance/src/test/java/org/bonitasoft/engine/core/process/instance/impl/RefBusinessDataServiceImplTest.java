@@ -124,7 +124,8 @@ public class RefBusinessDataServiceImplTest {
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
-        doThrow(new SRecorderException("ouch!")).when(recorder).recordUpdate(updateRecord, RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
+        doThrow(new SRecorderException("ouch!")).when(recorder).recordUpdate(updateRecord,
+                RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
 
         service.updateRefBusinessDataInstance(refBusinessDataInstance, dataId);
     }
@@ -135,14 +136,16 @@ public class RefBusinessDataServiceImplTest {
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
 
-        verify(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
+        verify(recorder).recordInsert(new InsertRecord(refBusinessDataInstance),
+                RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
     }
 
     @Test(expected = SRefBusinessDataInstanceCreationException.class)
     public void addRefBusinessDataThrowException() throws Exception {
         final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
 
-        doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
+        doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance),
+                RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
     }
@@ -155,8 +158,9 @@ public class RefBusinessDataServiceImplTest {
 
         service.getRefBusinessDataInstances(processIntanceId, startIndex, maxResults);
 
-        verify(persistence).selectList(SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstances(processIntanceId,
-                startIndex, maxResults));
+        verify(persistence)
+                .selectList(SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstances(processIntanceId,
+                        startIndex, maxResults));
     }
 
 }

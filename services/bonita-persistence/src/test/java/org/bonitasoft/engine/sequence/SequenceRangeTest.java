@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.sequence;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
@@ -31,6 +30,7 @@ public class SequenceRangeTest {
 
         assertThat(nextAvailableId).isPresent().contains(10L);
     }
+
     @Test
     public void should_not_give_id_if_sequence_is_not_initialized() {
         SequenceRange sequenceRange = new SequenceRange(4);
@@ -50,7 +50,6 @@ public class SequenceRangeTest {
         assertThat(sequenceRange.getNextAvailableId()).isPresent().contains(3L);
         assertThat(sequenceRange.getNextAvailableId()).isNotPresent();
     }
-
 
     @Test
     public void should_not_give_id_when_sequence_is_completed() {

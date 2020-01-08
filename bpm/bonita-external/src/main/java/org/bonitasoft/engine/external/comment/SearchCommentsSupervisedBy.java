@@ -50,7 +50,8 @@ public class SearchCommentsSupervisedBy extends TenantCommand {
 
         final SCommentService commentService = serviceAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
-        final SearchCommentsSupervisedByTransaction searchTransaction = new SearchCommentsSupervisedByTransaction(supervisorId, commentService,
+        final SearchCommentsSupervisedByTransaction searchTransaction = new SearchCommentsSupervisedByTransaction(
+                supervisorId, commentService,
                 searchEntitiesDescriptor.getSearchCommentDescriptor(), searchOptions);
         try {
             searchTransaction.execute();

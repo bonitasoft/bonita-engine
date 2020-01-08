@@ -81,7 +81,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     @Override
-    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder)
+            throws IOException, InvalidBusinessArchiveFormatException {
         final File file = new File(barFolder, PROCESS_DEFINITION_XML);
         if (!file.exists()) {
             return false;
@@ -92,7 +93,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         return true;
     }
 
-    protected void checkProcessInfos(final File barFolder, final DesignProcessDefinition processDefinition) throws InvalidBusinessArchiveFormatException {
+    protected void checkProcessInfos(final File barFolder, final DesignProcessDefinition processDefinition)
+            throws InvalidBusinessArchiveFormatException {
         final String processInfos = getProcessInfos(generateInfosFromDefinition(processDefinition));
         String fileContent;
         try {
@@ -105,7 +107,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
     }
 
-    public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
+    public DesignProcessDefinition deserializeProcessDefinition(final File file)
+            throws IOException, InvalidBusinessArchiveFormatException {
         String content = IOUtil.read(file);
         try {
             return convertXmlToProcess(content);
@@ -135,9 +138,11 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         serializeProcessDefinition(barFolder, processDefinition);
     }
 
-    public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
+    public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition)
+            throws IOException {
         try {
-            IOUtil.writeContentToFile(convertProcessToXml(processDefinition), new File(barFolder, PROCESS_DEFINITION_XML));
+            IOUtil.writeContentToFile(convertProcessToXml(processDefinition),
+                    new File(barFolder, PROCESS_DEFINITION_XML));
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
         } catch (final FileNotFoundException e) {
@@ -168,7 +173,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             unmarshaller
-                    .setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(this.getClass().getResource("/ProcessDefinition.xsd")));
+                    .setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+                            .newSchema(this.getClass().getResource("/ProcessDefinition.xsd")));
             DesignProcessDefinition process = (DesignProcessDefinition) unmarshaller.unmarshal(stream);
             if (process.getActorInitiator() != null) {
                 process.getActorInitiator().setInitiator(true);
@@ -213,13 +219,15 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         for (ActivityDefinition activity : flowElementContainer.getActivities()) {
             for (BoundaryEventDefinition boundaryEvent : activity.getBoundaryEventDefinitions()) {
                 BoundaryEventDefinitionImpl boundaryEventImpl = (BoundaryEventDefinitionImpl) boundaryEvent;
-                for (MessageEventTriggerDefinition messageEventTrigger : boundaryEvent.getMessageEventTriggerDefinitions()) {
+                for (MessageEventTriggerDefinition messageEventTrigger : boundaryEvent
+                        .getMessageEventTriggerDefinitions()) {
                     boundaryEventImpl.addEventTrigger(messageEventTrigger);
                 }
                 for (ErrorEventTriggerDefinition errorEventTrigger : boundaryEvent.getErrorEventTriggerDefinitions()) {
                     boundaryEventImpl.addEventTrigger(errorEventTrigger);
                 }
-                for (SignalEventTriggerDefinition signalEventTrigger : boundaryEventImpl.getSignalEventTriggerDefinitions()) {
+                for (SignalEventTriggerDefinition signalEventTrigger : boundaryEventImpl
+                        .getSignalEventTriggerDefinitions()) {
                     boundaryEventImpl.addEventTrigger(signalEventTrigger);
                 }
                 for (TimerEventTriggerDefinition timerEventTrigger : boundaryEvent.getTimerEventTriggerDefinitions()) {
@@ -250,10 +258,12 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     private void addEventTriggerOnIntermediateThrowEvent(FlowElementContainerDefinition flowElementContainer) {
         for (IntermediateThrowEventDefinition throwEvent : flowElementContainer.getIntermediateThrowEvents()) {
             IntermediateThrowEventDefinitionImpl throwEventImpl = (IntermediateThrowEventDefinitionImpl) throwEvent;
-            for (MessageEventTriggerDefinition messageEventTriggerDefinition : throwEventImpl.getMessageEventTriggerDefinitions()) {
+            for (MessageEventTriggerDefinition messageEventTriggerDefinition : throwEventImpl
+                    .getMessageEventTriggerDefinitions()) {
                 throwEventImpl.addEventTrigger(messageEventTriggerDefinition);
             }
-            for (SignalEventTriggerDefinition signalEventTriggerDefinition : throwEventImpl.getSignalEventTriggerDefinitions()) {
+            for (SignalEventTriggerDefinition signalEventTriggerDefinition : throwEventImpl
+                    .getSignalEventTriggerDefinitions()) {
                 throwEventImpl.addEventTrigger(signalEventTriggerDefinition);
             }
         }
@@ -279,7 +289,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
         final FlowElementContainerDefinition processContainer = processDefinition.getFlowElementContainer();
-        return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:").append(processContainer.getTransitions().size())
+        return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:")
+                .append(processContainer.getTransitions().size())
                 .append(",key3:").append(processContainer.getActivities().size()).toString();
     }
 

@@ -58,7 +58,8 @@ class BarResourceVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Objects.requireNonNull(file);
         Objects.requireNonNull(attrs);
-        businessArchive.addResource(barRootFolder.relativize(file).toString().replace(File.separator, "/"), IOUtil.getAllContentFrom(file.toFile()));
+        businessArchive.addResource(barRootFolder.relativize(file).toString().replace(File.separator, "/"),
+                IOUtil.getAllContentFrom(file.toFile()));
         resourcesCount++;
         return FileVisitResult.CONTINUE;
     }

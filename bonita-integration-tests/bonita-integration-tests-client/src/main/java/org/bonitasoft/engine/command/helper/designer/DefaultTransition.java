@@ -23,7 +23,7 @@ public class DefaultTransition extends Transition {
     @Override
     public void bind(String source, String target, ProcessDefinitionBuilder builder) {
         builder.addDefaultTransition(source, target);
-        if(branch != null) {
+        if (branch != null) {
             branch.build(source, builder);
         }
     }

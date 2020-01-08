@@ -82,8 +82,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     List<String> designErrors;
 
     /**
-     * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is the entry point of this builder. It must
-     * be called before any other method. The <code>DesignProcessDefinition</code> building will be completed when the method {@link #done()} or
+     * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is
+     * the entry point of this builder. It must
+     * be called before any other method. The <code>DesignProcessDefinition</code> building will be completed when the
+     * method {@link #done()} or
      * {@link #getProcess()} is called.
      *
      * @param name
@@ -155,7 +157,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         final List<String> names = new ArrayList<>();
         for (final ConnectorDefinition connectorDefinition : connectorDefinitions) {
             if (names.contains(connectorDefinition.getName())) {
-                designErrors.add("More than one connector are named '" + connectorDefinition.getName() + "'. All names must be unique.");
+                designErrors.add("More than one connector are named '" + connectorDefinition.getName()
+                        + "'. All names must be unique.");
             } else {
                 names.add(connectorDefinition.getName());
             }
@@ -179,8 +182,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void addToListAndVerifyNotAlreadySeen(HashSet<String> listToAddBizDataNameTo, HashSet<String> listToCheckBizDataNameAlreadySeen, String bizDataName,
-                                                  String errorMessage) {
+    private void addToListAndVerifyNotAlreadySeen(HashSet<String> listToAddBizDataNameTo,
+            HashSet<String> listToCheckBizDataNameAlreadySeen, String bizDataName,
+            String errorMessage) {
         listToAddBizDataNameTo.add(bizDataName);
         if (listToCheckBizDataNameAlreadySeen.contains(bizDataName)) {
             addError(errorMessage);
@@ -196,7 +200,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
-        validateContract(userTaskDefinition.getContract(), "the task-level contract for task <" + userTaskDefinition.getName() + ">");
+        validateContract(userTaskDefinition.getContract(),
+                "the task-level contract for task <" + userTaskDefinition.getName() + ">");
     }
 
     private void validateContractInputName(final String name) {
@@ -229,12 +234,15 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateContractInput(String containerIdentifier, InputDefinition inputDefinition) {
         validateContractInputName(inputDefinition.getName());
-        if (inputDefinition.hasChildren() && (inputDefinition.getType() != null && !inputDefinition.getType().equals(Type.FILE))) {
-            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier
+        if (inputDefinition.hasChildren()
+                && (inputDefinition.getType() != null && !inputDefinition.getType().equals(Type.FILE))) {
+            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on "
+                    + containerIdentifier
                     + " because it has children");
         }
         if (!inputDefinition.hasChildren() && inputDefinition.getType() == null) {
-            addError("Type not set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier);
+            addError(
+                    "Type not set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier);
         }
         if (inputDefinition.hasChildren()) {
             for (InputDefinition definition : inputDefinition.getInputs()) {
@@ -254,8 +262,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *        The expression representing the default value
      * @return The {@link BusinessDataDefinitionBuilder} containing the new {@link BusinessDataDefinition}
      */
-    public BusinessDataDefinitionBuilder addBusinessData(final String name, final String className, final Expression defaultValue) {
-        return new BusinessDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+    public BusinessDataDefinitionBuilder addBusinessData(final String name, final String className,
+            final Expression defaultValue) {
+        return new BusinessDataDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
     }
 
     protected void validateBusinessData() {
@@ -264,8 +274,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         HashSet<String> names = new HashSet<>();
         for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
             final Expression defaultValueExpression = businessDataDefinition.getDefaultValueExpression();
-            if (businessDataDefinition.isMultiple() && defaultValueExpression != null && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
-                addError("The return type of the initial value expression of the multiple business data: '" + businessDataDefinition.getName() + "' must be "
+            if (businessDataDefinition.isMultiple() && defaultValueExpression != null
+                    && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
+                addError("The return type of the initial value expression of the multiple business data: '"
+                        + businessDataDefinition.getName() + "' must be "
                         + List.class.getName());
             }
 
@@ -273,15 +285,18 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             for (final ActivityDefinition activity : activities) {
                 final LoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
                 if (loopCharacteristics instanceof MultiInstanceLoopCharacteristics) {
-                    if (businessDataDefinition.getName().equals(((MultiInstanceLoopCharacteristics) loopCharacteristics).getLoopDataInputRef())
+                    if (businessDataDefinition.getName()
+                            .equals(((MultiInstanceLoopCharacteristics) loopCharacteristics).getLoopDataInputRef())
                             && !businessDataDefinition.isMultiple()) {
-                        addError("The business data " + businessDataDefinition.getName() + " used in the multi instance " + activity.getName()
+                        addError("The business data " + businessDataDefinition.getName()
+                                + " used in the multi instance " + activity.getName()
                                 + " must be multiple");
                     }
                 }
             }
             if (!names.add(businessDataDefinition.getName())) {
-                addError("The process contains more than one business data with the name " + businessDataDefinition.getName());
+                addError("The process contains more than one business data with the name "
+                        + businessDataDefinition.getName());
             }
 
         }
@@ -289,7 +304,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         for (final ActivityDefinition activity : processContainer.getActivities()) {
             final List<BusinessDataDefinition> dataDefinitions = activity.getBusinessDataDefinitions();
             if (activity.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics) {
-                final MultiInstanceLoopCharacteristics multiInstanceCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
+                final MultiInstanceLoopCharacteristics multiInstanceCharacteristics = (MultiInstanceLoopCharacteristics) activity
+                        .getLoopCharacteristics();
                 final String loopDataInputRef = multiInstanceCharacteristics.getLoopDataInputRef();
                 if (!isReferenceValid(loopDataInputRef)) {
                     addError("The activity " + activity.getName() + " contains a reference " + loopDataInputRef
@@ -311,12 +327,15 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                             + " for the loop data output to an unknown data");
                 }
             } else if (!dataDefinitions.isEmpty()) {
-                addError("The activity " + activity.getName() + " contains business data but this activity does not have the multiple instance behaviour");
+                addError("The activity " + activity.getName()
+                        + " contains business data but this activity does not have the multiple instance behaviour");
             }
             names = new HashSet<>();
             for (BusinessDataDefinition businessDataDefinition : activity.getBusinessDataDefinitions()) {
                 if (!names.add(businessDataDefinition.getName())) {
-                    addError("The activity " + activity.getName() + " contains more than one business data with the name " + businessDataDefinition.getName());
+                    addError("The activity " + activity.getName()
+                            + " contains more than one business data with the name "
+                            + businessDataDefinition.getName());
                 }
             }
         }
@@ -331,7 +350,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private boolean isReferenceValid(final String dataReference, final ActivityDefinition activity) {
         final FlowElementContainerDefinition processContainer = process.getProcessContainer();
         return dataReference == null || activity.getBusinessDataDefinition(dataReference) != null
-                || processContainer.getBusinessDataDefinition(dataReference) != null || activity.getDataDefinition(dataReference) != null
+                || processContainer.getBusinessDataDefinition(dataReference) != null
+                || activity.getDataDefinition(dataReference) != null
                 || processContainer.getDataDefinition(dataReference) != null;
     }
 
@@ -358,7 +378,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void validateProcess(final FlowElementContainerDefinition flowElementContainer, final boolean isRootContainer) {
+    private void validateProcess(final FlowElementContainerDefinition flowElementContainer,
+            final boolean isRootContainer) {
         validateConnectors(flowElementContainer.getConnectors());
         validateGateways(flowElementContainer);
         validateDocuments(flowElementContainer);
@@ -370,7 +391,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateConnectors(flowElementContainer.getConnectors());
     }
 
-    private void validateFlowNodeUnique(final FlowElementContainerDefinition flowElementContainer, final List<String> names) {
+    private void validateFlowNodeUnique(final FlowElementContainerDefinition flowElementContainer,
+            final List<String> names) {
         validateFlowNodeName(names, flowElementContainer.getActivities());
         validateFlowNodeName(names, flowElementContainer.getEndEvents());
         validateFlowNodeName(names, flowElementContainer.getGatewaysList());
@@ -380,17 +402,20 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         // validateFlowNodeName(names, flowElementContainer.getBusinessDataDefinitions());
     }
 
-    private void validateFlowNodeName(final List<String> names, final Collection<? extends FlowNodeDefinition> flowNodes) {
+    private void validateFlowNodeName(final List<String> names,
+            final Collection<? extends FlowNodeDefinition> flowNodes) {
         for (final FlowNodeDefinition flowNode : flowNodes) {
             validateConnectors(flowNode.getConnectors());
             if (names.contains(flowNode.getName())) {
-                designErrors.add("More than one elements are named '" + flowNode.getName() + "'. All names must be unique.");
+                designErrors.add(
+                        "More than one elements are named '" + flowNode.getName() + "'. All names must be unique.");
             } else {
                 names.add(flowNode.getName());
             }
             if (flowNode instanceof SubProcessDefinition) {
                 final SubProcessDefinition subProcess = (SubProcessDefinition) flowNode;
-                org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = subProcess.getSubProcessContainer();
+                org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = subProcess
+                        .getSubProcessContainer();
                 if (subProcessContainer != null) {
                     validateFlowNodeUnique(subProcessContainer, names);
                 }
@@ -409,10 +434,12 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             if (activity instanceof UserTaskDefinition) {
                 validateUserTask((UserTaskDefinition) activity);
             }
-            if (activity instanceof CallActivityDefinition && ((CallActivityDefinition) activity).getCallableElement() == null) {
+            if (activity instanceof CallActivityDefinition
+                    && ((CallActivityDefinition) activity).getCallableElement() == null) {
                 addError("The call activity " + activity.getName() + " has a null callable element");
             }
-            if (activity instanceof SendTaskDefinition && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
+            if (activity instanceof SendTaskDefinition
+                    && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
                 addError("The send task " + activity.getName() + " hasn't target");
             }
         }
@@ -424,7 +451,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 switch (gateway.getGatewayType()) {
                     case PARALLEL:
                         if (transition.getCondition() != null) {
-                            designErrors.add("The parallel gateway can't have conditional outgoing transitions : " + gateway);
+                            designErrors.add(
+                                    "The parallel gateway can't have conditional outgoing transitions : " + gateway);
                         }
                         break;
                     default:
@@ -438,20 +466,25 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         final FlowElementContainerDefinition processContainer = process.getProcessContainer();
         for (final ActivityDefinition activity : processContainer.getActivities()) {
             if (activity instanceof SubProcessDefinition) {
-                final FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity).getSubProcessContainer();
+                final FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
+                        .getSubProcessContainer();
                 if (subProcessContainer == null) {
                     designErrors.add("The subprocess " + activity.getName() + " does not have any element," +
-                            " add at least one element using the builder that can be retrieved on the subprocess activity:" +
+                            " add at least one element using the builder that can be retrieved on the subprocess activity:"
+                            +
                             " org.bonitasoft.engine.bpm.process.impl.SubProcessActivityDefinitionBuilder.getSubProcessBuilder()");
                     return;
                 }
                 if (((SubProcessDefinition) activity).isTriggeredByEvent()) {
                     if (subProcessContainer.getStartEvents().size() != 1) {
-                        designErrors.add("An event sub process must have one and only one start events, but " + subProcessContainer.getStartEvents().size()
+                        designErrors.add("An event sub process must have one and only one start events, but "
+                                + subProcessContainer.getStartEvents().size()
                                 + " were found : " + activity);
                     }
-                    if (!subProcessContainer.getStartEvents().isEmpty() && subProcessContainer.getStartEvents().get(0).getEventTriggers().isEmpty()) {
-                        designErrors.add("The event sub process have no start event with a not NONE trigger : " + activity);
+                    if (!subProcessContainer.getStartEvents().isEmpty()
+                            && subProcessContainer.getStartEvents().get(0).getEventTriggers().isEmpty()) {
+                        designErrors
+                                .add("The event sub process have no start event with a not NONE trigger : " + activity);
                     }
                     if (activity.getIncomingTransitions().size() > 0) {
                         designErrors.add("An event sub process cannot have incoming transitions : " + activity);
@@ -465,7 +498,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void validateEvents(final FlowElementContainerDefinition flowElementContainer, final boolean isRootContainer) {
+    private void validateEvents(final FlowElementContainerDefinition flowElementContainer,
+            final boolean isRootContainer) {
         validateStartEvents(flowElementContainer, isRootContainer);
         validateEndEvents(flowElementContainer);
         validateBoundaryEvents(flowElementContainer);
@@ -479,7 +513,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void validateStartEvents(final FlowElementContainerDefinition processContainer, final boolean isRootContainer) {
+    private void validateStartEvents(final FlowElementContainerDefinition processContainer,
+            final boolean isRootContainer) {
         for (final StartEventDefinition startEvent : processContainer.getStartEvents()) {
             if (!startEvent.getIncomingTransitions().isEmpty()) {
                 designErrors.add("A start event can't have incoming transitions: on start event" + startEvent);
@@ -490,7 +525,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateMessageStartEvent(final StartEventDefinition startEvent, final boolean isRootContainer) {
         if (isRootContainer) {
-            final List<CatchMessageEventTriggerDefinition> messageEventTriggers = startEvent.getMessageEventTriggerDefinitions();
+            final List<CatchMessageEventTriggerDefinition> messageEventTriggers = startEvent
+                    .getMessageEventTriggerDefinitions();
             for (final CatchMessageEventTriggerDefinition messageEventTrigger : messageEventTriggers) {
                 if (!messageEventTrigger.getCorrelations().isEmpty()) {
                     designErrors.add("A message start event cannot have correlations. On start event:" + startEvent);
@@ -501,16 +537,25 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateMultiInstances(final FlowElementContainerDefinition processContainer) {
         for (final ActivityDefinition activity : processContainer.getActivities()) {
-            if (activity.getLoopCharacteristics() != null && activity.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics) {
-                final MultiInstanceLoopCharacteristics loopCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
-                if (loopCharacteristics.getLoopDataInputRef() != null && !loopCharacteristics.getLoopDataInputRef().isEmpty()
-                        && (loopCharacteristics.getLoopDataInputRef() == null || loopCharacteristics.getLoopDataInputRef().isEmpty())) {
-                    designErrors.add("The multi instance has got a data input reference but does not have a loop data input on activity" + activity.getName());
+            if (activity.getLoopCharacteristics() != null
+                    && activity.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics) {
+                final MultiInstanceLoopCharacteristics loopCharacteristics = (MultiInstanceLoopCharacteristics) activity
+                        .getLoopCharacteristics();
+                if (loopCharacteristics.getLoopDataInputRef() != null
+                        && !loopCharacteristics.getLoopDataInputRef().isEmpty()
+                        && (loopCharacteristics.getLoopDataInputRef() == null
+                                || loopCharacteristics.getLoopDataInputRef().isEmpty())) {
+                    designErrors.add(
+                            "The multi instance has got a data input reference but does not have a loop data input on activity"
+                                    + activity.getName());
                 }
-                if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
-                        && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
+                if (loopCharacteristics.getDataOutputItemRef() != null
+                        && !loopCharacteristics.getDataOutputItemRef().isEmpty()
+                        && (loopCharacteristics.getLoopDataOutputRef() == null
+                                || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
                     designErrors
-                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
+                            .add("The multi instance has got a data output reference but does not have a loop data output on activity"
+                                    + activity.getName());
                 }
                 // TODO add validation on data existence
             }
@@ -533,13 +578,19 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             if (!activity.getBoundaryEventDefinitions().isEmpty() && !supportAllBoundaryEvents(activity)) {
                 for (final BoundaryEventDefinition boundary : activity.getBoundaryEventDefinitions()) {
                     if (!boundary.getTimerEventTriggerDefinitions().isEmpty()) {
-                        designErrors.add("Timer boundary events are not supported in automatic, receive and send tasks: " + activity.getName());
+                        designErrors
+                                .add("Timer boundary events are not supported in automatic, receive and send tasks: "
+                                        + activity.getName());
                     }
                     if (!boundary.getSignalEventTriggerDefinitions().isEmpty()) {
-                        designErrors.add("Signal boundary events are not supported in automatic, receive and send tasks: " + activity.getName());
+                        designErrors
+                                .add("Signal boundary events are not supported in automatic, receive and send tasks: "
+                                        + activity.getName());
                     }
                     if (!boundary.getMessageEventTriggerDefinitions().isEmpty()) {
-                        designErrors.add("Message boundary events are not supported in automatic, receive and send tasks: " + activity.getName());
+                        designErrors
+                                .add("Message boundary events are not supported in automatic, receive and send tasks: "
+                                        + activity.getName());
                     }
                 }
             }
@@ -553,11 +604,13 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                     designErrors.add("A boundary event must not have incoming transitions: " + boundaryEvent.getName());
                 }
                 if (boundaryEvent.getEventTriggers().isEmpty()) {
-                    designErrors.add("A boundary event must have a trigger (it cannot be a NONE event): " + boundaryEvent.getName());
+                    designErrors.add("A boundary event must have a trigger (it cannot be a NONE event): "
+                            + boundaryEvent.getName());
                 }
                 for (final TimerEventTriggerDefinition timerTigger : boundaryEvent.getTimerEventTriggerDefinitions()) {
                     if (TimerType.CYCLE.equals(timerTigger.getTimerType())) {
-                        designErrors.add("Invalid timer type in boundary event " + boundaryEvent.getName() + ": CYCLE is not supported for boundary events.");
+                        designErrors.add("Invalid timer type in boundary event " + boundaryEvent.getName()
+                                + ": CYCLE is not supported for boundary events.");
                     }
                 }
                 validateNonInterruptingBoundaryEvent(boundaryEvent);
@@ -566,16 +619,19 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private boolean supportAllBoundaryEvents(final ActivityDefinition activity) {
-        return !(activity instanceof AutomaticTaskDefinition || activity instanceof ReceiveTaskDefinition || activity instanceof SendTaskDefinition);
+        return !(activity instanceof AutomaticTaskDefinition || activity instanceof ReceiveTaskDefinition
+                || activity instanceof SendTaskDefinition);
     }
 
     private void validateNonInterruptingBoundaryEvent(final BoundaryEventDefinition boundaryEvent) {
         if (!boundaryEvent.isInterrupting()) {
             if (!boundaryEvent.getSignalEventTriggerDefinitions().isEmpty()) {
-                designErrors.add("Non-interrupting boundary events are not supported for SIGNAL events: " + boundaryEvent.getName());
+                designErrors.add("Non-interrupting boundary events are not supported for SIGNAL events: "
+                        + boundaryEvent.getName());
             }
             if (!boundaryEvent.getMessageEventTriggerDefinitions().isEmpty()) {
-                designErrors.add("Non-interrupting boundary events are not supported for MESSAGE events: " + boundaryEvent.getName());
+                designErrors.add("Non-interrupting boundary events are not supported for MESSAGE events: "
+                        + boundaryEvent.getName());
             }
             if (!boundaryEvent.getErrorEventTriggerDefinitions().isEmpty()) {
                 designErrors.add("An error event must be INTERRUPTING: " + boundaryEvent.getName());
@@ -586,7 +642,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateBoundaryOutgoingTransitions(final BoundaryEventDefinition boundaryEvent) {
         for (final TransitionDefinition transition : boundaryEvent.getOutgoingTransitions()) {
             if (transition.getCondition() != null) {
-                designErrors.add("A boundary event must have no conditional transitions: " + transition.getSource() + "->" + transition.getTarget());
+                designErrors.add("A boundary event must have no conditional transitions: " + transition.getSource()
+                        + "->" + transition.getTarget());
             }
         }
     }
@@ -597,12 +654,14 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     @Override
     public DocumentDefinitionBuilder addDocumentDefinition(final String name) {
-        return new DocumentDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new DocumentDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name);
     }
 
     @Override
     public DocumentListDefinitionBuilder addDocumentListDefinition(final String name) {
-        return new DocumentListDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new DocumentListDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
     }
 
     @Override
@@ -666,145 +725,175 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     @Override
-    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {
-        return new ConnectorDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, connectorId, version,
+    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
+        return new ConnectorDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, connectorId, version,
                 activationEvent);
     }
 
     @Override
     public UserTaskDefinitionBuilder addUserTask(final String taskName, final String actorName) {
-        return new UserTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName, actorName);
+        return new UserTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                taskName, actorName);
     }
 
     @Override
     public AutomaticTaskDefinitionBuilder addAutomaticTask(final String taskName) {
-        return new AutomaticTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName);
+        return new AutomaticTaskDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName);
     }
 
     @Override
     public ReceiveTaskDefinitionBuilder addReceiveTask(final String taskName, final String messageName) {
-        return new ReceiveTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName, messageName);
+        return new ReceiveTaskDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName, messageName);
     }
 
     @Override
-    public SendTaskDefinitionBuilder addSendTask(final String taskName, final String messageName, final Expression targetProcess) {
-        return new SendTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName, messageName, targetProcess);
+    public SendTaskDefinitionBuilder addSendTask(final String taskName, final String messageName,
+            final Expression targetProcess) {
+        return new SendTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                taskName, messageName, targetProcess);
     }
 
     @Override
     public ManualTaskDefinitionBuilder addManualTask(final String name, final String actorName) {
-        return new ManualTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, actorName);
+        return new ManualTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, actorName);
     }
 
     @Override
     public TransitionDefinitionBuilder addTransition(final String source, final String target) {
-        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), source, target, false);
+        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                source, target, false);
     }
 
     @Override
-    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression condition) {
-        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), source, target, condition, false);
+    public TransitionDefinitionBuilder addTransition(final String source, final String target,
+            final Expression condition) {
+        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                source, target, condition, false);
     }
 
     @Override
     public GatewayDefinitionBuilder addGateway(final String name, final GatewayType gatewayType) {
-        return new GatewayDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, gatewayType);
+        return new GatewayDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, gatewayType);
     }
 
     @Override
     public StartEventDefinitionBuilder addStartEvent(final String name) {
-        return new StartEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new StartEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name);
     }
 
     @Override
     public EndEventDefinitionBuilder addEndEvent(final String name) {
-        return new EndEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new EndEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name);
     }
 
     @Override
     public IntermediateCatchEventDefinitionBuilder addIntermediateCatchEvent(final String name) {
-        return new IntermediateCatchEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new IntermediateCatchEventDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
     }
 
     @Override
     public IntermediateThrowEventDefinitionBuilder addIntermediateThrowEvent(final String name) {
-        return new IntermediateThrowEventDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+        return new IntermediateThrowEventDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
     }
 
     @Override
-    public CallActivityBuilder addCallActivity(final String name, final Expression callableElement, final Expression callableElementVersion) {
-        return new CallActivityBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, callableElement, callableElementVersion);
+    public CallActivityBuilder addCallActivity(final String name, final Expression callableElement,
+            final Expression callableElementVersion) {
+        return new CallActivityBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                callableElement, callableElementVersion);
     }
 
     @Override
     public SubProcessActivityDefinitionBuilder addSubProcess(final String name, final boolean triggeredByEvent) {
-        return new SubProcessActivityDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, triggeredByEvent);
+        return new SubProcessActivityDefinitionBuilder(this,
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, triggeredByEvent);
     }
 
     @Override
     public DataDefinitionBuilder addIntegerData(final String name, final Expression defaultValue) {
         final String className = Integer.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addLongData(final String name, final Expression defaultValue) {
         final String className = Long.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addShortTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, className, defaultValue);
     }
 
     @Override
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue)
-                .isLongText();
+        return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, className, defaultValue)
+                        .isLongText();
     }
 
     @Override
     public DataDefinitionBuilder addDoubleData(final String name, final Expression defaultValue) {
         final String className = Double.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addFloatData(final String name, final Expression defaultValue) {
         final String className = Float.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addDateData(final String name, final Expression defaultValue) {
         final String className = Date.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public XMLDataDefinitionBuilder addXMLData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new XMLDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new XMLDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                name, className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addBlobData(final String name, final Expression defaultValue) {
         final String className = Serializable.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addBooleanData(final String name, final Expression defaultValue) {
         final String className = Boolean.class.getName();
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     @Override
     public DataDefinitionBuilder addData(final String name, final String className, final Expression defaultValue) {
-        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name,
+                className, defaultValue);
     }
 
     /**
@@ -843,7 +932,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     @Override
     public TransitionDefinitionBuilder addDefaultTransition(final String source, final String target) {
-        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), source, target, null, true);
+        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(),
+                source, target, null, true);
     }
 
     /**
@@ -865,7 +955,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      * @param type
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
-     * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @return The {@link ParameterDefinitionBuilder} containing the new
+     *         {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);

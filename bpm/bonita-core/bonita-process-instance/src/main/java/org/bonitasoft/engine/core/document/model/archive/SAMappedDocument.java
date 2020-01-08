@@ -31,11 +31,9 @@ public class SAMappedDocument extends SMappedDocument implements ArchivedPersist
     private long archiveDate;
     private long sourceObjectId;
 
-
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SMappedDocument.class;
     }
-
 
 }

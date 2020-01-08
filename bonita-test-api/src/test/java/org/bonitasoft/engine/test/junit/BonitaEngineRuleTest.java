@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.test.junit;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.BonitaDatabaseConfiguration;
@@ -29,7 +28,6 @@ public class BonitaEngineRuleTest {
     private final MyTestEngine testEngineToInject = new MyTestEngine();
     @Rule
     public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.createWith(testEngineToInject);
-
 
     @Test
     public void should_TestEngine_be_started() throws Exception {
@@ -68,7 +66,7 @@ public class BonitaEngineRuleTest {
 
         @Override
         public void setBonitaDatabaseProperties(BonitaDatabaseConfiguration database) {
-            
+
         }
 
         @Override

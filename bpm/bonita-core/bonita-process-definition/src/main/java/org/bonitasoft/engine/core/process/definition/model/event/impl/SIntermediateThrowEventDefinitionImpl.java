@@ -24,7 +24,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateTh
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SIntermediateThrowEventDefinitionImpl extends SThrowEventDefinitionImpl implements SIntermediateThrowEventDefinition {
+public class SIntermediateThrowEventDefinitionImpl extends SThrowEventDefinitionImpl
+        implements SIntermediateThrowEventDefinition {
 
     private static final long serialVersionUID = 5010523330087778508L;
 

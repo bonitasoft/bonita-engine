@@ -29,18 +29,18 @@ public class GroovyScriptConditionExpressionExecutorStrategy extends GroovyScrip
             ClassLoaderService classLoaderService, TechnicalLoggerService logger) {
         super(cacheService, classLoaderService, logger);
     }
-    
+
     @Override
     public ExpressionKind getExpressionKind() {
         return KIND_READ_ONLY_CONDITION_SCRIPT_GROOVY;
     }
-    
+
     @Override
     public Object evaluate(SExpression expression, Map<String, Object> context,
             Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionEvaluationException {
-         Object result = super.evaluate(expression, context, resolvedExpressions, containerState);
-         return result instanceof Boolean ? result : result != null;
+        Object result = super.evaluate(expression, context, resolvedExpressions, containerState);
+        return result instanceof Boolean ? result : result != null;
     }
 
 }

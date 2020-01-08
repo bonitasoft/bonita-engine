@@ -16,12 +16,10 @@ package org.bonitasoft.engine.platform.model;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.platform.model.STenant;
 import org.junit.Test;
 
 /**
  * @author Celine Souchet
- *
  */
 public class STenantTest {
 
@@ -50,8 +48,9 @@ public class STenantTest {
         return buildTenant(45, "tenant", "me", 1567l, status, false);
     }
 
-    private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status,
-                                final boolean defaultTenant) {
+    private STenant buildTenant(final long id, final String name, final String createdBy, final long created,
+            final String status,
+            final boolean defaultTenant) {
         final STenant tenant = new STenant(name, createdBy, created, status, defaultTenant);
         tenant.setId(id);
         return tenant;

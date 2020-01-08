@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.recorder.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -31,16 +34,12 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public class RecorderImpl implements Recorder {
-
 
     private final TechnicalLoggerService logger;
 
@@ -123,7 +122,7 @@ public class RecorderImpl implements Recorder {
 
         try {
             int updateCount = persistenceService.update(query, record.getFields());
-            if(updateCount > 0 )
+            if (updateCount > 0)
                 eventService.fireEvent(createUpdateEvent(record.getEntity(), record.getFields(), type));
             return updateCount;
         } catch (final Exception e) {

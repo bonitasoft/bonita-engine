@@ -33,7 +33,8 @@ public class BoundaryInstanceBuilder extends FlowNodeInstanceBuilder<SBoundaryEv
 
     @Override
     SBoundaryEventInstance _build() {
-        final SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId,
+        final SBoundaryEventInstance boundaryEventInstance = new SBoundaryEventInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId,
                 logicalGroup1, logicalGroup2);
         boundaryEventInstance.setActivityInstanceId(activityInstanceId);
         return boundaryEventInstance;

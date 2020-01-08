@@ -79,8 +79,10 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         MessageEventTriggerDefinitionImpl that = (MessageEventTriggerDefinitionImpl) o;
         return Objects.equals(messageName, that.messageName) &&
                 Objects.equals(correlations, that.correlations);

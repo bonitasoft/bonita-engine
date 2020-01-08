@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatoryFieldsException;
-
-import org.bonitasoft.engine.page.SPageLogBuilder;
 
 /**
  * @author Baptiste Mesta
@@ -40,7 +39,8 @@ public class SPageLogBuilderImpl extends CRUDELogBuilder implements SPageLogBuil
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SPageLogBuilderFactoryImpl.PAGE_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SPageLogBuilderFactoryImpl.PAGE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: page identifier");
         }
     }

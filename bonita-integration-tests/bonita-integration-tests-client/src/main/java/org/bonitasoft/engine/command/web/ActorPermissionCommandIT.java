@@ -50,7 +50,8 @@ public class ActorPermissionCommandIT extends TestWithUser {
 
     private static final String IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD = "isAllowedToSeeOverviewForm";
 
-    private Map<String, Serializable> prepareParametersWithUserId(final long userId, final List<Long> processDefinitionIds) {
+    private Map<String, Serializable> prepareParametersWithUserId(final long userId,
+            final List<Long> processDefinitionIds) {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("USER_ID_KEY", userId);
         parameters.put("PROCESSDEFINITION_IDS_KEY", (Serializable) processDefinitionIds);
@@ -64,14 +65,16 @@ public class ActorPermissionCommandIT extends TestWithUser {
         return parameters;
     }
 
-    private Map<String, Serializable> prepareParametersWithArchivedDescriptor(final long userId, final long processInstanceId) {
+    private Map<String, Serializable> prepareParametersWithArchivedDescriptor(final long userId,
+            final long processInstanceId) {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("USER_ID_KEY", userId);
         parameters.put("PROCESSINSTANCE_ID_KEY", processInstanceId);
         return parameters;
     }
 
-    private ProcessDefinitionBuilder setterActors(final ProcessDefinitionBuilder processDefinitionBuilder, final List<String> actorNames,
+    private ProcessDefinitionBuilder setterActors(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<String> actorNames,
             final List<Boolean> isInitiators) {
         final ProcessDefinitionBuilder processDefBuilder = processDefinitionBuilder;
         if (actorNames != null && !actorNames.isEmpty() && isInitiators != null && !isInitiators.isEmpty()) {
@@ -98,25 +101,30 @@ public class ActorPermissionCommandIT extends TestWithUser {
         final List<Long> processDefinitionIds = new ArrayList<>();
         final int num = 5;
         for (int i = 0; i < num; i++) {
-            ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", String.valueOf(i));
+            ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                    .createNewInstance("My_Process", String.valueOf(i));
             if (i % 2 == 0) {
-                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
+                processDefinitionBuilder = setterActors(processDefinitionBuilder,
+                        Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                         Arrays.asList(true, false, false, false));
             } else {
-                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
+                processDefinitionBuilder = setterActors(processDefinitionBuilder,
+                        Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                         Arrays.asList(false, false, false, false));
             }
 
             // one process has only one actorInitiator.
             final DesignProcessDefinition processDef = processDefinitionBuilder.done();
-            final ProcessDefinition processDefinition = deployProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
-                    .done());
+            final ProcessDefinition processDefinition = deployProcess(
+                    new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
+                            .done());
             getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
             getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
             getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());
             final long processDefinitionId = processDefinition.getId();
             getProcessAPI().enableProcess(processDefinitionId);
-            final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+            final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                    .getProcessDeploymentInfo(processDefinition.getId());
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
             getProcessAPI().startProcess(processDefinition.getId());
@@ -124,7 +132,8 @@ public class ActorPermissionCommandIT extends TestWithUser {
         }
 
         final Map<String, Serializable> paras = prepareParametersWithUserId(user.getId(), processDefinitionIds);
-        final Map<Long, Boolean> res = (Map<Long, Boolean>) getCommandAPI().execute(IS_ALLOWED_TO_START_PROCESSES_CMD, paras);
+        final Map<Long, Boolean> res = (Map<Long, Boolean>) getCommandAPI().execute(IS_ALLOWED_TO_START_PROCESSES_CMD,
+                paras);
 
         assertEquals(processDefinitionIds.size(), res.size());
         assertTrue(res.get(processDefinitionIds.get(0)));
@@ -142,24 +151,29 @@ public class ActorPermissionCommandIT extends TestWithUser {
         final String ACTOR_NAME2 = "ActorElias";
         final String ACTOR_NAME3 = "ActorBap";
 
-        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0");
-        processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("My_Process", "1.0");
+        processDefinitionBuilder = setterActors(processDefinitionBuilder,
+                Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                 Arrays.asList(true, false, false, false));
         // one process has only one actorInitiator.
         final DesignProcessDefinition processDef = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
-                .done());
+        final ProcessDefinition processDefinition = deployProcess(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
+                        .done());
         getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
         getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
         getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());
         final long processDefinitionId = processDefinition.getId();
         getProcessAPI().enableProcess(processDefinitionId);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         getProcessAPI().startProcess(processDefinition.getId());
-        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinitionId, 0, 5, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinitionId, 0, 5,
+                ActorCriterion.NAME_ASC);
         final ActorInstance actorInitiator = getProcessAPI().getActorInitiator(processDefinitionId);
         actors.add(actorInitiator);
 
@@ -191,9 +205,11 @@ public class ActorPermissionCommandIT extends TestWithUser {
             designProcessDefinition.addUserTask("step2", ACTOR_NAME);
             designProcessDefinition.addTransition("step1", "step2");
             // assign pending task to jack
-            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                    ACTOR_NAME, user);
             final long processDefinitionId = processDefinition.getId();
-            final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
+            final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                    .getProcessDeploymentInfo(processDefinitionId);
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -203,10 +219,12 @@ public class ActorPermissionCommandIT extends TestWithUser {
             waitForUserTask(processInstance.getId(), "step2");
         }
 
-        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstanceIds.get(0));
+        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(),
+                processInstanceIds.get(0));
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
 
-        final Map<String, Serializable> paras2 = prepareParametersWithArchivedDescriptor(user.getId(), processInstanceIds.get(1));
+        final Map<String, Serializable> paras2 = prepareParametersWithArchivedDescriptor(user.getId(),
+                processInstanceIds.get(1));
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras2));
 
         disableAndDeleteProcessById(processDefinitionIds);
@@ -216,17 +234,20 @@ public class ActorPermissionCommandIT extends TestWithUser {
     public void isAllowedToSeeOverviewFormForProcessInstancesInvolvingUser() throws Exception {
         final User jack = createUser("jack", "bpm");
         // create process
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2", "step3"), Arrays.asList(false, true, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps(
+                        Arrays.asList("step1", "step2", "step3"), Arrays.asList(false, true, true));
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
 
         final long step2Id = waitForUserTask(processInstance, "step2");
-        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(jack.getId(), processInstance.getId());
+        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(jack.getId(),
+                processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
         assignAndExecuteStep(step2Id, jack);

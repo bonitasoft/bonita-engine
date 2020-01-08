@@ -24,5 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SProcessSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
+
     private long processInstanceId;
 }

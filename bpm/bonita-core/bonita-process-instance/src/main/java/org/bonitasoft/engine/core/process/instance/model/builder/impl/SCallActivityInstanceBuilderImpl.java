@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityIn
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SCallActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SCallActivityInstanceBuilder {
+public class SCallActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl
+        implements SCallActivityInstanceBuilder {
 
     public SCallActivityInstanceBuilderImpl(final SCallActivityInstance callActivityInstance) {
         super(callActivityInstance);

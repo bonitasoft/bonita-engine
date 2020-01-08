@@ -93,7 +93,8 @@ public class APICallContext implements Serializable {
      * @param body
      *        the body string of the api context if specified
      */
-    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) {
+    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString,
+            String body) {
         this.method = method;
         this.apiName = apiName;
         this.resourceName = resourceName;
@@ -141,7 +142,8 @@ public class APICallContext implements Serializable {
 
     private void addFilterIfValueNotBlank(String value, int indexOfEquals, int separatorSize) {
         if (indexOfEquals + separatorSize < value.length()) {
-            filters.put(value.substring(0, indexOfEquals), value.substring(indexOfEquals + separatorSize, value.length()));
+            filters.put(value.substring(0, indexOfEquals),
+                    value.substring(indexOfEquals + separatorSize, value.length()));
         }
     }
 
@@ -197,9 +199,10 @@ public class APICallContext implements Serializable {
     public void setApiName(String apiName) {
         this.apiName = apiName;
     }
-    
+
     /**
-     * @return the name of the main resource (if a subresource is queried, its name will be part of the compound resource ID)
+     * @return the name of the main resource (if a subresource is queried, its name will be part of the compound
+     *         resource ID)
      */
     public String getResourceName() {
         return resourceName;
@@ -210,14 +213,16 @@ public class APICallContext implements Serializable {
     }
 
     /**
-     * @return the list of identifiers composing the resource ID. This is useful for compound resource IDs (the identifiers are separated with  a / in the URL)
+     * @return the list of identifiers composing the resource ID. This is useful for compound resource IDs (the
+     *         identifiers are separated with a / in the URL)
      */
     public List<String> getCompoundResourceId() {
         return resourceId == null ? Collections.<String> emptyList() : Arrays.asList(resourceId.split("/"));
     }
 
     /**
-     * @return the full resource ID as a string. If the resource ID is compound, it will return as it is in the URL (with a / as separator between the identifiers)
+     * @return the full resource ID as a string. If the resource ID is compound, it will return as it is in the URL
+     *         (with a / as separator between the identifiers)
      */
     public String getResourceId() {
         return resourceId;
@@ -246,7 +251,6 @@ public class APICallContext implements Serializable {
         return body;
     }
 
-
     public void setBody(String body) {
         this.body = body;
     }
@@ -264,9 +268,10 @@ public class APICallContext implements Serializable {
     public String getSearchTerm() {
         return searchTerm;
     }
-    
+
     /**
-     * @return a Map containing the parameters of the request as they are set in the query string (including the filters and search terms)
+     * @return a Map containing the parameters of the request as they are set in the query string (including the filters
+     *         and search terms)
      */
     public Map<String, String[]> getParameters() {
         return parameters;

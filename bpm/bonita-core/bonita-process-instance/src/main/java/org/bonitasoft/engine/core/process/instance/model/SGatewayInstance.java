@@ -31,14 +31,16 @@ public class SGatewayInstance extends SFlowNodeInstance {
     private SGatewayType gatewayType;
     private String hitBys = "";
 
-    public SGatewayInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                final SGatewayType gatewayType, final long logicalGroup1, final long logicalGroup2) {
+    public SGatewayInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final SGatewayType gatewayType, final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
         this.gatewayType = gatewayType;
     }
 
     public SGatewayInstance(SGatewayInstance gatewayInstance) {
-        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(), gatewayInstance.getRootContainerId(),
+        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(),
+                gatewayInstance.getRootContainerId(),
                 gatewayInstance.getParentContainerId(),
                 gatewayInstance.getLogicalGroup(0), gatewayInstance.getLogicalGroup(1));
         setLogicalGroup(2, gatewayInstance.getLogicalGroup(2));

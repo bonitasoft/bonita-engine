@@ -75,7 +75,8 @@ public class ExportActorMapping implements TransactionContentWithResult<String> 
         while (!actors.isEmpty()) {
             for (final SActor sActor : actors) {
                 final Actor actor = new Actor(sActor.getName());
-                final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, Integer.MAX_VALUE);
+                final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0,
+                        Integer.MAX_VALUE);
                 for (final SActorMember sActorMember : actorMembers) {
                     addUser(actor, sActorMember);
                     addGroup(actor, sActorMember);
@@ -111,7 +112,8 @@ public class ExportActorMapping implements TransactionContentWithResult<String> 
         }
     }
 
-    private void addMembership(final Actor actor, final SActorMember sActorMember) throws SRoleNotFoundException, SGroupNotFoundException {
+    private void addMembership(final Actor actor, final SActorMember sActorMember)
+            throws SRoleNotFoundException, SGroupNotFoundException {
         if (sActorMember.getRoleId() > 0 && sActorMember.getGroupId() > 0) {
             final SRole role = identityService.getRole(sActorMember.getRoleId());
             final SGroup group = identityService.getGroup(sActorMember.getGroupId());

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.exception;
 /**
  * Happens when a process instance can't be there is a parent process instance that is still active
  * Delete this parent process first.
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ProcessInstanceHierarchicalDeletionException extends DeletionException {

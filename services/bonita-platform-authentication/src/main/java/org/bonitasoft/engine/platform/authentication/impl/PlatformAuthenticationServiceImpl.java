@@ -37,10 +37,12 @@ public class PlatformAuthenticationServiceImpl implements PlatformAuthentication
     }
 
     @Override
-    public void checkUserCredentials(final String username, final String password) throws SInvalidUserException, SInvalidPasswordException {
+    public void checkUserCredentials(final String username, final String password)
+            throws SInvalidUserException, SInvalidPasswordException {
         final String methodName = "checkUserCredentials";
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
         // FIXME read user and password from a configuration file
         if (!USERNAME.equals(username)) {
@@ -52,7 +54,8 @@ public class PlatformAuthenticationServiceImpl implements PlatformAuthentication
             throw new SInvalidPasswordException("Invalid password");
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 

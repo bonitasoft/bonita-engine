@@ -61,7 +61,8 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getNoParametersWhenAddingNoParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
         processBuilder.addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -76,9 +77,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getNumberOfParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key2", String.class.getCanonicalName())
-                .addParameter("key3", String.class.getCanonicalName()).addParameter("key4", String.class.getCanonicalName()).addUserTask("userTask1", null);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("key1", String.class.getCanonicalName())
+                .addParameter("key2", String.class.getCanonicalName())
+                .addParameter("key3", String.class.getCanonicalName())
+                .addParameter("key4", String.class.getCanonicalName()).addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -97,14 +101,16 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getNoParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
         processBuilder.addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20,
+                ParameterCriterion.NAME_DESC);
         assertEquals(0, parameters.size());
 
         deleteProcess(definition);
@@ -112,8 +118,10 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key2", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("key1", String.class.getCanonicalName())
+                .addParameter("key2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -125,7 +133,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20,
+                ParameterCriterion.NAME_ASC);
         assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
         assertEquals("key1", firstParameter.getName());
@@ -141,8 +150,10 @@ public class ProcessParameterIT extends CommonAPIIT {
     public void getParameter() throws BonitaException {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter", "1.0");
-        processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addDescription("Parameter description");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter",
+                "1.0");
+        processBuilder.addParameter("myParam1", String.class.getCanonicalName())
+                .addDescription("Parameter description");
         processBuilder.addParameter("myParam2", String.class.getCanonicalName()).addUserTask("userTask1", null);
 
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -168,14 +179,16 @@ public class ProcessParameterIT extends CommonAPIIT {
     public void setProcessDataDefaultValueWithParameterValue() throws Exception {
         final User user = createUser("jules", "his_password");
         final String parameterName = "anotherParam";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("setDataDefaultValueWithParameter", "9.23");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("setDataDefaultValueWithParameter", "9.23");
         processBuilder.addActor(ACTOR_NAME);
         final String aTask = "userTask1";
         final String dataName = "aData";
         processBuilder
                 .addParameter(parameterName, String.class.getCanonicalName())
                 .addData(dataName, String.class.getName(),
-                        new ExpressionBuilder().createParameterExpression("takes value of default parameter value", parameterName, String.class.getName()))
+                        new ExpressionBuilder().createParameterExpression("takes value of default parameter value",
+                                parameterName, String.class.getName()))
                 .addUserTask(aTask, ACTOR_NAME);
 
         final DesignProcessDefinition design = processBuilder.done();
@@ -186,7 +199,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         params.put(parameterName, paramValue);
         businessArchive.setParameters(params);
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive.done(), ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, aTask);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
@@ -199,8 +213,10 @@ public class ProcessParameterIT extends CommonAPIIT {
     @Test
     public void deployWithNullParamAndFormMappings() throws BonitaException {
         final String parameterName = "myParam1";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter", "1.0");
-        processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addParameter("myParam2", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter",
+                "1.0");
+        processBuilder.addParameter("myParam1", String.class.getCanonicalName())
+                .addParameter("myParam2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -210,7 +226,9 @@ public class ProcessParameterIT extends CommonAPIIT {
         params.put(parameterName, null);
         businessArchive.setParameters(params);
         businessArchive.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().withFormMapping(
-                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("someTask").build())
+                FormMappingDefinitionBuilder
+                        .buildFormMapping("somePage", FormMappingType.TASK, FormMappingTarget.INTERNAL)
+                        .withTaskname("someTask").build())
                 .build());
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -228,8 +246,10 @@ public class ProcessParameterIT extends CommonAPIIT {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
         final String wrongParameterName = "wrongParameterName";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getUnknownParameter", "1.0");
-        processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addParameter("myParam2", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("getUnknownParameter", "1.0");
+        processBuilder.addParameter("myParam1", String.class.getCanonicalName())
+                .addParameter("myParam2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -250,9 +270,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void sortParametersByNameAsc() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -265,7 +288,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20,
+                ParameterCriterion.NAME_ASC);
         assertEquals(4, parameters.size());
         assertEquals("bear", parameters.get(0).getName());
         assertEquals("bee", parameters.get(1).getName());
@@ -277,9 +301,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void sortParametersByNameDesc() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -292,7 +319,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20,
+                ParameterCriterion.NAME_DESC);
         assertEquals(4, parameters.size());
         assertEquals("squirrel", parameters.get(0).getName());
         assertEquals("donkey", parameters.get(1).getName());
@@ -304,9 +332,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getPageOne() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -319,7 +350,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 2, ParameterCriterion.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 2,
+                ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         assertEquals("squirrel", parameters.get(0).getName());
         assertEquals("donkey", parameters.get(1).getName());
@@ -329,9 +361,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getPageTwo() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -344,7 +379,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 2, 2, ParameterCriterion.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 2, 2,
+                ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         assertEquals("bee", parameters.get(0).getName());
         assertEquals("bear", parameters.get(1).getName());
@@ -354,9 +390,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void getPageTwoOutOfBound() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -369,14 +408,16 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameterInstances = getProcessAPI().getParameterInstances(definition.getId(), 8, 8, ParameterCriterion.NAME_ASC);
+        final List<ParameterInstance> parameterInstances = getProcessAPI().getParameterInstances(definition.getId(), 8,
+                8, ParameterCriterion.NAME_ASC);
         assertEquals(0, parameterInstances.size());
         deleteProcess(definition);
     }
 
     @Test
     public void emptyParameterIsAValidValue() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("emptyParameterIsAValidValue", "1.7");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("emptyParameterIsAValidValue", "1.7");
         processBuilder.addParameter("Astronaut", String.class.getCanonicalName()).addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -386,7 +427,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         deleteProcess(definition);
@@ -394,9 +436,12 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void resolvedDependencies() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
-                .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName())
+                .addParameter("bear", String.class.getCanonicalName())
+                .addParameter("squirrel", String.class.getCanonicalName())
+                .addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -409,7 +454,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         deleteProcess(definition);
@@ -417,8 +463,10 @@ public class ProcessParameterIT extends CommonAPIIT {
 
     @Test
     public void showResolvedAndUnresolvedParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("bee", String.class.getCanonicalName()).addDescription("description").addParameter("bear", String.class.getCanonicalName())
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess",
+                "1.0");
+        processBuilder.addParameter("bee", String.class.getCanonicalName()).addDescription("description")
+                .addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -429,7 +477,8 @@ public class ProcessParameterIT extends CommonAPIIT {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20,
+                ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         final ParameterInstance parameter1 = parameters.get(0);
         assertEquals("bee", parameter1.getName());
@@ -462,24 +511,34 @@ public class ProcessParameterIT extends CommonAPIIT {
         parameters.put("booleanValue", "true");
         parameters.put("doubleValue", "1.1");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndParameters(processBuilder.done(), actor, jack, parameters);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndParameters(processBuilder.done(),
+                actor, jack, parameters);
 
-        final Expression integerParameter = new ExpressionBuilder().createParameterExpression("integerExpression", "integerValue", Integer.class.getName());
-        final Expression isIntegerValueInteger = new ExpressionBuilder().createGroovyScriptExpression("testIntegerValueToBeInteger",
+        final Expression integerParameter = new ExpressionBuilder().createParameterExpression("integerExpression",
+                "integerValue", Integer.class.getName());
+        final Expression isIntegerValueInteger = new ExpressionBuilder().createGroovyScriptExpression(
+                "testIntegerValueToBeInteger",
                 "integerValue instanceof Integer", Boolean.class.getName(), integerParameter);
 
-        final Expression booleanParameter = new ExpressionBuilder().createParameterExpression("booleanParameter", "booleanValue", Boolean.class.getName());
-        final Expression isBooleanValueBoolean = new ExpressionBuilder().createGroovyScriptExpression("testBooleanValueToBeBoolean",
+        final Expression booleanParameter = new ExpressionBuilder().createParameterExpression("booleanParameter",
+                "booleanValue", Boolean.class.getName());
+        final Expression isBooleanValueBoolean = new ExpressionBuilder().createGroovyScriptExpression(
+                "testBooleanValueToBeBoolean",
                 "booleanValue instanceof Boolean", Boolean.class.getName(), booleanParameter);
 
-        final Expression doubleParameter = new ExpressionBuilder().createParameterExpression("doubleExpression", "doubleValue", Double.class.getName());
-        final Expression isDoubleValueDouble = new ExpressionBuilder().createGroovyScriptExpression("testDoubleValueToBeDouble",
+        final Expression doubleParameter = new ExpressionBuilder().createParameterExpression("doubleExpression",
+                "doubleValue", Double.class.getName());
+        final Expression isDoubleValueDouble = new ExpressionBuilder().createGroovyScriptExpression(
+                "testDoubleValueToBeDouble",
                 "doubleValue instanceof Double", Boolean.class.getName(), doubleParameter);
 
         final Map<String, Serializable> inputValues = new HashMap<>(0);
-        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isIntegerValueInteger, inputValues, processDefinition.getId()), is(true));
-        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isBooleanValueBoolean, inputValues, processDefinition.getId()), is(true));
-        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues, processDefinition.getId()), is(true));
+        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isIntegerValueInteger, inputValues,
+                processDefinition.getId()), is(true));
+        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isBooleanValueBoolean, inputValues,
+                processDefinition.getId()), is(true));
+        assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues,
+                processDefinition.getId()), is(true));
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(jack);

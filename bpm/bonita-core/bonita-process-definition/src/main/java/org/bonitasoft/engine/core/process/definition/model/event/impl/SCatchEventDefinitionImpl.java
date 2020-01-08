@@ -58,20 +58,25 @@ public abstract class SCatchEventDefinitionImpl extends SEventDefinitionImpl imp
             final Map<String, STransitionDefinition> transitionsMap) {
         super(eventDefinition, transitionsMap);
         isInterrupting = eventDefinition.isInterrupting();
-        timerEventTriggers = new ArrayList<STimerEventTriggerDefinition>(eventDefinition.getTimerEventTriggerDefinitions().size());
+        timerEventTriggers = new ArrayList<STimerEventTriggerDefinition>(
+                eventDefinition.getTimerEventTriggerDefinitions().size());
         for (final TimerEventTriggerDefinition timerTrigger : eventDefinition.getTimerEventTriggerDefinitions()) {
             addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(timerTrigger));
         }
-        messageEventTriggers = new ArrayList<SCatchMessageEventTriggerDefinition>(eventDefinition.getMessageEventTriggerDefinitions().size());
-        for (final CatchMessageEventTriggerDefinition catchMessageTrigger : eventDefinition.getMessageEventTriggerDefinitions()) {
+        messageEventTriggers = new ArrayList<SCatchMessageEventTriggerDefinition>(
+                eventDefinition.getMessageEventTriggerDefinitions().size());
+        for (final CatchMessageEventTriggerDefinition catchMessageTrigger : eventDefinition
+                .getMessageEventTriggerDefinitions()) {
             addMessageEventTrigger(new SCatchMessageEventTriggerDefinitionImpl(catchMessageTrigger));
         }
-        signalEventTriggers = new ArrayList<SCatchSignalEventTriggerDefinition>(eventDefinition.getSignalEventTriggerDefinitions().size());
+        signalEventTriggers = new ArrayList<SCatchSignalEventTriggerDefinition>(
+                eventDefinition.getSignalEventTriggerDefinitions().size());
         for (final SignalEventTriggerDefinition signalTrigger : eventDefinition.getSignalEventTriggerDefinitions()) {
             addSignalEventTrigger(new SCatchSignalEventTriggerDefinitionImpl(signalTrigger.getSignalName()));
         }
 
-        errorEventTriggers = new ArrayList<SCatchErrorEventTriggerDefinition>(eventDefinition.getErrorEventTriggerDefinitions().size());
+        errorEventTriggers = new ArrayList<SCatchErrorEventTriggerDefinition>(
+                eventDefinition.getErrorEventTriggerDefinitions().size());
         for (final ErrorEventTriggerDefinition errorTrigger : eventDefinition.getErrorEventTriggerDefinitions()) {
             addErrorEventTrigger(new SCatchErrorEventTriggerDefinitionImpl(errorTrigger.getErrorCode()));
         }

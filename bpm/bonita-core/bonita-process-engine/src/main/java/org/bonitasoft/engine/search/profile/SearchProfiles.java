@@ -32,7 +32,8 @@ public class SearchProfiles extends AbstractSearchEntity<Profile, SProfile> {
 
     private final ProfileService profileService;
 
-    public SearchProfiles(final ProfileService profileService, final SearchProfileDescriptor searchProfileDescriptor, final SearchOptions options) {
+    public SearchProfiles(final ProfileService profileService, final SearchProfileDescriptor searchProfileDescriptor,
+            final SearchOptions options) {
         super(searchProfileDescriptor, options);
         this.profileService = profileService;
     }

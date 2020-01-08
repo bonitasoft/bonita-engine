@@ -34,7 +34,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-
 /**
  *
  */
@@ -51,8 +50,7 @@ import javax.persistence.Version;
         @NamedQuery(name = "Person.query1", query = "SELECT p \nFROM Person p \nWHERE p.hasMobile = :hasMobile\nORDER BY p.persistenceId ASC"),
         @NamedQuery(name = "Person.findByRange", query = "SELECT p \nFROM Person p \nWHERE p.birthday >= :date1 AND p.birthday <= :date2\nORDER BY p.persistenceId ASC")
 })
-public class Person implements org.bonitasoft.engine.bdm.Entity
-{
+public class Person implements org.bonitasoft.engine.bdm.Entity {
 
     @Id
     @GeneratedValue
@@ -182,12 +180,12 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
         if (obj == null) {
             return false;
         }
-        if (getClass()!= obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Person other = ((Person) obj);
         if (persistenceId == null) {
-            if (other.persistenceId!= null) {
+            if (other.persistenceId != null) {
                 return false;
             }
         } else {
@@ -196,7 +194,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (persistenceVersion == null) {
-            if (other.persistenceVersion!= null) {
+            if (other.persistenceVersion != null) {
                 return false;
             }
         } else {
@@ -205,7 +203,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (name == null) {
-            if (other.name!= null) {
+            if (other.name != null) {
                 return false;
             }
         } else {
@@ -214,7 +212,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (age == null) {
-            if (other.age!= null) {
+            if (other.age != null) {
                 return false;
             }
         } else {
@@ -223,7 +221,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (phones == null) {
-            if (other.phones!= null) {
+            if (other.phones != null) {
                 return false;
             }
         } else {
@@ -232,7 +230,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (birthday == null) {
-            if (other.birthday!= null) {
+            if (other.birthday != null) {
                 return false;
             }
         } else {
@@ -241,7 +239,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (hasMobile == null) {
-            if (other.hasMobile!= null) {
+            if (other.hasMobile != null) {
                 return false;
             }
         } else {
@@ -250,7 +248,7 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
             }
         }
         if (bools == null) {
-            if (other.bools!= null) {
+            if (other.bools != null) {
                 return false;
             }
         } else {
@@ -266,45 +264,45 @@ public class Person implements org.bonitasoft.engine.bdm.Entity
         final int prime = 31;
         int result = 1;
         int persistenceIdCode = 0;
-        if (persistenceId!= null) {
+        if (persistenceId != null) {
             persistenceIdCode = persistenceId.hashCode();
         }
-        result = ((prime*result)+ persistenceIdCode);
+        result = ((prime * result) + persistenceIdCode);
         int persistenceVersionCode = 0;
-        if (persistenceVersion!= null) {
+        if (persistenceVersion != null) {
             persistenceVersionCode = persistenceVersion.hashCode();
         }
-        result = ((prime*result)+ persistenceVersionCode);
+        result = ((prime * result) + persistenceVersionCode);
         int nameCode = 0;
-        if (name!= null) {
+        if (name != null) {
             nameCode = name.hashCode();
         }
-        result = ((prime*result)+ nameCode);
+        result = ((prime * result) + nameCode);
         int ageCode = 0;
-        if (age!= null) {
+        if (age != null) {
             ageCode = age.hashCode();
         }
-        result = ((prime*result)+ ageCode);
+        result = ((prime * result) + ageCode);
         int phonesCode = 0;
-        if (phones!= null) {
+        if (phones != null) {
             phonesCode = phones.hashCode();
         }
-        result = ((prime*result)+ phonesCode);
+        result = ((prime * result) + phonesCode);
         int birthdayCode = 0;
-        if (birthday!= null) {
+        if (birthday != null) {
             birthdayCode = birthday.hashCode();
         }
-        result = ((prime*result)+ birthdayCode);
+        result = ((prime * result) + birthdayCode);
         int hasMobileCode = 0;
-        if (hasMobile!= null) {
+        if (hasMobile != null) {
             hasMobileCode = hasMobile.hashCode();
         }
-        result = ((prime*result)+ hasMobileCode);
+        result = ((prime * result) + hasMobileCode);
         int boolsCode = 0;
-        if (bools!= null) {
+        if (bools != null) {
             boolsCode = bools.hashCode();
         }
-        result = ((prime*result)+ boolsCode);
+        result = ((prime * result) + boolsCode);
         return result;
     }
 

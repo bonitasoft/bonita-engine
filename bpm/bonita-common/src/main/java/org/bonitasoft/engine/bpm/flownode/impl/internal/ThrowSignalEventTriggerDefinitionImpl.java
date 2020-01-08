@@ -18,11 +18,14 @@ import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
 /**
  * @author Matthieu Chaffotte
  */
-public class ThrowSignalEventTriggerDefinitionImpl extends SignalEventTriggerDefinitionImpl implements ThrowSignalEventTriggerDefinition {
+public class ThrowSignalEventTriggerDefinitionImpl extends SignalEventTriggerDefinitionImpl
+        implements ThrowSignalEventTriggerDefinition {
 
     private static final long serialVersionUID = 5042891449855476318L;
 
-    public ThrowSignalEventTriggerDefinitionImpl(){}
+    public ThrowSignalEventTriggerDefinitionImpl() {
+    }
+
     public ThrowSignalEventTriggerDefinitionImpl(final String name) {
         super(name);
     }

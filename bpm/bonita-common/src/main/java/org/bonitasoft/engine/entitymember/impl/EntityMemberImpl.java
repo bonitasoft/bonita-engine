@@ -38,7 +38,8 @@ public class EntityMemberImpl implements EntityMember {
 
     private String displayNamePart3;
 
-    public EntityMemberImpl(final long entityMemberId, final String externalId, final long userId, final long groupId, final long roleId,
+    public EntityMemberImpl(final long entityMemberId, final String externalId, final long userId, final long groupId,
+            final long roleId,
             final String displayNamePart1, final String displayNamePart2, final String displayNamePart3) {
         super();
         this.entityMemberId = entityMemberId;

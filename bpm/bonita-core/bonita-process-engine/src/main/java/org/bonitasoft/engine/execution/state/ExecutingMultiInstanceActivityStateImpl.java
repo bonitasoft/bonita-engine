@@ -55,7 +55,8 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;
 
-    public ExecutingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final ContainerRegistry containerRegistry,
+    public ExecutingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService,
+            final ContainerRegistry containerRegistry,
             final ActivityInstanceService activityInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
         this.containerRegistry = containerRegistry;
@@ -89,11 +90,14 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final SFlowNodeInstance childInstance)
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SFlowNodeInstance childInstance)
             throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-        final SMultiInstanceLoopCharacteristics loopCharacteristics = (SMultiInstanceLoopCharacteristics) activityDefinition.getLoopCharacteristics();
+        final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer
+                .getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        final SMultiInstanceLoopCharacteristics loopCharacteristics = (SMultiInstanceLoopCharacteristics) activityDefinition
+                .getLoopCharacteristics();
 
         try {
             final SMultiInstanceActivityInstance miActivity = (SMultiInstanceActivityInstance) flowNodeInstance;
@@ -112,16 +116,21 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 // check the completionCondition
                 final SExpression completionCondition = loopCharacteristics.getCompletionCondition();
                 final Map<String, Object> input = new HashMap<>(1);
-                input.put(ExpressionConstants.NUMBER_OF_ACTIVE_INSTANCES.getEngineConstantName(), miActivity.getNumberOfActiveInstances());
-                input.put(ExpressionConstants.NUMBER_OF_TERMINATED_INSTANCES.getEngineConstantName(), miActivity.getNumberOfTerminatedInstances());
-                input.put(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName(), miActivity.getNumberOfCompletedInstances());
+                input.put(ExpressionConstants.NUMBER_OF_ACTIVE_INSTANCES.getEngineConstantName(),
+                        miActivity.getNumberOfActiveInstances());
+                input.put(ExpressionConstants.NUMBER_OF_TERMINATED_INSTANCES.getEngineConstantName(),
+                        miActivity.getNumberOfTerminatedInstances());
+                input.put(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName(),
+                        miActivity.getNumberOfCompletedInstances());
                 final int numberOfInstances = miActivity.getNumberOfInstances();
                 input.put(ExpressionConstants.NUMBER_OF_INSTANCES.getEngineConstantName(), numberOfInstances);
-                final SExpressionContext sExpressionContext = new SExpressionContext(miActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                final SExpressionContext sExpressionContext = new SExpressionContext(miActivity.getId(),
+                        DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId(), input);
                 sExpressionContext.setProcessDefinitionId(miActivity.getProcessDefinitionId());
                 if (completionCondition != null) {
-                    final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition, sExpressionContext);
+                    final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition,
+                            sExpressionContext);
                     if (complete) {
                         stateBehaviors.interruptSubActivities(miActivity, ABORTING);
                         if (miActivity.isSequential()) {
@@ -139,22 +148,27 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
                 if (stateBehaviors.shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
-                    createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(), activityDefinition, miActivity, 1);
+                    createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(),
+                            activityDefinition, miActivity, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(sFlowNodeInstance);
                     }
                 }
-                return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
+                return numberOfActiveInstances == 0
+                        && (createInnerInstances == null || createInnerInstances.size() == 0);
             }
-            return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
+            return numberOfActiveInstances == 0
+                    || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
-        final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+        final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance)
+                .getNumberOfActiveInstances();
         if (numberOfActiveInstances > 0) {
             stateBehaviors.executeChildrenActivities(flowNodeInstance);
         }
@@ -162,7 +176,8 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public final StateCode execute(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
     }
 

@@ -17,7 +17,8 @@ import java.util.Random;
 
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 
-public class PendingActivityMappingBuilder extends PersistentObjectBuilder<SPendingActivityMapping, PendingActivityMappingBuilder> {
+public class PendingActivityMappingBuilder
+        extends PersistentObjectBuilder<SPendingActivityMapping, PendingActivityMappingBuilder> {
 
     private long activityId = new Random().nextLong();
 

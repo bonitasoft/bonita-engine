@@ -31,7 +31,8 @@ public class DeleteUsers extends DeleteWithActorMembers implements TransactionCo
 
     private final List<Long> userIds;
 
-    public DeleteUsers(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
+    public DeleteUsers(final IdentityService identityService, final ActorMappingService actorMappingService,
+            final ProfileService profileService,
             final List<Long> userIds) {
         super(actorMappingService, profileService, identityService);
         this.userIds = userIds;

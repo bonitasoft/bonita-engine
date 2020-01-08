@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
@@ -30,8 +31,6 @@ import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Baptiste Mesta
@@ -55,7 +54,8 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
     @XmlElement(type = ExpressionImpl.class, name = "condition")
     private Expression expression;
 
-    public TransitionDefinitionImpl(final String name, final FlowNodeDefinitionImpl source, final FlowNodeDefinitionImpl target) {
+    public TransitionDefinitionImpl(final String name, final FlowNodeDefinitionImpl source,
+            final FlowNodeDefinitionImpl target) {
         super(name);
         this.source = source;
         this.target = target;

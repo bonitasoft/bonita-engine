@@ -42,7 +42,8 @@ public class ScriptExecutorTest {
     private ScriptExecutor scriptExecutor;
 
     @Test
-    public void createAndInitializePlatformIfNecessary_should_not_create_platform_if_already_existing() throws Exception {
+    public void createAndInitializePlatformIfNecessary_should_not_create_platform_if_already_existing()
+            throws Exception {
         //given
         ScriptExecutor spy = spy(scriptExecutor);
         doReturn(true).when(spy).isPlatformAlreadyCreated();
@@ -57,7 +58,8 @@ public class ScriptExecutorTest {
     }
 
     @Test
-    public void createAndInitializePlatformIfNecessary_should_create_platform_if_not_already_existing() throws Exception {
+    public void createAndInitializePlatformIfNecessary_should_create_platform_if_not_already_existing()
+            throws Exception {
         //given
         ScriptExecutor spy = spy(scriptExecutor);
 

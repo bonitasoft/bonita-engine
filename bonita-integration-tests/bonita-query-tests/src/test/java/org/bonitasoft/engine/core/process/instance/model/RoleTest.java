@@ -14,21 +14,11 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.GroupBuilder.aGroup;
 import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 
-import java.util.List;
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.test.persistence.builder.RoleBuilder;
 import org.bonitasoft.engine.test.persistence.repository.RoleRepository;
-import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

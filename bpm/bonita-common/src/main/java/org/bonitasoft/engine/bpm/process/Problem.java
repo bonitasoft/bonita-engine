@@ -19,8 +19,10 @@ import java.io.Serializable;
  * A <code>Problem</code> explains the issue in the {@link DesignProcessDefinition} when it is not well designed.
  * It relates to :
  * <ul>
- * <li>structural problems such as a {@link org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition} without an exception flow,</li>
- * <li>naming problems such as two {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}s with the same name,</li>
+ * <li>structural problems such as a {@link org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition} without an
+ * exception flow,</li>
+ * <li>naming problems such as two {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}s with the same
+ * name,</li>
  * <li>type problems such as an {@link org.bonitasoft.engine.expression.Expression} which has not the right type,</li>
  * <li>...</li>
  * </ul>
@@ -61,7 +63,8 @@ public interface Problem extends Serializable {
 
     /**
      * Returns the resource/concept name of the problem.
-     * It can be related to {@link org.bonitasoft.engine.bpm.data.DataDefinition}, {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}, ...
+     * It can be related to {@link org.bonitasoft.engine.bpm.data.DataDefinition},
+     * {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}, ...
      *
      * @return the resource name
      */

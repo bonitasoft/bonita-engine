@@ -30,7 +30,8 @@ public class WaitForDataValue extends WaitUntil {
 
     private final String valueExpected;
 
-    public WaitForDataValue(final int repeatEach, final int timeout, final long processInstanceId, final String dataName,
+    public WaitForDataValue(final int repeatEach, final int timeout, final long processInstanceId,
+            final String dataName,
             final String valueExpected, final ProcessAPI processAPI) {
         super(repeatEach, timeout, false);
         this.processAPI = processAPI;

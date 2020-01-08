@@ -25,7 +25,8 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
  */
 public class SelectDescriptorBuilder {
 
-    public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingWithoutDisplayNameById(final long mappingId) {
+    public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingWithoutDisplayNameById(
+            final long mappingId) {
         return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
@@ -33,15 +34,18 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
-    public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingById(final long mappingId, final String suffix) {
+    public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingById(final long mappingId,
+            final String suffix) {
         return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfExternalIdentityMappings(final String externalId, final String kind) {
+    public static SelectOneDescriptor<Long> getNumberOfExternalIdentityMappings(final String externalId,
+            final String kind) {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("externalId", externalId);
         parameters.put("kind", kind);
-        return new SelectOneDescriptor<Long>("getNumberOfExternalIdentityMappings", parameters, SExternalIdentityMapping.class);
+        return new SelectOneDescriptor<Long>("getNumberOfExternalIdentityMappings", parameters,
+                SExternalIdentityMapping.class);
     }
 
 }

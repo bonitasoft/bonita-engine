@@ -30,7 +30,8 @@ public class SearchComments extends AbstractCommentSearchEntity {
 
     private final SCommentService commentService;
 
-    public SearchComments(SearchCommentDescriptor searchDescriptor, SearchOptions options, SCommentService commentService) {
+    public SearchComments(SearchCommentDescriptor searchDescriptor, SearchOptions options,
+            SCommentService commentService) {
         super(searchDescriptor, options);
         this.commentService = commentService;
     }

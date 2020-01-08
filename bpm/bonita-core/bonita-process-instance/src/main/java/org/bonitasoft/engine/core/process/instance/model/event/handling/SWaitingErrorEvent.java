@@ -32,8 +32,9 @@ public class SWaitingErrorEvent extends SWaitingEvent {
      */
     private long relatedActivityInstanceId;
 
-    public SWaitingErrorEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
-                                  final String flowNodeName, final String errorCode) {
+    public SWaitingErrorEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
+            final String flowNodeName, final String errorCode) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
         this.errorCode = errorCode;
     }

@@ -25,17 +25,16 @@ import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SearchApplicationPages extends AbstractSearchEntity<ApplicationPage, SApplicationPage> {
 
     private final ApplicationService applicationService;
     private final ApplicationPageModelConverter convertor;
 
-    public SearchApplicationPages(final ApplicationService applicationService, final ApplicationPageModelConverter convertor,
+    public SearchApplicationPages(final ApplicationService applicationService,
+            final ApplicationPageModelConverter convertor,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.applicationService = applicationService;

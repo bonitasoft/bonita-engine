@@ -58,7 +58,8 @@ public class IsTaskAvailableForUserRuleTest {
     long taskInstanceId = 42L;
 
     @InjectMocks
-    IsTaskAvailableForUserRule isTaskAvailableForUserRule = new IsTaskAvailableForUserRule(activityInstanceService, sessionService, sessionAccessor);
+    IsTaskAvailableForUserRule isTaskAvailableForUserRule = new IsTaskAvailableForUserRule(activityInstanceService,
+            sessionService, sessionAccessor);
 
     @Before
     public void initMocks() throws Exception {
@@ -124,9 +125,11 @@ public class IsTaskAvailableForUserRuleTest {
         final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
         queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
         context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
-        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService).getHumanTaskInstance(taskInstanceId);
+        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService)
+                .getHumanTaskInstance(taskInstanceId);
         when(archivedHumanTaskInstance.getExecutedBy()).thenReturn(5L);
-        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId)).thenReturn(archivedHumanTaskInstance);
+        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId))
+                .thenReturn(archivedHumanTaskInstance);
 
         assertThat(isTaskAvailableForUserRule.isAllowed("key", context)).isFalse();
     }
@@ -137,9 +140,11 @@ public class IsTaskAvailableForUserRuleTest {
         final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
         queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
         context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
-        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService).getHumanTaskInstance(taskInstanceId);
+        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService)
+                .getHumanTaskInstance(taskInstanceId);
         when(archivedHumanTaskInstance.getExecutedBy()).thenReturn(userId);
-        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId)).thenReturn(archivedHumanTaskInstance);
+        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId))
+                .thenReturn(archivedHumanTaskInstance);
 
         assertThat(isTaskAvailableForUserRule.isAllowed("key", context)).isTrue();
     }
@@ -150,8 +155,10 @@ public class IsTaskAvailableForUserRuleTest {
         final Map<String, String[]> queryParameters = new HashMap<String, String[]>();
         queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(taskInstanceId) });
         context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
-        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService).getHumanTaskInstance(taskInstanceId);
-        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId)).thenReturn(null);
+        doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService)
+                .getHumanTaskInstance(taskInstanceId);
+        when(activityInstanceService.getLastArchivedFlowNodeInstance(SAHumanTaskInstance.class, taskInstanceId))
+                .thenReturn(null);
 
         isTaskAvailableForUserRule.isAllowed("key", context);
     }

@@ -55,10 +55,12 @@ public class ContainerRegistry {
             throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(flowNodeInstance.getParentContainerType().name());
         if (containerExecutor != null) {
-            containerExecutor.childFinished(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentContainerId(), flowNodeInstance);
+            containerExecutor.childFinished(flowNodeInstance.getProcessDefinitionId(),
+                    flowNodeInstance.getParentContainerId(), flowNodeInstance);
         } else {
-            throw new SActivityExecutionException("There is no container executor for the container " + flowNodeInstance.getParentContainerId()
-                    + " having the type " + flowNodeInstance.getParentContainerType());
+            throw new SActivityExecutionException(
+                    "There is no container executor for the container " + flowNodeInstance.getParentContainerId()
+                            + " having the type " + flowNodeInstance.getParentContainerType());
         }
     }
 
@@ -71,7 +73,7 @@ public class ContainerRegistry {
     }
 
     public void executeFlowNodeInSameThread(final SFlowNodeInstance flowNodeInstance,
-                                            final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
+            final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         containerExecutor.executeFlowNode(flowNodeInstance, null, null);
     }

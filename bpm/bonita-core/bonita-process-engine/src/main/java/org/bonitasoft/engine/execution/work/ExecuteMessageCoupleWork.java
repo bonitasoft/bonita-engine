@@ -47,21 +47,25 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: " + waitingMessageId;
+        return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: "
+                + waitingMessageId;
     }
 
-    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService) throws SWaitingEventModificationException,
+    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService)
+            throws SWaitingEventModificationException,
             SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor
-                .addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
+                .addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
+                        SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
     @Override
     public String getRecoveryProcedure() {
-        return "call processApi.executeMessageCouple(" + messageInstanceId + ", " + waitingMessageId + "); to re-launch the execution of the message.";
+        return "call processApi.executeMessageCouple(" + messageInstanceId + ", " + waitingMessageId
+                + "); to re-launch the execution of the message.";
     }
 
     @Override
@@ -74,7 +78,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         if (waitingMessage != null) {
             tenantAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
             eventInstanceService.deleteMessageInstance(messageInstance);
-            dataInstanceService.deleteLocalDataInstances(messageInstanceId, DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
+            dataInstanceService.deleteLocalDataInstances(messageInstanceId,
+                    DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -88,11 +93,17 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         });
         TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.WARNING,
-                String.format("Unable to execute message couple with sent message %s and waiting message %s, the waiting message was reset" +
-                        " to allow other message to trigger it. This failure might come from a design issue, cause is: %s", messageInstanceId, waitingMessageId, getRootCause(e)));
+                String.format(
+                        "Unable to execute message couple with sent message %s and waiting message %s, the waiting message was reset"
+                                +
+                                " to allow other message to trigger it. This failure might come from a design issue, cause is: %s",
+                        messageInstanceId, waitingMessageId, getRootCause(e)));
         if (logger.isLoggable(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG)) {
             logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG,
-                    String.format("Cause of the issue while executing message couple: sent message %s and waiting message %s:", messageInstanceId, waitingMessageId), e);
+                    String.format(
+                            "Cause of the issue while executing message couple: sent message %s and waiting message %s:",
+                            messageInstanceId, waitingMessageId),
+                    e);
         }
 
     }

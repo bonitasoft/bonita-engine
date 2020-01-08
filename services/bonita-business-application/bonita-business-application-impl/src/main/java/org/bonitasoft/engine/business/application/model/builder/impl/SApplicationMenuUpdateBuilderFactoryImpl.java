@@ -15,14 +15,9 @@ package org.bonitasoft.engine.business.application.model.builder.impl;
 
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilderFactory;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationMenuUpdateBuilderFactoryImpl implements SApplicationMenuUpdateBuilderFactory {
 

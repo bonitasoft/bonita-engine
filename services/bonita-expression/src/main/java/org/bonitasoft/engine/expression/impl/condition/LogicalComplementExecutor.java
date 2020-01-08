@@ -36,8 +36,10 @@ public class LogicalComplementExecutor {
     private void validate(SExpression expression) throws SExpressionEvaluationException {
         List<SExpression> dependencies = expression.getDependencies();
         if (dependencies.size() != 1) {
-            throw new SExpressionEvaluationException("The expression '" + ConditionExpressionExecutorStrategy.LOGICAL_COMPLEMENT_OPERATOR
-                    + "' must have exactly 1 dependency.", expression.getName());
+            throw new SExpressionEvaluationException(
+                    "The expression '" + ConditionExpressionExecutorStrategy.LOGICAL_COMPLEMENT_OPERATOR
+                            + "' must have exactly 1 dependency.",
+                    expression.getName());
         }
         if (!Boolean.class.getName().equals(dependencies.get(0).getReturnType())) {
             StringBuilder stb = new StringBuilder();

@@ -19,7 +19,8 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface SCallActivityInstanceBuilderFactory extends SActivityInstanceBuilderFactory {
 
-    SCallActivityInstanceBuilder createNewCallActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+    SCallActivityInstanceBuilder createNewCallActivityInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
             long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
 
 }

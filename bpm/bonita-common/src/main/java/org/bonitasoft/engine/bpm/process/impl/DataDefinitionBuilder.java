@@ -30,62 +30,74 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
 
     private final DataDefinitionImpl dataDefinition;
 
-    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final DataDefinitionImpl dataDefinition) {
         super(container, processDefinitionBuilder);
         this.dataDefinition = dataDefinition;
         container.addDataDefinition(dataDefinition);
     }
 
-    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final ActivityDefinitionImpl activity, final DataDefinitionImpl dataDefinition) {
         super(container, processDefinitionBuilder);
         this.dataDefinition = dataDefinition;
         activity.addDataDefinition(dataDefinition);
     }
 
-    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final ThrowMessageEventTriggerDefinitionImpl messageEventTrigger, final DataDefinitionImpl dataDefinition) {
         super(container, processDefinitionBuilder);
         this.dataDefinition = dataDefinition;
         messageEventTrigger.addDataDefinition(dataDefinition);
     }
 
-    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    protected DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final DataDefinitionImpl dataDefinition) {
         super(container, processDefinitionBuilder);
         this.dataDefinition = dataDefinition;
     }
 
-    private static DataDefinitionImpl getData(final String name, final String className, final Expression defaultValue) {
+    private static DataDefinitionImpl getData(final String name, final String className,
+            final Expression defaultValue) {
         final DataDefinitionImpl data = new DataDefinitionImpl(name, defaultValue);
         data.setClassName(className);
         return data;
     }
 
-    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final String className, final Expression defaultValue) {
         this(processDefinitionBuilder, container, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
-    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final ActivityDefinitionImpl activity, final String name, final String className, final Expression defaultValue) {
+    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
+            final ActivityDefinitionImpl activity, final String name, final String className,
+            final Expression defaultValue) {
         this(processDefinitionBuilder, container, activity, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
-    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final ThrowMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
+    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
+            final ThrowMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className,
+            final Expression defaultValue) {
         this(processDefinitionBuilder, container, messageEventTrigger, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
-    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
+    public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
+            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className,
+            final Expression defaultValue) {
         this(processDefinitionBuilder, container, messageEventTrigger, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
@@ -99,7 +111,7 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
 
     /**
      * Marks this data as transient
-     * 
+     *
      * @return
      */
     public DataDefinitionBuilder isTransient() {

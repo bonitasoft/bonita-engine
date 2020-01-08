@@ -46,7 +46,8 @@ public class PlatformSessionServiceTest extends CommonBPMServicesTest {
         assertTrue(before.getTime() <= session.getCreationDate().getTime());
         assertTrue(session.getDuration() > 0);
         assertEquals(sessionService.getSessionsDuration(), session.getDuration());
-        assertEquals(session.getLastRenewDate().getTime() + session.getDuration(), session.getExpirationDate().getTime());
+        assertEquals(session.getLastRenewDate().getTime() + session.getDuration(),
+                session.getExpirationDate().getTime());
         assertEquals(username, session.getUserName());
     }
 
@@ -104,7 +105,8 @@ public class PlatformSessionServiceTest extends CommonBPMServicesTest {
         final SPlatformSession session2 = sessionService.getSession(session.getId());
         assertTrue(session2.getExpirationDate().after(session.getExpirationDate()));
         assertTrue(session2.getLastRenewDate().after(session.getLastRenewDate()));
-        assertEquals(session2.getLastRenewDate().getTime() + session2.getDuration(), session2.getExpirationDate().getTime());
+        assertEquals(session2.getLastRenewDate().getTime() + session2.getDuration(),
+                session2.getExpirationDate().getTime());
     }
 
 }

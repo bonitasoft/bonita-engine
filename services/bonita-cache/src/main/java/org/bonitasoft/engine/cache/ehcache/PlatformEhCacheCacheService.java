@@ -29,7 +29,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
-    public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final List<CacheConfiguration> cacheConfigurations,
+    public PlatformEhCacheCacheService(final TechnicalLoggerService logger,
+            final List<CacheConfiguration> cacheConfigurations,
             final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
         super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }

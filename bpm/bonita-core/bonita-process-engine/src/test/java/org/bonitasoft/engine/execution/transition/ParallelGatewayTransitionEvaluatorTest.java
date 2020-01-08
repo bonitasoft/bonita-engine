@@ -37,13 +37,16 @@ public class ParallelGatewayTransitionEvaluatorTest extends AbstractTransitionEv
     public void evaluateTransitions_should_return_all_transitions() throws Exception {
         //given
         FlowNodeTransitionsWrapper transitions = new FlowNodeTransitionsWrapper();
-        transitions.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(Arrays.asList(unConditionalTransition, trueTransition1, trueTransition2, falseTransition, nullTransition)));
+        transitions.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(Arrays
+                .asList(unConditionalTransition, trueTransition1, trueTransition2, falseTransition, nullTransition)));
 
         //when
-        List<STransitionDefinition> chosenTransitions = parallelGatewayTransitionEvaluator.evaluateTransitions(transitions);
+        List<STransitionDefinition> chosenTransitions = parallelGatewayTransitionEvaluator
+                .evaluateTransitions(transitions);
 
         //then
-        assertThat(chosenTransitions).containsExactly(unConditionalTransition, trueTransition1, trueTransition2, falseTransition, nullTransition);
+        assertThat(chosenTransitions).containsExactly(unConditionalTransition, trueTransition1, trueTransition2,
+                falseTransition, nullTransition);
     }
 
 }

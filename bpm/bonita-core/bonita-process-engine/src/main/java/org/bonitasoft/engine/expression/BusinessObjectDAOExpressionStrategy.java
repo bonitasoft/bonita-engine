@@ -41,7 +41,8 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String daoName = expression.getContent();
         if (context.containsKey(daoName)) {
@@ -51,7 +52,8 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
         try {
             return instantiateDAO(daoServerImplementation);
         } catch (Exception e) {
-            throw new SExpressionEvaluationException("Unable to instantiate Business Object Server DAO implementation" + daoServerImplementation, e,
+            throw new SExpressionEvaluationException(
+                    "Unable to instantiate Business Object Server DAO implementation" + daoServerImplementation, e,
                     expression.getName());
         }
     }
@@ -71,7 +73,8 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         List<Object> daos = new ArrayList<>(expressions.size());
         for (SExpression expression : expressions) {

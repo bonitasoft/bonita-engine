@@ -22,15 +22,10 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
-import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
-import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,19 +33,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class ProcessDefinitionQueriesTest {
-
 
     private static final long PROCESS_ID = 45354312L;
     private static final long ROLE_ID = 222222L;
     @Inject
     private ProcessInstanceRepository repository;
     /*
-        Tests for queries:
-        getNumberOfSUserWhoCanStartProcess
-        searchSUserWhoCanStartProcess
+     * Tests for queries:
+     * getNumberOfSUserWhoCanStartProcess
+     * searchSUserWhoCanStartProcess
      */
 
     @Test
@@ -68,7 +62,6 @@ public class ProcessDefinitionQueriesTest {
         repository.add(aUserMembership().forUser(paul).memberOf(G1, ROLE_ID).build());
         repository.add(aUserMembership().forUser(walter).memberOf(G2, ROLE_ID).build());
         repository.add(aUserMembership().forUser(marie).memberOf(G3, ROLE_ID).build());
-
 
         final List<SUser> users = repository.searchSUserWhoCanStartProcess(PROCESS_ID);
 

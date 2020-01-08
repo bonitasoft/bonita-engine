@@ -82,46 +82,57 @@ public class ProcessInvolvementDelegateTest {
         doReturn(PROCESS_INITIATOR_USER_ID).when(sProcessInstance).getStartedBy();
 
         // When
-        boolean involvedInProcessInstance = processInvolvementDelegate.isProcessOrArchivedProcessInitiator(WRONG_USER_ID, PROCESS_INSTANCE_ID);
+        boolean involvedInProcessInstance = processInvolvementDelegate
+                .isProcessOrArchivedProcessInitiator(WRONG_USER_ID, PROCESS_INSTANCE_ID);
 
         //then
         assertThat(involvedInProcessInstance).as("user should not be involved involved in human task").isFalse();
     }
 
     @Test
-    public final void should_isProcessOrArchivedProcessInitiator_return_true_if_user_started_process() throws Exception {
+    public final void should_isProcessOrArchivedProcessInitiator_return_true_if_user_started_process()
+            throws Exception {
         //given
         doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
         doReturn(PROCESS_INITIATOR_USER_ID).when(sProcessInstance).getStartedBy();
 
         // When
-        boolean involvedInProcessInstance = processInvolvementDelegate.isProcessOrArchivedProcessInitiator(PROCESS_INITIATOR_USER_ID, PROCESS_INSTANCE_ID);
+        boolean involvedInProcessInstance = processInvolvementDelegate
+                .isProcessOrArchivedProcessInitiator(PROCESS_INITIATOR_USER_ID, PROCESS_INSTANCE_ID);
 
         //then
         assertThat(involvedInProcessInstance).as("user should not be involved involved in human task").isTrue();
     }
 
     @Test
-    public final void should_isProcessOrArchivedProcessInitiator_return_true_when_process_is_archived() throws Exception {
+    public final void should_isProcessOrArchivedProcessInitiator_return_true_when_process_is_archived()
+            throws Exception {
         //given
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
-        doReturn(Arrays.asList(saProcessInstance)).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
+                .getProcessInstance(PROCESS_INSTANCE_ID);
+        doReturn(Arrays.asList(saProcessInstance)).when(processInstanceService)
+                .searchArchivedProcessInstances(any(QueryOptions.class));
         doReturn(PROCESS_INITIATOR_USER_ID).when(saProcessInstance).getStartedBy();
         // When
-        boolean involvedInProcessInstance = processInvolvementDelegate.isProcessOrArchivedProcessInitiator(PROCESS_INITIATOR_USER_ID, PROCESS_INSTANCE_ID);
+        boolean involvedInProcessInstance = processInvolvementDelegate
+                .isProcessOrArchivedProcessInitiator(PROCESS_INITIATOR_USER_ID, PROCESS_INSTANCE_ID);
 
         //then
         assertThat(involvedInProcessInstance).as("should be involved in archived case").isTrue();
     }
 
     @Test
-    public final void should_isProcessOrArchivedProcessInitiator_return_false_when_process_is_archived() throws Exception {
+    public final void should_isProcessOrArchivedProcessInitiator_return_false_when_process_is_archived()
+            throws Exception {
         //given
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
-        doReturn(Arrays.asList(saProcessInstance)).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService)
+                .getProcessInstance(PROCESS_INSTANCE_ID);
+        doReturn(Arrays.asList(saProcessInstance)).when(processInstanceService)
+                .searchArchivedProcessInstances(any(QueryOptions.class));
         doReturn(PROCESS_INITIATOR_USER_ID).when(saProcessInstance).getStartedBy();
         // When
-        boolean involvedInProcessInstance = processInvolvementDelegate.isProcessOrArchivedProcessInitiator(WRONG_USER_ID, PROCESS_INSTANCE_ID);
+        boolean involvedInProcessInstance = processInvolvementDelegate
+                .isProcessOrArchivedProcessInitiator(WRONG_USER_ID, PROCESS_INSTANCE_ID);
 
         //then
         assertThat(involvedInProcessInstance).as("should be involved in archived case").isFalse();

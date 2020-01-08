@@ -21,7 +21,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  */
-public class SCustomUserInfoDefinitionLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SCustomUserInfoDefinitionLogBuilderFactory {
+public class SCustomUserInfoDefinitionLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SCustomUserInfoDefinitionLogBuilderFactory {
 
     public static final int SPROFILE_METADATA_DEFINITION_INDEX = 1;
 
@@ -31,7 +32,7 @@ public class SCustomUserInfoDefinitionLogBuilderFactoryImpl extends CRUDELogBuil
     public SCustomUserInfoDefinitionLogBuilder createNewInstance() {
         return new SCustomUserInfoDefinitionLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return SPROFILE_METADATA_DEFINITION_INDEX_NAME;

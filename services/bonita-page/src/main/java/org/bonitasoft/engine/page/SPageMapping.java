@@ -45,7 +45,8 @@ public class SPageMapping implements PersistentObject {
     private void parseRules() {
         if (pageAuthorizRules != null) {
             authorizationRules.clear();
-            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIM, false); stringTk.hasMoreTokens();) {
+            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIM, false); stringTk
+                    .hasMoreTokens();) {
                 String rule = stringTk.nextToken();
                 authorizationRules.add(rule);
             }

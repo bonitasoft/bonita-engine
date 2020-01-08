@@ -111,7 +111,8 @@ public class ConfigurationServiceImplIT {
         configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
 
         //then
-        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should insert row").isEqualTo(2);
+        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should insert row")
+                .isEqualTo(2);
 
     }
 
@@ -124,7 +125,8 @@ public class ConfigurationServiceImplIT {
         configurationService.storePlatformEngineConf(Collections.singletonList(
                 new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8))));
         configurationService.storeTenantTemplateEngineConf(Collections.singletonList(
-                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes(UTF_8))));
+                new BonitaConfiguration("theResourceOfTenantTemplate.xml",
+                        "tenantTemplate resource content".getBytes(UTF_8))));
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_1), TENANT_ID_1);
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_12), TENANT_ID_12);
 
@@ -135,7 +137,8 @@ public class ConfigurationServiceImplIT {
         Assertions.assertThat(configurationService.getPlatformEngineConf()).containsExactly(
                 new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8)));
         Assertions.assertThat(configurationService.getTenantTemplateEngineConf()).containsExactly(
-                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes(UTF_8)));
+                new BonitaConfiguration("theResourceOfTenantTemplate.xml",
+                        "tenantTemplate resource content".getBytes(UTF_8)));
         Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_1)).containsExactly(
                 new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1".getBytes(UTF_8)));
         Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).containsExactly(
@@ -148,10 +151,13 @@ public class ConfigurationServiceImplIT {
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_1), TENANT_ID_1);
         //when
         configurationService.storeTenantEngineConf(Collections.singletonList(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8))), 1L);
+                new BonitaConfiguration("resourceOfTenant.xml",
+                        "resource content in tenant 1 modified".getBytes(UTF_8))),
+                1L);
         //then
         Assertions.assertThat(configurationService.getTenantEngineConf(1L)).containsExactly(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8)));
+                new BonitaConfiguration("resourceOfTenant.xml",
+                        "resource content in tenant 1 modified".getBytes(UTF_8)));
     }
 
     @Test
@@ -197,9 +203,12 @@ public class ConfigurationServiceImplIT {
         configurationService.storeLicenses(licenses);
 
         //then
-        BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes(UTF_8));
-        BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic", "license 2 content".getBytes(UTF_8));
-        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(expectedLicense1, expectedLicense2);
+        BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic",
+                "license 1 content".getBytes(UTF_8));
+        BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic",
+                "license 2 content".getBytes(UTF_8));
+        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration")
+                .containsOnly(expectedLicense1, expectedLicense2);
 
     }
 
@@ -212,9 +221,11 @@ public class ConfigurationServiceImplIT {
         configurationService.storeLicenses(createNewLicenseFolder());
 
         //then
-        BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic", "new license 2 content".getBytes(UTF_8));
+        BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic",
+                "new license 2 content".getBytes(UTF_8));
         BonitaConfiguration newLicense3 = new BonitaConfiguration("license3.lic", "license 3 content".getBytes(UTF_8));
-        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(newLicense2, newLicense3);
+        Assertions.assertThat(configurationService.getLicenses()).as("should retrieve configuration")
+                .containsOnly(newLicense2, newLicense3);
 
     }
 
@@ -228,13 +239,19 @@ public class ConfigurationServiceImplIT {
         configurationService.deleteTenantConfiguration(TENANT_ID_12);
 
         //then
-        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
-        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
-        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_5)).as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_5))
+                .as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_5))
+                .as("should delete only for tenant 12").hasSize(1);
+        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_5))
+                .as("should delete only for tenant 12").hasSize(1);
 
-        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
-        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
-        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_12)).as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantSecurityScripts(TENANT_ID_12))
+                .as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantEngineConf(TENANT_ID_12))
+                .as("should delete only for tenant 12").isEmpty();
+        Assertions.assertThat(configurationService.getTenantPortalConf(TENANT_ID_12))
+                .as("should delete only for tenant 12").isEmpty();
 
     }
 
@@ -250,7 +267,8 @@ public class ConfigurationServiceImplIT {
         configurationService.deleteAllConfiguration();
 
         //then
-        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should delete all").isEqualTo(0);
+        Assertions.assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "configuration")).as("should delete all")
+                .isEqualTo(0);
 
     }
 
@@ -267,7 +285,8 @@ public class ConfigurationServiceImplIT {
     }
 
     private void createTables() throws Exception {
-        final InputStream createTableResource = this.getClass().getResourceAsStream("/sql/" + dbVendor + "/createTables.sql");
+        final InputStream createTableResource = this.getClass()
+                .getResourceAsStream("/sql/" + dbVendor + "/createTables.sql");
         try (Connection connection = getConnection()) {
             ScriptUtils.executeSqlScript(connection,
                     new EncodedResource(new InputStreamResource(createTableResource)), false, false,
@@ -277,7 +296,8 @@ public class ConfigurationServiceImplIT {
     }
 
     private void dropTables() throws Exception {
-        final InputStream dropTablesResource = this.getClass().getResourceAsStream("/sql/" + dbVendor + "/dropTables.sql");
+        final InputStream dropTablesResource = this.getClass()
+                .getResourceAsStream("/sql/" + dbVendor + "/dropTables.sql");
         try (Connection connection = getConnection()) {
             ScriptUtils.executeSqlScript(connection,
                     new EncodedResource(new InputStreamResource(dropTablesResource)), true, true,

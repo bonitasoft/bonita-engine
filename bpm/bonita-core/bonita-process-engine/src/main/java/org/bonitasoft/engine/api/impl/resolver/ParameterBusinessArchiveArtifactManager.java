@@ -86,7 +86,8 @@ public class ParameterBusinessArchiveArtifactManager implements BusinessArchiveA
         int i = 0;
         do {
             try {
-                parameters = parameterService.getNullValues(processDefinition.getId(), i, NUMBER_OF_RESULT, OrderBy.NAME_ASC);
+                parameters = parameterService.getNullValues(processDefinition.getId(), i, NUMBER_OF_RESULT,
+                        OrderBy.NAME_ASC);
             } catch (final SBonitaException e) {
                 return Collections
                         .singletonList(new ProblemImpl(Level.ERROR, null, "parameter", "Unable to get parameter !!"));
@@ -94,7 +95,8 @@ public class ParameterBusinessArchiveArtifactManager implements BusinessArchiveA
             i += NUMBER_OF_RESULT;
             for (final SParameter parameter : parameters) {
                 if (parameter.getValue() == null) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter", "Parameter '" + parameter.getName() + "' is not set.");
+                    final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter",
+                            "Parameter '" + parameter.getName() + "' is not set.");
                     problems.add(problem);
                 }
             }
@@ -107,12 +109,14 @@ public class ParameterBusinessArchiveArtifactManager implements BusinessArchiveA
         try {
             parameterService.deleteAll(processDefinition.getId());
         } catch (SParameterProcessNotFoundException | SBonitaReadException e) {
-            throw new SObjectModificationException("Unable to delete parameters of the process definition <" + processDefinition.getName() + ">", e);
+            throw new SObjectModificationException(
+                    "Unable to delete parameters of the process definition <" + processDefinition.getName() + ">", e);
         }
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
         final List<SParameter> sParameter = parameterService.get(processDefinitionId, 0, Integer.MAX_VALUE, null);
         Map<String, String> map = new HashMap<>();
         for (SParameter parameter : sParameter) {

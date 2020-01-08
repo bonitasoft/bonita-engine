@@ -21,10 +21,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMulti
 /**
  * @author Baptiste Mesta
  */
-public class SAMultiInstanceActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAMultiInstanceActivityInstanceBuilderFactory {
+public class SAMultiInstanceActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAMultiInstanceActivityInstanceBuilderFactory {
 
     @Override
-    public SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(final SMultiInstanceActivityInstance sMultiActivityInstance) {
+    public SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(
+            final SMultiInstanceActivityInstance sMultiActivityInstance) {
         final SAMultiInstanceActivityInstance entity = new SAMultiInstanceActivityInstance(sMultiActivityInstance);
         return new SAMultiInstanceActivityInstanceBuilderImpl(entity);
     }

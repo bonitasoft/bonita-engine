@@ -40,7 +40,7 @@ public class SProcessInstanceCreationException extends SBonitaException {
 
     /**
      * @param sDefinition
-     *            The process definition to add on context
+     *        The process definition to add on context
      * @since 6.3
      */
     public void setProcessDefinitionOnContext(final SProcessDefinition sDefinition) {

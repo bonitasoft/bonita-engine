@@ -46,8 +46,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -88,13 +88,15 @@ public class ActivityInstanceServiceImplTest {
 
     @Test(expected = SActivityReadException.class)
     public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws Exception {
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenThrow(new SBonitaReadException("database out"));
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .thenThrow(new SBonitaReadException("database out"));
         activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
     }
 
     @Test
     public void getEmptyPossibleUserIdsOfPendingTasks() throws Exception {
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(Collections.<Long> emptyList());
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .thenReturn(Collections.<Long> emptyList());
 
         final List<Long> userIds = activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
         assertEquals(Collections.emptyList(), userIds);
@@ -122,7 +124,8 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_255_characters() throws Exception {
+    public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_255_characters()
+            throws Exception {
         // given
         final String displayName = "simple task";
         final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
@@ -149,7 +152,8 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void updateDisplayDescription_should_truncate_when_display_description_is_bigger_than_255_characters() throws Exception {
+    public void updateDisplayDescription_should_truncate_when_display_description_is_bigger_than_255_characters()
+            throws Exception {
         // given
         final String displayDescr255 = "123456789 123456789 123456789 123456789 123456789 "
                 + "123456789 123456789 123456789 123456789 123456789 "
@@ -181,11 +185,13 @@ public class ActivityInstanceServiceImplTest {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
         parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options, parameters)).thenReturn(
-                new ArrayList<SHumanTaskInstance>());
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options,
+                parameters)).thenReturn(
+                        new ArrayList<SHumanTaskInstance>());
 
         // When
-        final List<SHumanTaskInstance> result = activityInstanceServiceImpl.searchAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
+        final List<SHumanTaskInstance> result = activityInstanceServiceImpl
+                .searchAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
 
         // Then
         assertNotNull(result);
@@ -200,8 +206,9 @@ public class ActivityInstanceServiceImplTest {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
         parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options, parameters)).thenThrow(
-                new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options,
+                parameters)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         activityInstanceServiceImpl.searchAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
@@ -221,10 +228,12 @@ public class ActivityInstanceServiceImplTest {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
         parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options, parameters)).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor",
+                options, parameters)).thenReturn(1L);
 
         // When
-        final long result = activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
+        final long result = activityInstanceServiceImpl
+                .getNumberOfAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
 
         // Then
         assertEquals(1L, result);
@@ -239,11 +248,13 @@ public class ActivityInstanceServiceImplTest {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
         parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor", options, parameters)).thenThrow(
-                new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcessFor",
+                options, parameters)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
-        activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, options);
+        activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId,
+                options);
     }
 
     /**
@@ -256,12 +267,15 @@ public class ActivityInstanceServiceImplTest {
         // Given
         final long rootProcessDefinitionId = 10;
         final QueryOptions options = new QueryOptions(0, 10);
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options, parameters)).thenReturn(
-                new ArrayList<SHumanTaskInstance>());
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId",
+                (Object) rootProcessDefinitionId);
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options,
+                parameters)).thenReturn(
+                        new ArrayList<SHumanTaskInstance>());
 
         // When
-        final List<SHumanTaskInstance> result = activityInstanceServiceImpl.searchAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
+        final List<SHumanTaskInstance> result = activityInstanceServiceImpl
+                .searchAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
 
         // Then
         assertNotNull(result);
@@ -272,9 +286,11 @@ public class ActivityInstanceServiceImplTest {
         // Given
         final long rootProcessDefinitionId = 10;
         final QueryOptions options = new QueryOptions(0, 10);
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options, parameters)).thenThrow(
-                new SBonitaReadException(""));
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId",
+                (Object) rootProcessDefinitionId);
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options,
+                parameters)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         activityInstanceServiceImpl.searchAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
@@ -290,11 +306,14 @@ public class ActivityInstanceServiceImplTest {
         // Given
         final long rootProcessDefinitionId = 10;
         final QueryOptions options = new QueryOptions(0, 10);
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options, parameters)).thenReturn(1L);
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId",
+                (Object) rootProcessDefinitionId);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess",
+                options, parameters)).thenReturn(1L);
 
         // When
-        final long result = activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
+        final long result = activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasks(rootProcessDefinitionId,
+                options);
 
         // Then
         assertEquals(1L, result);
@@ -305,29 +324,37 @@ public class ActivityInstanceServiceImplTest {
         // Given
         final long rootProcessDefinitionId = 10;
         final QueryOptions options = new QueryOptions(0, 10);
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess", options, parameters)).thenThrow(
-                new SBonitaReadException(""));
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId",
+                (Object) rootProcessDefinitionId);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "AssignedAndPendingByRootProcess",
+                options, parameters)).thenThrow(
+                        new SBonitaReadException(""));
 
         // When
         activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
     }
 
     @Test
-    public void getNumberOfFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
-                Collections.<Map<String, Object>> emptyList());
+    public void getNumberOfFlownodesInAllStates_should_return_empty_collections_if_no_results()
+            throws SBonitaReadException {
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any()))
+                .thenReturn(
+                        Collections.<Map<String, Object>> emptyList());
 
-        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInAllStates(2L);
+        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl
+                .getNumberOfFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 
     @Test
-    public void getNumberOfArchivedFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
-                Collections.<Map<String, Object>> emptyList());
+    public void getNumberOfArchivedFlownodesInAllStates_should_return_empty_collections_if_no_results()
+            throws SBonitaReadException {
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Map<String, Object>>> any()))
+                .thenReturn(
+                        Collections.<Map<String, Object>> emptyList());
 
-        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);
+        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl
+                .getNumberOfArchivedFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 
@@ -339,15 +366,19 @@ public class ActivityInstanceServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
 
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED));
-        assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity").isEqualTo(sFlowNodeInstance);
-        assertThat(updateRecordArgumentCaptor.getValue().getFields()).as("should only update expectedEndDate field with new value")
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(),
+                eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED));
+        assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity")
+                .isEqualTo(sFlowNodeInstance);
+        assertThat(updateRecordArgumentCaptor.getValue().getFields())
+                .as("should only update expectedEndDate field with new value")
                 .containsExactly(entry("expectedEndDate", 123L));
 
     }
 
     @Test
-    public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails() throws Exception {
+    public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails()
+            throws Exception {
         //given
         doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
 
@@ -358,14 +389,14 @@ public class ActivityInstanceServiceImplTest {
         activityInstanceServiceImpl.setExpectedEndDate(sFlowNodeInstance, 123L);
     }
 
-
     @Test
     public void should_search_pending_tasks_assigned_to_a_user() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         List<SHumanTaskInstance> expectedResult = new ArrayList<>();
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 61L)))
-                .thenReturn(expectedResult);
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options,
+                Collections.singletonMap("userId", 61L)))
+                        .thenReturn(expectedResult);
 
         // When
         final List<SHumanTaskInstance> result = activityInstanceServiceImpl.searchPendingTasksAssignedTo(61L, options);
@@ -378,11 +409,14 @@ public class ActivityInstanceServiceImplTest {
     public void should_search_pending_tasks_assigned_to_a_user_throw_exception_on_persitence_error() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 99L)))
-                .thenThrow(new SBonitaReadException("Fake for test"));
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options,
+                Collections.singletonMap("userId", 99L)))
+                        .thenThrow(new SBonitaReadException("Fake for test"));
 
         // When
-        Throwable thrown = catchThrowable(() -> { activityInstanceServiceImpl.searchPendingTasksAssignedTo(99L, options); });
+        Throwable thrown = catchThrowable(() -> {
+            activityInstanceServiceImpl.searchPendingTasksAssignedTo(99L, options);
+        });
 
         // Then
         assertThat(thrown)
@@ -394,8 +428,9 @@ public class ActivityInstanceServiceImplTest {
     public void should_count_number_of_pending_tasks_assigned_to_user() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 365L)))
-                .thenReturn(14L);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options,
+                Collections.singletonMap("userId", 365L)))
+                        .thenReturn(14L);
 
         // When
         final long count = activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(365L, options);
@@ -405,14 +440,18 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void should_count_number_of_pending_tasks_assigned_to_user_throw_exception_on_persitence_error() throws Exception {
+    public void should_count_number_of_pending_tasks_assigned_to_user_throw_exception_on_persitence_error()
+            throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 3365L)))
-                .thenThrow(new SBonitaReadException("Fake for test"));
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options,
+                Collections.singletonMap("userId", 3365L)))
+                        .thenThrow(new SBonitaReadException("Fake for test"));
 
         // When
-        Throwable thrown = catchThrowable(() -> { activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(3365L, options); });
+        Throwable thrown = catchThrowable(() -> {
+            activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(3365L, options);
+        });
 
         // Then
         assertThat(thrown)

@@ -28,7 +28,6 @@ public class SADateDataInstance extends SADataInstance {
 
     private Date value;
 
-
     public SADateDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);
         value = (Date) sDataInstance.getValue();

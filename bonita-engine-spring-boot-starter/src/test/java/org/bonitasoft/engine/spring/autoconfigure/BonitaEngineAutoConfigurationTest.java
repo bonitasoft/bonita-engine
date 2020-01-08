@@ -24,7 +24,8 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 public class BonitaEngineAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(BonitaEngineCommonAutoConfiguration.class,BonitaEngineServerAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(BonitaEngineCommonAutoConfiguration.class,
+                    BonitaEngineServerAutoConfiguration.class));
 
     @Test
     public void should_configure_database_using_properties() {
@@ -50,12 +51,13 @@ public class BonitaEngineAutoConfigurationTest {
                     assertThat(bonitaDatabaseConfiguration.getPassword()).isEqualTo("secret");
                     assertThat(bonitaDatabaseConfiguration.getDatasource().getMaxPoolSize()).isEqualTo(3);
                     assertThat(bonitaDatabaseConfiguration.getXaDatasource().getMaxPoolSize()).isEqualTo(4);
-                    BonitaDatabaseConfiguration businessDataDatabaseConfiguration = engine.getBusinessDataDatabaseConfiguration();
+                    BonitaDatabaseConfiguration businessDataDatabaseConfiguration = engine
+                            .getBusinessDataDatabaseConfiguration();
                     assertThat(businessDataDatabaseConfiguration.getDatasource().getMaxPoolSize()).isEqualTo(5);
                     assertThat(businessDataDatabaseConfiguration.getXaDatasource().getMaxPoolSize()).isEqualTo(6);
                     assertThat(
                             businessDataDatabaseConfiguration.getDbVendor())
-                            .isEqualTo("mysql");
+                                    .isEqualTo("mysql");
                 });
     }
 

@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.connector.AbstractSConnector;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -39,9 +41,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplTest {
@@ -240,7 +239,8 @@ public class ConnectorExecutorImplTest {
 
     }
 
-    private void executeAConnector() throws InterruptedException, java.util.concurrent.ExecutionException, SConnectorException {
+    private void executeAConnector()
+            throws InterruptedException, java.util.concurrent.ExecutionException, SConnectorException {
         connectorExecutorImpl
                 .execute(new LocalSConnector(-1), new HashMap<>(), Thread.currentThread().getContextClassLoader())
                 .get();
@@ -264,7 +264,6 @@ public class ConnectorExecutorImplTest {
         assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).gauge().value())
                 .as("Pending connectors number").isEqualTo(1);
     }
-
 
     @Test
     public void createExecutorService_should_register_ExecutorServiceMetrics() {
@@ -315,12 +314,14 @@ public class ConnectorExecutorImplTest {
         }
     }
 
-
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_EXECUTED)
+                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_PENDING)
+                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(ConnectorExecutorImpl.NUMBER_OF_CONNECTORS_RUNNING)
+                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
 }

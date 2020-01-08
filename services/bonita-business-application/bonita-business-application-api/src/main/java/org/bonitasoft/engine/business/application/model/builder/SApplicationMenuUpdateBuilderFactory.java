@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplicationMenuUpdateBuilderFactory {
 

@@ -33,7 +33,8 @@ public class ExternalURLAdapter implements URLAdapter {
     @Override
     public String adapt(String url, String key, Map<String, Serializable> context) throws SExecutionException {
         @SuppressWarnings("unchecked")
-        final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
+        final Map<String, String[]> queryParameters = (Map<String, String[]>) context
+                .get(URLAdapterConstants.QUERY_PARAMETERS);
         final String[] hash = url.split(HASH_TAG);
         StringBuffer newURL = new StringBuffer(hash[0]);
 
@@ -49,7 +50,8 @@ public class ExternalURLAdapter implements URLAdapter {
         return newURL.toString();
     }
 
-    protected void appendParametersToURL(StringBuffer url, final Map<String, String[]> parameters) throws SExecutionException {
+    protected void appendParametersToURL(StringBuffer url, final Map<String, String[]> parameters)
+            throws SExecutionException {
         if (parameters != null) {
             for (Entry<String, String[]> parameterEntry : parameters.entrySet()) {
                 appendParameterToURL(url, parameterEntry.getKey(), parameterEntry.getValue());

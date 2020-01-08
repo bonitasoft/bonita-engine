@@ -31,7 +31,8 @@ public class SearchSupervisors extends AbstractSupervisorSearchEntity {
 
     private final SupervisorMappingService supervisorService;
 
-    public SearchSupervisors(final SupervisorMappingService supervisorService, final SearchEntityDescriptor searchDescriptor,
+    public SearchSupervisors(final SupervisorMappingService supervisorService,
+            final SearchEntityDescriptor searchDescriptor,
             final SearchOptions options) {
         super(searchDescriptor, options);
         this.supervisorService = supervisorService;

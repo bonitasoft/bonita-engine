@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JDefinedClass;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -47,9 +49,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JDefinedClass;
 
 public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
@@ -130,7 +129,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
         final String daoContent = readGeneratedDAOInterface();
-        assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
+        assertThat(daoContent)
+                .contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
     }
 
     @Test
@@ -163,7 +163,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     protected String getQueryMethodSignature(final Query query, final String queryReturnType,
             final String businessObjectName, final boolean returnsList) {
-        String signature = "public " + getSimpleClassName(queryReturnType) + "<" + getSimpleClassName(businessObjectName)
+        String signature = "public " + getSimpleClassName(queryReturnType) + "<"
+                + getSimpleClassName(businessObjectName)
                 + "> " + query.getName() + "(";
         boolean first = true;
         for (final QueryParameter param : query.getQueryParameters()) {
@@ -261,9 +262,11 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithComposition() throws Exception {
-        final RelationField eager = aRelationField().withName("addresses").composition().multiple().referencing(addressBO())
+        final RelationField eager = aRelationField().withName("addresses").composition().multiple()
+                .referencing(addressBO())
                 .build();
-        final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy().referencing(skillBO())
+        final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy()
+                .referencing(skillBO())
                 .build();
         final BusinessObjectModel bom = employeeWithRelations(eager, lazy);
 

@@ -16,6 +16,7 @@ package org.bonitasoft.engine;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.transaction.TransactionManager;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -41,7 +42,8 @@ class BonitaDataSourceInitializer {
         defaultDriver = Collections.unmodifiableMap(drivers);
     }
 
-    BasicManagedDataSource createManagedDataSource(BonitaDatabaseConfiguration configuration, TransactionManager transactionManager) {
+    BasicManagedDataSource createManagedDataSource(BonitaDatabaseConfiguration configuration,
+            TransactionManager transactionManager) {
         validate(configuration);
         BasicManagedDataSource bonitaDataSource = new BasicManagedDataSource();
         bonitaDataSource.setDefaultAutoCommit(false);
@@ -51,7 +53,8 @@ class BonitaDataSourceInitializer {
         return bonitaDataSource;
     }
 
-    private void setCommonDataSourceConfiguration(BonitaDatabaseConfiguration configuration, BasicDataSource bonitaDataSource) {
+    private void setCommonDataSourceConfiguration(BonitaDatabaseConfiguration configuration,
+            BasicDataSource bonitaDataSource) {
         bonitaDataSource.setInitialSize(1);
         bonitaDataSource.setDriverClassName(getDriverClassName(configuration, configuration.getDriverClassName()));
         bonitaDataSource.setUrl(configuration.getUrl());
@@ -72,7 +75,8 @@ class BonitaDataSourceInitializer {
     private void validate(BonitaDatabaseConfiguration configuration) {
         checkNullOrEmpty(configuration.getDbVendor(), "dbVendor");
         if (!defaultDriver.keySet().contains(configuration.getDbVendor())) {
-            throw new IllegalArgumentException(String.format("Database db vendor %s is invalid ( should be one of %s )", configuration.getDbVendor(), defaultDriver.keySet()));
+            throw new IllegalArgumentException(String.format("Database db vendor %s is invalid ( should be one of %s )",
+                    configuration.getDbVendor(), defaultDriver.keySet()));
         }
         checkNullOrEmpty(configuration.getUrl(), "url");
         checkNullOrEmpty(configuration.getUser(), "user");

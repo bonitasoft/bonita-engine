@@ -47,7 +47,6 @@ public class RefreshClassloaderSynchronizationTest {
     private ClassLoaderUpdater classLoaderUpdater;
     private RefreshClassloaderSynchronization refreshClassloaderSynchronization;
 
-
     @Before
     public void before() {
         refreshClassloaderSynchronization = new RefreshClassloaderSynchronization(classLoaderService, broadcastService,
@@ -64,16 +63,17 @@ public class RefreshClassloaderSynchronizationTest {
 
     @Test
     public void should_refresh_classloader_using_classLoaderUpdater() throws Exception {
-        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(),anyLong());
+        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
 
         refreshClassloaderSynchronization.afterCompletion(TransactionState.COMMITTED);
 
-        verify(classLoaderUpdater).refreshClassloaders(classLoaderService, 1L, singleton(pair(ScopeType.PROCESS, 111L)));
+        verify(classLoaderUpdater).refreshClassloaders(classLoaderService, 1L,
+                singleton(pair(ScopeType.PROCESS, 111L)));
     }
 
     @Test
     public void should_refresh_classloader_on_other_nodes_after_commit() throws Exception {
-        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(),anyLong());
+        doReturn(emptyMap()).when(broadcastService).executeOnOthersAndWait(any(), anyLong());
 
         refreshClassloaderSynchronization.afterCompletion(TransactionState.COMMITTED);
 

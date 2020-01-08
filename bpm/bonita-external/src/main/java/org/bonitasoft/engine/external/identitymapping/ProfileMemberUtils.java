@@ -89,7 +89,8 @@ public class ProfileMemberUtils {
         return profileMemeber;
     }
 
-    public static List<HashMap<String, Serializable>> membersAsProfileMembersMapList(final List<SProfileMember> members) {
+    public static List<HashMap<String, Serializable>> membersAsProfileMembersMapList(
+            final List<SProfileMember> members) {
         final ArrayList<HashMap<String, Serializable>> profileMemberMaps = new ArrayList<HashMap<String, Serializable>>();
         for (final SProfileMember profileMember : members) {
             profileMemberMaps.add(memberAsProfileMembersMap(profileMember));

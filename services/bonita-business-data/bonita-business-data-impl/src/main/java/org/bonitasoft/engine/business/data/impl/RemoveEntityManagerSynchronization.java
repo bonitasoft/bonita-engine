@@ -32,7 +32,7 @@ public class RemoveEntityManagerSynchronization implements BonitaTransactionSync
 
     @Override
     public void beforeCommit() {
-       // nothing to do
+        // nothing to do
     }
 
     @Override

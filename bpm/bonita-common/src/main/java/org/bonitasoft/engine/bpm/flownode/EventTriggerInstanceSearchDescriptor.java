@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.flownode;
 
 /**
  * Fields to filter the {@link EventTriggerInstance} on search.
- * 
+ *
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0

@@ -19,12 +19,12 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    UserIT.class,
-    RoleIT.class,
-    GroupIT.class,
-    MembershipIT.class,
-    OrganizationIT.class,
-    CustomUserInfoIT.class
+        UserIT.class,
+        RoleIT.class,
+        GroupIT.class,
+        MembershipIT.class,
+        OrganizationIT.class,
+        CustomUserInfoIT.class
 })
 public class IdentityTests {
 

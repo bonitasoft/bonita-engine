@@ -53,7 +53,8 @@ public class InitializingActivityWithBoundaryEventsStateImplTest {
 
     @Test
     public void should_register_waiting_event_after_connectors() throws Exception {
-        InitializingActivityWithBoundaryEventsStateImpl initializingActivityStateWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);
+        InitializingActivityWithBoundaryEventsStateImpl initializingActivityStateWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(
+                stateBehaviors);
 
         initializingActivityStateWithBoundary.afterConnectors(sProcessDefinition, sFlowNodeInstance);
 

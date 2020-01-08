@@ -14,12 +14,11 @@
 package org.bonitasoft.engine.api.impl.application.deployer.detector;
 
 import static org.bonitasoft.engine.io.FileOperations.isXmlFile;
-import static org.bonitasoft.engine.io.FileOperations.readFully;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 
 import org.bonitasoft.engine.io.FileAndContent;

@@ -15,9 +15,8 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.util.Objects;
 
-import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
 
 /**
  * @author Matthieu Chaffotte
@@ -29,7 +28,7 @@ public class SimpleBusinessDataReferenceImpl extends BusinessDataReferenceImpl i
     private final Long storageId;
 
     @JsonProperty("storageId_string")
-    private String storageIdAsString=null;
+    private String storageIdAsString = null;
 
     public SimpleBusinessDataReferenceImpl(final String name, final String type, final Long storageId) {
         super(name, type);

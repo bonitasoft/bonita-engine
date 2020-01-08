@@ -29,11 +29,16 @@ public abstract class SearchEntityMemberDescriptor extends SearchEntityDescripto
 
     public SearchEntityMemberDescriptor() {
         fieldDescriptorMap = new HashMap<String, FieldDescriptor>(4);
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.EXTERNAL_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.EXTERNAL_ID_KEY));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.USER_ID_KEY));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.GROUP_ID_KEY));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.ROLE_ID_KEY));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.EXTERNAL_ID,
+                new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.EXTERNAL_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_ID,
+                new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.USER_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.GROUP_ID,
+                new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.GROUP_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.ROLE_ID,
+                new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.ROLE_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_NAME,
+                new FieldDescriptor(SUser.class, SUser.USER_NAME));
     }
 
     @Override

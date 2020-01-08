@@ -24,9 +24,9 @@ public class ExtraPropertyStringListSerializer extends ExtraPropertyStringAbstra
     @Override
     protected Object convert(List value) {
         return Optional.ofNullable(value).orElseGet(Collections::emptyList)
-                        .stream()
-                        .map(o -> Objects.toString(o, null))
-                        .collect(Collectors.toList());
+                .stream()
+                .map(o -> Objects.toString(o, null))
+                .collect(Collectors.toList());
     }
 
 }

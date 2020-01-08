@@ -17,13 +17,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
-
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
+
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
 /**
  * @author Colin Puy
@@ -86,7 +85,8 @@ public class Proxyfier {
         }
 
         @Override
-        public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
+        public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args)
+                throws Throwable {
             Object invocationResult = thisMethod.invoke(entity, args);
 
             if (isGetterOrSetter(thisMethod)) {
@@ -100,7 +100,8 @@ public class Proxyfier {
             return proxifyIfNeeded(invocationResult);
         }
 
-        private void callSetterOnEntity(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException,
+        private void callSetterOnEntity(final Object invocationResult, final Method getter)
+                throws NoSuchMethodException, SecurityException,
                 IllegalAccessException, IllegalArgumentException, InvocationTargetException {
             if (invocationResult != null) {
                 final Method setter = getAssociatedSetter(invocationResult, getter);
@@ -108,7 +109,8 @@ public class Proxyfier {
             }
         }
 
-        private Method getAssociatedSetter(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException {
+        private Method getAssociatedSetter(final Object invocationResult, final Method getter)
+                throws NoSuchMethodException, SecurityException {
             return entity.getClass().getMethod(getter.getName().replaceFirst("^get", "set"), getter.getReturnType());
         }
 
@@ -139,7 +141,8 @@ public class Proxyfier {
         }
 
         private boolean shouldBeLoaded(final Method thisMethod, final Object notLazyLoaded) {
-            return thisMethod.isAnnotationPresent(LazyLoaded.class) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()));
+            return thisMethod.isAnnotationPresent(LazyLoaded.class)
+                    && !alreadyLoaded.contains(toFieldName(thisMethod.getName()));
         }
 
         private boolean isGetterOrSetter(final Method method) {

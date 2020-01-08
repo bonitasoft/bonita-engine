@@ -26,7 +26,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Baptiste Mesta
@@ -48,7 +47,8 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
             setContract(new SContractDefinitionImpl(contract));
         }
         for (ContextEntry contextEntry : userTaskDefinition.getContext()) {
-            context.add(new SContextEntryImpl(contextEntry.getKey(), ServerModelConvertor.convertExpression(contextEntry.getExpression())));
+            context.add(new SContextEntryImpl(contextEntry.getKey(),
+                    ServerModelConvertor.convertExpression(contextEntry.getExpression())));
         }
     }
 

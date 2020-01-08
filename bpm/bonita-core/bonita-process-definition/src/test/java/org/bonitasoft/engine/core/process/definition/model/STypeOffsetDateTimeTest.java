@@ -23,7 +23,7 @@ import org.junit.Test;
  * @author Danila Mazour
  */
 public class STypeOffsetDateTimeTest {
-    
+
     @Test
     public void offsetDateTime_are_valid() throws Exception {
 
@@ -31,7 +31,7 @@ public class STypeOffsetDateTimeTest {
 
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void null_is_valid() throws Exception {
 
@@ -49,5 +49,5 @@ public class STypeOffsetDateTimeTest {
         boolean stringValidation = SType.OFFSETDATETIME.validate("false");
         assertThat(stringValidation).isFalse();
     }
-    
+
 }

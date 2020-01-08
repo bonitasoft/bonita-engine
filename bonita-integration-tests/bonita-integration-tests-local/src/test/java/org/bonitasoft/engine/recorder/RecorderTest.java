@@ -96,7 +96,8 @@ public class RecorderTest extends CommonBPMServicesTest {
         final List<FilterOption> filters = new ArrayList<>(2);
         filters.add(getActionTypeFilterOption(actionType));
         filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getObjectIdKey(), indexValue));
-        final List<OrderByOption> orders = Collections.singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        final List<OrderByOption> orders = Collections
+                .singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
         final QueryOptions opts = new QueryOptions(0, 10, orders, filters, null);
         return loggerService.searchLogs(opts);
     }
@@ -107,7 +108,8 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException {
         final List<FilterOption> filters = Collections.singletonList(getActionTypeFilterOption(actionType));
-        final List<OrderByOption> orders = Collections.singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        final List<OrderByOption> orders = Collections
+                .singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
         return loggerService.searchLogs(new QueryOptions(0, 10, orders, filters, null));
     }
 
@@ -118,7 +120,8 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     private SUser getUserByUsername(final String firstName) throws SBonitaReadException {
         return getPersistenceService()
-                .selectOne(new SelectOneDescriptor<SUser>("getUserByUserName", Collections.singletonMap("userName", (Object) firstName), SUser.class));
+                .selectOne(new SelectOneDescriptor<SUser>("getUserByUserName",
+                        Collections.singletonMap("userName", (Object) firstName), SUser.class));
     }
 
     @Test
@@ -176,7 +179,8 @@ public class RecorderTest extends CommonBPMServicesTest {
         // query
         getTransactionService().begin();
         final SUser retrivedSUser = getPersistenceService().selectOne(
-                new SelectOneDescriptor<SUser>("getUserByUserName", Collections.singletonMap("userName", (Object) "firstNameUpdate"), SUser.class));
+                new SelectOneDescriptor<SUser>("getUserByUserName",
+                        Collections.singletonMap("userName", (Object) "firstNameUpdate"), SUser.class));
         assertNull(retrivedSUser);
 
         final List<SQueriableLog> retrievedLogs = getLogs(TEST_UPDATE);

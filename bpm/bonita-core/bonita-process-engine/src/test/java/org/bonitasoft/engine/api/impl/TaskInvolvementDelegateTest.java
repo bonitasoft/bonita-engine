@@ -101,7 +101,8 @@ public class TaskInvolvementDelegateTest {
     @Test
     public final void should_isInvolvedInHumanTaskInstance_return_true_if_user_assigned() throws Exception {
         // When
-        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(ASSIGNED_USER, ASSIGNED_TASK);
+        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(ASSIGNED_USER,
+                ASSIGNED_TASK);
 
         //then
         assertThat(involvedInHumanTaskInstance).as("Is involved in human task").isTrue();
@@ -112,7 +113,8 @@ public class TaskInvolvementDelegateTest {
     public final void should_isInvolvedInHumanTaskInstance_return_true_if_user_in_actors() throws Exception {
         //given
         // When
-        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING, EXISTING_TASK);
+        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING,
+                EXISTING_TASK);
 
         //then
         assertThat(involvedInHumanTaskInstance).as("Is involved in human task").isTrue();
@@ -121,7 +123,8 @@ public class TaskInvolvementDelegateTest {
     @Test
     public final void should_isInvolvedInHumanTaskInstance_return_false_if_user_not_the_assignee() throws Exception {
         // When
-        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING, ASSIGNED_TASK);
+        boolean involvedInHumanTaskInstance = taskInvolvementDelegate.isInvolvedInHumanTaskInstance(USER_PENDING,
+                ASSIGNED_TASK);
 
         //then
         assertThat(involvedInHumanTaskInstance).as("Is involved in human task").isFalse();
@@ -137,10 +140,12 @@ public class TaskInvolvementDelegateTest {
     @Test
     public final void should_hasUserPendingOrAssignedTasks_return_true_when_user_has_tasks() throws Exception {
         //given
-        doReturn(5L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER), any(QueryOptions.class));
+        doReturn(5L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER),
+                any(QueryOptions.class));
 
         // When
-        final boolean involvedInHumanTaskInstance = taskInvolvementDelegate.hasUserPendingOrAssignedTasks(ASSIGNED_USER, 45621L);
+        final boolean involvedInHumanTaskInstance = taskInvolvementDelegate.hasUserPendingOrAssignedTasks(ASSIGNED_USER,
+                45621L);
 
         //then
         assertThat(involvedInHumanTaskInstance).as("should return true").isTrue();
@@ -149,10 +154,12 @@ public class TaskInvolvementDelegateTest {
     @Test
     public final void should_hasUserPendingOrAssignedTasks_return_false_when_user_has_no_tasks() throws Exception {
         //given
-        doReturn(0L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER), any(QueryOptions.class));
+        doReturn(0L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER),
+                any(QueryOptions.class));
 
         // When
-        final boolean involvedInHumanTaskInstance = taskInvolvementDelegate.hasUserPendingOrAssignedTasks(ASSIGNED_USER, 45621L);
+        final boolean involvedInHumanTaskInstance = taskInvolvementDelegate.hasUserPendingOrAssignedTasks(ASSIGNED_USER,
+                45621L);
 
         //then
         assertThat(involvedInHumanTaskInstance).as("should return false").isFalse();
@@ -161,7 +168,8 @@ public class TaskInvolvementDelegateTest {
     @Test
     public final void should_hasUserPendingOrAssignedTasks_fail_when_read_exception() throws Exception {
         //given
-        doThrow(SBonitaReadException.class).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER), any(QueryOptions.class));
+        doThrow(SBonitaReadException.class).when(activityInstanceService)
+                .getNumberOfPendingOrAssignedTasks(eq(ASSIGNED_USER), any(QueryOptions.class));
 
         //expect
         expectedException.expect(SExecutionException.class);

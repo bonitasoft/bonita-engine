@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * represents a helper for updating a {@link User}. Chaining is possible with this updator to ease the {@link User} update.
+ * represents a helper for updating a {@link User}. Chaining is possible with this updator to ease the {@link User}
+ * update.
  * <br>
  * For instance, new UserUpdater.setUsername("john.doe").setFirstname("John").setLastname("Doe");
  *
@@ -36,7 +37,9 @@ public class UserUpdater implements Serializable {
      * represent the available {@link User} fields
      */
     public enum UserField {
-        USER_NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated ICON_NAME, @Deprecated ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
+        USER_NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated
+        ICON_NAME, @Deprecated
+        ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<UserField, Serializable> fields;

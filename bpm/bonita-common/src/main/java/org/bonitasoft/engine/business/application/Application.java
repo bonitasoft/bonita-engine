@@ -90,7 +90,8 @@ public interface Application extends BaseElement {
     long getUpdatedBy();
 
     /**
-     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and {@link ApplicationState#DEACTIVATED
+     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()}
+     * and {@link ApplicationState#DEACTIVATED
      * #name()}
      *
      * @return the <code>Application</code> state
@@ -107,18 +108,22 @@ public interface Application extends BaseElement {
     Long getHomePageId();
 
     /**
-     * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this
+     * application.
      *
-     * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this
+     *         application.
      * @see Profile
      */
     Long getProfileId();
 
     /**
-     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout. If no layout is associated to the current
+     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout. If no
+     * layout is associated to the current
      * {@code Application} the result will be {@code null}.
      *
-     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout or {@code null} if the current
+     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout or
+     *         {@code null} if the current
      *         {@code Application} has no layout.
      * @see org.bonitasoft.engine.page.Page
      * @since 7.0.0
@@ -126,10 +131,12 @@ public interface Application extends BaseElement {
     Long getLayoutId();
 
     /**
-     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme. If no theme is associated to the current
+     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme. If no
+     * theme is associated to the current
      * {@code Application} the result will be {@code null}.
      *
-     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme or {@code null} if the current
+     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme or
+     *         {@code null} if the current
      *         {@code Application} has no theme.
      * @see org.bonitasoft.engine.page.Page
      * @since 7.0.0

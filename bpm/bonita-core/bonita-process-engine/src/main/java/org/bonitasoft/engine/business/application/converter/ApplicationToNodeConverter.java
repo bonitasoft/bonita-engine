@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.application.converter;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -47,8 +46,9 @@ public class ApplicationToNodeConverter {
     private final PageService pageService;
 
     public ApplicationToNodeConverter(final ProfileService profileService, final ApplicationService applicationService,
-                                      final ApplicationPageToNodeConverter applicationPageToNodeConverter, final ApplicationMenuToNodeConverter applicationMenuToNodeConverter,
-                                      final PageService pageService) {
+            final ApplicationPageToNodeConverter applicationPageToNodeConverter,
+            final ApplicationMenuToNodeConverter applicationMenuToNodeConverter,
+            final PageService pageService) {
         this.profileService = profileService;
         this.applicationService = applicationService;
         this.applicationPageToNodeConverter = applicationPageToNodeConverter;
@@ -77,26 +77,30 @@ public class ApplicationToNodeConverter {
         }
     }
 
-    private void setTheme(final SApplication application, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
+    private void setTheme(final SApplication application, final ApplicationNode applicationNode)
+            throws SBonitaReadException, SObjectNotFoundException {
         if (application.getThemeId() != null) {
             SPage page = pageService.getPage(application.getThemeId());
             applicationNode.setTheme(page.getName());
         }
     }
 
-    private void setLayout(final SApplication application, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
+    private void setLayout(final SApplication application, final ApplicationNode applicationNode)
+            throws SBonitaReadException, SObjectNotFoundException {
         if (application.getLayoutId() != null) {
             SPage page = pageService.getPage(application.getLayoutId());
             applicationNode.setLayout(page.getName());
         }
     }
 
-    private void setPages(final long applicationId, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
+    private void setPages(final long applicationId, final ApplicationNode applicationNode)
+            throws SBonitaReadException, SObjectNotFoundException {
         int startIndex = 0;
         final int maxResults = 50;
         List<SApplicationPage> pages;
         do {
-            pages = applicationService.searchApplicationPages(buildApplicationPagesQueryOptions(applicationId, startIndex, maxResults));
+            pages = applicationService
+                    .searchApplicationPages(buildApplicationPagesQueryOptions(applicationId, startIndex, maxResults));
             for (final SApplicationPage page : pages) {
                 applicationNode.addApplicationPage(applicationPageToNodeConverter.toPage(page));
             }
@@ -104,20 +108,25 @@ public class ApplicationToNodeConverter {
         } while (pages.size() == maxResults);
     }
 
-    public QueryOptions buildApplicationPagesQueryOptions(final long applicationId, final int startIndex, final int pageSize) {
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationPage.class, SApplicationPage.ID, OrderByType.ASC));
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationPage.class, SApplicationPage.APPLICATION_ID, applicationId));
+    public QueryOptions buildApplicationPagesQueryOptions(final long applicationId, final int startIndex,
+            final int pageSize) {
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SApplicationPage.class, SApplicationPage.ID, OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(
+                new FilterOption(SApplicationPage.class, SApplicationPage.APPLICATION_ID, applicationId));
         return new QueryOptions(startIndex, pageSize, orderByOptions, filters, null);
     }
 
-    private void setHomePage(final SApplication application, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
+    private void setHomePage(final SApplication application, final ApplicationNode applicationNode)
+            throws SBonitaReadException, SObjectNotFoundException {
         if (application.getHomePageId() != null) {
             final SApplicationPage homePage = applicationService.getApplicationPage(application.getHomePageId());
             applicationNode.setHomePage(homePage.getToken());
         }
     }
 
-    private void setProfile(final SApplication application, final ApplicationNode applicationNode) throws SProfileNotFoundException {
+    private void setProfile(final SApplication application, final ApplicationNode applicationNode)
+            throws SProfileNotFoundException {
         if (application.getProfileId() != null) {
             final SProfile profile = profileService.getProfile(application.getProfileId());
             applicationNode.setProfile(profile.getName());

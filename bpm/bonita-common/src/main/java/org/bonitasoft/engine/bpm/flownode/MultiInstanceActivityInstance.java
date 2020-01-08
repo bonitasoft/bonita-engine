@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
-
 /**
  * @author Baptiste Mesta
  */

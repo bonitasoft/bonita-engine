@@ -29,21 +29,25 @@ public class ContractDefinitionBuilder extends InputContainerDefinitionBuilder {
 
     private final ContractDefinitionImpl contract;
 
-    public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final UserTaskDefinitionImpl activity) {
         super(container, processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
         activity.setContract(contract);
     }
 
-    public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl container) {
+    public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final DesignProcessDefinitionImpl container) {
         super((FlowElementContainerDefinitionImpl) container.getProcessContainer(), processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
         container.setContract(contract);
     }
 
-    public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation, final String... inputNames) {
-        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation);
+    public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation,
+            final String... inputNames) {
+        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression,
+                explanation);
         for (final String inputName : inputNames) {
             constraintDefinition.addInputName(inputName);
         }

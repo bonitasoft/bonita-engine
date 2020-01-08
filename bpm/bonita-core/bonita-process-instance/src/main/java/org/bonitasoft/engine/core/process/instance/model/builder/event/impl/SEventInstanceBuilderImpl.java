@@ -27,5 +27,4 @@ public abstract class SEventInstanceBuilderImpl extends SFlowNodeInstanceBuilder
         super(entity);
     }
 
-
 }

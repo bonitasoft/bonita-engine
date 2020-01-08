@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.connector;
 
 /**
  * Current state of a connector instance.
- * 
+ *
  * @author Baptiste Mesta
  */
 public enum ConnectorState {

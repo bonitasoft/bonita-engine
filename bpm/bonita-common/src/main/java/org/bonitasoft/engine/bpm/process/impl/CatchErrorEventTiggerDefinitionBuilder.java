@@ -17,7 +17,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchErrorEventTriggerDe
 import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -30,12 +29,14 @@ public class CatchErrorEventTiggerDefinitionBuilder extends FlowElementContainer
     }
 
     protected CatchErrorEventTiggerDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final FlowElementContainerDefinitionImpl container, final CatchEventDefinitionImpl event, final String errorCode) {
+            final FlowElementContainerDefinitionImpl container, final CatchEventDefinitionImpl event,
+            final String errorCode) {
         super(container, processDefinitionBuilder);
         if (errorCode != null && errorCode.trim().isEmpty()) {
             getProcessBuilder().addError("The error code cannot be empty.");
         }
-        final CatchErrorEventTriggerDefinitionImpl triggerDefinition = new CatchErrorEventTriggerDefinitionImpl(errorCode);
+        final CatchErrorEventTriggerDefinitionImpl triggerDefinition = new CatchErrorEventTriggerDefinitionImpl(
+                errorCode);
         event.addErrorEventTrigger(triggerDefinition);
     }
 

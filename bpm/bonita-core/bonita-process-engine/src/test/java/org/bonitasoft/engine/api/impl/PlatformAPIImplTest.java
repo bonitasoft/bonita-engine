@@ -19,10 +19,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -104,7 +102,8 @@ public class PlatformAPIImplTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void rescheduleErroneousTriggers_should_throw_exception_when_rescheduleErroneousTriggers_failed() throws Exception {
+    public void rescheduleErroneousTriggers_should_throw_exception_when_rescheduleErroneousTriggers_failed()
+            throws Exception {
         doThrow(new SSchedulerException("failed")).when(schedulerService).rescheduleErroneousTriggers();
 
         platformAPI.rescheduleErroneousTriggers();
@@ -122,14 +121,16 @@ public class PlatformAPIImplTest {
         //when
         platformAPI.updateClientTenantConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
         //then
-        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
+        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(TENANT_ID, "myProps.properties",
+                "updated content".getBytes());
     }
 
     @Test
     public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() {
         //given
         final String configurationFile = "a file";
-        doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
+        doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID,
+                configurationFile);
 
         //when
         final byte[] configuration = platformAPI.getClientTenantConfiguration(TENANT_ID, configurationFile);

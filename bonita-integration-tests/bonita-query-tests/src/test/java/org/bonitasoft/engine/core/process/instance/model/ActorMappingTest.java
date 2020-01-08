@@ -96,11 +96,13 @@ public class ActorMappingTest {
         final SActor actor = repository.add(anActor().build());
         long aRoleId = 111L;
         long aGroupId = 222L;
-        SActorMember actorMember = repository.add(anActorMember().forActor(actor).withRoleId(aRoleId).withGroupId(aGroupId).build());
+        SActorMember actorMember = repository
+                .add(anActorMember().forActor(actor).withRoleId(aRoleId).withGroupId(aGroupId).build());
         final SUser user = repository.add(aUser().withId(4444L).build());
         repository.add(aUserMembership().forUser(user).memberOf(aGroupId, aRoleId).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 
@@ -114,7 +116,8 @@ public class ActorMappingTest {
         SActorMember actorMember = repository.add(anActorMember().forActor(actor).withUserId(user.getId()).build());
         repository.add(aUserMembership().forUser(user).memberOf(unusedGroupId, unusedRoleId).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 
@@ -128,7 +131,8 @@ public class ActorMappingTest {
         final SUser user = repository.add(aUser().withId(66666L).withManager(manager.getId()).build());
         repository.add(aUserMembership().forUser(user).memberOf(unusedGroupId, aRoleId).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 
@@ -142,7 +146,8 @@ public class ActorMappingTest {
         final SUser user = repository.add(aUser().withId(77777L).withManager(manager.getId()).build());
         repository.add(aUserMembership().forUser(user).memberOf(aGroupId, unusedRoleId).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 
@@ -151,12 +156,14 @@ public class ActorMappingTest {
         final SActor actor = repository.add(anActor().build());
         long aRoleId = 111L;
         long aGroupId = 222L;
-        SActorMember actorMember = repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
+        SActorMember actorMember = repository
+                .add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         final SUser manager = repository.add(aUser().withId(2L).build());
         final SUser user = repository.add(aUser().withId(888888L).withManager(manager.getId()).build());
         repository.add(aUserMembership().forUser(user).memberOf(aGroupId, aRoleId).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(manager.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 
@@ -165,11 +172,13 @@ public class ActorMappingTest {
         final SActor actor = repository.add(anActor().build());
         long aRoleId = 111L;
         long aGroupId = 222L;
-        SActorMember actorMember = repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
+        SActorMember actorMember = repository
+                .add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         final SUser user = repository.add(aUser().withId(99999999L).build());
         repository.add(aUserMembership().forUser(user).memberOf(aGroupId, 16545L).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(0L);
     }
 
@@ -181,7 +190,8 @@ public class ActorMappingTest {
         final SUser user = repository.add(aUser().withId(132457L).build());
         SActorMember actorMember = repository.add(anActorMember().forActor(actor).withUserId(user.getId()).build());
 
-        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(), Arrays.asList(actorMember.getId()));
+        Long members = repository.getNumberOfUserMembersForUserOrManagerForActorMembers(user.getId(),
+                Arrays.asList(actorMember.getId()));
         assertThat(members).isEqualTo(1L);
     }
 

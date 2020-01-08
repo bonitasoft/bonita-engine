@@ -14,15 +14,11 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.PersistentClass;
 
 /**
  * @author Charles Souillard
@@ -46,7 +42,8 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         this.mappingExclusions = mappingExclusions;
     }
 
-    protected Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
+    protected Configuration buildConfiguration(final Properties properties,
+            final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
         final Configuration configuration = new Configuration();
         configuration.addProperties(properties);
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {

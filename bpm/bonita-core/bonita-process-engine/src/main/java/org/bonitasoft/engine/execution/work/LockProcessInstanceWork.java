@@ -28,8 +28,9 @@ import org.bonitasoft.engine.work.LockTimeoutException;
 
 /**
  * Transactional work that lock the process instance
- * This work try to lock a process instance, if it can't be locked before the end of the TIMEOUT, we reschedule the fill stack of work on the work service.
- * 
+ * This work try to lock a process instance, if it can't be locked before the end of the TIMEOUT, we reschedule the fill
+ * stack of work on the work service.
+ *
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
@@ -48,25 +49,31 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     @Override
     public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
-        final TechnicalLogger logger = getTenantAccessor(context).getTechnicalLoggerService().asLogger(LockProcessInstanceWork.class);
+        final TechnicalLogger logger = getTenantAccessor(context).getTechnicalLoggerService()
+                .asLogger(LockProcessInstanceWork.class);
         final LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
         BonitaLock lock = null;
         try {
-            logger.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
+            logger.debug("{} trying to get lock for instance {}: {}", Thread.currentThread().getName(),
+                    processInstanceId, getDescription());
             lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit, getTenantId());
             if (lock == null) {
-                throw new LockTimeoutException("Unable to lock process instance " + processInstanceId + ": " + getDescription());
+                throw new LockTimeoutException(
+                        "Unable to lock process instance " + processInstanceId + ": " + getDescription());
             }
-            logger.debug("{} obtained lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
+            logger.debug("{} obtained lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId,
+                    getDescription());
             return getWrappedWork().work(context);
         } catch (SLockException e) {
-            throw new LockException("Unexpected exception happened while trying to lock process instance " + processInstanceId + ": " + getDescription(), e);
+            throw new LockException("Unexpected exception happened while trying to lock process instance "
+                    + processInstanceId + ": " + getDescription(), e);
         } finally {
             if (lock != null) {
                 lockService.unlock(lock, getTenantId());
-                logger.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(), processInstanceId, getDescription());
+                logger.debug("{} has unlocked lock for instance {}: {}", Thread.currentThread().getName(),
+                        processInstanceId, getDescription());
             }
         }
 

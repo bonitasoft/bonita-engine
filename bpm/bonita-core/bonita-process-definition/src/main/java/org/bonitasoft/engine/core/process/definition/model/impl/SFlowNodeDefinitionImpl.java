@@ -32,7 +32,6 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;
 
-
 /**
  * @author Feng Hui
  * @author Elias Ricken de Medeiros
@@ -89,7 +88,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
 
         description = flowNodeDefinition.getDescription();
         displayDescription = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayDescription());
-        displayDescriptionAfterCompletion = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayDescriptionAfterCompletion());
+        displayDescriptionAfterCompletion = ServerModelConvertor
+                .convertExpression(flowNodeDefinition.getDisplayDescriptionAfterCompletion());
         displayName = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayName());
         setId(flowNodeDefinition.getId());
     }
@@ -236,7 +236,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         result = prime * result + (defaultTransition == null ? 0 : defaultTransition.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
-        result = prime * result + (displayDescriptionAfterCompletion == null ? 0 : displayDescriptionAfterCompletion.hashCode());
+        result = prime * result
+                + (displayDescriptionAfterCompletion == null ? 0 : displayDescriptionAfterCompletion.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (incomings == null ? 0 : incomings.hashCode());
         result = prime * result + (outgoings == null ? 0 : outgoings.hashCode());

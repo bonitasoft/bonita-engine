@@ -44,14 +44,19 @@ public class MenuIndex {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MenuIndex)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof MenuIndex))
+            return false;
 
         MenuIndex menuIndex = (MenuIndex) o;
 
-        if (lastUsedIndex != menuIndex.lastUsedIndex) return false;
-        if (value != menuIndex.value) return false;
-        if (parentId != null ? !parentId.equals(menuIndex.parentId) : menuIndex.parentId != null) return false;
+        if (lastUsedIndex != menuIndex.lastUsedIndex)
+            return false;
+        if (value != menuIndex.value)
+            return false;
+        if (parentId != null ? !parentId.equals(menuIndex.parentId) : menuIndex.parentId != null)
+            return false;
 
         return true;
     }

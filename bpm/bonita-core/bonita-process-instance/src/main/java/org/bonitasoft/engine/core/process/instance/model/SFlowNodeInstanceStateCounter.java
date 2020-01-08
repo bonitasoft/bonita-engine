@@ -14,8 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.model;
 
 /***
- * Represents flownode state counters for a given process instance. Only serves query purposes (like a view), not persisted.
- * 
+ * Represents flownode state counters for a given process instance. Only serves query purposes (like a view), not
+ * persisted.
+ *
  * @author Emmanuel Duchastenier
  */
 public class SFlowNodeInstanceStateCounter {

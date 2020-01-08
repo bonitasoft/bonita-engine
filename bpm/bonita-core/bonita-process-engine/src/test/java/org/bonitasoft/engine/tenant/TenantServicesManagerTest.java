@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.tenant;
 
-
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +39,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 public class TenantServicesManagerTest {
+
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -61,13 +61,13 @@ public class TenantServicesManagerTest {
     @Mock
     private ClassLoaderService classLoaderService;
 
-
     @Before
     public void before() throws Exception {
         doReturn(asList(tenantService1, tenantService2)).when(tenantConfiguration).getLifecycleServices();
         when(transactionService.executeInTransaction(any()))
                 .thenAnswer(invocationOnMock -> ((Callable) invocationOnMock.getArgument(0)).call());
-        tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService, classLoaderService,
+        tenantServicesManager = new TenantServicesManager(sessionAccessor, sessionService, transactionService,
+                classLoaderService,
                 tenantConfiguration, 12L, tenantElementsRestarter);
         doReturn(true).when(sessionAccessor).isTenantSession();
     }
@@ -106,6 +106,7 @@ public class TenantServicesManagerTest {
         inOrder.verify(tenantService1).stop();
         inOrder.verify(tenantService2).stop();
     }
+
     @Test
     public void pause_should_stop_services() throws Exception {
         tenantServicesManager.start();
@@ -137,6 +138,7 @@ public class TenantServicesManagerTest {
 
         assertThat(tenantServicesManager.isStarted()).isFalse();
     }
+
     @Test
     public void tenant_should_be_started_after_resume() throws Exception {
         tenantServicesManager.resume();
@@ -166,7 +168,6 @@ public class TenantServicesManagerTest {
     public void should_not_stop_tenant_that_is_already_stopped() throws Exception {
         tenantServicesManager.start();
         tenantServicesManager.stop();
-
 
         tenantServicesManager.stop();
         tenantServicesManager.stop();

@@ -56,10 +56,12 @@ public class ResetAllFailedConnectorStrategyTest {
         SConnectorInstanceWithFailureInfo instance2 = mock(SConnectorInstanceWithFailureInfo.class);
         SConnectorInstanceWithFailureInfo instance3 = mock(SConnectorInstanceWithFailureInfo.class);
         given(
-                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE, ConnectorState.FAILED.name(), 0,
+                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorState.FAILED.name(), 0,
                         MAX_RESULTS)).willReturn(Arrays.asList(instance1, instance2));
         given(
-                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE, ConnectorState.FAILED.name(), MAX_RESULTS,
+                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorState.FAILED.name(), MAX_RESULTS,
                         MAX_RESULTS)).willReturn(Arrays.asList(instance3));
 
         //when
@@ -72,10 +74,12 @@ public class ResetAllFailedConnectorStrategyTest {
     }
 
     @Test(expected = ActivityExecutionException.class)
-    public void resetConnectorsOf_should_throw_ActivityExecution_Exception_when_connectorService_throws_exception() throws Exception {
+    public void resetConnectorsOf_should_throw_ActivityExecution_Exception_when_connectorService_throws_exception()
+            throws Exception {
         //given
         given(
-                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE, ConnectorState.FAILED.name(), 0,
+                connectorInstanceService.getConnectorInstancesWithFailureInfo(20L, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorState.FAILED.name(), 0,
                         MAX_RESULTS)).willThrow(new SConnectorInstanceReadException(new Exception()));
 
         //when

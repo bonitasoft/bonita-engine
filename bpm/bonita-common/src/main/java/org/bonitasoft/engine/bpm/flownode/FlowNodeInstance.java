@@ -28,9 +28,11 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
 public interface FlowNodeInstance extends DescriptionElement, BaseElement {
 
     /**
-     * Returns the task's direct container ID. For a sub-task or CallActivity, would point to the containing activity ID of the current element.
+     * Returns the task's direct container ID. For a sub-task or CallActivity, would point to the containing activity ID
+     * of the current element.
      * For a normal Task / Activity, would point to the ID of the process instance containing the task / activity.
-     * For a multi-instanciated task, each task has its parentContainerId pointing to the containing multi-instance task (basic container for all task
+     * For a multi-instanciated task, each task has its parentContainerId pointing to the containing multi-instance task
+     * (basic container for all task
      * instances).
      *
      * @return the ID of the direct containing element (activity instance of process instance).
@@ -52,7 +54,8 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
     long getProcessDefinitionId();
 
     /**
-     * Always returns the directly containing process instance ID (at the lower level, if several levels of containing processes).
+     * Always returns the directly containing process instance ID (at the lower level, if several levels of containing
+     * processes).
      *
      * @return the ID of the lowest-level containing process instance.
      */

@@ -43,7 +43,8 @@ public abstract class PrintTestsStatusRule extends TestWatcher {
         } catch (final Exception be) {
             logger.error("unable to clean db", be);
         } finally {
-            logger.warn("-----------------------------------------------------------------------------------------------");
+            logger.warn(
+                    "-----------------------------------------------------------------------------------------------");
         }
     }
 
@@ -57,7 +58,8 @@ public abstract class PrintTestsStatusRule extends TestWatcher {
             }
             logger.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
         } finally {
-            logger.warn("-----------------------------------------------------------------------------------------------");
+            logger.warn(
+                    "-----------------------------------------------------------------------------------------------");
         }
     }
 

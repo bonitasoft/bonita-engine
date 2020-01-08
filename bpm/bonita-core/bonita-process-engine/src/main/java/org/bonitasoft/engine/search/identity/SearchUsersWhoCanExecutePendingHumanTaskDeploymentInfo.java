@@ -25,7 +25,6 @@ import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
 
 /**
  * @author Julien Reboul
- * 
  */
 public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends AbstractUserSearchEntity {
 
@@ -33,7 +32,8 @@ public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends Abst
 
     private final long humanTaskInstanceId;
 
-    public SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, final ActivityInstanceService activityInstanceService,
+    public SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId,
+            final ActivityInstanceService activityInstanceService,
             final SearchUserDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.activityInstanceService = activityInstanceService;
@@ -42,12 +42,14 @@ public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends Abst
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return activityInstanceService.getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId, searchOptions);
+        return activityInstanceService.getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId,
+                searchOptions);
     }
 
     @Override
     public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-        return activityInstanceService.searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId, searchOptions);
+        return activityInstanceService.searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId,
+                searchOptions);
     }
 
 }

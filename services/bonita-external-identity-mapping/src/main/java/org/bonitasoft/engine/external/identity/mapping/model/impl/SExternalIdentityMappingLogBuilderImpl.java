@@ -22,13 +22,15 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 /**
  * @author Emmanuel Duchastenier
  */
-public class SExternalIdentityMappingLogBuilderImpl extends CRUDELogBuilder implements SExternalIdentityMappingLogBuilder {
+public class SExternalIdentityMappingLogBuilderImpl extends CRUDELogBuilder
+        implements SExternalIdentityMappingLogBuilder {
 
     private static final String PREFIX = "EXTERNAL_IDENTITY_MAPPING";
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(SExternalIdentityMappingLogIndexesMapper.EXTERNAL_IDENTITY_MAPPING_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SExternalIdentityMappingLogIndexesMapper.EXTERNAL_IDENTITY_MAPPING_INDEX,
+                objectId);
         return this;
     }
 
@@ -41,7 +43,8 @@ public class SExternalIdentityMappingLogBuilderImpl extends CRUDELogBuilder impl
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(SExternalIdentityMappingLogIndexesMapper.EXTERNAL_IDENTITY_MAPPING_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: external identity mapping Id");
+                throw new MissingMandatoryFieldsException(
+                        "Some mandatory fields are missing: external identity mapping Id");
             }
         }
     }

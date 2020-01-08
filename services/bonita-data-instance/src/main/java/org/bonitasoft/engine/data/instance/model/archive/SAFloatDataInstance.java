@@ -25,7 +25,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @EqualsAndHashCode(callSuper = true)
 public class SAFloatDataInstance extends SADataInstance {
 
-
     private Float value;
 
     public SAFloatDataInstance(final SDataInstance sDataInstance) {

@@ -47,7 +47,8 @@ public class SynchroServiceImpl extends AbstractSynchroService {
      * @param logger
      *        the technical logger service
      */
-    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger, final CommonCacheService cacheService) {
+    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger,
+            final CommonCacheService cacheService) {
         super(logger, cacheService);
         waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
         eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
@@ -82,7 +83,8 @@ public class SynchroServiceImpl extends AbstractSynchroService {
     }
 
     @Override
-    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
+    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout)
+            throws InterruptedException, TimeoutException {
         Serializable id = null;
         String semaphoreKey = null;
         Semaphore semaphore = null;

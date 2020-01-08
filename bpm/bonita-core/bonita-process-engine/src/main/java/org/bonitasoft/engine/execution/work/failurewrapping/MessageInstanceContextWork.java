@@ -29,7 +29,8 @@ public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
     private String targetFlowNode;
     private String eventType;
 
-    public MessageInstanceContextWork(BonitaWork work, String messageName, String targetProcess, String targetFlowNode, String eventType) {
+    public MessageInstanceContextWork(BonitaWork work, String messageName, String targetProcess, String targetFlowNode,
+            String eventType) {
         super(work);
         this.messageName = messageName;
         this.targetProcess = targetProcess;

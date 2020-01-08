@@ -98,8 +98,9 @@ public class ApiExtensionPageServiceListenerImplTest {
 
         listener.pageInserted(page, content);
 
-        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String>emptyList());
-        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId, Collections.<String>emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId,
+                Collections.<String> emptyList());
         verifyNoMoreInteractions(pageMappingService);
     }
 
@@ -289,7 +290,8 @@ public class ApiExtensionPageServiceListenerImplTest {
     }
 
     @Test
-    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_getting_mappings() throws Exception {
+    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_getting_mappings()
+            throws Exception {
         //given
         final long pageId = 10L;
         final SPage page = buildPage(pageId);
@@ -304,7 +306,8 @@ public class ApiExtensionPageServiceListenerImplTest {
     }
 
     @Test
-    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_deleting_mappings() throws Exception {
+    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_deleting_mappings()
+            throws Exception {
         //given
         final long pageId = 10L;
         final SPage page = buildPage(pageId);

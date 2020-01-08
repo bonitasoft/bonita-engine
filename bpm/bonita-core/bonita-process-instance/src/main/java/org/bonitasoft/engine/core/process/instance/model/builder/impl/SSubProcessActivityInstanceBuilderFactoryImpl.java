@@ -21,13 +21,17 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActi
  * @author Celine Souchet
  * @author Elias Ricken de Medeiros
  */
-public class SSubProcessActivityInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl implements SSubProcessActivityInstanceBuilderFactory {
+public class SSubProcessActivityInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl
+        implements SSubProcessActivityInstanceBuilderFactory {
 
     @Override
-    public SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name, final long flowNodeDefinitionId,
-            final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+    public SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name,
+            final long flowNodeDefinitionId,
+            final long rootContainerId, final long parentContainerId, final long processDefinitionId,
+            final long rootProcessInstanceId,
             final long parentProcessInstanceId, final boolean isTriggeredByEvent) {
-        final SSubProcessActivityInstance entity = new SSubProcessActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+        final SSubProcessActivityInstance entity = new SSubProcessActivityInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId, isTriggeredByEvent);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         entity.setTokenCount(1);

@@ -64,7 +64,8 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     private DocumentListReferenceExpressionExecutorStrategy strategy;
 
     @Test
-    public void evaluate_result_should_retrieve_documents_list_when_it_is_not_already_in_the_context() throws Exception {
+    public void evaluate_result_should_retrieve_documents_list_when_it_is_not_already_in_the_context()
+            throws Exception {
         //given:
         final Map<String, Object> context = new HashMap<>();
         context.put("containerId", 123L);
@@ -83,7 +84,8 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluate_should_directly_return_the_documents_list_when_it_is_already_in_the_context() throws Exception {
+    public void evaluate_should_directly_return_the_documents_list_when_it_is_already_in_the_context()
+            throws Exception {
         //given:
         final Map<String, Object> context = new HashMap<>();
         final List<DocumentImpl> documentListInContext = singletonList(new DocumentImpl());
@@ -145,7 +147,8 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     // UTILS
     // =================================================================================================================
 
-    private void initDefinition(final String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
+    private void initDefinition(final String... names)
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
             SProcessDefinitionNotFoundException,
             SBonitaReadException {
         final SProcessInstance processInstance = mock(SProcessInstance.class);
@@ -153,9 +156,11 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(45l);
 
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        final SFlowElementContainerDefinition flowElementContainerDefinition = mock(SFlowElementContainerDefinition.class);
+        final SFlowElementContainerDefinition flowElementContainerDefinition = mock(
+                SFlowElementContainerDefinition.class);
         doReturn(flowElementContainerDefinition).when(processDefinition).getProcessContainer();
-        doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition).getDocumentListDefinitions();
+        doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition)
+                .getDocumentListDefinitions();
         doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
     }
 

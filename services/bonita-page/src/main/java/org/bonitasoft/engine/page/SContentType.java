@@ -22,5 +22,5 @@ public interface SContentType {
 
     String FORM = "form";
 
-    String API_EXTENSION= "apiExtension";
+    String API_EXTENSION = "apiExtension";
 }

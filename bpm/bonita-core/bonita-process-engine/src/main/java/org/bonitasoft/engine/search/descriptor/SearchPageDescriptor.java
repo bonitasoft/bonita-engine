@@ -41,12 +41,18 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
         pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, keyProvider.getHiddenKey()));
-        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
-        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
-        pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
-        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
-        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE, new FieldDescriptor(SPage.class, keyProvider.getContentTypeKey()));
-        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SPage.class, keyProvider.getProcessDefinitionIdKey()));
+        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE,
+                new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
+        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE,
+                new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
+        pageKeys.put(PageSearchDescriptor.INSTALLED_BY,
+                new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
+        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
+        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE,
+                new FieldDescriptor(SPage.class, keyProvider.getContentTypeKey()));
+        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SPage.class, keyProvider.getProcessDefinitionIdKey()));
 
         pageAllFields = new HashMap<>(1);
 

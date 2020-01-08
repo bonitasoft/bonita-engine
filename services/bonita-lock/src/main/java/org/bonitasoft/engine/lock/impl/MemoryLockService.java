@@ -66,10 +66,12 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock lock(long objectToLockId, String objectType, long tenantId) throws SLockException, SLockTimeoutException {
+    public BonitaLock lock(long objectToLockId, String objectType, long tenantId)
+            throws SLockException, SLockTimeoutException {
         BonitaLock bonitaLock = tryLock(objectToLockId, objectType, lockTimeoutSeconds, SECONDS, tenantId);
         if (bonitaLock == null) {
-            throw new SLockTimeoutException(String.format("Unable to acquire lock %s,%s,%s in %s seconds", objectToLockId, objectType, tenantId, lockTimeoutSeconds));
+            throw new SLockTimeoutException(String.format("Unable to acquire lock %s,%s,%s in %s seconds",
+                    objectToLockId, objectType, tenantId, lockTimeoutSeconds));
         }
         return bonitaLock;
     }
@@ -84,7 +86,8 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) throws SLockException {
+    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId)
+            throws SLockException {
         String key = buildKey(objectToLockId, objectType, tenantId);
         ReentrantLock lock = createLock(objectToLockId, objectType, tenantId);
         try {
@@ -95,7 +98,9 @@ public class MemoryLockService implements LockService {
                     //lock was taken but someone replace it in the map, get it next time
                     // this can happen when the lock is removed just between `createLock` and `tryLock`
                     // retry it...
-                    logger.debug("Lock for key {} was acquired but it was replaced due to a race condition. We will retry.", key);
+                    logger.debug(
+                            "Lock for key {} was acquired but it was replaced due to a race condition. We will retry.",
+                            key);
                     lock.unlock();
                     return tryLock(objectToLockId, objectType, timeout, timeUnit, tenantId);
                 }

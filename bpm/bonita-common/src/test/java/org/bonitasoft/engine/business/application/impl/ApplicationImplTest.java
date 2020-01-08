@@ -53,8 +53,11 @@ public class ApplicationImplTest {
         application.setState(state);
 
         //then
-        assertThat(application).hasToken(token).hasVersion(version).hasDescription(description).hasLayoutId(layoutId).hasThemeId(themeId)
-                .hasUpdatedBy(updatedBy).hasProfileId(profileId).hasIconPath(iconPath).hasCreatedBy(createdBy).hasCreationDate(creationDate)
-                .hasDisplayName(displayName).hasHomePageId(homePageId).hasLastUpdateDate(lastUpdateDate).hasState(state);
+        assertThat(application).hasToken(token).hasVersion(version).hasDescription(description).hasLayoutId(layoutId)
+                .hasThemeId(themeId)
+                .hasUpdatedBy(updatedBy).hasProfileId(profileId).hasIconPath(iconPath).hasCreatedBy(createdBy)
+                .hasCreationDate(creationDate)
+                .hasDisplayName(displayName).hasHomePageId(homePageId).hasLastUpdateDate(lastUpdateDate)
+                .hasState(state);
     }
 }

@@ -42,7 +42,8 @@ public class AllConfigurationResourceVisitorTest {
         final List<FullBonitaConfiguration> bonitaConfigurations = new ArrayList<>();
 
         //when
-        final AllConfigurationResourceVisitor resourceVisitor = new AllConfigurationResourceVisitor(bonitaConfigurations);
+        final AllConfigurationResourceVisitor resourceVisitor = new AllConfigurationResourceVisitor(
+                bonitaConfigurations);
         Files.walkFileTree(rootFolder, resourceVisitor);
 
         //then
@@ -53,12 +54,15 @@ public class AllConfigurationResourceVisitorTest {
         Assertions.assertThat(bonitaConfigurations).as("should visit all configuration folders")
                 .extracting("configurationType")
                 .containsOnly("TENANT_ENGINE", "TENANT_PORTAL", "TENANT_SECURITY_SCRIPTS",
-                        "TENANT_TEMPLATE_SECURITY_SCRIPTS", "PLATFORM_PORTAL", "TENANT_TEMPLATE_ENGINE", "PLATFORM_INIT_ENGINE", "PLATFORM_ENGINE",
+                        "TENANT_TEMPLATE_SECURITY_SCRIPTS", "PLATFORM_PORTAL", "TENANT_TEMPLATE_ENGINE",
+                        "PLATFORM_INIT_ENGINE", "PLATFORM_ENGINE",
                         "TENANT_TEMPLATE_PORTAL");
         Assertions.assertThat(bonitaConfigurations).as("should add all configuration files and skip licenses")
                 .extracting("resourceName")
-                .containsOnly("bonita-platform-init-custom.xml", "cache-config.xml", "compound-permissions-mapping.properties",
-                        "SamplePermissionRule.groovy.sample", "authenticationManager-config.properties", "bonita-tenant-community.properties",
+                .containsOnly("bonita-platform-init-custom.xml", "cache-config.xml",
+                        "compound-permissions-mapping.properties",
+                        "SamplePermissionRule.groovy.sample", "authenticationManager-config.properties",
+                        "bonita-tenant-community.properties",
                         "bonita-platform-community.properties");
 
     }

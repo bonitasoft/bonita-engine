@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -30,8 +30,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -72,7 +72,8 @@ public class FailedStateSetterTest {
         given(flowNodeStateManager.getFailedState()).willReturn(failedState);
         given(failedState.getId()).willReturn(FAILED_STATE_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
-        given(loggerService.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
+        given(loggerService.isLoggable(ArgumentMatchers.<Class<?>> any(), any(TechnicalLogSeverity.class)))
+                .willReturn(true);
     }
 
     @Test
@@ -91,14 +92,16 @@ public class FailedStateSetterTest {
     @Test
     public void setAsFailed_should_log_message_when_flowNodeInstance_is_not_found() throws Exception {
         //given
-        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
+        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
 
         //when
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
 
         //then
-        verify(loggerService).log(ArgumentMatchers.<Class<?>>any(), eq(TechnicalLogSeverity.DEBUG),
-                eq("Impossible to put flow node instance in failed state: flow node instance with id '" + FLOW_NODE_INSTANCE_ID + "' not found."));
+        verify(loggerService).log(ArgumentMatchers.<Class<?>> any(), eq(TechnicalLogSeverity.DEBUG),
+                eq("Impossible to put flow node instance in failed state: flow node instance with id '"
+                        + FLOW_NODE_INSTANCE_ID + "' not found."));
         verify(activityInstanceService, never()).setState(flowNodeInstance, failedState);
     }
 

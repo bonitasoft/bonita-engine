@@ -26,9 +26,7 @@ import org.eclipse.jdt.internal.compiler.env.IBinaryType;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 
 /**
- *
  * Environment provided to the JDT compiler that load class from a classloader instead of a classpath
- *
  * /!\ it extends FileSystem only because the JDT compiler use the subtype instead of Environment
  *
  * @author Baptiste Mesta
@@ -54,11 +52,10 @@ public class ClassLoaderEnvironment extends FileSystem {
         return findType(getClassName(toPointedNotation(packageName), new String(typeName)));
     }
 
-
     private NameEnvironmentAnswer findType(String className) {
         //load from cache
-        if(loadedClassFiles.containsKey(className)){
-            return new NameEnvironmentAnswer(loadedClassFiles.get(className),null);
+        if (loadedClassFiles.containsKey(className)) {
+            return new NameEnvironmentAnswer(loadedClassFiles.get(className), null);
         }
         //load from the classloader
         try {
@@ -87,7 +84,7 @@ public class ClassLoaderEnvironment extends FileSystem {
     }
 
     private boolean isPackage(String result) {
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             return true;
         }
         try {
@@ -100,14 +97,15 @@ public class ClassLoaderEnvironment extends FileSystem {
     @Override
     public boolean isPackage(char[][] parentPackageName,
             char[] className) {
-        return !Character.isUpperCase(className[0]) && isPackage(getClassName(toPointedNotation(parentPackageName), new String(className)));
+        return !Character.isUpperCase(className[0])
+                && isPackage(getClassName(toPointedNotation(parentPackageName), new String(className)));
     }
 
     String getClassName(String parentPackage, String className) {
-        if(parentPackage.isEmpty()){
+        if (parentPackage.isEmpty()) {
             return className;
-        }else{
-            return parentPackage+"."+className;
+        } else {
+            return parentPackage + "." + className;
         }
     }
 

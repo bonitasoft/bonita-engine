@@ -28,7 +28,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType, long tenantId) {
+    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
+            long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getConnectorInstances");
         namedQuery.setParameter("containerId", containerId);
@@ -37,7 +38,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstance> getConnectorInstancesOrderedById(final long containerId, final String containerType, long tenantId) {
+    public List<SConnectorInstance> getConnectorInstancesOrderedById(final long containerId, final String containerType,
+            long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getConnectorInstancesOrderedById");
         namedQuery.setParameter("containerId", containerId);
@@ -45,7 +47,8 @@ public class ConnectorInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
-    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId, final String containerType, String state,
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId,
+            final String containerType, String state,
             long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getConnectorInstancesWithFailureInfoInState");
@@ -64,7 +67,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType, final ConnectorEvent activationEvent,
+    public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent,
             long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getNextExecutableConnectorInstance");
@@ -76,7 +80,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstance> searchSConnectorInstance(final long containerId, final String containerType, long tenantId) {
+    public List<SConnectorInstance> searchSConnectorInstance(final long containerId, final String containerType,
+            long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("searchSConnectorInstance");
         return namedQuery.list();
@@ -89,7 +94,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType, final ConnectorEvent activationEvent,
+    public List<SConnectorInstance> getConnectorInstances(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent,
             String state, long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getConnectorInstancesWithState");
@@ -101,7 +107,8 @@ public class ConnectorInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SConnectorInstanceWithFailureInfo> getConnectorInstanceWithFailureInfo(final long containerId, long tenantId) {
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstanceWithFailureInfo(final long containerId,
+            long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getConnectorInstanceWithFailureInfo");
         namedQuery.setParameter("id", containerId);

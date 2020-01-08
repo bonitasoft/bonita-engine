@@ -48,7 +48,8 @@ public class ApplicationModelConverter {
         this.pageService = pageService;
     }
 
-    public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) throws CreationException {
+    public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId)
+            throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
@@ -63,13 +64,14 @@ public class ApplicationModelConverter {
                 .layoutId(getLayoutId(creator))
                 .themeId(getThemeId(creator))
                 .updatedBy(creatorUserId)
-        .description(description).iconPath(iconPath).profileId(profileId).build();
+                .description(description).iconPath(iconPath).profileId(profileId).build();
     }
-    
+
     protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {
         Long layoutId = (Long) creator.getFields().get(ApplicationField.LAYOUT_ID);
         if (layoutId == null) {
-            layoutId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_LAYOUT_NAME);
+            layoutId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN),
+                    ApplicationService.DEFAULT_LAYOUT_NAME);
         }
         return layoutId;
     }
@@ -77,7 +79,8 @@ public class ApplicationModelConverter {
     protected Long getThemeId(final ApplicationCreator creator) throws CreationException {
         Long themeId = (Long) creator.getFields().get(ApplicationField.THEME_ID);
         if (themeId == null) {
-            themeId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_THEME_NAME);
+            themeId = getPageId((String) creator.getFields().get(ApplicationField.TOKEN),
+                    ApplicationService.DEFAULT_THEME_NAME);
         }
         return themeId;
     }
@@ -86,7 +89,8 @@ public class ApplicationModelConverter {
         try {
             SPage defaultLayout = pageService.getPageByName(pageName);
             if (defaultLayout == null) {
-                throw new CreationException(String.format("Unable to created application with token '%s' because the page '%s' was not found.",
+                throw new CreationException(String.format(
+                        "Unable to created application with token '%s' because the page '%s' was not found.",
                         applicationToken, pageName));
             }
             return defaultLayout.getId();
@@ -96,7 +100,8 @@ public class ApplicationModelConverter {
     }
 
     public Application toApplication(final SApplication sApplication) {
-        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription(),
+        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(),
+                sApplication.getDescription(),
                 sApplication.getLayoutId(), sApplication.getThemeId());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
@@ -119,8 +124,10 @@ public class ApplicationModelConverter {
         return applications;
     }
 
-    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater, final long updaterUserId) {
-        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(updaterUserId);
+    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater,
+            final long updaterUserId) {
+        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
+                .createNewInstance(updaterUserId);
         updateFields(updater, builder);
 
         return builder.done();

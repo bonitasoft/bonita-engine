@@ -66,7 +66,8 @@ public class PageMappingServiceImplTest {
     @Test
     public void get_should_return_page_mappings() throws Exception {
         final QueryOptions options = new QueryOptions(0, 2);
-        final SelectListDescriptor<SPageMapping> listDescriptor = new SelectListDescriptor<SPageMapping>("getPageMappingByPageId",
+        final SelectListDescriptor<SPageMapping> listDescriptor = new SelectListDescriptor<SPageMapping>(
+                "getPageMappingByPageId",
                 Collections.<String, Object> singletonMap("pageId", 1983L), SPageMapping.class, options);
 
         pageMappingService.get(1983L, 0, 2);
@@ -76,13 +77,15 @@ public class PageMappingServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void get_should_throw_an_exception() throws Exception {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+        when(persistenceService.selectList(any(SelectListDescriptor.class)))
+                .thenThrow(new SBonitaReadException("exception"));
 
         pageMappingService.get(1983L, 0, 2);
     }
 
     @Test
-    public void should_throw_a_SObjectCreationException_when_create_a_page_mapping_with_a_key_that_already_exists() throws Exception {
+    public void should_throw_a_SObjectCreationException_when_create_a_page_mapping_with_a_key_that_already_exists()
+            throws Exception {
         final SPageMapping pageMapping = mock(SPageMapping.class);
         when(pageMapping.getPageId()).thenReturn(5L);
         when(persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
@@ -95,7 +98,8 @@ public class PageMappingServiceImplTest {
     }
 
     @Test
-    public void should_throw_a_SObjectCreationException_when_create_a_page_mapping_with_a_key_that_already_exists_for_an_url() throws Exception {
+    public void should_throw_a_SObjectCreationException_when_create_a_page_mapping_with_a_key_that_already_exists_for_an_url()
+            throws Exception {
         final SPageMapping pageMapping = mock(SPageMapping.class);
         when(pageMapping.getPageId()).thenReturn(5L);
         when(persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
@@ -114,7 +118,7 @@ public class PageMappingServiceImplTest {
 
         pageMappingService.create("aMappinKey", 1L, newArrayList("rule1"));
         final ArgumentCaptor<InsertRecord> captor = ArgumentCaptor.forClass(InsertRecord.class);
-        
+
         verify(recorder).recordInsert(captor.capture(), anyString());
         final InsertRecord insertRecord = captor.getValue();
         final PersistentObject entity = insertRecord.getEntity();

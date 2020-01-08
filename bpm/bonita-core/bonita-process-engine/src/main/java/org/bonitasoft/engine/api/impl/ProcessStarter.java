@@ -75,7 +75,8 @@ public class ProcessStarter {
     private final Map<String, Serializable> processContractInputs;
 
     private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
-            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter, final Map<String, Serializable> processContractInputs) {
+            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter,
+            final Map<String, Serializable> processContractInputs) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
@@ -84,25 +85,31 @@ public class ProcessStarter {
         this.processContractInputs = processContractInputs;
     }
 
-    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context) {
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+            final Map<String, Serializable> context) {
         this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter(), null);
     }
 
-    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+            final Map<String, Serializable> context,
             final List<String> activityNames, Map<String, Serializable> processContractInputs) {
-        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), processContractInputs);
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames),
+                processContractInputs);
     }
 
-    public ProcessStarter(final long userId, final long processDefinitionId, final Map<String, Serializable> processContractInputs) {
+    public ProcessStarter(final long userId, final long processDefinitionId,
+            final Map<String, Serializable> processContractInputs) {
         this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), processContractInputs);
     }
 
     public ProcessInstance start()
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,
+            ContractViolationException {
         try {
             return start(null);
         } catch (final SContractViolationException e) {
-            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
+            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(),
+                    e.getCause());
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaReadException e) {
@@ -115,13 +122,15 @@ public class ProcessStarter {
     }
 
     // For commands
-    public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SProcessInstanceCreationException,
+    public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
+            throws SProcessInstanceCreationException,
             SBonitaReadException, SProcessDefinitionException, SContractViolationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinitionIfIsEnabled(processDefinitionId);
+        final SProcessDefinition sProcessDefinition = processDefinitionService
+                .getProcessDefinitionIfIsEnabled(processDefinitionId);
         final Map<String, Object> operationContext = getContext();
         final long starterSubstituteUserId = SessionInfos.getUserIdFromSession();
         final long starterUserId = getStarterUserId(starterSubstituteUserId);
@@ -129,7 +138,8 @@ public class ProcessStarter {
         final SProcessInstance startedSProcessInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
+            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations,
+                    operationContext, connectorsWithInput,
                     new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
@@ -139,7 +149,8 @@ public class ProcessStarter {
             throw e;
         }
 
-        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId, startedSProcessInstance);
+        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId,
+                startedSProcessInstance);
         return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
     }
 
@@ -162,7 +173,8 @@ public class ProcessStarter {
         return Collections.emptyMap();
     }
 
-    private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
+    private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition,
+            final long starterId, final long starterSubstituteId,
             final SProcessInstance sProcessInstance) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
@@ -191,7 +203,8 @@ public class ProcessStarter {
         addSystemCommentOnProcessInstanceWhenStartingProcessFor(sProcessInstance, starterId, starterSubstituteId);
     }
 
-    protected void addSystemCommentOnProcessInstanceWhenStartingProcessFor(final SProcessInstance sProcessInstance, final long starterId,
+    protected void addSystemCommentOnProcessInstanceWhenStartingProcessFor(final SProcessInstance sProcessInstance,
+            final long starterId,
             final long starterSubstituteId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
@@ -201,10 +214,13 @@ public class ProcessStarter {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser starter = identityService.getUser(starterId);
-                commentService.addSystemComment(sProcessInstance.getId(), "The user " + SessionInfos.getUserNameFromSession()
-                        + " acting as delegate of the user " + starter.getUserName() + " has started the case.");
+                commentService.addSystemComment(sProcessInstance.getId(),
+                        "The user " + SessionInfos.getUserNameFromSession()
+                                + " acting as delegate of the user " + starter.getUserName()
+                                + " has started the case.");
             } catch (final SBonitaException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                        "Error when adding a comment on the process instance.", e);
             }
         }
     }

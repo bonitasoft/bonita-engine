@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -50,9 +50,11 @@ public class CustomUserInfoDefinitionImporterTest {
 
     private CustomUserInfoDefinitionImporter importer;
 
-    private final ExportedCustomUserInfoDefinition skillsUserInfoDefinition = new ExportedCustomUserInfoDefinition(SKILLS_NAME, SKILLS_DESCRIPTION);
+    private final ExportedCustomUserInfoDefinition skillsUserInfoDefinition = new ExportedCustomUserInfoDefinition(
+            SKILLS_NAME, SKILLS_DESCRIPTION);
 
-    private final ExportedCustomUserInfoDefinition locationInfoUserDefinition = new ExportedCustomUserInfoDefinition(LOCATION_NAME, null);
+    private final ExportedCustomUserInfoDefinition locationInfoUserDefinition = new ExportedCustomUserInfoDefinition(
+            LOCATION_NAME, null);
 
     @Before
     public void setUp() {
@@ -66,7 +68,8 @@ public class CustomUserInfoDefinitionImporterTest {
         importer.importCustomUserInfoDefinitions(Arrays.asList(skillsUserInfoDefinition, locationInfoUserDefinition));
 
         // then
-        ArgumentCaptor<SCustomUserInfoDefinition> userInfoCaptor = ArgumentCaptor.forClass(SCustomUserInfoDefinition.class);
+        ArgumentCaptor<SCustomUserInfoDefinition> userInfoCaptor = ArgumentCaptor
+                .forClass(SCustomUserInfoDefinition.class);
         verify(identityService, times(2)).createCustomUserInfoDefinition(userInfoCaptor.capture());
         SCustomUserInfoDefinition skills = userInfoCaptor.getAllValues().get(0);
         SCustomUserInfoDefinition location = userInfoCaptor.getAllValues().get(1);
@@ -79,7 +82,8 @@ public class CustomUserInfoDefinitionImporterTest {
     }
 
     @Test
-    public void importCustomUserInfoDefinitions_dont_call_service_to_create_elements_and_call_import_stragy_if_already_exists() throws Exception {
+    public void importCustomUserInfoDefinitions_dont_call_service_to_create_elements_and_call_import_stragy_if_already_exists()
+            throws Exception {
         // given
         SCustomUserInfoDefinition existingDefinition = mock(SCustomUserInfoDefinition.class);
         given(identityService.hasCustomUserInfoDefinition(SKILLS_NAME)).willReturn(true);

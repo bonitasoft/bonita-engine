@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-
 import java.util.Objects;
 
 import org.bonitasoft.engine.business.data.BusinessDataReference;
@@ -45,11 +44,12 @@ public class BusinessDataReferenceImpl implements BusinessDataReference {
         return type;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         BusinessDataReferenceImpl that = (BusinessDataReferenceImpl) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(type, that.type);

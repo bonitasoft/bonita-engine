@@ -20,7 +20,8 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * @author Laurent Leseigneur
  */
-public interface BusinessDataQueryResult extends Serializable,SearchResult {
+public interface BusinessDataQueryResult extends Serializable, SearchResult {
+
     Serializable getJsonResults();
 
     BusinessDataQueryMetadata getBusinessDataQueryMetadata();

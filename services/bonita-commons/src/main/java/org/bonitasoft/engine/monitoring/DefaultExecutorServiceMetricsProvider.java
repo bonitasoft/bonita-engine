@@ -28,13 +28,16 @@ public class DefaultExecutorServiceMetricsProvider implements ExecutorServiceMet
 
     @Override
     public ExecutorService bind(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
-                                String executorServiceName, long tenantId) {
-        return ExecutorServiceMetrics.monitor(meterRegistry, executorService, executorServiceName, Tags.of("tenant", String.valueOf(tenantId)));
+            String executorServiceName, long tenantId) {
+        return ExecutorServiceMetrics.monitor(meterRegistry, executorService, executorServiceName,
+                Tags.of("tenant", String.valueOf(tenantId)));
     }
 
     @Override
-    public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService, String executorServiceName, long tenantId) {
-        new ExecutorServiceMetrics(executorService, executorServiceName, Tags.of("tenant", String.valueOf(tenantId))).bindTo(meterRegistry);
+    public void bindMetricsOnly(MeterRegistry meterRegistry, ThreadPoolExecutor executorService,
+            String executorServiceName, long tenantId) {
+        new ExecutorServiceMetrics(executorService, executorServiceName, Tags.of("tenant", String.valueOf(tenantId)))
+                .bindTo(meterRegistry);
     }
 
     @Override
@@ -43,9 +46,12 @@ public class DefaultExecutorServiceMetricsProvider implements ExecutorServiceMet
         //right now, there is no unbind method on the MeterBinder, manually unbind them
         Optional.ofNullable(meterRegistry.find("executor").tags(tags).timer()).ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.active").tags(tags).gauge()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.pool.size").tags(tags).gauge()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.queue.remaining").tags(tags).gauge()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.pool.size").tags(tags).gauge())
+                .ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.queue.remaining").tags(tags).gauge())
+                .ifPresent(meterRegistry::remove);
         Optional.ofNullable(meterRegistry.find("executor.queued").tags(tags).gauge()).ifPresent(meterRegistry::remove);
-        Optional.ofNullable(meterRegistry.find("executor.completed").tags(tags).functionCounter()).ifPresent(meterRegistry::remove);
+        Optional.ofNullable(meterRegistry.find("executor.completed").tags(tags).functionCounter())
+                .ifPresent(meterRegistry::remove);
     }
 }

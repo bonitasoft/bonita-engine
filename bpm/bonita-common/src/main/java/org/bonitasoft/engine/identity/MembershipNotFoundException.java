@@ -28,7 +28,7 @@ public class MembershipNotFoundException extends NotFoundException {
 
     /**
      * creates a new instance of the exception with the given cause
-     * 
+     *
      * @param cause the cause of the exception
      */
     public MembershipNotFoundException(final Throwable cause) {

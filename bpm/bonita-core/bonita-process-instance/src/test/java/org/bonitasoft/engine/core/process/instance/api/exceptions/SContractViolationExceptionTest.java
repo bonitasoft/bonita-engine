@@ -28,14 +28,16 @@ public class SContractViolationExceptionTest {
 
     @Test
     public void should_return_explanation() {
-        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getExplanations()).containsExactly("issue1", "issue2");
     }
 
     @Test
     public void should_print_stack_trace_show_explanations() {
-        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1, issue2");
 
@@ -43,7 +45,8 @@ public class SContractViolationExceptionTest {
 
     @Test
     public void should_print_stack_trace_show_one_explanation() {
-        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1"));
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                Arrays.asList("issue1"));
 
         assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: issue1");
 
@@ -52,7 +55,9 @@ public class SContractViolationExceptionTest {
     @Test
     public void should_print_stack_trace_with_null_explanations() {
         List<String> explanations = null;
-        @SuppressWarnings("ConstantConditions") final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+        @SuppressWarnings("ConstantConditions")
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                explanations);
 
         assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
     }
@@ -60,14 +65,16 @@ public class SContractViolationExceptionTest {
     @Test
     public void should_print_stack_trace_with_empty_explanations() {
         List<String> explanations = Collections.emptyList();
-        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", explanations);
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                explanations);
 
         assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: no details");
     }
 
     @Test
     public void should_getSimpleMessage_not_show_explanations() {
-        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract",
+                Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getSimpleMessage()).isEqualTo("Bad contract");
 

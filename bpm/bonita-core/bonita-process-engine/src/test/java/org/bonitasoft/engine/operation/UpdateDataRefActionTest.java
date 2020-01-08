@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -69,17 +69,21 @@ public class UpdateDataRefActionTest {
     public void execute_should_update_simple_business_data_when_without_previous_refDataId() throws Exception {
         //given
         final String dataName = "address";
-        final BusinessDataContext businessDataContext = new BusinessDataContext(dataName, new Container(FLOW_NODE_INSTANCE_ID, ACTIVITY_INSTANCE));
-        final UpdateDataRefAction updateDataRefAction = new UpdateDataRefAction(refBusinessDataService, refBusinessDataRetriever);
+        final BusinessDataContext businessDataContext = new BusinessDataContext(dataName,
+                new Container(FLOW_NODE_INSTANCE_ID, ACTIVITY_INSTANCE));
+        final UpdateDataRefAction updateDataRefAction = new UpdateDataRefAction(refBusinessDataService,
+                refBusinessDataRetriever);
         final SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(null);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
         final Address entity = new Address(45L);
         updateDataRefAction.execute(entity, businessDataContext);
 
         //then
-        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance, entity.getPersistenceId());
+        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance,
+                entity.getPersistenceId());
     }
 
     @Test
@@ -88,14 +92,17 @@ public class UpdateDataRefActionTest {
         final long persistenceId = 45L;
         final String dataName = "address";
         final BusinessDataContext businessDataContext = buildContext(dataName);
-        final SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(persistenceId);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        final SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(
+                persistenceId);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
         updateDataRefAction.execute(new Address(persistenceId), businessDataContext);
 
         //then
-        verify(refBusinessDataService, never()).updateRefBusinessDataInstance(any(SSimpleRefBusinessDataInstance.class), anyLong());
+        verify(refBusinessDataService, never()).updateRefBusinessDataInstance(any(SSimpleRefBusinessDataInstance.class),
+                anyLong());
     }
 
     @Test
@@ -105,7 +112,8 @@ public class UpdateDataRefActionTest {
         final String dataName = "address";
         final BusinessDataContext businessDataContext = buildContext(dataName);
         final SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(30L);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
         updateDataRefAction.execute(new Address(persistenceId), businessDataContext);
@@ -144,7 +152,8 @@ public class UpdateDataRefActionTest {
         final String dataName = "address";
         final BusinessDataContext businessDataContext = buildContext(dataName);
         final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //then
         expectedException.expect(SEntityActionExecutionException.class);
@@ -160,7 +169,8 @@ public class UpdateDataRefActionTest {
         final String dataName = "addresses";
         final BusinessDataContext businessDataContext = buildContext(dataName);
         final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
         updateDataRefAction.execute(Arrays.<Entity> asList(new Address(45L), new Address(46L)), businessDataContext);
@@ -183,15 +193,19 @@ public class UpdateDataRefActionTest {
 
         final long persistenceId1 = 45L;
         final long persistenceId2 = 46L;
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, persistenceId2);
+        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1,
+                persistenceId2);
 
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
-        updateDataRefAction.execute(Arrays.<Entity> asList(new Address(persistenceId1), new Address(persistenceId2)), businessDataContext);
+        updateDataRefAction.execute(Arrays.<Entity> asList(new Address(persistenceId1), new Address(persistenceId2)),
+                businessDataContext);
 
         //then
-        verify(refBusinessDataService, never()).updateRefBusinessDataInstance(refBusinessDataInstance, Arrays.asList(persistenceId1, persistenceId2));
+        verify(refBusinessDataService, never()).updateRefBusinessDataInstance(refBusinessDataInstance,
+                Arrays.asList(persistenceId1, persistenceId2));
     }
 
     @Test
@@ -202,14 +216,18 @@ public class UpdateDataRefActionTest {
 
         final long persistenceId1 = 45L;
         final long persistenceId2 = 46L;
-        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1, 34L);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(persistenceId1,
+                34L);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //when
-        updateDataRefAction.execute(Arrays.<Entity> asList(new Address(persistenceId1), new Address(persistenceId2)), businessDataContext);
+        updateDataRefAction.execute(Arrays.<Entity> asList(new Address(persistenceId1), new Address(persistenceId2)),
+                businessDataContext);
 
         //then
-        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance, Arrays.asList(persistenceId1, persistenceId2));
+        verify(refBusinessDataService).updateRefBusinessDataInstance(refBusinessDataInstance,
+                Arrays.asList(persistenceId1, persistenceId2));
     }
 
     @Test
@@ -219,9 +237,11 @@ public class UpdateDataRefActionTest {
         final SMultiRefBusinessDataInstance refBusinessDataInstance = createMultiRefBusinessDataInstance(34L);
 
         final BusinessDataContext businessDataContext = buildContext(dataName);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
-        doThrow(new SRefBusinessDataInstanceModificationException(new Exception())).when(refBusinessDataService).updateRefBusinessDataInstance(
-                refBusinessDataInstance, Arrays.asList(45L, 46L));
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
+        doThrow(new SRefBusinessDataInstanceModificationException(new Exception())).when(refBusinessDataService)
+                .updateRefBusinessDataInstance(
+                        refBusinessDataInstance, Arrays.asList(45L, 46L));
 
         //then
         expectedException.expect(SEntityActionExecutionException.class);
@@ -237,7 +257,8 @@ public class UpdateDataRefActionTest {
         final String dataName = "addresses";
         final BusinessDataContext businessDataContext = buildContext(dataName);
         final SSimpleRefBusinessDataInstance refBusinessDataInstance = mock(SSimpleRefBusinessDataInstance.class);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //then
         expectedException.expect(SEntityActionExecutionException.class);
@@ -253,7 +274,8 @@ public class UpdateDataRefActionTest {
         final String dataName = "addresses";
         final BusinessDataContext businessDataContext = buildContext(dataName);
         final SMultiRefBusinessDataInstance refBusinessDataInstance = mock(SMultiRefBusinessDataInstance.class);
-        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext))
+                .willReturn(refBusinessDataInstance);
 
         //then
         expectedException.expect(SEntityActionExecutionException.class);
@@ -263,7 +285,8 @@ public class UpdateDataRefActionTest {
     }
 
     private BusinessDataContext buildContext(final String dataName) {
-        final BusinessDataContext businessDataContext = new BusinessDataContext(dataName, new Container(PROCESS_INSTANCE_ID, PROCESS_INSTANCE));
+        final BusinessDataContext businessDataContext = new BusinessDataContext(dataName,
+                new Container(PROCESS_INSTANCE_ID, PROCESS_INSTANCE));
         return businessDataContext;
     }
 

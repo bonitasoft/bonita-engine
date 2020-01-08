@@ -17,7 +17,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * Thrown when a reference to an inexistant {@link ProcessInstance} is made, generally through its ID.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -38,9 +38,10 @@ public class ProcessInstanceNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessInstanceNotFoundException(final Throwable cause) {
@@ -49,7 +50,7 @@ public class ProcessInstanceNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception and the message with the identifier of the process instance.
-     * 
+     *
      * @param processInstanceId
      *        The identifier of the process instance
      */

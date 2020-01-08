@@ -61,7 +61,8 @@ public class BinaryComparatorMapperTest {
     }
 
     @Test
-    public void getEvaluator_for_greaterThanOrEquals_operator_should_return_GreaterThanOrEqualsEvaluator() throws Exception {
+    public void getEvaluator_for_greaterThanOrEquals_operator_should_return_GreaterThanOrEqualsEvaluator()
+            throws Exception {
         //given
 
         //when

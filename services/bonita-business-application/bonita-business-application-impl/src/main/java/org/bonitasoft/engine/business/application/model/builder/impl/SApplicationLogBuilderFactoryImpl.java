@@ -16,10 +16,8 @@ package org.bonitasoft.engine.business.application.model.builder.impl;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilderFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderFactory;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SApplicationLogBuilderFactory {
 

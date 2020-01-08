@@ -25,9 +25,10 @@ import org.bonitasoft.engine.session.model.SSession;
 public class LogMessageBuilder {
 
     /**
-     * Build the log message using the flow node's context (display name, id, parent activity id, parent process instance id, root process instance id, and
+     * Build the log message using the flow node's context (display name, id, parent activity id, parent process
+     * instance id, root process instance id, and
      * process definition id)
-     * 
+     *
      * @param flowNodeInstance
      * @return the message log built using the flow node's context.
      */
@@ -53,7 +54,8 @@ public class LogMessageBuilder {
         return stb.toString();
     }
 
-    public static String buildExecuteTaskContextMessage(final SFlowNodeInstance flowNodeInstance, final String username, final long executerUserId,
+    public static String buildExecuteTaskContextMessage(final SFlowNodeInstance flowNodeInstance, final String username,
+            final long executerUserId,
             final long executerSubstituteId, Map<String, Serializable> inputs) {
         final StringBuilder stb = new StringBuilder();
         stb.append("The user <" + username + "> ");
@@ -70,7 +72,7 @@ public class LogMessageBuilder {
 
     /**
      * Build message "The user <session.getUsername> (acting as delegate of user with id <starterId>)"
-     * 
+     *
      * @param session
      * @param starterId
      * @return

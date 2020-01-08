@@ -31,13 +31,15 @@ public class ConnectorReseter {
     }
 
     /**
-     * Reset the {@link org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo} to the given state
-     * 
+     * Reset the {@link org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo} to the
+     * given state
+     *
      * @param connectorInstanceWithFailure {@code SConnectorInstance} identifier
      * @param state the new {@code SConnectorInstance} state
      * @throws ActivityExecutionException
      */
-    public void resetState(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, ConnectorStateReset state) throws ActivityExecutionException {
+    public void resetState(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, ConnectorStateReset state)
+            throws ActivityExecutionException {
         try {
             // set state
             connectorInstanceService.setState(connectorInstanceWithFailure, state.name());

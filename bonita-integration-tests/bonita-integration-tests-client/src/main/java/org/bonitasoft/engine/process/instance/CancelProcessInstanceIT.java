@@ -57,7 +57,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
     public void cancelProcessInstanceWithHumanTasks() throws Exception {
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
-        final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, "auto1");
+        final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2,
+                "auto1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, taskName1);
@@ -80,21 +81,26 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
         final String autoTaskName = "auto1";
-        final ProcessDefinition targetProcessDef = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, autoTaskName);
-        final ProcessDefinition callActivityProcDef = deployProcessWithCallActivity(taskName1, "callActivity", targetProcessDef.getName(),
+        final ProcessDefinition targetProcessDef = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2,
+                autoTaskName);
+        final ProcessDefinition callActivityProcDef = deployProcessWithCallActivity(taskName1, "callActivity",
+                targetProcessDef.getName(),
                 targetProcessDef.getVersion(), taskName2);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(callActivityProcDef.getId());
 
-        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInExecutingState(parentProcessInstance, "callActivity", false);
+        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInExecutingState(parentProcessInstance, "callActivity",
+                false);
         assertNotNull("Expected call activity in executing state", waitForFlowNode);
 
         checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
         assertEquals(2, processInstances.size());
         final ProcessInstance targetProcessInstance = processInstances.get(0);
         assertEquals(targetProcessDef.getId(), targetProcessInstance.getProcessDefinitionId());
 
-        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), 50, 5000, true, parentProcessInstance, 2,
+        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), 50, 5000, true,
+                parentProcessInstance, 2,
                 TestStates.READY);
         assertTrue(checkNbOfActivities.waitUntil());
 
@@ -116,7 +122,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final String catchMessageEvent = "receiveMessage";
         final String previousStep = "auto1";
         final String nextStep = "auto2";
-        final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchMessageEvent(catchMessageEvent, "m1", previousStep, nextStep);
+        final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchMessageEvent(catchMessageEvent, "m1",
+                previousStep, nextStep);
 
         final ProcessInstance receiveProcessInstance = getProcessAPI().startProcess(receiveProcess.getId());
         waitForFlowNodeInState(receiveProcessInstance, catchMessageEvent, TestStates.WAITING, true);
@@ -127,7 +134,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
-        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
@@ -147,7 +155,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final String catchMessageEvent = "receiveSignal";
         final String previousStep = "auto1";
         final String nextStep = "auto2";
-        final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchSignalEvent(catchMessageEvent, "s1", previousStep, nextStep);
+        final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchSignalEvent(catchMessageEvent, "s1",
+                previousStep, nextStep);
 
         final ProcessInstance receiveProcessInstance = getProcessAPI().startProcess(receiveProcess.getId());
         waitForFlowNodeInState(receiveProcessInstance, catchMessageEvent, TestStates.WAITING, true);
@@ -158,7 +167,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
-        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
@@ -177,17 +187,18 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         getProcessAPI().cancelProcessInstance(45);
     }
 
-
     @Test
     public void should_cancel_process_instance_with_running_tasks() throws Exception {
         //given
         ProcessDefinition processDefinition = getProcessAPI()
-                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processWithATaskThatCallCancel", "1.0")
-                        .addStartEvent("start")
-                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
-                                new ExpressionBuilder().createConstantStringExpression("1.0"))
-                        .addTransition("start", "call")
-                        .getProcess());
+                .deployAndEnableProcess(
+                        new ProcessDefinitionBuilder().createNewInstance("processWithATaskThatCallCancel", "1.0")
+                                .addStartEvent("start")
+                                .addCallActivity("call",
+                                        new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
+                                        new ExpressionBuilder().createConstantStringExpression("1.0"))
+                                .addTransition("start", "call")
+                                .getProcess());
         //when
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         ActivityInstance activityInstance = waitForTaskToFail(processInstance);
@@ -202,8 +213,10 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         } catch (ProcessInstanceNotFoundException ignored) {
         }
         //verify the call activity was archived in cancelled state:
-        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
-                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI()
+                .searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call")
+                        .filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
         assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
         assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
         disableAndDeleteProcess(processDefinition);

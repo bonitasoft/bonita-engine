@@ -15,7 +15,7 @@ package org.bonitasoft.engine.expression;
 
 /**
  * Default interpreters supported by the engine
- * 
+ *
  * @author Baptiste Mesta
  */
 public enum ExpressionInterpreter {

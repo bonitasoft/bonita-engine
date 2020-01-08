@@ -37,5 +37,5 @@ public interface SWaitingEventKeyProviderBuilderFactory {
     String getEventTypeKey();
 
     String getActiveKey();
-    
+
 }

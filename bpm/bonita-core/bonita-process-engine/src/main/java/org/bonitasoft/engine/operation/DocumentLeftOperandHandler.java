@@ -40,7 +40,8 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     private final DocumentHelper documentHelper;
     final DocumentService documentService;
 
-    public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
+    public DocumentLeftOperandHandler(final DocumentService documentService,
+            final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentService = documentService;
@@ -48,9 +49,10 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId,
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue,
+            final long containerId,
             final String containerType)
-                    throws SOperationExecutionException {
+            throws SOperationExecutionException {
         final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(newValue);
         final String documentName = sLeftOperand.getName();
         long processInstanceId;
@@ -64,7 +66,8 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
                     //do not update if the document value say it did not changed
                     return newValue;
                 }
-                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId(containerId, containerType), null);
+                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId,
+                        getAuthorId(containerId, containerType), null);
             }
             return newValue;
         } catch (final SBonitaException e) {
@@ -79,9 +82,9 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     }
 
     @Override
-    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting a document is not supported");
     }
-
 
 }

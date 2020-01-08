@@ -69,14 +69,18 @@ public class BuildTestUtil {
 
     public static final String ROLE_NAME = "Developper";
 
-    public static byte[] buildConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
-            final String implementationVersion, final String implementationClassname, String... dependencies) throws UnsupportedEncodingException {
+    public static byte[] buildConnectorImplementationFile(final String definitionId, final String definitionVersion,
+            final String implementationId,
+            final String implementationVersion, final String implementationClassname, String... dependencies)
+            throws UnsupportedEncodingException {
         final StringBuilder stb = new StringBuilder();
         stb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        stb.append("<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">\n");
+        stb.append(
+                "<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">\n");
         stb.append("\t<definitionId>").append(definitionId).append("</definitionId>\n");
         stb.append("\t<definitionVersion>").append(definitionVersion).append("</definitionVersion>\n");
-        stb.append("\t<implementationClassname>").append(implementationClassname).append("</implementationClassname>\n");
+        stb.append("\t<implementationClassname>").append(implementationClassname)
+                .append("</implementationClassname>\n");
         stb.append("\t<implementationId>").append(implementationId).append("</implementationId>\n");
         stb.append("\t<implementationVersion>").append(implementationVersion).append("</implementationVersion>\n");
         if (dependencies.length > 0) {
@@ -90,7 +94,8 @@ public class BuildTestUtil {
         return stb.toString().getBytes("UTF-8");
     }
 
-    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, Class<? extends Connector> connectorClass) throws UnsupportedEncodingException {
+    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion,
+            Class<? extends Connector> connectorClass) throws UnsupportedEncodingException {
         return new BarResource(
                 connectorClass.getSimpleName() + ".impl",
                 BuildTestUtil.buildConnectorImplementationFile(definitionId,
@@ -98,7 +103,9 @@ public class BuildTestUtil {
                         definitionId + "-impl",
                         "generated", connectorClass.getName()));
     }
-    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, String className, String... dependencies) throws UnsupportedEncodingException {
+
+    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion,
+            String className, String... dependencies) throws UnsupportedEncodingException {
         return new BarResource(
                 className + ".impl",
                 BuildTestUtil.buildConnectorImplementationFile(definitionId,
@@ -108,11 +115,14 @@ public class BuildTestUtil {
                         dependencies));
     }
 
-    public static BusinessArchiveBuilder buildBusinessArchiveWithConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies, final List<BarResource> userFilters)
+    public static BusinessArchiveBuilder buildBusinessArchiveWithConnectorAndUserFilter(
+            final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+            final List<BarResource> userFilters)
             throws InvalidProcessDefinitionException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefinitionBuilder.done());
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        processDefinitionBuilder.done());
         for (final BarResource barResource : connectorImplementations) {
             businessArchiveBuilder.addConnectorImplementation(barResource);
         }
@@ -127,9 +137,11 @@ public class BuildTestUtil {
         return businessArchiveBuilder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithCallActivity(final String processName, final Expression targetProcessExpr,
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithCallActivity(final String processName,
+            final Expression targetProcessExpr,
             final Expression targetVersionExpr) {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("start");
         builder.addCallActivity("callActivity", targetProcessExpr, targetVersionExpr);
@@ -138,8 +150,10 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithHumanTaskAndErrorEndEvent(final String processName, final String taskName) {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithHumanTaskAndErrorEndEvent(final String processName,
+            final String taskName) {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("start");
         builder.addUserTask(taskName, ACTOR_NAME);
@@ -148,8 +162,10 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndErrorEndEvent(final String processName) {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndErrorEndEvent(
+            final String processName) {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addStartEvent("start");
         builder.addAutomaticTask("step");
         builder.addEndEvent("end").addErrorEventTrigger("errorCode");
@@ -157,42 +173,55 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedGroovyScript(final String processName)
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedGroovyScript(
+            final String processName)
             throws InvalidExpressionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addStartEvent("start");
         builder.addAutomaticTask("activityThatFail").addData("data", String.class.getName(),
-                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()", String.class.getName()));
+                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()",
+                        String.class.getName()));
         builder.addEndEvent("end");
         builder.addTransition("start", "activityThatFail").addTransition("activityThatFail", "end");
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithFailedConnector(final String processName) throws InvalidExpressionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
-        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addConnector("testConnectorThatThrowException",
-                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithFailedConnector(final String processName)
+            throws InvalidExpressionException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder
+                .addConnector("testConnectorThatThrowException",
+                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .throwErrorEventWhenFailed("errorCode");
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
         builder.addStartEvent("start").addAutomaticTask("AutomaticStep").addEndEvent("end");
         builder.addTransition("start", "AutomaticStep").addTransition("AutomaticStep", "end");
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedConnector(final String processName)
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedConnector(
+            final String processName)
             throws InvalidExpressionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addStartEvent("start");
-        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep").addConnector("testConnectorThatThrowException",
-                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep")
+                .addConnector("testConnectorThatThrowException",
+                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .throwErrorEventWhenFailed("errorCode");
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
         builder.addEndEvent("end");
         builder.addTransition("start", "AutomaticStep").addTransition("AutomaticStep", "end");
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithUserTaskAndFailedConnector(final String processName)
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithUserTaskAndFailedConnector(
+            final String processName)
             throws InvalidExpressionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addStartEvent("start");
         builder.addActor(ACTOR_NAME).addUserTask("StepBeforeFailedConnector", ACTOR_NAME);
         final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep")
@@ -201,22 +230,27 @@ public class BuildTestUtil {
                 .throwErrorEventWhenFailed("errorCode");
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
         builder.addEndEvent("end");
-        builder.addTransition("start", "StepBeforeFailedConnector").addTransition("StepBeforeFailedConnector", "AutomaticStep")
+        builder.addTransition("start", "StepBeforeFailedConnector")
+                .addTransition("StepBeforeFailedConnector", "AutomaticStep")
                 .addTransition("AutomaticStep", "end");
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(final String processName,
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(
+            final String processName,
             final String userTaskName)
             throws InvalidExpressionException {
         final String errorCode = "mistake";
 
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(userTaskName, ACTOR_NAME);
         userTaskBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
-        final ConnectorDefinitionBuilder connectorDefinitionBuilder = userTaskBuilder.addConnector("testConnectorThatThrowException",
-                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_FINISH).throwErrorEventWhenFailed(errorCode);
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = userTaskBuilder
+                .addConnector("testConnectorThatThrowException",
+                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_FINISH)
+                .throwErrorEventWhenFailed(errorCode);
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
         final BoundaryEventDefinitionBuilder boundaryEvent = userTaskBuilder.addBoundaryEvent("error", true);
         boundaryEvent.addErrorEventTrigger(errorCode);
@@ -226,8 +260,10 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static void buildErrorEventSubProcessWithUserTask(final String taskName, final ProcessDefinitionBuilder builder) {
-        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess(EVENT_SUB_PROCESS_NAME, true).getSubProcessBuilder();
+    public static void buildErrorEventSubProcessWithUserTask(final String taskName,
+            final ProcessDefinitionBuilder builder) {
+        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess(EVENT_SUB_PROCESS_NAME, true)
+                .getSubProcessBuilder();
         subProcessBuilder.addStartEvent("SubStart").addErrorEventTrigger();
         subProcessBuilder.addUserTask(taskName, ACTOR_NAME);
         subProcessBuilder.addEndEvent("SubEnd");
@@ -244,7 +280,8 @@ public class BuildTestUtil {
         return builder.done();
     }
 
-    public static SearchOptionsBuilder buildSearchOptions(final long processDefId, final int pageIndex, final int numberOfResults, final String orderByField,
+    public static SearchOptionsBuilder buildSearchOptions(final long processDefId, final int pageIndex,
+            final int numberOfResults, final String orderByField,
             final Order order) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
         builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefId);
@@ -252,33 +289,39 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static SearchOptionsBuilder buildSearchOptions(final int pageIndex, final int numberOfResults, final String orderByField, final Order order) {
+    public static SearchOptionsBuilder buildSearchOptions(final int pageIndex, final int numberOfResults,
+            final String orderByField, final Order order) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
         builder.sort(orderByField, order);
         return builder;
     }
 
-    public static Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
+    public static Operation buildStringOperation(final String dataInstanceName, final String newConstantValue,
+            final boolean isTransient)
             throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
                 .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done();
         final Expression expression = new ExpressionBuilder().createConstantStringExpression(newConstantValue);
         final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         return operation;
     }
 
-    public static Operation buildIntegerOperation(final String dataInstanceName, final int newConstantValue) throws InvalidExpressionException {
+    public static Operation buildIntegerOperation(final String dataInstanceName, final int newConstantValue)
+            throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
         final Expression expression = new ExpressionBuilder().createConstantIntegerExpression(newConstantValue);
         final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         return operation;
     }
 
-    public static Operation buildOperation(final String dataName, final boolean isTransient, final OperatorType operatorType, final String operator,
+    public static Operation buildOperation(final String dataName, final boolean isTransient,
+            final OperatorType operatorType, final String operator,
             final Expression rightOperand) {
         final OperationBuilder operationBuilder = new OperationBuilder().createNewInstance();
         operationBuilder.setOperator(operator);
@@ -289,16 +332,20 @@ public class BuildTestUtil {
         return operationBuilder.done();
     }
 
-    public static Operation buildAssignOperation(final String dataInstanceName, final String expressionContent, final ExpressionType expressionType,
+    public static Operation buildAssignOperation(final String dataInstanceName, final String expressionContent,
+            final ExpressionType expressionType,
             final String returnType) throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(expressionContent)
+        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName)
+                .setContent(expressionContent)
                 .setExpressionType(expressionType).setReturnType(returnType).done();
-        return new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+        return new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
     }
 
-    public static List<String> buildActorAndDescription(final ProcessDefinitionBuilder processBuilder, final int nbActor) {
+    public static List<String> buildActorAndDescription(final ProcessDefinitionBuilder processBuilder,
+            final int nbActor) {
         final List<String> actorList = new ArrayList<>();
         for (int i = 1; i <= nbActor; i++) {
             final String actorName = ACTOR_NAME + i;
@@ -308,17 +355,22 @@ public class BuildTestUtil {
         return actorList;
     }
 
-    public static DesignProcessDefinition buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition() throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+    public static DesignProcessDefinition buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition()
+            throws InvalidProcessDefinitionException {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
         processBuilder.addActor(BuildTestUtil.ACTOR_NAME).addDescription(DESCRIPTION);
 
         // 1 instance of process def:
-        return processBuilder.addAutomaticTask("step1").addUserTask("step2", BuildTestUtil.ACTOR_NAME).addUserTask("step3", BuildTestUtil.ACTOR_NAME)
-                .addUserTask("step4", BuildTestUtil.ACTOR_NAME).addTransition("step1", "step2").addTransition("step1", "step3").addTransition("step1", "step4")
+        return processBuilder.addAutomaticTask("step1").addUserTask("step2", BuildTestUtil.ACTOR_NAME)
+                .addUserTask("step3", BuildTestUtil.ACTOR_NAME)
+                .addUserTask("step4", BuildTestUtil.ACTOR_NAME).addTransition("step1", "step2")
+                .addTransition("step1", "step3").addTransition("step1", "step4")
                 .getProcess();
     }
 
-    public static List<DesignProcessDefinition> buildNbProcessDefinitionWithHumanAndAutomatic(final int nbProcess, final List<String> stepNames,
+    public static List<DesignProcessDefinition> buildNbProcessDefinitionWithHumanAndAutomatic(final int nbProcess,
+            final List<String> stepNames,
             final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
         final List<DesignProcessDefinition> processDefinitions = new ArrayList<>();
         for (int i = 0; i < nbProcess; i++) {
@@ -326,34 +378,45 @@ public class BuildTestUtil {
             if (i >= 0 && i < 10) {
                 processName += "0";
             }
-            final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION + i,
+            final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithHumanAndAutomaticSteps(
+                    processName + i, PROCESS_VERSION + i,
                     stepNames, isHuman);
             processDefinitions.add(designProcessDefinition);
         }
         return processDefinitions;
     }
 
-    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator)
+    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName,
+            final String processVersion,
+            final List<String> stepNames, final List<Boolean> isHuman, final String actorName,
+            final boolean addActorInitiator)
             throws InvalidProcessDefinitionException {
-        return buildProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, actorName, addActorInitiator, false);
+        return buildProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman,
+                actorName, addActorInitiator, false);
     }
 
-    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
+    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName,
+            final String processVersion,
             final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
-        return buildProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, ACTOR_NAME, false);
+        return buildProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman,
+                ACTOR_NAME, false);
     }
 
-    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final List<String> stepNames, final List<Boolean> isHuman)
+    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final List<String> stepNames,
+            final List<Boolean> isHuman)
             throws InvalidProcessDefinitionException {
-        return buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION, stepNames, isHuman, ACTOR_NAME, false);
+        return buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION, stepNames, isHuman,
+                ACTOR_NAME, false);
     }
 
-    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator,
+    public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName,
+            final String processVersion,
+            final List<String> stepNames, final List<Boolean> isHuman, final String actorName,
+            final boolean addActorInitiator,
             final boolean parallelActivities)
             throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                processVersion);
         if (!isHuman.isEmpty() && isHuman.contains(true)) {
             processBuilder.addActor(actorName);
             if (addActorInitiator) {
@@ -380,12 +443,14 @@ public class BuildTestUtil {
         return doc.getName().getBytes();
     }
 
-    public static BarResource generateJarAndBuildBarResource(final Class<?> clazz, final String name) throws IOException {
+    public static BarResource generateJarAndBuildBarResource(final Class<?> clazz, final String name)
+            throws IOException {
         final byte[] data = IOUtil.generateJar(clazz);
         return new BarResource(name, data);
     }
 
-    public static BarResource getContentAndBuildBarResource(final String name, final Class<? extends Connector> clazz) throws IOException {
+    public static BarResource getContentAndBuildBarResource(final String name, final Class<? extends Connector> clazz)
+            throws IOException {
         final InputStream stream = clazz.getResourceAsStream(name);
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);

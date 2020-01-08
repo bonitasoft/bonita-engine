@@ -75,18 +75,22 @@ public class ProfileMemberIT extends AbstractProfileIT {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user",
+                builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
     }
 
-    private void checkCreateAndDeleProfileMember(final String memberType, final Long userId, final Long groupId, final Long roleId) throws BonitaException {
+    private void checkCreateAndDeleProfileMember(final String memberType, final Long userId, final Long groupId,
+            final Long roleId) throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
-        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers(memberType, builder.done());
+        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers(memberType,
+                builder.done());
         final long numberOfProfileMembersBeforeCreation = searchedProfileMember.getCount();
 
-        final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(adminProfileId, userId, groupId, roleId);
+        final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(adminProfileId, userId,
+                groupId, roleId);
 
         searchedProfileMember = getProfileAPI().searchProfileMembers(memberType, builder.done());
         assertEquals(numberOfProfileMembersBeforeCreation + 1, searchedProfileMember.getCount());
@@ -132,23 +136,26 @@ public class ProfileMemberIT extends AbstractProfileIT {
     @Test
     public void getProfileForUser() throws BonitaException {
         // Get Profile For User
-        final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertThat(profiles).hasSize(2).extracting("name").contains("Administrator", "User");
     }
 
     @Test
     public void getProfileWithNavigationForUser() throws BonitaException {
-        final List<Profile> profiles = getProfileAPI().getProfilesWithNavigationForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> profiles = getProfileAPI().getProfilesWithNavigationForUser(user1.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertThat(profiles).hasSize(2).extracting("name").containsExactlyInAnyOrder("Administrator", "User");
     }
-    
+
     @Test
     public void getProfileForUserReturnDisctinctProfiles() throws BonitaException {
         // user 1 is mapped to profile "Administrator" through direct "userName1" mapping + through "role1" mapping:
         getIdentityAPI().addUserMembership(user1.getId(), group2.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
 
         assertEquals(2, getUserProfiles.size());
         assertThat(getUserProfiles).extracting("name").containsExactlyInAnyOrder("Administrator", "User");
@@ -159,7 +166,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertEquals(2, getUserProfiles.size());
         assertEquals("Administrator", getUserProfiles.get(0).getName());
         assertEquals("User", getUserProfiles.get(1).getName());
@@ -170,7 +178,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertEquals(2, getUserProfiles.size());
         assertEquals("Administrator", getUserProfiles.get(0).getName());
         assertEquals("User", getUserProfiles.get(1).getName());
@@ -183,7 +192,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         getIdentityAPI().addUserMembership(user3.getId(), group3.getId(), role2.getId());
 
         // Get Profile For User
-        List<Profile> userProfiles = getProfileAPI().getProfilesForUser(user5.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        List<Profile> userProfiles = getProfileAPI().getProfilesForUser(user5.getId(), 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertEquals(1, userProfiles.size());
         assertEquals("Process owner", userProfiles.get(0).getName());
 
@@ -199,7 +209,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
 
     @Test
     public void getProfilesForUserWithWrongParameter() throws Exception {
-        final List<Profile> profilesForUser = getProfileAPI().getProfilesForUser(564162L, 0, 10, ProfileCriterion.NAME_ASC);
+        final List<Profile> profilesForUser = getProfileAPI().getProfilesForUser(564162L, 0, 10,
+                ProfileCriterion.NAME_ASC);
         assertEquals(0, profilesForUser.size());
     }
 
@@ -210,7 +221,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         builder.filter(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, "User1FirstName");
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
         builder.searchTerm("userName1");
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user",
+                builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
         assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
         assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
@@ -222,7 +234,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, userProfileId);
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("group", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("group",
+                builder.done());
 
         assertEquals(1, searchedProfileMember.getResult().size());
         final ProfileMember profileMember = searchedProfileMember.getResult().get(0);
@@ -239,7 +252,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         builder.filter(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, "role2");
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
         builder.searchTerm("role2");
-        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("role", builder.done());
+        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("role",
+                builder.done());
         assertEquals(1, searchedProfileMember.getCount());
         ProfileMember profileMember = searchedProfileMember.getResult().get(0);
         assertEquals("role2", profileMember.getDisplayNamePart1());
@@ -265,7 +279,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, Order.ASC);
         builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
-        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup", builder.done());
+        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup",
+                builder.done());
         assertEquals(2, searchedProfileMember.getCount());
         assertEquals("role2", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
         assertEquals("group1", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
@@ -302,7 +317,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
     public void searchUserProfileMembersOfUser() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileMemberSearchDescriptor.USER_ID, user1.getId());
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user",
+                builder.done());
         assertEquals(2, searchedProfileMember.getResult().size());
         assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
         assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
@@ -313,7 +329,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
     public void searchUserProfileMembersOfGroup() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group1.getId());
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("group", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("group",
+                builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
         assertEquals("group1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
     }
@@ -322,7 +339,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
     public void searchUserProfileMembersOfRole() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role1.getId());
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("role", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("role",
+                builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
         assertEquals("role1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
     }
@@ -332,7 +350,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role3.getId());
         builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group3.getId());
-        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup", builder.done());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup",
+                builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
         assertEquals("role3", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
         assertEquals("group3", searchedProfileMember.getResult().get(0).getDisplayNamePart2());

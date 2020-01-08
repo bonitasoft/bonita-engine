@@ -37,20 +37,26 @@ public class ChildrenMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public QueryOptions buildQueryOptions() {
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
-        List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
+        List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        List<FilterOption> filters = Collections
+                .singletonList(new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
         return new QueryOptions(range.getStartIndex(), range.getMaxResults(), orderByOptions, filters, null);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChildrenMenusFilterBuilder)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ChildrenMenusFilterBuilder))
+            return false;
 
         ChildrenMenusFilterBuilder that = (ChildrenMenusFilterBuilder) o;
 
-        if (parentId != that.parentId) return false;
-        if (range != null ? !range.equals(that.range) : that.range != null) return false;
+        if (parentId != that.parentId)
+            return false;
+        if (range != null ? !range.equals(that.range) : that.range != null)
+            return false;
 
         return true;
     }

@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TenantRestarter {
 
-
     private UserTransactionService transactionService;
     private List<TenantRestartHandler> tenantRestartHandlers;
     private Long tenantId;
@@ -43,8 +42,8 @@ public class TenantRestarter {
     private PlatformService platformService;
 
     public TenantRestarter(@Value("${tenantId}") Long tenantId, UserTransactionService transactionService,
-                           SessionAccessor sessionAccessor, SessionService sessionService,
-                           PlatformService platformService, List<TenantRestartHandler> tenantRestartHandlers) {
+            SessionAccessor sessionAccessor, SessionService sessionService,
+            PlatformService platformService, List<TenantRestartHandler> tenantRestartHandlers) {
         this.tenantId = tenantId;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
@@ -67,7 +66,8 @@ public class TenantRestarter {
         return tenantRestartHandlers;
     }
 
-    public void executeAfterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
+    public void executeAfterServicesStart(List<TenantRestartHandler> tenantRestartHandlers)
+            throws STransactionNotFoundException {
         if (transactionService.isTransactionActive()) {
             executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
         } else {
@@ -76,10 +76,12 @@ public class TenantRestarter {
     }
 
     private void afterServicesStart(List<TenantRestartHandler> tenantRestartHandlers) {
-        new StarterThread(tenantId,sessionAccessor, sessionService, transactionService, platformService, tenantRestartHandlers).start();
+        new StarterThread(tenantId, sessionAccessor, sessionService, transactionService, platformService,
+                tenantRestartHandlers).start();
     }
 
-    private void executeAfterServicesStartAfterCurrentTransaction(final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
+    private void executeAfterServicesStartAfterCurrentTransaction(
+            final List<TenantRestartHandler> tenantRestartHandlers) throws STransactionNotFoundException {
         transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
 
             @Override

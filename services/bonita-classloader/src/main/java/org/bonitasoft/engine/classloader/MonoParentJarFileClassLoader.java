@@ -47,7 +47,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
     /**
      * Creates a JarFileClassLoader that is a child of the system class loader.
-     * 
+     *
      * @param name
      *        the name of this class loader
      * @param urls
@@ -61,7 +61,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
     /**
      * Creates a JarFileClassLoader that is a child of the specified class loader.
-     * 
+     *
      * @param name
      *        the name of this class loader
      * @param urls
@@ -100,7 +100,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
     /**
      * Adds an array of urls to the end of this class loader.
-     * 
+     *
      * @param urls
      *        the URLs to add
      */
@@ -255,7 +255,8 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
                     String resourceName = className.replace('.', '/') + ".class";
 
                     // find the class file resource
-                    ResourceHandle resourceHandle = MonoParentJarFileClassLoader.this.resourceFinder.getResource(resourceName);
+                    ResourceHandle resourceHandle = MonoParentJarFileClassLoader.this.resourceFinder
+                            .getResource(resourceName);
                     if (resourceHandle == null) {
                         throw new ClassNotFoundException(className);
                     }
@@ -298,11 +299,13 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
         if (pkg != null) {
             if (pkg.isSealed()) {
                 if (!pkg.isSealed(jarUrl)) {
-                    throw new SecurityException("Package was already sealed with another URL: package=" + packageName + ", url=" + jarUrl);
+                    throw new SecurityException(
+                            "Package was already sealed with another URL: package=" + packageName + ", url=" + jarUrl);
                 }
             } else {
                 if (isSealed(packageAttributes, mainAttributes)) {
-                    throw new SecurityException("Package was already been loaded and not sealed: package=" + packageName + ", url=" + jarUrl);
+                    throw new SecurityException("Package was already been loaded and not sealed: package=" + packageName
+                            + ", url=" + jarUrl);
                 }
             }
         } else {
@@ -311,14 +314,16 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
             String specVersion = getAttribute(Attributes.Name.SPECIFICATION_VERSION, packageAttributes, mainAttributes);
             String implTitle = getAttribute(Attributes.Name.IMPLEMENTATION_TITLE, packageAttributes, mainAttributes);
             String implVendor = getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR, packageAttributes, mainAttributes);
-            String implVersion = getAttribute(Attributes.Name.IMPLEMENTATION_VERSION, packageAttributes, mainAttributes);
+            String implVersion = getAttribute(Attributes.Name.IMPLEMENTATION_VERSION, packageAttributes,
+                    mainAttributes);
 
             URL sealBase = null;
             if (isSealed(packageAttributes, mainAttributes)) {
                 sealBase = jarUrl;
             }
 
-            definePackage(packageName, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor, sealBase);
+            definePackage(packageName, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor,
+                    sealBase);
         }
     }
 

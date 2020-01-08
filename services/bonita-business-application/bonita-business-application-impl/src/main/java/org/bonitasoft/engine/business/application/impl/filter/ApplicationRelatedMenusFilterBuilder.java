@@ -38,7 +38,8 @@ public class ApplicationRelatedMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public QueryOptions buildQueryOptions() {
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
         List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID, applicationId));
         //only too menu will be deleted as children menus will be deleted by the parent
@@ -48,13 +49,17 @@ public class ApplicationRelatedMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ApplicationRelatedMenusFilterBuilder)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ApplicationRelatedMenusFilterBuilder))
+            return false;
 
         ApplicationRelatedMenusFilterBuilder that = (ApplicationRelatedMenusFilterBuilder) o;
 
-        if (applicationId != that.applicationId) return false;
-        if (range != null ? !range.equals(that.range) : that.range != null) return false;
+        if (applicationId != that.applicationId)
+            return false;
+        if (range != null ? !range.equals(that.range) : that.range != null)
+            return false;
 
         return true;
     }

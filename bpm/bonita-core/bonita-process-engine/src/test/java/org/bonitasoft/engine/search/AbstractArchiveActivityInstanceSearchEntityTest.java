@@ -44,7 +44,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleAutoTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.AUTOMATIC_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAAutomaticTaskInstance.class);
     }
@@ -53,7 +54,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleManualTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAManualTaskInstance.class);
     }
@@ -62,7 +64,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleUserTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.USER_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAUserTaskInstance.class);
     }
@@ -71,7 +74,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleHumanTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAHumanTaskInstance.class);
     }
@@ -80,7 +84,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleReceiveTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.RECEIVE_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAReceiveTaskInstance.class);
     }
@@ -89,7 +94,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleSendTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SASendTaskInstance.class);
     }
@@ -98,7 +104,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleCallActivityType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SACallActivityInstance.class);
     }
@@ -107,7 +114,8 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleLoopTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.LOOP_ACTIVITY);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SALoopActivityInstance.class);
     }
@@ -115,8 +123,10 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     @Test
     public void getEntityClassShouldHandleMultiInstanceTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
-        searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE,
+                FlowNodeType.MULTI_INSTANCE_ACTIVITY);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SAMultiInstanceActivityInstance.class);
     }
@@ -125,12 +135,15 @@ public class AbstractArchiveActivityInstanceSearchEntityTest {
     public void getEntityClassShouldHandleSuProcessTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS);
-        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(searchOptions);
+        final AbstractArchiveActivityInstanceSearchEntity searcher = new MyAbstractArchiveActivityInstanceSearchEntity(
+                searchOptions);
 
         assertThat(searcher.getEntityClass()).isEqualTo(SASubProcessActivityInstance.class);
     }
 
-    private static class MyAbstractArchiveActivityInstanceSearchEntity extends AbstractArchiveActivityInstanceSearchEntity {
+    private static class MyAbstractArchiveActivityInstanceSearchEntity
+            extends AbstractArchiveActivityInstanceSearchEntity {
+
         public MyAbstractArchiveActivityInstanceSearchEntity(SearchOptionsImpl searchOptions) {
             super(null, searchOptions, null);
         }

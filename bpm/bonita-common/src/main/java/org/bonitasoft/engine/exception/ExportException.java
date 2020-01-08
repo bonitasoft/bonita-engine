@@ -15,7 +15,7 @@ package org.bonitasoft.engine.exception;
 
 /**
  * Thrown when it's not possible to import an element.
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @since 6.4
  */
@@ -25,7 +25,8 @@ public class ExportException extends BonitaException {
      * Constructs a new exception with the specified detail cause.
      *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ExportException(final Throwable cause) {

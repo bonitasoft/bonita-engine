@@ -15,11 +15,11 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -48,8 +48,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -96,11 +96,13 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test(expected = SJobLogCreationException.class)
-    public final void createJobLog_should_throw_exception_when_recorder_failed() throws SJobLogCreationException, SRecorderException {
+    public final void createJobLog_should_throw_exception_when_recorder_failed()
+            throws SJobLogCreationException, SRecorderException {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         // When
         jobServiceImpl.createJobLog(sJobLog);
@@ -111,7 +113,8 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(sJobLog).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any());
+        doReturn(sJobLog).when(readPersistenceService)
+                .selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any());
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
@@ -122,9 +125,11 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test
-    public final void deleteJobLog_by_id_should_do_nothing_when_job_log_doesnt_exist() throws SBonitaReadException, SJobLogDeletionException {
+    public final void deleteJobLog_by_id_should_do_nothing_when_job_log_doesnt_exist()
+            throws SBonitaReadException, SJobLogDeletionException {
         // Given
-        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any()))
+                .thenReturn(null);
 
         // When
         jobServiceImpl.deleteJobLog(1);
@@ -137,8 +142,10 @@ public class JobServiceImplForJobLogTest {
     public void deleteJobLog_by_id_should_throw_exception_when_recorder_failed() throws Exception {
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(sJobLog).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any());
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doReturn(sJobLog).when(readPersistenceService)
+                .selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobLog>> any());
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         jobServiceImpl.deleteJobLog(3);
     }
@@ -158,7 +165,8 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public final void deleteJobLog_by_object_should_throw_exception_when_parameter_is_null() throws SJobLogDeletionException {
+    public final void deleteJobLog_by_object_should_throw_exception_when_parameter_is_null()
+            throws SJobLogDeletionException {
         jobServiceImpl.deleteJobLog(null);
     }
 
@@ -167,7 +175,8 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobLog(sJobLog);
@@ -216,7 +225,9 @@ public class JobServiceImplForJobLogTest {
         // Given
         final long jobLogId = 1;
         final SJobLog sJobLog = mock(SJobLog.class);
-        when(readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId))).thenReturn(sJobLog);
+        when(readPersistenceService
+                .selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId)))
+                        .thenReturn(sJobLog);
 
         // When
         final SJobLog result = jobServiceImpl.getJobLog(jobLogId);
@@ -229,7 +240,8 @@ public class JobServiceImplForJobLogTest {
     public void getJobLog_should_throw_exception_when_not_exist() throws SBonitaReadException {
         // Given
         final long jobLogId = 455;
-        doReturn(null).when(readPersistenceService).selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId));
+        doReturn(null).when(readPersistenceService)
+                .selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId));
 
         // When
         final SJobLog jobLog = jobServiceImpl.getJobLog(jobLogId);
@@ -283,7 +295,8 @@ public class JobServiceImplForJobLogTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
 
-        when(readPersistenceService.getNumberOfEntities(SJobLog.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(readPersistenceService.getNumberOfEntities(SJobLog.class, options, null))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         jobServiceImpl.getNumberOfJobLogs(options);
@@ -294,7 +307,8 @@ public class JobServiceImplForJobLogTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobLog sJobLog = mock(SJobLog.class);
-        when(readPersistenceService.searchEntity(SJobLog.class, options, null)).thenReturn(Collections.singletonList(sJobLog));
+        when(readPersistenceService.searchEntity(SJobLog.class, options, null))
+                .thenReturn(Collections.singletonList(sJobLog));
 
         // When
         final SJobLog result = jobServiceImpl.searchJobLogs(options).get(0);
@@ -304,7 +318,8 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test(expected = SBonitaReadException.class)
-    public void searchJobLog_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SBonitaReadException {
+    public void searchJobLog_should_throw_exception_when_persistenceService_failed()
+            throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobLog.class, options, null);
@@ -331,7 +346,8 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog jobLog = new SJobLog();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         // When
         jobServiceImpl.updateJobLog(jobLog, descriptor);
@@ -350,11 +366,11 @@ public class JobServiceImplForJobLogTest {
 
         // When
         Exception jobException = new Exception("theException");
-        jobServiceImpl.logJobError(jobException,5L);
+        jobServiceImpl.logJobError(jobException, 5L);
 
         // Then
         ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
-        verify(jobServiceImpl).updateJobLog(eq(jobLogs.get(0)),captor.capture());
+        verify(jobServiceImpl).updateJobLog(eq(jobLogs.get(0)), captor.capture());
 
         EntityUpdateDescriptor updateDescriptor = captor.getValue();
         assertThat((String) updateDescriptor.getFields().get("lastMessage")).contains(jobException.getMessage());
@@ -362,9 +378,9 @@ public class JobServiceImplForJobLogTest {
         assertThat(updateDescriptor.getFields().get("retryNumber")).isEqualTo(2L);
     }
 
-
     @Test
-    public void createJobLog_should_call_job_service_createJobLog_when_related_job_descriptor_exists() throws Exception {
+    public void createJobLog_should_call_job_service_createJobLog_when_related_job_descriptor_exists()
+            throws Exception {
         //given
         Exception exception = new Exception("Missing mandatory parameter");
         long jobDescriptorId = 4L;
@@ -397,7 +413,5 @@ public class JobServiceImplForJobLogTest {
         //then
         verify(jobServiceImpl, never()).createJobLog(any(SJobLog.class));
     }
-
-
 
 }

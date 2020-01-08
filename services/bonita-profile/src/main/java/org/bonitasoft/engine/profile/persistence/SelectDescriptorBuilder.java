@@ -15,10 +15,8 @@ package org.bonitasoft.engine.profile.persistence;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -26,7 +24,6 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
@@ -43,47 +40,59 @@ public class SelectDescriptorBuilder {
 
     private static final String PROFILE_ID = "profileId";
 
-    public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final long id) {
+    public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz,
+            final long id) {
         return new SelectByIdDescriptor<>(clazz, id);
     }
 
-    public static <T extends PersistentObject> SelectOneDescriptor<T> getElementByNameDescriptor(final Class<T> clazz, final String elementName,
+    public static <T extends PersistentObject> SelectOneDescriptor<T> getElementByNameDescriptor(final Class<T> clazz,
+            final String elementName,
             final String name) {
         final Map<String, Object> parameters = Collections.singletonMap("name", name);
         return new SelectOneDescriptor<>("get" + elementName + "ByName", parameters, clazz);
     }
 
-    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfUser(final long userId, final String field, final OrderByType order,
+    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfUser(final long userId,
+            final String field, final OrderByType order,
             final int fromIndex, final int numberOfElements) {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field, order);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field,
+                order);
         final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put(USER_ID, userId);
-        return new SelectListDescriptor<>("getDirectProfileMembersOfUser", parameters, SProfileMember.class, queryOptions);
+        return new SelectListDescriptor<>("getDirectProfileMembersOfUser", parameters, SProfileMember.class,
+                queryOptions);
     }
 
-    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfGroup(final long groupId, final String field, final OrderByType order,
+    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfGroup(final long groupId,
+            final String field, final OrderByType order,
             final int fromIndex, final int numberOfElements) {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field, order);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field,
+                order);
         final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put(GROUP_ID, groupId);
-        return new SelectListDescriptor<>("getDirectProfileMembersOfGroup", parameters, SProfileMember.class, queryOptions);
+        return new SelectListDescriptor<>("getDirectProfileMembersOfGroup", parameters, SProfileMember.class,
+                queryOptions);
     }
 
-    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfRole(final long roleId, final String field, final OrderByType order,
+    public static SelectListDescriptor<SProfileMember> getDirectProfileMembersOfRole(final long roleId,
+            final String field, final OrderByType order,
             final int fromIndex, final int numberOfElements) {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field, order);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field,
+                order);
         final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put(ROLE_ID, roleId);
-        return new SelectListDescriptor<>("getDirectProfileMembersOfRole", parameters, SProfileMember.class, queryOptions);
+        return new SelectListDescriptor<>("getDirectProfileMembersOfRole", parameters, SProfileMember.class,
+                queryOptions);
     }
 
-    public static SelectListDescriptor<SProfile> getProfilesOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field,
+    public static SelectListDescriptor<SProfile> getProfilesOfUser(final long userId, final int fromIndex,
+            final int numberOfElements, final String field,
             final OrderByType order) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfile.class, field, order);
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, userId);
         return new SelectListDescriptor<>("getProfilesOfUser", parameters, SProfile.class, queryOptions);
     }
-    
+
     public static SelectListDescriptor<SProfile> getProfilesWithNavigationOfUser(long userId, int fromIndex,
             int numberOfElements, String field, OrderByType order) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfile.class, field, order);
@@ -91,15 +100,15 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<>("getProfilesWithNavigationOfUser", parameters, SProfile.class, queryOptions);
     }
 
-
-    public static SelectListDescriptor<SProfileMember> getSProfileMembersWithoutDisplayName(final long profileId, final QueryOptions queryOptions) {
+    public static SelectListDescriptor<SProfileMember> getSProfileMembersWithoutDisplayName(final long profileId,
+            final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap(PROFILE_ID, profileId);
-        return new SelectListDescriptor<>("getSProfileMembersWithoutDisplayName", parameters, SProfileMember.class, queryOptions);
+        return new SelectListDescriptor<>("getSProfileMembersWithoutDisplayName", parameters, SProfileMember.class,
+                queryOptions);
     }
 
     public static SelectByIdDescriptor<SProfileMember> getProfileMemberWithoutDisplayName(final long profileMemberId) {
         return new SelectByIdDescriptor<>(SProfileMember.class, profileMemberId);
     }
 
-   
 }

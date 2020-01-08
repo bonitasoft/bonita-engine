@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 /**
  * A Manual Task is a Task that is not managed by any business process engine
  * It represent a work that is done outside of the system.
- * 
+ *
  * @author Baptiste Mesta
  */
 public interface ManualTaskDefinition extends HumanTaskDefinition {

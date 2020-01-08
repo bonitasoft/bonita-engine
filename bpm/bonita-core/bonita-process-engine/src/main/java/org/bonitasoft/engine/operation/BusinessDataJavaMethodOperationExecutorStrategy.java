@@ -31,7 +31,8 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
     private final EntitiesActionsExecutor entitiesActionsExecutor;
     private final MergeEntityAction mergeEntityAction;
 
-    public BusinessDataJavaMethodOperationExecutorStrategy(final BusinessDataService businessDataService, final EntitiesActionsExecutor entitiesActionsExecutor,
+    public BusinessDataJavaMethodOperationExecutorStrategy(final BusinessDataService businessDataService,
+            final EntitiesActionsExecutor entitiesActionsExecutor,
             final MergeEntityAction mergeEntityAction) {
         this.businessDataService = businessDataService;
         this.entitiesActionsExecutor = entitiesActionsExecutor;
@@ -39,27 +40,33 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext,
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue)
             throws SOperationExecutionException {
         if (isBusinessData(operation)) {
-            return delegateBusinessValueForLeftOperand(operation, valueToSetObjectWith, expressionContext, shouldPersistValue);
+            return delegateBusinessValueForLeftOperand(operation, valueToSetObjectWith, expressionContext,
+                    shouldPersistValue);
         }
         return computeJavaOperation(operation, valueToSetObjectWith, expressionContext, shouldPersistValue);
     }
 
-    protected Object computeJavaOperation(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext,
+    protected Object computeJavaOperation(final SOperation operation, final Object valueToSetObjectWith,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue) throws SOperationExecutionException {
-        return super.computeNewValueForLeftOperand(operation, valueToSetObjectWith, expressionContext, shouldPersistValue);
+        return super.computeNewValueForLeftOperand(operation, valueToSetObjectWith, expressionContext,
+                shouldPersistValue);
     }
 
     private Object delegateBusinessValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith,
-            final SExpressionContext expressionContext, final boolean shouldPersistValue) throws SOperationExecutionException {
+            final SExpressionContext expressionContext, final boolean shouldPersistValue)
+            throws SOperationExecutionException {
         final Object businessObject = extractObjectToInvokeFromContext(operation, expressionContext);
         final String methodName = extractMethodName(operation);
         final String parameterType = extractParameterType(operation);
         try {
-            Object newValue = businessDataService.callJavaOperation(businessObject, valueToSetObjectWith, methodName, parameterType);
+            Object newValue = businessDataService.callJavaOperation(businessObject, valueToSetObjectWith, methodName,
+                    parameterType);
             if (shouldPersistValue) {
                 newValue = entitiesActionsExecutor.executeAction(newValue, null, mergeEntityAction);
             }

@@ -90,7 +90,8 @@ public class CustomUserInfoValueImporterTest {
     }
 
     @Test
-    public void importUsers_should_throw_OrganizationImportException_if_value_name_isnt_conform_to_definition_name() throws Exception {
+    public void importUsers_should_throw_OrganizationImportException_if_value_name_isnt_conform_to_definition_name()
+            throws Exception {
         // given
         String notDefinedName = "no exist in definition";
         ExportedCustomUserInfoValue invalidValue = new ExportedCustomUserInfoValue(notDefinedName, "any value");
@@ -101,7 +102,8 @@ public class CustomUserInfoValueImporterTest {
             fail("exception expected");
         } catch (SImportOrganizationException e) {
             // then
-            String expectedMessage = "The XML file is inconsistent. A custom user info value is refenced with name '" + notDefinedName
+            String expectedMessage = "The XML file is inconsistent. A custom user info value is refenced with name '"
+                    + notDefinedName
                     + "', but no custom user info definition is defined with this name.";
             assertThat(e.getMessage()).isEqualTo(expectedMessage);
         }

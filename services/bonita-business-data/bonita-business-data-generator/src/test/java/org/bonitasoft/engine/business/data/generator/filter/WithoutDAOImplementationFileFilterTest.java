@@ -58,10 +58,13 @@ public class WithoutDAOImplementationFileFilterTest {
     private void checkAcceptShouldReturns(String domain, String subDomain, String extension, boolean expectedResult) {
         // given
         doReturn("Employee." + extension).when(file).getName();
-        doReturn(domain + File.separatorChar + subDomain + File.separatorChar + "model" + File.separatorChar + "Employee." + extension).when(file)
-                .getAbsolutePath();
+        doReturn(domain + File.separatorChar + subDomain + File.separatorChar + "model" + File.separatorChar
+                + "Employee." + extension).when(file)
+                        .getAbsolutePath();
 
         // when then
-        assertThat(fileFilter.accept(file)).as("should return " + expectedResult + " when accepting file " + file.getAbsolutePath()).isEqualTo(expectedResult);
+        assertThat(fileFilter.accept(file))
+                .as("should return " + expectedResult + " when accepting file " + file.getAbsolutePath())
+                .isEqualTo(expectedResult);
     }
 }

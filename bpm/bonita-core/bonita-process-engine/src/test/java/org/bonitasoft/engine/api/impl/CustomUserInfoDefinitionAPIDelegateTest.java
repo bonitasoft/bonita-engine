@@ -15,8 +15,8 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -54,7 +54,8 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     }
 
     @Test
-    public void create_should_call_service_to_retrieve_the_item_and_return_result_as_a_CustomUserDefinition() throws Exception {
+    public void create_should_call_service_to_retrieve_the_item_and_return_result_as_a_CustomUserDefinition()
+            throws Exception {
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class)))
                 .willReturn(SCustomUserInfoDefinition.builder().id(1).build());
 
@@ -64,10 +65,12 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     }
 
     @Test
-    public void create_should_throws_AlreadyExistException_when_service_throws_SCustomUserInfoDefinitionAlreadyExistsException() throws Exception {
+    public void create_should_throws_AlreadyExistException_when_service_throws_SCustomUserInfoDefinitionAlreadyExistsException()
+            throws Exception {
         // given
         String name = "skill";
-        SCustomUserInfoDefinitionAlreadyExistsException serverException = new SCustomUserInfoDefinitionAlreadyExistsException(name);
+        SCustomUserInfoDefinitionAlreadyExistsException serverException = new SCustomUserInfoDefinitionAlreadyExistsException(
+                name);
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class))).willThrow(serverException);
 
         try {
@@ -76,7 +79,8 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
             fail("Expected AlreadyExistsException");
         } catch (AlreadyExistsException e) {
             // then
-            assertThat(e.getMessage()).isEqualTo("A custom user info definition already exists with name '" + name + "'");
+            assertThat(e.getMessage())
+                    .isEqualTo("A custom user info definition already exists with name '" + name + "'");
         }
     }
 
@@ -116,7 +120,8 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     }
 
     @Test
-    public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition() throws Exception {
+    public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition()
+            throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
                 Arrays.asList(
                         SCustomUserInfoDefinition.builder().id(1).build(),
@@ -131,7 +136,8 @@ public class CustomUserInfoDefinitionAPIDelegateTest {
     }
 
     @Test
-    public void list_call_service_to_retrieve_items_and_return_empty_list_when_service_returns_empty_list() throws Exception {
+    public void list_call_service_to_retrieve_items_and_return_empty_list_when_service_returns_empty_list()
+            throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
                 Collections.<SCustomUserInfoDefinition> emptyList());
 

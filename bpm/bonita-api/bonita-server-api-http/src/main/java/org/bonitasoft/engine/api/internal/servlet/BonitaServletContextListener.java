@@ -27,7 +27,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * Used to initialize the spring context if not yet initialized.
  * Also, starts the node if the platform exists.
- * 
+ *
  * @author Baptiste Mesta
  */
 public class BonitaServletContextListener implements ServletContextListener {

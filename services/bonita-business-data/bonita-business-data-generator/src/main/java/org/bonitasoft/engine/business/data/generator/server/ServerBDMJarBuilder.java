@@ -48,7 +48,8 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
     /**
      * protected for testing - must be changed
      */
-    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws CodeGenerationException {
+    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom)
+            throws CodeGenerationException {
         try {
             final List<BusinessObject> entities = bom.getBusinessObjects();
             final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();

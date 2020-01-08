@@ -56,9 +56,11 @@ public class ExternalURLAdapterTest {
         Map<String, Serializable> context = new HashMap<>();
         context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParametersMap);
 
-        String newUrl = urlAdapter.adapt("http://internal.subdomain.company.net/myFormProviderApp/local#myAnchor", null, context);
+        String newUrl = urlAdapter.adapt("http://internal.subdomain.company.net/myFormProviderApp/local#myAnchor", null,
+                context);
 
-        assertThat(newUrl).isEqualTo("http://internal.subdomain.company.net/myFormProviderApp/local?someKey=true#myAnchor");
+        assertThat(newUrl)
+                .isEqualTo("http://internal.subdomain.company.net/myFormProviderApp/local?someKey=true#myAnchor");
     }
 
     @Test
@@ -71,7 +73,8 @@ public class ExternalURLAdapterTest {
 
         String newUrl = urlAdapter.adapt("http://internal.subdomain.company.net?redirect=false#title17", null, context);
 
-        assertThat(newUrl).isEqualTo("http://internal.subdomain.company.net?redirect=false&boniparam=bonitabpm#title17");
+        assertThat(newUrl)
+                .isEqualTo("http://internal.subdomain.company.net?redirect=false&boniparam=bonitabpm#title17");
     }
 
     @Test

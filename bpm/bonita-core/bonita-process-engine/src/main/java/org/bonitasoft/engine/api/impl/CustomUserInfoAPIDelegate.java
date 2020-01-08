@@ -43,7 +43,8 @@ public class CustomUserInfoAPIDelegate {
         this.service = service;
     }
 
-    public List<CustomUserInfo> list(final long userId, final int startIndex, final int maxResult) throws SIdentityException, SBonitaReadException {
+    public List<CustomUserInfo> list(final long userId, final int startIndex, final int maxResult)
+            throws SIdentityException, SBonitaReadException {
         List<SCustomUserInfoDefinition> definitions = service.getCustomUserInfoDefinitions(startIndex, maxResult);
         if (definitions.size() == 0) {
             return Collections.emptyList();
@@ -64,7 +65,8 @@ public class CustomUserInfoAPIDelegate {
         return map;
     }
 
-    private List<SCustomUserInfoValue> searchCorrespondingValues(final long userId, final List<SCustomUserInfoDefinition> definitions)
+    private List<SCustomUserInfoValue> searchCorrespondingValues(final long userId,
+            final List<SCustomUserInfoDefinition> definitions)
             throws SBonitaReadException {
         return service.searchCustomUserInfoValue(new QueryOptions(
                 0,

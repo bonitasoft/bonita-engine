@@ -53,9 +53,10 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * a new one is created.
      *
      * @param type The classloader's type identifier
-     * @param id   The local ClassLoader's id
+     * @param id The local ClassLoader's id
      * @return the local ClassLoader for the given type and id
-     * @throws SClassLoaderException Error thrown if it's impossible to get a local ClassLoader for the given type and id
+     * @throws SClassLoaderException Error thrown if it's impossible to get a local ClassLoader for the given type and
+     *         id
      */
     ClassLoader getLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
@@ -63,7 +64,7 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      * Remove the local ClassLoader identified by the given type and id;
      *
      * @param type The classloader's type identifier
-     * @param id   The local ClassLoader's id
+     * @param id The local ClassLoader's id
      * @throws SClassLoaderException if we can't remove the classloader because it contains children
      */
     void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException;
@@ -71,16 +72,16 @@ public interface ClassLoaderService extends PlatformLifecycleService {
     /**
      * add listener on a classloader
      *
-     * @param type                the classloader type
-     * @param id                  the classloader id
+     * @param type the classloader type
+     * @param id the classloader id
      * @param classLoaderListener the listener to add
      * @return true if the listener was added
      */
     boolean addListener(final String type, final long id, ClassLoaderListener classLoaderListener);
 
     /**
-     * @param type                the classloader type
-     * @param id                  the classloader id
+     * @param type the classloader type
+     * @param id the classloader id
      * @param classLoaderListener classloader listener to remove
      * @return true if the listener was removed
      */

@@ -32,7 +32,8 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
     private final TestStates state;
 
     @Deprecated
-    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions,
+            final ProcessInstance processInstance,
             final ProcessAPI processAPI, final TestStates state) {
         super(repeatEach, timeout, throwExceptions);
         this.processInstance = processInstance;
@@ -41,19 +42,22 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
     }
 
     @Deprecated
-    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions,
+            final ProcessInstance processInstance,
             final ProcessAPI processAPI) {
         this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.NORMAL_FINAL);
     }
 
     @Deprecated
-    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final ProcessAPI processAPI) {
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout,
+            final ProcessInstance processInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, false, processInstance, processAPI);
     }
 
     @Override
     protected boolean check() {
-        final List<ArchivedProcessInstance> archivedProcessInstances = processAPI.getArchivedProcessInstances(processInstance.getId(), 0, 200);
+        final List<ArchivedProcessInstance> archivedProcessInstances = processAPI
+                .getArchivedProcessInstances(processInstance.getId(), 0, 200);
         return APITestUtil.containsState(archivedProcessInstances, state);
     }
 

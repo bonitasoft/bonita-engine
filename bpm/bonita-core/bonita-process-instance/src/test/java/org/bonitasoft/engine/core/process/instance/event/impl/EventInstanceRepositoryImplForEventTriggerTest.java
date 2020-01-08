@@ -97,7 +97,8 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
     public final void createEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.createTimerEventTriggerInstance(eventTriggerInstance);
@@ -125,7 +126,8 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
     public final void deleteEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.deleteEventTriggerInstance(eventTriggerInstance);
@@ -136,12 +138,14 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
         // Given
         final long eventTriggerInstanceId = 63L;
         final STimerEventTriggerInstance eventTriggerInstance = new STimerEventTriggerInstance();
-        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(STimerEventTriggerInstance.class,
-                STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
+        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder
+                .getElementById(STimerEventTriggerInstance.class,
+                        STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(eventTriggerInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final STimerEventTriggerInstance result = eventInstanceRepository.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceRepository
+                .getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertEquals("Should return the result of the mock.", eventTriggerInstance, result);
@@ -151,37 +155,46 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
     public final void getEventTriggerInstance_should_return_null_if_doesnt_exist() throws Exception {
         // Given
         final long eventTriggerInstanceId = 63L;
-        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(STimerEventTriggerInstance.class,
-                STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
+        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder
+                .getElementById(STimerEventTriggerInstance.class,
+                        STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final STimerEventTriggerInstance result = eventInstanceRepository.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceRepository
+                .getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertNull("Should return the result of the mock.", result);
     }
+
     @Test
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_return_the_number() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        doReturn(3L).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id",
+                OrderByType.ASC);
+        doReturn(3L).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class),
+                eq("ByProcessInstance"), eq(queryOptions),
                 ArgumentMatchers.<Map<String, Object>> any());
 
         // When
-        final long result = eventInstanceRepository.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
+        final long result = eventInstanceRepository.getNumberOfTimerEventTriggerInstances(processInstanceId,
+                queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", 3L, result);
     }
 
     @Test(expected = SBonitaReadException.class)
-    public final void getNumberOfEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
+    public final void getNumberOfEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error()
+            throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id",
+                OrderByType.ASC);
+        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(
+                eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions),
                 any());
 
@@ -193,24 +206,30 @@ public class EventInstanceRepositoryImplForEventTriggerTest {
     public final void searchEventTriggerInstancesByProcessInstance_should_return_the_list() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id",
+                OrderByType.ASC);
         final List<STimerEventTriggerInstance> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstance());
-        doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
-               any());
+        doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class),
+                eq("ByProcessInstance"), eq(queryOptions),
+                any());
 
         // When
-        final List<STimerEventTriggerInstance> result = eventInstanceRepository.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
+        final List<STimerEventTriggerInstance> result = eventInstanceRepository
+                .searchTimerEventTriggerInstances(processInstanceId, queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
     }
 
     @Test(expected = SBonitaReadException.class)
-    public final void searchEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
+    public final void searchEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error()
+            throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id",
+                OrderByType.ASC);
+        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(
+                eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions), any());
 
         // When

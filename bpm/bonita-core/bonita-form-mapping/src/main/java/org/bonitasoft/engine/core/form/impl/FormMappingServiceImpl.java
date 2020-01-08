@@ -77,7 +77,8 @@ public class FormMappingServiceImpl implements FormMappingService {
     private QueriableLoggerService queriableLoggerService;
     private final AuthorizationRuleMapping authorizationRuleMapping;
 
-    public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
+    public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService,
+            SessionService sessionService,
             ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
             FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter,
             QueriableLoggerService queriableLoggerService, AuthorizationRuleMapping authorizationRuleMapping) {
@@ -96,7 +97,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         authorizationRulesMap = new HashMap<>(3);
         authorizationRulesMap.put(FormMappingType.PROCESS_START, authorizationRuleMapping.getProcessStartRuleKeys());
         authorizationRulesMap.put(FormMappingType.TASK, authorizationRuleMapping.getTaskRuleKeys());
-        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW, authorizationRuleMapping.getProcessOverviewRuleKeys());
+        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW,
+                authorizationRuleMapping.getProcessOverviewRuleKeys());
 
     }
 
@@ -111,7 +113,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         List<String> authorizationRules = buildAuthorizationRules(type);
         switch (target) {
             case SFormMapping.TARGET_INTERNAL:
-                sPageMapping = pageMappingService.create(key, getPageIdOrNull(form, processDefinitionId), authorizationRules);
+                sPageMapping = pageMappingService.create(key, getPageIdOrNull(form, processDefinitionId),
+                        authorizationRules);
                 break;
             case SFormMapping.TARGET_URL:
                 sPageMapping = pageMappingService.create(key, form, externalUrlAdapter, authorizationRules);
@@ -146,7 +149,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         return pageByName == null ? null : pageByName.getId();
     }
 
-    private void insertFormMapping(SFormMapping sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {
+    private void insertFormMapping(SFormMapping sFormMapping, SPageMapping sPageMapping)
+            throws SObjectCreationException {
         sFormMapping.setPageMapping(sPageMapping);
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.CREATED);
         try {
@@ -227,7 +231,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         return logBuilder;
     }
 
-    private void log(final SFormMapping formMapping, final int sQueriableLogStatus, final FormMappingLogBuilder logBuilder, final String callerMethodName,
+    private void log(final SFormMapping formMapping, final int sQueriableLogStatus,
+            final FormMappingLogBuilder logBuilder, final String callerMethodName,
             String rawMessage) {
         logBuilder.actionScope(String.valueOf(formMapping.getProcessDefinitionId()));
         logBuilder.actionStatus(sQueriableLogStatus);
@@ -239,10 +244,13 @@ public class FormMappingServiceImpl implements FormMappingService {
         }
     }
 
-    protected SPageMapping createPageMappingForExistingFormMapping(SFormMapping formMapping, String url, Long pageId) throws SObjectCreationException {
-        String key = formMappingKeyGenerator.generateKey(formMapping.getProcessDefinitionId(), formMapping.getTask(), formMapping.getType());
+    protected SPageMapping createPageMappingForExistingFormMapping(SFormMapping formMapping, String url, Long pageId)
+            throws SObjectCreationException {
+        String key = formMappingKeyGenerator.generateKey(formMapping.getProcessDefinitionId(), formMapping.getTask(),
+                formMapping.getType());
         if (url != null) {
-            return pageMappingService.create(key, url, externalUrlAdapter, buildAuthorizationRules(formMapping.getType()));
+            return pageMappingService.create(key, url, externalUrlAdapter,
+                    buildAuthorizationRules(formMapping.getType()));
         } else {
             return pageMappingService.create(key, pageId, buildAuthorizationRules(formMapping.getType()));
         }
@@ -303,7 +311,8 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public SFormMapping get(String key) throws SBonitaReadException, SObjectNotFoundException {
-        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", key),
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey",
+                Collections.<String, Object> singletonMap("key", key),
                 SFormMapping.class));
     }
 
@@ -313,7 +322,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         parameters.put("processDefinitionId", processDefinitionId);
         parameters.put("type", type);
         parameters.put("task", task);
-        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinitionOnTask", parameters, SFormMapping.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>(
+                "getFormMappingOfProcessDefinitionOnTask", parameters, SFormMapping.class));
     }
 
     @Override
@@ -321,14 +331,17 @@ public class FormMappingServiceImpl implements FormMappingService {
         Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processDefinitionId", processDefinitionId);
         parameters.put("type", type);
-        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinition", parameters, SFormMapping.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinition",
+                parameters, SFormMapping.class));
     }
 
     @Override
-    public List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
+    public List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults)
+            throws SBonitaReadException {
         Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processDefinitionId", processDefinitionId);
-        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappingsOfProcessDefinition", parameters, SFormMapping.class,
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>(
+                "getFormMappingsOfProcessDefinition", parameters, SFormMapping.class,
                 new QueryOptions(
                         fromIndex, numberOfResults)));
     }
@@ -336,25 +349,29 @@ public class FormMappingServiceImpl implements FormMappingService {
     @Override
     public List<SFormMapping> list(int fromIndex, int numberOfResults) throws SBonitaReadException {
         Map<String, Object> parameters = new HashMap<String, Object>(3);
-        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters, SFormMapping.class, new QueryOptions(
-                fromIndex, numberOfResults)));
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters,
+                SFormMapping.class, new QueryOptions(
+                        fromIndex, numberOfResults)));
     }
 
     @Override
     public long getNumberOfFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions,
+                Collections.<String, Object> emptyMap());
     }
 
     @Override
     public List<SFormMapping> searchFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceService.searchEntity(SFormMapping.class, queryOptions,
+                Collections.<String, Object> emptyMap());
     }
 
     private static class FormMappingLogBuilder extends CRUDELogBuilder implements SPersistenceLogBuilder {
 
         /*
          * resulting log example
-         * 1 54 1433257801158 2015 6 153 23 william.jobs 1 7.0.0-SNAPSHOT INTERNAL FORM_MAPPING_UPDATED 1 1 update the formmapping
+         * 1 54 1433257801158 2015 6 153 23 william.jobs 1 7.0.0-SNAPSHOT INTERNAL FORM_MAPPING_UPDATED 1 1 update the
+         * formmapping
          * org.bonitasoft.engine.core.form.impl.FormMappingServiceImpl update -1 -1 1 -1 -1
          */
         @Override

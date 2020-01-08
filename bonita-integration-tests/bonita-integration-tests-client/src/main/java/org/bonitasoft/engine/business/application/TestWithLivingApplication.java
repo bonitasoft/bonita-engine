@@ -54,7 +54,8 @@ public class TestWithLivingApplication extends CommonAPIIT {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = getLivingApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
+        final SearchResult<Application> searchResult = getLivingApplicationAPI()
+                .searchApplications(new SearchOptionsBuilder(0, 1000).done());
         for (final Application app : searchResult.getResult()) {
             getLivingApplicationAPI().deleteApplication(app.getId());
         }
@@ -85,7 +86,8 @@ public class TestWithLivingApplication extends CommonAPIIT {
     }
 
     protected Page createPage(final String pageName) throws Exception {
-        return getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName), createPageContent(pageName));
+        return getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName),
+                createPageContent(pageName));
     }
 
     private byte[] createPageContent(final String pageName)
@@ -137,7 +139,8 @@ public class TestWithLivingApplication extends CommonAPIIT {
         assertThat(app.getProfileId()).isNull();
     }
 
-    protected void assertIsHRApplication(final Profile profile, final Page layout, final Page theme, final Application app) {
+    protected void assertIsHRApplication(final Profile profile, final Page layout, final Page theme,
+            final Application app) {
         assertThat(app.getToken()).isEqualTo("HR-dashboard");
         assertThat(app.getVersion()).isEqualTo("2.0");
         assertThat(app.getDisplayName()).isEqualTo("My HR dashboard");
@@ -149,7 +152,8 @@ public class TestWithLivingApplication extends CommonAPIIT {
         assertThat(app.getThemeId()).isEqualTo(theme.getId());
     }
 
-    protected void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {
+    protected void assertIsMyNewCustomPage(final Page myPage, final Application hrApp,
+            final ApplicationPage applicationPage) {
         assertThat(applicationPage.getApplicationId()).isEqualTo(hrApp.getId());
         assertThat(applicationPage.getToken()).isEqualTo("my-new-custom-page");
         assertThat(applicationPage.getPageId()).isEqualTo(myPage.getId());
@@ -162,7 +166,8 @@ public class TestWithLivingApplication extends CommonAPIIT {
         assertThat(applicationMenu.getApplicationPageId()).isNull();
     }
 
-    protected void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu, ApplicationPage myNewCustomPage) {
+    protected void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu,
+            ApplicationPage myNewCustomPage) {
         assertThat(applicationMenu.getIndex()).isEqualTo(1);
         assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
         assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");

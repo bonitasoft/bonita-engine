@@ -39,5 +39,5 @@ public class SAProcessContractDataTest {
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);
         assertThat(saProcessContractData.getValue()).isEqualTo(value);
     }
-    
+
 }

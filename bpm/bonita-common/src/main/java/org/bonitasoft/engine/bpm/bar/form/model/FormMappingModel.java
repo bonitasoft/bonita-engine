@@ -34,7 +34,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FormMappingModel implements Serializable {
 
-
     private static final long serialVersionUID = 1L;
 
     @XmlElementWrapper(name = "form-mappings", required = true)

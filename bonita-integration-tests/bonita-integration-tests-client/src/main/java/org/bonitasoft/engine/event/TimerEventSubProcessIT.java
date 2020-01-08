@@ -29,7 +29,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -56,7 +55,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
 
         final Date processStartDate = processInstance.getStartDate();
         assertThat(subProcInst.getStartDate()).as(
-                String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
+                String.format("process started at %s should trigger subprocess at %s (+ %d ms) ",
+                        formatedDate(processStartDate),
                         formatedDate(subProcInst.getStartDate()), timerDuration))
                 .isAfter(processStartDate);
 
@@ -117,13 +117,15 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    private void checkProcessDataInstance(final String dataName, final long processInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkProcessDataInstance(final String dataName, final long processInstanceId,
+            final Serializable expectedValue) throws DataNotFoundException {
         final DataInstance processDataInstance;
         processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId,
+            final Serializable expectedValue)
             throws DataNotFoundException {
         final DataInstance activityDataInstance;
         activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
@@ -133,7 +135,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
     @Test
     public void timerEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);
-        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
+        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(),
+                targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
         final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
         final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, "subStep");
@@ -155,12 +158,14 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
     @Test
     public void should_be_able_to_init_timer_from_data_in_parent() throws Exception {
         //given
-        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithESPTimerBasedOnData", "1.0");
+        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithESPTimerBasedOnData", "1.0");
         parentProcessBuilder.addActor(ACTOR_NAME);
         parentProcessBuilder.addUserTask("userTask", ACTOR_NAME);
         parentProcessBuilder.addLongData("timeToWait", new ExpressionBuilder().createConstantLongExpression(1000));
         //construct sub process
-        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder.addSubProcess("subProcessToStartWithTimer", true).getSubProcessBuilder();
+        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder
+                .addSubProcess("subProcessToStartWithTimer", true).getSubProcessBuilder();
         StartEventDefinitionBuilder startEventDefinitionBuilder = subProcessBuilder.addStartEvent("timerStart");
         startEventDefinitionBuilder.addTimerEventTriggerDefinition(TimerType.DURATION,
                 new ExpressionBuilder().createDataExpression("timeToWait", Long.class.getName()));
@@ -169,8 +174,10 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         subProcessBuilder.addTransition("timerStart", "userTaskInSubProcess");
         subProcessBuilder.addTransition("userTaskInSubProcess", "endSubProcess");
         DesignProcessDefinition processDefinition1 = parentProcessBuilder.done();
-        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition1);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME,
+                user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         //when
         waitForUserTask("userTaskInSubProcess");

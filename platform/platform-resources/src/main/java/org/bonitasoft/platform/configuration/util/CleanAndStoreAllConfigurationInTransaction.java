@@ -35,7 +35,8 @@ public class CleanAndStoreAllConfigurationInTransaction extends TransactionCallb
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    public CleanAndStoreAllConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor, List<FullBonitaConfiguration> bonitaConfigurations) {
+    public CleanAndStoreAllConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
+            List<FullBonitaConfiguration> bonitaConfigurations) {
 
         this.jdbcTemplate = jdbcTemplate;
         this.dbVendor = dbVendor;

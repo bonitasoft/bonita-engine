@@ -66,7 +66,8 @@ public abstract class AbstractCommandProfileIT extends TestWithTechnicalUser {
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
         // search for the newly created profile IDs:
-        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 50).sort(ProfileSearchDescriptor.ID, Order.ASC).done();
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 50).sort(ProfileSearchDescriptor.ID, Order.ASC)
+                .done();
         final SearchResult<Profile> searchProfiles = getProfileAPI().searchProfiles(searchOptions);
         final List<Profile> profiles = searchProfiles.getResult();
         assertEquals(2, profiles.size());
@@ -96,7 +97,8 @@ public abstract class AbstractCommandProfileIT extends TestWithTechnicalUser {
     public static void restorDefaultProfiles() throws Exception {
         final APITestUtil testUtil = new APITestUtil();
         testUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
-        final byte[] xmlContent = (byte[]) testUtil.getCommandAPI().execute(EXPORT_DEFAULT_PROFILES_CMD, Collections.<String, Serializable>emptyMap());
+        final byte[] xmlContent = (byte[]) testUtil.getCommandAPI().execute(EXPORT_DEFAULT_PROFILES_CMD,
+                Collections.<String, Serializable> emptyMap());
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         testUtil.getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);

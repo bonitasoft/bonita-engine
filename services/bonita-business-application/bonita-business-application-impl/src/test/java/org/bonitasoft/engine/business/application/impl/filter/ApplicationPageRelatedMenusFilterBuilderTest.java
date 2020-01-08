@@ -31,7 +31,8 @@ public class ApplicationPageRelatedMenusFilterBuilderTest {
     public void buildQueryOptions_should_filter_on_applicationPageId() throws Exception {
         //given
         long applicationPageId = 2L;
-        ApplicationPageRelatedMenusFilterBuilder builder = new ApplicationPageRelatedMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS), applicationPageId);
+        ApplicationPageRelatedMenusFilterBuilder builder = new ApplicationPageRelatedMenusFilterBuilder(
+                new SelectRange(START_INDEX, MAX_RESULTS), applicationPageId);
 
         //when
         QueryOptions options = builder.buildQueryOptions();
@@ -40,8 +41,10 @@ public class ApplicationPageRelatedMenusFilterBuilderTest {
         assertThat(options).isNotNull();
         assertThat(options.getFromIndex()).isEqualTo(START_INDEX);
         assertThat(options.getNumberOfResults()).isEqualTo(MAX_RESULTS);
-        assertThat(options.getOrderByOptions()).containsExactly(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
-        assertThat(options.getFilters()).containsExactly(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId));
+        assertThat(options.getOrderByOptions())
+                .containsExactly(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        assertThat(options.getFilters()).containsExactly(
+                new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId));
     }
 
 }

@@ -68,7 +68,8 @@ public class PageAPIIT extends CommonAPIIT {
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
+        final SearchResult<Page> searchPages = getPageAPI()
+                .searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         for (final Page page : searchPages.getResult()) {
             if (!page.isProvided()) {
                 getPageAPI().deletePage(page.getId());
@@ -87,7 +88,8 @@ public class PageAPIIT extends CommonAPIIT {
         final String name = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(name, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getPageAPI().createPage(
-                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setContentType(ContentType.FORM)
+                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setContentType(ContentType.FORM)
                         .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 pageContent);
 
@@ -111,7 +113,8 @@ public class PageAPIIT extends CommonAPIIT {
         loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
         assertThat(page.getInstalledBy()).isEqualTo(john.getId());
         assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
@@ -143,7 +146,8 @@ public class PageAPIIT extends CommonAPIIT {
                 .hasContentType(ContentType.FORM)
                 .hasProcessDefinitionId(5L);
 
-        assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
+        assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated")
+                .isAfter(page.getLastModificationDate());
 
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
@@ -157,9 +161,11 @@ public class PageAPIIT extends CommonAPIIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page2 = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -176,11 +182,13 @@ public class PageAPIIT extends CommonAPIIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
-                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
-                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        final Page page2 = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -197,10 +205,12 @@ public class PageAPIIT extends CommonAPIIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
-                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page2 = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -220,7 +230,8 @@ public class PageAPIIT extends CommonAPIIT {
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
-        getPageAPI().updatePageContent(createPage.getId(), IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes())));
+        getPageAPI().updatePageContent(createPage.getId(),
+                IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes())));
 
         // then
         // exception
@@ -255,7 +266,8 @@ public class PageAPIIT extends CommonAPIIT {
         // when
         final String newDescription = "new description";
         final String newDisplayName = "new display name";
-        final byte[] updatedPageContent = CommonTestUtil.createTestPageContent(PAGE_NAME2, newDisplayName, newDescription);
+        final byte[] updatedPageContent = CommonTestUtil.createTestPageContent(PAGE_NAME2, newDisplayName,
+                newDescription);
         getPageAPI().updatePageContent(pageBefore.getId(), updatedPageContent);
 
         // then
@@ -272,7 +284,8 @@ public class PageAPIIT extends CommonAPIIT {
         final Date createTimeMillis = new Date(System.currentTimeMillis());
         final String pageName = generateUniquePageName(0);
         final byte[] oldContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 oldContent);
         final long pageId = page.getId();
 
@@ -299,13 +312,17 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_create_page_use_content_type_in_properties() throws Exception {
         // given
         final String pageName1 = generateUniquePageName(0);
-        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION,
-                "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST", "myGetResource.pathTemplate=helloWorld",
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME,
+                "with content " + PAGE_DESCRIPTION,
+                "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST",
+                "myGetResource.pathTemplate=helloWorld",
                 "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
 
         final String pageName2 = generateUniquePageName(1);
-        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
-                + ContentType.API_EXTENSION, "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME,
+                "with page creator " + PAGE_DESCRIPTION, "contentType="
+                        + ContentType.API_EXTENSION,
+                "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
                 "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
 
         // when
@@ -324,11 +341,15 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_create_a_page_and_delete_it_and_recreate_it_with_same_values() throws Exception {
         // given
         final String pageName = generateUniquePageName(1);
-        final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
-                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
-                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
+        final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
+                "with page creator " + PAGE_DESCRIPTION, "contentType="
+                        + ContentType.API_EXTENSION,
+                "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy",
+                "myGetResource.permissions=newPermission",
                 "myPostResource.method=POST",
-                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy", "myPostResource.permissions=newPermission");
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy",
+                "myPostResource.permissions=newPermission");
 
         // when
         Page pageWithContent = getPageAPI().createPage(pageName, pageContent);
@@ -345,7 +366,8 @@ public class PageAPIIT extends CommonAPIIT {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
@@ -360,11 +382,13 @@ public class PageAPIIT extends CommonAPIIT {
         // , "content.zip"given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -375,11 +399,13 @@ public class PageAPIIT extends CommonAPIIT {
         // , "content.zip"given
         final String pageName = "plop";
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -390,11 +416,13 @@ public class PageAPIIT extends CommonAPIIT {
         // , "content.zip"given
         final String pageName = "";
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -409,7 +437,8 @@ public class PageAPIIT extends CommonAPIIT {
         expectedException.expect(InvalidPageZipMissingIndexException.class);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -449,7 +478,8 @@ public class PageAPIIT extends CommonAPIIT {
         // expect exception
     }
 
-    private void checkPageContentContainsProperties(final byte[] content, final String displayName, final String description) throws Exception {
+    private void checkPageContentContainsProperties(final byte[] content, final String displayName,
+            final String description) throws Exception {
         try {
             Map<String, String> contentAsMap = unzip(content);
             assertThat(contentAsMap.keySet()).as("should contains page.properties").contains("page.properties");
@@ -504,12 +534,14 @@ public class PageAPIIT extends CommonAPIIT {
         final String pageName = generateUniquePageName(0);
         final byte[] bytes = createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         getPageAPI().createPage(
-                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID)
+                        .setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
 
         // when then exception
         getPageAPI().createPage(
-                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID)
+                        .setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
 
     }
@@ -526,21 +558,25 @@ public class PageAPIIT extends CommonAPIIT {
         for (int i = 0; i < noneMatchingCount; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + i;
             getPageAPI().createPage(
-                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(noneMatchingdisplayName),
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description)
+                            .setDisplayName(noneMatchingdisplayName),
                     CommonTestUtil.createTestPageContent(generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
         }
         final String generateUniquePageName = generateUniquePageName(9);
         final Page pageWithMatchingSearchTerm = getPageAPI().createPage(
-                new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(matchingDisplayName),
+                new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description)
+                        .setDisplayName(matchingDisplayName),
                 CommonTestUtil.createTestPageContent(generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).searchTerm(matchingValue).done());
+        final SearchResult<Page> searchPages = getPageAPI()
+                .searchPages(new SearchOptionsBuilder(0, 5).searchTerm(matchingValue).done());
 
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have only one matching page").isEqualTo(1);
-        assertThat(results.get(0)).as("should get the page with matching search term").isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
+        assertThat(results.get(0)).as("should get the page with matching search term")
+                .isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
     }
 
     private String generateUniquePageName(final int i) {
@@ -553,8 +589,11 @@ public class PageAPIIT extends CommonAPIIT {
         final int expectedResultSize = 5;
         for (int i = 0; i < expectedResultSize + 3; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + 1;
-            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, DISPLAY_NAME,
+                    PAGE_DESCRIPTION);
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION)
+                            .setDisplayName(DISPLAY_NAME),
                     pageContent);
         }
 
@@ -579,17 +618,23 @@ public class PageAPIIT extends CommonAPIIT {
         final int expectedMatchingResults = 3;
         for (int i = 0; i < expectedMatchingResults; i++) {
             final String generateUniquePageName = generateUniquePageName(i);
-            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, matchingDisplayName, description);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(matchingDisplayName),
+            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, matchingDisplayName,
+                    description);
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description)
+                            .setDisplayName(matchingDisplayName),
                     pageContent);
         }
         final String anOtherName = generateUniquePageName(4);
-        getPageAPI().createPage(new PageCreator(anOtherName, CONTENT_NAME).setDescription("an awesome page!!!!!!!").setDisplayName(noneMatchingDisplayName),
+        getPageAPI().createPage(
+                new PageCreator(anOtherName, CONTENT_NAME).setDescription("an awesome page!!!!!!!")
+                        .setDisplayName(noneMatchingDisplayName),
                 CommonTestUtil.createTestPageContent(anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
-                new SearchOptionsBuilder(0, expectedMatchingResults + 2).filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName).done());
+                new SearchOptionsBuilder(0, expectedMatchingResults + 2)
+                        .filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName).done());
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have "
@@ -610,8 +655,9 @@ public class PageAPIIT extends CommonAPIIT {
             final String generateUniquePageName = generateUniquePageName(i);
             final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName, description);
             getPageAPI().createPage(
-                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i).setDescription(
-                            "should be excluded from results")
+                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i)
+                            .setDescription(
+                                    "should be excluded from results")
                             .setDisplayName(matchingDisplayName),
                     pageContent);
             getPageAPI().createPage(
@@ -621,12 +667,14 @@ public class PageAPIIT extends CommonAPIIT {
         }
         final String anOtherName = generateUniquePageName(4);
         getPageAPI().createPage(
-                new PageCreator(anOtherName, CONTENT_NAME).setDescription("should be excluded from results").setDisplayName(noneMatchingDisplayName),
+                new PageCreator(anOtherName, CONTENT_NAME).setDescription("should be excluded from results")
+                        .setDisplayName(noneMatchingDisplayName),
                 createTestPageContent(anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
-                new SearchOptionsBuilder(0, expectedMatchingResults + 2).filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName)
+                new SearchOptionsBuilder(0, expectedMatchingResults + 2)
+                        .filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName)
                         .filter(PageSearchDescriptor.CONTENT_TYPE, ContentType.PAGE).done());
         // then
         final List<Page> results = searchPages.getResult();
@@ -637,7 +685,7 @@ public class PageAPIIT extends CommonAPIIT {
 
     @Test
     public void should_search_by_hidden_param() throws Exception {
-         // given
+        // given
         final String description = PAGE_DESCRIPTION;
         final String matchingDisplayName = DISPLAY_NAME;
 
@@ -647,8 +695,9 @@ public class PageAPIIT extends CommonAPIIT {
             final String generateUniquePageName = generateUniquePageName(i);
             final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName, description);
             getPageAPI().createPage(
-                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i).setDescription(
-                            "should be excluded from results")
+                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i)
+                            .setDescription(
+                                    "should be excluded from results")
                             .setDisplayName(matchingDisplayName).setHidden(false),
                     pageContent);
             getPageAPI().createPage(
@@ -659,7 +708,8 @@ public class PageAPIIT extends CommonAPIIT {
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
-                new SearchOptionsBuilder(0, expectedMatchingResults + 10).filter(PageSearchDescriptor.HIDDEN,true).done());
+                new SearchOptionsBuilder(0, expectedMatchingResults + 10).filter(PageSearchDescriptor.HIDDEN, true)
+                        .done());
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have " + expectedMatchingResults + " results")
@@ -677,12 +727,16 @@ public class PageAPIIT extends CommonAPIIT {
         final int numberOfNonsMatchingPage = 5;
         for (int i = 0; i < numberOfNonsMatchingPage; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + i;
-            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, displayName, description);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
+            final byte[] pageContent = CommonTestUtil.createTestPageContent(generateUniquePageName, displayName,
+                    description);
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description)
+                            .setDisplayName(displayName),
                     pageContent);
         }
         final Page expectedMatchingPage = getPageAPI().createPage(
-                new PageCreator(firstPageNameInDescOrder, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
+                new PageCreator(firstPageNameInDescOrder, CONTENT_NAME).setDescription(description)
+                        .setDisplayName(displayName),
                 CommonTestUtil.createTestPageContent(firstPageNameInDescOrder, displayName, description));
 
         // when
@@ -699,15 +753,25 @@ public class PageAPIIT extends CommonAPIIT {
     public void updatePageContent_should_update_mappings() throws Exception {
         // given
         final String pageName = generateUniquePageName(0);
-        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
-                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPostResource.method=POST",
-                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy", "myPostResource.permissions = newPermission");
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
+                "with content " + PAGE_DESCRIPTION, "contentType="
+                        + ContentType.API_EXTENSION,
+                "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
+                "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy",
+                "myPostResource.permissions = newPermission");
 
-        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
-                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPutResource.method=PUT",
-                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy", "myPutResource.permissions = newPermission");
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME,
+                "with content " + PAGE_DESCRIPTION, "contentType="
+                        + ContentType.API_EXTENSION,
+                "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
+                "myPutResource.method=PUT",
+                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy",
+                "myPutResource.permissions = newPermission");
 
         // when
         final Page page = getPageAPI().createPage(pageName, pageContent1);
@@ -718,12 +782,14 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_search_work_with_processDefinitionId_set_to_null() throws Exception {
         // given
         String name = generateUniquePageName(345);
-        getPageAPI().createPage(new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getPageAPI().createPage(
+                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 CommonTestUtil.createTestPageContent(name, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
-                new SearchOptionsBuilder(0, 1).filter(PageSearchDescriptor.NAME, name).filter(PageSearchDescriptor.PROCESS_DEFINITION_ID, null).done());
+                new SearchOptionsBuilder(0, 1).filter(PageSearchDescriptor.NAME, name)
+                        .filter(PageSearchDescriptor.PROCESS_DEFINITION_ID, null).done());
 
         // then
         final List<Page> results = searchPages.getResult();

@@ -19,10 +19,11 @@ import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
- * An <code>Operation</code> has a <code>LeftOperand</code> (typically, for assignment operations, left operand is the part of the operation receiving the
+ * An <code>Operation</code> has a <code>LeftOperand</code> (typically, for assignment operations, left operand is the
+ * part of the operation receiving the
  * value), an <code>OperatorType</code> which defines the type of operation to execute
  * and a right operand, represented by an <code>Expression</code>.
- * 
+ *
  * @see LeftOperand
  * @see Expression
  * @see OperatorType
@@ -32,7 +33,8 @@ import org.bonitasoft.engine.expression.Expression;
 public interface Operation extends Serializable, Visitable, Cloneable {
 
     /**
-     * @return the <code>LeftOperand</code> of this <code>Operation</code>, representing what entity will be set after execution.
+     * @return the <code>LeftOperand</code> of this <code>Operation</code>, representing what entity will be set after
+     *         execution.
      */
     LeftOperand getLeftOperand();
 

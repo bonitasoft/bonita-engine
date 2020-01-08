@@ -146,7 +146,8 @@ public class ContractTypeValidatorTest {
                 Collections.<SInputDefinition> singletonList(new SInputDefinitionImpl("", "")));
 
         //when
-        contractTypeValidator.validate(definition, new FileInputValue("theFile", "", new byte[] { 0, 1 }), errorReporter);
+        contractTypeValidator.validate(definition, new FileInputValue("theFile", "", new byte[] { 0, 1 }),
+                errorReporter);
 
         // then
         assertThat(errorReporter.hasError()).isFalse();
@@ -194,7 +195,8 @@ public class ContractTypeValidatorTest {
 
         // then
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("i am not a list cannot be assigned to multiple COMPLEX type");
+        assertThat(errorReporter.getErrors())
+                .containsExactly("i am not a list cannot be assigned to multiple COMPLEX type");
     }
 
     @Test
@@ -387,7 +389,8 @@ public class ContractTypeValidatorTest {
                 .build();
         SInputDefinition nodeInputDef = aComplexInput().withName("node").withInput(nodeNameInputDef, leafInputDef)
                 .build();
-        SInputDefinition rootInputDef = aComplexInput().withName("root").withInput(rootNameInputDef, nodeInputDef).build();
+        SInputDefinition rootInputDef = aComplexInput().withName("root").withInput(rootNameInputDef, nodeInputDef)
+                .build();
 
         Serializable rootInputs = (Serializable) contractInputMap(
                 entry("rootName", "rootNameValue"),

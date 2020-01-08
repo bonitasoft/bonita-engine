@@ -37,15 +37,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
-import org.bonitasoft.engine.bdm.model.BusinessObject;
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.model.field.Field;
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.RelationField;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
@@ -54,7 +45,14 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JType;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Before;
+import org.junit.Test;
 
 public class EntityCodeGeneratorTest {
 

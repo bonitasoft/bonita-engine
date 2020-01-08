@@ -28,13 +28,15 @@ public class BusinessDataAssignmentStrategy implements OperationExecutorStrategy
     private final EntitiesActionsExecutor actionsExecutor;
     private final MergeEntityAction mergeEntityAction;
 
-    public BusinessDataAssignmentStrategy(EntitiesActionsExecutor actionsExecutor, MergeEntityAction mergeEntityAction) {
+    public BusinessDataAssignmentStrategy(EntitiesActionsExecutor actionsExecutor,
+            MergeEntityAction mergeEntityAction) {
         this.actionsExecutor = actionsExecutor;
         this.mergeEntityAction = mergeEntityAction;
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext,
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value,
+            final SExpressionContext expressionContext,
             final boolean shouldPersistValue)
             throws SOperationExecutionException {
         if (!shouldPersistValue) {

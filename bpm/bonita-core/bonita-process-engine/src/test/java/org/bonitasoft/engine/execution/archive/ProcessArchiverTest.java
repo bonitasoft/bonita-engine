@@ -96,14 +96,17 @@ public class ProcessArchiverTest {
         processInstance.setId(451L);
 
         doReturn(mock(SAProcessInstance.class)).when(processArchiver).buildArchiveProcessInstance(processInstance);
-        doNothing().when(processArchiver).archiveConnectorInstancesIfAny(eq(processInstance), eq(connectorInstanceService), nullable(SProcessDefinition.class),
+        doNothing().when(processArchiver).archiveConnectorInstancesIfAny(eq(processInstance),
+                eq(connectorInstanceService), nullable(SProcessDefinition.class),
                 anyLong());
 
-        doReturn(sRefBusinessDataInstances).when(refBusinessDataService).getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
+        doReturn(sRefBusinessDataInstances).when(refBusinessDataService)
+                .getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
         doNothing().when(refBusinessDataService)
                 .archiveRefBusinessDataInstance(nullable(SRefBusinessDataInstance.class));
 
-        processArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService, logger, commentService,
+        processArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
+                logger, commentService,
                 processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
 
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref1);

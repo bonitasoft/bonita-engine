@@ -75,16 +75,20 @@ public class TriggerTimerEventJob extends InternalJob {
     public void execute() throws SJobExecutionException, SRetryableException {
         try {
             if (!tenantServicesManager.isStarted()) {
-                throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId + " because the tenant is not started");
+                throw new SRetryableException("Unable to execute timer linked with the job  " + jobDescriptorId
+                        + " because the tenant is not started");
             }
             if (subProcessId == null) {
-                eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
+                eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId,
+                        flowNodeInstanceId, containerType);
             } else {
-                eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, targetSFlowNodeDefinitionId, containerType, subProcessId,
+                eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId,
+                        targetSFlowNodeDefinitionId, containerType, subProcessId,
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
             if (flowNodeInstanceId != null) {
-                Optional<STimerEventTriggerInstance> triggerInstance = eventInstanceService.getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
+                Optional<STimerEventTriggerInstance> triggerInstance = eventInstanceService
+                        .getTimerEventTriggerInstanceOfFlowNode(flowNodeInstanceId);
                 if (triggerInstance.isPresent()) {
                     eventInstanceService.deleteEventTriggerInstance(triggerInstance.get());
                 }

@@ -23,7 +23,7 @@ public class SUserFilterLoadingException extends SBonitaException {
     private static final long serialVersionUID = -746939454533910295L;
 
     /**
-     * 
+     *
      */
     public SUserFilterLoadingException(final Throwable t) {
         super(t);

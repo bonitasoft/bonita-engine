@@ -26,10 +26,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * This Rule authorizes a user, if this user is the manager of another user involved in the given process instance.
  * It has the same behavior as {@link ProcessRuntimeAPI#isManagerOfUserInvolvedInProcessInstance(long, long)}
- * 
+ *
  * @author Emmanuel Duchastenier
  */
-public class IsManagerOfUserInvolvedInProcessInstanceRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
+public class IsManagerOfUserInvolvedInProcessInstanceRule extends AuthorizationRuleWithParameters
+        implements AuthorizationRule {
 
     private SessionAccessor sessionAccessor;
 
@@ -48,7 +49,8 @@ public class IsManagerOfUserInvolvedInProcessInstanceRule extends AuthorizationR
     public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
         Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
         if (processInstanceId == null) {
-            throw new IllegalArgumentException("Parameter 'id' is mandatory to execute Page Authorization rule 'isManagerOfUserInvolvedInProcessInstance'");
+            throw new IllegalArgumentException(
+                    "Parameter 'id' is mandatory to execute Page Authorization rule 'isManagerOfUserInvolvedInProcessInstance'");
         }
         try {
             long userId = getLoggedUserId(sessionAccessor, sessionService);

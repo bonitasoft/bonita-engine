@@ -18,13 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Index;
 import org.bonitasoft.engine.bdm.model.Query;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Test;
 
 public class BusinessObjectTest {
 
@@ -60,7 +59,8 @@ public class BusinessObjectTest {
     @Test
     public void should_addQuery() {
         final BusinessObject businessObject = new BusinessObject();
-        final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
+        final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'",
+                List.class.getName());
         assertThat(businessObject.getQueries()).containsExactly(query);
     }
 

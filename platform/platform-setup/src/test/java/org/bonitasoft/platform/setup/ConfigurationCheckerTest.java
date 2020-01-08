@@ -33,7 +33,8 @@ import org.junit.rules.TestRule;
 public class ConfigurationCheckerTest {
 
     @Rule
-    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
+    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user",
+            "db.password", "db.vendor", "db.server.name=",
             "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Rule
@@ -64,7 +65,8 @@ public class ConfigurationCheckerTest {
     public void validate_should_fail_mandatory_property_is_not_set() throws Exception {
         final String dbVendor = "dbVendor";
         System.setProperty("sysprop.bonita.db.vendor", dbVendor);
-        final Properties propertiesWithMissingServerName = new PropertyLoader("/incomplete_database.properties").loadProperties();
+        final Properties propertiesWithMissingServerName = new PropertyLoader("/incomplete_database.properties")
+                .loadProperties();
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("Mandatory property");

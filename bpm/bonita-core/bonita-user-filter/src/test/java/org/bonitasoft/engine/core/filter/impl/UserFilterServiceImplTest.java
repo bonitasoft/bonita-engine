@@ -88,24 +88,31 @@ public class UserFilterServiceImplTest {
 
     @Before
     public void setup() {
-        sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("UserFiler", "filterId", "version"));
-        userFilterImplementationDescriptor = new UserFilterImplementationDescriptor(MyUserFilter.class.getName(), "id", "version", "filterId", "version",
+        sUserFilterDefinition = new SUserFilterDefinitionImpl(
+                new UserFilterDefinitionImpl("UserFiler", "filterId", "version"));
+        userFilterImplementationDescriptor = new UserFilterImplementationDescriptor(MyUserFilter.class.getName(), "id",
+                "version", "filterId", "version",
                 new JarDependencies(Collections.singletonList("dep.jar")));
     }
 
     @Test
     public void executeFilter_should_work_for_existing_descriptor() throws Exception {
-        doReturn(CompletableFuture.completedFuture(Collections.emptyMap())).when(connectorExecutor).execute(any(), anyMap(), any());
-        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
+        doReturn(CompletableFuture.completedFuture(Collections.emptyMap())).when(connectorExecutor).execute(any(),
+                anyMap(), any());
+        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
+                eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
 
         userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.emptyMap(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "actorName");
     }
 
     @Test(expected = SUserFilterExecutionException.class)
     public void executeFilter_should_fail_for_non_existing_descriptor() throws Exception {
-        userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.<String, SExpression> emptyMap(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
+        userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition,
+                Collections.<String, SExpression> emptyMap(),
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "actorName");
     }
 
     @Test
@@ -130,71 +137,92 @@ public class UserFilterServiceImplTest {
                 "\t\t<jarDependency>UserFilterDependency.jar</jarDependency>\n" +
                 "\t</jarDependencies>\n" +
                 "</connectorImplementation>\n").getBytes();
-        doReturn(Collections.singletonList(new SBARResource("my-user-filter.impl", BARResourceType.USER_FILTER, PROCESS_DEFINITION_ID, userFilterImplContent)))
-                .when(resourceService).get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
+        doReturn(Collections.singletonList(new SBARResource("my-user-filter.impl", BARResourceType.USER_FILTER,
+                PROCESS_DEFINITION_ID, userFilterImplContent)))
+                        .when(resourceService)
+                        .get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
         //when
         userFilterService.loadUserFilters(PROCESS_DEFINITION_ID);
 
         //then
         verify(cacheService).store(eq("USER_FILTER"), eq(PROCESS_DEFINITION_ID + ":user-filter-def-1.0"),
                 userFilterImplementationDescriptorArgumentCaptor.capture());
-        UserFilterImplementationDescriptor userFilterImplementationDescriptor = userFilterImplementationDescriptorArgumentCaptor.getValue();
+        UserFilterImplementationDescriptor userFilterImplementationDescriptor = userFilterImplementationDescriptorArgumentCaptor
+                .getValue();
         assertThat(userFilterImplementationDescriptor.getDefinitionId()).isEqualTo("user-filter-def");
         assertThat(userFilterImplementationDescriptor.getDefinitionVersion()).isEqualTo("1.0");
-        assertThat(userFilterImplementationDescriptor.getImplementationClassName()).isEqualTo("org.bonitasoft.user.filter.TestUserFilter");
+        assertThat(userFilterImplementationDescriptor.getImplementationClassName())
+                .isEqualTo("org.bonitasoft.user.filter.TestUserFilter");
         assertThat(userFilterImplementationDescriptor.getId()).isEqualTo("user-filter-impl");
         assertThat(userFilterImplementationDescriptor.getVersion()).isEqualTo("1.0");
-        assertThat(userFilterImplementationDescriptor.getJarDependencies().getDependencies()).containsOnly("UserFilterDependency.jar");
+        assertThat(userFilterImplementationDescriptor.getJarDependencies().getDependencies())
+                .containsOnly("UserFilterDependency.jar");
 
     }
 
-    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_with_null_cause() throws Exception {
+    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_with_null_cause()
+            throws Exception {
 
         //given
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger, resourceService));
-        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
-        doThrow(new SConnectorException("Test exception")).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(), (URLClassLoader) any(),
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
+                        resourceService));
+        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
+                eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
+        doThrow(new SConnectorException("Test exception")).when(spyUserFilterService).executeFilterInClassloader(
+                anyString(), anyMap(), (URLClassLoader) any(),
                 (SExpressionContext) any(), anyString());
         //then
         expectedException.expect(SUserFilterExecutionException.class);
         expectedException.expectMessage("Test exception");
         //when
-        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.<String, SExpression> emptyMap(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
+        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition,
+                Collections.<String, SExpression> emptyMap(),
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "actorName");
 
     }
 
     @Test
-    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_with_nonNull_cause() throws Exception {
+    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_with_nonNull_cause()
+            throws Exception {
 
         //given
         SConnectorException theException = mock(SConnectorException.class);
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger, resourceService));
-        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
+                        resourceService));
+        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
+                eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
         when(theException.getCause()).thenReturn(new RuntimeException(" The root cause"));
-        doThrow(theException).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(), (URLClassLoader) any(), (SExpressionContext) any(),
+        doThrow(theException).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(),
+                (URLClassLoader) any(), (SExpressionContext) any(),
                 anyString());
 
         //then
         expectedException.expect(SUserFilterExecutionException.class);
         expectedException.expectMessage("The root cause");
         //when
-        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.<String, SExpression> emptyMap(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
+        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition,
+                Collections.<String, SExpression> emptyMap(),
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "actorName");
     }
 
     @Test
-    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_in_debug_mode() throws Exception {
+    public void executeFilter_should_throw_a_SUserFilterExecutionException_when_receiving_SConnectorException_in_debug_mode()
+            throws Exception {
 
         //given
         SConnectorException theException = mock(SConnectorException.class);
         UserFilterServiceImpl spyUserFilterService = spy(
-                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger, resourceService));
-        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
+                new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, logger,
+                        resourceService));
+        doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"),
+                eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
         when(theException.getCause()).thenReturn(new RuntimeException(" The root cause"));
-        doThrow(theException).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(), (URLClassLoader) any(), (SExpressionContext) any(),
+        doThrow(theException).when(spyUserFilterService).executeFilterInClassloader(anyString(), anyMap(),
+                (URLClassLoader) any(), (SExpressionContext) any(),
                 anyString());
         when(logger.isLoggable((Class) any(), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
 
@@ -202,16 +230,20 @@ public class UserFilterServiceImplTest {
         expectedException.expect(SUserFilterExecutionException.class);
         expectedException.expectMessage("Current Thread ID : <");
         //when
-        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.<String, SExpression> emptyMap(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
+        spyUserFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition,
+                Collections.<String, SExpression> emptyMap(),
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "actorName");
     }
 
     @Test
     public void buildDebugMessage_should_contain_all_the_debug_info() {
 
         //when
-        String result = userFilterService.buildDebugMessage(45L, sUserFilterDefinition, new HashMap<String, SExpression>(),
-                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "an actor",
+        String result = userFilterService.buildDebugMessage(45L, sUserFilterDefinition,
+                new HashMap<String, SExpression>(),
+                new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()),
+                new SExpressionContext(), "an actor",
                 "an implementation class name", userFilterImplementationDescriptor);
         //then
         assertThat(result).contains("an actor");

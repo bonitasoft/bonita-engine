@@ -85,7 +85,8 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     private void cleanApplications() throws SearchException, DeletionException {
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 100).done());
+        final SearchResult<Application> applications = getApplicationAPI()
+                .searchApplications(new SearchOptionsBuilder(0, 100).done());
         for (Application application : applications.getResult()) {
             getApplicationAPI().deleteApplication(application.getId());
         }

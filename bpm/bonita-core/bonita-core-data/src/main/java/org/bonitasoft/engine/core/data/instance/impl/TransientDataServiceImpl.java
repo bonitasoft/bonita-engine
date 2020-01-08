@@ -249,7 +249,8 @@ public class TransientDataServiceImpl implements TransientDataService {
         }
 
         try {
-            createDataInstance(SDataInstanceBuilder.createNewInstance(dataDefinition, containerId, containerType.name(), dataValue));
+            createDataInstance(SDataInstanceBuilder.createNewInstance(dataDefinition, containerId, containerType.name(),
+                    dataValue));
         } catch (final SDataInstanceNotWellFormedException e) {
             throw new SDataInstanceReadException(e);
         }
@@ -260,7 +261,7 @@ public class TransientDataServiceImpl implements TransientDataService {
             final int numberOfResults) throws SDataInstanceException {
         try {
             return getTransientData(containerId).stream()
-                    .skip(fromIndex*numberOfResults)
+                    .skip(fromIndex * numberOfResults)
                     .limit(numberOfResults)
                     .map(data -> {
                         try {

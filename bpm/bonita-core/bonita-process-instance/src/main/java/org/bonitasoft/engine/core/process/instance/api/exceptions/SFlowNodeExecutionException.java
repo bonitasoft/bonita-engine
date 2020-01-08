@@ -18,7 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * An unexpected error happened during the execution of the flow node
  * The flow node might be in an inconsistent state
- * 
+ *
  * @author Celine Souchet
  */
 public class SFlowNodeExecutionException extends SBonitaException {

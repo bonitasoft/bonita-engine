@@ -18,7 +18,7 @@ package org.bonitasoft.engine.home;
  * <p>
  * The bonita home is the folder containing all configuration files and working directories
  * </p>
- * 
+ *
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @since 6.0.0

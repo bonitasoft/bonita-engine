@@ -48,8 +48,8 @@ public class STimerEventTriggerInstance implements PersistentObject {
      */
     private String eventInstanceName;
 
-
-    public STimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName, final long executionDate, final String jobTriggerName) {
+    public STimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName,
+            final long executionDate, final String jobTriggerName) {
         this.eventInstanceId = eventInstanceId;
         this.eventInstanceName = eventInstanceName;
         this.executionDate = executionDate;

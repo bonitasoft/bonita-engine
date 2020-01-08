@@ -12,10 +12,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 /**
- * 
- *     <p>
- *      Contains classes to use when invoking search methods
- *     </p>
- * 
+ * <p>
+ * Contains classes to use when invoking search methods
+ * </p>
  */
 package org.bonitasoft.engine.search;

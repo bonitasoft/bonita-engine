@@ -32,7 +32,7 @@ public interface SDocumentListDefinition extends SNamedElement {
 
     /**
      * The expression that will be evaluated when we initialize the document list
-     * 
+     *
      * @return the initial value expression
      */
     SExpression getExpression();

@@ -28,7 +28,8 @@ public class BoundaryEventInstanceImpl extends CatchEventInstanceImpl implements
 
     private long activityInstanceId;
 
-    public BoundaryEventInstanceImpl(final String name, final long flownodeDefinitionId, final long activityInstanceId) {
+    public BoundaryEventInstanceImpl(final String name, final long flownodeDefinitionId,
+            final long activityInstanceId) {
         super(name, flownodeDefinitionId);
         this.activityInstanceId = activityInstanceId;
     }

@@ -70,8 +70,8 @@ public class HTTPServerAPITest {
         Field connManager = httpClient.getClass().getDeclaredField("connManager");
         connManager.setAccessible(true);
 
-
-        PoolingHttpClientConnectionManager connectionManager = (PoolingHttpClientConnectionManager) connManager.get(httpClient);
+        PoolingHttpClientConnectionManager connectionManager = (PoolingHttpClientConnectionManager) connManager
+                .get(httpClient);
 
         assertThat(connectionManager.getDefaultMaxPerRoute()).isEqualTo(3);
         assertThat(connectionManager.getMaxTotal()).isEqualTo(3);
@@ -113,7 +113,7 @@ public class HTTPServerAPITest {
     public void should_build_entity_serialize_simple_parameters() throws Exception {
         HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
                 asList("param1", "param2"),
-                new Object[] {"Välue1", singletonMap("key", "välue") });
+                new Object[] { "Välue1", singletonMap("key", "välue") });
         String content = IOUtil.read(entity.getContent());
         String decodedContent = URLDecoder.decode(content, "UTF-8");
         assertThat(decodedContent).as("Decoded content").contains("välue", "Välue1");
@@ -123,8 +123,7 @@ public class HTTPServerAPITest {
     public void should_build_entity_serialize_byte_array_parameters() throws Exception {
         HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
                 asList(String.class.getName(), Map.class.getName(), byte[].class.getName()),
-                new Object[] {"Välue36", singletonMap("key", "välue"), new byte[] {} }
-        );
+                new Object[] { "Välue36", singletonMap("key", "välue"), new byte[] {} });
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         entity.writeTo(outputStream);
         byte[] content = outputStream.toByteArray();

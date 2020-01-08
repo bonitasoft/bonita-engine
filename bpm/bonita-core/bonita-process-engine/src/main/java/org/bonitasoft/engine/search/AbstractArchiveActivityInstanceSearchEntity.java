@@ -39,13 +39,15 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Yanyan Liu
  * @author Celine Souchet
  */
-public abstract class AbstractArchiveActivityInstanceSearchEntity extends AbstractSearchEntity<ArchivedActivityInstance, SAActivityInstance> {
+public abstract class AbstractArchiveActivityInstanceSearchEntity
+        extends AbstractSearchEntity<ArchivedActivityInstance, SAActivityInstance> {
 
     private final FlowNodeStateManager flowNodeStateManager;
 
     private final Class<? extends PersistentObject> entityClass;
 
-    public AbstractArchiveActivityInstanceSearchEntity(final SearchArchivedActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions,
+    public AbstractArchiveActivityInstanceSearchEntity(final SearchArchivedActivityInstanceDescriptor searchDescriptor,
+            final SearchOptions searchOptions,
             final FlowNodeStateManager flowNodeStateManager) {
         super(searchDescriptor, searchOptions);
         this.flowNodeStateManager = flowNodeStateManager;
@@ -59,7 +61,8 @@ public abstract class AbstractArchiveActivityInstanceSearchEntity extends Abstra
 
     protected Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) {
         Class<? extends PersistentObject> entityClass = SAActivityInstance.class;
-        final SearchFilter searchFilter = getSearchFilter(searchOptions, ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
+        final SearchFilter searchFilter = getSearchFilter(searchOptions,
+                ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
         if (searchFilter != null) {
             final FlowNodeType activityType = (FlowNodeType) searchFilter.getValue();
             if (activityType != null) {

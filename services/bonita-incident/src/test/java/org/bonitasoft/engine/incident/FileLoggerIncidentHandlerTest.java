@@ -45,13 +45,15 @@ public class FileLoggerIncidentHandlerTest {
         //Given
         long tenantId = 1;
         temporaryFolder.newFolder("logFolder");
-        final File incidentFile = new File(temporaryFolder.newFolder("logFolder", String.valueOf(tenantId)), TenantStorage.INCIDENTS_LOG_FILENAME);
+        final File incidentFile = new File(temporaryFolder.newFolder("logFolder", String.valueOf(tenantId)),
+                TenantStorage.INCIDENTS_LOG_FILENAME);
         final FileHandler fh = new FileHandler(incidentFile.getAbsolutePath());
 
         when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
         doReturn(fh).when(tenantStorage).getIncidentFileHandler(tenantId);
 
-        final Incident incident = new Incident("test", "recovery", new Exception("an unexpected exception"), new Exception("unable to handle failure"));
+        final Incident incident = new Incident("test", "recovery", new Exception("an unexpected exception"),
+                new Exception("unable to handle failure"));
         FileLoggerIncidentHandler fileLoggerIncidentHandler = spy(new FileLoggerIncidentHandler());
         doReturn(bonitaHomeServer).when(fileLoggerIncidentHandler).getBonitaHomeServer();
 

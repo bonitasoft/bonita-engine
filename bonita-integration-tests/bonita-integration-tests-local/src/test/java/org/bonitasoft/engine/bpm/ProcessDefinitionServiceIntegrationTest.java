@@ -69,7 +69,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         final SProcessDefinition sProcessDefinition = createSProcessDefinition("myProcessName", "1.0");
 
         getTransactionService().begin();
-        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(sProcessDefinition.getId());
+        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService
+                .getProcessDeploymentInfo(sProcessDefinition.getId());
         assertEquals("myProcessName", processDefinitionDeployInfo.getName());
         assertEquals("myProcessName", processDefinitionDeployInfo.getDisplayName()); // display name should be the same as name
         assertEquals("1.0", processDefinitionDeployInfo.getVersion());
@@ -90,13 +91,15 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
         getTransactionService().begin();
         // update processDefinitionDeployInfo
-        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
                 .updateDisplayName(updatedDisplayName)
                 .updateActivationState(ActivationState.ENABLED).done();
         processDefinitionService.updateProcessDefinitionDeployInfo(processId, updateDescriptor);
 
         // check and do assert
-        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processId);
+        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService
+                .getProcessDeploymentInfo(processId);
         assertEquals("myProcessName", processDefinitionDeployInfo.getName());
         assertEquals(updatedDisplayName, processDefinitionDeployInfo.getDisplayName());
         assertNotNull(processDefinitionDeployInfo.getLastUpdateDate());
@@ -118,10 +121,12 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         getTransactionService().begin();
         // update processDefinitionDeployInfo with wrong processId
 
-        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory
+                .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
                 .updateDisplayName(updatedDisplayName).done();
         try {
-            processDefinitionService.updateProcessDefinitionDeployInfo(sProcessDefinition.getId() + 1, updateDescriptor);
+            processDefinitionService.updateProcessDefinitionDeployInfo(sProcessDefinition.getId() + 1,
+                    updateDescriptor);
         } finally {
             getTransactionService().complete();
             // clean-up
@@ -135,11 +140,14 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
         getTransactionService().begin();
         final Long processId = sProcessDefinition.getId();
-        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processId);
-        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getAPISession().getId()).getUserId());
+        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService
+                .getProcessDeploymentInfo(processId);
+        assertEquals(processDefinitionDeployInfo.getDeployedBy(),
+                getSessionService().getSession(getAPISession().getId()).getUserId());
         getTransactionService().complete();
 
-        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getAPISession().getId()).getUserId());
+        assertEquals(processDefinitionDeployInfo.getDeployedBy(),
+                getSessionService().getSession(getAPISession().getId()).getUserId());
 
         getTransactionService().begin();
         actorMappingService.deleteActors(processId);
@@ -150,7 +158,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
     @Test
     public void getProcessDefIds() throws Exception {
-        final List<SProcessDefinition> sProcessDefinitions = createSProcessDefinitions(25, "testGetProcessDefIds", "0.0");
+        final List<SProcessDefinition> sProcessDefinitions = createSProcessDefinitions(25, "testGetProcessDefIds",
+                "0.0");
 
         getTransactionService().begin();
         List<Long> processDefIds = processDefinitionService.getProcessDefinitionIds(0, 10);
@@ -169,11 +178,13 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     public void getNumberOfUsersWhoCanStartProcessWithActorInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", true, Arrays.asList(sUser1, sUser2));
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                true, Arrays.asList(sUser1, sUser2));
 
         getTransactionService().begin();
         final QueryOptions searchOptions = new QueryOptions(0, 5);
-        final long result = processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final long result = processDefinitionService
+                .getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         assertEquals(2, result);
         getTransactionService().complete();
 
@@ -186,11 +197,13 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     public void getNumberOfUsersWhoCanStartProcessWithActorNotInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", false, Arrays.asList(sUser1, sUser2));
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                false, Arrays.asList(sUser1, sUser2));
 
         getTransactionService().begin();
         final QueryOptions searchOptions = new QueryOptions(0, 5);
-        final long result = processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final long result = processDefinitionService
+                .getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         assertEquals(0, result);
         getTransactionService().complete();
 
@@ -205,13 +218,16 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2", sUser1.getId());
         final SUser sUser3 = createEnabledSUser("firstname3", "lastname3", "pwd3", sUser2.getId());
         final SUser sUser4 = createEnabledSUser("firstname4", "lastname4", "pwd4");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", true,
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                true,
                 Arrays.asList(sUser2, sUser3, sUser4));
 
         getTransactionService().begin();
-        final FilterOption filterManagedBy = new FilterOption(SUser.class, UserSearchDescriptor.MANAGER_USER_ID, sUser1.getId());
+        final FilterOption filterManagedBy = new FilterOption(SUser.class, UserSearchDescriptor.MANAGER_USER_ID,
+                sUser1.getId());
         final QueryOptions searchOptions = new QueryOptions(0, 5, null, Arrays.asList(filterManagedBy), null);
-        final long result = processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final long result = processDefinitionService
+                .getNumberOfUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         assertEquals(1, result);
         getTransactionService().complete();
 
@@ -224,11 +240,14 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     public void searchUsersWhoCanStartProcessWithActorInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", true, Arrays.asList(sUser1, sUser2));
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                true, Arrays.asList(sUser1, sUser2));
 
         getTransactionService().begin();
-        final QueryOptions searchOptions = new QueryOptions(0, 5, SUser.class, UserSearchDescriptor.FIRST_NAME, OrderByType.ASC);
-        final List<SUser> result = processDefinitionService.searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final QueryOptions searchOptions = new QueryOptions(0, 5, SUser.class, UserSearchDescriptor.FIRST_NAME,
+                OrderByType.ASC);
+        final List<SUser> result = processDefinitionService
+                .searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         assertEquals(sUser1, result.get(0));
         assertEquals(sUser2, result.get(1));
         getTransactionService().complete();
@@ -242,11 +261,14 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     public void searchUsersWhoCanStartProcessWithActorNotInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", false, Arrays.asList(sUser1, sUser2));
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                false, Arrays.asList(sUser1, sUser2));
 
         getTransactionService().begin();
-        final QueryOptions searchOptions = new QueryOptions(0, 5, SUser.class, UserSearchDescriptor.FIRST_NAME, OrderByType.ASC);
-        final List<SUser> result = processDefinitionService.searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final QueryOptions searchOptions = new QueryOptions(0, 5, SUser.class, UserSearchDescriptor.FIRST_NAME,
+                OrderByType.ASC);
+        final List<SUser> result = processDefinitionService
+                .searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         assertTrue("Users are added to a actor that isn't initiator", result.isEmpty());
         getTransactionService().complete();
 
@@ -261,14 +283,19 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         final SUser sUser2 = createEnabledSUser("firstname2", "lastname2", "pwd2", sUser1.getId());
         final SUser sUser3 = createEnabledSUser("firstname3", "lastname3", "pwd3", sUser2.getId());
         final SUser sUser4 = createEnabledSUser("firstname4", "lastname4", "pwd4");
-        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1", true,
+        final SProcessDefinition sProcessDefinition = createSProcessDefinitionWithSActor("process1", "1.0", "actor1",
+                true,
                 Arrays.asList(sUser2, sUser3, sUser4));
 
         getTransactionService().begin();
-        final FilterOption filterManagedBy = new FilterOption(SUser.class, UserSearchDescriptor.MANAGER_USER_ID, sUser1.getId());
-        final OrderByOption orderByFirstName = new OrderByOption(SUser.class, UserSearchDescriptor.FIRST_NAME, OrderByType.ASC);
-        final QueryOptions searchOptions = new QueryOptions(0, 5, Arrays.asList(orderByFirstName), Arrays.asList(filterManagedBy), null);
-        final List<SUser> result = processDefinitionService.searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
+        final FilterOption filterManagedBy = new FilterOption(SUser.class, UserSearchDescriptor.MANAGER_USER_ID,
+                sUser1.getId());
+        final OrderByOption orderByFirstName = new OrderByOption(SUser.class, UserSearchDescriptor.FIRST_NAME,
+                OrderByType.ASC);
+        final QueryOptions searchOptions = new QueryOptions(0, 5, Arrays.asList(orderByFirstName),
+                Arrays.asList(filterManagedBy), null);
+        final List<SUser> result = processDefinitionService
+                .searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
         getTransactionService().complete();
         assertEquals(sUser2, result.get(0));
 

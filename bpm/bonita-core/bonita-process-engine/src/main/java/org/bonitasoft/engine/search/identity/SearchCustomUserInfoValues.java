@@ -33,7 +33,8 @@ public class SearchCustomUserInfoValues extends AbstractSearchEntity<CustomUserI
 
     private final IdentityService service;
 
-    public SearchCustomUserInfoValues(IdentityService service, SearchEntityDescriptor searchDescriptor, SearchOptions options) {
+    public SearchCustomUserInfoValues(IdentityService service, SearchEntityDescriptor searchDescriptor,
+            SearchOptions options) {
         super(searchDescriptor, options);
         this.service = service;
     }

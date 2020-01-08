@@ -97,7 +97,7 @@ public class TransientDataServiceImplTest {
     }
 
     private SShortTextDataInstance createData(final long id, final int containerId, final String name,
-                                              final String containerType) throws SCacheException {
+            final String containerType) throws SCacheException {
         SShortTextDataInstance data = new SShortTextDataInstance();
         data.setId(id);
         data.setName(name);
@@ -163,9 +163,9 @@ public class TransientDataServiceImplTest {
     @Test
     public void should_get_multiple_data_instances_from_a_container() throws Exception {
         SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
-        SActivityDefinition activityDefinition = flowNodeDefinition(dataWithName("name",null),
-                dataWithName("name1",null),
-                dataWithName("name2",null));
+        SActivityDefinition activityDefinition = flowNodeDefinition(dataWithName("name", null),
+                dataWithName("name1", null),
+                dataWithName("name2", null));
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
         when(processDef.getProcessContainer()).thenReturn(container);
@@ -175,18 +175,19 @@ public class TransientDataServiceImplTest {
         SShortTextDataInstance data = createData(12, 42, "name", "ctype");
         SShortTextDataInstance data1 = createData(13, 42, "name1", "ctype");
         SShortTextDataInstance data2 = createData(14, 42, "name2", "ctype");
-        when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList("name:42:ctype","name:44:ctype","name:48:ctype"));
+        when(cacheService.getKeys("transient_data"))
+                .thenReturn(Arrays.asList("name:42:ctype", "name:44:ctype", "name:48:ctype"));
 
         List<SDataInstance> dataInstances = transientDataServiceImpl.getDataInstances(42, "ctype", 0, 10);
 
         assertThat(dataInstances.size()).isEqualTo(3);
-        assertThat(dataInstances).contains(data,data1,data2);
+        assertThat(dataInstances).contains(data, data1, data2);
     }
 
     @Test
     public void should_return_empty_data_list_for_flownodes_not_in_definition() throws Exception {
         //happens when flow node is e.g. a manual task
-        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("p","1");
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("p", "1");
         SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
         when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDefinition);
         when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
@@ -195,12 +196,12 @@ public class TransientDataServiceImplTest {
 
         assertThat(dataInstances).isEmpty();
     }
-    
+
     private SDataDefinition dataWithName(String dataName, SExpression defaultValueExpression) {
         SDataDefinition dataDef = mock(SDataDefinition.class);
         when(dataDef.isTransientData()).thenReturn(true);
         when(dataDef.getName()).thenReturn(dataName);
-        if(defaultValueExpression != null) {
+        if (defaultValueExpression != null) {
             when(dataDef.getDefaultValueExpression()).thenReturn(defaultValueExpression);
         }
         return dataDef;
@@ -209,7 +210,7 @@ public class TransientDataServiceImplTest {
     @Test
     public void should_paginate_result_when_retrieving_multiple_DataInstance() throws Exception {
         SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
-        SDataDefinition dataDef = dataWithName("name",null);
+        SDataDefinition dataDef = dataWithName("name", null);
         SActivityDefinition activityDefinition = flowNodeDefinition(dataDef);
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
@@ -218,19 +219,19 @@ public class TransientDataServiceImplTest {
         when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDef);
         when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
         when(cacheService.getKeys("transient_data")).thenReturn(Arrays.asList((Object) "name:42:ctype"));
-      
+
         assertThat(transientDataServiceImpl.getDataInstances(42, "ctype", 0, 10)).hasSize(1);
         assertThat(transientDataServiceImpl.getDataInstances(42, "ctype", 0, 1)).hasSize(1);
         assertThat(transientDataServiceImpl.getDataInstances(42, "ctype", 1, 1)).isEmpty();
     }
-    
+
     @Test
     public void should_reevaluate_a_transient_data_instance_if_not_found_in_cache_but_data_definition_exists()
             throws Exception {
         // given
         SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
         SExpression defaultValueExpression = mock(SExpression.class);
-        SDataDefinition dataDef = dataWithName("name",defaultValueExpression);
+        SDataDefinition dataDef = dataWithName("name", defaultValueExpression);
         SActivityDefinition activityDefinition = flowNodeDefinition(dataDef);
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
@@ -251,7 +252,6 @@ public class TransientDataServiceImplTest {
         verify(cacheService).store(TransientDataServiceImpl.TRANSIENT_DATA_CACHE_NAME,
                 TransientDataServiceImpl.getKey(dataInstance), dataInstance);
     }
-
 
     @Test
     public void should_throw_a_SDataInstanceException_when_trying_reevaluate_a_data_not_defined()

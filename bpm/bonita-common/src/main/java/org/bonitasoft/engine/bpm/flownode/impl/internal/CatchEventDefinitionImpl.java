@@ -128,9 +128,12 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         CatchEventDefinitionImpl that = (CatchEventDefinitionImpl) o;
         return Objects.equals(isInterrupting, that.isInterrupting) &&
                 Objects.equals(timerEventTriggers, that.timerEventTriggers) &&
@@ -141,7 +144,8 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timerEventTriggers, messageEventTriggers, signalEventTriggers, errorEventTriggers, isInterrupting);
+        return Objects.hash(super.hashCode(), timerEventTriggers, messageEventTriggers, signalEventTriggers,
+                errorEventTriggers, isInterrupting);
     }
 
     @Override

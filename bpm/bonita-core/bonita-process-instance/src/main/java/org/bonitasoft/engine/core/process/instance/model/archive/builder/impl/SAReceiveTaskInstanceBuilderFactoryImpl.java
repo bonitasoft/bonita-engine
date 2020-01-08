@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SARecei
 /**
  * @author Julien Molinaro
  */
-public class SAReceiveTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SAReceiveTaskInstanceBuilderFactory {
+public class SAReceiveTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SAReceiveTaskInstanceBuilderFactory {
 
     @Override
     public SAReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final SReceiveTaskInstance sReceiveTaskInstance) {

@@ -37,7 +37,8 @@ public class LivingApplicationExporterDelegate {
     }
 
     public byte[] exportApplications(long... applicationIds) throws ExportException {
-        ApplicationsWithIdsFilterBuilder filterBuilder = new ApplicationsWithIdsFilterBuilder(ArrayUtils.toObject(applicationIds));
+        ApplicationsWithIdsFilterBuilder filterBuilder = new ApplicationsWithIdsFilterBuilder(
+                ArrayUtils.toObject(applicationIds));
         try {
             List<SApplication> applications = applicationService.searchApplications(filterBuilder.buildQueryOptions());
             return exporter.export(applications);

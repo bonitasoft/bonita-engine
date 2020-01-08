@@ -40,7 +40,8 @@ public class SGroupLogBuilderImpl extends CRUDELogBuilder implements SGroupLogBu
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SGroupLogBuilderFactoryImpl.GROUP_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SGroupLogBuilderFactoryImpl.GROUP_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Identity Group Id");
         }
     }

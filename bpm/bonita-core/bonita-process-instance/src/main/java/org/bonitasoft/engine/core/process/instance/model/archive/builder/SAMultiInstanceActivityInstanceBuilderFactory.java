@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityI
  */
 public interface SAMultiInstanceActivityInstanceBuilderFactory extends SAActivityInstanceBuilderFactory {
 
-    SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(SMultiInstanceActivityInstance sMultiActivityInstance);
+    SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(
+            SMultiInstanceActivityInstance sMultiActivityInstance);
 
 }

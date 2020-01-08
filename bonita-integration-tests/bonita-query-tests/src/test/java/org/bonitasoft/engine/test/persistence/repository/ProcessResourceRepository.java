@@ -34,25 +34,26 @@ public class ProcessResourceRepository extends TestRepository {
         namedQuery.setParameter("name", name);
         return (SBARResource) namedQuery.uniqueResult();
     }
+
     public List<SBARResource> getBARResourcesOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getBARResourcesOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public List<SBARResourceLight> getBARResourcesLightOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getBARResourcesLightOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         namedQuery.setParameter("type", type);
         return namedQuery.list();
     }
+
     public long getNumberOfBARResourcesOfType(long processDefinitionId, BARResourceType type) {
         final Query namedQuery = getNamedQuery("getNumberOfBARResourcesOfType");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         namedQuery.setParameter("type", type);
         return (long) namedQuery.uniqueResult();
     }
-
-
 
 }

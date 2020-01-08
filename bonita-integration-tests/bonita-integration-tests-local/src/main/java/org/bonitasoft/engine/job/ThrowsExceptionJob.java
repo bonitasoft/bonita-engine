@@ -36,7 +36,8 @@ public class ThrowsExceptionJob implements StatelessJob {
     @Override
     public void execute() throws SJobExecutionException {
         if (throwException) {
-            throw new SJobExecutionException("This job throws an arbitrary exception if parameter 'throwException' is provided.");
+            throw new SJobExecutionException(
+                    "This job throws an arbitrary exception if parameter 'throwException' is provided.");
         }
     }
 

@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SHumanTaskInsta
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class SHumanTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl implements SHumanTaskInstanceBuilderFactory {
+public abstract class SHumanTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl
+        implements SHumanTaskInstanceBuilderFactory {
 
     private static final String ASSIGNEE_ID_KEY = "assigneeId";
 

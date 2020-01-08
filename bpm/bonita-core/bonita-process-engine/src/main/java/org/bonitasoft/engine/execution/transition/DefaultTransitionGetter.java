@@ -24,12 +24,14 @@ import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
  */
 public class DefaultTransitionGetter {
 
-    STransitionDefinition getDefaultTransition(FlowNodeTransitionsWrapper transitions, SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
+    STransitionDefinition getDefaultTransition(FlowNodeTransitionsWrapper transitions,
+            SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
             throws SActivityExecutionException {
         STransitionDefinition defaultTransition = transitions.getDefaultTransition();
-        if(defaultTransition == null) {
-            final SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                    + ", but no outgoing transition had a valid condition.");
+        if (defaultTransition == null) {
+            final SActivityExecutionException exception = new SActivityExecutionException(
+                    "There is no default transition on " + flowNodeInstance.getName()
+                            + ", but no outgoing transition had a valid condition.");
             exception.setProcessDefinitionNameOnContext(processDefinition.getName());
             exception.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
             exception.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());

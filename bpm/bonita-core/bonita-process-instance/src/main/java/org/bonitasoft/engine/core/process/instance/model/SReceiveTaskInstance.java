@@ -26,8 +26,9 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 @EqualsAndHashCode(callSuper = true)
 public class SReceiveTaskInstance extends SActivityInstance {
 
-    public SReceiveTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                final long logicalGroup1, final long logicalGroup2) {
+    public SReceiveTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 

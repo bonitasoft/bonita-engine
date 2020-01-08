@@ -34,7 +34,8 @@ import org.junit.Test;
 public class TenantMaintenanceLocalIT extends TestWithUser {
 
     @Test
-    public void should_pause_tenant_then_stop_start_node_dont_restart_elements_but_resume_restart_them() throws Exception {
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements_but_resume_restart_them()
+            throws Exception {
         // given: tenant is paused
         long tenantId = getSession().getTenantId();
         WorkService workService = getTenantAccessor(tenantId).getWorkService();
@@ -42,8 +43,10 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
 
         logoutThenloginAs(USERNAME, PASSWORD);
 
-        final ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
-        pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
+        final ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def",
+                "1.0");
+        pdb.addAutomaticTask("step1").addMultiInstance(false,
+                new ExpressionBuilder().createConstantIntegerExpression(100));
         final DesignProcessDefinition dpd = pdb.done();
         final ProcessDefinition pd = deployAndEnableProcess(dpd);
         ProcessInstance processInstance = getProcessAPI().startProcess(pd.getId());

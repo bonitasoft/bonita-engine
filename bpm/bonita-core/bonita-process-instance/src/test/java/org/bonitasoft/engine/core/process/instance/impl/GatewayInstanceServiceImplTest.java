@@ -93,7 +93,8 @@ public class GatewayInstanceServiceImplTest {
 
         List<SFlowNodeDefinition> sourceElements = new ArrayList<>(Arrays.asList(step1, step2));
         List<SFlowNodeDefinition> targetElements = new ArrayList<>(Arrays.asList(step2, step3));
-        List<SFlowNodeDefinition> sourceAndTarget = gatewayInstanceService.extractElementThatAreSourceAndTarget(sourceElements, targetElements);
+        List<SFlowNodeDefinition> sourceAndTarget = gatewayInstanceService
+                .extractElementThatAreSourceAndTarget(sourceElements, targetElements);
 
         assertThat(sourceElements).isEmpty();
         assertThat(targetElements).containsOnly(step3);
@@ -111,7 +112,8 @@ public class GatewayInstanceServiceImplTest {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), true);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), true);
 
         assertThat(containsToken).isTrue();
     }
@@ -121,7 +123,8 @@ public class GatewayInstanceServiceImplTest {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), true);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), true);
 
         assertThat(containsToken).isFalse();
     }
@@ -131,7 +134,8 @@ public class GatewayInstanceServiceImplTest {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), false);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), false);
 
         assertThat(containsToken).isTrue();
     }
@@ -141,7 +145,8 @@ public class GatewayInstanceServiceImplTest {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), false);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), false);
 
         assertThat(containsToken).isFalse();
     }
@@ -150,7 +155,8 @@ public class GatewayInstanceServiceImplTest {
     public void should_containsToken_for_both_element_with_token_return_true1() throws Exception {
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), null);
 
         assertThat(containsToken).isTrue();
     }
@@ -159,7 +165,8 @@ public class GatewayInstanceServiceImplTest {
     public void should_containsToken_for_both_element_with_token_return_true2() throws Exception {
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), null);
 
         assertThat(containsToken).isTrue();
     }
@@ -167,7 +174,8 @@ public class GatewayInstanceServiceImplTest {
     @Test
     public void should_containsToken_for_both_element_with_no_token_return_false() throws Exception {
 
-        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
+        boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID,
+                flowNodeDefList("step0", "step1", "step2"), null);
 
         assertThat(containsToken).isFalse();
     }
@@ -184,7 +192,7 @@ public class GatewayInstanceServiceImplTest {
         List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SFlowNodeInstance.class, "name", name));
         filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
-        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
+        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
         SUserTaskInstance sUserTaskInstance = new SUserTaskInstance();
         sUserTaskInstance.setName(name);
         sUserTaskInstance.setTerminal(terminal);
@@ -202,7 +210,8 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isTrue();
@@ -216,7 +225,8 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isTrue();
@@ -230,7 +240,8 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isTrue();
@@ -248,7 +259,8 @@ public class GatewayInstanceServiceImplTest {
         transition(2, 3);
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isFalse();
@@ -262,7 +274,8 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         instanceInDatabase("step3", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isTrue();
@@ -276,7 +289,8 @@ public class GatewayInstanceServiceImplTest {
         node(3, "step3");
         instanceInDatabase("step3", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isFalse();
@@ -289,7 +303,8 @@ public class GatewayInstanceServiceImplTest {
         node(2, "step2");
         node(3, "step3");
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(
+                Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
                 processContainer);
 
         assertThat(containsAToken).isFalse();
@@ -311,9 +326,10 @@ public class GatewayInstanceServiceImplTest {
         List<STransitionDefinition> startTransition = Arrays.asList(transition(6, 666), transition(3, 666));
         List<STransitionDefinition> toComplete = new ArrayList<>();
         gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete,
-                Collections.<STransitionDefinition>emptyList());
+                Collections.<STransitionDefinition> emptyList());
 
-        assertThat(toComplete).containsOnly(transition(1, 2), transition(2, 3), transition(4, 6), transition(5, 6), transition(3, 666), transition(6, 666));
+        assertThat(toComplete).containsOnly(transition(1, 2), transition(2, 3), transition(4, 6), transition(5, 6),
+                transition(3, 666), transition(6, 666));
     }
 
     @Test
@@ -323,11 +339,11 @@ public class GatewayInstanceServiceImplTest {
         node(2, "step2");
         transition(1, 666);
         transition(666, 1);
-        transition(2,666);
+        transition(2, 666);
         List<STransitionDefinition> startTransition = Arrays.asList(transition(1, 666));
         List<STransitionDefinition> toComplete = new ArrayList<>();
         gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete,
-                Collections.<STransitionDefinition>emptyList());
+                Collections.<STransitionDefinition> emptyList());
 
         assertThat(toComplete).containsOnly(transition(1, 666), transition(666, 1));
     }
@@ -341,7 +357,8 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_checkMergingCondition_on_inclusive() throws Exception {
-        doReturn(true).when(gatewayInstanceService).isInclusiveGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        doReturn(true).when(gatewayInstanceService).isInclusiveGatewayActivated(any(SProcessDefinition.class),
+                any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.INCLUSIVE);
@@ -354,7 +371,8 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_checkMergingCondition_on_parallel() throws Exception {
-        doReturn(true).when(gatewayInstanceService).isParallelGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        doReturn(true).when(gatewayInstanceService).isParallelGatewayActivated(any(SProcessDefinition.class),
+                any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         SGatewayInstance gate = new SGatewayInstance();
         gate.setGatewayType(SGatewayType.PARALLEL);
@@ -408,7 +426,8 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_getRemainingToken_return_not_merged_tokens() {
-        List<String> remainingTokens = gatewayInstanceService.getRemainingTokens(Arrays.asList("1", "2", "3", "2", "1"), Arrays.asList("1", "2", "3"));
+        List<String> remainingTokens = gatewayInstanceService.getRemainingTokens(Arrays.asList("1", "2", "3", "2", "1"),
+                Arrays.asList("1", "2", "3"));
 
         assertThat(remainingTokens).containsOnly("2", "1");
     }
@@ -457,7 +476,6 @@ public class GatewayInstanceServiceImplTest {
         assertThat(isMerged).isFalse();
     }
 
-
     @Test
     public void should_inclusiveBehavior_merged() throws SBonitaReadException {
         node(666, "gate");
@@ -475,7 +493,9 @@ public class GatewayInstanceServiceImplTest {
         transition(1, 666);
         transition(2, 666);
         transition(3, 666);
-        doNothing().when(gatewayInstanceService).addBackwardReachableTransitions(any(SFlowElementContainerDefinition.class), any(SFlowNodeDefinition.class), anyList(), anyList(), anyList());
+        doNothing().when(gatewayInstanceService).addBackwardReachableTransitions(
+                any(SFlowElementContainerDefinition.class), any(SFlowNodeDefinition.class), anyList(), anyList(),
+                anyList());
         doReturn(true).when(gatewayInstanceService).transitionsContainsAToken(anyList(), any(SFlowNodeDefinition.class),
                 anyLong(), any(SFlowElementContainerDefinition.class));
 
@@ -505,31 +525,37 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void should_setState_change_lastUpdate_and_reachStateDate() throws SGatewayModificationException, SRecorderException {
+    public void should_setState_change_lastUpdate_and_reachStateDate()
+            throws SGatewayModificationException, SRecorderException {
         SGatewayInstance gate = new SGatewayInstance();
 
         gatewayInstanceService.setState(gate, 12);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
 
-        assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId", "reachedStateDate", "lastUpdateDate");
+        assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId", "reachedStateDate",
+                "lastUpdateDate");
     }
 
     @Test
     public void should_getActiveGatewayOfProcess_return_the_gateway() throws Exception {
         SGatewayInstance gate = new SGatewayInstance();
-        doReturn(gate).when(persistenceRead).selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
+        doReturn(gate).when(persistenceRead)
+                .selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
 
-        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID, "myGate");
+        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID,
+                "myGate");
 
         assertThat(myGate).isEqualTo(gate);
     }
 
     @Test
     public void should_getActiveGatewayOfProcess_return_null_if_not_found() throws Exception {
-        doReturn(null).when(persistenceRead).selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
+        doReturn(null).when(persistenceRead)
+                .selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
 
-        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID, "myGate");
+        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID,
+                "myGate");
 
         assertThat(myGate).isNull();
     }

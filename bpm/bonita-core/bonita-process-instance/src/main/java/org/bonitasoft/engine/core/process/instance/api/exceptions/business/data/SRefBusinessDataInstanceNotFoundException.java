@@ -23,7 +23,8 @@ public class SRefBusinessDataInstanceNotFoundException extends SBonitaException 
     private static final long serialVersionUID = -5163481117317685640L;
 
     public SRefBusinessDataInstanceNotFoundException(final long processInstanceId, final String name) {
-        super("Unable to find a reference to a business data named '" + name + "' of process instance " + processInstanceId);
+        super("Unable to find a reference to a business data named '" + name + "' of process instance "
+                + processInstanceId);
     }
 
 }

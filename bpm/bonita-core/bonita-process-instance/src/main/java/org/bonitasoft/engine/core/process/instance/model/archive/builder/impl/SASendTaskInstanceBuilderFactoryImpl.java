@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASendT
 /**
  * @author Baptiste Mesta
  */
-public class SASendTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SASendTaskInstanceBuilderFactory {
+public class SASendTaskInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SASendTaskInstanceBuilderFactory {
 
     @Override
     public SASendTaskInstanceBuilder createNewSendTaskInstance(final SSendTaskInstance sSendTaskInstance) {

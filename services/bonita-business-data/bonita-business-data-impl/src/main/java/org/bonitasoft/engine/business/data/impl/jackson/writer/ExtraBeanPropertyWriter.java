@@ -13,17 +13,16 @@
  **/
 package org.bonitasoft.engine.business.data.impl.jackson.writer;
 
-import org.bonitasoft.engine.business.data.impl.jackson.serializer.ExtraPropertyStringListSerializer;
-import org.bonitasoft.engine.business.data.impl.jackson.serializer.ExtraPropertyStringSerializer;
-import org.bonitasoft.engine.business.data.impl.jackson.utils.ExtraPropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.bonitasoft.engine.business.data.impl.jackson.serializer.ExtraPropertyStringListSerializer;
+import org.bonitasoft.engine.business.data.impl.jackson.serializer.ExtraPropertyStringSerializer;
+import org.bonitasoft.engine.business.data.impl.jackson.utils.ExtraPropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExtraBeanPropertyWriter extends BeanPropertyWriter {
 

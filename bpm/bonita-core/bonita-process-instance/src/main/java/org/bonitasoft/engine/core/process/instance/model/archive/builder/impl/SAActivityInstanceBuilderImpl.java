@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAActiv
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class SAActivityInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl implements SAActivityInstanceBuilder {
+public abstract class SAActivityInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl
+        implements SAActivityInstanceBuilder {
 
     protected SAActivityInstanceBuilderImpl(final SAActivityInstance entity) {
         super(entity);

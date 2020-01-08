@@ -25,25 +25,31 @@ import org.bonitasoft.engine.expression.Expression;
  */
 public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
 
-    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
+    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
             final String name, final String className, final Expression defaultValue) {
         super(processDefinitionBuilder, process, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
-            final ActivityDefinitionImpl activity, final String name, final String className, final Expression defaultValue) {
+    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl process,
+            final ActivityDefinitionImpl activity, final String name, final String className,
+            final Expression defaultValue) {
         super(processDefinitionBuilder, process, activity, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
+    public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
+            final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className,
+            final Expression defaultValue) {
         super(processDefinitionBuilder, container, messageEventTrigger, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    private static XMLDataDefinitionImpl getTextData(final String name, final String className, final Expression defaultValue) {
+    private static XMLDataDefinitionImpl getTextData(final String name, final String className,
+            final Expression defaultValue) {
         final XMLDataDefinitionImpl xml = new XMLDataDefinitionImpl(name, defaultValue);
         xml.setClassName(className);
         return xml;
@@ -51,6 +57,7 @@ public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
 
     /**
      * Sets the XML name space.
+     *
      * @param nameSpace XML name space
      * @return
      */
@@ -61,6 +68,7 @@ public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
 
     /**
      * Sets the XML element.
+     *
      * @param element XML element
      * @return
      */

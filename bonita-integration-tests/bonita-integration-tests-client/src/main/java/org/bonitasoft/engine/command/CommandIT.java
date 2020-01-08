@@ -67,7 +67,8 @@ public class CommandIT extends TestWithTechnicalUser {
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         getCommandAPI().addDependency("commands", byteArray);
-        getCommandAPI().register("intReturn", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
+        getCommandAPI().register("intReturn", "Retrieving the integer value",
+                "org.bonitasoft.engine.command.IntergerCommand");
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("int", 83);
         final Integer actual = (Integer) getCommandAPI().execute("intReturn", parameters);
@@ -83,7 +84,8 @@ public class CommandIT extends TestWithTechnicalUser {
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         getCommandAPI().addDependency("commands", byteArray);
-        getCommandAPI().register("except", "Throws ParameterizationException", "org.bonitasoft.engine.command.ParameterizationExceptionCommand");
+        getCommandAPI().register("except", "Throws ParameterizationException",
+                "org.bonitasoft.engine.command.ParameterizationExceptionCommand");
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("key", 83);
         try {
@@ -101,7 +103,8 @@ public class CommandIT extends TestWithTechnicalUser {
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         getCommandAPI().addDependency("commands", byteArray);
-        getCommandAPI().register("except", "Throws ExecutionExceptionCommand", "org.bonitasoft.engine.command.ExecutionExceptionCommand");
+        getCommandAPI().register("except", "Throws ExecutionExceptionCommand",
+                "org.bonitasoft.engine.command.ExecutionExceptionCommand");
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("key", 83);
         try {
@@ -116,7 +119,8 @@ public class CommandIT extends TestWithTechnicalUser {
     public void createCommand() throws BonitaException {
         try {
             getCommandAPI().addDependency("commands", "jar".getBytes());
-            final CommandDescriptor command = getCommandAPI().register("command1", "command description", "implementation");
+            final CommandDescriptor command = getCommandAPI().register("command1", "command description",
+                    "implementation");
             assertNotNull(command);
             assertEquals("command1", command.getName());
             assertEquals("command description", command.getDescription());
@@ -202,12 +206,14 @@ public class CommandIT extends TestWithTechnicalUser {
             getCommandAPI().register("aaaCommand3", "command description", "implementation");
             getCommandAPI().register("aaaCommand1", "command description", "implementation");
 
-            final List<CommandDescriptor> commandsPage1 = getCommandAPI().getAllCommands(0, 2, CommandCriterion.NAME_ASC);
+            final List<CommandDescriptor> commandsPage1 = getCommandAPI().getAllCommands(0, 2,
+                    CommandCriterion.NAME_ASC);
             assertEquals(2, commandsPage1.size());
             assertEquals("aaaCommand1", commandsPage1.get(0).getName());
             assertEquals("aaaCommand2", commandsPage1.get(1).getName());
 
-            final List<CommandDescriptor> commandsPage2 = getCommandAPI().getAllCommands(2, 1, CommandCriterion.NAME_ASC);
+            final List<CommandDescriptor> commandsPage2 = getCommandAPI().getAllCommands(2, 1,
+                    CommandCriterion.NAME_ASC);
             assertEquals(1, commandsPage2.size());
             assertEquals("aaaCommand3", commandsPage2.get(0).getName());
         } finally {
@@ -245,7 +251,8 @@ public class CommandIT extends TestWithTechnicalUser {
         final String commandName = "command1";
         try {
             getCommandAPI().addDependency("commands", "jar".getBytes());
-            final CommandDescriptor registeredCommand = getCommandAPI().register(commandName, "command description", "implementation");
+            final CommandDescriptor registeredCommand = getCommandAPI().register(commandName, "command description",
+                    "implementation");
             final CommandDescriptor command = getCommandAPI().get(registeredCommand.getId());
             assertEquals("command1", command.getName());
         } finally {
@@ -258,9 +265,12 @@ public class CommandIT extends TestWithTechnicalUser {
     public void searchCommands() throws BonitaException {
         final CommandAPI commandAPI = getCommandAPI();
         commandAPI.addDependency("commands", "jar".getBytes());
-        final CommandDescriptor command1 = commandAPI.register("testCommand1", "SearchCommands description1", "implementation");
-        final CommandDescriptor command2 = commandAPI.register("testCommand2", "GetCommands description2", "implementation");
-        final CommandDescriptor command3 = commandAPI.register("testCommand3", "GetCommands description3", "implementation");
+        final CommandDescriptor command1 = commandAPI.register("testCommand1", "SearchCommands description1",
+                "implementation");
+        final CommandDescriptor command2 = commandAPI.register("testCommand2", "GetCommands description2",
+                "implementation");
+        final CommandDescriptor command3 = commandAPI.register("testCommand3", "GetCommands description3",
+                "implementation");
         try {
             // search paging with order ASC
             SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
@@ -337,9 +347,11 @@ public class CommandIT extends TestWithTechnicalUser {
     @Test
     public void searchCommandsWithApostrophe() throws BonitaException {
         getCommandAPI().addDependency("commands", "jar".getBytes());
-        final CommandDescriptor command1 = getCommandAPI().register("'command'1", "SearchCommands description1", "implementation");
+        final CommandDescriptor command1 = getCommandAPI().register("'command'1", "SearchCommands description1",
+                "implementation");
         final CommandDescriptor command2 = getCommandAPI().register("command2", "'command'1", "implementation");
-        final CommandDescriptor command3 = getCommandAPI().register("command3", "'SearchCommands description1", "command'tation");
+        final CommandDescriptor command3 = getCommandAPI().register("command3", "'SearchCommands description1",
+                "command'tation");
 
         // test search with filter
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

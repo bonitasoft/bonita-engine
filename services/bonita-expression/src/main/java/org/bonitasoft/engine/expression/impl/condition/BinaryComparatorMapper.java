@@ -28,11 +28,16 @@ public class BinaryComparatorMapper {
     public BinaryComparatorMapper(EqualityComparator equalityComparator, InequalityComparator inequalityComparator) {
         evaluators = new HashMap<String, BinaryComparator>();
         evaluators.put(ConditionExpressionExecutorStrategy.EQUALS_COMPARATOR, new EqualsComparator(equalityComparator));
-        evaluators.put(ConditionExpressionExecutorStrategy.NOT_EQUALS_COMPARATOR, new DifferentComparator(equalityComparator));
-        evaluators.put(ConditionExpressionExecutorStrategy.GREATER_THAN_COMPARATOR, new GreaterThanComparator(inequalityComparator));
-        evaluators.put(ConditionExpressionExecutorStrategy.GREATER_THAN_OR_EQUALS_COMPARATOR, new GreaterThanOrEqualsComparator(inequalityComparator));
-        evaluators.put(ConditionExpressionExecutorStrategy.LESS_THAN_COMPARATOR, new LessThanComparator(inequalityComparator));
-        evaluators.put(ConditionExpressionExecutorStrategy.lESS_THAN_OR_EQUALS_COMPARATOR, new LessThanOrEqualsComparator(inequalityComparator));
+        evaluators.put(ConditionExpressionExecutorStrategy.NOT_EQUALS_COMPARATOR,
+                new DifferentComparator(equalityComparator));
+        evaluators.put(ConditionExpressionExecutorStrategy.GREATER_THAN_COMPARATOR,
+                new GreaterThanComparator(inequalityComparator));
+        evaluators.put(ConditionExpressionExecutorStrategy.GREATER_THAN_OR_EQUALS_COMPARATOR,
+                new GreaterThanOrEqualsComparator(inequalityComparator));
+        evaluators.put(ConditionExpressionExecutorStrategy.LESS_THAN_COMPARATOR,
+                new LessThanComparator(inequalityComparator));
+        evaluators.put(ConditionExpressionExecutorStrategy.lESS_THAN_OR_EQUALS_COMPARATOR,
+                new LessThanOrEqualsComparator(inequalityComparator));
 
     }
 

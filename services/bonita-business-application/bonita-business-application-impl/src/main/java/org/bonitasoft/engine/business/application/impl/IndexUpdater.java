@@ -40,15 +40,18 @@ public class IndexUpdater {
         this.maxResults = maxResults;
     }
 
-    public void incrementIndexes(Long parentId, int from, int to) throws SBonitaReadException, SObjectModificationException {
+    public void incrementIndexes(Long parentId, int from, int to)
+            throws SBonitaReadException, SObjectModificationException {
         updateIndexes(parentId, from, to, 1);
     }
 
-    public void decrementIndexes(Long parentId, int from, int to) throws SBonitaReadException, SObjectModificationException {
+    public void decrementIndexes(Long parentId, int from, int to)
+            throws SBonitaReadException, SObjectModificationException {
         updateIndexes(parentId, from, to, -1);
     }
 
-    private void updateIndexes(Long parentId, int from, int to, int offSet) throws SObjectModificationException, SBonitaReadException {
+    private void updateIndexes(Long parentId, int from, int to, int offSet)
+            throws SObjectModificationException, SBonitaReadException {
         if (to >= from) {
             List<SApplicationMenu> menusToUpdate = null;
             int firstResult = 0;
@@ -60,10 +63,13 @@ public class IndexUpdater {
         }
     }
 
-    private List<SApplicationMenu> getCurrentPage(Long parentId, int from, int to, int firstResult) throws SBonitaReadException {
-        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
-        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, from, to), new FilterOption(
-                SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
+    private List<SApplicationMenu> getCurrentPage(Long parentId, int from, int to, int firstResult)
+            throws SBonitaReadException {
+        List<OrderByOption> orderBy = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
+        List<FilterOption> filters = Arrays
+                .asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.INDEX, from, to), new FilterOption(
+                        SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentId));
         QueryOptions options = new QueryOptions(firstResult, maxResults, orderBy, filters, null);
         return applicationService.searchApplicationMenus(options);
     }

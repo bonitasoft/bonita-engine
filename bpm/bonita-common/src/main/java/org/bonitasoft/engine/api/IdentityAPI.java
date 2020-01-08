@@ -13,10 +13,9 @@
  **/
 package org.bonitasoft.engine.api;
 
-
 /**
  * The Interface IdentityAPI.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -24,6 +23,5 @@ package org.bonitasoft.engine.api;
  * @author Yanyan Liu
  */
 public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI, CustomUserInfoAPI {
-
 
 }

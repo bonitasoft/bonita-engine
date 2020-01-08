@@ -66,7 +66,8 @@ public class ExpressionImplTest {
         assertThat(copy.getName()).isEqualTo(expression.getName());
         assertThat(copy.getInterpreter()).isEqualTo(expression.getInterpreter());
         assertThat(copy.getReturnType()).isEqualTo(expression.getReturnType());
-        assertThat(copy.getDependencies().get(0).getContent()).isEqualTo(expression.getDependencies().get(0).getContent());
+        assertThat(copy.getDependencies().get(0).getContent())
+                .isEqualTo(expression.getDependencies().get(0).getContent());
     }
 
     @Test

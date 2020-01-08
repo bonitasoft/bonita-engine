@@ -37,20 +37,26 @@ public class ApplicationPageRelatedMenusFilterBuilder implements FilterBuilder {
 
     @Override
     public QueryOptions buildQueryOptions() {
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
-        List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId));
+        List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.ID, OrderByType.ASC));
+        List<FilterOption> filters = Collections.singletonList(
+                new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICATION_PAGE_ID, applicationPageId));
         return new QueryOptions(range.getStartIndex(), range.getMaxResults(), orderByOptions, filters, null);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ApplicationPageRelatedMenusFilterBuilder)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ApplicationPageRelatedMenusFilterBuilder))
+            return false;
 
         ApplicationPageRelatedMenusFilterBuilder that = (ApplicationPageRelatedMenusFilterBuilder) o;
 
-        if (applicationPageId != that.applicationPageId) return false;
-        if (range != null ? !range.equals(that.range) : that.range != null) return false;
+        if (applicationPageId != that.applicationPageId)
+            return false;
+        if (range != null ? !range.equals(that.range) : that.range != null)
+            return false;
 
         return true;
     }

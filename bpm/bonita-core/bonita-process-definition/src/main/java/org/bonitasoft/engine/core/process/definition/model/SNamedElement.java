@@ -21,7 +21,7 @@ public interface SNamedElement extends SBaseElement {
 
     /**
      * Gets the name of the element.
-     * 
+     *
      * @return the element name
      */
     String getName();

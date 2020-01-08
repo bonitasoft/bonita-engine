@@ -33,7 +33,9 @@ public class ApplicationContainerImporterTest {
     @Test
     public void importXML_should_return_result_of_unmarshall() throws Exception {
         //when
-        final ApplicationNodeContainer importedContainer = importer.importXML("<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>".getBytes());
+        final ApplicationNodeContainer importedContainer = importer.importXML(
+                "<applications xmlns=\"http://documentation.bonitasoft.com/application-xml-schema/1.0\"></applications>"
+                        .getBytes());
 
         //then
         assertThat(importedContainer.getApplications()).isEmpty();

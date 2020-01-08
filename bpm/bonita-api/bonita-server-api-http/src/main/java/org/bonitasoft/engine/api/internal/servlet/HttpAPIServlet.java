@@ -30,7 +30,8 @@ public class HttpAPIServlet extends HttpServlet {
     private static final long serialVersionUID = 4936475894513095747L;
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         try {
             new HttpAPIServletCall(req, resp).doPost();
         } catch (final FileUploadException e) {

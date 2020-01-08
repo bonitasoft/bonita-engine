@@ -23,9 +23,10 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 
 /**
- * The LoginAPI allows to log in (and out) onto the Engine. This is a mandatory step to go further using the Engine APIs.
+ * The LoginAPI allows to log in (and out) onto the Engine. This is a mandatory step to go further using the Engine
+ * APIs.
  * Other Engine APIs are only accessible through the returned APISession.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  * @see APISession
@@ -35,39 +36,39 @@ public interface LoginAPI {
 
     /**
      * Connects the user in order to use API methods of the default tenant.
-     * 
+     *
      * @param userName
-     *            the user name
+     *        the user name
      * @param password
-     *            the password
+     *        the password
      * @return the session to use with other tenant API methods
      * @throws LoginException
-     *             occurs when an exception is thrown during login
+     *         occurs when an exception is thrown during login
      * @throws UnknownUserException
-     *             occurs when the user trying to login is unknown to the engine
+     *         occurs when the user trying to login is unknown to the engine
      */
     APISession login(String userName, String password) throws LoginException, UnknownUserException;
 
     /**
      * Connects the user in order to use API methods of the default tenant.
-     * 
+     *
      * @param credentials
-     *            the properties to use to login
+     *        the properties to use to login
      * @return the session to use with other tenant API methods
      * @throws LoginException
-     *             occurs when an exception is thrown during login
+     *         occurs when an exception is thrown during login
      */
     APISession login(Map<String, Serializable> credentials) throws LoginException;
 
     /**
      * Disconnects the logged user on a tenant according to the given session.
-     * 
+     *
      * @param session
-     *            the tenant session
+     *        the tenant session
      * @throws SessionNotFoundException
-     *             if the given session is not found on the server side. This may occurs when the session has expired.
+     *         if the given session is not found on the server side. This may occurs when the session has expired.
      * @throws LogoutException
-     *             occurs when an exception is thrown during the logout
+     *         occurs when an exception is thrown during the logout
      */
     void logout(APISession session) throws SessionNotFoundException, LogoutException;
 

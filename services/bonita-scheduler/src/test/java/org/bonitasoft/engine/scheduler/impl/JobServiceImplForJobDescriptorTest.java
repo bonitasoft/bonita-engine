@@ -15,9 +15,9 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -44,8 +44,8 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -78,7 +78,8 @@ public class JobServiceImplForJobDescriptorTest {
     private JobServiceImpl jobServiceImpl;
 
     @Test
-    public final void createJobDescriptor_should_return_jobDescriptor() throws SJobDescriptorCreationException, SRecorderException {
+    public final void createJobDescriptor_should_return_jobDescriptor()
+            throws SJobDescriptorCreationException, SRecorderException {
         // Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         doReturn("plop").when(sJobDescriptor).getJobName();
@@ -112,7 +113,8 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorCreationException.class)
     public void createJobDescriptor_should_throw_exception_when_recorder_failed() throws Exception {
         //given
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         when(sJobDescriptor.getJobName()).thenReturn("jobName");
 
@@ -128,7 +130,8 @@ public class JobServiceImplForJobDescriptorTest {
         //Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
-        doReturn(sJobDescriptor).when(readPersistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any());
+        doReturn(sJobDescriptor).when(readPersistenceService)
+                .selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any());
 
         // When
         jobServiceImpl.deleteJobDescriptor(3);
@@ -140,7 +143,8 @@ public class JobServiceImplForJobDescriptorTest {
     @Test
     public final void deleteJobDescriptor_by_id_should_do_nothing_when_job_descriptor_doesnt_exist() throws Exception {
         // Given
-        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any()))
+                .thenReturn(null);
         when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.TRACE))).thenReturn(true);
 
         // When
@@ -151,9 +155,11 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public final void deleteJobDescriptor_by_id_should_do_nothing_when_job_descriptor_doesnt_exist_without_log() throws Exception {
+    public final void deleteJobDescriptor_by_id_should_do_nothing_when_job_descriptor_doesnt_exist_without_log()
+            throws Exception {
         // Given
-        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
+        when(readPersistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<SJobDescriptor>> any()))
+                .thenReturn(null);
 
         // When
         jobServiceImpl.deleteJobDescriptor(1);
@@ -168,7 +174,8 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
         doReturn(sJobDescriptor).when(readPersistenceService).selectById(any());
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobDescriptor(3);
@@ -212,8 +219,9 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorDeletionException.class)
     public void deleteAllJobDescriptors_should_throw_exception_when_searchEntity_failed() throws Exception {
         //Given
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), nullable(Map.class))).thenThrow(
-                new SBonitaReadException("error"));
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class),
+                nullable(Map.class))).thenThrow(
+                        new SBonitaReadException("error"));
 
         //When
         jobServiceImpl.deleteAllJobDescriptors();
@@ -222,8 +230,9 @@ public class JobServiceImplForJobDescriptorTest {
     @Test
     public void deleteAllJobDescriptors_should_delete_all_job_descriptors() throws Exception {
         SJobDescriptor sJobDescriptor = new SJobDescriptor();
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), nullable(Map.class))).thenReturn(
-                asList(new SJobDescriptor(), new SJobDescriptor()));
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class),
+                nullable(Map.class))).thenReturn(
+                        asList(new SJobDescriptor(), new SJobDescriptor()));
 
         jobServiceImpl.deleteAllJobDescriptors();
 
@@ -231,7 +240,8 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public final void deleteJobDescriptor_by_object_should_delete_job_descriptor() throws SRecorderException, SJobDescriptorDeletionException {
+    public final void deleteJobDescriptor_by_object_should_delete_job_descriptor()
+            throws SRecorderException, SJobDescriptorDeletionException {
         // Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
@@ -245,17 +255,21 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public final void deleteJobDescriptor_by_object_should_throw_exception_when_job_descriptor_is_null() throws SJobDescriptorDeletionException {
+    public final void deleteJobDescriptor_by_object_should_throw_exception_when_job_descriptor_is_null()
+            throws SJobDescriptorDeletionException {
         jobServiceImpl.deleteJobDescriptor(null);
     }
 
     @Test
-    public void getJobDescriptor_by_id_should_return_jobDescriptor() throws SBonitaReadException, SJobDescriptorReadException {
+    public void getJobDescriptor_by_id_should_return_jobDescriptor()
+            throws SBonitaReadException, SJobDescriptorReadException {
         // Given
         final long jobDescriptorId = 1;
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
-        when(readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId))).thenReturn(
-                sJobDescriptor);
+        when(readPersistenceService.selectById(
+                SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId)))
+                        .thenReturn(
+                                sJobDescriptor);
 
         // When
         final SJobDescriptor jobDescriptor = jobServiceImpl.getJobDescriptor(jobDescriptorId);
@@ -265,10 +279,12 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public void getJobDescriptor_by_id__should_return_null_when_no_job_descriptor() throws SBonitaReadException, SJobDescriptorReadException {
+    public void getJobDescriptor_by_id__should_return_null_when_no_job_descriptor()
+            throws SBonitaReadException, SJobDescriptorReadException {
         // Given
         final long jobDescriptorId = 455;
-        doReturn(null).when(readPersistenceService).selectById(SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId));
+        doReturn(null).when(readPersistenceService).selectById(
+                SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId));
 
         // When
         final SJobDescriptor result = jobServiceImpl.getJobDescriptor(jobDescriptorId);
@@ -278,7 +294,8 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test(expected = SJobDescriptorReadException.class)
-    public void getJobDescriptor_by_id_should_throw_exception_when_selectById_failed() throws SBonitaReadException, SJobDescriptorReadException {
+    public void getJobDescriptor_by_id_should_throw_exception_when_selectById_failed()
+            throws SBonitaReadException, SJobDescriptorReadException {
         final long jobDescriptorId = 1;
         doThrow(new SBonitaReadException("")).when(readPersistenceService).selectById(
                 SelectDescriptorBuilder.getElementById(SJobDescriptor.class, "SJobDescriptor", jobDescriptorId));
@@ -304,7 +321,8 @@ public class JobServiceImplForJobDescriptorTest {
     public void getNumberOfJobDescriptors_should_throw_exception() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        when(readPersistenceService.getNumberOfEntities(SJobDescriptor.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(readPersistenceService.getNumberOfEntities(SJobDescriptor.class, options, null))
+                .thenThrow(new SBonitaReadException(""));
 
         // When
         jobServiceImpl.getNumberOfJobDescriptors(options);
@@ -315,7 +333,8 @@ public class JobServiceImplForJobDescriptorTest {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
-        when(readPersistenceService.searchEntity(SJobDescriptor.class, options, null)).thenReturn(Collections.singletonList(sJobDescriptor));
+        when(readPersistenceService.searchEntity(SJobDescriptor.class, options, null))
+                .thenReturn(Collections.singletonList(sJobDescriptor));
 
         // When
         final SJobDescriptor result = jobServiceImpl.searchJobDescriptors(options).get(0);
@@ -329,7 +348,8 @@ public class JobServiceImplForJobDescriptorTest {
     public void searchJobDescriptors_should_throw_exception() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
-        doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobDescriptor.class, options, null);
+        doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobDescriptor.class, options,
+                null);
 
         // When
         jobServiceImpl.searchJobDescriptors(options).get(0);

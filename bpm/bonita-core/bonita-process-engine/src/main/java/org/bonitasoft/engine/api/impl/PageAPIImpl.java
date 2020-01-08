@@ -89,13 +89,15 @@ public class PageAPIImpl implements PageAPI {
     }
 
     @Override
-    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    public Page createPage(final PageCreator pageCreator, final byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         return getPageAPIDelegate().createPage(pageCreator, content);
     }
 
     @Override
-    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+    public Page createPage(final String contentName, final byte[] content)
+            throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
         return getPageAPIDelegate().createPage(contentName, content);
     }
@@ -120,34 +122,41 @@ public class PageAPIImpl implements PageAPI {
     }
 
     @Override
-    public Page getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws PageNotFoundException {
+    public Page getPageByNameAndProcessDefinitionId(String name, long processDefinitionId)
+            throws PageNotFoundException {
         return getPageAPIDelegate().getPageByNameAndProcessDefinition(name, processDefinitionId);
     }
 
     @Override
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater)
+            throws UpdateException, AlreadyExistsException,
             UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
         return getPageAPIDelegate().updatePage(pageId, pageUpdater);
     }
 
     @Override
-    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
+    public void updatePageContent(final long pageId, final byte[] content)
+            throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException {
         getPageAPIDelegate().updatePageContent(pageId, content);
     }
 
     @Override
-    public Properties getPageProperties(final byte[] content, final boolean checkIfItAlreadyExists) throws InvalidPageTokenException, AlreadyExistsException,
-            InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
+    public Properties getPageProperties(final byte[] content, final boolean checkIfItAlreadyExists)
+            throws InvalidPageTokenException, AlreadyExistsException,
+            InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException,
+            InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException {
         return getPageAPIDelegate().getPageProperties(content, checkIfItAlreadyExists);
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules)
+            throws NotFoundException, ExecutionException, UnauthorizedAccessException {
         final PageMappingService pageMappingService = retrievePageMappingService();
         try {
-            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
+            return ModelConvertor.toPageURL(
+                    pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
         } catch (final SObjectNotFoundException e) {
             throw new NotFoundException(e);
         } catch (final SBonitaReadException e) {
@@ -162,6 +171,5 @@ public class PageAPIImpl implements PageAPI {
     PageMappingService retrievePageMappingService() {
         return getTenantAccessor().getPageMappingService();
     }
-
 
 }

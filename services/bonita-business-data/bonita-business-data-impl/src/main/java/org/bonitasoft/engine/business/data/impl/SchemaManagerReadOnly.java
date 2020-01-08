@@ -37,13 +37,15 @@ public class SchemaManagerReadOnly implements SchemaManager {
 
     @Override
     public List<Exception> drop(Set<String> managedClasses) {
-        log.warn("No drop of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
+        log.warn(
+                "No drop of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
         return new ArrayList<>();
     }
 
     @Override
     public List<Exception> update(Set<String> managedClasses) {
-        log.warn("No update of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
+        log.warn(
+                "No update of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
         return new ArrayList<>();
     }
 

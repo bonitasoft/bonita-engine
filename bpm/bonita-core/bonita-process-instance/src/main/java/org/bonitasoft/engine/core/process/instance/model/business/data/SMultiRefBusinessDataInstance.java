@@ -26,5 +26,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
+
     private List<Long> dataIds;
 }

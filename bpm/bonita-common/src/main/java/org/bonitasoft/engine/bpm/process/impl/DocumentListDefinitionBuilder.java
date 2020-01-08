@@ -24,7 +24,8 @@ public class DocumentListDefinitionBuilder extends FlowElementContainerBuilder {
 
     private final DocumentListDefinitionImpl documentListDefinitionImpl;
 
-    public DocumentListDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public DocumentListDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name) {
         super(container, processDefinitionBuilder);
         documentListDefinitionImpl = new DocumentListDefinitionImpl(name);
@@ -33,7 +34,7 @@ public class DocumentListDefinitionBuilder extends FlowElementContainerBuilder {
 
     /**
      * Sets description on this document
-     * 
+     *
      * @param description description
      * @return
      *         the builder

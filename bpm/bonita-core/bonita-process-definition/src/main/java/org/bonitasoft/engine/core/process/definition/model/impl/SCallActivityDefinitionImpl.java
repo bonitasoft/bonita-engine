@@ -55,7 +55,8 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         dataOutputOperations = new ArrayList<>(3);
     }
 
-    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition, final Map<String, STransitionDefinition> transitionsMap) {
+    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
         super(activityDefinition, transitionsMap);
         callableElement = ServerModelConvertor.convertExpression(activityDefinition.getCallableElement());
         callableElementVersion = ServerModelConvertor.convertExpression(activityDefinition.getCallableElementVersion());
@@ -75,30 +76,25 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         return callableElementVersion;
     }
 
-
     @Override
     public List<SOperation> getDataInputOperations() {
         return Collections.unmodifiableList(dataInputOperations);
     }
-
 
     @Override
     public List<SOperation> getDataOutputOperations() {
         return Collections.unmodifiableList(dataOutputOperations);
     }
 
-
     @Override
     public SCallableElementType getCallableElementType() {
         return callableElementType;
     }
 
-
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.CALL_ACTIVITY;
     }
-
 
     @Override
     public Map<String, SExpression> getProcessStartContractInputs() {

@@ -16,7 +16,8 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process cannot be enabled. This can happen if the process is already enabled, or if an unexpected error occurs on methods like
+ * Thrown when a process cannot be enabled. This can happen if the process is already enabled, or if an unexpected error
+ * occurs on methods like
  * {@link org.bonitasoft.engine.api.ProcessAPI#enableProcess(long)}.
  *
  * @author Baptiste Mesta
@@ -43,7 +44,8 @@ public class ProcessEnablementException extends ExecutionException {
      * Constructs a new exception with the specified detail cause.
      *
      * @param cause
-     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */
     public ProcessEnablementException(final Throwable cause) {

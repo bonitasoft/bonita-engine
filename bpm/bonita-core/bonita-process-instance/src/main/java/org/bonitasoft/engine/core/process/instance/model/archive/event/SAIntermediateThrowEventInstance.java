@@ -24,6 +24,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAIntermediateThrowEventInstance extends SAThrowEventInstance {
+
     public SAIntermediateThrowEventInstance(final SIntermediateThrowEventInstance sIntermediateThrowEventInstance) {
         super(sIntermediateThrowEventInstance);
     }

@@ -69,17 +69,24 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
-        processDefinitionBuilder.addShortTextData("procData", new ExpressionBuilder().createConstantStringExpression("procDataValue"));
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", "actor");
-        userTaskDefinitionBuilder.addOperation(new LeftOperandBuilder().createNewInstance("procData").done(), OperatorType.ASSIGNMENT, "=", null,
+        processDefinitionBuilder.addShortTextData("procData",
+                new ExpressionBuilder().createConstantStringExpression("procDataValue"));
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1",
+                "actor");
+        userTaskDefinitionBuilder.addOperation(new LeftOperandBuilder().createNewInstance("procData").done(),
+                OperatorType.ASSIGNMENT, "=", null,
                 new ExpressionBuilder().createConstantStringExpression("updated proc value"));
-        userTaskDefinitionBuilder.addOperation(new LeftOperandBuilder().createNewInstance("activityData").done(), OperatorType.ASSIGNMENT, "=", null,
+        userTaskDefinitionBuilder.addOperation(new LeftOperandBuilder().createNewInstance("activityData").done(),
+                OperatorType.ASSIGNMENT, "=", null,
                 new ExpressionBuilder().createConstantStringExpression("updated a value"));
-        processDefinitionBuilder.addShortTextData("activityData", new ExpressionBuilder().createConstantStringExpression("activityDataBalue")).getProcess();
+        processDefinitionBuilder.addShortTextData("activityData",
+                new ExpressionBuilder().createConstantStringExpression("activityDataBalue")).getProcess();
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor",
+                john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -103,9 +110,11 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         waitForUserTaskAndExecuteIt(p2, "step1", john);
         waitForUserTaskAndExecuteIt(p3, "step1", john);
         userTransactionService.executeInTransaction((Callable<Void>) () -> {
-            final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
+            final SADataInstance saActDataInstances = dataInstanceService
+                    .getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
             assertNotNull(saActDataInstances);
-            final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
+            final SADataInstance saProcDataInstances = dataInstanceService
+                    .getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
             assertNotNull(saProcDataInstances);
 
             return null;
@@ -128,8 +137,10 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction((Callable<Void>) () -> {
-            final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
-            final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
+            final SADataInstance saActDataInstances = dataInstanceService
+                    .getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
+            final SADataInstance saProcDataInstances = dataInstanceService
+                    .getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
             assertNull(saActDataInstances);
             assertNull(saProcDataInstances);
 
@@ -145,16 +156,21 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
     public void archivedFlowNodeInstance() throws Exception {
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, "bpm");
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
-                .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
+                .addDisplayDescriptionAfterCompletion(
+                        new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor",
+                john);
 
-        final ProcessDefinitionBuilder callingProcess = new ProcessDefinitionBuilder().createNewInstance("Caller", "1.0");
-        callingProcess.addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("ProcessToDelete"),
+        final ProcessDefinitionBuilder callingProcess = new ProcessDefinitionBuilder().createNewInstance("Caller",
+                "1.0");
+        callingProcess.addCallActivity("call",
+                new ExpressionBuilder().createConstantStringExpression("ProcessToDelete"),
                 new ExpressionBuilder().createConstantStringExpression("1.0"));
 
         final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());

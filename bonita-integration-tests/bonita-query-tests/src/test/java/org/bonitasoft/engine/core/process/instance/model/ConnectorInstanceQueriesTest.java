@@ -59,7 +59,7 @@ public class ConnectorInstanceQueriesTest {
     private SConnectorInstance expectedConnector6;
 
     /**
-     * 
+     *
      */
     @Before
     public void setUp() {
@@ -67,18 +67,23 @@ public class ConnectorInstanceQueriesTest {
         containerId = 1L;
         long differentContainerId = 5L;
         long tenantId = 100L;
-        expectedConnector1 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_FINISH)
+        expectedConnector1 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ConnectorEvent.ON_FINISH)
                 .withFailureInfo(false).setState(ConnectorState.EXECUTING.toString()).build();
-        expectedConnector2 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector2 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ConnectorEvent.ON_ENTER)
                 .setState(ConnectorState.EXECUTING.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector3 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector3 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ConnectorEvent.ON_ENTER)
                 .setState(ConnectorState.DONE.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector4 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector4 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ConnectorEvent.ON_ENTER)
                 .setState(ConnectorState.TO_BE_EXECUTED.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
+        expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+                .setActivationEvent(ConnectorEvent.ON_ENTER)
                 .setState(ConnectorState.FAILED.toString()).withFailureInfo(false)
                 .build();
         expectedConnector6 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
@@ -97,10 +102,12 @@ public class ConnectorInstanceQueriesTest {
         repository.add(expectedConnector4);
         repository.add(expectedConnector5);
         repository.add(expectedConnector6);
-        connectorInstanceOfDifferentContainer = repository.add(aConnectorInstance().setContainerId(differentContainerId).setContainerType(containerType)
-                .setActivationEvent(ConnectorEvent.ON_ENTER)
-                .withFailureInfo(false).build());// unexpected connector on different container
-        SConnectorInstance differentTenantConnector = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+        connectorInstanceOfDifferentContainer = repository
+                .add(aConnectorInstance().setContainerId(differentContainerId).setContainerType(containerType)
+                        .setActivationEvent(ConnectorEvent.ON_ENTER)
+                        .withFailureInfo(false).build());// unexpected connector on different container
+        SConnectorInstance differentTenantConnector = aConnectorInstance().setContainerId(containerId)
+                .setContainerType(containerType)
                 .setActivationEvent(ConnectorEvent.ON_FINISH)
                 .withFailureInfo(false).build();
         differentTenantConnector.setTenantId(tenantId);
@@ -110,9 +117,11 @@ public class ConnectorInstanceQueriesTest {
 
     @Test
     public void getConnectorInstances() {
-        List<SConnectorInstance> connectors = repository.getConnectorInstances(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        List<SConnectorInstance> connectors = repository.getConnectorInstances(containerId, containerType,
+                PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
-        assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector6, expectedConnector3, expectedConnector4,
+        assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector6,
+                expectedConnector3, expectedConnector4,
                 expectedConnector5);
     }
 
@@ -120,9 +129,11 @@ public class ConnectorInstanceQueriesTest {
     public void getConnectorInstancesOrderedById() {
 
         List<SConnectorInstance> connectors = repository
-                .getConnectorInstancesOrderedById(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
+                .getConnectorInstancesOrderedById(containerId, containerType,
+                        PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
-        assertThat(connectors).containsExactly(expectedConnector5, expectedConnector2, expectedConnector6, expectedConnector3, expectedConnector1,
+        assertThat(connectors).containsExactly(expectedConnector5, expectedConnector2, expectedConnector6,
+                expectedConnector3, expectedConnector1,
                 expectedConnector4);
     }
 
@@ -136,7 +147,8 @@ public class ConnectorInstanceQueriesTest {
     @Test
     public void getNextExecutableConnectorInstance() {
         SConnectorInstance connectors = repository
-                .getNextExecutableConnectorInstance(containerId, containerType, ConnectorEvent.ON_ENTER, PersistentObjectBuilder.DEFAULT_TENANT_ID);
+                .getNextExecutableConnectorInstance(containerId, containerType, ConnectorEvent.ON_ENTER,
+                        PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).isSameAs(expectedConnector2);
     }
@@ -146,7 +158,8 @@ public class ConnectorInstanceQueriesTest {
         List<SConnectorInstance> connectors = repository
                 .searchSConnectorInstance(containerId, containerType, PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
-        assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector3, expectedConnector4, expectedConnector5,
+        assertThat(connectors).containsOnly(expectedConnector1, expectedConnector2, expectedConnector3,
+                expectedConnector4, expectedConnector5,
                 expectedConnector6, connectorInstanceOfDifferentContainer);
     }
 
@@ -161,7 +174,8 @@ public class ConnectorInstanceQueriesTest {
     @Test
     public void getConnectorInstancesWithState() {
         List<SConnectorInstance> connectors = repository
-                .getConnectorInstances(containerId, containerType, ConnectorEvent.ON_ENTER, ConnectorState.TO_BE_EXECUTED.toString(),
+                .getConnectorInstances(containerId, containerType, ConnectorEvent.ON_ENTER,
+                        ConnectorState.TO_BE_EXECUTED.toString(),
                         PersistentObjectBuilder.DEFAULT_TENANT_ID);
 
         assertThat(connectors).containsOnly(expectedConnector4);
@@ -171,7 +185,8 @@ public class ConnectorInstanceQueriesTest {
     public void getConnectorInstanceWithFailureInfo() {
         List<SConnectorInstanceWithFailureInfo> connectors = repository
                 .getConnectorInstanceWithFailureInfo(containerId, PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        final List<Long> idsToFind = Lists.newArrayList(expectedConnector1.getId(), expectedConnector2.getId(), expectedConnector3.getId(),
+        final List<Long> idsToFind = Lists.newArrayList(expectedConnector1.getId(), expectedConnector2.getId(),
+                expectedConnector3.getId(),
                 expectedConnector4.getId(), expectedConnector5.getId(), expectedConnector6.getId());
         assertThat(connectors).areExactly(6, new Condition<SConnectorInstanceWithFailureInfo>() {
 

@@ -92,7 +92,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SCatchEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final SCatchMessageEventTriggerDefinition messageTrigger = (SCatchMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
@@ -101,25 +102,33 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SExpressionContext expressionContext;
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
-                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageBoundaryEventInstance(processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName,
-                        eventInstance.getFlowNodeDefinitionId(),
-                        eventInstance.getName());
-                expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
+                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                        .createNewWaitingMessageBoundaryEventInstance(processDefinition.getId(),
+                                eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(),
+                                eventInstance.getId(), messageName, processName,
+                                eventInstance.getFlowNodeDefinitionId(),
+                                eventInstance.getName());
+                expressionContext = new SExpressionContext(eventInstance.getParentContainerId(),
+                        getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
                 break;
             case INTERMEDIATE_CATCH_EVENT:
-                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(
-                        processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName,
-                        eventInstance.getFlowNodeDefinitionId(),
-                        eventInstance.getName());
-                expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
+                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                        .createNewWaitingMessageIntermediateEventInstance(
+                                processDefinition.getId(),
+                                eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(),
+                                eventInstance.getId(), messageName, processName,
+                                eventInstance.getFlowNodeDefinitionId(),
+                                eventInstance.getName());
+                expressionContext = new SExpressionContext(eventInstance.getParentContainerId(),
+                        getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
                 break;
             case START_EVENT:
-                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageStartEventInstance(processDefinition.getId(),
-                        messageTrigger.getMessageName(), processDefinition.getName(), eventDefinition.getId(), eventDefinition.getName());
+                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                        .createNewWaitingMessageStartEventInstance(processDefinition.getId(),
+                                messageTrigger.getMessageName(), processDefinition.getName(), eventDefinition.getId(),
+                                eventDefinition.getName());
                 expressionContext = new SExpressionContext();
                 expressionContext.setProcessDefinitionId(processDefinition.getId());
                 break;
@@ -132,7 +141,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     }
 
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SReceiveTaskInstance receiveTaskInstance,
+    public void handleCatchEvent(final SProcessDefinition processDefinition,
+            final SReceiveTaskInstance receiveTaskInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final SCatchMessageEventTriggerDefinition messageTrigger = (SCatchMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
@@ -140,11 +150,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SWaitingMessageEventBuilder builder;
         SExpressionContext expressionContext;
 
-        builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
-                receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getParentProcessInstanceId(), receiveTaskInstance.getId(), messageName,
-                processName, receiveTaskInstance.getFlowNodeDefinitionId(),
-                receiveTaskInstance.getName());
-        expressionContext = new SExpressionContext(receiveTaskInstance.getParentContainerId(), getParentContainerType(receiveTaskInstance).name(),
+        builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                .createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
+                        receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getParentProcessInstanceId(),
+                        receiveTaskInstance.getId(), messageName,
+                        processName, receiveTaskInstance.getFlowNodeDefinitionId(),
+                        receiveTaskInstance.getName());
+        expressionContext = new SExpressionContext(receiveTaskInstance.getParentContainerId(),
+                getParentContainerType(receiveTaskInstance).name(),
                 processDefinition.getId());
 
         fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
@@ -153,37 +166,44 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
+    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final Long processDefinitionId = processDefinition.getId();
-        final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
+        final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(),
+                getParentContainerType(eventInstance).name(),
                 processDefinitionId);
 
         handleThrowMessage(sEventTriggerDefinition, eventInstance.getName(), processDefinitionId, expressionContext);
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
-                                 final SThrowMessageEventTriggerDefinition messageTrigger) throws SMessageInstanceCreationException,
+            final SThrowMessageEventTriggerDefinition messageTrigger) throws SMessageInstanceCreationException,
             SDataInstanceException, SExpressionException, STransactionNotFoundException {
-        final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+        final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
         handleThrowMessage(messageTrigger, sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
     }
 
-    private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final String eventInstanceName,
-                                    final Long processDefinitionId, final SExpressionContext expressionContext) throws
-            SMessageInstanceCreationException, SDataInstanceException, SExpressionException, STransactionNotFoundException {
+    private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition,
+            final String eventInstanceName,
+            final Long processDefinitionId, final SExpressionContext expressionContext)
+            throws SMessageInstanceCreationException, SDataInstanceException, SExpressionException,
+            STransactionNotFoundException {
         final SThrowMessageEventTriggerDefinition messageTrigger = (SThrowMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
         final SExpression targetProcess = messageTrigger.getTargetProcess();
         final SExpression targetFlowNode = messageTrigger.getTargetFlowNode();
         // evaluate expression
-        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess, expressionContext);
+        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess,
+                expressionContext);
         String stringTargetFlowNode = null;
         if (targetFlowNode != null) {
             stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode, expressionContext);
         }
-        final SMessageInstanceBuilder builder = SMessageInstanceBuilder.create(messageName, stringTargetProcess, stringTargetFlowNode, processDefinitionId, eventInstanceName);
+        final SMessageInstanceBuilder builder = SMessageInstanceBuilder.create(messageName, stringTargetProcess,
+                stringTargetFlowNode, processDefinitionId, eventInstanceName);
         final List<SCorrelationDefinition> correlations = messageTrigger.getCorrelations();
 
         fillCorrelation(builder, correlations, expressionContext);
@@ -194,23 +214,29 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
         // create data
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
-            bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
+            bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(),
+                    DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext);
             final TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(
                         this.getClass(),
                         TechnicalLogSeverity.DEBUG,
-                        "Initialized variables for message instance [name: <" + messageInstance.getMessageName() + ">, id: <" + messageInstance.getId()
-                                + ">, flow node: <" + messageInstance.getFlowNodeName() + ">, target flow node: <" + messageInstance.getTargetFlowNode()
-                                + ">, target process: <" + messageInstance.getTargetProcess() + ">, process definition: <"
+                        "Initialized variables for message instance [name: <" + messageInstance.getMessageName()
+                                + ">, id: <" + messageInstance.getId()
+                                + ">, flow node: <" + messageInstance.getFlowNodeName() + ">, target flow node: <"
+                                + messageInstance.getTargetFlowNode()
+                                + ">, target process: <" + messageInstance.getTargetProcess()
+                                + ">, process definition: <"
                                 + messageInstance.getProcessDefinitionId() + ">]");
             }
         }
     }
 
-    private void fillCorrelation(final SCorrelationContainerBuilder builder, final List<SCorrelationDefinition> correlations,
-            final SExpressionContext expressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+    private void fillCorrelation(final SCorrelationContainerBuilder builder,
+            final List<SCorrelationDefinition> correlations,
+            final SExpressionContext expressionContext)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         final int size = Math.min(5, correlations.size());
         final List<SExpression> toEval = new ArrayList<>(size * 2);
@@ -242,10 +268,13 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID)
+            throws SBonitaException {
         final SMessageInstance messageInstance = getEventInstanceService().getMessageInstance(triggeringElementID);
-        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(waitingEvent.getProcessDefinitionId());
-        final SExpressionContext context = new SExpressionContext(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name(),
+        final SProcessDefinition processDefinition = processDefinitionService
+                .getProcessDefinition(waitingEvent.getProcessDefinitionId());
+        final SExpressionContext context = new SExpressionContext(messageInstance.getId(),
+                DataInstanceContainer.MESSAGE_INSTANCE.name(),
                 processDefinition.getId());
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SFlowNodeDefinition targetFlowNode = processContainer.getFlowNode(waitingEvent.getFlowNodeName());
@@ -271,15 +300,21 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
+    public void handleEventSubProcess(final SProcessDefinition processDefinition,
+            final SEventDefinition eventDefinition,
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final SWaitingMessageEventBuilderFactory builderFact = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class);
+        final SWaitingMessageEventBuilderFactory builderFact = BuilderFactory
+                .get(SWaitingMessageEventBuilderFactory.class);
         final SMessageEventTriggerDefinition messageEventTriggerDefinition = (SMessageEventTriggerDefinition) sEventTriggerDefinition;
-        final SWaitingMessageEventBuilder builder = builderFact.createNewWaitingMessageEventSubProcInstance(processDefinition.getId(),
-                parentProcessInstance.getId(), parentProcessInstance.getRootProcessInstanceId(), messageEventTriggerDefinition.getMessageName(),
+        final SWaitingMessageEventBuilder builder = builderFact.createNewWaitingMessageEventSubProcInstance(
+                processDefinition.getId(),
+                parentProcessInstance.getId(), parentProcessInstance.getRootProcessInstanceId(),
+                messageEventTriggerDefinition.getMessageName(),
                 processDefinition.getName(), eventDefinition.getId(), eventDefinition.getName(), subProcessId);
-        final SExpressionContext expressionContext = new SExpressionContext(parentProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
+        final SExpressionContext expressionContext = new SExpressionContext(parentProcessInstance.getId(),
+                DataInstanceContainer.PROCESS_INSTANCE.name(),
                 processDefinition.getId());
         fillCorrelation(builder, messageEventTriggerDefinition.getCorrelations(), expressionContext);
         getEventInstanceService().createWaitingEvent(builder.done());
@@ -287,7 +322,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition,
+            final SEndEventDefinition sEventDefinition,
             final SThrowEventInstance sThrowEventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do

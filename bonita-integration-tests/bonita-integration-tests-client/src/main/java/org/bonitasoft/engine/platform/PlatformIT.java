@@ -28,7 +28,6 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.TimerEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -155,8 +154,12 @@ public class PlatformIT extends CommonAPIIT {
     public void should_have_processes_with_duration_timer_still_works_after_start() throws Exception {
         APIClient apiClient = new APIClient();
         apiClient.login("install", "install");
-        ProcessDefinition wait1Sec = apiClient.getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("a process with 1 sec intermediate timer", "1.0")
-                .addIntermediateCatchEvent("wait1Sec").addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000)).getProcess());
+        ProcessDefinition wait1Sec = apiClient.getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder()
+                        .createNewInstance("a process with 1 sec intermediate timer", "1.0")
+                        .addIntermediateCatchEvent("wait1Sec").addTimerEventTriggerDefinition(TimerType.DURATION,
+                                new ExpressionBuilder().createConstantLongExpression(1000))
+                        .getProcess());
         for (int i = 0; i < 100; i++) {
             apiClient.getProcessAPI().startProcess(wait1Sec.getId());
         }
@@ -164,6 +167,7 @@ public class PlatformIT extends CommonAPIIT {
         Thread.sleep(800);
         stopNodeAndStartNode();
         apiClient.login("install", "install");
-        await().atMost(Duration.TWO_MINUTES).until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(), (FunctionalMatcher<Long>) it -> it == 0);
+        await().atMost(Duration.TWO_MINUTES).until(() -> apiClient.getProcessAPI().getNumberOfProcessInstances(),
+                (FunctionalMatcher<Long>) it -> it == 0);
     }
 }

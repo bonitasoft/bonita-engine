@@ -28,7 +28,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 
 /**
  * Adapter to execute client connector objects in the server side
- * 
+ *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  */
@@ -48,7 +48,8 @@ public class SConnectorAdapter implements SConnector {
     @Override
     public void setInputParameters(final Map<String, Object> parameters) {
         final APIAccessor apiAccessor = (APIAccessor) parameters.remove("connectorApiAccessor");
-        final EngineExecutionContext executionContext = (EngineExecutionContext) parameters.remove("engineExecutionContext");
+        final EngineExecutionContext executionContext = (EngineExecutionContext) parameters
+                .remove("engineExecutionContext");
         if (connector instanceof AbstractConnector) {
             ((AbstractConnector) connector).setAPIAccessor(apiAccessor);
             if (executionContext != null) {

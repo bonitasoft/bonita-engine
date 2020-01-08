@@ -26,14 +26,16 @@ public class JobNameBuilder {
 
     private static final String PREFIX = "Timer_Ev_";
 
-    public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition, final SCatchEventInstance flowNodeInstance) {
+    public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition,
+            final SCatchEventInstance flowNodeInstance) {
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             return PREFIX + processDefinitionId + eventDefinition.getName();
         }
         return PREFIX + flowNodeInstance.getId();
     }
 
-    public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition, final long parentProcessInstanceId,
+    public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition,
+            final long parentProcessInstanceId,
             final long subProcessId) {
         return PREFIX + processDefinitionId + eventDefinition.getName() + parentProcessInstanceId + subProcessId;
     }

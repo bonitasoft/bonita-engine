@@ -50,7 +50,8 @@ class FolderMgr {
     }
 
     private static void warnIfSomeTempFolderAlreadyExists(File systemTempFolder) {
-        File[] files = systemTempFolder.listFiles((dir, name) -> dir.isDirectory() && name.startsWith(TEMP_FOLDER_NAME_PREFIX));
+        File[] files = systemTempFolder
+                .listFiles((dir, name) -> dir.isDirectory() && name.startsWith(TEMP_FOLDER_NAME_PREFIX));
         List<File> temporaryFolders = Arrays.asList(files != null ? files : new File[0]);
         if (!temporaryFolders.isEmpty()) {
             LOGGER.warn("The following temporary folders were not deleted on the previous shutdown. " +

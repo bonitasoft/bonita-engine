@@ -38,7 +38,8 @@ public class GetCategories implements TransactionContentWithResult<List<SCategor
 
     private List<SCategory> categoryList;
 
-    public GetCategories(final int startIndex, final int maxResults, final String fieldExecutor, final CategoryService categoryService,
+    public GetCategories(final int startIndex, final int maxResults, final String fieldExecutor,
+            final CategoryService categoryService,
             final OrderByType orderExecutor) {
         super();
         this.startIndex = startIndex;

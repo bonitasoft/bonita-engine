@@ -34,7 +34,8 @@ public final class CheckNbAssignedTaskOf extends WaitUntil {
 
     private List<HumanTaskInstance> assignedHumanTaskInstances;
 
-    public CheckNbAssignedTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions, final int nbActivities,
+    public CheckNbAssignedTaskOf(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions, final int nbActivities,
             final User user) {
         super(repeatEach, timeout, throwExceptions);
         this.nbActivities = nbActivities;
@@ -44,7 +45,8 @@ public final class CheckNbAssignedTaskOf extends WaitUntil {
 
     @Override
     protected boolean check() {
-        assignedHumanTaskInstances = processAPI.getAssignedHumanTaskInstances(user.getId(), 0, Math.max(nbActivities, 20), ActivityInstanceCriterion.NAME_ASC);
+        assignedHumanTaskInstances = processAPI.getAssignedHumanTaskInstances(user.getId(), 0,
+                Math.max(nbActivities, 20), ActivityInstanceCriterion.NAME_ASC);
         return assignedHumanTaskInstances.size() == nbActivities;
     }
 

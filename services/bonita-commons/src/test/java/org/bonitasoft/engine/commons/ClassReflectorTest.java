@@ -224,7 +224,8 @@ class ClassReflectorTest {
 
     @Test
     void testGetCompatibleMethod_with_parameters() throws Exception {
-        final Method compatibleMethod = ClassReflector.getCompatibleMethod(pojo.getClass(), "twoParamMethod", String.class, Integer.class);
+        final Method compatibleMethod = ClassReflector.getCompatibleMethod(pojo.getClass(), "twoParamMethod",
+                String.class, Integer.class);
         assertThat(compatibleMethod).isNotNull();
     }
 

@@ -37,8 +37,10 @@ public class BusinessObjectDeserializerTest {
 
     @Test
     public void should_deserialize_an_entity() throws Exception {
-        final OffsetDateTime nextAppointment = OffsetDateTime.of(LocalDateTime.of(2019, 12, 12, 10, 30, 0), ZoneOffset.ofHours(2));
-        Child jules = new Child("jules", 1, new Date(), LocalDate.of(2017, 3, 6), LocalDateTime.of(2018, 1, 2, 23, 59, 59), nextAppointment);
+        final OffsetDateTime nextAppointment = OffsetDateTime.of(LocalDateTime.of(2019, 12, 12, 10, 30, 0),
+                ZoneOffset.ofHours(2));
+        Child jules = new Child("jules", 1, new Date(), LocalDate.of(2017, 3, 6),
+                LocalDateTime.of(2018, 1, 2, 23, 59, 59), nextAppointment);
 
         final String julesAsJson = jules.toJson();
         jules.setNextAppointment(nextAppointment.withOffsetSameInstant(ZoneOffset.UTC));

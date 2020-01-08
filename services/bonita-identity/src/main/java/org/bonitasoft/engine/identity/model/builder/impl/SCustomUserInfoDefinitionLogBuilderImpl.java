@@ -23,13 +23,15 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  */
-public class SCustomUserInfoDefinitionLogBuilderImpl extends CRUDELogBuilder implements SCustomUserInfoDefinitionLogBuilder {
+public class SCustomUserInfoDefinitionLogBuilderImpl extends CRUDELogBuilder
+        implements SCustomUserInfoDefinitionLogBuilder {
 
     private static final String PREFIX = "IDENTITY_CUSTOM_USER_INFO_DEFINITION";
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(SCustomUserInfoDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX, objectId);
+        queriableLogBuilder.numericIndex(
+                SCustomUserInfoDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX, objectId);
         return this;
     }
 
@@ -40,8 +42,10 @@ public class SCustomUserInfoDefinitionLogBuilderImpl extends CRUDELogBuilder imp
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SCustomUserInfoDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Identity SCustomUserInfoDefinition Id");
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(
+                SCustomUserInfoDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX) == 0L) {
+            throw new MissingMandatoryFieldsException(
+                    "Some mandatory fields are missing: " + "Identity SCustomUserInfoDefinition Id");
         }
     }
 

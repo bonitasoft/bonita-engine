@@ -21,9 +21,8 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Adding context information about Connector definition and instance to exception for better logging
- * 
+ *
  * @author Celine Souchet
- * 
  */
 public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailureWrappingWork {
 
@@ -37,11 +36,11 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
 
     /**
      * @param wrappedWork
-     *            The work to wrap
+     *        The work to wrap
      * @param connectorDefinitionName
-     *            The name of the connector definition
+     *        The name of the connector definition
      * @param connectorInstanceId
-     *            The identifier of the connector instance
+     *        The identifier of the connector instance
      */
     public ConnectorDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final String connectorDefinitionName,
             final long connectorInstanceId) {
@@ -50,13 +49,13 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
 
     /**
      * @param wrappedWork
-     *            The work to wrap
+     *        The work to wrap
      * @param connectorDefinitionName
-     *            The name of the connector definition
+     *        The name of the connector definition
      * @param connectorInstanceId
-     *            The identifier of the connector instance
+     *        The identifier of the connector instance
      * @param activationEvent
-     *            The event to activate the connector
+     *        The event to activate the connector
      */
     public ConnectorDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final String connectorDefinitionName,
             long connectorInstanceId, final ConnectorEvent activationEvent) {

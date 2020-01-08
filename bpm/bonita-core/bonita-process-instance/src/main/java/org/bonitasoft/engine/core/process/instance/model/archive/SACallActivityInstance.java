@@ -27,7 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SACallActivityInstance extends SAActivityInstance {
-    
+
     public SACallActivityInstance(final SCallActivityInstance activityInstance) {
         super(activityInstance);
     }

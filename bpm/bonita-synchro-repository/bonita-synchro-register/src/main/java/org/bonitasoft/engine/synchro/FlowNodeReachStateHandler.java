@@ -31,7 +31,8 @@ public class FlowNodeReachStateHandler extends AbstractJMSUpdateHandler {
 
     private final int stateId;
 
-    public FlowNodeReachStateHandler(final long tenantId, final long messageTimeout, String brokerURL, final int stateId) {
+    public FlowNodeReachStateHandler(final long tenantId, final long messageTimeout, String brokerURL,
+            final int stateId) {
         super(tenantId, messageTimeout, brokerURL);
         this.stateId = stateId;
         identifier = UUID.randomUUID().toString();
@@ -40,7 +41,8 @@ public class FlowNodeReachStateHandler extends AbstractJMSUpdateHandler {
     @Override
     protected Map<String, Serializable> getEvent(final SEvent sEvent) {
         final SFlowNodeInstance flowNodeInstance = (SFlowNodeInstance) sEvent.getObject();
-        return PerfEventUtil.getFlowNodeReachStateEvent(flowNodeInstance.getRootContainerId(), flowNodeInstance.getName(), stateId);
+        return PerfEventUtil.getFlowNodeReachStateEvent(flowNodeInstance.getRootContainerId(),
+                flowNodeInstance.getName(), stateId);
     }
 
     @Override

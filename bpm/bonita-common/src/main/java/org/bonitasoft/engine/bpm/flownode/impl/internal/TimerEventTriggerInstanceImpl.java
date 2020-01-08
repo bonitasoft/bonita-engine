@@ -30,7 +30,8 @@ public class TimerEventTriggerInstanceImpl extends EventTriggerInstanceImpl impl
 
     private final String eventInstanceName;
 
-    public TimerEventTriggerInstanceImpl(final long id, final long eventInstanceId, final String eventInstanceName, final Date executionDate) {
+    public TimerEventTriggerInstanceImpl(final long id, final long eventInstanceId, final String eventInstanceName,
+            final Date executionDate) {
         super(id, eventInstanceId);
         this.eventInstanceName = eventInstanceName;
         setExecutionDate(executionDate);
@@ -91,7 +92,8 @@ public class TimerEventTriggerInstanceImpl extends EventTriggerInstanceImpl impl
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("TimerEventTriggerInstanceImpl [id=").append(getId()).append(", executionDate=").append(executionDate).append(", eventInstanceName=")
+        builder.append("TimerEventTriggerInstanceImpl [id=").append(getId()).append(", executionDate=")
+                .append(executionDate).append(", eventInstanceName=")
                 .append(eventInstanceName).append(", eventInstanceId=").append(getEventInstanceId()).append("]");
         return builder.toString();
     }

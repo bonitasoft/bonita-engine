@@ -40,8 +40,10 @@ public class PageURL implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PageURL pageURL = (PageURL) o;
         return Objects.equals(url, pageURL.url) &&
                 Objects.equals(pageId, pageURL.pageId);

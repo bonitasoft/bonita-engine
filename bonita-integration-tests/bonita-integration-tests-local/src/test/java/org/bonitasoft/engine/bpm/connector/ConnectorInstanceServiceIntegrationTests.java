@@ -59,8 +59,10 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         getTransactionService().complete();
     }
 
-    private SConnectorInstance createConnectorInTransaction(final String name, final long containerId, final String containerType, final String connectorId,
-            final String version, final ConnectorEvent activationEvent, final int executionOrder) throws SBonitaException {
+    private SConnectorInstance createConnectorInTransaction(final String name, final long containerId,
+            final String containerType, final String connectorId,
+            final String version, final ConnectorEvent activationEvent, final int executionOrder)
+            throws SBonitaException {
         final SConnectorInstance connectorInstance = SConnectorInstance.builder().name(name)
                 .containerId(containerId)
                 .containerType(containerType)
@@ -75,10 +77,12 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         return connectorInstance;
     }
 
-    private SConnectorInstance getNextInTransaction(final long containerId, final String containerType, final ConnectorEvent activationEvent)
+    private SConnectorInstance getNextInTransaction(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent)
             throws SBonitaException {
         getTransactionService().begin();
-        final SConnectorInstance connectorInstance = connectorInstanceService.getNextExecutableConnectorInstance(containerId, containerType,
+        final SConnectorInstance connectorInstance = connectorInstanceService.getNextExecutableConnectorInstance(
+                containerId, containerType,
                 activationEvent);
         getTransactionService().complete();
         return connectorInstance;
@@ -98,8 +102,10 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         final ConnectorEvent activationEvent = ConnectorEvent.ON_ENTER;
 
         // insert two connector instances
-        final SConnectorInstance connectorA = createConnectorInTransaction("a", containerId, containerType, "myConnector-1", "1.0", activationEvent, 1);
-        final SConnectorInstance connectorB = createConnectorInTransaction("b", containerId, containerType, "myConnector-2", "1.0", activationEvent, 2);
+        final SConnectorInstance connectorA = createConnectorInTransaction("a", containerId, containerType,
+                "myConnector-1", "1.0", activationEvent, 1);
+        final SConnectorInstance connectorB = createConnectorInTransaction("b", containerId, containerType,
+                "myConnector-2", "1.0", activationEvent, 2);
 
         // check that the next connector to be executed is the first inserted
         checkNextExecutableConnector(containerId, containerType, activationEvent, "a");
@@ -120,7 +126,8 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         final ConnectorEvent activationEvent = ConnectorEvent.ON_ENTER;
 
         // insert two connector instances
-        final SConnectorInstance connectorA = createConnectorInTransaction("a", containerId, containerType, "myConnector-1", "1.0", activationEvent, 1);
+        final SConnectorInstance connectorA = createConnectorInTransaction("a", containerId, containerType,
+                "myConnector-1", "1.0", activationEvent, 1);
         createConnectorInTransaction("b", containerId, containerType, "myConnector-2", "1.0", activationEvent, 2);
 
         // check that the next connector to be executed is the first inserted
@@ -131,9 +138,11 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         checkNextExecutableConnector(containerId, containerType, activationEvent, "a");
     }
 
-    private void checkNextExecutableConnector(final long containerId, final String containerType, final ConnectorEvent activationEvent,
+    private void checkNextExecutableConnector(final long containerId, final String containerType,
+            final ConnectorEvent activationEvent,
             final String connectorName) throws SBonitaException {
-        final SConnectorInstance nextConnectorInstance = getNextInTransaction(containerId, containerType, activationEvent);
+        final SConnectorInstance nextConnectorInstance = getNextInTransaction(containerId, containerType,
+                activationEvent);
         assertEquals(connectorName, nextConnectorInstance.getName());
     }
 

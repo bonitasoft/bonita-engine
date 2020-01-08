@@ -36,7 +36,8 @@ public class GetUserMembershipsOfGroup implements TransactionContentWithResult<L
 
     private final int maxResults;
 
-    public GetUserMembershipsOfGroup(final long groupId, final IdentityService identityService, final int startIndex, final int maxResults) {
+    public GetUserMembershipsOfGroup(final long groupId, final IdentityService identityService, final int startIndex,
+            final int maxResults) {
         this.groupId = groupId;
         this.identityService = identityService;
         this.startIndex = startIndex;

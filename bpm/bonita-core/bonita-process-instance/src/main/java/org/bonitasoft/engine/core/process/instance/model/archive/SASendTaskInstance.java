@@ -27,6 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SASendTaskInstance extends SAActivityInstance {
+
     public SASendTaskInstance(final SSendTaskInstance sSendTaskInstance) {
         super(sSendTaskInstance);
     }

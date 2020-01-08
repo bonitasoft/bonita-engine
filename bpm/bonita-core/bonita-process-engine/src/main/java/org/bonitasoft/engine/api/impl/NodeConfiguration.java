@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.PlatformRestartHandler;
-import org.bonitasoft.engine.tenant.restart.TenantRestartHandler;
 
 /**
  * This class allow to provide a configuration for the current node

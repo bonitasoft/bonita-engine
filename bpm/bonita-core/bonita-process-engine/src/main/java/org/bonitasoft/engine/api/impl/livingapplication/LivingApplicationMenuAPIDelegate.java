@@ -46,36 +46,44 @@ public class LivingApplicationMenuAPIDelegate {
     private final ApplicationMenuCreatorValidator creatorValidator;
     private final long loggedUserId;
 
-    public LivingApplicationMenuAPIDelegate(final TenantServiceAccessor accessor, final ApplicationMenuModelConverter converter,
-                                            final ApplicationMenuCreatorValidator creatorValidator, final long loggedUserId) {
+    public LivingApplicationMenuAPIDelegate(final TenantServiceAccessor accessor,
+            final ApplicationMenuModelConverter converter,
+            final ApplicationMenuCreatorValidator creatorValidator, final long loggedUserId) {
         this.creatorValidator = creatorValidator;
         this.loggedUserId = loggedUserId;
         applicationService = accessor.getApplicationService();
         this.converter = converter;
     }
 
-    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
+    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator)
+            throws CreationException {
         try {
             if (!creatorValidator.isValid(applicationMenuCreator)) {
-                throw new CreationException("The ApplicationMenuCreator is invalid. Problems: " + creatorValidator.getProblems());
+                throw new CreationException(
+                        "The ApplicationMenuCreator is invalid. Problems: " + creatorValidator.getProblems());
             }
             final int index = applicationService.getNextAvailableIndex(applicationMenuCreator.getParentId());
-            final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(converter.buildSApplicationMenu(applicationMenuCreator, index));
-            applicationService.updateApplication(sApplicationMenu.getApplicationId(), BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                    .createNewInstance(loggedUserId).done());
+            final SApplicationMenu sApplicationMenu = applicationService
+                    .createApplicationMenu(converter.buildSApplicationMenu(applicationMenuCreator, index));
+            applicationService.updateApplication(sApplicationMenu.getApplicationId(),
+                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
+                            .createNewInstance(loggedUserId).done());
             return converter.toApplicationMenu(sApplicationMenu);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
     }
 
-    public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException,
+    public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater)
+            throws ApplicationMenuNotFoundException,
             UpdateException {
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationMenuUpdateDescriptor(updater);
         try {
-            final SApplicationMenu sApplicationMenu = applicationService.updateApplicationMenu(applicationMenuId, updateDescriptor);
-            applicationService.updateApplication(sApplicationMenu.getApplicationId(), BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                    .createNewInstance(loggedUserId).done());
+            final SApplicationMenu sApplicationMenu = applicationService.updateApplicationMenu(applicationMenuId,
+                    updateDescriptor);
+            applicationService.updateApplication(sApplicationMenu.getApplicationId(),
+                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
+                            .createNewInstance(loggedUserId).done());
             return converter.toApplicationMenu(sApplicationMenu);
         } catch (final SObjectModificationException e) {
             throw new UpdateException(e);
@@ -100,14 +108,16 @@ public class LivingApplicationMenuAPIDelegate {
     public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
         try {
             final SApplicationMenu deletedApplicationMenu = applicationService.deleteApplicationMenu(applicationMenuId);
-            applicationService.updateApplication(deletedApplicationMenu.getApplicationId(), BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
-                    .createNewInstance(loggedUserId).done());
+            applicationService.updateApplication(deletedApplicationMenu.getApplicationId(),
+                    BuilderFactory.get(SApplicationUpdateBuilderFactory.class)
+                            .createNewInstance(loggedUserId).done());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
     }
 
-    public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchApplicationMenus searchApplicationMenus) throws SearchException {
+    public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchApplicationMenus searchApplicationMenus)
+            throws SearchException {
         try {
             searchApplicationMenus.execute();
             return searchApplicationMenus.getResult();

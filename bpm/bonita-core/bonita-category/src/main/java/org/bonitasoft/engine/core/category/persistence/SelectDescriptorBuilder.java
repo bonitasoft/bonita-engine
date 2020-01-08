@@ -45,64 +45,79 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SCategory>("getCategoryByName", parameters, SCategory.class);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfElement(final String elementName, final Class<? extends PersistentObject> clazz) {
+    public static SelectOneDescriptor<Long> getNumberOfElement(final String elementName,
+            final Class<? extends PersistentObject> clazz) {
         final Map<String, Object> parameters = Collections.emptyMap();
         return new SelectOneDescriptor<Long>("getNumberOf" + elementName, parameters, clazz, Long.class);
     }
 
-    public static SelectListDescriptor<SCategory> getCategories(final String field, final OrderByType order, final int fromIndex, final int numberOfProcesses) {
+    public static SelectListDescriptor<SCategory> getCategories(final String field, final OrderByType order,
+            final int fromIndex, final int numberOfProcesses) {
         final Map<String, Object> parameters = Collections.emptyMap();
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfProcesses, SCategory.class, field, order);
         return new SelectListDescriptor<SCategory>("getCategories", parameters, SCategory.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SCategory> getCategoriesOfProcess(final long processId, final int fromIndex, final int numberOfCategories,
+    public static SelectListDescriptor<SCategory> getCategoriesOfProcess(final long processId, final int fromIndex,
+            final int numberOfCategories,
             final OrderByType order) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfCategories, SCategory.class, "name", order);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfCategories, SCategory.class, "name",
+                order);
         return new SelectListDescriptor<SCategory>("getCategoriesOfProcess", parameters, SCategory.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SCategory> getCategoriesUnrelatedToProcess(final long processId, final int fromIndex, final int numberOfCategories,
+    public static SelectListDescriptor<SCategory> getCategoriesUnrelatedToProcess(final long processId,
+            final int fromIndex, final int numberOfCategories,
             final OrderByType order) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfCategories, SCategory.class, "name", order);
-        return new SelectListDescriptor<SCategory>("getCategoriesUnrelatedToProcess", parameters, SCategory.class, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfCategories, SCategory.class, "name",
+                order);
+        return new SelectListDescriptor<SCategory>("getCategoriesUnrelatedToProcess", parameters, SCategory.class,
+                queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfCategoriesOfProcess(final long processId) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
-        return new SelectOneDescriptor<Long>("getNumberOfCategoriesOfProcess", parameters, SProcessCategoryMapping.class);
+        return new SelectOneDescriptor<Long>("getNumberOfCategoriesOfProcess", parameters,
+                SProcessCategoryMapping.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfCategoriesUnrelatedToProcess(final long processId) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
-        return new SelectOneDescriptor<Long>("getNumberOfCategoriesUnrelatedToProcess", parameters, SProcessCategoryMapping.class);
+        return new SelectOneDescriptor<Long>("getNumberOfCategoriesUnrelatedToProcess", parameters,
+                SProcessCategoryMapping.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfCategorizedProcessIds(final List<Long> processIds) {
         final Map<String, Object> parameters = Collections.singletonMap("processIds", (Object) processIds);
-        return new SelectOneDescriptor<Long>("getNumberOfCategorizedProcessIds", parameters, SProcessCategoryMapping.class, Long.class);
+        return new SelectOneDescriptor<Long>("getNumberOfCategorizedProcessIds", parameters,
+                SProcessCategoryMapping.class, Long.class);
     }
 
-    public static SelectOneDescriptor<Long> isCategoryExistsInProcess(final long categoryId, final long processDefinitionId) {
+    public static SelectOneDescriptor<Long> isCategoryExistsInProcess(final long categoryId,
+            final long processDefinitionId) {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("categoryId", categoryId);
         parameters.put("processDefinitionId", processDefinitionId);
         return new SelectOneDescriptor<Long>("isCategoryExistsInProcess", parameters, SProcessCategoryMapping.class);
     }
 
-    public static SelectListDescriptor<SProcessCategoryMapping> getCategoryMappingOfProcessAndCategories(final long processDefinitionId,
+    public static SelectListDescriptor<SProcessCategoryMapping> getCategoryMappingOfProcessAndCategories(
+            final long processDefinitionId,
             final List<Long> categoryIds, final int fromIndex, final int maxResults) {
-        final QueryOptions queryOptions = buildQueryOptionsForCategoryMappingOrderedByCategoryId(fromIndex, maxResults, OrderByType.ASC);
+        final QueryOptions queryOptions = buildQueryOptionsForCategoryMappingOrderedByCategoryId(fromIndex, maxResults,
+                OrderByType.ASC);
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("categoryIds", categoryIds);
         parameters.put("processDefinitionId", processDefinitionId);
-        return new SelectListDescriptor<SProcessCategoryMapping>("getCategoryMappingOfProcessAndCategories", parameters, SProcessCategoryMapping.class,
+        return new SelectListDescriptor<SProcessCategoryMapping>("getCategoryMappingOfProcessAndCategories", parameters,
+                SProcessCategoryMapping.class,
                 queryOptions);
     }
 
-    public static QueryOptions buildQueryOptionsForCategoryMappingOrderedByCategoryId(final int fromIndex, final int maxResults, final OrderByType order) {
+    public static QueryOptions buildQueryOptionsForCategoryMappingOrderedByCategoryId(final int fromIndex,
+            final int maxResults, final OrderByType order) {
         return new QueryOptions(fromIndex, maxResults, SProcessCategoryMapping.class, "categoryId", order);
     }
 

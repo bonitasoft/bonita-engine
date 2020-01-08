@@ -78,11 +78,14 @@ public class PermissionServiceImplTest {
     private File securityFolder;
 
     @Before
-    public void before() throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
+    public void before()
+            throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
         securityFolder = temporaryFolder.newFolder("security");
 
-        doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
-        permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
+        doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService)
+                .getLocalClassLoader(anyString(), anyLong());
+        permissionService = spy(
+                new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
@@ -130,7 +133,8 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_checkAPICallWithScript_throw_exception_if_not_started() throws SExecutionException, ClassNotFoundException {
+    public void should_checkAPICallWithScript_throw_exception_if_not_started()
+            throws SExecutionException, ClassNotFoundException {
         //given service not started
         expectedException.expect(SExecutionException.class);
         expectedException.expectMessage(containsString("not started"));
@@ -144,41 +148,50 @@ public class PermissionServiceImplTest {
         //given
         permissionService.start();
         expectedException.expect(SExecutionException.class);
-        expectedException.expectMessage(containsString("does not implements org.bonitasoft.engine.api.permission.PermissionRule"));
+        expectedException.expectMessage(
+                containsString("does not implements org.bonitasoft.engine.api.permission.PermissionRule"));
 
         //when
         permissionService.checkAPICallWithScript(String.class.getName(), new APICallContext(), false);
     }
 
     @Test
-    public void should_checkAPICallWithScript_run_the_class_in_script_folder() throws SBonitaException, ClassNotFoundException, IOException {
+    public void should_checkAPICallWithScript_run_the_class_in_script_folder()
+            throws SBonitaException, ClassNotFoundException, IOException {
         //given
         final String methodBody = "        return true\n";
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody), Charset.defaultCharset());
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody),
+                Charset.defaultCharset());
 
         permissionService.start();
 
         //when
-        final boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
+        final boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(),
+                false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule -> rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule -> rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING),
+                eq("Executing my custom rule"));
     }
 
     @Test
-    public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder() throws SBonitaException, ClassNotFoundException, IOException {
+    public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder()
+            throws SBonitaException, ClassNotFoundException, IOException {
         //given
         File test = new File(securityFolder, "test");
         test.mkdir();
-        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), getRuleContent("test", "        return true\n"), Charset.defaultCharset());
+        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"),
+                getRuleContent("test", "        return true\n"), Charset.defaultCharset());
 
         permissionService.start();
 
         //when
-        final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(), false);
+        final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(),
+                false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule -> rule.getName().equals("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule -> rule.getName().equals("test.MyCustomRule")),
+                eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
     /*
@@ -194,7 +207,8 @@ public class PermissionServiceImplTest {
      * "\n" +
      * "class MyCustomRule implements PermissionRule {\n" +
      * "    @Override\n" +
-     * "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+     * "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n"
+     * +
      * "        logger.warning(\"Executing my custom rule\")\n" +
      * "        return true\n" +
      * "    }\n" +
@@ -215,13 +229,15 @@ public class PermissionServiceImplTest {
     public void should_checkAPICallWithScript_reload_classes() throws Exception {
         //given
         permissionService.start();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return true\n"), Charset.defaultCharset());
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
+                getRuleContent("        return true\n"), Charset.defaultCharset());
 
         //when
         boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
         assertThat(myCustomRule).isTrue();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return false\n"), Charset.defaultCharset());
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
+                getRuleContent("        return false\n"), Charset.defaultCharset());
 
         myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
@@ -233,7 +249,8 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_that_throw_exception() throws Exception {
         //given
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        throw new RuntimeException()\n"),
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"),
+                getRuleContent("        throw new RuntimeException()\n"),
                 Charset.defaultCharset());
 
         permissionService.start();

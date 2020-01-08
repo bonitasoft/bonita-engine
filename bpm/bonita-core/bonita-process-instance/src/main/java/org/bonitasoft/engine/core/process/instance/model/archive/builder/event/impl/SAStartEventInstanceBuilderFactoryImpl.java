@@ -22,10 +22,12 @@ import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstan
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SAStartEventInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl implements SAStartEventInstanceBuilderFactory {
+public class SAStartEventInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl
+        implements SAStartEventInstanceBuilderFactory {
 
     @Override
-    public SAStartEventInstanceBuilder createNewArchivedStartEventInstance(final SStartEventInstance startEventInstance) {
+    public SAStartEventInstanceBuilder createNewArchivedStartEventInstance(
+            final SStartEventInstance startEventInstance) {
         final SAStartEventInstance entity = new SAStartEventInstance(startEventInstance);
         return new SAStartEventInstanceBuilderImpl(entity);
     }

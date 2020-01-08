@@ -17,15 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.scheduler.impl.JobUtils.createJobDetails;
 import static org.mockito.BDDMockito.given;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.quartz.Job;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.spi.TriggerFiredBundle;

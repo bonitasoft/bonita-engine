@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 /**
  * @author Elias Ricken de Medeiros
  */
-public abstract class SErrorEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl implements SErrorEventTriggerDefinition {
+public abstract class SErrorEventTriggerDefinitionImpl extends SEventTriggerDefinitionImpl
+        implements SErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8002085238119587513L;
 

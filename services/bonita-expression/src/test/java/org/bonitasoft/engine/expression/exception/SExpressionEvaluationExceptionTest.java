@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SExpressionEvaluationExceptionTest {
@@ -35,33 +34,39 @@ public class SExpressionEvaluationExceptionTest {
     private final String expressionName = "plop";
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_cause() {
-        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(cause, expressionName);
+        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(cause,
+                expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_message() {
-        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(message, expressionName);
+        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(
+                message, expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.expression.exception.SExpressionEvaluationException#getExpressionName()}.
      */
     @Test
     public final void return_expression_name_when_use_constructor_with_message_and_cause() {
-        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(message, cause, expressionName);
+        final SExpressionEvaluationException sExpressionEvaluationException = new SExpressionEvaluationException(
+                message, cause, expressionName);
 
         final String result = sExpressionEvaluationException.getExpressionName();
         assertEquals(expressionName, result);

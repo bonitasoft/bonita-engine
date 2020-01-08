@@ -69,9 +69,11 @@ public class ConnectorReseterTest {
     }
 
     @Test(expected = ActivityExecutionException.class)
-    public void resetState_should_throw_ActivityExecutionException_when_connectorInstance_service_throws_exception() throws Exception {
+    public void resetState_should_throw_ActivityExecutionException_when_connectorInstance_service_throws_exception()
+            throws Exception {
         //given
-        doThrow(new SConnectorInstanceModificationException(new Exception())).when(connectorInstanceService).setState(connectorInstance,
+        doThrow(new SConnectorInstanceModificationException(new Exception())).when(connectorInstanceService).setState(
+                connectorInstance,
                 ConnectorStateReset.SKIPPED.name());
 
         //when

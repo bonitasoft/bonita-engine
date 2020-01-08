@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class MenuIndexValidator {
 
-
     public List<String> validate(MenuIndex oldIndex, MenuIndex newIndex) {
         final List<String> problems = new ArrayList<String>(1);
         int lastValidIndex = getLastValidIndex(oldIndex, newIndex);
@@ -35,7 +34,7 @@ public class MenuIndexValidator {
 
     private int getLastValidIndex(MenuIndex oldIndex, MenuIndex newIndex) {
         int lastValidIndex = newIndex.getLastUsedIndex();
-        if(oldIndex.getParentId() != newIndex.getParentId()) {
+        if (oldIndex.getParentId() != newIndex.getParentId()) {
             // a new element will be added in this parent
             lastValidIndex = newIndex.getLastUsedIndex() + 1;
         }

@@ -34,9 +34,12 @@ public class SearchCustomUserInfoValueDescriptor extends SearchEntityDescriptor 
 
     public SearchCustomUserInfoValueDescriptor() {
         searchableKeys = new HashMap<String, FieldDescriptor>(3);
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID));
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.USER_ID, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID));
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.VALUE, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.VALUE));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.DEFINITION_ID,
+                new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.USER_ID,
+                new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.VALUE,
+                new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.VALUE));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(2);

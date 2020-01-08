@@ -13,6 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
+import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
 import org.junit.Test;
@@ -20,14 +30,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
-import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })

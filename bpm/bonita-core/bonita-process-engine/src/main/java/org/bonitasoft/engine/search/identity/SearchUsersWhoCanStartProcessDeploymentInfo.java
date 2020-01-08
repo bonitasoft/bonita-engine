@@ -25,7 +25,6 @@ import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class SearchUsersWhoCanStartProcessDeploymentInfo extends AbstractUserSearchEntity {
 
@@ -33,7 +32,8 @@ public class SearchUsersWhoCanStartProcessDeploymentInfo extends AbstractUserSea
 
     private final long processDefinitionId;
 
-    public SearchUsersWhoCanStartProcessDeploymentInfo(final ProcessDefinitionService processDefinitionService, final SearchUserDescriptor searchDescriptor,
+    public SearchUsersWhoCanStartProcessDeploymentInfo(final ProcessDefinitionService processDefinitionService,
+            final SearchUserDescriptor searchDescriptor,
             final long processDefinitionId, final SearchOptions options) {
         super(searchDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -42,7 +42,8 @@ public class SearchUsersWhoCanStartProcessDeploymentInfo extends AbstractUserSea
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, searchOptions);
+        return processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId,
+                searchOptions);
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SAIntegerDataInstance extends SADataInstance {
+
     private Integer value;
 
     public SAIntegerDataInstance(final SDataInstance sDataInstance) {

@@ -33,9 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @EqualsAndHashCode(callSuper = true)
 public class SABlobDataInstance extends SADataInstance {
 
-
     private byte[] value;
-
 
     public SABlobDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

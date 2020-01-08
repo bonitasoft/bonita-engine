@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -28,8 +28,8 @@ import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 

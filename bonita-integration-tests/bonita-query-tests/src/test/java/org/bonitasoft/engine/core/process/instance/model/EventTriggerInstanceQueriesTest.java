@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
@@ -47,7 +48,8 @@ public class EventTriggerInstanceQueriesTest {
         repository.add(buildSTimerEventTriggerInstance(87L, eventInstanceImpl.getId(), "name", "jobTriggerName"));
 
         // Then
-        final long numberOfEventTriggerInstances = repository.getNumberOfTimerEventTriggerInstances(processInstanceId, null);
+        final long numberOfEventTriggerInstances = repository.getNumberOfTimerEventTriggerInstances(processInstanceId,
+                null);
 
         // When
         assertEquals(1, numberOfEventTriggerInstances);
@@ -67,7 +69,8 @@ public class EventTriggerInstanceQueriesTest {
         repository.add(buildSTimerEventTriggerInstance(98L, eventInstanceImpl2.getId(), "toto", "plop"));
 
         // Then
-        final long numberOfEventTriggerInstances = repository.getNumberOfTimerEventTriggerInstances(processInstanceId, "name");
+        final long numberOfEventTriggerInstances = repository.getNumberOfTimerEventTriggerInstances(processInstanceId,
+                "name");
 
         // When
         assertEquals(1, numberOfEventTriggerInstances);
@@ -84,7 +87,8 @@ public class EventTriggerInstanceQueriesTest {
         repository.add(buildSTimerEventTriggerInstance(87L, eventInstanceImpl.getId(), "name", "jobTriggerName"));
 
         // Then
-        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, null);
+        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository
+                .searchTimerEventTriggerInstances(processInstanceId, null);
 
         // When
         assertEquals(1, sTimerEventTriggerInstances.size());
@@ -104,24 +108,29 @@ public class EventTriggerInstanceQueriesTest {
         repository.add(buildSTimerEventTriggerInstance(98L, eventInstanceImpl2.getId(), "toto", "plop"));
 
         // Then
-        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, "toto");
+        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository
+                .searchTimerEventTriggerInstances(processInstanceId, "toto");
 
         // When
         assertEquals(1, sTimerEventTriggerInstances.size());
         assertEquals(98L, sTimerEventTriggerInstances.get(0).getId());
     }
 
-    private STimerEventTriggerInstance buildSTimerEventTriggerInstance(final long id, final long eventInstanceId, final String eventInstanceName,
-                                                                       final String jobTriggerName) {
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(eventInstanceId, eventInstanceName, 96L,
+    private STimerEventTriggerInstance buildSTimerEventTriggerInstance(final long id, final long eventInstanceId,
+            final String eventInstanceName,
+            final String jobTriggerName) {
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(eventInstanceId,
+                eventInstanceName, 96L,
                 jobTriggerName);
         sTimerEventTriggerInstance.setId(id);
         sTimerEventTriggerInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sTimerEventTriggerInstance;
     }
 
-    private SIntermediateCatchEventInstance buildSIntermediateCatchEventInstanceImpl(final long id, final String name, final long processInstanceId) {
-        final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance(name, 9, 6, 8, 4, 2);
+    private SIntermediateCatchEventInstance buildSIntermediateCatchEventInstanceImpl(final long id, final String name,
+            final long processInstanceId) {
+        final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance(
+                name, 9, 6, 8, 4, 2);
         sIntermediateCatchEventInstance.setLogicalGroup(3, processInstanceId);
         sIntermediateCatchEventInstance.setId(id);
         sIntermediateCatchEventInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);

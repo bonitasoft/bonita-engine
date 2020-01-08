@@ -48,6 +48,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
         PlatformSetupApplication.class
 })
 public class ScriptExecutorIT {
+
     @Rule
     public TestRule clean = new ClearSystemProperties(BONITA_SETUP_FOLDER);
 
@@ -101,8 +102,10 @@ public class ScriptExecutorIT {
     public void should_executeSQLResource_use_filesystem() throws Exception {
         //given
         final File confFolder = temporaryFolder.newFolder();
-        final Path createTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor).resolve("myScript.sql");
-        final Path dropTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor).resolve("cleanup.sql");
+        final Path createTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql")
+                .resolve(dbVendor).resolve("myScript.sql");
+        final Path dropTableScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql")
+                .resolve(dbVendor).resolve("cleanup.sql");
         Files.createDirectories(createTableScript.getParent());
         final String createTable = "CREATE TABLE " +
                 dbVendor +
@@ -130,12 +133,14 @@ public class ScriptExecutorIT {
     public void should_executeSQLResource_fail_when_script_is_missing() throws Exception {
         //given
         final File confFolder = temporaryFolder.newFolder();
-        final Path sqlScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor).resolve("missingScript.sql");
+        final Path sqlScript = confFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor)
+                .resolve("missingScript.sql");
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.getAbsolutePath());
 
         //expect
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("SQL resource file not found in filesystem: " + sqlScript.toFile().getAbsolutePath());
+        expectedException
+                .expectMessage("SQL resource file not found in filesystem: " + sqlScript.toFile().getAbsolutePath());
 
         //when
         scriptExecutor.executeSQLResource("missingScript.sql", FAIL_ON_ERROR);

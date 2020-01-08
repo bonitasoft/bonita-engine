@@ -56,7 +56,6 @@ public class SGatewayInstanceImplTest {
         assertThat(gatewayInstance.isFinished()).isFalse();
     }
 
-
     private SGatewayInstance buildGateWithHitBys(final String hitBys) {
         SGatewayInstance gatewayInstance = new SGatewayInstance();
         gatewayInstance.setHitBys(hitBys);

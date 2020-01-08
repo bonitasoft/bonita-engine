@@ -17,7 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Thrown by a {@link Command} when something unexpected happens during execution.
- * 
+ *
  * @author Matthieu Chaffotte
  */
 public class SCommandExecutionException extends SBonitaException {

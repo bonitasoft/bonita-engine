@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAMulti
 /**
  * @author Baptiste Mesta
  */
-public class SAMultiInstanceActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAMultiInstanceActivityInstanceBuilder {
+public class SAMultiInstanceActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl
+        implements SAMultiInstanceActivityInstanceBuilder {
 
     public SAMultiInstanceActivityInstanceBuilderImpl(final SAMultiInstanceActivityInstance entity) {
         super(entity);

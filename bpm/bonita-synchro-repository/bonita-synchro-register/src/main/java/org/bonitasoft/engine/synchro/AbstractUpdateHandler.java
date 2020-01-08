@@ -54,7 +54,8 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             final Long id = getObjectId(sEvent);
 
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-            final BonitaTransactionSynchronization synchronization = getSynchronization(event, id, tenantServiceAccessor);
+            final BonitaTransactionSynchronization synchronization = getSynchronization(event, id,
+                    tenantServiceAccessor);
 
             final UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
             userTransactionService.registerBonitaSynchronization(synchronization);

@@ -19,15 +19,6 @@ import static io.micrometer.core.instrument.config.MeterFilter.denyUnless;
 
 import java.util.List;
 
-import org.bonitasoft.engine.configuration.ConditionalOnProperty;
-import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
-import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
-import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
-import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.binder.jpa.HibernateMetrics;
@@ -36,6 +27,14 @@ import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
+import org.bonitasoft.engine.configuration.ConditionalOnProperty;
+import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration related to Monitoring

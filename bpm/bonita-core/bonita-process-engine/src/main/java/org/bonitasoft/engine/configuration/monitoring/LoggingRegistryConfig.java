@@ -16,6 +16,7 @@ package org.bonitasoft.engine.configuration.monitoring;
 import io.micrometer.core.instrument.step.StepRegistryConfig;
 
 public interface LoggingRegistryConfig extends StepRegistryConfig {
+
     LoggingRegistryConfig DEFAULT = k -> null;
 
     @Override

@@ -34,8 +34,10 @@ public class SearchArchivedTasksManagedBy extends AbstractArchivedHumanTaskInsta
 
     private final long managerUserId;
 
-    public SearchArchivedTasksManagedBy(final long managerUserId, final SearchOptions options, final ActivityInstanceService activityInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final SearchArchivedHumanTaskInstanceDescriptor searchArchivedHumanTaskInstanceDescriptor) {
+    public SearchArchivedTasksManagedBy(final long managerUserId, final SearchOptions options,
+            final ActivityInstanceService activityInstanceService,
+            final FlowNodeStateManager flowNodeStateManager,
+            final SearchArchivedHumanTaskInstanceDescriptor searchArchivedHumanTaskInstanceDescriptor) {
         super(searchArchivedHumanTaskInstanceDescriptor, options, flowNodeStateManager);
         this.managerUserId = managerUserId;
         this.activityInstanceService = activityInstanceService;

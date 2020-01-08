@@ -44,7 +44,8 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
     }
 
     @Override
-    public SARefBusinessDataInstanceBuilder createNewInstance(SProcessSimpleRefBusinessDataInstance businessDataInstance) {
+    public SARefBusinessDataInstanceBuilder createNewInstance(
+            SProcessSimpleRefBusinessDataInstance businessDataInstance) {
         final SAProcessSimpleRefBusinessDataInstance entity = new SAProcessSimpleRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setProcessInstanceId(businessDataInstance.getProcessInstanceId());
@@ -53,7 +54,8 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
     }
 
     @Override
-    public SARefBusinessDataInstanceBuilder createNewInstance(SProcessMultiRefBusinessDataInstance businessDataInstance) {
+    public SARefBusinessDataInstanceBuilder createNewInstance(
+            SProcessMultiRefBusinessDataInstance businessDataInstance) {
         final SAProcessMultiRefBusinessDataInstance entity = new SAProcessMultiRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setProcessInstanceId(businessDataInstance.getProcessInstanceId());
@@ -66,7 +68,8 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
     }
 
     @Override
-    public SARefBusinessDataInstanceBuilder createNewInstanceForFlowNode(SFlowNodeSimpleRefBusinessDataInstance businessDataInstance) {
+    public SARefBusinessDataInstanceBuilder createNewInstanceForFlowNode(
+            SFlowNodeSimpleRefBusinessDataInstance businessDataInstance) {
         final SAFlowNodeSimpleRefBusinessDataInstance entity = new SAFlowNodeSimpleRefBusinessDataInstance();
         setCommonAttributes(businessDataInstance, entity);
         entity.setFlowNodeInstanceId(businessDataInstance.getFlowNodeInstanceId());
@@ -74,7 +77,8 @@ public class SARefBusinessDataInstanceBuilderFactoryImpl implements SARefBusines
         return new SARefBusinessDataInstanceBuilderImpl(entity);
     }
 
-    protected void setCommonAttributes(SRefBusinessDataInstance businessDataInstance, SARefBusinessDataInstance entity) {
+    protected void setCommonAttributes(SRefBusinessDataInstance businessDataInstance,
+            SARefBusinessDataInstance entity) {
         entity.setName(businessDataInstance.getName());
         entity.setDataClassName(businessDataInstance.getDataClassName());
     }

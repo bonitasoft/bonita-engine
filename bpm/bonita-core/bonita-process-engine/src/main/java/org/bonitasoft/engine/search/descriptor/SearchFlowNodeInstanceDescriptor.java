@@ -41,14 +41,18 @@ public class SearchFlowNodeInstanceDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getNameKey()));
         flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.STATE_NAME,
                 new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getStateNameKey()));
-        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SFlowNodeInstance.class,
-                keyProvider.getProcessDefinitionKey()));
-        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SFlowNodeInstance.class,
-                keyProvider.getParentProcessInstanceKey()));
-        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SFlowNodeInstance.class,
-                keyProvider.getParentActivityInstanceKey()));
-        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SFlowNodeInstance.class,
-                keyProvider.getRootProcessInstanceKey()));
+        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SFlowNodeInstance.class,
+                        keyProvider.getProcessDefinitionKey()));
+        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SFlowNodeInstance.class,
+                        keyProvider.getParentProcessInstanceKey()));
+        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
+                new FieldDescriptor(SFlowNodeInstance.class,
+                        keyProvider.getParentActivityInstanceKey()));
+        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SFlowNodeInstance.class,
+                        keyProvider.getRootProcessInstanceKey()));
         flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.DISPLAY_NAME,
                 new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getDisplayNameKey()));
         flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.STATE_CATEGORY,

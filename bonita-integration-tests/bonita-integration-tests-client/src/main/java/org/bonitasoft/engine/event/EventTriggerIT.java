@@ -40,7 +40,8 @@ public class EventTriggerIT extends AbstractEventIT {
     @Test
     public void searchTimerEventTriggerInstances() throws Exception {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
-        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false, "Toto");
+        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false,
+                "Toto");
         final ProcessDefinition process3 = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessDefinition process4 = deployAndEnableProcessWithBoundarySignalEvent("signal");
 
@@ -54,17 +55,21 @@ public class EventTriggerIT extends AbstractEventIT {
 
         // Return only timer event trigger
         SearchOptions options = new SearchOptionsBuilder(0, 10).done();
-        SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance3.getId(),
+        SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances = getProcessAPI()
+                .searchTimerEventTriggerInstances(processInstance3.getId(),
+                        options);
+        assertEquals(0, searchTimerEventTriggerInstances.getCount());
+        assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
+
+        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance4.getId(),
                 options);
         assertEquals(0, searchTimerEventTriggerInstances.getCount());
         assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
 
-        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance4.getId(), options);
-        assertEquals(0, searchTimerEventTriggerInstances.getCount());
-        assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
-
-        options = new SearchOptionsBuilder(0, 10).filter(TimerEventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_NAME, "timer").done();
-        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options);
+        options = new SearchOptionsBuilder(0, 10)
+                .filter(TimerEventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_NAME, "timer").done();
+        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(),
+                options);
         assertEquals(1, searchTimerEventTriggerInstances.getCount());
         final List<TimerEventTriggerInstance> result = searchTimerEventTriggerInstances.getResult();
         assertEquals(1, result.size());
@@ -76,22 +81,27 @@ public class EventTriggerIT extends AbstractEventIT {
     @Test
     public void updateTimerEventTriggerInstance() throws Exception {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto2", "moi");
-        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false, "Toto2");
+        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false,
+                "Toto2");
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(process2.getId());
         try {
             waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
 
             final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
-            final List<TimerEventTriggerInstance> result = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
+            final List<TimerEventTriggerInstance> result = getProcessAPI()
+                    .searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
             assertEquals(1, result.size());
 
             final Date date = new Date();
-            final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
+            final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(),
+                    date);
             assertTrue(newDate.equals(date) || newDate.after(date));
 
             waitForUserTask(processInstance2, EXCEPTION_STEP);
 
-            Assertions.assertThat(getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult()).isEmpty();
+            Assertions.assertThat(
+                    getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult())
+                    .isEmpty();
         } finally {
             disableAndDeleteProcess(process2, process1);
         }

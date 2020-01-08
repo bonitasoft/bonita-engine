@@ -37,13 +37,15 @@ public interface OperationExecutorStrategy {
      *         the new value to set the left operand with
      * @throws SOperationExecutionException
      */
-    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue, SExpressionContext expressionContext, final boolean shouldPersistValue)
+    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue,
+            SExpressionContext expressionContext, final boolean shouldPersistValue)
             throws SOperationExecutionException;
 
     String getOperationType();
 
     /**
      * Determines if the operation right value should be persisted when the value is evaluated to null.
+     *
      * @return true if the the evaluated right value should be persisted; false otherwise.
      */
     boolean shouldPersistOnNullValue();

@@ -46,17 +46,20 @@ public class ContractConstraintsValidator {
         this.expressionService = expressionService;
     }
 
-    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
+    public void validate(long processDefinitionId, final SContractDefinition contract,
+            final Map<String, Serializable> variables)
             throws SContractViolationException {
-        final Map<String, Serializable> vars = (variables == null ? Collections.<String, Serializable> emptyMap() : variables);
+        final Map<String, Serializable> vars = (variables == null ? Collections.<String, Serializable> emptyMap()
+                : variables);
         final List<String> comments = new ArrayList<>();
         final Map<String, Object> context = new HashMap<>(vars.size());
         context.putAll(vars);
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, processDefinitionId);
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             if (logger.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)) {
-                logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) "
-                        + constraint.getInputNames());
+                logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
+                        "Evaluating constraint [" + constraint.getName() + "] on input(s) "
+                                + constraint.getInputNames());
             }
             validateConstraint(comments, constraint, context);
         }
@@ -65,27 +68,35 @@ public class ContractConstraintsValidator {
         }
     }
 
-    private void validateConstraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Object> variables)
+    private void validateConstraint(final List<String> comments, final SConstraintDefinition constraint,
+            final Map<String, Object> variables)
             throws SContractViolationException {
         Boolean valid;
         try {
-            valid = (Boolean) expressionService.evaluate(createGroovyExpression(constraint), variables, Collections.<Integer, Object> emptyMap(),
+            valid = (Boolean) expressionService.evaluate(createGroovyExpression(constraint), variables,
+                    Collections.<Integer, Object> emptyMap(),
                     ContainerState.ACTIVE);
-        } catch (SExpressionTypeUnknownException | SExpressionEvaluationException | SExpressionDependencyMissingException | SInvalidExpressionException e) {
+        } catch (SExpressionTypeUnknownException | SExpressionEvaluationException
+                | SExpressionDependencyMissingException | SInvalidExpressionException e) {
             logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.ERROR,
-                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " evaluation failed.", e);
+                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames()
+                            + " evaluation failed.",
+                    e);
             throw new SContractViolationException("Exception while validating constraints", e);
         }
         if (!valid) {
             logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
-                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " is not valid");
+                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames()
+                            + " is not valid");
             comments.add(constraint.getExplanation());
         }
     }
 
     private SExpression createGroovyExpression(SConstraintDefinition constraint) throws SInvalidExpressionException {
-        return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(constraint.getName()).setContent(constraint.getExpression())
-                .setExpressionType(ExpressionExecutorStrategy.TYPE_READ_ONLY_CONDITION_SCRIPT).setInterpreter(ExpressionExecutorStrategy.INTERPRETER_GROOVY)
+        return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(constraint.getName())
+                .setContent(constraint.getExpression())
+                .setExpressionType(ExpressionExecutorStrategy.TYPE_READ_ONLY_CONDITION_SCRIPT)
+                .setInterpreter(ExpressionExecutorStrategy.INTERPRETER_GROOVY)
                 .setReturnType(Boolean.class.getName()).done();
     }
 

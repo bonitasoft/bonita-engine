@@ -34,7 +34,8 @@ public class WaitForFinalArchivedActivity extends WaitUntil {
     private final ProcessAPI processAPI;
 
     @Deprecated
-    public WaitForFinalArchivedActivity(final int repeatEach, final int timeout, final String activityName, final long processInstanceId,
+    public WaitForFinalArchivedActivity(final int repeatEach, final int timeout, final String activityName,
+            final long processInstanceId,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.activityName = activityName;
@@ -44,13 +45,15 @@ public class WaitForFinalArchivedActivity extends WaitUntil {
 
     @Override
     protected boolean check() {
-        final List<ArchivedActivityInstance> activityInstances = processAPI.getArchivedActivityInstances(processInstanceId, 0, 100,
+        final List<ArchivedActivityInstance> activityInstances = processAPI.getArchivedActivityInstances(
+                processInstanceId, 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         final Iterator<ArchivedActivityInstance> iterator = activityInstances.iterator();
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final ArchivedActivityInstance activityInstance = iterator.next();
-            if (activityInstance.getName().equals(activityName) && activityInstance.getState().equals(TestStates.NORMAL_FINAL.getStateName())) {
+            if (activityInstance.getName().equals(activityName)
+                    && activityInstance.getState().equals(TestStates.NORMAL_FINAL.getStateName())) {
                 result = activityInstance;
                 found = true;
             }

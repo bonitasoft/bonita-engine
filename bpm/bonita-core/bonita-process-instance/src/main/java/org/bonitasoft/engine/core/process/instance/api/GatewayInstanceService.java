@@ -42,18 +42,18 @@ public interface GatewayInstanceService {
 
     /**
      * Create gatewayInstance in DB according to the given gateway instance object
-     * 
+     *
      * @param gatewayInstance
-     *            the gatewayInsttance object
+     *        the gatewayInsttance object
      * @throws SGatewayCreationException
      */
     void createGatewayInstance(SGatewayInstance gatewayInstance) throws SGatewayCreationException;
 
     /**
      * Get gateway instance by its id
-     * 
+     *
      * @param gatewayInstanceId
-     *            identifier of gateway instance
+     *        identifier of gateway instance
      * @return an SGatewayInstance object
      * @throws SGatewayNotFoundException
      * @throws SGatewayReadException
@@ -62,11 +62,11 @@ public interface GatewayInstanceService {
 
     /**
      * Change state of the specific gateway
-     * 
+     *
      * @param gatewayInstance
-     *            the gateway instance will be updated
+     *        the gateway instance will be updated
      * @param stateId
-     *            identifier of gateway state
+     *        identifier of gateway state
      * @throws SGatewayModificationException
      */
     void setState(SGatewayInstance gatewayInstance, int stateId) throws SGatewayModificationException;
@@ -77,35 +77,39 @@ public interface GatewayInstanceService {
      * @return
      * @throws SBonitaException
      */
-    boolean checkMergingCondition(SProcessDefinition sDefinition, SGatewayInstance gatewayInstance) throws SBonitaException;
+    boolean checkMergingCondition(SProcessDefinition sDefinition, SGatewayInstance gatewayInstance)
+            throws SBonitaException;
 
     /**
      * Add transitionDefinitionName to hitBy of specific gatewayInstance
-     * 
+     *
      * @param gatewayInstance
-     *            the gateway instance will be updated
+     *        the gateway instance will be updated
      * @param transitionIndex
-     *            value will be added to hitBy of gatewayInstance
+     *        value will be added to hitBy of gatewayInstance
      * @throws SGatewayModificationException
      * @throws SGatewayCreationException
      */
-    void hitTransition(SGatewayInstance gatewayInstance, long transitionIndex) throws SGatewayModificationException, SGatewayCreationException;
+    void hitTransition(SGatewayInstance gatewayInstance, long transitionIndex)
+            throws SGatewayModificationException, SGatewayCreationException;
 
     /**
      * Get active gatewayInstance in the specific process instance
-     * 
+     *
      * @param parentProcessInstanceId
-     *            identifier of parent process instance
+     *        identifier of parent process instance
      * @param name
-     *            name of gateway instance
+     *        name of gateway instance
      * @return
      * @throws SGatewayNotFoundException
      * @throws SGatewayReadException
      */
-    SGatewayInstance getActiveGatewayInstanceOfTheProcess(long parentProcessInstanceId, String name) throws SGatewayNotFoundException, SGatewayReadException;
+    SGatewayInstance getActiveGatewayInstanceOfTheProcess(long parentProcessInstanceId, String name)
+            throws SGatewayNotFoundException, SGatewayReadException;
 
-    List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, SGatewayInstance gatewayInstance) throws SBonitaException;
+    List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition,
+            SGatewayInstance gatewayInstance) throws SBonitaException;
 
-
-    List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition, long processInstanceId) throws SBonitaReadException;
+    List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition,
+            long processInstanceId) throws SBonitaReadException;
 }

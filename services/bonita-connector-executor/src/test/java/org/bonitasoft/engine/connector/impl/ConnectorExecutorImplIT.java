@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.session.SessionService;
@@ -32,8 +33,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectorExecutorImplIT {

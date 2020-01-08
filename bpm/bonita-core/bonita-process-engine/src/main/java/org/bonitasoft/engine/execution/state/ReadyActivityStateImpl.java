@@ -35,26 +35,31 @@ public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
     }
 
     @Override
-    protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         if (((SHumanTaskInstance) flowNodeInstance).getAssigneeId() <= 0) {
             throw new SActivityStateExecutionException("The activity is not yet assigned, unable to execute it");
         }
     }
 
     @Override
-    protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected void onEnterToOnFinish(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         stateBehaviors.executeOperations(processDefinition, (SActivityInstance) flowNodeInstance);
     }
 
     @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
         stateBehaviors.mapDataOutputOfMultiInstance(processDefinition, flowNodeInstance);
         stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);
     }
 
     @Override
-    public int getId() { return ID_ACTIVITY_READY; }
+    public int getId() {
+        return ID_ACTIVITY_READY;
+    }
 
     @Override
     public boolean isInterrupting() {
@@ -77,12 +82,14 @@ public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return false;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

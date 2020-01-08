@@ -26,6 +26,7 @@ import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBui
 import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -45,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Celine Souchet
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class FlowNodeInstanceTest {
 
@@ -74,11 +75,13 @@ public class FlowNodeInstanceTest {
         // Create process
         final String processNameSupervisedByJohn = "Process definition";
         buildAndCreateProcessDefinition(6L, PROCESS_DEFINITION_ID, processNameSupervisedByJohn);
-        repository.add(aProcessInstance().withProcessDefinitionId(PROCESS_DEFINITION_ID).withName(processNameSupervisedByJohn)
-                .withId(ROOT_PROCESS_INSTANCE_ID).build());
+        repository.add(
+                aProcessInstance().withProcessDefinitionId(PROCESS_DEFINITION_ID).withName(processNameSupervisedByJohn)
+                        .withId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 
-    protected void buildAndCreateProcessDefinition(final long id, final long processDefinitionId, final String processName) {
+    protected void buildAndCreateProcessDefinition(final long id, final long processDefinitionId,
+            final String processName) {
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfo();
         sProcessDefinitionDeployInfo.setId(id);
         sProcessDefinitionDeployInfo.setName(processName);
@@ -91,26 +94,34 @@ public class FlowNodeInstanceTest {
     @Test
     public void getFlowNodeInstanceIdsToRestart_should_return_ids_of_flow_nodes_that_need_to_be_restarted() {
         // given
-        repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .build());
-        final SFlowNodeInstance executing = repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
-                .build());
-        final SFlowNodeInstance notStable = repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
-                .build());
-        final SFlowNodeInstance terminal = repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
-                .build());
-        repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
-                .build());
+        repository
+                .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .build());
+        final SFlowNodeInstance executing = repository
+                .add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
+                        .build());
+        final SFlowNodeInstance notStable = repository.add(
+                aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
+                        .build());
+        final SFlowNodeInstance terminal = repository
+                .add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
+                        .build());
+        repository
+                .add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .build());
 
         SFlowNodeInstance abortingBoundary = repository
-                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
+                        .withStateExecuting(false).withStable(true)
                         .withTerminal(false).withStateName("WAITING")
                         .withStateCategory(SStateCategory.ABORTING).build());
         SFlowNodeInstance cancellingBoundary = repository
-                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
+                        .withStateExecuting(false).withStable(true)
                         .withTerminal(false).withStateName("WAITING")
                         .withStateCategory(SStateCategory.CANCELLING).build());
-        repository.add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+        repository.add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10)
+                .withStateExecuting(false).withStable(true)
                 .withTerminal(false).withStateName("WAITING")
                 .withStateCategory(SStateCategory.NORMAL).build());
 
@@ -119,7 +130,8 @@ public class FlowNodeInstanceTest {
         final List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRestart(options);
 
         // then
-        assertThat(nodeToRestart).containsOnly(executing.getId(), notStable.getId(), terminal.getId(), abortingBoundary.getId(), cancellingBoundary.getId());
+        assertThat(nodeToRestart).containsOnly(executing.getId(), notStable.getId(), terminal.getId(),
+                abortingBoundary.getId(), cancellingBoundary.getId());
     }
 
     // For
@@ -129,8 +141,9 @@ public class FlowNodeInstanceTest {
         buildAndAddAssignedTasks();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(1);
     }
@@ -141,8 +154,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(1);
@@ -154,8 +168,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(1);
@@ -167,8 +182,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(1);
@@ -180,8 +196,9 @@ public class FlowNodeInstanceTest {
         buildAndAddAssignedTasks();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(1);
@@ -194,8 +211,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(1);
@@ -208,8 +226,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(1);
@@ -222,8 +241,9 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
+                        JOHN_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(1);
@@ -237,7 +257,8 @@ public class FlowNodeInstanceTest {
         buildAndAddAssignedTasks();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(2);
@@ -273,10 +294,13 @@ public class FlowNodeInstanceTest {
 
     }
 
-    private SFlowNodeInstance buildAndAddUserTaskWithParentAndRootProcessInstanceId(final String taskName, final long containingProcessInstanceId,
-                                                                                    final long rootProcessInstanceId, int stateId, String stateName) {
-        return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
-                .withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId).withStateId(stateId).withStateName(stateName).build());
+    private SFlowNodeInstance buildAndAddUserTaskWithParentAndRootProcessInstanceId(final String taskName,
+            final long containingProcessInstanceId,
+            final long rootProcessInstanceId, int stateId, String stateName) {
+        return repository
+                .add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId)
+                        .withStateId(stateId).withStateName(stateName).build());
     }
 
     @Test
@@ -305,9 +329,11 @@ public class FlowNodeInstanceTest {
 
     }
 
-    private SAFlowNodeInstance buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId(String taskName, long containingProcessInstanceId,
-                                                                                             long rootProcessInstanceId, int stateId, String stateName, boolean terminal) {
-        return repository.add(anArchivedUserTask().withName(taskName).withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId)
+    private SAFlowNodeInstance buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId(String taskName,
+            long containingProcessInstanceId,
+            long rootProcessInstanceId, int stateId, String stateName, boolean terminal) {
+        return repository.add(anArchivedUserTask().withName(taskName).withLogicalGroup4(containingProcessInstanceId)
+                .withLogicalGroup2(rootProcessInstanceId)
                 .withStateId(stateId).withStateName(stateName).withTerminal(terminal).build());
     }
 
@@ -317,7 +343,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(2);
@@ -329,7 +356,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(2);
@@ -341,7 +369,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final long numberOfHumanTaskInstances = repository
+                .getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(2);
@@ -353,7 +382,8 @@ public class FlowNodeInstanceTest {
         buildAndAddAssignedTasks();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(2);
@@ -366,7 +396,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(2);
@@ -379,7 +410,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(2);
@@ -392,7 +424,8 @@ public class FlowNodeInstanceTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
+        final List<SHumanTaskInstance> sHumanTaskInstances = repository
+                .searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
 
         // Then
         assertThat(sHumanTaskInstances).hasSize(2);
@@ -402,7 +435,8 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_return_gateway_if_not_finished() {
         // Given
-        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false)
+        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1")
+                .withTerminal(false)
                 .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 
@@ -417,7 +451,8 @@ public class FlowNodeInstanceTest {
     public void getActiveGatewayInstance_should_not_return_gateway_if_finished() {
         // Given
         repository
-                .add(aGatewayInstanceBuilder().withHitBys("FINISH:1").withTerminal(true).withName("gate1").withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build());
+                .add(aGatewayInstanceBuilder().withHitBys("FINISH:1").withTerminal(true).withName("gate1")
+                        .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build());
 
         // When
         final SGatewayInstance gate1 = repository.getActiveGatewayInstanceOfProcess(ROOT_PROCESS_INSTANCE_ID, "gate1");
@@ -429,7 +464,8 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_not_return_gateway_if_wrong_name() {
         // Given
-        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false)
+        final SGatewayInstance gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2")
+                .withName("notTheGoodGateway").withTerminal(false)
                 .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 
@@ -442,27 +478,34 @@ public class FlowNodeInstanceTest {
 
     private void buildAndAddAssignedTasks() {
         // Tasks OK assigned to John
-        repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
+        repository
+                .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID)
+                        .withId(NORMAL_HUMAN_INSTANCE_ID).build());
 
         // Tasks KO assigned to john & OK not assigned
-        repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
-        repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
-        repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
+        repository
+                .add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
+        repository.add(
+                aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
+        repository
+                .add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
         buildAndAddNormalTask("normalTask4", ROOT_PROCESS_INSTANCE_ID);
 
         // Tasks OK assigned to Bob
-        repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(BOB_ID).build());
+        repository
+                .add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(BOB_ID).build());
     }
 
     private void buildAndAddTasksWithPendingMappingForUser() {
         // Tasks OK not assigned & pending for John
-        final SFlowNodeInstance normalTask1 = repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
+        final SFlowNodeInstance normalTask1 = repository
+                .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
         repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(normalTask1.getId()).build());
 
         // Tasks KO not assigned & pending for john, and OK not assigned & not pending
@@ -504,27 +547,34 @@ public class FlowNodeInstanceTest {
 
     private void buildAndAddTasksWithPendingMappingForActor(final SActor actorForJohn, final SActor actorForBob) {
         // Tasks OK not assigned & pending for John
-        final SFlowNodeInstance normalTask1 = repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
-        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(normalTask1.getId()).build());
+        final SFlowNodeInstance normalTask1 = repository
+                .add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
+        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(normalTask1.getId())
+                .build());
 
         // Tasks KO not assigned & pending for john, and OK not assigned & not pending
         final SFlowNodeInstance executingTask = buildAndAddExecutingTask();
-        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(executingTask.getId()).build());
+        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(executingTask.getId())
+                .build());
         final SFlowNodeInstance notStableTask = buildAndAddNotStableTask();
-        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(notStableTask.getId()).build());
+        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(notStableTask.getId())
+                .build());
         final SFlowNodeInstance terminalTask = buildAndAddTerminalTask();
-        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(terminalTask.getId()).build());
+        repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(terminalTask.getId())
+                .build());
         buildAndAddNormalTask("normalTask4", ROOT_PROCESS_INSTANCE_ID);
 
         // Tasks OK not assigned & pending for Bob
         final SFlowNodeInstance normalTask4 = buildAndAddNormalTask("normalTask2", ROOT_PROCESS_INSTANCE_ID);
-        repository.add(aPendingActivityMapping().withActorId(actorForBob.getId()).withActivityId(normalTask4.getId()).build());
+        repository.add(
+                aPendingActivityMapping().withActorId(actorForBob.getId()).withActivityId(normalTask4.getId()).build());
     }
 
     private SFlowNodeInstance buildAndAddNormalTask(final String taskName, final long rootProcessInstanceId) {
-        return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
-                .withRootProcessInstanceId(rootProcessInstanceId).build());
+        return repository
+                .add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
+                        .withRootProcessInstanceId(rootProcessInstanceId).build());
     }
 
     private SFlowNodeInstance buildAndAddExecutingTask() {

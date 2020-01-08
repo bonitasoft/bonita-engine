@@ -90,7 +90,8 @@ public class FormMappingServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor, pageMappingService, pageService,
+        formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor,
+                pageMappingService, pageService,
                 formMappingKeyGenerator, EXTERNAL, LEGACY, queriableLoggerService, authorizationRuleMapping);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
         doReturn(new SPage("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
@@ -125,39 +126,50 @@ public class FormMappingServiceImplTest {
 
     @Test
     public void createForTaskShouldAddCorrectAuthorizations() throws Exception {
-        doReturn("clef").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "task", FormMappingType.TASK.getId());
+        doReturn("clef").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "task",
+                FormMappingType.TASK.getId());
 
-        formMappingService.create(PROCESS_DEFINITION_ID, "task", FormMappingType.TASK.getId(), SFormMapping.TARGET_INTERNAL, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, "task", FormMappingType.TASK.getId(),
+                SFormMapping.TARGET_INTERNAL, null);
 
-        verify(pageMappingService).create("clef", null, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_TASK_AVAILABLE_FOR_USER));
+        verify(pageMappingService).create("clef", null,
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_TASK_AVAILABLE_FOR_USER));
     }
 
     @Test
     public void createForProcessStartShouldAddCorrectAuthorizations() throws Exception {
-        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());
+        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null,
+                FormMappingType.PROCESS_START.getId());
 
-        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_URL, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(),
+                SFormMapping.TARGET_URL, null);
 
-        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
+        verify(pageMappingService).create("keye", null, EXTERNAL,
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
     }
 
     @Test
     public void createLegacyFormShouldNotAddCorrectAuthorizations() throws Exception {
-        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());
+        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null,
+                FormMappingType.PROCESS_START.getId());
 
-        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_LEGACY, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(),
+                SFormMapping.TARGET_LEGACY, null);
 
         verify(pageMappingService).create("keye", null, LEGACY, null);
     }
 
     @Test
     public void createForProcessOverviewShouldAddCorrectAuthorizations() throws Exception {
-        doReturn("clave").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId());
+        doReturn("clave").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null,
+                FormMappingType.PROCESS_OVERVIEW.getId());
 
-        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(), SFormMapping.TARGET_URL, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(),
+                SFormMapping.TARGET_URL, null);
 
         verify(pageMappingService).create("clave", null, EXTERNAL,
-                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER,
+                        IS_INVOLVED_IN_PROCESS_INSTANCE));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -170,7 +182,8 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.getNumberOfFormMappings(queryOptions);
 
-        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions,
+                Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -178,7 +191,8 @@ public class FormMappingServiceImplTest {
         formMappingService.get("theKey");
 
         verify(persistenceService).selectOne(
-                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", "theKey"), SFormMapping.class));
+                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey",
+                        Collections.<String, Object> singletonMap("key", "theKey"), SFormMapping.class));
     }
 
     @Test
@@ -186,7 +200,8 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.searchFormMappings(queryOptions);
 
-        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions,
+                Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -196,7 +211,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_URL), entry("pageMapping.url", "http://fake.url"),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_URL),
+                entry("pageMapping.url", "http://fake.url"),
                 entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", EXTERNAL));
     }
@@ -208,7 +224,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_NONE), entry("pageMapping.url", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_NONE),
+                entry("pageMapping.url", null),
                 entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", null));
     }
@@ -228,7 +245,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, PAGE_ID);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), anyString());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_INTERNAL), entry("pageMapping.url", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_INTERNAL),
+                entry("pageMapping.url", null),
                 entry("pageMapping.pageId", PAGE_ID),
                 entry("pageMapping.urlAdapter", null));
     }

@@ -21,7 +21,8 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 
 public class BDMQueryCommandParameters {
 
-	public static Map<String, Serializable> createCommandParameters(final EntityGetter getter, final long persistenceId) {
+    public static Map<String, Serializable> createCommandParameters(final EntityGetter getter,
+            final long persistenceId) {
         final Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
         commandParameters.put("queryName", getter.getAssociatedNamedQuery());
         commandParameters.put("returnType", getter.getReturnTypeClassName());

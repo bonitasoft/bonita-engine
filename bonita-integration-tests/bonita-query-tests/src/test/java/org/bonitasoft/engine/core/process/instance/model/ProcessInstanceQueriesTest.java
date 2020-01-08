@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -40,7 +41,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
-import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,7 +67,8 @@ public class ProcessInstanceQueriesTest {
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_user_filters() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
         final List<Long> userIds = repository.getPossibleUserIdsOfPendingTasks(pendingActivity.getActivityId());
 
@@ -78,60 +79,71 @@ public class ProcessInstanceQueriesTest {
     public void isTaskPendingForUser_should_be_true_when_mapped_using_pending_mapping() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
-
 
     @Test
     public void isTaskPendingForUser_should_be_true_when_mapped_using_actor() {
         final SUser expectedUser = repository.add(aUser().build());
         SActor actor = repository.add(anActor().build());
-        SActorMember actorMember = repository.add(anActorMember().withUserId(expectedUser.getId()).forActor(actor).build());
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        SActorMember actorMember = repository
+                .add(anActorMember().withUserId(expectedUser.getId()).forActor(actor).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
-
 
     @Test
     public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_role() {
         final SUser expectedUser = repository.add(aUser().build());
-        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId,aRoleId).build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         SActor actor = repository.add(anActor().build());
         repository.add(anActorMember().withRoleId(aRoleId).forActor(actor).build());
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
+
     @Test
     public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_group() {
         final SUser expectedUser = repository.add(aUser().build());
-        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId,aRoleId).build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         SActor actor = repository.add(anActor().build());
         repository.add(anActorMember().withGroupId(aGroupId).forActor(actor).build());
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
+
     @Test
     public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_membership() {
         final SUser expectedUser = repository.add(aUser().build());
-        repository.add(aUserMembership().forUser(expectedUser).memberOf(anotherGroupId,anotherRoleId).build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(anotherGroupId, anotherRoleId).build());
         SActor actor = repository.add(anActor().build());
         repository.add(anActorMember().withGroupId(anotherGroupId).withRoleId(anotherRoleId).forActor(actor).build());
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
@@ -140,9 +152,11 @@ public class ProcessInstanceQueriesTest {
     public void isTaskPendingForUser_should_be_false_when_not_pending() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         SUser notPendingUser = repository.add(aUser().withId(2L).build());// not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), notPendingUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                notPendingUser.getId());
 
         assertThat(taskPendingForUser).isFalse();
     }
@@ -151,9 +165,11 @@ public class ProcessInstanceQueriesTest {
     public void isTaskPendingForUser() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
-        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(),
+                expectedUser.getId());
 
         assertThat(taskPendingForUser).isTrue();
     }
@@ -161,7 +177,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_userid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(anActorMember().forActor(actor).withUserId(expectedUser.getId()).build());
         repository.add(aUser().withId(2L).build()); // not expected user
@@ -174,7 +191,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_groupid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
@@ -189,7 +207,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_roleid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withRoleId(aRoleId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
@@ -208,7 +227,8 @@ public class ProcessInstanceQueriesTest {
         final SUser notExpectedUser = repository.add(aUser().withId(2L).build());
         final SUser notExpectedUser2 = repository.add(aUser().withId(3L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser2).memberOf(aGroupId, aRoleId).build());
@@ -227,7 +247,8 @@ public class ProcessInstanceQueriesTest {
         final SUser walter = repository.add(aUser().withUserName("walter").withId(3L).build());
         final SUser marie = repository.add(aUser().withUserName("marie").withId(4L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(john).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(paul).memberOf(aGroupId, aRoleId).build());
@@ -243,7 +264,8 @@ public class ProcessInstanceQueriesTest {
     public void getNumberOfSUserWhoCanStartPendingTask_should_return_users_mapped_through_user_filters() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
         final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(pendingActivity.getActivityId());
 
@@ -253,12 +275,14 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getNumberOfSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_userid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(anActorMember().forActor(actor).withUserId(expectedUser.getId()).build());
         repository.add(aUser().withId(2L).build()); // not expected user
 
-        final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
+        final long numberOfUsers = repository
+                .getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
 
         assertThat(numberOfUsers).isEqualTo(1);
     }
@@ -266,14 +290,16 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getNumberOfSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_groupid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         final SUser notExpectedUser = repository.add(aUser().withId(2L).build());
         repository.add(aUserMembership().forUser(notExpectedUser).memberOf(anotherGroupId, aRoleId).build());
 
-        final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
+        final long numberOfUsers = repository
+                .getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
 
         assertThat(numberOfUsers).isEqualTo(1);
     }
@@ -281,14 +307,16 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void getNumberOfSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_roleid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withRoleId(aRoleId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         final SUser notexpectedUser = repository.add(aUser().withId(2L).build());
         repository.add(aUserMembership().forUser(notexpectedUser).memberOf(aGroupId, anotherRoleId).build());
 
-        final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
+        final long numberOfUsers = repository
+                .getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
 
         assertThat(numberOfUsers).isEqualTo(1);
     }
@@ -300,14 +328,16 @@ public class ProcessInstanceQueriesTest {
         final SUser notExpectedUser = repository.add(aUser().withId(2L).build());
         final SUser notExpectedUser2 = repository.add(aUser().withId(3L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser2).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(notExpectedUser).memberOf(anotherGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(notExpectedUser2).memberOf(aGroupId, anotherRoleId).build());
 
-        final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
+        final long numberOfUsers = repository
+                .getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
 
         assertThat(numberOfUsers).isEqualTo(2);
     }
@@ -319,14 +349,16 @@ public class ProcessInstanceQueriesTest {
         final SUser walter = repository.add(aUser().withUserName("walter").withId(3L).build());
         final SUser marie = repository.add(aUser().withUserName("marie").withId(4L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(john).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(paul).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(walter).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(marie).memberOf(aGroupId, aRoleId).build());
 
-        final long numberOfUsers = repository.getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
+        final long numberOfUsers = repository
+                .getNumberOfSUserWhoCanStartPendingTask(addedPendingMapping.getActivityId());
 
         assertThat(numberOfUsers).isEqualTo(4);
     }
@@ -335,7 +367,8 @@ public class ProcessInstanceQueriesTest {
     public void searchSUserWhoCanStartPendingTask_should_return_users_mapped_through_user_filters() {
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
-        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+        final SPendingActivityMapping pendingActivity = repository
+                .add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
 
         final List<SUser> userIds = repository.searchPossibleUserIdsOfPendingTasks(pendingActivity.getActivityId());
 
@@ -345,7 +378,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_userid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(anActorMember().forActor(actor).withUserId(expectedUser.getId()).build());
         repository.add(aUser().withId(2L).build()); // not expected user
@@ -358,7 +392,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_groupid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
@@ -373,7 +408,8 @@ public class ProcessInstanceQueriesTest {
     @Test
     public void searchSUserWhoCanStartPendingTask_should_return_users_mapped_through_his_roleid_in_actormember() {
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withRoleId(aRoleId).build());
         final SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
@@ -392,7 +428,8 @@ public class ProcessInstanceQueriesTest {
         final SUser notExpectedUser = repository.add(aUser().withId(2L).build());
         final SUser notExpectedUser2 = repository.add(aUser().withId(3L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(expectedUser2).memberOf(aGroupId, aRoleId).build());
@@ -411,7 +448,8 @@ public class ProcessInstanceQueriesTest {
         final SUser walter = repository.add(aUser().withUserName("walter").withId(3L).build());
         final SUser marie = repository.add(aUser().withUserName("marie").withId(4L).build());
         final SActor actor = repository.add(anActor().build());
-        final SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+        final SPendingActivityMapping addedPendingMapping = repository
+                .add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).withRoleId(aRoleId).build());
         repository.add(aUserMembership().forUser(john).memberOf(aGroupId, aRoleId).build());
         repository.add(aUserMembership().forUser(paul).memberOf(aGroupId, aRoleId).build());
@@ -425,15 +463,17 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchSingleChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance childPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -442,18 +482,21 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchOnlyChildrenSProcessInstanceOfProcessInstance_return_processInstancesIdsFromCallActivity() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SGatewayInstance gatewayActivity = (SGatewayInstance) repository.add(aGatewayInstanceBuilder().withLogicalGroup4(parentPI.getId())
-                .withName("call Activity")
-                .build());
-        final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
+        final SGatewayInstance gatewayActivity = (SGatewayInstance) repository
+                .add(aGatewayInstanceBuilder().withLogicalGroup4(parentPI.getId())
+                        .withName("call Activity")
+                        .build());
+        final SProcessInstance childPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
                 .withCallerId(gatewayActivity.getId()).withCallerType(SFlowNodeType.GATEWAY)
                 .withStateId(STARTED.getId()).build());
@@ -465,19 +508,22 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchChildProcessInstanceOfProcessInstance_return_processInstancesIdsNotGrandChildren() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
-                .withLogicalGroup4(childPI.getId())
-                .withName("call Activity")
-                .build());
+        final SProcessInstance childPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository
+                .add(aCallActivityInstanceBuilder()
+                        .withLogicalGroup4(childPI.getId())
+                        .withName("call Activity")
+                        .build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Grand Child Process Instance Started")
                 .withCallerId(callSubActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
                 .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
@@ -489,22 +535,26 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchGrandChildProcessInstanceOfChildProcessInstance_return_processInstancesIdsNotChild() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
-        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
-                .withLogicalGroup4(childPI.getId())
-                .withName("call Activity")
-                .build());
-        final SProcessInstance grandChildPI = repository.add(aProcessInstance().withContainerId(1).withName("test Grand Child Process Instance Started")
-                .withCallerId(callSubActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
+        final SProcessInstance childPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
+        final SCallActivityInstance callSubActivity = (SCallActivityInstance) repository
+                .add(aCallActivityInstanceBuilder()
+                        .withLogicalGroup4(childPI.getId())
+                        .withName("call Activity")
+                        .build());
+        final SProcessInstance grandChildPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Grand Child Process Instance Started")
+                        .withCallerId(callSubActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(childPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(childPI.getId());
@@ -513,21 +563,25 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchChildrenSProcessInstanceOfProcessInstance_return_processInstancesIds() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         final SCallActivityInstance callActivity = (SCallActivityInstance) repository.add(aCallActivityInstanceBuilder()
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SProcessInstance childPI1 = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
-        final SProcessInstance childPI2 = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.COMPLETED.getId()).build());
-        final SProcessInstance childPI3 = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
+        final SProcessInstance childPI1 = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
+        final SProcessInstance childPI2 = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(ProcessInstanceState.COMPLETED.getId()).build());
+        final SProcessInstance childPI3 = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance Started")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(ProcessInstanceState.CANCELLED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(3);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -536,8 +590,9 @@ public class ProcessInstanceQueriesTest {
 
     @Test
     public void searchChildSProcessInstanceOfProcessInstance_return_processInstancesIdsFromParentPIOnly() {
-        final SProcessInstance parentPI = repository.add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance parentPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Parent Process Instance")
+                        .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Started")
                 .withStateId(STARTED.getId()).build());
         repository.add(aProcessInstance().withContainerId(1).withName("test Process Instance Independent Completed")
@@ -548,9 +603,10 @@ public class ProcessInstanceQueriesTest {
                 .withLogicalGroup4(parentPI.getId())
                 .withName("call Activity")
                 .build());
-        final SProcessInstance childPI = repository.add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
-                .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
-                .withStateId(STARTED.getId()).build());
+        final SProcessInstance childPI = repository
+                .add(aProcessInstance().withContainerId(1).withName("test Child Process Instance")
+                        .withCallerId(callActivity.getId()).withCallerType(SFlowNodeType.CALL_ACTIVITY)
+                        .withStateId(STARTED.getId()).build());
 
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
@@ -575,7 +631,8 @@ public class ProcessInstanceQueriesTest {
         repository.add(buildFailedProcessInstance(3, 888888L));
 
         // When
-        final long numberOfSProcessInstanceFailed = repository.getNumberOfSProcessInstanceFailedForProcessDefinition(777777L);
+        final long numberOfSProcessInstanceFailed = repository
+                .getNumberOfSProcessInstanceFailedForProcessDefinition(777777L);
 
         // Then
         assertEquals(2, numberOfSProcessInstanceFailed);
@@ -589,7 +646,8 @@ public class ProcessInstanceQueriesTest {
         repository.add(buildFailedProcessInstance(3, 888888L));
 
         // When
-        final List<SProcessInstance> sProcessInstanceFailed = repository.searchSProcessInstanceFailedForProcessDefinition(777777L);
+        final List<SProcessInstance> sProcessInstanceFailed = repository
+                .searchSProcessInstanceFailedForProcessDefinition(777777L);
 
         // Then
         assertEquals(2, sProcessInstanceFailed.size());
@@ -664,7 +722,8 @@ public class ProcessInstanceQueriesTest {
         final List<SProcessInstance> failedSProcessInstance = repository.searchSProcessInstanceFailed();
 
         // Then
-        assertThat(failedSProcessInstance).containsOnly(failedProcessInstance, failedProcessInstanceWithFailedFlowNode, processInstanceWithFailedFlowNode);
+        assertThat(failedSProcessInstance).containsOnly(failedProcessInstance, failedProcessInstanceWithFailedFlowNode,
+                processInstanceWithFailedFlowNode);
     }
 
     @Test
@@ -704,7 +763,8 @@ public class ProcessInstanceQueriesTest {
         repository.add(buildFailedProcessInstance(1));
         repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
 
-        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
+        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1)
+                .withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
         repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
 
@@ -737,7 +797,8 @@ public class ProcessInstanceQueriesTest {
         repository.add(buildFailedProcessInstance(1));
         repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
 
-        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
+        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1)
+                .withName("test Parent Process Instance")
                 .withStateId(STARTED.getId()).build());
         repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
 
@@ -757,7 +818,8 @@ public class ProcessInstanceQueriesTest {
         repository.add(aSupervisor().withProcessDefinitionId(15L).withUserId(userId).build());
 
         // When
-        final List<SProcessInstance> sProcessInstanceFailedList = repository.searchFailedSProcessInstanceSupervisedBy(userId);
+        final List<SProcessInstance> sProcessInstanceFailedList = repository
+                .searchFailedSProcessInstanceSupervisedBy(userId);
 
         // Then
         assertThat(sProcessInstanceFailedList).hasSize(2).extracting("id").contains(1L, 4L);
@@ -798,12 +860,15 @@ public class ProcessInstanceQueriesTest {
         final SAProcessInstance saProcessInstance2 = repository.add(buildSAProcessInstance(2L));
 
         // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+        final List<SAProcessInstance> archivedProcessInstances = repository
+                .getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
 
         // Then
         assertFalse("The list of archived process instance must not be empty !!", archivedProcessInstances.isEmpty());
-        assertEquals("The first element of the list must to have as id 1", saProcessInstance1, archivedProcessInstances.get(0));
-        assertEquals("The second element of the list must to have as id 2", saProcessInstance2, archivedProcessInstances.get(1));
+        assertEquals("The first element of the list must to have as id 1", saProcessInstance1,
+                archivedProcessInstances.get(0));
+        assertEquals("The second element of the list must to have as id 2", saProcessInstance2,
+                archivedProcessInstances.get(1));
     }
 
     @Test
@@ -811,7 +876,8 @@ public class ProcessInstanceQueriesTest {
         // Given
 
         // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+        final List<SAProcessInstance> archivedProcessInstances = repository
+                .getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
 
         // Then
         assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
