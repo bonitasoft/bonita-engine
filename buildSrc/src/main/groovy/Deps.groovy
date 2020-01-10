@@ -28,7 +28,7 @@ class Deps {
     public static String eclipseCompilerVersion = "4.6.1"
     public static String jbcryptVersion = "0.3m"
     public static String javaxActivationVersion = "1.1.1"
-    public static String quartzVersion = "2.2.1"
+    public static String quartzVersion = "2.3.2"
     public static String guavaVersion = "19.0"
     public static String micrometerVersion = "1.3.2"
 

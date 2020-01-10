@@ -1,5 +1,3 @@
-
-
 dependencies {
     compile project(':services:bonita-session')
     compile project(':services:bonita-log')
@@ -11,7 +9,11 @@ dependencies {
     compile project(':services:bonita-commons')
     compile project(':services:bonita-transaction')
     compile project(':services:bonita-incident')
-    compile "org.quartz-scheduler:quartz:${Deps.quartzVersion}"
+    compile("org.quartz-scheduler:quartz:${Deps.quartzVersion}") {
+        exclude(group: "com.mchange") // c3p0 + transitive dep mchange-commons-java, because we do not use
+        // default Quartz connection provider, as we have our own
+        exclude(module: "HikariCP-java7") // Same reason
+    }
     compile "io.micrometer:micrometer-core:${Deps.micrometerVersion}"
     testCompile "ch.qos.logback:logback-classic:${Deps.logbackVersion}"
     testCompile "junit:junit:${Deps.junit4Version}"
