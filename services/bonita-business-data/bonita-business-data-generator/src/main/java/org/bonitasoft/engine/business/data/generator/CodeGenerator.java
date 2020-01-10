@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.data.generator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -44,7 +45,6 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
-import com.sun.tools.xjc.util.NullStream;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
@@ -64,11 +64,8 @@ public class CodeGenerator {
     }
 
     public void generate(final File destDir) throws IOException {
-        final PrintStream stream = new PrintStream(new NullStream());
-        try {
+        try (PrintStream stream = new PrintStream(new NullStream())) {
             model.build(destDir, stream);
-        } finally {
-            stream.close();
         }
     }
 
@@ -87,7 +84,7 @@ public class CodeGenerator {
     }
 
     public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
-        if (fullyqualifiedName.indexOf(".") == -1) {
+        if (!fullyqualifiedName.contains(".")) {
             return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
         }
         return model._class(fullyqualifiedName, ClassType.INTERFACE);
@@ -126,12 +123,12 @@ public class CodeGenerator {
     }
 
     @SuppressWarnings("rawtypes")
-    protected JClass narrowClass(final Class<? extends Collection> collectionClass, final JClass narrowClass) {
+    private JClass narrowClass(final Class<? extends Collection> collectionClass, final JClass narrowClass) {
         final JClass collectionJClass = getModel().ref(collectionClass);
         return collectionJClass.narrow(narrowClass);
     }
 
-    protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) {
+    JFieldVar addListField(final JDefinedClass entityClass, final Field field) {
         final JClass fieldClass = toJavaClass(field);
         final JClass fieldListClass = narrowClass(List.class, fieldClass);
         final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
@@ -143,7 +140,7 @@ public class CodeGenerator {
         return listFieldVar;
     }
 
-    public JClass toJavaClass(final Field field) {
+    JClass toJavaClass(final Field field) {
         if (field instanceof SimpleField) {
             final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
             return getModel().ref(fieldClass);
@@ -156,7 +153,7 @@ public class CodeGenerator {
         return getModel().ref(type.getClazz());
     }
 
-    public void addDefaultConstructor(final JDefinedClass definedClass) {
+    void addDefaultConstructor(final JDefinedClass definedClass) {
         definedClass.constructor(JMod.PUBLIC);
     }
 
@@ -167,7 +164,7 @@ public class CodeGenerator {
         return method;
     }
 
-    public JMethod addListSetter(final JDefinedClass definedClass, final JFieldVar field) {
+    JMethod addListSetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
         final JFieldRef thisField = JExpr._this().ref(field.name());
@@ -217,13 +214,13 @@ public class CodeGenerator {
         return method;
     }
 
-    public String getGetterName(final JVar field) {
+    private String getGetterName(final JVar field) {
         final JType type = field.type();
         final boolean bool = Boolean.class.getName().equals(type.fullName());
         return getGetterName(bool, field.name());
     }
 
-    public String getGetterName(final Field field) {
+    private String getGetterName(final Field field) {
         final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType())
                 && !field.isCollection();
         return getGetterName(bool, field.getName());
@@ -240,7 +237,7 @@ public class CodeGenerator {
         return builder.toString();
     }
 
-    public String getSetterName(final JVar field) {
+    String getSetterName(final JVar field) {
         return "set" + WordUtils.capitalize(field.name());
     }
 
@@ -255,7 +252,7 @@ public class CodeGenerator {
         return annotable.annotate(model.ref(annotationType));
     }
 
-    protected void checkAnnotationTarget(final JAnnotatable annotable, final Class<? extends Annotation> annotationType,
+    private void checkAnnotationTarget(final JAnnotatable annotable, final Class<? extends Annotation> annotationType,
             final Set<ElementType> supportedElementTypes) {
         if (annotable instanceof JClass && !supportedElementTypes.isEmpty()
                 && !supportedElementTypes.contains(ElementType.TYPE)) {
@@ -271,7 +268,7 @@ public class CodeGenerator {
         }
     }
 
-    protected Set<ElementType> getSupportedElementTypes(final Class<? extends Annotation> annotationType) {
+    private Set<ElementType> getSupportedElementTypes(final Class<? extends Annotation> annotationType) {
         final Set<ElementType> elementTypes = new HashSet<ElementType>();
         final Target targetAnnotation = annotationType.getAnnotation(Target.class);
         if (targetAnnotation != null) {
@@ -283,6 +280,27 @@ public class CodeGenerator {
             }
         }
         return elementTypes;
+    }
+
+    private static class NullStream extends OutputStream {
+
+        NullStream() {
+        }
+
+        public void write(int b) throws IOException {
+        }
+
+        public void close() throws IOException {
+        }
+
+        public void flush() throws IOException {
+        }
+
+        public void write(byte[] b, int off, int len) throws IOException {
+        }
+
+        public void write(byte[] b) throws IOException {
+        }
     }
 
 }
