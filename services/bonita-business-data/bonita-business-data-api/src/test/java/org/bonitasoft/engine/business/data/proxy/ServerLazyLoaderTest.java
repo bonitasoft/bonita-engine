@@ -109,7 +109,8 @@ public class ServerLazyLoaderTest {
         serverLazyLoader.load(method, persistenceId);
 
         //then
-        verify(businessDataRepository, never()).findListByNamedQuery(queryName, resultClass, parameters, startIndex, maxResults);
+        verify(businessDataRepository, never()).findListByNamedQuery(queryName, resultClass, parameters, startIndex,
+                maxResults);
         verify(businessDataRepository).findByNamedQuery(queryName, resultClass, parameters);
 
     }
@@ -123,7 +124,8 @@ public class ServerLazyLoaderTest {
         final Method method = employee.getClass().getMethod("getName");
 
         //given
-        doThrow(NonUniqueResultException.class).when(businessDataRepository).findByNamedQuery(queryName, resultClass, parameters);
+        doThrow(NonUniqueResultException.class).when(businessDataRepository).findByNamedQuery(queryName, resultClass,
+                parameters);
 
         //when
         serverLazyLoader.load(method, persistenceId);

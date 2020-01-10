@@ -17,7 +17,8 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
- * Once the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} is deployed, the associated {@link ActorDefinition}s are instantiated.
+ * Once the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} is deployed, the associated
+ * {@link ActorDefinition}s are instantiated.
  * This object represents this instance of {@link ActorDefinition}.
  *
  * @author Matthieu Chaffotte

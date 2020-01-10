@@ -27,14 +27,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
-import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -90,8 +89,10 @@ public class PlatformServiceImpl implements PlatformService {
     private final PlatformRetriever platformRetriever;
     private final List<String> sqlFolders;
 
-    public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever, final Recorder recorder,
-            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties,
+    public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever,
+            final Recorder recorder,
+            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
+            final SPlatformProperties sPlatformProperties,
             final DataSource datasource, final List<String> sqlFolders) {
         this.platformPersistenceService = platformPersistenceService;
         this.logger = logger.asLogger(PlatformServiceImpl.class);
@@ -108,7 +109,8 @@ public class PlatformServiceImpl implements PlatformService {
      * @param sqlFiles the sql files to execute
      * @throws SQLException
      */
-    private void executeSQLResources(final List<String> sqlFiles, final Map<String, String> replacements) throws IOException, SQLException {
+    private void executeSQLResources(final List<String> sqlFiles, final Map<String, String> replacements)
+            throws IOException, SQLException {
         for (final String sqlFile : sqlFiles) {
             executeSQLResource(sqlFile, replacements);
         }
@@ -145,7 +147,8 @@ public class PlatformServiceImpl implements PlatformService {
      * @param sqlFile the sql file to execute
      * @throws IOException
      */
-    private void executeSQLResource(final String sqlFile, final Map<String, String> replacements) throws IOException, SQLException {
+    private void executeSQLResource(final String sqlFile, final Map<String, String> replacements)
+            throws IOException, SQLException {
         for (final String sqlFolder : sqlFolders) {
             final String fileContent = getSQLFileContent(sqlFolder, sqlFile);
 
@@ -174,7 +177,8 @@ public class PlatformServiceImpl implements PlatformService {
         }
     }
 
-    private void doExecuteSQLThroughJDBC(final List<String> commands, final Map<String, String> replacements) throws SQLException {
+    private void doExecuteSQLThroughJDBC(final List<String> commands, final Map<String, String> replacements)
+            throws SQLException {
         final Connection connection = getConnection();
         connection.setAutoCommit(false);
         try {
@@ -238,7 +242,8 @@ public class PlatformServiceImpl implements PlatformService {
             final String tenantName = tenant.getName();
             final STenant existingTenant = getTenantByName(tenantName);
             if (existingTenant != null) {
-                throw new STenantAlreadyExistException("Unable to create the tenant " + tenantName + " : it already exists.");
+                throw new STenantAlreadyExistException(
+                        "Unable to create the tenant " + tenantName + " : it already exists.");
             }
         } catch (final STenantNotFoundException ignored) {
             //it's ok, the tenant does not exists
@@ -258,7 +263,8 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void deleteTenant(final long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
+    public void deleteTenant(final long tenantId)
+            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
         final STenant tenant = getTenant(tenantId);
         if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
@@ -272,7 +278,8 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void deleteTenantObjects(final long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
+    public void deleteTenantObjects(final long tenantId)
+            throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
         final STenant tenant = getTenant(tenantId);
         if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
@@ -313,7 +320,8 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (final SCacheException e) {
-            logger.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}", e.getMessage());
+            logger.warn("Can't cache the platform, maybe the platform cache service is not started yet: {}",
+                    e.getMessage());
         }
     }
 
@@ -356,7 +364,8 @@ public class PlatformServiceImpl implements PlatformService {
         STenant tenant;
         try {
             final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(STenant.NAME, name);
-            tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_TENANT_BY_NAME, parameters, STenant.class));
+            tenant = platformPersistenceService
+                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_TENANT_BY_NAME, parameters, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with name: " + name);
             }
@@ -369,30 +378,36 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public STenant getDefaultTenant() throws STenantNotFoundException {
         try {
-            STenant tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_DEFAULT_TENANT, null, STenant.class));
+            STenant tenant = platformPersistenceService
+                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_DEFAULT_TENANT, null, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No default tenant found");
             }
             return tenant;
         } catch (final SBonitaReadException e) {
-            throw new STenantNotFoundException("Unable to check if a default tenant already exists: " + e.getMessage(), e);
+            throw new STenantNotFoundException("Unable to check if a default tenant already exists: " + e.getMessage(),
+                    e);
         }
     }
 
     @Override
     public boolean isDefaultTenantCreated() throws SBonitaReadException {
-        return platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class)) != null;
+        return platformPersistenceService
+                .selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class)) != null;
     }
 
     @Override
-    public List<STenant> getTenants(final Collection<Long> ids, final QueryOptions queryOptions) throws STenantNotFoundException, STenantException {
+    public List<STenant> getTenants(final Collection<Long> ids, final QueryOptions queryOptions)
+            throws STenantNotFoundException, STenantException {
         List<STenant> tenants;
         try {
             final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
             tenants = platformPersistenceService
-                    .selectList(new SelectListDescriptor<>(QUERY_GET_TENANTS_BY_IDS, parameters, STenant.class, queryOptions));
+                    .selectList(new SelectListDescriptor<>(QUERY_GET_TENANTS_BY_IDS, parameters, STenant.class,
+                            queryOptions));
             if (tenants.size() != ids.size()) {
-                throw new STenantNotFoundException("Unable to retrieve all tenants by ids. Expected: " + ids + ", retrieved: " + tenants);
+                throw new STenantNotFoundException(
+                        "Unable to retrieve all tenants by ids. Expected: " + ids + ", retrieved: " + tenants);
             }
         } catch (final SBonitaReadException e) {
             throw new STenantException("Problem getting list of tenants: " + e.getMessage(), e);
@@ -401,12 +416,14 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor) throws STenantUpdateException {
+    public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor)
+            throws STenantUpdateException {
         final String tenantName = (String) descriptor.getFields().get(STenantUpdateBuilderFactory.NAME);
         if (tenantName != null) {
             try {
                 if (getTenantByName(tenantName).getId() != tenant.getId()) {
-                    throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                    throw new STenantUpdateException(
+                            "Unable to update the tenant with new name " + tenantName + " : it already exists.");
                 }
             } catch (final STenantNotFoundException e) {
                 // Ok
@@ -460,7 +477,8 @@ public class PlatformServiceImpl implements PlatformService {
     public List<STenant> getTenants(final QueryOptions queryOptions) throws STenantException {
         List<STenant> tenants;
         try {
-            tenants = platformPersistenceService.selectList(new SelectListDescriptor<>(LOG_GET_TENANTS, null, STenant.class, queryOptions));
+            tenants = platformPersistenceService
+                    .selectList(new SelectListDescriptor<>(LOG_GET_TENANTS, null, STenant.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new STenantException("Problem getting list of tenants : " + e.getMessage(), e);
         }
@@ -471,8 +489,9 @@ public class PlatformServiceImpl implements PlatformService {
     public int getNumberOfTenants() throws STenantException {
         final Map<String, Object> emptyMap = Collections.emptyMap();
         try {
-            final Long read = platformPersistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_NUMBER_OF_TENANTS, emptyMap, STenant.class,
-                    Long.class));
+            final Long read = platformPersistenceService
+                    .selectOne(new SelectOneDescriptor<>(QUERY_GET_NUMBER_OF_TENANTS, emptyMap, STenant.class,
+                            Long.class));
             return read.intValue();
         } catch (final SBonitaReadException e) {
             throw new STenantException(e);

@@ -23,9 +23,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import com.company.pojo.Employee;
 import org.bonitasoft.engine.business.data.JpaTestConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -42,8 +44,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.company.pojo.Employee;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -78,7 +78,8 @@ public class ConcurrencyTest {
 
         final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
         doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(), loggerService);
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(configuration.getJpaModelConfiguration(),
+                loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(
                 mock(DependencyService.class),
                 classLoaderService, schemaManager, mock(TenantResourcesService.class), TENANT_ID));

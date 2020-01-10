@@ -34,7 +34,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Restart flow nodes for works: {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity} {@link NotifyChildFinishedWork}
+ * Restart flow nodes for works: {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity}
+ * {@link NotifyChildFinishedWork}
  *
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -52,10 +53,11 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     private UserTransactionService transactionService;
     private ExecuteFlowNodes executeFlowNodes;
 
-    public RestartFlowNodesHandler(@Value("${tenantId}") Long tenantId, @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
-                                   FlowNodeInstanceService flowNodeInstanceService,
-                                   UserTransactionService transactionService,
-                                   ExecuteFlowNodes executeFlowNodes) {
+    public RestartFlowNodesHandler(@Value("${tenantId}") Long tenantId,
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            FlowNodeInstanceService flowNodeInstanceService,
+            UserTransactionService transactionService,
+            ExecuteFlowNodes executeFlowNodes) {
         this.tenantId = tenantId;
         this.logger = logger;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -100,7 +102,8 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             throws RestartException {
         final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
 
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
+        logger.log(getClass(), TechnicalLogSeverity.INFO,
+                "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
         try {
             final Iterator<Long> iterator = flownodesIds.iterator();
             do {

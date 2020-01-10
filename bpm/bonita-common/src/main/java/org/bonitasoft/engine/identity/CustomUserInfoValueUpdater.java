@@ -29,8 +29,9 @@ public class CustomUserInfoValueUpdater implements Serializable {
     private final String value;
 
     /**
-     * creates a new instance of {@link CustomUserInfoValueUpdater} with a value to update on a {@link CustomUserInfoValue}
-     * 
+     * creates a new instance of {@link CustomUserInfoValueUpdater} with a value to update on a
+     * {@link CustomUserInfoValue}
+     *
      * @param value the value to update on a {@link CustomUserInfoValue}
      */
     public CustomUserInfoValueUpdater(final String value) {

@@ -29,7 +29,7 @@ public interface ArchiveService {
 
     /**
      * Archive the given entity in sliding archive if relevant and in the appropriate definitive archive
-     * 
+     *
      * @param time
      *        The archive date
      * @param record
@@ -53,7 +53,7 @@ public interface ArchiveService {
     /**
      * Remove the given entity from both sliding archive (if present) and the right archive level (if present)
      * This operation should normally to be used. This is for admin purpose only
-     * 
+     *
      * @param record
      *        The delete record containing archived entity to be deleted
      * @throws SRecorderException
@@ -62,7 +62,7 @@ public interface ArchiveService {
 
     /**
      * Get the ReadPersistenceService corresponding to the definitive archive
-     * 
+     *
      * @return the ReadPersistenceService corresponding to the definitive archive
      */
     ReadPersistenceService getDefinitiveArchiveReadPersistenceService();

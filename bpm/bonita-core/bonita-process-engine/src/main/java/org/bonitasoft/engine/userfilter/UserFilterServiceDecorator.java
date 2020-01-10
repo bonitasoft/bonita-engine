@@ -25,15 +25,15 @@ import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.expression.EngineConstantExpressionBuilder;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
- * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
+ * This {@link UserFilterService} implementation injects, in method
+ * {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
  * access the {@link APIAccessor} for User filters.
  * This new expression is referenced under the name 'apiAccessor'.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
@@ -43,7 +43,7 @@ public class UserFilterServiceDecorator implements UserFilterService {
 
     /**
      * @param userFilterService
-     *            the UserFilterService class that this class is decorating.
+     *        the UserFilterService class that this class is decorating.
      */
     public UserFilterServiceDecorator(final UserFilterService userFilterService) {
         super();
@@ -53,11 +53,12 @@ public class UserFilterServiceDecorator implements UserFilterService {
     /**
      * {@inheritDoc}. This implementation injects a new expression to access the {@link APIAccessor} for User filters.
      * This new expression is referenced under the name 'apiAccessor'.
-     * 
      */
     @Override
-    public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition, final Map<String, SExpression> inputs,
-            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
+    public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition,
+            final Map<String, SExpression> inputs,
+            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName)
+            throws SUserFilterExecutionException {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
         apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
@@ -65,7 +66,8 @@ public class UserFilterServiceDecorator implements UserFilterService {
         final Map<String, SExpression> enrichedInputs = new HashMap<String, SExpression>(inputs);
         enrichedInputs.put("connectorApiAccessor", apiAccessorExpression);
         enrichedInputs.put("engineExecutionContext", engineExecutionContext);
-        return userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, enrichedInputs, classLoader, expressionContext, actorName);
+        return userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, enrichedInputs, classLoader,
+                expressionContext, actorName);
     }
 
     @Override

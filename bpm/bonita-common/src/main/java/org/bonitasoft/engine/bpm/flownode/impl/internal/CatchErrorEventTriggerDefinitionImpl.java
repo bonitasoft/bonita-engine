@@ -18,11 +18,14 @@ import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class CatchErrorEventTriggerDefinitionImpl extends ErrorEventTriggerDefinitionImpl implements CatchErrorEventTriggerDefinition {
+public class CatchErrorEventTriggerDefinitionImpl extends ErrorEventTriggerDefinitionImpl
+        implements CatchErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8087566164595708656L;
 
-    public CatchErrorEventTriggerDefinitionImpl(){}
+    public CatchErrorEventTriggerDefinitionImpl() {
+    }
+
     public CatchErrorEventTriggerDefinitionImpl(final String errorCode) {
         super(errorCode);
     }

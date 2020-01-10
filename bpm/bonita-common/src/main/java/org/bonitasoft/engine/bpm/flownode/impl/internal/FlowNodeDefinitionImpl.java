@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -176,9 +177,12 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         FlowNodeDefinitionImpl that = (FlowNodeDefinitionImpl) o;
         return Objects.equals(incomings, that.incomings) &&
                 Objects.equals(outgoings, that.outgoings) &&
@@ -192,7 +196,8 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription, displayName, displayDescriptionAfterCompletion,
+        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription,
+                displayName, displayDescriptionAfterCompletion,
                 defaultTransition);
     }
 

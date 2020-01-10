@@ -16,12 +16,11 @@ package org.bonitasoft.engine.business.application.model.builder.impl;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilderFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderFactory;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class SApplicationPageLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SApplicationLogBuilderFactory {
+public class SApplicationPageLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SApplicationLogBuilderFactory {
 
     public static final int APPLICATION_PAGE_INDEX = 1;
 

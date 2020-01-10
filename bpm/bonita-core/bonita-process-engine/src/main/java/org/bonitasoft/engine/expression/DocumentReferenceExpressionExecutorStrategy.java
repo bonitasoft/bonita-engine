@@ -46,14 +46,17 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     private final ActivityInstanceService activityInstanceService;
 
-    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService, final ActivityInstanceService activityInstanceService) {
+    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService,
+            final ActivityInstanceService activityInstanceService) {
         this.documentService = documentService;
         this.activityInstanceService = activityInstanceService;
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         return evaluate(Collections.singletonList(expression), context, resolvedExpressions, containerState).get(0);
     }
 
@@ -63,8 +66,10 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
         final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
         final Long time = (Long) context.get("time");
@@ -88,7 +93,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) throws SBonitaReadException {
+    private Document getDocument(final long processInstanceId, final SExpression expression, final Long time)
+            throws SBonitaReadException {
         try {
             AbstractSMappedDocument document;
             if (time != null) {
@@ -103,7 +109,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     }
 
     // visible for testing
-    long getProcessInstance(final Long containerId, final String containerType, Long time) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+    long getProcessInstance(final Long containerId, final String containerType, Long time)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException,
             SExpressionDependencyMissingException, SActivityInstanceNotFoundException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
@@ -113,7 +120,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
         // on a flownode instance, containerId is always the original id:
         if (time != null) {
-            return activityInstanceService.getMostRecentArchivedActivityInstance(containerId).getParentProcessInstanceId();
+            return activityInstanceService.getMostRecentArchivedActivityInstance(containerId)
+                    .getParentProcessInstanceId();
         } else {
             return activityInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
         }

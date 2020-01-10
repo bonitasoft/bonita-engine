@@ -86,7 +86,8 @@ public class BusinessObjectValidationRuleTest {
         if (expectedValidation) {
             assertThat(validationStatus).isOk("should valid business object with qualified name:" + qualifiedName);
         } else {
-            assertThat(validationStatus).isNotOk("should not valid business object with qualified name:" + qualifiedName);
+            assertThat(validationStatus)
+                    .isNotOk("should not valid business object with qualified name:" + qualifiedName);
         }
     }
 
@@ -168,5 +169,5 @@ public class BusinessObjectValidationRuleTest {
 
         assertThat(validationStatus).isNotOk();
     }
-    
+
 }

@@ -32,7 +32,6 @@ import org.hibernate.annotations.Type;
 @Table(name = "platform")
 public class SPlatform implements PersistentObject {
 
-
     public static final String CREATED_BY = "createdBy";
     public static final String CREATED = "created";
     public static final String ID = "id";
@@ -50,7 +49,8 @@ public class SPlatform implements PersistentObject {
     @Type(type = "materialized_clob")
     private String information;
 
-    public SPlatform(final String version, final String previousVersion, final String initialVersion, final String createdBy, final long created) {
+    public SPlatform(final String version, final String previousVersion, final String initialVersion,
+            final String createdBy, final long created) {
         this.version = version;
         this.previousVersion = previousVersion;
         this.initialVersion = initialVersion;

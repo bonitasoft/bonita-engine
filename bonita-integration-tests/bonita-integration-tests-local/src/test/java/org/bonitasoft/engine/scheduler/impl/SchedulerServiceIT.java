@@ -36,7 +36,6 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -96,7 +95,8 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         final Date future = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "myVar";
         final SJobDescriptor jobDescriptor = SJobDescriptor.builder()
-                .jobClassName("org.bonitasoft.engine.scheduler.job.IncrementVariableJob").jobName("IncrementVariableJob").build();
+                .jobClassName("org.bonitasoft.engine.scheduler.job.IncrementVariableJob")
+                .jobName("IncrementVariableJob").build();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(SJobParameter.builder().key("jobName").value("testDoNotExecuteAFutureJob").build());
         parameters.add(SJobParameter.builder().key("variableName").value(variableName).build());
@@ -176,8 +176,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
         //we have failed job
         List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
-        assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
-                assertThat(f.getLastMessage()).contains("an Error"));
+        assertThat(failedJobs).hasOnlyOneElementSatisfying(f -> assertThat(f.getLastMessage()).contains("an Error"));
     }
 
     @Test
@@ -190,22 +189,24 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
 
         //we have failed job
         List<SFailedJob> failedJobs = await().until(() -> inTx(() -> jobService.getFailedJobs(0, 100)), hasSize(1));
-        assertThat(failedJobs).hasOnlyOneElementSatisfying(f ->
-                assertThat(f.getLastMessage()).contains("a Job exception"));
+        assertThat(failedJobs)
+                .hasOnlyOneElementSatisfying(f -> assertThat(f.getLastMessage()).contains("a Job exception"));
 
         //small sleep because quartz do not always immediately delete the associated trigger (done in the quartz Thread)
         // because of that it can cause issues when rescheduling (Foreign key violation)
         Thread.sleep(500);
         //reschedule the job: no more exception
         inTx(() -> {
-            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                    toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
             return null;
         });
         await().until(() -> storage.getVariableValue("nbSuccess", 0).equals(1));
     }
 
     @Test
-    public void should_be_able_to_restart_a_cron_job_that_failed_because_of_a_SJobExecutionException() throws Exception {
+    public void should_be_able_to_restart_a_cron_job_that_failed_because_of_a_SJobExecutionException()
+            throws Exception {
         // schedule a job that throws a SJobExecutionException
         schedule(jobDescriptor(JobThatMayThrowErrorOrJobException.class, "MyJob"),
                 new UnixCronTrigger("triggerJob", new Date(System.currentTimeMillis() + 100), "* * * * * ?"),
@@ -223,6 +224,7 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
             }
         };
         List<SFailedJob> sFailedJobs = await().until(getFailedJobs, new BaseMatcher<List<SFailedJob>>() {
+
             @Override
             public boolean matches(Object item) {
                 List<SFailedJob> list = (List<SFailedJob>) item;
@@ -239,10 +241,10 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         //ensure we trace the number of failure
         assertThat(sFailedJobs.get(0).getNumberOfFailures()).isGreaterThan(1);
 
-
         //reschedule the job: no more exception
         inTx(() -> {
-            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                    toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
             return null;
         });
 
@@ -251,7 +253,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         //ensure no more failed job is present
         assertThat(inTx(() -> jobService.getFailedJobs(0, 100))).isEmpty();
     }
-
 
     @Test
     public void should_keep_a_failed_job_when_failing_once() throws Exception {
@@ -271,10 +272,10 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         //ensure we trace the number of failure
         assertThat(sFailedJobs.get(0).getNumberOfFailures()).isEqualTo(1);
 
-
         //reschedule the job: no more exception
         inTx(() -> {
-            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(), toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
+            schedulerService.retryJobThatFailed(persistedJobDescriptor.getId(),
+                    toJobParameterList(singletonMap(TYPE, NO_EXCEPTION)));
             return null;
         });
 
@@ -283,7 +284,6 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         //ensure no more failed job is present
         assertThat(inTx(() -> jobService.getFailedJobs(0, 100))).isEmpty();
     }
-
 
     @Test
     public void should_let_quartz_retry_a_job_that_failed_because_of_a_SRetryableException() throws Exception {
@@ -319,13 +319,13 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
         });
     }
 
-
     private SJobDescriptor jobDescriptor(Class<?> jobClass, String jobName) {
         return SJobDescriptor.builder()
                 .jobClassName(jobClass.getName()).jobName(jobName).build();
     }
 
-    private void schedule(SJobDescriptor jobDescriptor, Trigger trigger, Map<String, Serializable> parameters) throws Exception {
+    private void schedule(SJobDescriptor jobDescriptor, Trigger trigger, Map<String, Serializable> parameters)
+            throws Exception {
         List<SJobParameter> parametersList = toJobParameterList(parameters);
         inTx(() -> {
             schedulerService.schedule(jobDescriptor, parametersList, trigger);
@@ -334,7 +334,9 @@ public class SchedulerServiceIT extends CommonBPMServicesTest {
     }
 
     private List<SJobParameter> toJobParameterList(Map<String, Serializable> parameters) {
-        return parameters.entrySet().stream().map(e -> SJobParameter.builder().key(e.getKey()).value(e.getValue()).build()).collect(Collectors.toList());
+        return parameters.entrySet().stream()
+                .map(e -> SJobParameter.builder().key(e.getKey()).value(e.getValue()).build())
+                .collect(Collectors.toList());
     }
 
 }

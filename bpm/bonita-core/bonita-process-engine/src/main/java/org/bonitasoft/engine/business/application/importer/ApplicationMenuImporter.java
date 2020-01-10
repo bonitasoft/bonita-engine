@@ -38,13 +38,16 @@ public class ApplicationMenuImporter {
         this.converter = converter;
     }
 
-    public List<ImportError> importApplicationMenu(ApplicationMenuNode applicationMenuNode, SApplication application, SApplicationMenu parentMenu)
+    public List<ImportError> importApplicationMenu(ApplicationMenuNode applicationMenuNode, SApplication application,
+            SApplicationMenu parentMenu)
             throws ImportException {
         List<ImportError> errors = new ArrayList<ImportError>();
         try {
-            ApplicationMenuImportResult importResult = converter.toSApplicationMenu(applicationMenuNode, application, parentMenu);
+            ApplicationMenuImportResult importResult = converter.toSApplicationMenu(applicationMenuNode, application,
+                    parentMenu);
             if (importResult.getError() == null) {
-                SApplicationMenu applicationMenu = applicationService.createApplicationMenu(importResult.getApplicationMenu());
+                SApplicationMenu applicationMenu = applicationService
+                        .createApplicationMenu(importResult.getApplicationMenu());
                 for (ApplicationMenuNode subMenuNode : applicationMenuNode.getApplicationMenus()) {
                     errors.addAll(importApplicationMenu(subMenuNode, application, applicationMenu));
                 }

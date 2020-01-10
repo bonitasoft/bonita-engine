@@ -30,7 +30,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,18 +42,20 @@ public class DeleteEventTriggerInstanceIT extends TestWithUser {
 
     @Test
     public void should_delete_timer_event_trigger_on_interrupted_process() throws Exception {
-        ProcessDefinition procWithTimers = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("ProcWithTimers", "1.0")
-                .addStartEvent("start")
-                .addIntermediateCatchEvent("intermediate").addTimerEventTriggerDefinition(TimerType.DURATION, constant(100000))
-                .addTransition("start", "intermediate")
-                .getProcess()
-        );
+        ProcessDefinition procWithTimers = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("ProcWithTimers", "1.0")
+                        .addStartEvent("start")
+                        .addIntermediateCatchEvent("intermediate")
+                        .addTimerEventTriggerDefinition(TimerType.DURATION, constant(100000))
+                        .addTransition("start", "intermediate")
+                        .getProcess());
         ProcessInstance processInstance = getProcessAPI().startProcess(procWithTimers.getId());
-        await().until(() -> !getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 1).filter("name", "intermediate").done()).getResult().isEmpty());
+        await().until(() -> !getProcessAPI()
+                .searchFlowNodeInstances(new SearchOptionsBuilder(0, 1).filter("name", "intermediate").done())
+                .getResult().isEmpty());
 
         getProcessAPI().deleteProcessInstance(processInstance.getId());
         disableAndDeleteProcess(procWithTimers);
-
 
         assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
     }
@@ -69,14 +70,14 @@ public class DeleteEventTriggerInstanceIT extends TestWithUser {
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                         new ProcessDefinitionBuilder().createNewInstance("ProcWithBoundaryTimers", "1.0")
                                 .addActor("actor")
-                                .addUserTask("myTask", "actor").addBoundaryEvent("timerBoundary", true).addTimerEventTriggerDefinition(TimerType.DURATION, constant(100000))
+                                .addUserTask("myTask", "actor").addBoundaryEvent("timerBoundary", true)
+                                .addTimerEventTriggerDefinition(TimerType.DURATION, constant(100000))
                                 .addUserTask("afterBoundary", "actor")
                                 .addUserTask("boundaryOut", "actor")
                                 .addTransition("timerBoundary", "boundaryOut")
                                 .getProcess())
                         .setActorMapping(actorMapping)
-                        .done()
-        );
+                        .done());
         ProcessInstance processInstance = getProcessAPI().startProcess(procWithTimers.getId());
 
         long myTask = waitForUserTask("myTask");
@@ -87,7 +88,6 @@ public class DeleteEventTriggerInstanceIT extends TestWithUser {
         assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
 
         disableAndDeleteProcess(procWithTimers);
-
 
         assertThat(((Number) query("SELECT count(*) FROM event_trigger_instance").get(0)).intValue()).isEqualTo(0);
     }

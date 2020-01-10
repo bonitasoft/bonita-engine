@@ -56,19 +56,22 @@ public class DocumentHelper {
     private final ProcessDefinitionService processDefinitionService;
     private final ProcessInstanceService processInstanceService;
 
-    public DocumentHelper(final DocumentService documentService, final ProcessDefinitionService processDefinitionService,
-                          final ProcessInstanceService processInstanceService) {
+    public DocumentHelper(final DocumentService documentService,
+            final ProcessDefinitionService processDefinitionService,
+            final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
     }
 
-    public List<AbstractSMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name) throws SBonitaReadException {
+    public List<AbstractSMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name)
+            throws SBonitaReadException {
         QueryOptions queryOptions = new QueryOptions(0, 100);
         List<SMappedDocument> mappedDocuments;
         final List<AbstractSMappedDocument> result = new ArrayList<>();
         do {
-            mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
+            mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(),
+                    queryOptions.getNumberOfResults());
             result.addAll(mappedDocuments);
             queryOptions = QueryOptions.getNextPage(queryOptions);
         } while (mappedDocuments.size() == 100);
@@ -79,27 +82,34 @@ public class DocumentHelper {
             throws org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException, SBonitaReadException {
         try {
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            final List<SDocumentListDefinition> documentDefinitions = processDefinition.getProcessContainer().getDocumentListDefinitions();
+            final SProcessDefinition processDefinition = processDefinitionService
+                    .getProcessDefinition(processInstance.getProcessDefinitionId());
+            final List<SDocumentListDefinition> documentDefinitions = processDefinition.getProcessContainer()
+                    .getDocumentListDefinitions();
             for (final SDocumentListDefinition documentDefinition : documentDefinitions) {
                 if (documentName.equals(documentDefinition.getName())) {
                     return true;
                 }
             }
         } catch (final SProcessInstanceNotFoundException e) {
-            throw new SObjectNotFoundException("Unable to find the list " + documentName + ", nothing in database and the process instance "
-                    + processInstanceId + " is not found", e);
+            throw new SObjectNotFoundException(
+                    "Unable to find the list " + documentName + ", nothing in database and the process instance "
+                            + processInstanceId + " is not found",
+                    e);
         } catch (final SProcessInstanceReadException e) {
             throw new SBonitaReadException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
-            throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-                    + ", nothing in database and the process definition is not found", e);
+            throw new SObjectNotFoundException(
+                    "Unable to find the list " + documentName + " on process instance " + processInstanceId
+                            + ", nothing in database and the process definition is not found",
+                    e);
         }
         return false;
     }
 
     public SDocument createDocumentObject(final DocumentValue documentValue, final long authorId) {
-        final SDocumentBuilder processDocumentBuilder = new SDocumentBuilderFactory().createNewInstance(documentValue.getFileName(),
+        final SDocumentBuilder processDocumentBuilder = new SDocumentBuilderFactory().createNewInstance(
+                documentValue.getFileName(),
                 getMimeTypeOrGuessIt(documentValue), authorId);
         processDocumentBuilder.setHasContent(documentValue.hasContent());
         processDocumentBuilder.setURL(documentValue.getUrl());
@@ -125,7 +135,8 @@ public class DocumentHelper {
         }
     }
 
-    public void deleteDocument(final String documentName, final long processInstanceId) throws SObjectModificationException {
+    public void deleteDocument(final String documentName, final long processInstanceId)
+            throws SObjectModificationException {
         try {
             documentService.removeCurrentVersion(processInstanceId, documentName);
         } catch (final SObjectNotFoundException e) {
@@ -134,17 +145,18 @@ public class DocumentHelper {
     }
 
     /**
-     * @param newValue          the new value
-     * @param documentName      the name of the document
+     * @param newValue the new value
+     * @param documentName the name of the document
      * @param processInstanceId the id of the process instance
-     * @param authorId          the author id
-     * @param description       used only when creating a document
+     * @param authorId the author id
+     * @param description used only when creating a document
      * @throws SBonitaReadException
      * @throws SObjectCreationException
      * @throws SObjectModificationException
      */
-    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId,
-                                       String description)
+    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName,
+            final long processInstanceId, final long authorId,
+            String description)
             throws SBonitaReadException, SObjectCreationException, SObjectModificationException {
         final SDocument document = createDocumentObject(newValue, authorId);
         try {
@@ -157,24 +169,29 @@ public class DocumentHelper {
         }
     }
 
-    public void setDocumentList(final List<DocumentValue> documentList, final String documentName, final long processInstanceId, final long authorId)
-            throws SBonitaReadException, SObjectCreationException, SObjectNotFoundException, SObjectModificationException, SObjectAlreadyExistsException {
+    public void setDocumentList(final List<DocumentValue> documentList, final String documentName,
+            final long processInstanceId, final long authorId)
+            throws SBonitaReadException, SObjectCreationException, SObjectNotFoundException,
+            SObjectModificationException, SObjectAlreadyExistsException {
         // get the list having the name
         final List<AbstractSMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
         int index;
         for (index = 0; index < documentList.size(); index++) {
-            processDocumentOnIndex(documentList.get(index), documentName, processInstanceId, currentList, index, authorId);
+            processDocumentOnIndex(documentList.get(index), documentName, processInstanceId, currentList, index,
+                    authorId);
         }
 
         // when no more elements in documentList remove elements above
         removeOthersDocuments(currentList);
     }
 
-    void updateExistingDocument(final AbstractSMappedDocument documentToUpdate, final int index, final DocumentValue documentValue, final long authorId)
+    void updateExistingDocument(final AbstractSMappedDocument documentToUpdate, final int index,
+            final DocumentValue documentValue, final long authorId)
             throws SObjectModificationException {
         if (documentValue.hasChanged()) {
-            documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue, authorId), index);
+            documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue, authorId),
+                    index);
         } else {
             //  update the index if needed
             if (documentToUpdate.getIndex() != index) {
@@ -183,8 +200,10 @@ public class DocumentHelper {
         }
     }
 
-    AbstractSMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<AbstractSMappedDocument> currentList, final Long documentId, final String documentName,
-                                                                 final Long processInstanceId) throws SObjectNotFoundException {
+    AbstractSMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(
+            final List<AbstractSMappedDocument> currentList,
+            final Long documentId, final String documentName,
+            final Long processInstanceId) throws SObjectNotFoundException {
         final Iterator<AbstractSMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             final AbstractSMappedDocument next = iterator.next();
@@ -193,18 +212,21 @@ public class DocumentHelper {
                 return next;
             }
         }
-        throw new SObjectNotFoundException("The document with id " + documentId + " was not in the list " + documentName + " of process instance "
-                + processInstanceId);
+        throw new SObjectNotFoundException(
+                "The document with id " + documentId + " was not in the list " + documentName + " of process instance "
+                        + processInstanceId);
     }
 
-    List<AbstractSMappedDocument> getExistingDocumentList(final String documentName, final long processInstanceId) throws SBonitaReadException,
+    List<AbstractSMappedDocument> getExistingDocumentList(final String documentName, final long processInstanceId)
+            throws SBonitaReadException,
             SObjectNotFoundException {
         List<AbstractSMappedDocument> currentList;
         currentList = getAllDocumentOfTheList(processInstanceId, documentName);
         // if it's not a list it throws an exception
         if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId)) {
-            throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-                    + ", nothing in database and nothing declared in the definition");
+            throw new SObjectNotFoundException(
+                    "Unable to find the list " + documentName + " on process instance " + processInstanceId
+                            + ", nothing in database and nothing declared in the definition");
         }
         return currentList;
     }
@@ -216,17 +238,21 @@ public class DocumentHelper {
 
     }
 
-    void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-                                final List<AbstractSMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+    void processDocumentOnIndex(final DocumentValue documentValue, final String documentName,
+            final long processInstanceId,
+            final List<AbstractSMappedDocument> currentList, final int index, final long authorId)
+            throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update
-            final AbstractSMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName,
+            final AbstractSMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList,
+                    documentValue.getDocumentId(), documentName,
                     processInstanceId);
             updateExistingDocument(documentToUpdate, index, documentValue, authorId);
         } else {
             // create new element
-            documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue, authorId), processInstanceId, documentName, null, index);
+            documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue, authorId),
+                    processInstanceId, documentName, null, index);
         }
     }
 
@@ -239,8 +265,9 @@ public class DocumentHelper {
             }
             final boolean isDocumentWithContent = newValue instanceof DocumentValue;
             if (!isDocumentWithContent) {
-                throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                        + newValue.getClass().getName());
+                throw new SOperationExecutionException(
+                        "Document operation only accepts an expression returning a DocumentValue and not "
+                                + newValue.getClass().getName());
             }
         }
         return (DocumentValue) newValue;
@@ -250,8 +277,9 @@ public class DocumentHelper {
         if (fileInput.getId() == null) {
             return new DocumentValue(fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
         } else if (fileInput.getContent() != null) {
-            return new DocumentValue(Long.valueOf(fileInput.getId()), fileInput.getContent(), fileInput.getContentType(), fileInput.getFileName());
-        }else {
+            return new DocumentValue(Long.valueOf(fileInput.getId()), fileInput.getContent(),
+                    fileInput.getContentType(), fileInput.getFileName());
+        } else {
             return new DocumentValue(Long.valueOf(fileInput.getId()));
         }
     }
@@ -261,9 +289,12 @@ public class DocumentHelper {
         if (document.hasContent()) {
             try {
                 byte[] documentContent = documentService.getDocumentContent(document.getContentStorageId());
-                documentValue = new DocumentValue(documentContent, document.getContentMimeType(), document.getContentFileName());
+                documentValue = new DocumentValue(documentContent, document.getContentMimeType(),
+                        document.getContentFileName());
             } catch (SObjectNotFoundException e) {
-                throw new SOperationExecutionException("Unable to execute set document operation because the content of the document to use is not found", e);
+                throw new SOperationExecutionException(
+                        "Unable to execute set document operation because the content of the document to use is not found",
+                        e);
             }
         } else {
             documentValue = new DocumentValue(document.getUrl());
@@ -273,7 +304,8 @@ public class DocumentHelper {
 
     public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
         if (!(newValue instanceof List)) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+            throw new SOperationExecutionException(
+                    "Document operation only accepts an expression returning a list of DocumentValue");
         }
         List<DocumentValue> newList = new ArrayList<>(((List) newValue).size());
         for (final Object item : (List<?>) newValue) {
@@ -294,7 +326,8 @@ public class DocumentHelper {
                 //ignore the item
                 continue;
             }
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+            throw new SOperationExecutionException(
+                    "Document operation only accepts an expression returning a list of DocumentValue");
 
         }
         return newList;

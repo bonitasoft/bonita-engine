@@ -21,11 +21,9 @@ import javax.inject.Inject;
 
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
-import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +46,8 @@ public class UserTest {
         SUser user = aUser().withId(124L).withUserName("walter.bates").build();
         repository.add(user);
         repository.flush();
-        SUserLogin userLogin = SUserLogin.builder().id(124L).tenantId(DEFAULT_TENANT_ID).lastConnection(1234567L).sUser(user).build();
+        SUserLogin userLogin = SUserLogin.builder().id(124L).tenantId(DEFAULT_TENANT_ID).lastConnection(1234567L)
+                .sUser(user).build();
         user.setSUserLogin(userLogin);
         repository.add(userLogin);
         repository.flush();

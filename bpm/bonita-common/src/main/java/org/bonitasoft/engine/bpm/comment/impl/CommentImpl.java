@@ -43,7 +43,8 @@ public class CommentImpl implements Comment {
      * @deprecated As of 6.1 use {@link #CommentImpl()} and the setters
      */
     @Deprecated
-    public CommentImpl(final long id, final long tenantId, final long userId, final long processInstanceId, final long postDate, final String content) {
+    public CommentImpl(final long id, final long tenantId, final long userId, final long processInstanceId,
+            final long postDate, final String content) {
         super();
         this.id = id;
         this.tenantId = tenantId;
@@ -165,7 +166,8 @@ public class CommentImpl implements Comment {
 
     @Override
     public String toString() {
-        return "CommentImpl [id=" + id + ", tenantId=" + tenantId + ", userId=" + userId + ", processInstanceId=" + processInstanceId + ", postDate="
+        return "CommentImpl [id=" + id + ", tenantId=" + tenantId + ", userId=" + userId + ", processInstanceId="
+                + processInstanceId + ", postDate="
                 + postDate + ", content=" + content + "]";
     }
 

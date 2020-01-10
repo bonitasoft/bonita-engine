@@ -21,12 +21,13 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SActivityInstan
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public abstract class SActivityInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SActivityInstanceBuilder {
+public abstract class SActivityInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl
+        implements SActivityInstanceBuilder {
 
     protected SActivityInstanceBuilderImpl(final SActivityInstance entity) {
         super(entity);
     }
-    
+
     @Override
     public SActivityInstanceBuilder setName(final String name) {
         this.entity.setName(name);
@@ -38,6 +39,5 @@ public abstract class SActivityInstanceBuilderImpl extends SFlowNodeInstanceBuil
         this.entity.setDescription(description);
         return this;
     }
-
 
 }

@@ -35,8 +35,8 @@ public class JDBCJobListener implements BonitaJobListener {
     private SchedulerService schedulerService;
 
     public JDBCJobListener(final JobService jobService,
-                           final TechnicalLoggerService logger,
-                           SchedulerService schedulerService) {
+            final TechnicalLoggerService logger,
+            SchedulerService schedulerService) {
         super();
         this.jobService = jobService;
         this.logger = logger.asLogger(JDBCJobListener.class);
@@ -56,7 +56,8 @@ public class JDBCJobListener implements BonitaJobListener {
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         if (jobException != null) {
-            if (jobException instanceof JobExecutionException && ((JobExecutionException) jobException).refireImmediately()) {
+            if (jobException instanceof JobExecutionException
+                    && ((JobExecutionException) jobException).refireImmediately()) {
                 logger.debug("An exception occurs during the job execution but it will be retried.", jobException);
             } else {
                 logger.warn("An exception occurs during the job execution.", jobException);
@@ -78,9 +79,11 @@ public class JDBCJobListener implements BonitaJobListener {
     private void deleteJobDescriptor(Map<String, Serializable> context, Long jobDescriptorId) {
         try {
             //delete job only if there is no other trigger
-            boolean mayFireAgain = schedulerService.mayFireAgain(((String) context.get(JOB_GROUP)), ((String) context.get(JOB_NAME)));
+            boolean mayFireAgain = schedulerService.mayFireAgain(((String) context.get(JOB_GROUP)),
+                    ((String) context.get(JOB_NAME)));
 
-            logger.debug("{} job descriptor of job {} because it may {}fire again.", mayFireAgain ? "Keeping" : "Deleting", context.get(JOB_NAME), mayFireAgain ? "" : "not ");
+            logger.debug("{} job descriptor of job {} because it may {}fire again.",
+                    mayFireAgain ? "Keeping" : "Deleting", context.get(JOB_NAME), mayFireAgain ? "" : "not ");
             if (!mayFireAgain) {
                 jobService.deleteJobDescriptor(jobDescriptorId);
             }

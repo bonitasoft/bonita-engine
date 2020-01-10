@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte

@@ -13,16 +13,15 @@
  **/
 package org.bonitasoft.engine.bdm.validator;
 
-import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.model.NamedElement;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.bonitasoft.engine.bdm.model.NamedElement;
 
 public class UniqueNameValidatorTest {
 
@@ -35,7 +34,8 @@ public class UniqueNameValidatorTest {
 
     @Test
     public void should_validate_a_list_with_no_duplicated_names() {
-        List<NamedElement> listWithNoDuplicatedNames = asList(aNamedElement("aName"), aNamedElement("anOtherName"), aNamedElement("yetDifferentName"));
+        List<NamedElement> listWithNoDuplicatedNames = asList(aNamedElement("aName"), aNamedElement("anOtherName"),
+                aNamedElement("yetDifferentName"));
 
         ValidationStatus status = validator.validate(listWithNoDuplicatedNames, "named elements");
 
@@ -45,7 +45,8 @@ public class UniqueNameValidatorTest {
     @Test
     public void should_not_validate_a_list_duplicated_names() {
         String duplicatedName = "duplicatedName";
-        List<NamedElement> listWithNoDuplicatedNames = asList(aNamedElement("notDuplicatedName"), aNamedElement(duplicatedName), aNamedElement(duplicatedName),
+        List<NamedElement> listWithNoDuplicatedNames = asList(aNamedElement("notDuplicatedName"),
+                aNamedElement(duplicatedName), aNamedElement(duplicatedName),
                 aNamedElement(duplicatedName));
 
         ValidationStatus status = validator.validate(listWithNoDuplicatedNames, "named elements");

@@ -21,12 +21,16 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityIn
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SCallActivityInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl implements SCallActivityInstanceBuilderFactory {
+public class SCallActivityInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl
+        implements SCallActivityInstanceBuilderFactory {
 
     @Override
-    public SCallActivityInstanceBuilder createNewCallActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SCallActivityInstance callActivityInstance = new SCallActivityInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+    public SCallActivityInstanceBuilder createNewCallActivityInstance(final String name,
+            final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+            final long parentProcessInstanceId) {
+        final SCallActivityInstance callActivityInstance = new SCallActivityInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         callActivityInstance.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SCallActivityInstanceBuilderImpl(callActivityInstance);

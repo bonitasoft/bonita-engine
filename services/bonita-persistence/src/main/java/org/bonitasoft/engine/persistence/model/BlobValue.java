@@ -30,11 +30,12 @@ import org.hibernate.annotations.Type;
 
 /**
  * Represent a Blob value store in the persistence layer.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 @Data
-@NoArgsConstructor@Entity
+@NoArgsConstructor
+@Entity
 @Table(name = "blob_")
 @IdClass(PersistentObjectId.class)
 @Filter(name = "tenantFilter")

@@ -32,7 +32,6 @@ public class OrganizationParserTest {
 
     private OrganizationParser organizationParser = new OrganizationParser();
 
-
     @Test
     public void should_parse_organization_work() throws Exception {
         //given
@@ -51,7 +50,8 @@ public class OrganizationParserTest {
     public void should_replace_old_namespace() throws Exception {
         //given
         String content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<organization:Organization xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema\">\n" +
+                "<organization:Organization xmlns:organization=\"http://documentation.bonitasoft.com/organization-xml-schema\">\n"
+                +
                 "\t<users>\n" +
                 "\t</users>\n" +
                 "\t<roles>\n" +
@@ -103,7 +103,8 @@ public class OrganizationParserTest {
     @Test
     public void should_parse_OrganizationWithSpecialCharacters_work() throws Exception {
         //given
-        String content = IOUtil.read(OrganizationParserTest.class.getResourceAsStream("/OrganizationWithSpecialCharacters.xml"));
+        String content = IOUtil
+                .read(OrganizationParserTest.class.getResourceAsStream("/OrganizationWithSpecialCharacters.xml"));
         //when
         Organization organization = organizationParser.convert(content);
         //then
@@ -120,19 +121,18 @@ public class OrganizationParserTest {
         assertThat(organization).isNotNull();
         checkWilliamJobs(organization.getUsers().get(0));
         checkAprilSanchez(organization.getUsers().get(1));
-        assertThat(organization.getRoles()).hasSize(1).containsOnly(new ExportedRole("member", "Member", "this is the default member", "member icon", "member.png"));
+        assertThat(organization.getRoles()).hasSize(1).containsOnly(
+                new ExportedRole("member", "Member", "this is the default member", "member icon", "member.png"));
         assertThat(organization.getGroups()).hasSize(13).contains(
                 new ExportedGroup("headquarters", null, "Headquarters", "the main group", "acme logo", "acme.png"),
-                new ExportedGroup("hr", "/headquarters", "Human Resources", null, null, null)
-        );
+                new ExportedGroup("hr", "/headquarters", "Human Resources", null, null, null));
         assertThat(organization.getMemberships()).contains(
                 new ExportedUserMembership("william.jobs", "member", "headquarters", null, null, null),
-                new ExportedUserMembership("april.sanchez", "member", "hr", "/headquarters", "william.jobs", 1457625147L)
-        );
+                new ExportedUserMembership("april.sanchez", "member", "hr", "/headquarters", "william.jobs",
+                        1457625147L));
         assertThat(organization.getCustomUserInfoDefinition()).containsExactly(
                 new ExportedCustomUserInfoDefinition("Office location", null),
-                new ExportedCustomUserInfoDefinition("Skills", "The user skills")
-        );
+                new ExportedCustomUserInfoDefinition("Skills", "The user skills"));
     }
 
     private void checkAprilSanchez(ExportedUser aprilSanchez) {
@@ -173,8 +173,7 @@ public class OrganizationParserTest {
         assertThat(williamJobs.getProfessionalRoom()).isEqualTo("213");
         assertThat(williamJobs.getCustomUserInfoValues()).containsExactly(
                 new ExportedCustomUserInfoValue("Office location", "Engineering"),
-                new ExportedCustomUserInfoValue("Skills", "Java")
-        );
+                new ExportedCustomUserInfoValue("Skills", "Java"));
     }
 
 }

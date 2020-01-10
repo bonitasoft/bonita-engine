@@ -71,13 +71,15 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
 
         //then
-        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test(expected = SCommandExecutionException.class)
     public void executeCommandWithEntityShloudThrowException() throws Exception {
         //given
-        doThrow(SBusinessDataNotFoundException.class).when(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+        doThrow(SBusinessDataNotFoundException.class).when(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME,
+                PARAMETER_IDENTIFIER,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
@@ -88,7 +90,8 @@ public class GetBusinessDataByIdCommandTest {
     public void executeCommandWithChildEntityShouldThrowException() throws Exception {
         //given
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(
+                PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
                 PARAMETER_CHILDNAME,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
@@ -105,7 +108,8 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
 
         //then
-        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test
@@ -117,7 +121,8 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
 
         //then
-        verify(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_CHILDNAME, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_CHILDNAME,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
 }

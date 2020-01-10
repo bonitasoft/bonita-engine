@@ -17,8 +17,8 @@ import static java.lang.System.currentTimeMillis;
 
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**

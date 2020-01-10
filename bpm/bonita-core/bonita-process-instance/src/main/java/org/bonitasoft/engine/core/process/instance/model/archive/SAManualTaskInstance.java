@@ -32,6 +32,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("manual")
 public class SAManualTaskInstance extends SAHumanTaskInstance {
+
     public SAManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {
         super(sManualTaskInstance);
     }

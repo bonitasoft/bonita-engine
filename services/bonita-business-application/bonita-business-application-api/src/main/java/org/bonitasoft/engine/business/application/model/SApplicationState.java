@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.model;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public enum SApplicationState {
     ACTIVATED,

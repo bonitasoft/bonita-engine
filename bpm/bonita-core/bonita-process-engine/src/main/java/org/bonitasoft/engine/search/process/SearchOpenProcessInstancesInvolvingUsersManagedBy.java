@@ -34,7 +34,8 @@ public class SearchOpenProcessInstancesInvolvingUsersManagedBy extends AbstractP
     private final long managerUserId;
 
     public SearchOpenProcessInstancesInvolvingUsersManagedBy(final ProcessInstanceService processInstanceService,
-            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long managerUserId, final SearchOptions options,
+            final SearchProcessInstanceDescriptor searchEntitiesDescriptor, final long managerUserId,
+            final SearchOptions options,
             final ProcessDefinitionService processDefinitionService) {
         super(searchEntitiesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;
@@ -43,7 +44,8 @@ public class SearchOpenProcessInstancesInvolvingUsersManagedBy extends AbstractP
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(managerUserId, searchOptions);
+        return processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(managerUserId,
+                searchOptions);
     }
 
     @Override

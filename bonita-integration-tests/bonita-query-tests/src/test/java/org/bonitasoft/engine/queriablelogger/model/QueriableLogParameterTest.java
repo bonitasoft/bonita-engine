@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
@@ -69,20 +69,19 @@ public class QueriableLogParameterTest {
 
         assertThat(queriableLogs).hasSize(2);
         assertThat(queriableLogs.stream().filter(m -> m.get("ID").equals(1L)).findFirst().get()).containsOnly(
-                entry("ID",1L),
-                entry("TENANTID",1L),
-                entry("PARAM_NAME","name1"),
-                entry("B_LOG_ID",1L),
-                entry("STRINGVALUE","stringValue1"),
-                entry("VALUETYPE","valueType1")
-               );
+                entry("ID", 1L),
+                entry("TENANTID", 1L),
+                entry("PARAM_NAME", "name1"),
+                entry("B_LOG_ID", 1L),
+                entry("STRINGVALUE", "stringValue1"),
+                entry("VALUETYPE", "valueType1"));
         assertThat(queriableLogs.stream().filter(m -> m.get("ID").equals(2L)).findFirst().get()).containsOnly(
-                entry("ID",2L),
-                entry("TENANTID",1L),
-                entry("PARAM_NAME","name2"),
-                entry("B_LOG_ID",2L),
-                entry("STRINGVALUE","stringValue2"),
-                entry("VALUETYPE","valueType2")
+                entry("ID", 2L),
+                entry("TENANTID", 1L),
+                entry("PARAM_NAME", "name2"),
+                entry("B_LOG_ID", 2L),
+                entry("STRINGVALUE", "stringValue2"),
+                entry("VALUETYPE", "valueType2")
 
         );
 

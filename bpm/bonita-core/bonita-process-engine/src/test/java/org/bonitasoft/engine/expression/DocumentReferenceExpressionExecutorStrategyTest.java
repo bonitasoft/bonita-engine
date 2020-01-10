@@ -74,8 +74,10 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(PROCESS_INSTANCE_ID);
         doReturn(PARENT_PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
         doReturn(document).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), nullable(String.class));
-        doReturn(parentDocument).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), nullable(String.class));
-        doReturn(archivedDocument).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), nullable(String.class), eq(A_LONG_TIME_AGO));
+        doReturn(parentDocument).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID),
+                nullable(String.class));
+        doReturn(archivedDocument).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID),
+                nullable(String.class), eq(A_LONG_TIME_AGO));
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
@@ -90,7 +92,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluate_result_should_contains_process_document_when_container_is_a_process_instance() throws Exception {
+    public void evaluate_result_should_contains_process_document_when_container_is_a_process_instance()
+            throws Exception {
         final Map<String, Object> context = new HashMap<>();
         context.put("containerId", PROCESS_INSTANCE_ID);
         context.put("containerType", "PROCESS_INSTANCE");
@@ -101,7 +104,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance() throws Exception {
+    public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance()
+            throws Exception {
         final Map<String, Object> context = new HashMap<>();
         context.put("containerId", PROCESS_INSTANCE_ID);
         context.put("containerType", "OTHER");
@@ -112,7 +116,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
+    public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance()
+            throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID),
                 nullable(String.class));
         final Map<String, Object> context = new HashMap<>();
@@ -125,7 +130,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
+    public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance()
+            throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID),
                 nullable(String.class));
         final Map<String, Object> context = new HashMap<>();

@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.queriablelogger.model;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.TestRepository;
@@ -80,51 +80,51 @@ public class QueriableLogTest {
 
         assertThat(queriableLogs).hasSize(2);
         assertThat(queriableLogs.stream().filter(m -> m.get("ID").equals(1L)).findFirst().get()).containsOnly(
-                entry("ACTIONSCOPE","actionScope1"),entry("ACTIONSTATUS",-1), entry("ACTIONTYPE","actionType1"),
-                entry("CALLERCLASSNAME","callerClassName1"),
-                entry("CALLERMETHODNAME","callerMethodName1"),
-                entry("CLUSTERNODE","clusterNode1"),
-                entry( "NUMERICINDEX1",-1L),
-                entry("NUMERICINDEX2",-1L),
-                entry("NUMERICINDEX3",-1L),
-                entry("NUMERICINDEX4",-1L),
-                entry("NUMERICINDEX5",-1L ),
-                entry("PRODUCTVERSION","productVersion1"),
-                entry("SEVERITY","BUSINESS"),
-                entry("RAWMESSAGE","message1"),
-                entry("TENANTID",DEFAULT_TENANT_ID),
-                entry("THREADNUMBER",queriableLog.getThreadNumber()),
-                entry("USERID","userId1"),
-                entry("WEEKOFYEAR",queriableLog.getWeekOfYear()),
-                entry("WHATMONTH",queriableLog.getMonth()),
-                entry("DAYOFYEAR", queriableLog.getDayOfYear() ),
-                entry("LOG_TIMESTAMP", queriableLog.getTimeStamp() ),
-                entry("ID", 1L ),
-                entry("WHATYEAR",queriableLog.getYear()));
+                entry("ACTIONSCOPE", "actionScope1"), entry("ACTIONSTATUS", -1), entry("ACTIONTYPE", "actionType1"),
+                entry("CALLERCLASSNAME", "callerClassName1"),
+                entry("CALLERMETHODNAME", "callerMethodName1"),
+                entry("CLUSTERNODE", "clusterNode1"),
+                entry("NUMERICINDEX1", -1L),
+                entry("NUMERICINDEX2", -1L),
+                entry("NUMERICINDEX3", -1L),
+                entry("NUMERICINDEX4", -1L),
+                entry("NUMERICINDEX5", -1L),
+                entry("PRODUCTVERSION", "productVersion1"),
+                entry("SEVERITY", "BUSINESS"),
+                entry("RAWMESSAGE", "message1"),
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("THREADNUMBER", queriableLog.getThreadNumber()),
+                entry("USERID", "userId1"),
+                entry("WEEKOFYEAR", queriableLog.getWeekOfYear()),
+                entry("WHATMONTH", queriableLog.getMonth()),
+                entry("DAYOFYEAR", queriableLog.getDayOfYear()),
+                entry("LOG_TIMESTAMP", queriableLog.getTimeStamp()),
+                entry("ID", 1L),
+                entry("WHATYEAR", queriableLog.getYear()));
         assertThat(queriableLogs.stream().filter(m -> m.get("ID").equals(2L)).findFirst().get()).containsOnly(
-                entry("ACTIONSCOPE","actionScope2"),
-                entry("ACTIONSTATUS",-1),
-                entry("ACTIONTYPE","actionType2"),
-                entry("CALLERCLASSNAME","callerClassName2"),
-                entry("CALLERMETHODNAME","callerMethodName2"),
-                entry("CLUSTERNODE","clusterNode2"),
-                entry( "NUMERICINDEX1",-1L),
-                entry("NUMERICINDEX2",-1L),
-                entry("NUMERICINDEX3",-1L),
-                entry("NUMERICINDEX4",-1L),
-                entry("NUMERICINDEX5",-1L ),
-                entry("PRODUCTVERSION","productVersion2"),
-                entry("SEVERITY","BUSINESS"),
-                entry("RAWMESSAGE","message2"),
-                entry("TENANTID",DEFAULT_TENANT_ID),
-                entry("THREADNUMBER",queriableLog.getThreadNumber()),
-                entry("USERID","userId2"),
-                entry("WEEKOFYEAR",queriableLog1.getWeekOfYear()),
-                entry("WHATMONTH",queriableLog1.getMonth()),
-                entry("DAYOFYEAR", queriableLog1.getDayOfYear() ),
-                entry("LOG_TIMESTAMP", queriableLog1.getTimeStamp() ),
-                entry("ID", 2L ),
-                entry("WHATYEAR",queriableLog1.getYear())
+                entry("ACTIONSCOPE", "actionScope2"),
+                entry("ACTIONSTATUS", -1),
+                entry("ACTIONTYPE", "actionType2"),
+                entry("CALLERCLASSNAME", "callerClassName2"),
+                entry("CALLERMETHODNAME", "callerMethodName2"),
+                entry("CLUSTERNODE", "clusterNode2"),
+                entry("NUMERICINDEX1", -1L),
+                entry("NUMERICINDEX2", -1L),
+                entry("NUMERICINDEX3", -1L),
+                entry("NUMERICINDEX4", -1L),
+                entry("NUMERICINDEX5", -1L),
+                entry("PRODUCTVERSION", "productVersion2"),
+                entry("SEVERITY", "BUSINESS"),
+                entry("RAWMESSAGE", "message2"),
+                entry("TENANTID", DEFAULT_TENANT_ID),
+                entry("THREADNUMBER", queriableLog.getThreadNumber()),
+                entry("USERID", "userId2"),
+                entry("WEEKOFYEAR", queriableLog1.getWeekOfYear()),
+                entry("WHATMONTH", queriableLog1.getMonth()),
+                entry("DAYOFYEAR", queriableLog1.getDayOfYear()),
+                entry("LOG_TIMESTAMP", queriableLog1.getTimeStamp()),
+                entry("ID", 2L),
+                entry("WHATYEAR", queriableLog1.getYear())
 
         );
 

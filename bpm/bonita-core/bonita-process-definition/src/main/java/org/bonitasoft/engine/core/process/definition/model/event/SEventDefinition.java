@@ -25,7 +25,7 @@ public interface SEventDefinition extends SFlowNodeDefinition {
 
     /**
      * Retrieve an unmodifiable list of event triggers associate to this event. If none, an empty list is returned.
-     * 
+     *
      * @return an unmodifiable list of event triggers associate to this event
      */
     List<SEventTriggerDefinition> getEventTriggers();

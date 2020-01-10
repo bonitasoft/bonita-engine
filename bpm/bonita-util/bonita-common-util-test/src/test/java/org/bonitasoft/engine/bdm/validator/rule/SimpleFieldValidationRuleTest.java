@@ -15,12 +15,11 @@ package org.bonitasoft.engine.bdm.validator.rule;
 
 import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Colin PUY

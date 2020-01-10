@@ -19,7 +19,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 /**
  * @author Emmanuel Duchastenier
  */
-public interface SExternalIdentityMappingLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
+public interface SExternalIdentityMappingLogBuilderFactory
+        extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
     SExternalIdentityMappingLogBuilder createNewInstance();
 }

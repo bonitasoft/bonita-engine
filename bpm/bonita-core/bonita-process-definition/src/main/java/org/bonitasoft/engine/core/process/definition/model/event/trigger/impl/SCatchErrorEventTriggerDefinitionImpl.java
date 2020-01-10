@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchE
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SCatchErrorEventTriggerDefinitionImpl extends SErrorEventTriggerDefinitionImpl implements SCatchErrorEventTriggerDefinition {
+public class SCatchErrorEventTriggerDefinitionImpl extends SErrorEventTriggerDefinitionImpl
+        implements SCatchErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8087566164595708656L;
 

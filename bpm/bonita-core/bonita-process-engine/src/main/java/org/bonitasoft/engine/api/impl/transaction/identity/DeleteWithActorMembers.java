@@ -47,7 +47,8 @@ public class DeleteWithActorMembers {
 
     private final Set<Long> removedActorIds = new HashSet<Long>();
 
-    public DeleteWithActorMembers(final ActorMappingService actorMappingService, final ProfileService profileService, final IdentityService identityService) {
+    public DeleteWithActorMembers(final ActorMappingService actorMappingService, final ProfileService profileService,
+            final IdentityService identityService) {
         super();
         this.actorMappingService = actorMappingService;
         this.profileService = profileService;
@@ -62,7 +63,8 @@ public class DeleteWithActorMembers {
         removedActorIds.add(removedActorMember.getActorId());
     }
 
-    protected void deleteActorMembersOfUser(final long userId) throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {
+    protected void deleteActorMembersOfUser(final long userId)
+            throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {
         List<SActorMember> actorMembers = actorMappingService.getActorMembersOfUser(userId, 0, BATCH_SIZE);
         while (!actorMembers.isEmpty()) {
             for (final SActorMember sActorMember : actorMembers) {
@@ -75,7 +77,8 @@ public class DeleteWithActorMembers {
     protected void deleteProfileMembersOfUser(final long id) throws SBonitaException {
         List<SProfileMember> profileMembersOfUser;
         do {
-            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
+            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, BATCH_SIZE, SProfileMember.ID,
+                    OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembersOfUser) {
                 profileService.deleteProfileMember(sProfileMember);
             }
@@ -92,7 +95,8 @@ public class DeleteWithActorMembers {
         }
     }
 
-    protected void deleteActorMembersOfGroup(final long groupId) throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException,
+    protected void deleteActorMembersOfGroup(final long groupId)
+            throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException,
             SIdentityException {
         List<SActorMember> actorMembers;
         do {
@@ -105,7 +109,8 @@ public class DeleteWithActorMembers {
         deleteActorMembersOfGroupChildren(groupId);
     }
 
-    private void deleteActorMembersOfGroupChildren(final long groupId) throws SIdentityException, SActorMemberNotFoundException, SActorMemberDeletionException,
+    private void deleteActorMembersOfGroupChildren(final long groupId)
+            throws SIdentityException, SActorMemberNotFoundException, SActorMemberDeletionException,
             SBonitaReadException {
         int i = 0;
         List<SGroup> childrenGroup;
@@ -121,7 +126,8 @@ public class DeleteWithActorMembers {
     protected void deleteProfileMembersOfGroup(final long groupId) throws SBonitaException {
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, BATCH_SIZE, SProfileMember.ID,
+                    OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }
@@ -152,7 +158,8 @@ public class DeleteWithActorMembers {
         } while (memberships.size() == BATCH_SIZE);
     }
 
-    protected void deleteActorMembersOfRole(final long roleId) throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {
+    protected void deleteActorMembersOfRole(final long roleId)
+            throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {
         List<SActorMember> actorMembers;
         do {
             actorMembers = actorMappingService.getActorMembersOfRole(roleId, 0, BATCH_SIZE);
@@ -165,7 +172,8 @@ public class DeleteWithActorMembers {
     protected void deleteProfileMembersOfRole(final long roleId) throws SBonitaException {
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, BATCH_SIZE, SProfileMember.ID,
+                    OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }

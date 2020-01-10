@@ -29,7 +29,8 @@ public class AbortingReceiveTaskStateImpl extends AbortingFlowNodeContainerState
 
     private final WaitingEventsInterrupter waitingEventsInterrupter;
 
-    public AbortingReceiveTaskStateImpl(final StateBehaviors stateBehaviors, WaitingEventsInterrupter waitingEventsInterrupter) {
+    public AbortingReceiveTaskStateImpl(final StateBehaviors stateBehaviors,
+            WaitingEventsInterrupter waitingEventsInterrupter) {
         super(stateBehaviors);
         this.waitingEventsInterrupter = waitingEventsInterrupter;
     }
@@ -40,7 +41,8 @@ public class AbortingReceiveTaskStateImpl extends AbortingFlowNodeContainerState
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         try {
             final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) instance;
             waitingEventsInterrupter.interruptWaitingEvents(receiveTaskInstance);

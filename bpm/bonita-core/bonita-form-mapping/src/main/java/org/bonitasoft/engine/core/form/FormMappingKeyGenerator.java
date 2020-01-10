@@ -20,7 +20,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
  */
 public interface FormMappingKeyGenerator {
 
-
     String generateKey(long processDefinitionId, String task, Integer type) throws SObjectCreationException;
 
 }

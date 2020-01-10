@@ -20,7 +20,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ArchivedMultiInstanceActivityInstanceImpl extends ArchivedActivityInstanceImpl implements ArchivedMultiInstanceActivityInstance {
+public class ArchivedMultiInstanceActivityInstanceImpl extends ArchivedActivityInstanceImpl
+        implements ArchivedMultiInstanceActivityInstance {
 
     private static final long serialVersionUID = -8302189436621268820L;
 
@@ -42,9 +43,12 @@ public class ArchivedMultiInstanceActivityInstanceImpl extends ArchivedActivityI
 
     private final int loopCardinality;
 
-    public ArchivedMultiInstanceActivityInstanceImpl(final String name, final long flownodeDefinitionId, final boolean sequential,
-            final String loopDataInputRef, final String loopDataOutputRef, final String dataInputItemRef, final String dataOutputItemRef,
-            final int numberOfActiveInstances, final int numberOfCompletedInstances, final int numberOfTerminatedInstances, final int loopCardinality) {
+    public ArchivedMultiInstanceActivityInstanceImpl(final String name, final long flownodeDefinitionId,
+            final boolean sequential,
+            final String loopDataInputRef, final String loopDataOutputRef, final String dataInputItemRef,
+            final String dataOutputItemRef,
+            final int numberOfActiveInstances, final int numberOfCompletedInstances,
+            final int numberOfTerminatedInstances, final int loopCardinality) {
         super(name);
         setFlownodeDefinitionId(flownodeDefinitionId);
         this.sequential = sequential;

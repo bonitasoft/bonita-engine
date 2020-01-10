@@ -24,7 +24,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 
 /**
@@ -55,7 +54,8 @@ public class SShortTextDataInstance extends SDataInstance {
     @Override
     public void validate() throws SDataInstanceNotWellFormedException {
         if (getValue() != null && getValue().length() > MAX_LENGTH) {
-            throw new SDataInstanceNotWellFormedException("Data " + getName() + " must not be longer than " + MAX_LENGTH + " characters");
+            throw new SDataInstanceNotWellFormedException(
+                    "Data " + getName() + " must not be longer than " + MAX_LENGTH + " characters");
         }
     }
 

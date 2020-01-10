@@ -15,7 +15,6 @@ package org.bonitasoft.engine.data.instance.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -69,6 +68,7 @@ public abstract class SDataInstance implements PersistentObject {
     }
 
     public abstract void setValue(Serializable value);
+
     public abstract Serializable getValue();
 
     public Boolean isTransientData() {
@@ -78,6 +78,7 @@ public abstract class SDataInstance implements PersistentObject {
     public void setDataTypeClassName(final String className) {
         this.className = className;
     }
+
     /**
      * Check if the data is well formed
      *
@@ -86,6 +87,5 @@ public abstract class SDataInstance implements PersistentObject {
      */
     public void validate() throws SDataInstanceNotWellFormedException {
     }
-
 
 }

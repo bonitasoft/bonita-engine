@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -92,7 +92,8 @@ public class QuartzSchedulerExecutorTest {
     @Mock
     private ListenerManager listenerManager;
 
-    private JobDetail jobDetail = JobBuilder.newJob(ConcurrentQuartzJob.class).withIdentity(JOB_NAME, GROUP_NAME).build();
+    private JobDetail jobDetail = JobBuilder.newJob(ConcurrentQuartzJob.class).withIdentity(JOB_NAME, GROUP_NAME)
+            .build();
 
     @Mock
     private org.quartz.Trigger trigger1;
@@ -109,7 +110,8 @@ public class QuartzSchedulerExecutorTest {
     }
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
-        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor, new TechnicalLoggerSLF4JImpl(), useOptimization);
+        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService,
+                sessionAccessor, new TechnicalLoggerSLF4JImpl(), useOptimization);
         quartz.start();
         return quartz;
     }
@@ -156,10 +158,12 @@ public class QuartzSchedulerExecutorTest {
     public void getQuartzTrigger_should_getQuartzTrigger_with_restart_ALL_have_a_ignore_misfire_policy() {
         // given
         final Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
-        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ALL);
+        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??",
+                MisfireRestartPolicy.ALL);
 
         // when
-        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger,
+                "MyJob", "12");
 
         // then
         assertEquals(CronTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY, quartzTrigger.getMisfireInstruction());
@@ -169,10 +173,12 @@ public class QuartzSchedulerExecutorTest {
     public void getQuartzTrigger_should_getQuartzTrigger_with_restart_NONE_have_a_do_nothing_misfire_policy() {
         // given
         final Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
-        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.NONE);
+        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??",
+                MisfireRestartPolicy.NONE);
 
         // when
-        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger,
+                "MyJob", "12");
 
         // then
         assertEquals(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING, quartzTrigger.getMisfireInstruction());
@@ -182,10 +188,12 @@ public class QuartzSchedulerExecutorTest {
     public void getQuartzTrigger_should_getQuartzTrigger_with_restart_ONE_have_a_fire_once_misfire_policy() {
         // given
         final Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
-        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ONE);
+        final UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??",
+                MisfireRestartPolicy.ONE);
 
         // when
-        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+        final CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger,
+                "MyJob", "12");
 
         // then
         assertEquals(CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW, quartzTrigger.getMisfireInstruction());
@@ -300,23 +308,28 @@ public class QuartzSchedulerExecutorTest {
         scheduleJob(executor, true, 1);
     }
 
-    private void scheduleJob(final QuartzSchedulerExecutor executor, final boolean disallowConcurrentExecution, final int expectedOptimizationCall)
+    private void scheduleJob(final QuartzSchedulerExecutor executor, final boolean disallowConcurrentExecution,
+            final int expectedOptimizationCall)
             throws Exception {
         // when
-        executor.schedule(1l, "2", JOB_NAME, new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), disallowConcurrentExecution);
+        executor.schedule(1l, "2", JOB_NAME, new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())),
+                disallowConcurrentExecution);
 
         // then
         verify(scheduler).scheduleJob(any(JobDetail.class), any(org.quartz.Trigger.class));
-        verify(transactionService, times(expectedOptimizationCall)).registerBonitaSynchronization(any(BonitaTransactionSynchronization.class));
+        verify(transactionService, times(expectedOptimizationCall))
+                .registerBonitaSynchronization(any(BonitaTransactionSynchronization.class));
     }
 
     @Test(expected = SSchedulerException.class)
     public void schedule_with_exception() throws Exception {
         // given
-        doThrow(SchedulerException.class).when(scheduler).scheduleJob(any(JobDetail.class), any(org.quartz.Trigger.class));
+        doThrow(SchedulerException.class).when(scheduler).scheduleJob(any(JobDetail.class),
+                any(org.quartz.Trigger.class));
 
         // when
-        quartzSchedulerExecutor.schedule(1l, "2", JOB_NAME, new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), true);
+        quartzSchedulerExecutor.schedule(1l, "2", JOB_NAME,
+                new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), true);
 
         // then exception
 
@@ -348,7 +361,6 @@ public class QuartzSchedulerExecutorTest {
         assertThat(dataMap.get("tenantId")).isEqualTo(tenantId);
     }
 
-
     @Test
     public void executeAgain_should_schedule_job_when_no_more_job_is_registered() throws Exception {
         // given
@@ -378,12 +390,12 @@ public class QuartzSchedulerExecutorTest {
         verify(scheduler, times(0)).rescheduleJob(any(org.quartz.TriggerKey.class), any(org.quartz.Trigger.class));
     }
 
-
     @Test
     public void executeAgain_should_schedule_job_when_job_have_no_trigger_that_may_not_fire_again() throws Exception {
         // given
         doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
-        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayFireAgain())).when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayFireAgain())).when(scheduler)
+                .getTriggersOfJob(any(JobKey.class));
 
         // when
         quartzSchedulerExecutor.executeAgain(JOB_ID, GROUP_NAME, JOB_NAME, true, 5000);
@@ -395,16 +407,19 @@ public class QuartzSchedulerExecutorTest {
     }
 
     private SimpleTriggerImpl triggerThatMayFireAgain() {
-        SimpleTriggerImpl simpleTrigger = (SimpleTriggerImpl) TriggerBuilder.newTrigger().withIdentity(JOB_NAME, GROUP_NAME).build();
+        SimpleTriggerImpl simpleTrigger = (SimpleTriggerImpl) TriggerBuilder.newTrigger()
+                .withIdentity(JOB_NAME, GROUP_NAME).build();
         simpleTrigger.setNextFireTime(new Date());
         return simpleTrigger;
     }
 
     @Test
-    public void executeAgain_should_reschedule_job_when_job_have_at_least_one_trigger_may_not_fire_again() throws Exception {
+    public void executeAgain_should_reschedule_job_when_job_have_at_least_one_trigger_may_not_fire_again()
+            throws Exception {
         // given
         doReturn(jobDetail).when(scheduler).getJobDetail(any(JobKey.class));
-        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayNotFireAgain())).when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(asList(triggerThatMayFireAgain(), triggerThatMayNotFireAgain())).when(scheduler)
+                .getTriggersOfJob(any(JobKey.class));
 
         // when
         quartzSchedulerExecutor.executeAgain(JOB_ID, GROUP_NAME, JOB_NAME, true, 5000);
@@ -463,12 +478,11 @@ public class QuartzSchedulerExecutorTest {
         verify(transactionService, times(1)).registerBonitaSynchronization(any(BonitaTransactionSynchronization.class));
     }
 
-
     @Test
     public void mayFireAgain_should_return_true_when_some_trigger_may_fire_again() throws Exception {
         when(trigger1.mayFireAgain()).thenReturn(false);
         when(trigger2.mayFireAgain()).thenReturn(true);
-        doReturn(asList(trigger1,trigger2)).when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(asList(trigger1, trigger2)).when(scheduler).getTriggersOfJob(any(JobKey.class));
 
         boolean mayFireAgain = quartzSchedulerExecutor.mayFireAgain(GROUP_NAME, JOB_NAME);
 
@@ -479,7 +493,7 @@ public class QuartzSchedulerExecutorTest {
     public void mayFireAgain_should_return_false_when_no_trigger_may_fire_again() throws Exception {
         when(trigger1.mayFireAgain()).thenReturn(false);
         when(trigger2.mayFireAgain()).thenReturn(false);
-        doReturn(asList(trigger1,trigger2)).when(scheduler).getTriggersOfJob(any(JobKey.class));
+        doReturn(asList(trigger1, trigger2)).when(scheduler).getTriggersOfJob(any(JobKey.class));
 
         boolean mayFireAgain = quartzSchedulerExecutor.mayFireAgain(GROUP_NAME, JOB_NAME);
 
@@ -510,7 +524,8 @@ public class QuartzSchedulerExecutorTest {
 
     }
 
-    private void check_reschedule(final TriggerState triggerState, final int expectedNumberOfInvocations) throws SchedulerException, SSchedulerException {
+    private void check_reschedule(final TriggerState triggerState, final int expectedNumberOfInvocations)
+            throws SchedulerException, SSchedulerException {
         final List<String> groupNames = new ArrayList<String>();
         final Set<TriggerKey> triggerKeys = new HashSet<TriggerKey>();
         groupNames.add(GROUP_NAME);
@@ -560,7 +575,8 @@ public class QuartzSchedulerExecutorTest {
 
     }
 
-    private void checkIsStarted(final boolean expectedResponse, final boolean schedulerStartStatus, final boolean schedulerSchutdownStatus)
+    private void checkIsStarted(final boolean expectedResponse, final boolean schedulerStartStatus,
+            final boolean schedulerSchutdownStatus)
             throws SchedulerException, SSchedulerException {
         // given
         doReturn(schedulerStartStatus).when(scheduler).isStarted();
@@ -611,7 +627,8 @@ public class QuartzSchedulerExecutorTest {
         final org.quartz.Trigger trigger = mock(org.quartz.Trigger.class);
         doReturn(TriggerBuilder.newTrigger()).when(trigger).getTriggerBuilder();
         doReturn(trigger).when(scheduler).getTrigger(any(TriggerKey.class));
-        doThrow(SchedulerException.class).when(scheduler).rescheduleJob(any(TriggerKey.class), any(org.quartz.Trigger.class));
+        doThrow(SchedulerException.class).when(scheduler).rescheduleJob(any(TriggerKey.class),
+                any(org.quartz.Trigger.class));
 
         // When
         quartzSchedulerExecutor.rescheduleJob("triggerName", "groupName", new Date());
@@ -689,12 +706,14 @@ public class QuartzSchedulerExecutorTest {
     public void should_register_listeners_on_start() throws Exception {
         BonitaJobListener listener1 = mock(BonitaJobListener.class);
         BonitaJobListener listener2 = mock(BonitaJobListener.class);
-        quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor, new TechnicalLoggerSLF4JImpl(), false);
+        quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor,
+                new TechnicalLoggerSLF4JImpl(), false);
         quartzSchedulerExecutor.setJobListeners(asList(listener1, listener2));
 
         quartzSchedulerExecutor.start();
 
-        verify(listenerManager).addJobListener(argThat((quartzListener) -> ((QuartzJobListener) quartzListener).getBonitaJobListeners().containsAll(asList(listener1, listener2))));
+        verify(listenerManager).addJobListener(argThat((quartzListener) -> ((QuartzJobListener) quartzListener)
+                .getBonitaJobListeners().containsAll(asList(listener1, listener2))));
     }
 
 }

@@ -51,26 +51,31 @@ public class ManualTasksIT extends TestWithUser {
         designProcessDefinition.addManualTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndAssignIt(processInstance, "step2", user);
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10,
+                null);
         assertEquals(1, toDoTasks.size());
         final HumanTaskInstance humanTaskInstance = toDoTasks.get(0);
         assertEquals(user.getId(), humanTaskInstance.getAssigneeId());
 
         // No need to verify anything, if no exception, query exists
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK).done());
 
         getProcessAPI().searchActivities(
-                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
-                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK)
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID, user.getId()).done());
 
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         waitForProcessToFinish(processInstance.getId());
@@ -88,12 +93,14 @@ public class ManualTasksIT extends TestWithUser {
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step1", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(),
+                ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndAssignIt(processInstance, "step2", user);
         waitForUserTaskAndAssignIt(processInstance, "step3", user);
 
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10,
+                null);
         assertEquals(2, toDoTasks.size());
         final HumanTaskInstance humanTaskInstance1 = toDoTasks.get(0);
         final HumanTaskInstance humanTaskInstance2 = toDoTasks.get(1);

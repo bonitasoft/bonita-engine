@@ -28,7 +28,8 @@ public class GetNumberOfCategoriesUnrelatedToProcess implements TransactionConte
 
     private long numberOfCategories;
 
-    public GetNumberOfCategoriesUnrelatedToProcess(final CategoryService categoryService, final long processDefinitionId) {
+    public GetNumberOfCategoriesUnrelatedToProcess(final CategoryService categoryService,
+            final long processDefinitionId) {
         super();
         this.categoryService = categoryService;
         this.processDefinitionId = processDefinitionId;

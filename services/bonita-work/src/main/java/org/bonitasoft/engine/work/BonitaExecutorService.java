@@ -16,7 +16,6 @@ package org.bonitasoft.engine.work;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * This is the interface we use to wrap the ThreadPool that execute works
  *
  * @author Julien Reboul
@@ -34,9 +33,9 @@ public interface BonitaExecutorService {
      */
     void shutdownAndEmptyQueue();
 
-
     /**
      * Execute the work described by the work descriptor
+     *
      * @param work
      */
     void submit(WorkDescriptor work);

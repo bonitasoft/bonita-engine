@@ -37,12 +37,18 @@ public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
         searchEntityKeys = new HashMap<>(7);
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SAComment.class, SAComment.PROCESSINSTANCEID_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTED_BY_ID, new FieldDescriptor(SAComment.class, SAComment.USERID_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.ID, new FieldDescriptor(SAComment.class, SAComment.ID_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE, new FieldDescriptor(SAComment.class, SAComment.POSTDATE_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAComment.class, SAComment.SOURCEOBJECTID_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT, new FieldDescriptor(SAComment.class, SAComment.CONTENT_KEY));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTED_BY_ID,
+                new FieldDescriptor(SAComment.class, SAComment.USERID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.ID,
+                new FieldDescriptor(SAComment.class, SAComment.ID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE,
+                new FieldDescriptor(SAComment.class, SAComment.POSTDATE_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID,
+                new FieldDescriptor(SAComment.class, SAComment.SOURCEOBJECTID_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT,
+                new FieldDescriptor(SAComment.class, SAComment.CONTENT_KEY));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME,
+                new FieldDescriptor(SUser.class, SUser.USER_NAME));
 
         archivedCommentsAllFields = new HashMap<>(1);
         final Set<String> archivedCommentFields = new HashSet<>(1);

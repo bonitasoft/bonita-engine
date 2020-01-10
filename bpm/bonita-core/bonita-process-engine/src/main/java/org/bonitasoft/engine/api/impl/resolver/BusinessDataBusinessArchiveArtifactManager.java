@@ -47,7 +47,8 @@ public class BusinessDataBusinessArchiveArtifactManager implements BusinessArchi
 
     @Override
     public List<Problem> checkResolution(final SProcessDefinition processDefinition) {
-        final List<SBusinessDataDefinition> businessDataDefinitions = processDefinition.getProcessContainer().getBusinessDataDefinitions();
+        final List<SBusinessDataDefinition> businessDataDefinitions = processDefinition.getProcessContainer()
+                .getBusinessDataDefinitions();
         if (businessDataDefinitions.isEmpty()) {
             return Collections.emptyList();
         }
@@ -56,8 +57,10 @@ public class BusinessDataBusinessArchiveArtifactManager implements BusinessArchi
         for (final SBusinessDataDefinition sBusinessDataDefinition : businessDataDefinitions) {
             final String className = sBusinessDataDefinition.getClassName();
             if (!entityClassNames.contains(className)) {
-                final Problem problem = new ProblemImpl(Level.ERROR, sBusinessDataDefinition.getName(), "business data", "The business data '"
-                        + sBusinessDataDefinition.getName() + "' with the class name '" + className + "', is not managed by the current version of the BDM");
+                final Problem problem = new ProblemImpl(Level.ERROR, sBusinessDataDefinition.getName(), "business data",
+                        "The business data '"
+                                + sBusinessDataDefinition.getName() + "' with the class name '" + className
+                                + "', is not managed by the current version of the BDM");
                 problems.add(problem);
             }
         }
@@ -70,7 +73,8 @@ public class BusinessDataBusinessArchiveArtifactManager implements BusinessArchi
     }
 
     @Override
-    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder) throws SBonitaException {
+    public void exportToBusinessArchive(long processDefinitionId, BusinessArchiveBuilder businessArchiveBuilder)
+            throws SBonitaException {
 
     }
 

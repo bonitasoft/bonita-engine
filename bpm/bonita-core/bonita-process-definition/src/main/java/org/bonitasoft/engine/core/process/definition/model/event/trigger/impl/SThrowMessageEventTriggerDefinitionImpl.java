@@ -28,7 +28,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Elias Ricken de Medeiros
  * @author Yanyan Liu
  */
-public class SThrowMessageEventTriggerDefinitionImpl extends SMessageEventTriggerDefinitionImpl implements SThrowMessageEventTriggerDefinition {
+public class SThrowMessageEventTriggerDefinitionImpl extends SMessageEventTriggerDefinitionImpl
+        implements SThrowMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -513177194601607560L;
 

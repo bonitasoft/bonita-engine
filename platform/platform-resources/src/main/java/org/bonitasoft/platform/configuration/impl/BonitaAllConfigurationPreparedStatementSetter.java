@@ -24,14 +24,16 @@ import org.springframework.jdbc.support.lob.TemporaryLobCreator;
 /**
  * @author Laurent Leseigneur
  */
-public class BonitaAllConfigurationPreparedStatementSetter implements BatchPreparedStatementSetter, ConfigurationColumns {
+public class BonitaAllConfigurationPreparedStatementSetter
+        implements BatchPreparedStatementSetter, ConfigurationColumns {
 
     public static final String INSERT_CONFIGURATION = "INSERT into configuration(tenant_id, content_type, resource_name, resource_content) values (?,?,?,?)";
     private final List<FullBonitaConfiguration> bonitaConfigurations;
 
     String dbVendor;
 
-    public BonitaAllConfigurationPreparedStatementSetter(List<FullBonitaConfiguration> bonitaConfigurations, String dbVendor) {
+    public BonitaAllConfigurationPreparedStatementSetter(List<FullBonitaConfiguration> bonitaConfigurations,
+            String dbVendor) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.dbVendor = dbVendor;
         if (this.dbVendor == null) {
@@ -55,10 +57,12 @@ public class BonitaAllConfigurationPreparedStatementSetter implements BatchPrepa
             case "oracle":
             case "mysql":
             case "sqlserver":
-                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
+                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT,
+                        bonitaConfiguration.getResourceContent());
                 break;
             default:
-                throw new IllegalArgumentException(new StringBuilder("unsupported db vendor:").append(dbVendor).toString());
+                throw new IllegalArgumentException(
+                        new StringBuilder("unsupported db vendor:").append(dbVendor).toString());
 
         }
 

@@ -59,31 +59,37 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
     private EhCacheCacheService cacheService;
 
     private GroovyScriptConditionExpressionExecutorStrategy executorStrategy;
-    
-    private final static String diskStorePath = IOUtil.TMP_DIRECTORY + File.separator + GroovyScriptExpressionExecutorCacheStrategyTest.class.getSimpleName();
+
+    private final static String diskStorePath = IOUtil.TMP_DIRECTORY + File.separator
+            + GroovyScriptExpressionExecutorCacheStrategyTest.class.getSimpleName();
     private Map<String, Object> context;
-    
+
     @Before
     public void setup() throws Exception {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
         final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
-        cacheService = new EhCacheCacheService(logger,  cacheConfigurations, defaultCacheConfiguration, diskStorePath, 1);
+        cacheService = new EhCacheCacheService(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath,
+                1);
         cacheService.start();
-        executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService, logger);
-        doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+        executorStrategy = new GroovyScriptConditionExpressionExecutorStrategy(cacheService, classLoaderService,
+                logger);
+        doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService)
+                .getLocalClassLoader(anyString(), anyLong());
         context = new HashMap<>();
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
     }
+
     @After
     public void stop() {
         cacheService.stop();
     }
-    
+
     @Test
     public void should_return_a_true_boolean_value() throws Exception {
         //given
-        final SExpressionImpl expression = new SExpressionImpl("myExpr", "'toto'", null, "java.lang.Boolean", null, Collections.<SExpression> emptyList());
+        final SExpressionImpl expression = new SExpressionImpl("myExpr", "'toto'", null, "java.lang.Boolean", null,
+                Collections.<SExpression> emptyList());
         // when
         final Object evaluate = executorStrategy.evaluate(expression, context, Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
@@ -91,12 +97,13 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         // then
         assertThat(evaluate).isEqualTo(true);
     }
-    
+
     @Test
     public void should_return_a_false_boolean_value() throws Exception {
         //given
         context.put("toto", null);
-        final SExpressionImpl expression = new SExpressionImpl("myExpr", "toto", null, "java.lang.Boolean", null, Collections.<SExpression> emptyList());
+        final SExpressionImpl expression = new SExpressionImpl("myExpr", "toto", null, "java.lang.Boolean", null,
+                Collections.<SExpression> emptyList());
         // when
         final Object evaluate = executorStrategy.evaluate(expression, context, Collections.<Integer, Object> emptyMap(),
                 ContainerState.ACTIVE);
@@ -104,5 +111,5 @@ public class GroovyScriptConditionExpressionExecutorStrategyTest {
         // then
         assertThat(evaluate).isEqualTo(false);
     }
-    
+
 }

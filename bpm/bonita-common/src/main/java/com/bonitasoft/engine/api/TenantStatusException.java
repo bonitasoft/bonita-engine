@@ -16,11 +16,13 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
- * Thrown when we try to access on a paused tenant an API method that cannot be called on a paused tenant, or when we try to access on a running tenant an API
+ * Thrown when we try to access on a paused tenant an API method that cannot be called on a paused tenant, or when we
+ * try to access on a running tenant an API
  * method that cannot be called on a running tenant.
- * 
+ *
  * @author Emmanuel Duchastenier
- * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.exception.TenantStatusException} instead. This class was only introduced to avoid an API
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.exception.TenantStatusException} instead. This
+ *             class was only introduced to avoid an API
  *             break of Bonita Engine Subscription version. It will be deleted in next releases.
  */
 @Deprecated

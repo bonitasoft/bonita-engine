@@ -59,7 +59,8 @@ public class IsActorInitiatorRuleTest {
     long userId = 2L;
 
     @InjectMocks
-    IsActorInitiatorRule isActorInitiatorRule = new IsActorInitiatorRule(actorMappingService, sessionAccessor, sessionService, formMappingService);
+    IsActorInitiatorRule isActorInitiatorRule = new IsActorInitiatorRule(actorMappingService, sessionAccessor,
+            sessionService, formMappingService);
 
     @Before
     public void initMocks() throws Exception {

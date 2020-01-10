@@ -18,7 +18,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstan
 /**
  * @author Baptiste Mesta
  */
-public abstract class SFlowNodeInstanceBuilderFactoryImpl extends SFlowElementInstanceBuilderFactoryImpl implements SFlowNodeInstanceBuilderFactory {
+public abstract class SFlowNodeInstanceBuilderFactoryImpl extends SFlowElementInstanceBuilderFactoryImpl
+        implements SFlowNodeInstanceBuilderFactory {
 
     protected static final String DISPLAY_DESCRIPTION = "displayDescription";
 
@@ -39,7 +40,6 @@ public abstract class SFlowNodeInstanceBuilderFactoryImpl extends SFlowElementIn
     protected static final String EXECUTE_FOR_KEY = "executedBySubstitute";
 
     protected static final String STATE_EXECUTING_KEY = "stateExecuting";
-
 
     @Override
     public String getDisplayDescriptionKey() {

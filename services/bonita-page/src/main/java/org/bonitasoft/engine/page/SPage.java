@@ -35,11 +35,11 @@ import lombok.experimental.SuperBuilder;
 public class SPage extends AbstractSPage {
 
     public static final String NAME = "name";
-    public static final String DESCRIPTION =  "description";
-    public static final String INSTALLATION_DATE =  "installationDate";
-    public static final String INSTALLED_BY =  "installedBy";
-    public static final String CONTENT_TYPE =  "contentType";
-    public static final String PROCESS_DEFINITION_ID =  "processDefinitionId";
+    public static final String DESCRIPTION = "description";
+    public static final String INSTALLATION_DATE = "installationDate";
+    public static final String INSTALLED_BY = "installedBy";
+    public static final String CONTENT_TYPE = "contentType";
+    public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
     public static final String ID = "id";
     public static final String PROVIDED = "provided";
     public static final String HIDDEN = "hidden";
@@ -48,9 +48,9 @@ public class SPage extends AbstractSPage {
     public static final String LAST_UPDATE_BY = "lastUpdateBy";
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
-                     final long installedBy,
-                     final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
-                     final String contentName) {
+            final long installedBy,
+            final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
         super(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
@@ -60,9 +60,9 @@ public class SPage extends AbstractSPage {
     }
 
     public SPage(final String name, final String description, final String displayName, final long installationDate,
-                     final long installedBy,
-                     final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
-                     final String contentName) {
+            final long installedBy,
+            final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
@@ -82,7 +82,7 @@ public class SPage extends AbstractSPage {
     }
 
     public SPage(final String name, final long installationDate, final long installedBy, final boolean provided,
-                     final String contentName) {
+            final String contentName) {
         setName(name);
         setInstallationDate(installationDate);
         setInstalledBy(installedBy);

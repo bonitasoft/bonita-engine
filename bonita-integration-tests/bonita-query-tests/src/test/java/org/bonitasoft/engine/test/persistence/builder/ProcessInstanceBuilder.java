@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
-
 public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInstance, ProcessInstanceBuilder> {
 
     private long processDefinitionId;
@@ -58,7 +57,7 @@ public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInst
     public static ProcessInstanceBuilder aProcessInstance() {
         return new ProcessInstanceBuilder();
     }
-    
+
     @Override
     SProcessInstance _build() {
         SProcessInstance processInstance = new SProcessInstance(name, processDefinitionId);
@@ -92,7 +91,7 @@ public class ProcessInstanceBuilder extends PersistentObjectBuilder<SProcessInst
         this.processDefinitionId = processDefinitionId;
         return this;
     }
-    
+
     public ProcessInstanceBuilder withDescription(final String description) {
         this.description = description;
         return this;

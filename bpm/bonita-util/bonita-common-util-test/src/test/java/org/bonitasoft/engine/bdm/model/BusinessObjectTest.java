@@ -60,7 +60,9 @@ public class BusinessObjectTest {
         businessObject.setQualifiedName("aQualifiedName");
         businessObject.addField(aBooleanField("aSimpleField"));
         businessObject
-                .addField(anAggregationField("aggregationField", aBO("boName").withField(aBooleanField("aField")).build()));
+                .addField(
+                        anAggregationField("aggregationField",
+                                aBO("boName").withField(aBooleanField("aField")).build()));
 
         assertThat(businessObject).canBeMarshalled();
     }
@@ -76,7 +78,8 @@ public class BusinessObjectTest {
 
     @Test
     public void could_have_optional_uniqueConstraints() {
-        final BusinessObject bo = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
+        final BusinessObject bo = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2"))
+                .build();
 
         bo.addUniqueConstraint("const", "field1");
         bo.addUniqueConstraint("const2", "field2");
@@ -130,7 +133,8 @@ public class BusinessObjectTest {
     @Test
     public void isARelationField_should_be_true_with_an_object_with_relation_field() throws Exception {
         final BusinessObject bo = new BusinessObject();
-        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation().referencing(addressBO())
+        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation()
+                .referencing(addressBO())
                 .build();
         bo.addField(aggregationMultiple);
 

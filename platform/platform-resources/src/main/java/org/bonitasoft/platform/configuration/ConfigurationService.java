@@ -23,15 +23,16 @@ import org.bonitasoft.platform.exception.PlatformException;
 
 /**
  * Give access to Bonita Platform configuration.
- * Is used by setup mechanism to retrieve configuration before running the Engine + Portal, on a system that does give access to a persistent filesystem.
- * 
+ * Is used by setup mechanism to retrieve configuration before running the Engine + Portal, on a system that does give
+ * access to a persistent filesystem.
+ *
  * @author Emmanuel Duchastenier
  */
 public interface ConfigurationService {
 
     /**
      * Retrieves the portal configuration at platform-level.
-     * 
+     *
      * @return a list of BonitaConfiguration that represents each file
      */
     List<BonitaConfiguration> getPlatformPortalConf();
@@ -84,14 +85,14 @@ public interface ConfigurationService {
 
     /**
      * store platform init configuration file in database
-     * 
+     *
      * @param bonitaConfigurations list of files
      */
     void storePlatformInitEngineConf(List<BonitaConfiguration> bonitaConfigurations);
 
     /**
      * store platform configuration file in database
-     * 
+     *
      * @param bonitaConfigurations list of files
      */
     void storePlatformEngineConf(List<BonitaConfiguration> bonitaConfigurations);

@@ -86,13 +86,15 @@ public class BinaryComparatorExecutorTest {
     }
 
     @Test
-    public void evaluate_should_throw_SExpressionEvaluationException_when_number_there_are_not_exactly_2_dependencies() throws Exception {
+    public void evaluate_should_throw_SExpressionEvaluationException_when_number_there_are_not_exactly_2_dependencies()
+            throws Exception {
         //given
         SExpression expression = mock(SExpression.class);
         String operator = ">";
         given(expression.getContent()).willReturn(operator);
         given(expression.getName()).willReturn(operator);
-        given(expression.getDependencies()).willReturn(Arrays.asList(mock(SExpression.class), mock(SExpression.class), mock(SExpression.class)));
+        given(expression.getDependencies())
+                .willReturn(Arrays.asList(mock(SExpression.class), mock(SExpression.class), mock(SExpression.class)));
 
         try {
             //when
@@ -100,14 +102,16 @@ public class BinaryComparatorExecutorTest {
             fail("exception expected");
         } catch (SExpressionEvaluationException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("The expression '" + expression.getContent() + "' has " + expression.getDependencies().size()
-                    + " dependencies, but it must have exactly " + 2 + " dependencies.");
+            assertThat(e.getMessage()).isEqualTo(
+                    "The expression '" + expression.getContent() + "' has " + expression.getDependencies().size()
+                            + " dependencies, but it must have exactly " + 2 + " dependencies.");
         }
 
     }
 
     @Test
-    public void evaluate_should_throw_SExpressionEvaluationException_when_return_types_are_incompatible() throws Exception {
+    public void evaluate_should_throw_SExpressionEvaluationException_when_return_types_are_incompatible()
+            throws Exception {
         //given
 
         SExpression left = buildIntegerExpression(5);
@@ -121,13 +125,15 @@ public class BinaryComparatorExecutorTest {
             fail("exception expected");
         } catch (SExpressionEvaluationException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("The two dependencies of expression '" + operator + "' must have the same return type.");
+            assertThat(e.getMessage())
+                    .isEqualTo("The two dependencies of expression '" + operator + "' must have the same return type.");
         }
 
     }
 
     @Test
-    public void evaluate_should_throw_SExpressionEvaluationException_when_evaluator_throws_SComparisonException() throws Exception {
+    public void evaluate_should_throw_SExpressionEvaluationException_when_evaluator_throws_SComparisonException()
+            throws Exception {
         //given
         String operator = ">";
         given(mapper.getEvaluator(operator)).willReturn(evaluator);
@@ -147,7 +153,8 @@ public class BinaryComparatorExecutorTest {
             fail("exception expected");
         } catch (SExpressionEvaluationException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("Unable to evaluate expression '" + comparisonExpression.getName() + "'");
+            assertThat(e.getMessage())
+                    .isEqualTo("Unable to evaluate expression '" + comparisonExpression.getName() + "'");
         }
 
     }
@@ -175,7 +182,8 @@ public class BinaryComparatorExecutorTest {
     }
 
     @Test
-    public void areCompatible_should_return_true_when_two_parameters_has_different_return_types_but_operator_is_equals_to() throws Exception {
+    public void areCompatible_should_return_true_when_two_parameters_has_different_return_types_but_operator_is_equals_to()
+            throws Exception {
         //given
 
         //when
@@ -186,7 +194,8 @@ public class BinaryComparatorExecutorTest {
     }
 
     @Test
-    public void areCompatible_should_return_true_when_two_parameters_has_different_return_types_but_both_are_numeric() throws Exception {
+    public void areCompatible_should_return_true_when_two_parameters_has_different_return_types_but_both_are_numeric()
+            throws Exception {
         //given
 
         //when
@@ -278,7 +287,8 @@ public class BinaryComparatorExecutorTest {
         return expression;
     }
 
-    private SExpression buildComparisonExpression(SExpression leftExpression, SExpression rightExpression, String operator) {
+    private SExpression buildComparisonExpression(SExpression leftExpression, SExpression rightExpression,
+            String operator) {
         final SExpressionImpl expression = new SExpressionImpl();
         expression.setName("compare");
         expression.setContent(operator);

@@ -55,7 +55,8 @@ public abstract class AbstractUserFilter implements UserFilter {
         return (String) getInputParameter(paramName);
     }
 
-    protected void validateStringInputParameterIsNotNulOrEmpty(final String paramName) throws ConnectorValidationException {
+    protected void validateStringInputParameterIsNotNulOrEmpty(final String paramName)
+            throws ConnectorValidationException {
         final String paramValue = (String) getInputParameter(paramName);
         if (paramValue == null || "".equals(paramValue.trim())) {
             throw new ConnectorValidationException("The input parameter '" + paramName + "' cannot be null or empty");

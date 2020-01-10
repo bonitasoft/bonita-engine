@@ -36,8 +36,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -64,7 +64,8 @@ public class BonitaHomeServerTest {
                 conf("file2", "file2Content".getBytes()));
         doReturn(tenantTemplateConf)
                 .when(configurationService).getTenantTemplateEngineConf();
-        List<BonitaConfiguration> tenantTemplateScripts = confs(conf("org/bonitasoft/package/TrueScript.groovy", "return true".getBytes()),
+        List<BonitaConfiguration> tenantTemplateScripts = confs(
+                conf("org/bonitasoft/package/TrueScript.groovy", "return true".getBytes()),
                 conf("org/bonitasoft/package/FalseScript.groovy", "return false".getBytes()));
         doReturn(tenantTemplateScripts)
                 .when(configurationService).getTenantTemplateSecurityScripts();
@@ -87,9 +88,11 @@ public class BonitaHomeServerTest {
                 .when(configurationService).getTenantPortalConf(TENANT_ID);
 
         //when
-        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties", "the updated content".getBytes());
+        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",
+                "the updated content".getBytes());
         //then
-        verify(configurationService).storeTenantPortalConf(Collections.singletonList(conf("myFile.properties", "the updated content".getBytes())), TENANT_ID);
+        verify(configurationService).storeTenantPortalConf(
+                Collections.singletonList(conf("myFile.properties", "the updated content".getBytes())), TENANT_ID);
     }
 
     @Test(expected = UpdateException.class)
@@ -101,7 +104,8 @@ public class BonitaHomeServerTest {
                 .when(configurationService).getTenantPortalConf(TENANT_ID);
 
         //when
-        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties", "the updated content".getBytes());
+        bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties",
+                "the updated content".getBytes());
     }
 
     @Test
@@ -109,7 +113,7 @@ public class BonitaHomeServerTest {
         //when
         bonitaHomeServer.deleteTenant(TENANT_ID);
 
-        //then 
+        //then
         verify(configurationService).deleteTenantConfiguration(TENANT_ID);
     }
 
@@ -129,15 +133,18 @@ public class BonitaHomeServerTest {
         databaseProperties.setProperty("databaseProperty", "aValueInDb");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         databaseProperties.store(out, "");
-        doReturn(Collections.singletonList(new BonitaConfiguration("myProp.properties", out.toByteArray()))).when(configurationService).getPlatformEngineConf();
+        doReturn(Collections.singletonList(new BonitaConfiguration("myProp.properties", out.toByteArray())))
+                .when(configurationService).getPlatformEngineConf();
         Properties classPathProperties = new Properties();
         classPathProperties.setProperty("overriddenProperty", "classPathValue");
         classPathProperties.setProperty("classPathProperty", "aValueInClassPath");
-        doReturn(classPathProperties).when(bonitaHomeServer).getPropertiesFromClassPath(ArgumentMatchers.<String> anyVararg());
+        doReturn(classPathProperties).when(bonitaHomeServer)
+                .getPropertiesFromClassPath(ArgumentMatchers.<String> anyVararg());
         //when
         Properties allProperties = bonitaHomeServer.getPlatformProperties();
         //then
-        assertThat(allProperties).containsOnly(entry("overriddenProperty", "databaseValue"), entry("databaseProperty", "aValueInDb"),
+        assertThat(allProperties).containsOnly(entry("overriddenProperty", "databaseValue"),
+                entry("databaseProperty", "aValueInDb"),
                 entry("classPathProperty", "aValueInClassPath"));
     }
 
@@ -145,17 +152,22 @@ public class BonitaHomeServerTest {
     public void should_getPropertiesFromClassPath_get_properties_of_all_files_from_classpath() throws Exception {
         //given
         File jar1 = temporaryFolder.newFile("myJar1.jar");
-        FileUtils.writeByteArrayToFile(jar1, IOUtil.generateJar(Collections.singletonMap("myPropertiesFile1.properties", "prop1=value1".getBytes())));
+        FileUtils.writeByteArrayToFile(jar1, IOUtil
+                .generateJar(Collections.singletonMap("myPropertiesFile1.properties", "prop1=value1".getBytes())));
         File jar2 = temporaryFolder.newFile("myJar2.jar");
-        FileUtils.writeByteArrayToFile(jar2, IOUtil.generateJar(Collections.singletonMap("myPropertiesFile2.properties", "prop2=value2".getBytes())));
+        FileUtils.writeByteArrayToFile(jar2, IOUtil
+                .generateJar(Collections.singletonMap("myPropertiesFile2.properties", "prop2=value2".getBytes())));
         File jar3 = temporaryFolder.newFile("myJar3.jar");
-        FileUtils.writeByteArrayToFile(jar3, IOUtil.generateJar(Collections.singletonMap("myPropertiesFile3.properties", "prop3=value3".getBytes())));
+        FileUtils.writeByteArrayToFile(jar3, IOUtil
+                .generateJar(Collections.singletonMap("myPropertiesFile3.properties", "prop3=value3".getBytes())));
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { jar1.toURI().toURL(), jar2.toURI().toURL(), jar3.toURI().toURL() }, contextClassLoader);
+        URLClassLoader urlClassLoader = new URLClassLoader(
+                new URL[] { jar1.toURI().toURL(), jar2.toURI().toURL(), jar3.toURI().toURL() }, contextClassLoader);
         try {
             Thread.currentThread().setContextClassLoader(urlClassLoader);
             //when
-            Properties propertiesFromClassPath = bonitaHomeServer.getPropertiesFromClassPath("myPropertiesFile1.properties",
+            Properties propertiesFromClassPath = bonitaHomeServer.getPropertiesFromClassPath(
+                    "myPropertiesFile1.properties",
                     "myPropertiesFile2.properties", "anUnexistingProperty.properties");
             //then
             assertThat(propertiesFromClassPath).containsOnly(entry("prop1", "value1"), entry("prop2", "value2"));

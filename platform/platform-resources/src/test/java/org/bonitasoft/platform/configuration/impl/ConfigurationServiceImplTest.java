@@ -50,7 +50,8 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getPlatformPortalConf_should_call_query_for_PLATFORM_PORTAL_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService).getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
+        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getPlatformPortalConf();
 
@@ -59,7 +60,8 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getPlatformEngineConf_should_call_query_for_PLATFORM_ENGINE_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService).getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
+        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getPlatformInitEngineConf();
 
@@ -68,7 +70,8 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getAllTenantsPortalConf_should_call_query_for_TENANT_PORTAL_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService).getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
+        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getAllTenantsPortalConf();
 
@@ -77,7 +80,8 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getAllTenantsEngineConf_should_call_query_for_TENANT_ENGINE_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService).getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
+        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getAllTenantsEngineConf();
 
@@ -86,7 +90,8 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getLicenses_should_call_query_for_LICENSES_type() throws Exception {
-        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService).getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
+        Mockito.doReturn(Collections.EMPTY_LIST).when(configurationService)
+                .getNonTenantResource(ArgumentMatchers.any(ConfigurationType.class));
 
         configurationService.getLicenses();
 
@@ -111,7 +116,9 @@ public class ConfigurationServiceImplTest {
         // then
         Assertions.assertThat(configFolder.toPath().resolve("platform_type").resolve("conf1.properties").toFile())
                 .as("should lowercase configuration type").exists();
-        Assertions.assertThat(configFolder.toPath().resolve("tenants").resolve("5").resolve("tenant_type").resolve("conf2.properties").toFile())
+        Assertions
+                .assertThat(configFolder.toPath().resolve("tenants").resolve("5").resolve("tenant_type")
+                        .resolve("conf2.properties").toFile())
                 .as("should create sub folder with tenantId").exists();
 
     }
@@ -122,7 +129,7 @@ public class ConfigurationServiceImplTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("tenantId value 0 is not allowed");
 
-        //when 
+        //when
         configurationService.deleteTenantConfiguration(0);
     }
 }

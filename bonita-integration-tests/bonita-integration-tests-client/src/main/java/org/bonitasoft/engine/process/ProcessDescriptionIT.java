@@ -27,25 +27,30 @@ public class ProcessDescriptionIT extends TestWithUser {
 
     @Test
     public void allInstanceDescriptions() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("descProcess", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("descProcess",
+                "1.0");
         processBuilder.addDescription("processDescription");
         processBuilder.addActor(ACTOR_NAME).addDescription("actorDescription");
         processBuilder.addBooleanData("booleanProcessData", null).addDescription("descBooleanProcessData");
         processBuilder.addStartEvent("start");
         processBuilder.addGateway("gateway", GatewayType.PARALLEL).addDescription("descGateway");
-        processBuilder.addUserTask("userTask", ACTOR_NAME).addDescription("descUserTask").addBooleanData("booleanUserTaskData", null)
+        processBuilder.addUserTask("userTask", ACTOR_NAME).addDescription("descUserTask")
+                .addBooleanData("booleanUserTaskData", null)
                 .addDescription("descBooleanUserTaskData");
         processBuilder.addTransition("start", "gateway");
         processBuilder.addTransition("gateway", "userTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals("processDescription", processInstance.getDescription());
 
-        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData", processInstance.getId());
+        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData",
+                processInstance.getId());
         assertEquals("descBooleanProcessData", processDataInstance.getDescription());
 
         final long userTaskId = waitForUserTask(processInstance, "userTask");
-        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData", userTaskId);
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData",
+                userTaskId);
         assertEquals("descBooleanUserTaskData", activityDataInstance.getDescription());
 
         disableAndDeleteProcess(processDefinition);

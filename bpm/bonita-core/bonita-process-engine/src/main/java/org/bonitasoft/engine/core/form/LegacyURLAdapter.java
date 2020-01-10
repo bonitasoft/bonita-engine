@@ -31,27 +31,30 @@ import org.bonitasoft.engine.page.URLAdapterConstants;
  * @author Baptiste Mesta, Anthony Birembaut
  */
 public class LegacyURLAdapter implements URLAdapter {
-    
+
     private static final String UUID_SEPERATOR = "--";
-    
+
     private static final String DEFAULT_FORM_MODE = "form";
 
     ProcessDefinitionService processDefinitionService;
-    
+
     FormMappingService formMappingService;
 
-    public LegacyURLAdapter(final ProcessDefinitionService processDefinitionService, final FormMappingService formMappingService) {
+    public LegacyURLAdapter(final ProcessDefinitionService processDefinitionService,
+            final FormMappingService formMappingService) {
         this.processDefinitionService = processDefinitionService;
         this.formMappingService = formMappingService;
     }
 
     @Override
-    public String adapt(final String url, final String key, final Map<String, Serializable> context) throws SExecutionException {
+    public String adapt(final String url, final String key, final Map<String, Serializable> context)
+            throws SExecutionException {
         @SuppressWarnings("unchecked")
-        final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
+        final Map<String, String[]> queryParameters = (Map<String, String[]>) context
+                .get(URLAdapterConstants.QUERY_PARAMETERS);
 
         String[] idParamValue = new String[0];
-        if(queryParameters != null){
+        if (queryParameters != null) {
             idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
         }
         String bpmId;
@@ -61,7 +64,8 @@ public class LegacyURLAdapter implements URLAdapter {
             bpmId = idParamValue[0];
             try {
                 final SFormMapping formMapping = formMappingService.get(key);
-                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(formMapping.getProcessDefinitionId());
+                final SProcessDefinition processDefinition = processDefinitionService
+                        .getProcessDefinition(formMapping.getProcessDefinitionId());
                 final String locale = (String) context.get(URLAdapterConstants.LOCALE);
                 final String contextPath = (String) context.get(URLAdapterConstants.CONTEXT_PATH);
                 boolean assignTask = false;
@@ -80,43 +84,49 @@ public class LegacyURLAdapter implements URLAdapter {
                     mode = modeParamValue[0];
                 }
                 boolean autoInstantiate = true;
-                final String[] autoInstantiateValue = queryParameters.get(URLAdapterConstants.AUTO_INSTANTIATE_QUERY_PARAM);
-                if (autoInstantiateValue != null && autoInstantiateValue.length > 0 && "false".equals(autoInstantiateValue[0])) {
+                final String[] autoInstantiateValue = queryParameters
+                        .get(URLAdapterConstants.AUTO_INSTANTIATE_QUERY_PARAM);
+                if (autoInstantiateValue != null && autoInstantiateValue.length > 0
+                        && "false".equals(autoInstantiateValue[0])) {
                     autoInstantiate = false;
                 }
-                return generateLegacyURL(contextPath, locale, bpmId, formMapping, processDefinition, user, assignTask, mode, autoInstantiate);
+                return generateLegacyURL(contextPath, locale, bpmId, formMapping, processDefinition, user, assignTask,
+                        mode, autoInstantiate);
             } catch (final SBonitaException e) {
-                throw new SExecutionException("Unable to generate the legacy form URL for key " + key + "(id: " + bpmId + ")", e);
+                throw new SExecutionException(
+                        "Unable to generate the legacy form URL for key " + key + "(id: " + bpmId + ")", e);
             }
         }
     }
 
-    protected String generateLegacyURL(final String contextPath, final String locale, final String bpmId, final SFormMapping formMapping, final SProcessDefinition processDefinition, final String user, final boolean assignTask, final String mode, boolean autoInstantiate) {
+    protected String generateLegacyURL(final String contextPath, final String locale, final String bpmId,
+            final SFormMapping formMapping, final SProcessDefinition processDefinition, final String user,
+            final boolean assignTask, final String mode, boolean autoInstantiate) {
         final StringBuilder legacyFormURL = new StringBuilder(contextPath);
         legacyFormURL.append("/portal/homepage?ui=form&locale=")
-            .append(locale)
-            .append("&theme=")
-            .append(formMapping.getProcessDefinitionId())
-            .append("#mode=")
-            .append(mode)
-            .append("&form=")
-            .append(urlEncode(processDefinition.getName()))
-            .append(UUID_SEPERATOR)
-            .append(urlEncode(processDefinition.getVersion()));
+                .append(locale)
+                .append("&theme=")
+                .append(formMapping.getProcessDefinitionId())
+                .append("#mode=")
+                .append(mode)
+                .append("&form=")
+                .append(urlEncode(processDefinition.getName()))
+                .append(UUID_SEPERATOR)
+                .append(urlEncode(processDefinition.getVersion()));
         if (FormMappingType.TASK.getId().equals(formMapping.getType())) {
             legacyFormURL.append(UUID_SEPERATOR).append(urlEncode(formMapping.getTask() + "$"))
-                .append("entry&task=")
-                .append(bpmId);
+                    .append("entry&task=")
+                    .append(bpmId);
             if (assignTask) {
                 legacyFormURL.append("&assignTask=true");
             }
         } else if (FormMappingType.PROCESS_OVERVIEW.getId().equals(formMapping.getType())) {
             legacyFormURL.append(urlEncode("$"))
-                .append("recap&instance=").append(bpmId)
-                .append("&recap=true");
+                    .append("recap&instance=").append(bpmId)
+                    .append("&recap=true");
         } else {
             legacyFormURL.append(urlEncode("$"))
-                .append("entry&process=").append(bpmId);
+                    .append("entry&process=").append(bpmId);
             if (!autoInstantiate) {
                 legacyFormURL.append("&autoInstantiate=false");
             }

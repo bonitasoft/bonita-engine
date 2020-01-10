@@ -54,11 +54,14 @@ public class ApplicationPageDestructorTest {
         destructor.onDeleteApplicationPage(applicationPage);
 
         //then
-        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(new ApplicationPageRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), APPLICATION_PAGE_ID));
+        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(
+                new ApplicationPageRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS),
+                        APPLICATION_PAGE_ID));
     }
 
     @Test
-    public void onDeleteApplicationPage_should_throw_SObjectModificationException_when_homePageChecker_returns_true() throws Exception {
+    public void onDeleteApplicationPage_should_throw_SObjectModificationException_when_homePageChecker_returns_true()
+            throws Exception {
         //given
         SApplicationPage applicationPage = mock(SApplicationPage.class);
         given(applicationPage.getId()).willReturn(APPLICATION_PAGE_ID);
@@ -70,7 +73,8 @@ public class ApplicationPageDestructorTest {
             Assertions.fail("Exception expected");
         } catch (SObjectModificationException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("The application page with id '" + APPLICATION_PAGE_ID + "' cannot be deleted because it is set as the application home page");
+            assertThat(e.getMessage()).isEqualTo("The application page with id '" + APPLICATION_PAGE_ID
+                    + "' cannot be deleted because it is set as the application home page");
         }
 
     }

@@ -237,7 +237,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         final Category category = getProcessAPI().createCategory(name, description);
         categories.add(category);
         // test
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(
+                category.getId(), 0, 10,
                 ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertEquals(0, processDeploymentInfos.size());
     }
@@ -245,11 +246,14 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test
     public void removeSeveralCategoriesToProcessDefinition() throws Exception {
         // generate category id;
-        final Category category1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        final Category category1 = getProcessAPI().createCategory("Human resources",
+                "Category for personnel Management");
         categories.add(category1);
-        final Category category2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters");
+        final Category category2 = getProcessAPI().createCategory("Travel Service",
+                "Category for all related travel matters");
         categories.add(category2);
-        final Category category3 = getProcessAPI().createCategory("Cleaning Service", "Category for all related travel matters");
+        final Category category3 = getProcessAPI().createCategory("Cleaning Service",
+                "Category for all related travel matters");
         categories.add(category3);
         // generate process definition id
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
@@ -257,13 +261,17 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         final long processDefinitionId = processDefinition.getId();
 
         // test number of current categories form this process:
-        getProcessAPI().addCategoriesToProcess(processDefinitionId, Arrays.asList(new Long[] { category1.getId(), category2.getId(), category3.getId() }));
-        List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
+        getProcessAPI().addCategoriesToProcess(processDefinitionId,
+                Arrays.asList(new Long[] { category1.getId(), category2.getId(), category3.getId() }));
+        List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10,
+                CategoryCriterion.NAME_DESC);
         assertEquals(3, categories.size());
 
-        getProcessAPI().removeCategoriesFromProcess(processDefinitionId, Arrays.asList(new Long[] { category1.getId(), category3.getId() }));
+        getProcessAPI().removeCategoriesFromProcess(processDefinitionId,
+                Arrays.asList(new Long[] { category1.getId(), category3.getId() }));
         // test number of current categories form this process:
-        categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
+        categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10,
+                CategoryCriterion.NAME_DESC);
         assertEquals(1, categories.size());
         // check if the remaining one is the good one:
         assertEquals(category2.getId(), categories.get(0).getId());
@@ -271,15 +279,19 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
 
     @Test
     public void addSeveralCategoriesToProcessDefinition() throws Exception {
-        final Category category1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        final Category category1 = getProcessAPI().createCategory("Human resources",
+                "Category for personnel Management");
         categories.add(category1);
-        final Category category2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters");
+        final Category category2 = getProcessAPI().createCategory("Travel Service",
+                "Category for all related travel matters");
         categories.add(category2);
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
         processDefinitions.add(processDefinition);
         // test
-        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(new Long[] { category1.getId(), category2.getId() }));
-        final List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinition.getId(), 0, 10, CategoryCriterion.NAME_DESC);
+        getProcessAPI().addCategoriesToProcess(processDefinition.getId(),
+                Arrays.asList(new Long[] { category1.getId(), category2.getId() }));
+        final List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinition.getId(), 0,
+                10, CategoryCriterion.NAME_DESC);
         assertEquals(2, categories.size());
         assertEquals(category1.getId(), categories.get(1).getId());
         assertEquals(category2.getId(), categories.get(0).getId());
@@ -296,8 +308,10 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         processDefinitions.add(processDefinition);
         // test
         getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
-                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC).get(0);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                        ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC)
+                .get(0);
         assertEquals(processDefinition.getName(), processDeploymentInfo.getName());
         assertEquals(processDefinition.getVersion(), processDeploymentInfo.getVersion());
     }
@@ -334,8 +348,9 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         }
         // test
         getProcessAPI().addProcessDefinitionsToCategory(categoryId, processDefinitionIds);
-        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
-                ProcessDeploymentInfoCriterion.NAME_ASC);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI()
+                .getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                        ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList);
         assertEquals(3, processDeploymentInfoList.size());
     }
@@ -365,7 +380,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test
     public void getNumberOfProcessesInCategory() throws Exception {
         // generate categories
-        final Category category = generateCategory(1, "categoryName", "test get number of processes in category").get(0);
+        final Category category = generateCategory(1, "categoryName", "test get number of processes in category")
+                .get(0);
         categories.add(category);
         // generate process definition
         processDefinitions = generateProcessDefinition(3, "processName", "version");
@@ -398,23 +414,26 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         // add process definitions to category
         getProcessAPI().addProcessDefinitionsToCategory(categoryId, processDefinitionIds);
         // test
-        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameASC = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 3,
-                ProcessDeploymentInfoCriterion.NAME_ASC);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameASC = getProcessAPI()
+                .getProcessDeploymentInfosOfCategory(categoryId, 0, 3,
+                        ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList_NameASC);
         assertEquals(3, processDeploymentInfoList_NameASC.size());
         assertEquals("process1", processDeploymentInfoList_NameASC.get(0).getName());
         assertEquals("process2", processDeploymentInfoList_NameASC.get(1).getName());
         assertEquals("process3", processDeploymentInfoList_NameASC.get(2).getName());
 
-        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameDESC = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 3,
-                ProcessDeploymentInfoCriterion.NAME_DESC);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameDESC = getProcessAPI()
+                .getProcessDeploymentInfosOfCategory(categoryId, 0, 3,
+                        ProcessDeploymentInfoCriterion.NAME_DESC);
         assertNotNull(processDeploymentInfoList_NameDESC);
         assertEquals(3, processDeploymentInfoList_NameDESC.size());
         assertEquals("process3", processDeploymentInfoList_NameDESC.get(0).getName());
         assertEquals("process2", processDeploymentInfoList_NameDESC.get(1).getName());
         assertEquals("process1", processDeploymentInfoList_NameDESC.get(2).getName());
 
-        final List<ProcessDeploymentInfo> outOfRangeList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 3, 3,
+        final List<ProcessDeploymentInfo> outOfRangeList = getProcessAPI().getProcessDeploymentInfosOfCategory(
+                categoryId, 3, 3,
                 ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(0, outOfRangeList.size());
     }
@@ -433,21 +452,24 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
             getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
         }
         // test
-        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_ASC);
+        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0,
+                10, CategoryCriterion.NAME_ASC);
         assertNotNull(categoryList_ASC);
         assertEquals(3, categoryList_ASC.size());
         assertEquals("category1", categoryList_ASC.get(0).getName());
         assertEquals("category2", categoryList_ASC.get(1).getName());
         assertEquals("category3", categoryList_ASC.get(2).getName());
 
-        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
+        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId,
+                0, 10, CategoryCriterion.NAME_DESC);
         assertNotNull(categoryList_DESC);
         assertEquals(3, categoryList_DESC.size());
         assertEquals("category3", categoryList_DESC.get(0).getName());
         assertEquals("category2", categoryList_DESC.get(1).getName());
         assertEquals("category1", categoryList_DESC.get(2).getName());
 
-        final List<Category> outOfRangeCategories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
+        final List<Category> outOfRangeCategories = getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
         assertEquals(0, outOfRangeCategories.size());
     }
 
@@ -465,7 +487,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().addProcessDefinitionToCategory(categories.get(2).getId(), processDefinitions.get(2).getId());
 
         // Test : No category related
-        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0, 10,
+        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesUnrelatedToProcessDefinition(
+                processDefinitionId, 0, 10,
                 CategoryCriterion.NAME_ASC);
         assertNotNull(categoryList_ASC);
         assertEquals(3, categoryList_ASC.size());
@@ -474,7 +497,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals("category3", categoryList_ASC.get(2).getName());
 
         // Test : 2 related categories
-        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesUnrelatedToProcessDefinition(processDefinitions.get(2).getId(), 0, 10,
+        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesUnrelatedToProcessDefinition(
+                processDefinitions.get(2).getId(), 0, 10,
                 CategoryCriterion.NAME_DESC);
         assertNotNull(categoryList_DESC);
         assertEquals(1, categoryList_DESC.size());
@@ -496,21 +520,24 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         }
 
         // test
-        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_ASC);
+        final List<Category> categoryList_ASC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0,
+                10, CategoryCriterion.NAME_ASC);
         assertNotNull(categoryList_ASC);
         assertEquals(3, categoryList_ASC.size());
         assertEquals("category1", categoryList_ASC.get(0).getName());
         assertEquals("category2", categoryList_ASC.get(1).getName());
         assertEquals("category3", categoryList_ASC.get(2).getName());
 
-        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
+        final List<Category> categoryList_DESC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId,
+                0, 10, CategoryCriterion.NAME_DESC);
         assertNotNull(categoryList_DESC);
         assertEquals(3, categoryList_DESC.size());
         assertEquals("category3", categoryList_DESC.get(0).getName());
         assertEquals("category2", categoryList_DESC.get(1).getName());
         assertEquals("category1", categoryList_DESC.get(2).getName());
 
-        final List<Category> outOfRangeCategories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
+        final List<Category> outOfRangeCategories = getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
         assertEquals(0, outOfRangeCategories.size());
     }
 
@@ -529,7 +556,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
         getProcessAPI().removeProcessDefinitionsFromCategory(category.getId(), 0, 2);
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(
+                category.getId(), 0, 10,
                 ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertNotNull(processDeploymentInfos);
         assertEquals(1, processDeploymentInfos.size());
@@ -546,7 +574,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test
     public void removeProcessDefinitionFromCategory() throws Exception {
         // generate categories
-        categories = generateCategory(3, "category", "test remove one specified process definition from all categories ");
+        categories = generateCategory(3, "category",
+                "test remove one specified process definition from all categories ");
         // generate process definition
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
         processDefinitions.add(processDefinition);
@@ -584,27 +613,31 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test
     public void getUnCategoriedProcesses() throws Exception {
         processDefinitions = generateProcessDefinition(3, "process", "version");
-        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameASC = getProcessAPI().getUncategorizedProcessDeploymentInfos(0, 3,
-                ProcessDeploymentInfoCriterion.NAME_ASC);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameASC = getProcessAPI()
+                .getUncategorizedProcessDeploymentInfos(0, 3,
+                        ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList_NameASC);
         assertEquals(3, processDeploymentInfoList_NameASC.size());
         assertEquals("process1", processDeploymentInfoList_NameASC.get(0).getName());
         assertEquals("process2", processDeploymentInfoList_NameASC.get(1).getName());
         assertEquals("process3", processDeploymentInfoList_NameASC.get(2).getName());
 
-        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameDESC = getProcessAPI().getUncategorizedProcessDeploymentInfos(0, 2,
-                ProcessDeploymentInfoCriterion.NAME_DESC);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList_NameDESC = getProcessAPI()
+                .getUncategorizedProcessDeploymentInfos(0, 2,
+                        ProcessDeploymentInfoCriterion.NAME_DESC);
         assertNotNull(processDeploymentInfoList_NameDESC);
         assertEquals(2, processDeploymentInfoList_NameDESC.size());
         assertEquals("process3", processDeploymentInfoList_NameDESC.get(0).getName());
         assertEquals("process2", processDeploymentInfoList_NameDESC.get(1).getName());
 
-        final List<ProcessDeploymentInfo> outOfRangeProcesses = getProcessAPI().getUncategorizedProcessDeploymentInfos(3, 3,
+        final List<ProcessDeploymentInfo> outOfRangeProcesses = getProcessAPI().getUncategorizedProcessDeploymentInfos(
+                3, 3,
                 ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(0, outOfRangeProcesses.size());
     }
 
-    private List<Category> generateCategory(final int count, final String categoryName, final String description) throws AlreadyExistsException,
+    private List<Category> generateCategory(final int count, final String categoryName, final String description)
+            throws AlreadyExistsException,
             CreationException {
         final List<Category> categoryList = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
@@ -613,13 +646,17 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         return categoryList;
     }
 
-    private List<ProcessDefinition> generateProcessDefinition(final int count, final String processName, final String version)
-            throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException, AlreadyExistsException {
+    private List<ProcessDefinition> generateProcessDefinition(final int count, final String processName,
+            final String version)
+            throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException,
+            AlreadyExistsException {
         final List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
-                    version + i, Arrays.asList("step1"), Arrays.asList(true));
-            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+            final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                    .buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
+                            version + i, Arrays.asList("step1"), Arrays.asList(true));
+            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                    .setProcessDefinition(designProcessDefinition)
                     .done();
             processDefinitionList.add(getProcessAPI().deploy(businessArchive));
         }
@@ -629,11 +666,14 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test(expected = AlreadyExistsException.class)
     public void cannotAddTheSameCategoryToAProcess() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
+        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9")
+                .addAutomaticTask("step1").getProcess();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         processDefinitions.add(processDefinition);
-        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        final Category category = getProcessAPI().createCategory("Human resources",
+                "Category for personnel Management");
         categories.add(category);
         getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(category.getId()));
         getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(category.getId()));
@@ -643,11 +683,14 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test(expected = AlreadyExistsException.class)
     public void cannotAddTheSameCategoryToAProcessList() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
+        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9")
+                .addAutomaticTask("step1").getProcess();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         processDefinitions.add(processDefinition);
-        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        final Category category = getProcessAPI().createCategory("Human resources",
+                "Category for personnel Management");
         categories.add(category);
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), Arrays.asList(processDefinition.getId()));
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), Arrays.asList(processDefinition.getId()));
@@ -657,11 +700,14 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Test(expected = AlreadyExistsException.class)
     public void cannotAssociateTheSameCategoryTwiceWitAProcess() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
+        final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9")
+                .addAutomaticTask("step1").getProcess();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         processDefinitions.add(processDefinition);
-        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        final Category category = getProcessAPI().createCategory("Human resources",
+                "Category for personnel Management");
         categories.add(category);
         getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
         getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinition.getId());

@@ -20,6 +20,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface SThrowMessageEventTriggerDefinitionBuilderFactory {
 
-    SThrowMessageEventTriggerDefinitionBuilder createNewInstance(final String name, final SExpression targetProcessName, final SExpression targetFlowNodeName);
+    SThrowMessageEventTriggerDefinitionBuilder createNewInstance(final String name, final SExpression targetProcessName,
+            final SExpression targetFlowNodeName);
 
 }

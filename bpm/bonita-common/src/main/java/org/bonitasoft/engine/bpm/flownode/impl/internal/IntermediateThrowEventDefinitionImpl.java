@@ -18,15 +18,16 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
- * 
  */
-public class IntermediateThrowEventDefinitionImpl extends ThrowEventDefinitionImpl implements IntermediateThrowEventDefinition {
+public class IntermediateThrowEventDefinitionImpl extends ThrowEventDefinitionImpl
+        implements IntermediateThrowEventDefinition {
 
     private static final long serialVersionUID = 3876200120954720838L;
 
-    public IntermediateThrowEventDefinitionImpl(){
+    public IntermediateThrowEventDefinitionImpl() {
         super();
     }
+
     public IntermediateThrowEventDefinitionImpl(final String name) {
         super(name);
     }

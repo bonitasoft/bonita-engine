@@ -42,7 +42,8 @@ public class DocumentManager {
         // For Sonar
     }
 
-    public static Document generateDocument(final String s) throws ParserConfigurationException, SAXException, IOException {
+    public static Document generateDocument(final String s)
+            throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final InputStream is = new ByteArrayInputStream(s.getBytes());
         try {
@@ -52,7 +53,8 @@ public class DocumentManager {
         }
     }
 
-    public static String getDocumentContent(final Document document) throws TransformerFactoryConfigurationError, TransformerException, IOException {
+    public static String getDocumentContent(final Document document)
+            throws TransformerFactoryConfigurationError, TransformerException, IOException {
         final Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");

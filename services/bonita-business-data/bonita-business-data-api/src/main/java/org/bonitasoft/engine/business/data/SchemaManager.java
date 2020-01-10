@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data;
 
-
 import java.util.List;
 import java.util.Set;
 

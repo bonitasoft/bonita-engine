@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import java.util.Map;
+
 import groovy.lang.Binding;
 import groovy.lang.GroovyRuntimeException;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
-
-import java.util.Map;
-
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -34,7 +33,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class GroovyScriptExpressionExecutorStrategy extends AbstractGroovyScriptExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final ClassLoader scriptClassLoader = Thread.currentThread().getContextClassLoader();
@@ -49,7 +49,8 @@ public class GroovyScriptExpressionExecutorStrategy extends AbstractGroovyScript
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expressionName).append(" with content: ").append(expressionContent).append(" depends on ").append(property)
+            builder.append(expressionName).append(" with content: ").append(expressionContent).append(" depends on ")
+                    .append(property)
                     .append(" is neither defined in the script nor in dependencies");
             throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
         } catch (final GroovyRuntimeException e) {

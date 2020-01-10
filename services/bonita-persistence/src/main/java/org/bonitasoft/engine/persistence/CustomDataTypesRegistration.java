@@ -13,16 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.spi.BasicTypeRegistration;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.boot.spi.SessionFactoryBuilderFactory;
 import org.hibernate.boot.spi.SessionFactoryBuilderImplementor;
@@ -36,19 +30,19 @@ public class CustomDataTypesRegistration implements SessionFactoryBuilderFactory
     private static Set<BasicType> typeOverrides = new HashSet<>();
 
     @Override
-    public SessionFactoryBuilder getSessionFactoryBuilder(final MetadataImplementor metadata, final SessionFactoryBuilderImplementor defaultBuilder) {
-//        for (BasicType typeOverride : typeOverrides) {
-//            logger.info("Registering custom Hibernate data type " + typeOverride);
-//        }
-//        metadata.getTypeConfiguration().addBasicTypeRegistrationContributions(
-//                typeOverrides.stream().map(BasicTypeRegistration::new).collect(toList()));
+    public SessionFactoryBuilder getSessionFactoryBuilder(final MetadataImplementor metadata,
+            final SessionFactoryBuilderImplementor defaultBuilder) {
+        //        for (BasicType typeOverride : typeOverrides) {
+        //            logger.info("Registering custom Hibernate data type " + typeOverride);
+        //        }
+        //        metadata.getTypeConfiguration().addBasicTypeRegistrationContributions(
+        //                typeOverrides.stream().map(BasicTypeRegistration::new).collect(toList()));
         for (BasicType typeOverride : typeOverrides) {
             logger.info("Registering custom Hibernate data type " + typeOverride);
             metadata.getTypeResolver().registerTypeOverride(typeOverride);
         }
         return defaultBuilder;
     }
-
 
     static void addTypeOverride(BasicType type) {
         typeOverrides.add(type);

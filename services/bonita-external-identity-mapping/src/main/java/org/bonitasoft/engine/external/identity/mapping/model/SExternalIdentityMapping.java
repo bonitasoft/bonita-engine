@@ -66,8 +66,9 @@ public class SExternalIdentityMapping implements PersistentObject {
         this.externalId = externalId;
     }
 
-    public SExternalIdentityMapping(final long id, final long tenantId, final String externalId, final long userId, final long groupId, final long roleId,
-                                        final String displayNamePart1, final String displayNamePart2, final String displayNamePart3) {
+    public SExternalIdentityMapping(final long id, final long tenantId, final String externalId, final long userId,
+            final long groupId, final long roleId,
+            final String displayNamePart1, final String displayNamePart2, final String displayNamePart3) {
         this.id = id;
         this.tenantId = tenantId;
         this.externalId = externalId;
@@ -78,7 +79,5 @@ public class SExternalIdentityMapping implements PersistentObject {
         this.displayNamePart2 = displayNamePart2;
         this.displayNamePart3 = displayNamePart3;
     }
-
-
 
 }

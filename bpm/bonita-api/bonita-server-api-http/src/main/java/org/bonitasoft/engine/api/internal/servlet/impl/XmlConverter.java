@@ -39,7 +39,7 @@ public class XmlConverter {
 
     public String toXML(final Object object) {
         final StringWriter stringWriter = new StringWriter();
-        try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)){
+        try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)) {
             out.writeObject(object);
         } catch (IOException e) {
             throw new BonitaRuntimeException("Unable to serialize object " + object, e);
@@ -50,7 +50,7 @@ public class XmlConverter {
     @SuppressWarnings("unchecked")
     public <T> T fromXML(final String object) {
         try (final StringReader xmlReader = new StringReader(object);
-             final ObjectInputStream in = XSTREAM.createObjectInputStream(xmlReader)) {
+                final ObjectInputStream in = XSTREAM.createObjectInputStream(xmlReader)) {
             return (T) in.readObject();
         } catch (final ClassNotFoundException | IOException | RuntimeException e) {
             throw new BonitaRuntimeException("Unable to deserialize object " + object, e);

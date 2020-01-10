@@ -74,13 +74,16 @@ public class ExportOrganizationTest {
     }
 
     @Test
-    public void getAllCustomUserInfoDefinitions_should_return_all_custom_user_info_definition_from_service() throws Exception {
+    public void getAllCustomUserInfoDefinitions_should_return_all_custom_user_info_definition_from_service()
+            throws Exception {
         // given
-        given(identityService.getCustomUserInfoDefinitions(0, MAX_RESULTS)).willReturn(Arrays.asList(userInfoDef1, userInfoDef2));
+        given(identityService.getCustomUserInfoDefinitions(0, MAX_RESULTS))
+                .willReturn(Arrays.asList(userInfoDef1, userInfoDef2));
         given(identityService.getCustomUserInfoDefinitions(2, MAX_RESULTS)).willReturn(Arrays.asList(userInfoDef3));
 
         // when
-        List<SCustomUserInfoDefinition> allCustomUserInfoDefinitions = exportOrganization.getAllCustomUserInfoDefinitions();
+        List<SCustomUserInfoDefinition> allCustomUserInfoDefinitions = exportOrganization
+                .getAllCustomUserInfoDefinitions();
 
         // then
         assertThat(allCustomUserInfoDefinitions).isEqualTo(Arrays.asList(userInfoDef1, userInfoDef2, userInfoDef3));
@@ -100,18 +103,22 @@ public class ExportOrganizationTest {
     }
 
     @Test
-    public void addCustomUserInfoValues_should_call_addCustomUserInfoValue_on_builder_for_all_elements() throws Exception {
+    public void addCustomUserInfoValues_should_call_addCustomUserInfoValue_on_builder_for_all_elements()
+            throws Exception {
         // given
         given(identityService.searchCustomUserInfoValue(any())).willReturn(
                 Arrays.asList(userInfoVal1));
         ExportedUserBuilder clientUserbuilder = mock(ExportedUserBuilder.class);
 
         // when
-        exportOrganization.addCustomUserInfoValues(USER_ID, clientUserbuilder, Collections.singletonMap(USER_INFO_DEF1_ID, SKILSS_NAME));
+        exportOrganization.addCustomUserInfoValues(USER_ID, clientUserbuilder,
+                Collections.singletonMap(USER_INFO_DEF1_ID, SKILSS_NAME));
 
         // then
-        verify(clientUserbuilder, times(1)).addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
-        verify(clientUserbuilder, times(1)).addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
+        verify(clientUserbuilder, times(1))
+                .addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
+        verify(clientUserbuilder, times(1))
+                .addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
     }
 
 }

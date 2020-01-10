@@ -32,7 +32,8 @@ public class SearchArchivedProcessInstances extends AbstractArchivedProcessInsta
     private final ProcessInstanceService processInstanceService;
 
     public SearchArchivedProcessInstances(final ProcessInstanceService processInstanceService,
-            final ProcessDefinitionService processDefinitionService, final SearchArchivedProcessInstancesDescriptor archivedProcessInstancesDescriptor,
+            final ProcessDefinitionService processDefinitionService,
+            final SearchArchivedProcessInstancesDescriptor archivedProcessInstancesDescriptor,
             final SearchOptions options) {
         super(archivedProcessInstancesDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;

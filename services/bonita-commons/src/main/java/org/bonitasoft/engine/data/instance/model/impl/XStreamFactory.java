@@ -38,10 +38,9 @@ public class XStreamFactory {
         return xStream;
     }
 
-
     /**
      * Removes the XStream object related from given ClassLoader from the cache
-     * 
+     *
      * @param classLoader classLoader related to the XStreamObject to be removed.
      */
     public static void remove(ClassLoader classLoader) {

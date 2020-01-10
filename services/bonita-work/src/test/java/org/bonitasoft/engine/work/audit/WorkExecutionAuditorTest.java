@@ -40,8 +40,7 @@ public class WorkExecutionAuditorTest {
         // given:
         WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
                 new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, DAYS)
-        );
+                new ExecutionCountCheckConfig(50, 3, DAYS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now(), 10));
@@ -55,8 +54,7 @@ public class WorkExecutionAuditorTest {
         // given:
         WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
                 new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, MILLIS)
-        );
+                new ExecutionCountCheckConfig(50, 3, MILLIS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now().minus(12, MINUTES), 200));
@@ -70,8 +68,7 @@ public class WorkExecutionAuditorTest {
         // given:
         WorkExecutionAuditor auditor = new WorkExecutionAuditor(new FixedEngineClock(now()),
                 new RegistrationDurationElapsedCheckConfig(3, DAYS),
-                new ExecutionCountCheckConfig(50, 3, HOURS)
-        );
+                new ExecutionCountCheckConfig(50, 3, HOURS));
 
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(now().minus(12, MINUTES), 200));
@@ -87,8 +84,7 @@ public class WorkExecutionAuditorTest {
         WorkExecutionAuditor auditor = new WorkExecutionAuditor(
                 new FixedEngineClock(registrationDate.plusSeconds(250)),
                 new RegistrationDurationElapsedCheckConfig(30, MILLIS),
-                new ExecutionCountCheckConfig(50, 3, DAYS)
-        );
+                new ExecutionCountCheckConfig(50, 3, DAYS));
         // when:
         final ExecutionStatus executionStatus = auditor.executionStatus(workDescriptor(registrationDate, 1));
 
@@ -197,8 +193,7 @@ public class WorkExecutionAuditorTest {
                 new FixedEngineClock(now().plus(250, DAYS)),
                 auditListener,
                 new RegistrationDurationElapsedCheckConfig(30, MILLIS),
-                new ExecutionCountCheckConfig(0, 3, MILLIS)
-        );
+                new ExecutionCountCheckConfig(0, 3, MILLIS));
     }
 
 }

@@ -18,10 +18,8 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.business.application.Application;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationImpl extends BaseElementImpl implements Application {
 
@@ -47,7 +45,8 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         this.description = description;
     }
 
-    public ApplicationImpl(final String token, final String version, final String description, Long layoutId, final Long themeId) {
+    public ApplicationImpl(final String token, final String version, final String description, Long layoutId,
+            final Long themeId) {
         this(token, version, description);
         this.layoutId = layoutId;
         this.themeId = themeId;
@@ -161,26 +160,41 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ApplicationImpl)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ApplicationImpl))
+            return false;
+        if (!super.equals(o))
+            return false;
 
         final ApplicationImpl that = (ApplicationImpl) o;
 
-        if (createdBy != that.createdBy) return false;
-        if (updatedBy != that.updatedBy) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-        if (layoutId != null ? !layoutId.equals(that.layoutId) : that.layoutId != null) return false;
-        if (iconPath != null ? !iconPath.equals(that.iconPath) : that.iconPath != null) return false;
-        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null) return false;
+        if (createdBy != that.createdBy)
+            return false;
+        if (updatedBy != that.updatedBy)
+            return false;
+        if (version != null ? !version.equals(that.version) : that.version != null)
+            return false;
+        if (layoutId != null ? !layoutId.equals(that.layoutId) : that.layoutId != null)
+            return false;
+        if (iconPath != null ? !iconPath.equals(that.iconPath) : that.iconPath != null)
+            return false;
+        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null)
+            return false;
         if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
             return false;
-        if (state != null ? !state.equals(that.state) : that.state != null) return false;
-        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null) return false;
-        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) return false;
-        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null) return false;
-        if (themeId != null ? !themeId.equals(that.themeId) : that.themeId != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (state != null ? !state.equals(that.state) : that.state != null)
+            return false;
+        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null)
+            return false;
+        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null)
+            return false;
+        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null)
+            return false;
+        if (themeId != null ? !themeId.equals(that.themeId) : that.themeId != null)
+            return false;
+        if (description != null ? !description.equals(that.description) : that.description != null)
+            return false;
         return !(token != null ? !token.equals(that.token) : that.token != null);
 
     }
@@ -207,9 +221,12 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
 
     @Override
     public String toString() {
-        return "ApplicationImpl [version=" + version + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy=" + createdBy
-                + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", state=" + state + ", homePageId=" + homePageId + ", displayName="
-                + displayName + ", profileId=" + profileId + ", description=" + description + ", token=" + token + ", getId()=" + getId() + "]";
+        return "ApplicationImpl [version=" + version + ", iconPath=" + iconPath + ", creationDate=" + creationDate
+                + ", createdBy=" + createdBy
+                + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", state=" + state
+                + ", homePageId=" + homePageId + ", displayName="
+                + displayName + ", profileId=" + profileId + ", description=" + description + ", token=" + token
+                + ", getId()=" + getId() + "]";
     }
 
 }

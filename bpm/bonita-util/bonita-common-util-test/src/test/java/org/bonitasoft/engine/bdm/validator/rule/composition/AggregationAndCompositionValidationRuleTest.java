@@ -42,7 +42,8 @@ public class AggregationAndCompositionValidationRuleTest {
 
         final BusinessObject daughter = aBO("daughter").build();
         final BusinessObject mother = aBO("mother").withField(aCompositionField("daughter", daughter)).build();
-        final BusinessObject grandMother = aBO("grandMother").withField(anAggregationField("daughter", daughter)).build();
+        final BusinessObject grandMother = aBO("grandMother").withField(anAggregationField("daughter", daughter))
+                .build();
         final BusinessObjectModel bom = aBOM().withBOs(grandMother, mother, daughter).build();
         final ValidationStatus validationStatus = rule.validate(bom);
 

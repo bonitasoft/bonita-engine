@@ -58,14 +58,16 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
             newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
             backupAndReplaceContentIfNecessary(setEnvWindowsFile, newContent,
-                    "Setting Bonita internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                    "Setting Bonita internal database vendor to '" + dbVendor
+                            + "' and Business Data database vendor to '" + bdmDbVendor
                             + "' in 'setenv.bat' file");
 
             newContent = readContentFromFile(getTemplateFolderPath("setenv.sh"));
             newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
             newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
             backupAndReplaceContentIfNecessary(setEnvUnixFile, newContent,
-                    "Setting Bonita internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                    "Setting Bonita internal database vendor to '" + dbVendor
+                            + "' and Business Data database vendor to '" + bdmDbVendor
                             + "' in 'setenv.sh' file");
 
             //2. update bonita.xml:
@@ -73,15 +75,18 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             newContent = updateBonitaXmlFile(newContent, standardConfiguration, "ds1");
             newContent = updateBonitaXmlFile(newContent, bdmConfiguration, "ds2");
             backupAndReplaceContentIfNecessary(bonitaXmlFile, newContent,
-                    "Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita internal database on '" + dbVendor
+                    "Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita internal database on '"
+                            + dbVendor
                             + "' and for Business Data database on '" + bdmDbVendor + "'");
 
             //3. copy the JDBC drivers:
             final Path srcDriverFile = bonitaDbDriverFile.toPath();
-            final Path targetBonitaDbDriverFile = getPathUnderAppServer("lib/bonita", true).resolve(srcDriverFile.getFileName());
+            final Path targetBonitaDbDriverFile = getPathUnderAppServer("lib/bonita", true)
+                    .resolve(srcDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcDriverFile, targetBonitaDbDriverFile, dbVendor);
             final Path srcBdmDriverFile = bdmDriverFile.toPath();
-            final Path targetBdmDriverFile = getPathUnderAppServer("lib/bonita", true).resolve(srcBdmDriverFile.getFileName());
+            final Path targetBdmDriverFile = getPathUnderAppServer("lib/bonita", true)
+                    .resolve(srcBdmDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
             LOGGER.info("Tomcat auto-configuration complete.");
         } catch (PlatformException e) {
@@ -90,17 +95,22 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         }
     }
 
-    private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration, final String datasourceAlias) {
+    private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration,
+            final String datasourceAlias) {
         Map<String, String> replacements = new HashMap<>(5);
-        replacements.put("@@" + datasourceAlias + ".database_connection_user@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
-        replacements.put("@@" + datasourceAlias + ".database_connection_password@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
+        replacements.put("@@" + datasourceAlias + ".database_connection_user@@",
+                Matcher.quoteReplacement(configuration.getDatabaseUser()));
+        replacements.put("@@" + datasourceAlias + ".database_connection_password@@",
+                Matcher.quoteReplacement(configuration.getDatabasePassword()));
         replacements.put("@@" + datasourceAlias + ".driver_class_name@@", configuration.getNonXaDriverClassName());
         replacements.put("@@" + datasourceAlias + ".xa.driver_class_name@@", configuration.getXaDriverClassName());
         replacements.put("@@" + datasourceAlias + ".xa_datasource_factory@@", configuration.getXaDataSourceFactory());
-        replacements.put("@@" + datasourceAlias + ".database_connection_url@@", getDatabaseConnectionUrlForXmlFile(configuration));
+        replacements.put("@@" + datasourceAlias + ".database_connection_url@@",
+                getDatabaseConnectionUrlForXmlFile(configuration));
         replacements.put("@@" + datasourceAlias + "_database_server_name@@", configuration.getServerName());
         replacements.put("@@" + datasourceAlias + "_database_port_number@@", configuration.getServerPort());
-        replacements.put("@@" + datasourceAlias + "_database_database_name@@", Matcher.quoteReplacement(configuration.getDatabaseName()));
+        replacements.put("@@" + datasourceAlias + "_database_database_name@@",
+                Matcher.quoteReplacement(configuration.getDatabaseName()));
         replacements.put("@@" + datasourceAlias + ".database_test_query@@", configuration.getTestQuery());
         return replaceValues(content, replacements);
     }
@@ -112,7 +122,8 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         return replaceValues(setEnvFileContent, replacementMap);
     }
 
-    void restorePreviousConfiguration(Path setEnvUnixFile, Path setEnvWindowsFile, Path bonitaXmlFile) throws PlatformException {
+    void restorePreviousConfiguration(Path setEnvUnixFile, Path setEnvWindowsFile, Path bonitaXmlFile)
+            throws PlatformException {
         LOGGER.warn("Problem encountered, restoring previous configuration");
         // undo file copies:
         restoreOriginalFile(bonitaXmlFile);

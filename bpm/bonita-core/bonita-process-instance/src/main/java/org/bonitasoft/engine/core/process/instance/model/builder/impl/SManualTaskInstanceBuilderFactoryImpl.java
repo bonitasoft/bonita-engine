@@ -23,13 +23,17 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInst
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SManualTaskInstanceBuilderFactoryImpl extends SHumanTaskInstanceBuilderFactoryImpl implements SManualTaskInstanceBuilderFactory {
+public class SManualTaskInstanceBuilderFactoryImpl extends SHumanTaskInstanceBuilderFactoryImpl
+        implements SManualTaskInstanceBuilderFactory {
 
     @Override
-    public SManualTaskInstanceBuilder createNewManualTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long actorId, final long processDefinitionId, final long rootProcessInstanceId,
+    public SManualTaskInstanceBuilder createNewManualTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long actorId, final long processDefinitionId,
+            final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SManualTaskInstance activityInst = new SManualTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
+        final SManualTaskInstance activityInst = new SManualTaskInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, actorId,
                 STaskPriority.NORMAL, processDefinitionId, rootProcessInstanceId);
         activityInst.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SManualTaskInstanceBuilderImpl(activityInst);

@@ -27,7 +27,8 @@ import org.bonitasoft.engine.session.PlatformSession;
 @EqualsAndHashCode(callSuper = true)
 public class PlatformSessionImpl extends SessionImpl implements PlatformSession {
 
-    public PlatformSessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId) {
+    public PlatformSessionImpl(final long id, final Date creationDate, final long duration, final String userName,
+            final long userId) {
         super(id, creationDate, duration, userName, userId);
     }
 

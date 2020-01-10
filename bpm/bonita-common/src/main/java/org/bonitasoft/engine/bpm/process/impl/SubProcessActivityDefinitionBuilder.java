@@ -23,7 +23,8 @@ public class SubProcessActivityDefinitionBuilder extends FlowElementContainerBui
 
     private final SubProcessDefinitionImpl subProcessActivity;
 
-    SubProcessActivityDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    SubProcessActivityDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final boolean triggeredByEvent) {
         super(container, processDefinitionBuilder);
         subProcessActivity = new SubProcessDefinitionImpl(name, triggeredByEvent);

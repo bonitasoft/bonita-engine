@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
@@ -48,7 +47,8 @@ public class ApplicationMenuToNodeConverter {
      * @throws SObjectNotFoundException if the referenced menu does not exist.
      * @throws SBonitaReadException if the referenced menu cannot be retrieved.
      */
-    protected ApplicationMenuNode toMenu(final SApplicationMenu menu) throws SBonitaReadException, SObjectNotFoundException {
+    protected ApplicationMenuNode toMenu(final SApplicationMenu menu)
+            throws SBonitaReadException, SObjectNotFoundException {
         if (menu == null) {
             throw new IllegalArgumentException("Application menu to convert cannot be null");
         }
@@ -69,10 +69,13 @@ public class ApplicationMenuToNodeConverter {
      * @param maxResults pagination max results to retrieve.
      * @return the newly built {@link QueryOptions}
      */
-    protected QueryOptions buildApplicationMenusQueryOptions(final long applicationId, final Long parentMenuId, final int startIndex, final int maxResults) {
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
+    protected QueryOptions buildApplicationMenusQueryOptions(final long applicationId, final Long parentMenuId,
+            final int startIndex, final int maxResults) {
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SApplicationMenu.class, SApplicationMenu.INDEX, OrderByType.ASC));
 
-        final List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID, applicationId),
+        final List<FilterOption> filters = Arrays.asList(
+                new FilterOption(SApplicationMenu.class, SApplicationMenu.APPLICAITON_ID, applicationId),
                 new FilterOption(SApplicationMenu.class, SApplicationMenu.PARENT_ID, parentMenuId));
 
         return new QueryOptions(startIndex, maxResults, orderByOptions, filters, null);
@@ -84,18 +87,21 @@ public class ApplicationMenuToNodeConverter {
      * @param applicationId ID of the application.
      * @param parentMenuId Id of the parent menu, use <code>null</code> for explicit no parent.
      * @param applicationNode
-     * @param menuNode the menu node to add new menu elements to. Pass null if new menu node must be added to root application node.
+     * @param menuNode the menu node to add new menu elements to. Pass null if new menu node must be added to root
+     *        application node.
      * @throws SBonitaReadException
      * @throws SObjectNotFoundException
      */
-    public void addMenusToApplicationNode(final long applicationId, final Long parentMenuId, final ApplicationNode applicationNode,
+    public void addMenusToApplicationNode(final long applicationId, final Long parentMenuId,
+            final ApplicationNode applicationNode,
             final ApplicationMenuNode menuNode)
             throws SBonitaReadException, SObjectNotFoundException {
         int startIndex = 0;
         final int maxResults = 50;
         List<SApplicationMenu> menus;
         do {
-            menus = applicationService.searchApplicationMenus(buildApplicationMenusQueryOptions(applicationId, parentMenuId, startIndex, maxResults));
+            menus = applicationService.searchApplicationMenus(
+                    buildApplicationMenusQueryOptions(applicationId, parentMenuId, startIndex, maxResults));
             for (final SApplicationMenu menu : menus) {
                 // Add converted current menu...
                 final ApplicationMenuNode menuNode2 = toMenu(menu);

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 public class SProcessDefinitionBuilderImpl implements SProcessDefinitionBuilder {
 
     private final SProcessDefinitionImpl entity;
-    
+
     public SProcessDefinitionBuilderImpl(final SProcessDefinitionImpl entity) {
         super();
         this.entity = entity;

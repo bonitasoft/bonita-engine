@@ -37,13 +37,12 @@ import org.hibernate.annotations.Type;
 @DiscriminatorValue("SXMLDataInstanceImpl")
 public class SXMLDataInstance extends SDataInstance {
 
-
     @Column(name = "clobValue")
     @Type(type = "materialized_clob")
     private String value;
-	@Column
+    @Column
     private String namespace;
-	@Column
+    @Column
     private String element;
 
     public SXMLDataInstance(final SXMLDataDefinition dataDefinition) {

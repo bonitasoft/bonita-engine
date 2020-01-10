@@ -60,7 +60,9 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         p1 = buildSProcessDefinition("P1", "1.0");
         p2 = buildSProcessDefinition("P2", "1.0");
         page = pageService.addPage(
-                CommonTestUtil.createTestPageContent(PAGE_NAME, "coucou depuis la page", "C'était juste pour dire coucou"), "mySuperPage.zip",
+                CommonTestUtil.createTestPageContent(PAGE_NAME, "coucou depuis la page",
+                        "C'était juste pour dire coucou"),
+                "mySuperPage.zip",
                 54L);
         transactionService.complete();
     }
@@ -97,28 +99,34 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         List<SFormMapping> listAll = formMappingService.list(0, 10);
 
         transactionService.complete();
-        assertThat(list).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+        assertThat(list).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(),
+                FormMappingType.PROCESS_START.getId(),
                 FormMappingType.PROCESS_OVERVIEW.getId());
         assertThat(list).extracting("task").containsExactlyInAnyOrder("step1", null, null);
         assertThat(list).extracting("pageMapping.url").containsExactlyInAnyOrder(null, "http://bit.coin", null);
-        assertThat(list).extracting("pageMapping.urlAdapter").containsExactlyInAnyOrder(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER,
+        assertThat(list).extracting("pageMapping.urlAdapter").containsExactlyInAnyOrder(null,
+                URLAdapterConstants.EXTERNAL_URL_ADAPTER,
                 URLAdapterConstants.LEGACY_URL_ADAPTER);
         assertThat(list).extracting("pageMapping.pageId").containsExactlyInAnyOrder(page.getId(), null, null);
         //        assertThat(list).extracting("pageMapping.key").containsExactlyInAnyOrder();
-        assertThat(listAll).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+        assertThat(listAll).extracting("type").containsExactlyInAnyOrder(FormMappingType.TASK.getId(),
+                FormMappingType.PROCESS_START.getId(),
                 FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingType.PROCESS_OVERVIEW.getId());
-        assertThat(listAll).extracting("processDefinitionId").containsExactlyInAnyOrder(p1.getId(), p1.getId(), p1.getId(), p2.getId());
+        assertThat(listAll).extracting("processDefinitionId").containsExactlyInAnyOrder(p1.getId(), p1.getId(),
+                p1.getId(), p2.getId());
     }
 
     @Test
     public void create_and_get_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL",
+                "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(), "step1");
+        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(),
+                "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
     }
@@ -126,12 +134,14 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void create_and_get_by_key_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL",
+                "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getPageMapping().getKey());
-        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(), "step1");
+        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(),
+                "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
     }
@@ -139,7 +149,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void create_and_get_FormMapping_with_no_task() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(p1.getId(), "task", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "task", FormMappingType.TASK.getId(), "URL",
+                "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
@@ -153,7 +164,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void delete_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL",
+                "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
@@ -173,7 +185,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void update_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL",
+                "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();

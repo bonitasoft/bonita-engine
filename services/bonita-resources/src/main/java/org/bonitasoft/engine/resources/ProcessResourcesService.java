@@ -31,7 +31,8 @@ public interface ProcessResourcesService {
 
     void removeAll(long processDefinitionId, BARResourceType external) throws SBonitaReadException, SRecorderException;
 
-    List<SBARResource> get(long processDefinitionId, BARResourceType type, int from, int numberOfElements) throws SBonitaReadException;
+    List<SBARResource> get(long processDefinitionId, BARResourceType type, int from, int numberOfElements)
+            throws SBonitaReadException;
 
     long count(long processDefinitionId, BARResourceType type) throws SBonitaReadException;
 

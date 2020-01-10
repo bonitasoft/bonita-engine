@@ -35,7 +35,6 @@ import org.mockito.junit.MockitoRule;
 
 public class SequenceDAOTest {
 
-
     private static final Long TENANT_ID = 2L;
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -52,7 +51,6 @@ public class SequenceDAOTest {
     public void before() {
         sequenceDAO = new SequenceDAO(connection, TENANT_ID);
     }
-
 
     @Test
     public void should_getNextId_from_database() throws Exception {

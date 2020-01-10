@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
 

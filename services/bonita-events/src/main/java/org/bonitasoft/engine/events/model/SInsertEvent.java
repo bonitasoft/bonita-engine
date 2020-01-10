@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-
 public class SInsertEvent extends SEvent {
 
     public SInsertEvent(String type) {

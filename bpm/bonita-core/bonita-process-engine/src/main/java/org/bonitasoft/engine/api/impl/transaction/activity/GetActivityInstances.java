@@ -40,7 +40,8 @@ public class GetActivityInstances implements TransactionContentWithResult<List<S
 
     private final OrderByType order;
 
-    public GetActivityInstances(final ActivityInstanceService activityInstanceService, final long processInstanceUUID, final int pageIndex,
+    public GetActivityInstances(final ActivityInstanceService activityInstanceService, final long processInstanceUUID,
+            final int pageIndex,
             final int numberPerPage, final String field, final OrderByType order) {
         this.activityInstanceService = activityInstanceService;
         this.processInstanceUUID = processInstanceUUID;
@@ -52,7 +53,8 @@ public class GetActivityInstances implements TransactionContentWithResult<List<S
 
     @Override
     public void execute() throws SBonitaException {
-        activities = activityInstanceService.getOpenActivityInstances(processInstanceUUID, pageIndex, numberPerPage, field, order);
+        activities = activityInstanceService.getOpenActivityInstances(processInstanceUUID, pageIndex, numberPerPage,
+                field, order);
     }
 
     @Override

@@ -36,8 +36,10 @@ public class ApplicationCreator implements Serializable {
      * Creates an instance of <code>ApplicationCreator</code> containing mandatory information.
      * <p>The created {@link Application} will used the default layout.</p>
      *
-     * @param token the {@code Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
-     *        characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used
+     * @param token the {@code Application} token. The token will be part of application URL. It cannot be null or empty
+     *        and should contain only alpha numeric
+     *        characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are
+     *        reserved key words and cannot be used
      *        as token: 'api', 'content', 'theme'.
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
@@ -85,7 +87,8 @@ public class ApplicationCreator implements Serializable {
     }
 
     /**
-     * Defines the identifier of the {@link Profile} related to this {@link Application} and returns the current <code>ApplicationCreator</code>
+     * Defines the identifier of the {@link Profile} related to this {@link Application} and returns the current
+     * <code>ApplicationCreator</code>
      *
      * @param profileId the <code>Profile</code> identifier
      * @return the current <code>ApplicationCreator</code>
@@ -100,7 +103,8 @@ public class ApplicationCreator implements Serializable {
     /**
      * Retrieves all fields defined in this <code>ApplicationCreator</code>
      *
-     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields defined in this <code>ApplicationCreator</code>
+     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields defined in this
+     *         <code>ApplicationCreator</code>
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {

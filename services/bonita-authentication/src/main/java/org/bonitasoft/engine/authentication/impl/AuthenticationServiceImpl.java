@@ -53,21 +53,25 @@ public class AuthenticationServiceImpl implements GenericAuthenticationService {
             final String password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
             final String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogBeforeMethod(this.getClass(), methodName));
             }
             final SUser user = identityService.getUserByUserName(userName);
             if (identityService.checkCredentials(user, password)) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                            LogUtil.getLogAfterMethod(this.getClass(), methodName));
                 }
                 return userName;
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogAfterMethod(this.getClass(), methodName));
             }
         } catch (final SUserNotFoundException sunfe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, sunfe));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, sunfe));
             }
         }
         return null;

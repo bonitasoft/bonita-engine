@@ -19,16 +19,14 @@ import static org.awaitility.Awaitility.await;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bonitasoft.engine.configuration.monitoring.LoggingMeterRegistry;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Tags;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Tags;
 
 public class LoggingMeterRegistryTest {
 

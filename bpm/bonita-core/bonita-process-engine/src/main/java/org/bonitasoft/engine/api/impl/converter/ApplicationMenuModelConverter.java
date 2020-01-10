@@ -42,7 +42,8 @@ public class ApplicationMenuModelConverter {
         final Long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
         final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
 
-        final SApplicationMenu.SApplicationMenuBuilder builder = SApplicationMenu.builder().displayName(displayName).applicationId(applicationId).applicationPageId(applicationPageId).index(menuIndex);
+        final SApplicationMenu.SApplicationMenuBuilder builder = SApplicationMenu.builder().displayName(displayName)
+                .applicationId(applicationId).applicationPageId(applicationPageId).index(menuIndex);
         if (parentId != null) {
             builder.parentId(parentId);
         }
@@ -50,7 +51,8 @@ public class ApplicationMenuModelConverter {
     }
 
     public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) {
-        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationId(),
+        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(),
+                sApplicationMenu.getApplicationId(),
                 sApplicationMenu.getApplicationPageId(),
                 sApplicationMenu.getIndex());
         menu.setId(sApplicationMenu.getId());
@@ -58,7 +60,8 @@ public class ApplicationMenuModelConverter {
         return menu;
     }
 
-    public List<ApplicationMenu> toApplicationMenu(final List<SApplicationMenu> sApplicationMenus) throws SBonitaException {
+    public List<ApplicationMenu> toApplicationMenu(final List<SApplicationMenu> sApplicationMenus)
+            throws SBonitaException {
         final List<ApplicationMenu> menus = new ArrayList<ApplicationMenu>(sApplicationMenus.size());
         for (final SApplicationMenu sMenu : sApplicationMenus) {
             menus.add(toApplicationMenu(sMenu));
@@ -67,7 +70,8 @@ public class ApplicationMenuModelConverter {
     }
 
     public EntityUpdateDescriptor toApplicationMenuUpdateDescriptor(final ApplicationMenuUpdater updater) {
-        SApplicationMenuUpdateBuilder builder = BuilderFactory.get(SApplicationMenuUpdateBuilderFactory.class).createNewInstance();
+        SApplicationMenuUpdateBuilder builder = BuilderFactory.get(SApplicationMenuUpdateBuilderFactory.class)
+                .createNewInstance();
 
         for (Map.Entry<ApplicationMenuField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {

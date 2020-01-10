@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.core.document.api;
 
-
 /**
  * @author Emmanuel Duchastenier
- *
  */
 public enum SDocumentMappingCriterion {
-    NAME_DESC,
-    NAME_ASC;
+    NAME_DESC, NAME_ASC;
 }

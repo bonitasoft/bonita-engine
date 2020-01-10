@@ -39,7 +39,6 @@ import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -54,9 +53,10 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final TechnicalUser technicalUser;
     private final ProfileService profileService;
 
-    public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
-                                   final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
-                                   TechnicalUser technicalUser, ProfileService profileService) {
+    public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService,
+            final SessionService sessionService,
+            final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
+            TechnicalUser technicalUser, ProfileService profileService) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.identityService = identityService;
@@ -146,7 +146,8 @@ public class SecuredLoginServiceImpl implements LoginService {
 
     private boolean isTechnicalUser(Map<String, Serializable> credentials) {
         return technicalUser.getUserName().equals(extractUserName(credentials))
-                && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)));
+                && technicalUser.getPassword()
+                        .equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)));
     }
 
     private String extractUserName(Map<String, Serializable> credentials) {
@@ -155,7 +156,6 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
         return null;
     }
-
 
     @Override
     public void logout(final long sessionId) throws SSessionNotFoundException {

@@ -19,7 +19,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ArchivedSubProcessActivityInstanceImpl extends ArchivedActivityInstanceImpl implements ArchivedSubProcessActivityInstance {
+public class ArchivedSubProcessActivityInstanceImpl extends ArchivedActivityInstanceImpl
+        implements ArchivedSubProcessActivityInstance {
 
     private static final long serialVersionUID = 3524292074421289601L;
 

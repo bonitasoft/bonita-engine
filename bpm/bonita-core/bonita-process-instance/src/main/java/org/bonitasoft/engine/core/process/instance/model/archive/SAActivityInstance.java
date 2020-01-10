@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public abstract class SAActivityInstance extends SAFlowNodeInstance {
+
     public SAActivityInstance(final SActivityInstance activityInstance) {
         super(activityInstance);
     }

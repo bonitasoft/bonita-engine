@@ -98,8 +98,10 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
         return data;
     }
 
-    private SAShortTextDataInstance selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstance dataInstance) throws SBonitaReadException {
-        final SelectByIdDescriptor<SAShortTextDataInstance> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstance.class,
+    private SAShortTextDataInstance selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstance dataInstance)
+            throws SBonitaReadException {
+        final SelectByIdDescriptor<SAShortTextDataInstance> selectByIdDescriptor1 = new SelectByIdDescriptor<>(
+                SAShortTextDataInstance.class,
                 dataInstance.getId());
         return archiveService.getDefinitiveArchiveReadPersistenceService().selectById(selectByIdDescriptor1);
     }

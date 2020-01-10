@@ -15,7 +15,6 @@ package org.bonitasoft.engine.operation.pojo;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import org.bonitasoft.engine.bdm.Entity;
 
 public class Employee implements Entity {
@@ -74,7 +73,8 @@ public class Employee implements Entity {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(persistenceId).append(persistenceVersion).append(firstName).append(lastName).build();
+        return new HashCodeBuilder().append(persistenceId).append(persistenceVersion).append(firstName).append(lastName)
+                .build();
     }
 
     @Override
@@ -89,13 +89,15 @@ public class Employee implements Entity {
             return false;
         }
         final Employee other = (Employee) obj;
-        return new EqualsBuilder().append(persistenceId, other.persistenceId).append(persistenceVersion, other.persistenceVersion)
+        return new EqualsBuilder().append(persistenceId, other.persistenceId)
+                .append(persistenceVersion, other.persistenceVersion)
                 .append(firstName, other.firstName).append(lastName, other.lastName).build();
     }
 
     @Override
     public String toString() {
-        return "Employee [id=" + persistenceId + ", version=" + persistenceVersion + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+        return "Employee [id=" + persistenceId + ", version=" + persistenceVersion + ", firstName=" + firstName
+                + ", lastName=" + lastName + "]";
     }
 
 }

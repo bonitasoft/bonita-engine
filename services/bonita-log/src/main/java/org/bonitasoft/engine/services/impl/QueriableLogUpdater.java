@@ -19,26 +19,25 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class QueriableLogUpdater {
-
 
     private static final int MAX_MESSAGE_LENGTH = 255;
     private final QueriableLogSessionProvider sessionProvider;
     private final PlatformService platformService;
     private final TechnicalLoggerService logger;
 
-    public QueriableLogUpdater(final QueriableLogSessionProvider sessionProvider, final PlatformService platformService, final TechnicalLoggerService logger) {
+    public QueriableLogUpdater(final QueriableLogSessionProvider sessionProvider, final PlatformService platformService,
+            final TechnicalLoggerService logger) {
         this.sessionProvider = sessionProvider;
         this.platformService = platformService;
         this.logger = logger;
     }
 
-    public SQueriableLog buildFinalLog(final String callerClassName, final String callerMethodName, final SQueriableLog log) {
+    public SQueriableLog buildFinalLog(final String callerClassName, final String callerMethodName,
+            final SQueriableLog log) {
         final SQueriableLog.SQueriableLogBuilder builder = log.toBuilder();
 
         final String rawMessage = log.getRawMessage();

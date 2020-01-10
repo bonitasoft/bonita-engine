@@ -53,14 +53,16 @@ public class WaitingEventsInterrupter {
 
     private static final int MAX_NUMBER_OF_RESULTS = 100;
 
-    public WaitingEventsInterrupter(final EventInstanceService eventInstanceService, final SchedulerService schedulerService, final TechnicalLoggerService logger) {
+    public WaitingEventsInterrupter(final EventInstanceService eventInstanceService,
+            final SchedulerService schedulerService, final TechnicalLoggerService logger) {
         this.eventInstanceService = eventInstanceService;
         this.schedulerService = schedulerService;
         this.logger = logger;
     }
 
-    public void interruptWaitingEvents(final SProcessDefinition processDefinition, final SCatchEventInstance catchEventInstance,
-                                       final SCatchEventDefinition catchEventDef) throws SBonitaException {
+    public void interruptWaitingEvents(final SProcessDefinition processDefinition,
+            final SCatchEventInstance catchEventInstance,
+            final SCatchEventDefinition catchEventDef) throws SBonitaException {
         interruptTimerEvent(processDefinition, catchEventInstance, catchEventDef);
         // message, signal and error
         interruptWaitingEvents(catchEventInstance.getId(), catchEventDef);
@@ -74,13 +76,15 @@ public class WaitingEventsInterrupter {
     }
 
     public void interruptWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
-        if (flowNodeInstance instanceof SReceiveTaskInstance || flowNodeInstance instanceof SIntermediateCatchEventInstance
+        if (flowNodeInstance instanceof SReceiveTaskInstance
+                || flowNodeInstance instanceof SIntermediateCatchEventInstance
                 || flowNodeInstance instanceof SBoundaryEventInstance) {
             interruptWaitingEvents(flowNodeInstance.getId(), SWaitingEvent.class);
         }
     }
 
-    private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass)
+    private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId,
+            final Class<T> waitingEventClass)
             throws SBonitaReadException, SWaitingEventModificationException {
         final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
         final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
@@ -93,47 +97,59 @@ public class WaitingEventsInterrupter {
         } while (count > waitingEvents.size());
     }
 
-    private void deleteWaitingEvents(final List<? extends SWaitingEvent> waitingEvents) throws SWaitingEventModificationException {
+    private void deleteWaitingEvents(final List<? extends SWaitingEvent> waitingEvents)
+            throws SWaitingEventModificationException {
         for (final SWaitingEvent sWaitingEvent : waitingEvents) {
             eventInstanceService.deleteWaitingEvent(sWaitingEvent);
         }
     }
 
-    private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
+    private QueryOptions getWaitingEventsCountOptions(final long instanceId,
+            final Class<? extends SWaitingEvent> waitingEventClass) {
         final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
         return new QueryOptions(filters, null);
     }
 
-    private QueryOptions getWaitingEventsQueryOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
-        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(),
+    private QueryOptions getWaitingEventsQueryOptions(final long instanceId,
+            final Class<? extends SWaitingEvent> waitingEventClass) {
+        final OrderByOption orderByOption = new OrderByOption(waitingEventClass,
+                BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(),
                 OrderByType.ASC);
         final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
         return new QueryOptions(0, MAX_NUMBER_OF_RESULTS, Collections.singletonList(orderByOption), filters, null);
     }
 
-    private List<FilterOption> getFilterForWaitingEventsToInterrupt(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
-        final SWaitingEventKeyProviderBuilderFactory waitingEventKeyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
+    private List<FilterOption> getFilterForWaitingEventsToInterrupt(final long instanceId,
+            final Class<? extends SWaitingEvent> waitingEventClass) {
+        final SWaitingEventKeyProviderBuilderFactory waitingEventKeyProvider = BuilderFactory
+                .get(SWaitingEventKeyProviderBuilderFactory.class);
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
-        filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getFlowNodeInstanceIdKey(), instanceId));
+        filters.add(
+                new FilterOption(waitingEventClass, waitingEventKeyProvider.getFlowNodeInstanceIdKey(), instanceId));
         filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getActiveKey(), true));
         return filters;
     }
 
-    private void interruptTimerEvent(final SProcessDefinition processDefinition, final SCatchEventInstance catchEventInstance,
-                                     final SCatchEventDefinition catchEventDef) throws SSchedulerException, SBonitaReadException {
+    private void interruptTimerEvent(final SProcessDefinition processDefinition,
+            final SCatchEventInstance catchEventInstance,
+            final SCatchEventDefinition catchEventDef) throws SSchedulerException, SBonitaReadException {
         // FIXME to support multiple events change this code
         if (!catchEventDef.getTimerEventTriggerDefinitions().isEmpty()) {
-            final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), catchEventDef, catchEventInstance);
+            final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), catchEventDef,
+                    catchEventInstance);
             final boolean delete = schedulerService.delete(jobName);
             try {
                 eventInstanceService.deleteEventTriggerInstanceOfFlowNode(catchEventInstance.getId());
             } catch (SEventTriggerInstanceDeletionException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Unable to delete event trigger of flow node instance " + catchEventInstance + " because: " + e.getMessage());
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                        "Unable to delete event trigger of flow node instance " + catchEventInstance + " because: "
+                                + e.getMessage());
             }
             if (!delete) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
-                            + "' when interrupting timer catch event named '" + catchEventDef.getName() + "' and id '" + catchEventInstance.getId()
+                            + "' when interrupting timer catch event named '" + catchEventDef.getName() + "' and id '"
+                            + catchEventInstance.getId()
                             + "'. It was probably already triggered.");
                 }
             }

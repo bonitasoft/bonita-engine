@@ -87,7 +87,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     private ProcessDefinition createProcessDefinition(final String processName) throws BonitaException {
         // test process definition with no supervisor
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0").done();
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance(processName, "1.0").done();
         return deployAndEnableProcess(designProcessDefinition);
     }
 
@@ -116,21 +117,30 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final ProcessDefinition processDefinition1 = processDefinitions.get(0);
         final ProcessDefinition processDefinition2 = processDefinitions.get(1);
 
-        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(0).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(1).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(2).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(3).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(4).getId()));
+        supervisors
+                .add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(0).getId()));
+        supervisors
+                .add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(1).getId()));
+        supervisors
+                .add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(2).getId()));
+        supervisors
+                .add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(3).getId()));
+        supervisors
+                .add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(4).getId()));
     }
 
     private void createGroupSupervisors() throws BonitaException {
-        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(0).getId(), groups.get(0).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(1).getId(), groups.get(1).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(0).getId(),
+                groups.get(0).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(1).getId(),
+                groups.get(1).getId()));
     }
 
     private void createRoleSupervisors() throws BonitaException {
-        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(0).getId(), roles.get(0).getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(1).getId(), roles.get(1).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(0).getId(),
+                roles.get(0).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(1).getId(),
+                roles.get(1).getId()));
     }
 
     private void createMembershipSupervisors() throws BonitaException {
@@ -139,9 +149,12 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final Role role2 = roles.get(1);
         final Group group1 = groups.get(0);
         final Group group2 = groups.get(1);
-        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(), role1.getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(), role2.getId()));
-        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinitions.get(1).getId(), group2.getId(), role1.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(),
+                role1.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(),
+                role2.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinitions.get(1).getId(),
+                group2.getId(), role1.getId()));
     }
 
     @Test
@@ -172,7 +185,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final long userId = users.get(0).getId();
 
         // Count to assert
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result.getCount());
 
@@ -188,7 +202,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final long userId = users.get(0).getId();
 
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId,
+                userId);
 
         try {
             getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
@@ -204,7 +219,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final long groupId = groups.get(0).getId();
 
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, groupId);
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId,
+                groupId);
 
         try {
             getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, groupId);
@@ -220,7 +236,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final long roleId = roles.get(0).getId();
 
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForRole(processDefinitionId, roleId);
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForRole(processDefinitionId,
+                roleId);
 
         try {
             getProcessAPI().createProcessSupervisorForRole(processDefinitionId, roleId);
@@ -236,7 +253,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final Group group1 = groups.get(0);
         final Role role1 = roles.get(0);
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForMembership(processDefinitionId, group1.getId(),
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForMembership(
+                processDefinitionId, group1.getId(),
                 role1.getId());
 
         try {
@@ -263,7 +281,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         } catch (final DeletionException e) {
 
         }
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 10, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 10, ProcessSupervisorSearchDescriptor.ROLE_ID,
+                Order.ASC);
         SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result.getCount());
 
@@ -304,7 +323,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
             createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, group.getId());
             assertEquals(processDefinitionId, createdSupervisor.getProcessDefinitionId());
             // Search supervisor
-            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 1, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 1,
+                    ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
             final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
             assertEquals(13, result.getCount());
             final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
@@ -333,7 +353,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
                     .createProcessSupervisorForMembership(processDefinitionId, group1.getId(), role.getId());
             assertEquals(processDefinitionId, createdSupervisor.getProcessDefinitionId());
             // Search supervisor
-            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 12, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 12,
+                    ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
             final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
             assertEquals(13, result.getCount());
             final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
@@ -358,7 +379,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final ProcessSupervisor supervisor5 = supervisors.get(4);
 
         // test ASC
-        SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result1.getCount());
         List<ProcessSupervisor> supervisorsResult = result1.getResult();
@@ -391,9 +413,11 @@ public class SupervisorIT extends TestWithTechnicalUser {
     @Test
     public void searchProcessSupervisorsForUserWithFilter() throws Exception {
         // filter on process
-        Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
+        Map<String, Serializable> filters = Collections.singletonMap(
+                ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
                 (Serializable) processDefinitions.get(1).getId());
-        SearchOptionsBuilder builder = buildSearchOptions(filters, 3, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(filters, 3, 5, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(5, result1.getCount());
         List<ProcessSupervisor> supervisorsResult = result1.getResult();
@@ -401,7 +425,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(4).getUserId(), supervisorsResult.get(1).getUserId());
 
         // filter on firstname
-        filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
+        filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID,
+                (Serializable) users.get(0).getId());
         builder = buildSearchOptions(filters, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         final SearchResult<ProcessSupervisor> result2 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(1, result2.getCount());
@@ -411,7 +436,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     @Test
     public void searchProcessSupervisorsForGroup() throws Exception {
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 2, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 2, ProcessSupervisorSearchDescriptor.GROUP_ID,
+                Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result1.getCount());
@@ -424,8 +450,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
     public void searchProcessSupervisorsForGroupWithFilter() throws Exception {
         final Group group1 = groups.get(0);
 
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.GROUP_ID, (Serializable) group1.getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.GROUP_ID,
+                (Serializable) group1.getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5,
+                ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(2, result1.getCount());
@@ -435,7 +463,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     @Test
     public void searchProcessSupervisorsForRole() throws Exception {
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 9, 11, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 9, 11, ProcessSupervisorSearchDescriptor.ROLE_ID,
+                Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
@@ -447,8 +476,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
     public void searchProcessSupervisorsForRoleWithFilter() throws Exception {
         final Role role1 = roles.get(0);
 
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID,
+                (Serializable) role1.getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5,
+                ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(3, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
@@ -462,7 +493,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final Group group1 = groups.get(0);
         final Group group2 = groups.get(1);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 4, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 4, ProcessSupervisorSearchDescriptor.ROLE_ID,
+                Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result1.getCount());
@@ -477,8 +509,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     @Test
     public void searchProcessSupervisorsForRoleAndGroupWithFilter() throws Exception {
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) roles.get(0).getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 1, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID,
+                (Serializable) roles.get(0).getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 1, 5,
+                ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
@@ -492,7 +526,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
     public void searchProcessSupervisorsForUserAndRole() throws Exception {
         final Role role1 = roles.get(0);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
@@ -509,8 +544,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
     public void searchProcessSupervisorsForUserAndRoleWithFilter() throws Exception {
         final Role role1 = roles.get(0);
 
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID,
+                (Serializable) role1.getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5,
+                ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
@@ -524,7 +561,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
     public void searchProcessSupervisorsForUserAndGroup() throws Exception {
         final Group group2 = groups.get(1);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 8, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 8, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
@@ -540,8 +578,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     @Test
     public void searchProcessSupervisorsForUserAndGroupWithFilter() throws Exception {
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID,
+                (Serializable) users.get(0).getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5,
+                ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
@@ -557,7 +597,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         final Group group1 = groups.get(0);
         final Group group2 = groups.get(1);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID,
+                Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
 
@@ -576,8 +617,10 @@ public class SupervisorIT extends TestWithTechnicalUser {
 
     @Test
     public void searchProcessSupervisorsForUserAndGroupAndRoleWithFilter() throws Exception {
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID,
+                (Serializable) users.get(0).getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5,
+                ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
 
@@ -587,7 +630,8 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(0).getSupervisorId(), supervisors.get(0).getSupervisorId());
     }
 
-    private SearchOptionsBuilder buildSearchOptions(final Map<String, Serializable> filters, final int pageIndex, final int numberOfResults,
+    private SearchOptionsBuilder buildSearchOptions(final Map<String, Serializable> filters, final int pageIndex,
+            final int numberOfResults,
             final String orderByField, final Order order) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
         if (filters != null) {

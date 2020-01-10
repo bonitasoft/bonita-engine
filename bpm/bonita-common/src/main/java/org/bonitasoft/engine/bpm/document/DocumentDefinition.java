@@ -19,7 +19,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * The definition of a document attached to a process definition
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet

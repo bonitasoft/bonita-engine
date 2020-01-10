@@ -77,7 +77,8 @@ public class ProfilesImporterTest {
     public void before() throws Exception {
         doReturn(mock(SProfile.class)).when(profileService).createProfile(any(SProfile.class));
         doReturn(mock(SProfileEntry.class)).when(profileService).createProfileEntry(any(SProfileEntry.class));
-        doReturn(mock(SProfile.class)).when(profileService).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
+        doReturn(mock(SProfile.class)).when(profileService).updateProfile(any(SProfile.class),
+                any(EntityUpdateDescriptor.class));
     }
 
     @Test
@@ -109,7 +110,8 @@ public class ProfilesImporterTest {
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
 
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.REPLACE_DUPLICATES, -1);
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.REPLACE_DUPLICATES, -1);
 
         // then: all entries and mappings are replaced
         verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
@@ -138,7 +140,8 @@ public class ProfilesImporterTest {
         addTwoProfileEntries(exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.REPLACE_DUPLICATES, -1);
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.REPLACE_DUPLICATES, -1);
 
         // then
         verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
@@ -158,7 +161,8 @@ public class ProfilesImporterTest {
         doReturn(true).when(existingProfile).isDefault();
         doReturn(existingProfile).when(profileService).getProfileByName(exportedProfile.getName());
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.REPLACE_DUPLICATES, -1);
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.REPLACE_DUPLICATES, -1);
 
         // then
         verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
@@ -177,7 +181,8 @@ public class ProfilesImporterTest {
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("Mine");
 
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.REPLACE_DUPLICATES,
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.REPLACE_DUPLICATES,
                 SessionService.SYSTEM_ID);
 
         // then
@@ -195,7 +200,8 @@ public class ProfilesImporterTest {
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineDefault");
 
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile, new ProfileNode("MineDefault", true)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(
+                exportedProfiles(exportedProfile, new ProfileNode("MineDefault", true)),
                 ImportPolicy.REPLACE_DUPLICATES, -1);
 
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("MineNotDefault", Status.ADDED));
@@ -211,7 +217,8 @@ public class ProfilesImporterTest {
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
 
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.IGNORE_DUPLICATES, -1);
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.IGNORE_DUPLICATES, -1);
 
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.SKIPPED));
     }
@@ -219,7 +226,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_import_nothing_when_profile_name_is_empty() throws Exception {
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ProfileNode("", false)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(
+                exportedProfiles(new ProfileNode("", false)),
                 ImportPolicy.UPDATE_DEFAULTS, -1);
 
         // then
@@ -229,7 +237,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_import_nothing_when_profile_name_is_null() throws Exception {
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ProfileNode(null, false)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(
+                exportedProfiles(new ProfileNode(null, false)),
                 ImportPolicy.UPDATE_DEFAULTS, -1);
 
         // then
@@ -244,7 +253,8 @@ public class ProfilesImporterTest {
         addTwoProfileEntries(exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile), ImportPolicy.IGNORE_DUPLICATES, -1);
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile),
+                ImportPolicy.IGNORE_DUPLICATES, -1);
 
         // then
         verify(profileService, never()).deleteAllProfileMembersOfProfile(any(SProfile.class));
@@ -285,7 +295,8 @@ public class ProfilesImporterTest {
         exportedProfileMapping.setUsers(Collections.singletonList("john"));
         doThrow(new SUserNotFoundException("john")).when(identityService).getUserByUserName("john");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("john", Type.USER));
@@ -302,7 +313,8 @@ public class ProfilesImporterTest {
         doReturn(user).when(identityService).getUserByUserName("john");
 
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping).isEmpty();
@@ -316,7 +328,8 @@ public class ProfilesImporterTest {
         exportedProfileMapping.setRoles(Collections.singletonList("role"));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("role", Type.ROLE));
@@ -333,7 +346,8 @@ public class ProfilesImporterTest {
         doReturn(role).when(identityService).getRoleByName("role");
 
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping).isEmpty();
@@ -348,7 +362,8 @@ public class ProfilesImporterTest {
         exportedProfileMapping.setGroups(Collections.singletonList("group"));
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("group", Type.GROUP));
@@ -365,7 +380,8 @@ public class ProfilesImporterTest {
         doReturn(group).when(identityService).getGroupByPath("group");
 
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping).isEmpty();
@@ -381,7 +397,8 @@ public class ProfilesImporterTest {
         exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("group", Type.GROUP));
@@ -395,7 +412,8 @@ public class ProfilesImporterTest {
         exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("role", Type.ROLE));
@@ -410,7 +428,8 @@ public class ProfilesImporterTest {
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping.get(1)).isEqualTo(new ImportError("role", Type.ROLE));
@@ -433,7 +452,8 @@ public class ProfilesImporterTest {
         doReturn(group).when(identityService).getGroupByPath("group");
 
         // when
-        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+        final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService,
+                identityService, 123, exportedProfileMapping);
 
         // then
         assertThat(importProfileMapping).isEmpty();

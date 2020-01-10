@@ -27,7 +27,8 @@ public class SAHumanTaskInstanceImplTest {
 
     @Test
     public void creatingArchiveShouldCopyAllRelevantAttibute() {
-        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
+        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L,
+                STaskPriority.UNDER_NORMAL, 7777L, 8888L);
         final long claimedDate = System.currentTimeMillis();
         taskInstance.setClaimedDate(claimedDate);
         taskInstance.setStateId(3);
@@ -57,9 +58,11 @@ public class SAHumanTaskInstanceImplTest {
         assertThat(archivedTaskInstance.getSourceObjectId()).isEqualTo(taskInstance.getId());
         assertThat(archivedTaskInstance.getStateName()).isEqualTo("estado");
         assertThat(archivedTaskInstance.getStateId()).isEqualTo(3);
-        assertThat(archivedTaskInstance.getParentActivityInstanceId()).isEqualTo(taskInstance.getParentActivityInstanceId());
+        assertThat(archivedTaskInstance.getParentActivityInstanceId())
+                .isEqualTo(taskInstance.getParentActivityInstanceId());
         assertThat(archivedTaskInstance.getParentContainerId()).isEqualTo(874555L);
-        assertThat(archivedTaskInstance.getParentProcessInstanceId()).isEqualTo(taskInstance.getParentProcessInstanceId());
+        assertThat(archivedTaskInstance.getParentProcessInstanceId())
+                .isEqualTo(taskInstance.getParentProcessInstanceId());
         assertThat(archivedTaskInstance.getRootContainerId()).isEqualTo(2565412L);
         assertThat(archivedTaskInstance.getFlowNodeDefinitionId()).isEqualTo(147L);
         assertThat(archivedTaskInstance.getLogicalGroup(0)).isEqualTo(7777L);
@@ -69,7 +72,8 @@ public class SAHumanTaskInstanceImplTest {
     @Test
     public void should_allow_null_expected_date() {
         //given
-        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
+        final SUserTaskInstance taskInstance = new SUserTaskInstance("taskName", 147L, 2565412L, 874555L, 7L,
+                STaskPriority.UNDER_NORMAL, 7777L, 8888L);
 
         //when
         taskInstance.setExpectedEndDate(null);

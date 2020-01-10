@@ -13,17 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.event.trigger;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public enum STimerType {
-    
+
     CYCLE,
-    
+
     DATE,
-    
+
     DURATION
-    
+
 }

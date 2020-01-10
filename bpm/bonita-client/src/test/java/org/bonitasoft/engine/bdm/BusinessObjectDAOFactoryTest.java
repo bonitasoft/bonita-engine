@@ -47,18 +47,21 @@ public class BusinessObjectDAOFactoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_create_dao_throw_IllegalArgmumentException_if_daoInterface_is_not_an_interface() throws Exception {
+    public void should_create_dao_throw_IllegalArgmumentException_if_daoInterface_is_not_an_interface()
+            throws Exception {
         factory.createDAO(session, DummyDAOImpl.class);
     }
 
     @Test(expected = BusinessObjectDaoCreationException.class)
-    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_not_in_classpath() throws Exception {
+    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_not_in_classpath()
+            throws Exception {
         Mockito.doThrow(ClassNotFoundException.class).when(factory).loadClass(BusinessObjectDAO.class.getName());
         factory.createDAO(session, BusinessObjectDAO.class);
     }
 
     @Test(expected = BusinessObjectDaoCreationException.class)
-    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session() throws Exception {
+    public void should_create_dao_throw_BusinessObjectDaoCreationException_if_daoImpl_has_no_constructor_with_session()
+            throws Exception {
         Mockito.doReturn(DummyDAOWithoutConstructorImpl.class).when(factory).loadClass(ArgumentMatchers.anyString());
         factory.createDAO(session, DummyDAO.class);
     }

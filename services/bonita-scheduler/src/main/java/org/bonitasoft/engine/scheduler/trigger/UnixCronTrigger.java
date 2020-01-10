@@ -30,7 +30,8 @@ public class UnixCronTrigger extends OneShotTrigger implements CronTrigger {
         this.endDate = null;
     }
 
-    public UnixCronTrigger(final String name, final Date startDate, final String expression, final MisfireRestartPolicy misfireHandlingPolicy) {
+    public UnixCronTrigger(final String name, final Date startDate, final String expression,
+            final MisfireRestartPolicy misfireHandlingPolicy) {
         super(name, startDate, misfireHandlingPolicy);
         this.expression = expression;
         this.endDate = null;

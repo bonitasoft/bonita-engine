@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
@@ -54,10 +54,12 @@ public class ApplicationMenuToNodeConverterTest {
         final Long applicationPageId = 888L;
         final String displayName = "Readable menu name for display";
         final String token = "application-page-token";
-        doReturn(new SApplicationPage(91L, applicationPageId, token)).when(applicationService).getApplicationPage(applicationPageId);
+        doReturn(new SApplicationPage(91L, applicationPageId, token)).when(applicationService)
+                .getApplicationPage(applicationPageId);
 
         // when:
-        final ApplicationMenuNode convertedMenu = converter.toMenu(new SApplicationMenu(displayName, 147L, applicationPageId, 14));
+        final ApplicationMenuNode convertedMenu = converter
+                .toMenu(new SApplicationMenu(displayName, 147L, applicationPageId, 14));
 
         // then:
         assertThat(convertedMenu.getApplicationPage()).isEqualTo(token);
@@ -72,7 +74,8 @@ public class ApplicationMenuToNodeConverterTest {
         final Long applicationPageId1 = 44L;
 
         final String displayName1 = "HR";
-        final SApplicationMenu sApplicationMenu1 = new SApplicationMenu(displayName1, applicationId, applicationPageId1, 1);
+        final SApplicationMenu sApplicationMenu1 = new SApplicationMenu(displayName1, applicationId, applicationPageId1,
+                1);
         final List<SApplicationMenu> level1Menus = new ArrayList<SApplicationMenu>();
         level1Menus.add(sApplicationMenu1);
 
@@ -82,16 +85,20 @@ public class ApplicationMenuToNodeConverterTest {
         level2Menus.add(sApplicationMenu11);
         final String displayName12 = "HR collective agreement";
         final Long applicationPageId12 = 577L;
-        final SApplicationMenu sApplicationMenu12 = new SApplicationMenu(displayName12, applicationId, applicationPageId12, 2);
+        final SApplicationMenu sApplicationMenu12 = new SApplicationMenu(displayName12, applicationId,
+                applicationPageId12, 2);
         level2Menus.add(sApplicationMenu12);
 
-        given(applicationService.searchApplicationMenus(any(QueryOptions.class))).willReturn(level1Menus).willReturn(level2Menus)
+        given(applicationService.searchApplicationMenus(any(QueryOptions.class))).willReturn(level1Menus)
+                .willReturn(level2Menus)
                 .willReturn(Collections.<SApplicationMenu> emptyList());
 
         final String token1 = "mytoken-level-1";
-        given(applicationService.getApplicationPage(applicationPageId1)).willReturn(new SApplicationPage(applicationId, applicationPageId1, token1));
+        given(applicationService.getApplicationPage(applicationPageId1))
+                .willReturn(new SApplicationPage(applicationId, applicationPageId1, token1));
         final String token12 = "mytoken-level-12";
-        given(applicationService.getApplicationPage(applicationPageId12)).willReturn(new SApplicationPage(applicationId, applicationPageId12, token12));
+        given(applicationService.getApplicationPage(applicationPageId12))
+                .willReturn(new SApplicationPage(applicationId, applicationPageId12, token12));
 
         // when:
         final ApplicationNode node = new ApplicationNode();

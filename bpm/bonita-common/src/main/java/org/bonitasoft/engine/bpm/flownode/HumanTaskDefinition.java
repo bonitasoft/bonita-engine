@@ -19,7 +19,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * A Human task is a task having an actor and that can be assigned.
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */

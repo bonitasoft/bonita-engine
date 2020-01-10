@@ -107,7 +107,8 @@ public interface ActorMappingService {
      *         Error thrown if has exceptions while try to update an actor
      * @throws SBonitaReadException
      */
-    SActor updateActor(long actorId, EntityUpdateDescriptor updateDescriptor) throws SActorNotFoundException, SActorUpdateException, SBonitaReadException;
+    SActor updateActor(long actorId, EntityUpdateDescriptor updateDescriptor)
+            throws SActorNotFoundException, SActorUpdateException, SBonitaReadException;
 
     /**
      * Delete actors in the id specified scope
@@ -132,7 +133,8 @@ public interface ActorMappingService {
      * @throws SActorMemberCreationException
      *         Error thrown if has exceptions while try to create the SActorMember object
      */
-    SActorMember addUserToActor(long actorId, long userId) throws SActorNotFoundException, SActorMemberCreationException;
+    SActorMember addUserToActor(long actorId, long userId)
+            throws SActorNotFoundException, SActorMemberCreationException;
 
     /**
      * Add the groupId specified group to the actorId specified actor
@@ -147,7 +149,8 @@ public interface ActorMappingService {
      * @throws SActorMemberCreationException
      *         Error thrown if has exceptions while try to create the SActorMember object
      */
-    SActorMember addGroupToActor(long actorId, long groupId) throws SActorNotFoundException, SActorMemberCreationException;
+    SActorMember addGroupToActor(long actorId, long groupId)
+            throws SActorNotFoundException, SActorMemberCreationException;
 
     /**
      * Add the roleId specified role to the actorId specified actor
@@ -162,7 +165,8 @@ public interface ActorMappingService {
      * @throws SActorMemberCreationException
      *         Error thrown if has exceptions while try to create the SActorMember object
      */
-    SActorMember addRoleToActor(long actorId, long roleId) throws SActorNotFoundException, SActorMemberCreationException;
+    SActorMember addRoleToActor(long actorId, long roleId)
+            throws SActorNotFoundException, SActorMemberCreationException;
 
     /**
      * Add the roleId and groupId specified relationship to the actorId specified actor
@@ -179,7 +183,8 @@ public interface ActorMappingService {
      * @throws SActorMemberCreationException
      *         Error thrown if has exceptions while try to create the SActorMember object
      */
-    SActorMember addRoleAndGroupToActor(long actorId, long roleId, long groupId) throws SActorNotFoundException, SActorMemberCreationException;
+    SActorMember addRoleAndGroupToActor(long actorId, long roleId, long groupId)
+            throws SActorNotFoundException, SActorMemberCreationException;
 
     /**
      * Remove actorMember for the give actorMemberId
@@ -191,7 +196,8 @@ public interface ActorMappingService {
      * @throws SActorMemberDeletionException
      *         Error thrown if has exceptions while try to remove the SActorMember object
      */
-    SActorMember deleteActorMember(long actorMemberId) throws SActorMemberNotFoundException, SActorMemberDeletionException;
+    SActorMember deleteActorMember(long actorMemberId)
+            throws SActorMemberNotFoundException, SActorMemberDeletionException;
 
     /**
      * Remove an actor member
@@ -239,7 +245,8 @@ public interface ActorMappingService {
      * @return List of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
-    List<SActorMember> getActorMembersOfUser(long userId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfUser(long userId, int fromIndex, int numberOfActorMembers)
+            throws SBonitaReadException;
 
     /**
      * Get a list of SActorMember objects for given groupId
@@ -249,7 +256,8 @@ public interface ActorMappingService {
      * @return a list of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
-    List<SActorMember> getActorMembersOfGroup(long groupId, int index, int numberOfActorMembers) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfGroup(long groupId, int index, int numberOfActorMembers)
+            throws SBonitaReadException;
 
     /**
      * Get a list of SActorMember objects for given roleId
@@ -259,7 +267,8 @@ public interface ActorMappingService {
      * @return a list of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
-    List<SActorMember> getActorMembersOfRole(long roleId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfRole(long roleId, int fromIndex, int numberOfActorMembers)
+            throws SBonitaReadException;
 
     /**
      * Is a specified user allowed to start a process?

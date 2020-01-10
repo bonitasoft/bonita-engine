@@ -37,7 +37,8 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
-public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressionsInstance implements TransactionContentWithResult<Map<String, Serializable>> {
+public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressionsInstance
+        implements TransactionContentWithResult<Map<String, Serializable>> {
 
     private final Map<Expression, Map<String, Serializable>> expressionsAndTheirPartialContext;
 
@@ -49,8 +50,10 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
 
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
-    public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+    public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions,
+            final long processDefinitionId,
+            final ExpressionResolverService expressionResolverService,
+            final ProcessDefinitionService processDefinitionService,
             final BusinessDataRepository bdrService) {
         super(bdrService);
         expressionsAndTheirPartialContext = expressions;
@@ -66,7 +69,8 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
             // how to deal with containerType and containerId
             final SExpressionContext context = new SExpressionContext();
             if (processDefinitionId != 0) {
-                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                final SProcessDefinition processDefinition = processDefinitionService
+                        .getProcessDefinition(processDefinitionId);
                 final Set<Expression> exps = expressionsAndTheirPartialContext.keySet();
                 for (final Expression exp : exps) {
                     Map<String, Serializable> inputValues = getPartialContext(expressionsAndTheirPartialContext, exp);
@@ -85,8 +89,10 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
 
     }
 
-    protected Serializable evaluateExpression(final SExpressionContext context, final SExpression sexp, final SProcessDefinition processDefinition)
-            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+    protected Serializable evaluateExpression(final SExpressionContext context, final SExpression sexp,
+            final SProcessDefinition processDefinition)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException {
         try {
             return (Serializable) expressionResolver.evaluate(sexp, context);
         } catch (final SExpressionTypeUnknownException e) {
@@ -100,7 +106,8 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
         }
     }
 
-    private <T extends SBonitaException> T enrichExceptionContext(final T e, final SProcessDefinition processDefinition) {
+    private <T extends SBonitaException> T enrichExceptionContext(final T e,
+            final SProcessDefinition processDefinition) {
         e.setProcessDefinitionIdOnContext(processDefinition.getId());
         e.setProcessDefinitionNameOnContext(processDefinition.getName());
         e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());

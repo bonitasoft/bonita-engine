@@ -17,20 +17,22 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.EndEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowErrorEventTriggerDefinitionImpl;
 
-
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
 public class ThrowErrorEventTriggerBuilder extends FlowElementContainerBuilder {
 
-    ThrowErrorEventTriggerBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    ThrowErrorEventTriggerBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final EndEventDefinitionImpl event, final String errorCode) {
         super(container, processDefinitionBuilder);
-        final ThrowErrorEventTriggerDefinitionImpl errorEventTrigger = new ThrowErrorEventTriggerDefinitionImpl(errorCode);
+        final ThrowErrorEventTriggerDefinitionImpl errorEventTrigger = new ThrowErrorEventTriggerDefinitionImpl(
+                errorCode);
         event.addErrorEventTriggerDefinition(errorEventTrigger);
         if (errorCode == null || errorCode.length() == 0) {
-            processDefinitionBuilder.addError("The error code cannot be empty in a throw error event: " + event.getName());
+            processDefinitionBuilder
+                    .addError("The error code cannot be empty in a throw error event: " + event.getName());
         }
     }
 

@@ -77,13 +77,16 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_update_check_the_type() throws Exception {
         exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");
-        handler.update(new SLeftOperandImpl(), Collections.<String, Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
+        exception.expectMessage(
+                "Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");
+        handler.update(new SLeftOperandImpl(), Collections.<String, Object> emptyMap(), new HashMap<Object, Object>(),
+                45l, "container");
     }
 
     @Test
     public void should_update_delete_if_type_is_null() throws Exception {
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), null, 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), null, 45l,
+                "PROCESS_INSTANCE");
         verify(documentService).removeCurrentVersion(45l, "myDoc");
     }
 
@@ -92,9 +95,11 @@ public class DocumentLeftOperandHandlerTest {
         //given
         doThrow(new SObjectNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(),
+                new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"),
+                isNull(String.class));
     }
 
     @Test
@@ -103,7 +108,8 @@ public class DocumentLeftOperandHandlerTest {
         final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(),
+                new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
         verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
     }
@@ -116,7 +122,8 @@ public class DocumentLeftOperandHandlerTest {
         final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(),
+                new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
         //then
         verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
 
@@ -125,7 +132,8 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_not_update_if_has_change_is_false() throws Exception {
         //when
-        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new DocumentValue(123l),
+                45l, "PROCESS_INSTANCE");
         //then
         verify(documentService, times(0)).updateDocument(any(SMappedDocument.class), any(SDocument.class));
     }

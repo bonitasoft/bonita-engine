@@ -19,7 +19,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ArchivedCallActivityInstanceImpl extends ArchivedActivityInstanceImpl implements ArchivedCallActivityInstance {
+public class ArchivedCallActivityInstanceImpl extends ArchivedActivityInstanceImpl
+        implements ArchivedCallActivityInstance {
 
     private static final long serialVersionUID = 3788310745899679306L;
 

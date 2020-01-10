@@ -21,7 +21,8 @@ import java.util.Map;
  */
 public class ExpressionConstantsResolver {
 
-    private static final Map<String, ExpressionConstants> mapOfExpressionConstants = new HashMap<String, ExpressionConstants>(5);
+    private static final Map<String, ExpressionConstants> mapOfExpressionConstants = new HashMap<String, ExpressionConstants>(
+            5);
 
     public static ExpressionConstants getExpressionConstantsFromName(final String engineName) {
         return mapOfExpressionConstants.get(engineName);

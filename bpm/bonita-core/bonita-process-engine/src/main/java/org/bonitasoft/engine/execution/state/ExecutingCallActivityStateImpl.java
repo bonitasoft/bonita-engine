@@ -43,14 +43,16 @@ public class ExecutingCallActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         stateBehaviors.mapDataOutputOfMultiInstance(processDefinition, instance);
         stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, instance);
         return StateCode.DONE;
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return false;
     }
 
@@ -65,7 +67,8 @@ public class ExecutingCallActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

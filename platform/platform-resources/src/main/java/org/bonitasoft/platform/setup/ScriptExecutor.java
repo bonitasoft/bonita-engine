@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.exception.PlatformException;
@@ -63,7 +64,8 @@ public class ScriptExecutor {
     private VersionService versionService;
 
     @Autowired
-    public ScriptExecutor(@Value("${db.vendor}") String dbVendor, DataSource datasource, VersionService versionService) {
+    public ScriptExecutor(@Value("${db.vendor}") String dbVendor, DataSource datasource,
+            VersionService versionService) {
         if (dbVendor == null) {
             throw new IllegalArgumentException("dbVendor is null");
         }
@@ -95,7 +97,8 @@ public class ScriptExecutor {
 
     protected void insertPlatform() {
         String version = versionService.getPlatformSetupVersion();
-        final String sql = "INSERT INTO platform (id, version, previousversion, initialversion, created, createdby) VALUES (1, '" + version + "', '', '"
+        final String sql = "INSERT INTO platform (id, version, previousversion, initialversion, created, createdby) VALUES (1, '"
+                + version + "', '', '"
                 + version + "', " + System.currentTimeMillis() + ", 'platformAdmin')";
         new JdbcTemplate(datasource).update(sql);
     }
@@ -133,7 +136,8 @@ public class ScriptExecutor {
     }
 
     private Resource getResourceFromFileSystem(String setupFolderPath, String sqlFile) {
-        Path path = Paths.get(setupFolderPath).resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor).resolve(sqlFile);
+        Path path = Paths.get(setupFolderPath).resolve(PLATFORM_CONF_FOLDER_NAME).resolve("sql").resolve(dbVendor)
+                .resolve(sqlFile);
         final File file = path.toFile();
         if (file.exists()) {
             return new FileSystemResource(file);
@@ -190,7 +194,8 @@ public class ScriptExecutor {
 
     public void deleteTables() throws PlatformException {
         try {
-            executeSQLResources(asList("preDropStructure.sql", "dropQuartzTables.sql", "dropTables.sql"), CONTINUE_ON_ERROR);
+            executeSQLResources(asList("preDropStructure.sql", "dropQuartzTables.sql", "dropTables.sql"),
+                    CONTINUE_ON_ERROR);
         } catch (final IOException e) {
             throw new PlatformException(e);
         }

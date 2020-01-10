@@ -56,7 +56,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     protected final TechnicalLoggerService logger;
 
     public AbstractDBPersistenceService(final String name, final char likeEscapeCharacter,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+            final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         sequenceManager = null;
         datasource = null;
@@ -66,7 +67,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
             for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
                 final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
                 if (!PersistentObject.class.isAssignableFrom(clazz)) {
-                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz
+                            + " because it does not implements "
                             + PersistentObject.class);
                 }
                 this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
@@ -77,7 +79,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     public AbstractDBPersistenceService(final String name,
             final char likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+            final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
@@ -91,12 +94,14 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         }
         if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
             if (!enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
+                logger.log(getClass(), TechnicalLogSeverity.INFO,
+                        "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
             }
             for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
                 final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
                 if (!PersistentObject.class.isAssignableFrom(clazz)) {
-                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz
+                            + " because it does not implements "
                             + PersistentObject.class);
                 }
                 this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
@@ -122,13 +127,15 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     @Override
-    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final QueryOptions options, final Map<String, Object> parameters)
+    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final QueryOptions options,
+            final Map<String, Object> parameters)
             throws SBonitaReadException {
         return getNumberOfEntities(entityClass, null, options, parameters);
     }
 
     @Override
-    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final String querySuffix, final QueryOptions options,
+    public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final String querySuffix,
+            final QueryOptions options,
             final Map<String, Object> parameters) throws SBonitaReadException {
         List<FilterOption> filters;
         if (options == null) {
@@ -138,25 +145,30 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         }
         final String queryName = getQueryName("getNumberOf", querySuffix, entityClass, filters);
 
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, entityClass, Long.class, options);
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, entityClass,
+                Long.class, options);
         return selectList(descriptor).get(0);
     }
 
     @Override
-    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final QueryOptions options, final Map<String, Object> parameters)
+    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final QueryOptions options,
+            final Map<String, Object> parameters)
             throws SBonitaReadException {
         return searchEntity(entityClass, null, options, parameters);
     }
 
     @Override
-    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final String querySuffix, final QueryOptions options,
+    public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final String querySuffix,
+            final QueryOptions options,
             final Map<String, Object> parameters) throws SBonitaReadException {
         final String queryName = getQueryName("search", querySuffix, entityClass, options.getFilters());
-        final SelectListDescriptor<T> descriptor = new SelectListDescriptor<T>(queryName, parameters, entityClass, options);
+        final SelectListDescriptor<T> descriptor = new SelectListDescriptor<T>(queryName, parameters, entityClass,
+                options);
         return selectList(descriptor);
     }
 
-    private <T extends PersistentObject> String getQueryName(final String prefix, final String suffix, final Class<T> entityClass,
+    private <T extends PersistentObject> String getQueryName(final String prefix, final String suffix,
+            final Class<T> entityClass,
             final List<FilterOption> filters) {
         final SortedSet<String> query = new TreeSet<String>();
         for (final FilterOption filter : filters) {

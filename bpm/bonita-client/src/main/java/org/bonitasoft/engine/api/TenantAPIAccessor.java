@@ -37,7 +37,8 @@ import org.bonitasoft.engine.util.APITypeManager;
  */
 public final class TenantAPIAccessor {
 
-    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    private static ServerAPI getServerAPI()
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getServerAPI();
     }
 
@@ -51,47 +52,58 @@ public final class TenantAPIAccessor {
         APITypeManager.refresh();
     }
 
-    private static <T> T getAPI(final Class<T> clazz, final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    private static <T> T getAPI(final Class<T> clazz, final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz },
+                sessionInterceptor);
     }
 
-    private static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    private static <T> T getAPI(final Class<T> clazz)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz },
+                sessionInterceptor);
     }
 
     public static LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(LoginAPI.class);
     }
 
-    public static IdentityAPI getIdentityAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static IdentityAPI getIdentityAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(IdentityAPI.class, session);
     }
 
-    public static ProcessAPI getProcessAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ProcessAPI getProcessAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProcessAPI.class, session);
     }
 
-    public static CommandAPI getCommandAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static CommandAPI getCommandAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(CommandAPI.class, session);
     }
 
-    public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ProfileAPI getProfileAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
     }
 
-    public static ThemeAPI getThemeAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ThemeAPI getThemeAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ThemeAPI.class, session);
     }
 
-    public static PermissionAPI getPermissionAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static PermissionAPI getPermissionAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PermissionAPI.class, session);
     }
 
-    public static PageAPI getCustomPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static PageAPI getCustomPageAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PageAPI.class, session);
     }
 
@@ -100,7 +112,8 @@ public final class TenantAPIAccessor {
         return getAPI(ApplicationAPI.class, session);
     }
 
-    public static TenantAdministrationAPI getTenantAdministrationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+    public static TenantAdministrationAPI getTenantAdministrationAPI(final APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(TenantAdministrationAPI.class, session);
     }
@@ -109,7 +122,8 @@ public final class TenantAPIAccessor {
      * @deprecated as of 7.3, see {@link BusinessDataAPI} for replacements
      */
     @Deprecated
-    public static BusinessDataAPI getBusinessDataAPI(APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+    public static BusinessDataAPI getBusinessDataAPI(APISession session)
+            throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(BusinessDataAPI.class, session);
     }

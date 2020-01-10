@@ -20,12 +20,16 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SSendTaskInstan
 /**
  * @author Baptiste Mesta
  */
-public class SSendTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl implements SSendTaskInstanceBuilderFactory {
+public class SSendTaskInstanceBuilderFactoryImpl extends SActivityInstanceBuilderFactoryImpl
+        implements SSendTaskInstanceBuilderFactory {
 
     @Override
-    public SSendTaskInstanceBuilder createNewSendTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        final SSendTaskInstance activityInstanceImpl = new SSendTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
+    public SSendTaskInstanceBuilder createNewSendTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
+            final long parentProcessInstanceId) {
+        final SSendTaskInstance activityInstanceImpl = new SSendTaskInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId);
         activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SSendTaskInstanceBuilderImpl(activityInstanceImpl);

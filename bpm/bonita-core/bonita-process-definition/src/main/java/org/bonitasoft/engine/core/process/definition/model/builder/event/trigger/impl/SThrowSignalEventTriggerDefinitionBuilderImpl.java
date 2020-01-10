@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.ST
 public class SThrowSignalEventTriggerDefinitionBuilderImpl implements SThrowSignalEventTriggerDefinitionBuilder {
 
     private final SThrowSignalEventTriggerDefinitionImpl entity;
-            
+
     public SThrowSignalEventTriggerDefinitionBuilderImpl(final SThrowSignalEventTriggerDefinitionImpl entity) {
         super();
         this.entity = entity;

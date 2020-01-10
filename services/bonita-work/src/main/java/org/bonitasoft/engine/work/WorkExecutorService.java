@@ -16,7 +16,6 @@ package org.bonitasoft.engine.work;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
- *
  * Trigger the asynchronous execution of a work
  *
  * @author Baptiste Mesta

@@ -53,7 +53,8 @@ public class FormMappingKeyGeneratorImplTest {
 
     @Test
     public void generateKey_on_process_overview() throws Exception {
-        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, null, SFormMapping.TYPE_PROCESS_OVERVIEW);
+        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, null,
+                SFormMapping.TYPE_PROCESS_OVERVIEW);
 
         assertThat(generateKey).isEqualTo("processInstance/myProcess/12.589");
     }
@@ -65,14 +66,16 @@ public class FormMappingKeyGeneratorImplTest {
 
     @Test
     public void generateKey_on_task() throws Exception {
-        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, "step1", SFormMapping.TYPE_TASK);
+        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, "step1",
+                SFormMapping.TYPE_TASK);
 
         assertThat(generateKey).isEqualTo("taskInstance/myProcess/12.589/step1");
     }
 
     @Test
     public void generateKey_on_process_start() throws Exception {
-        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, "step1", SFormMapping.TYPE_PROCESS_START);
+        String generateKey = formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, "step1",
+                SFormMapping.TYPE_PROCESS_START);
 
         assertThat(generateKey).isEqualTo("process/myProcess/12.589");
     }
@@ -89,7 +92,8 @@ public class FormMappingKeyGeneratorImplTest {
 
     @Test(expected = SObjectCreationException.class)
     public void generateKeyShouldThrowObjectCreationExceptionWhenProcessDefNotFound() throws Exception {
-        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_ID);
+        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService)
+                .getProcessDefinition(PROCESS_DEFINITION_ID);
         formMappingKeyGenerator.generateKey(PROCESS_DEFINITION_ID, "someTaskName", SFormMapping.TYPE_TASK);
     }
 

@@ -46,6 +46,7 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -134,7 +135,8 @@ public class IOUtil {
         for (final Class<?> clazz : classes) {
             resources.put(clazz.getName().replace(".", "/") + ".class", ClassDataUtil.getClassData(clazz));
             for (final Class<?> internalClass : clazz.getDeclaredClasses()) {
-                resources.put(internalClass.getName().replace(".", "/") + ".class", ClassDataUtil.getClassData(internalClass));
+                resources.put(internalClass.getName().replace(".", "/") + ".class",
+                        ClassDataUtil.getClassData(internalClass));
             }
         }
         return resources;
@@ -441,7 +443,8 @@ public class IOUtil {
         return files;
     }
 
-    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile)
+            throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         mkdirs(outputFile.getParentFile());
 
@@ -524,7 +527,8 @@ public class IOUtil {
         }
     }
 
-    public static byte[] addJarEntry(final byte[] jarToUpdate, final String entryName, final byte[] entryContent) throws IOException {
+    public static byte[] addJarEntry(final byte[] jarToUpdate, final String entryName, final byte[] entryContent)
+            throws IOException {
         ByteArrayOutputStream out = null;
         ByteArrayInputStream bais = null;
         JarOutputStream jos = null;
@@ -602,7 +606,7 @@ public class IOUtil {
     }
 
     public static boolean checkMD5(File md5File, byte[] contentToCheck) throws NoSuchAlgorithmException {
-        if(!md5File.exists()){
+        if (!md5File.exists()) {
             return false;
         }
         try {

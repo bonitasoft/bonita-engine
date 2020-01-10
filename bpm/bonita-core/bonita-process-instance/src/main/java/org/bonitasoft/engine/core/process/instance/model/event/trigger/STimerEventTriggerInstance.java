@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger;
 
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -58,8 +58,8 @@ public class STimerEventTriggerInstance implements PersistentObject {
      */
     private String eventInstanceName;
 
-
-    public STimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName, final long executionDate, final String jobTriggerName) {
+    public STimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName,
+            final long executionDate, final String jobTriggerName) {
         this.eventInstanceId = eventInstanceId;
         this.eventInstanceName = eventInstanceName;
         this.executionDate = executionDate;

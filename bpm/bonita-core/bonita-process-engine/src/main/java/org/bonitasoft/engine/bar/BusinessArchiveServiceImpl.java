@@ -53,8 +53,10 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
     private final TechnicalLoggerService logger;
     private final ClassLoaderService classLoaderService;
 
-    public BusinessArchiveServiceImpl(ProcessDefinitionService processDefinitionService, DependencyService dependencyService,
-            BusinessArchiveArtifactsManager businessArchiveArtifactsManager, TechnicalLoggerService logger, ClassLoaderService classLoaderService) {
+    public BusinessArchiveServiceImpl(ProcessDefinitionService processDefinitionService,
+            DependencyService dependencyService,
+            BusinessArchiveArtifactsManager businessArchiveArtifactsManager, TechnicalLoggerService logger,
+            ClassLoaderService classLoaderService) {
         this.processDefinitionService = processDefinitionService;
         this.dependencyService = dependencyService;
         this.businessArchiveArtifactsManager = businessArchiveArtifactsManager;
@@ -63,7 +65,8 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
     }
 
     @Override
-    public SProcessDefinition deploy(BusinessArchive businessArchive) throws SObjectCreationException, SAlreadyExistsException {
+    public SProcessDefinition deploy(BusinessArchive businessArchive)
+            throws SObjectCreationException, SAlreadyExistsException {
 
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
         SProcessDefinition sProcessDefinition;
@@ -72,7 +75,8 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
             checkNoV6Forms(businessArchive);
             sProcessDefinition = processDefinitionService.store(designProcessDefinition);
 
-            final boolean isResolved = businessArchiveArtifactsManager.resolveDependencies(businessArchive, sProcessDefinition);
+            final boolean isResolved = businessArchiveArtifactsManager.resolveDependencies(businessArchive,
+                    sProcessDefinition);
             if (isResolved) {
                 processDefinitionService.resolveProcess(sProcessDefinition.getId());
             }
@@ -96,10 +100,13 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
         }
     }
 
-    void checkIfExists(DesignProcessDefinition designProcessDefinition) throws SBonitaReadException, SAlreadyExistsException {
+    void checkIfExists(DesignProcessDefinition designProcessDefinition)
+            throws SBonitaReadException, SAlreadyExistsException {
         try {
-            processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
-            throw new SAlreadyExistsException("The process " + designProcessDefinition.getName() + " in version " + designProcessDefinition.getVersion()
+            processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(),
+                    designProcessDefinition.getVersion());
+            throw new SAlreadyExistsException("The process " + designProcessDefinition.getName() + " in version "
+                    + designProcessDefinition.getVersion()
                     + " already exists.");
         } catch (final SProcessDefinitionNotFoundException e) {
             // ok
@@ -108,27 +115,35 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
 
     void info(SProcessDefinition sProcessDefinition) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <"
-                    + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <"
+                            + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion()
+                            + "> with id <" + sProcessDefinition.getId() + ">");
         }
     }
 
     @Override
-    public BusinessArchive export(long processDefinitionId) throws SBonitaException, InvalidBusinessArchiveFormatException {
-        final DesignProcessDefinition designProcessDefinition = processDefinitionService.getDesignProcessDefinition(processDefinitionId);
+    public BusinessArchive export(long processDefinitionId)
+            throws SBonitaException, InvalidBusinessArchiveFormatException {
+        final DesignProcessDefinition designProcessDefinition = processDefinitionService
+                .getDesignProcessDefinition(processDefinitionId);
 
         return businessArchiveArtifactsManager.exportBusinessArchive(processDefinitionId, designProcessDefinition);
     }
 
     @Override
-    public void delete(long processDefinitionId) throws SProcessDefinitionNotFoundException, SObjectModificationException {
+    public void delete(long processDefinitionId)
+            throws SProcessDefinitionNotFoundException, SObjectModificationException {
         try {
-            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            final SProcessDefinition processDefinition = processDefinitionService
+                    .getProcessDefinition(processDefinitionId);
             businessArchiveArtifactsManager.deleteDependencies(processDefinition);
             processDefinitionService.delete(processDefinition.getId());
             classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinition.getId());
-        } catch (SBonitaReadException | SProcessDeletionException | SDeletingEnabledProcessException | SRecorderException | SClassLoaderException e) {
-            throw new SObjectModificationException("Unable to delete the process definition <" + processDefinitionId + ">", e);
+        } catch (SBonitaReadException | SProcessDeletionException | SDeletingEnabledProcessException
+                | SRecorderException | SClassLoaderException e) {
+            throw new SObjectModificationException(
+                    "Unable to delete the process definition <" + processDefinitionId + ">", e);
         }
     }
 }

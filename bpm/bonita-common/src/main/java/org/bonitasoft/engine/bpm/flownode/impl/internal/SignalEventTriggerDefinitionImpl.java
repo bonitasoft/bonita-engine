@@ -57,8 +57,10 @@ public abstract class SignalEventTriggerDefinitionImpl implements SignalEventTri
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         SignalEventTriggerDefinitionImpl that = (SignalEventTriggerDefinitionImpl) o;
         return Objects.equals(signalName, that.signalName);
     }

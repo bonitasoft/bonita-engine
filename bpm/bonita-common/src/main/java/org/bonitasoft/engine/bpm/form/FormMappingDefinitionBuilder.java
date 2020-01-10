@@ -25,7 +25,8 @@ public class FormMappingDefinitionBuilder {
         formMapping = new FormMappingDefinition(page, type, target);
     }
 
-    public static FormMappingDefinitionBuilder buildFormMapping(final String form, final FormMappingType type, final FormMappingTarget target) {
+    public static FormMappingDefinitionBuilder buildFormMapping(final String form, final FormMappingType type,
+            final FormMappingTarget target) {
         return new FormMappingDefinitionBuilder(form, type, target);
     }
 

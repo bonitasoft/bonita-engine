@@ -36,7 +36,8 @@ public class ApplicationMenuCreator implements Serializable {
      *
      * @param applicationId the identifier of related {@link org.bonitasoft.engine.business.application.Application}
      * @param displayName the {@link org.bonitasoft.engine.business.application.ApplicationMenu} display name
-     * @param applicationPageId the identifier of related {@link org.bonitasoft.engine.business.application.ApplicationPage}
+     * @param applicationPageId the identifier of related
+     *        {@link org.bonitasoft.engine.business.application.ApplicationPage}
      * @see ApplicationMenu
      */
     public ApplicationMenuCreator(final Long applicationId, final String displayName, final Long applicationPageId) {
@@ -70,18 +71,21 @@ public class ApplicationMenuCreator implements Serializable {
     }
 
     /**
-     * Retrieves the identifier of the parent {@link ApplicationMenu}. If no parent is defined this method will return null.
+     * Retrieves the identifier of the parent {@link ApplicationMenu}. If no parent is defined this method will return
+     * null.
+     *
      * @return the identifier of the parent {@code ApplicationMenu} or null if no parent is defined
      * @see org.bonitasoft.engine.business.application.ApplicationMenu
      */
     public Long getParentId() {
-        return (Long)fields.get(ApplicationMenuField.PARENT_ID);
+        return (Long) fields.get(ApplicationMenuField.PARENT_ID);
     }
 
     /**
      * Retrieves all fields defined in this {@code ApplicationMenuCreator}
      *
-     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields defined in this {@code ApplicationMenuCreator}
+     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields defined in this
+     *         {@code ApplicationMenuCreator}
      */
     public Map<ApplicationMenuField, Serializable> getFields() {
         return Collections.unmodifiableMap(fields);

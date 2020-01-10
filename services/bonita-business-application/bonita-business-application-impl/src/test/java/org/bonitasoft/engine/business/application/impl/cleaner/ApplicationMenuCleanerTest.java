@@ -58,7 +58,8 @@ public class ApplicationMenuCleanerTest {
         SApplicationMenu menu2 = mock(SApplicationMenu.class);
         SApplicationMenu menu3 = mock(SApplicationMenu.class);
         given(filterBuilder.buildQueryOptions()).willReturn(options);
-        given(applicationService.searchApplicationMenus(options)).willReturn(Arrays.asList(menu1, menu2)).willReturn(Arrays.asList(menu3));
+        given(applicationService.searchApplicationMenus(options)).willReturn(Arrays.asList(menu1, menu2))
+                .willReturn(Arrays.asList(menu3));
 
         //when
         cleaner.deleteRelatedApplicationMenus(filterBuilder);

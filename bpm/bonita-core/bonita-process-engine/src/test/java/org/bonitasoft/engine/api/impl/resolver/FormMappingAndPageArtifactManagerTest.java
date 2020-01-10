@@ -108,8 +108,9 @@ public class FormMappingAndPageArtifactManagerTest {
 
     @Before
     public void before() {
-        formMappingAndPageArtifactManager = spy(new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService,
-                technicalLoggerService, formMappingService, processDefinitionService));
+        formMappingAndPageArtifactManager = spy(
+                new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService,
+                        technicalLoggerService, formMappingService, processDefinitionService));
         formMappings = new ArrayList<>();
 
         doReturn(PROCESS_DEFINITION_ID).when(sDefinition).getId();
@@ -127,10 +128,14 @@ public class FormMappingAndPageArtifactManagerTest {
     @Test
     public void deployPageFailure_Should_Not_Interrupt_Deployment() throws Exception {
         //given
-        formMappings.add(new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task", SFormMapping.TARGET_INTERNAL));
-        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build())
-                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
-        doReturn(new ArrayList<Problem>()).when(formMappingAndPageArtifactManager).checkResolution(any(SProcessDefinition.class));
+        formMappings.add(new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task",
+                SFormMapping.TARGET_INTERNAL));
+        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setFormMappings(buildFormMappingModel().build())
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done())
+                .done();
+        doReturn(new ArrayList<Problem>()).when(formMappingAndPageArtifactManager)
+                .checkResolution(any(SProcessDefinition.class));
         //when then
         formMappingAndPageArtifactManager.deploy(bar, sDefinition);
         verify(formMappingAndPageArtifactManager).checkResolution(any(SProcessDefinition.class));
@@ -140,7 +145,8 @@ public class FormMappingAndPageArtifactManagerTest {
     public void should_check_resolution_report_problem_when_page_is_missing() throws Exception {
         //given
         doReturn(1L).when(sPageMapping).getPageId();
-        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null, SFormMapping.TARGET_INTERNAL);
+        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
@@ -151,7 +157,9 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), 1L))
+        ProblemAssert.assertThat(problems.get(0))
+                .hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND,
+                        sPageMapping.getKey(), 1L))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -160,7 +168,8 @@ public class FormMappingAndPageArtifactManagerTest {
     public void should_check_resolution_report_problem_when_formMapping_on_page_has_no_pageMapping() throws Exception {
         //given
         doReturn(1L).when(sPageMapping).getPageId();
-        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null, SFormMapping.TARGET_INTERNAL);
+        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
@@ -171,7 +180,9 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), sPageMapping.getPageId()))
+        ProblemAssert.assertThat(problems.get(0))
+                .hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND,
+                        sPageMapping.getKey(), sPageMapping.getPageId()))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -180,7 +191,8 @@ public class FormMappingAndPageArtifactManagerTest {
     public void should_check_resolution_report_problems_when_mapping_has_no_pages() throws Exception {
         //given
         doReturn(null).when(sPageMapping).getPageId();
-        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null, SFormMapping.TARGET_INTERNAL);
+        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
@@ -196,7 +208,8 @@ public class FormMappingAndPageArtifactManagerTest {
     @Test
     public void should_format_message_when_form_mapping_page_is_null() throws Exception {
         //given
-        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), null,
+        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID,
+                FormMappingType.PROCESS_OVERVIEW.getId(), null,
                 SFormMapping.TARGET_INTERNAL);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
@@ -208,7 +221,9 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), null))
+        ProblemAssert.assertThat(problems.get(0))
+                .hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND,
+                        sPageMapping.getKey(), null))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -216,7 +231,8 @@ public class FormMappingAndPageArtifactManagerTest {
     @Test
     public void should_check_resolution_throw_exception() throws Exception {
         //given
-        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task",
+        final SFormMapping sFormMapping = new SFormMapping(PROCESS_DEFINITION_ID,
+                FormMappingType.PROCESS_OVERVIEW.getId(), "task",
                 SFormMapping.TARGET_INTERNAL);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
@@ -271,7 +287,8 @@ public class FormMappingAndPageArtifactManagerTest {
         final Map<String, byte[]> pageResources = formMappingAndPageArtifactManager.getPageResources(businessArchive);
 
         //then
-        assertThat(pageResources).hasSize(2).containsKeys("resources/customPages/custompage_step1.zip", "resources/customPages/custompage_step2.zip");
+        assertThat(pageResources).hasSize(2).containsKeys("resources/customPages/custompage_step1.zip",
+                "resources/customPages/custompage_step2.zip");
     }
 
     @Before
@@ -297,9 +314,11 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then:
         verify(formMappingService, times(1))
-                .create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.INTERNAL.name(), startForm);
+                .create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(),
+                        FormMappingTarget.INTERNAL.name(), startForm);
         verify(formMappingService, times(1))
-                .create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.INTERNAL.name(), overviewForm);
+                .create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(),
+                        FormMappingTarget.INTERNAL.name(), overviewForm);
     }
 
     @Test
@@ -311,50 +330,61 @@ public class FormMappingAndPageArtifactManagerTest {
         formMappingAndPageArtifactManager.deployFormMappings(barBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.NONE.name(),
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(),
+                FormMappingTarget.NONE.name(),
                 null);
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.NONE.name(), null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(),
+                FormMappingTarget.NONE.name(), null);
     }
 
     @Test
     public void deployShouldCreateDeclaredMappingsForDeclaredTaskForms() throws Exception {
         // when:
         final String taskname = "taskname";
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "5");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc",
+                "5");
         processDefBuilder.addUserTask(taskname, null);
 
         final long processDefinitionId = 3L;
         final String form = "pagename";
         final FormMappingType type = FormMappingType.TASK;
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
                 buildFormMapping(form, type, FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
         formMappingAndPageArtifactManager.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskname, type.getId(), FormMappingTarget.INTERNAL.name(), form);
+        verify(formMappingService, times(1)).create(processDefinitionId, taskname, type.getId(),
+                FormMappingTarget.INTERNAL.name(), form);
     }
 
     @Test
     public void deployShouldNotCreateDeclaredMappingsForDeclaredAutomaticTaskForms() throws Exception {
         // when:
         final String taskname = "taskname";
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "5");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc",
+                "5");
         processDefBuilder.addAutomaticTask(taskname);
 
         final long processDefinitionId = 3L;
         final String form = "pagename";
         final String type = FormMappingType.TASK.name();
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
-                buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
+                buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname)
+                        .build())
+                .build());
         formMappingAndPageArtifactManager.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.NONE.name(), null);
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.NONE.name(),
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(),
+                FormMappingTarget.NONE.name(), null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(),
+                FormMappingTarget.NONE.name(),
                 null);
         verifyNoMoreInteractions(formMappingService);
     }
@@ -364,26 +394,31 @@ public class FormMappingAndPageArtifactManagerTest {
         // Given:
         final long processDefinitionId = 5L;
         final String taskName = "taskname";
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "5");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc",
+                "5");
         processDefBuilder.addUserTask(taskName, null);
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefBuilder.done()).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefBuilder.done()).done();
 
         // when:
         formMappingAndPageArtifactManager.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(), FormMappingTarget.NONE.name(), null);
+        verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(),
+                FormMappingTarget.NONE.name(), null);
     }
 
     @Test
     public void deployShouldIgnoreDeclaredMappingsForUndeclaredTasks() throws Exception {
         // Given:
         final long processDefinitionId = 5L;
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "5");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc",
+                "5");
         final String declaredTaskName = "declaredtaskName";
         processDefBuilder.addUserTask(declaredTaskName, null);
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        processDefBuilder.done());
         final String unknownTaskName = "Unknown__Task__Name";
         businessArchiveBuilder.setFormMappings(FormMappingModelBuilder.buildFormMappingModel()
                 .addTaskForm("someForm", FormMappingTarget.INTERNAL, unknownTaskName).build());
@@ -393,9 +428,11 @@ public class FormMappingAndPageArtifactManagerTest {
         formMappingAndPageArtifactManager.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), eq(FormMappingType.TASK.getId()), anyString(),
+        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName),
+                eq(FormMappingType.TASK.getId()), anyString(),
                 nullable(String.class));
-        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), eq(FormMappingType.TASK.getId()), anyString(),
+        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName),
+                eq(FormMappingType.TASK.getId()), anyString(),
                 nullable(String.class));
     }
 
@@ -403,10 +440,13 @@ public class FormMappingAndPageArtifactManagerTest {
     public void checkFormMappingResolutionShouldAddProblemsIfPageIdIsNull() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
 
-        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1", SFormMapping.TARGET_INTERNAL);
-        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(), null,
+        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1",
                 SFormMapping.TARGET_INTERNAL);
-        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_INTERNAL);
+        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(),
+                null,
+                SFormMapping.TARGET_INTERNAL);
+        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
 
         SPageMapping pageMapping = new SPageMapping();
         sFormMappingTask.setPageMapping(pageMapping);
@@ -416,7 +456,8 @@ public class FormMappingAndPageArtifactManagerTest {
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessStart, problems);
-        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3).extracting("resource", "resourceId")
+        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3)
+                .extracting("resource", "resourceId")
                 .contains(tuple("form mapping", "Step1"),
                         tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
                         tuple("form mapping", FormMappingType.PROCESS_START.name()));
@@ -426,9 +467,12 @@ public class FormMappingAndPageArtifactManagerTest {
     public void checkFormMappingResolutionShouldNotAddProblemsIfThereIsNONE() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
 
-        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1", SFormMapping.TARGET_NONE);
-        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(), null, SFormMapping.TARGET_NONE);
-        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_NONE);
+        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1",
+                SFormMapping.TARGET_NONE);
+        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(),
+                null, SFormMapping.TARGET_NONE);
+        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_NONE);
 
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
@@ -440,19 +484,23 @@ public class FormMappingAndPageArtifactManagerTest {
     public void checkFormMappingResolutionShouldAddProblemsIfThereIsUNDEFINED() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
 
-        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1", SFormMapping.TARGET_UNDEFINED);
-        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(), null,
+        SFormMapping sFormMappingTask = new SFormMapping(321324, FormMappingType.TASK.getId(), "Step1",
                 SFormMapping.TARGET_UNDEFINED);
-        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_UNDEFINED);
+        SFormMapping sFormMappingProcessOverview = new SFormMapping(321324, FormMappingType.PROCESS_OVERVIEW.getId(),
+                null,
+                SFormMapping.TARGET_UNDEFINED);
+        SFormMapping sFormMappingProcessStart = new SFormMapping(321324, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_UNDEFINED);
 
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
         formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessStart, problems);
 
-        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3).extracting("resource", "resourceId").contains(
-                tuple("form mapping", "Step1"),
-                tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
-                tuple("form mapping", FormMappingType.PROCESS_START.name()));
+        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3)
+                .extracting("resource", "resourceId").contains(
+                        tuple("form mapping", "Step1"),
+                        tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
+                        tuple("form mapping", FormMappingType.PROCESS_START.name()));
     }
 
     @Test
@@ -474,32 +522,43 @@ public class FormMappingAndPageArtifactManagerTest {
     public void should_export_form_mapping_with_existing_page() throws Exception {
         //given
         BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor")
-                .addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
-        doReturn(Arrays.asList(withFormMapping("myPage1", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW, FormMappingTarget.INTERNAL, null),
-                withFormMapping("myPage2", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_START, FormMappingTarget.INTERNAL, null),
-                withFormMapping("myPage3", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task1"),
-                withFormMapping("myPage4", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2")))
-                        .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor")
+                        .addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
+        doReturn(Arrays.asList(
+                withFormMapping("myPage1", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW,
+                        FormMappingTarget.INTERNAL, null),
+                withFormMapping("myPage2", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_START,
+                        FormMappingTarget.INTERNAL, null),
+                withFormMapping("myPage3", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL,
+                        "task1"),
+                withFormMapping("myPage4", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL,
+                        "task2")))
+                                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
         //when
         formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
         //then
         FormMappingModel formMappingModel = businessArchiveBuilder.done().getFormMappingModel();
         assertThat(formMappingModel.getFormMappings())
-                .containsOnly(new FormMappingDefinition("myPage1", FormMappingType.PROCESS_OVERVIEW, FormMappingTarget.INTERNAL),
+                .containsOnly(
+                        new FormMappingDefinition("myPage1", FormMappingType.PROCESS_OVERVIEW,
+                                FormMappingTarget.INTERNAL),
                         new FormMappingDefinition("myPage2", FormMappingType.PROCESS_START, FormMappingTarget.INTERNAL),
                         new FormMappingDefinition("myPage3", FormMappingType.TASK, FormMappingTarget.INTERNAL, "task1"),
-                        new FormMappingDefinition("myPage4", FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2"));
+                        new FormMappingDefinition("myPage4", FormMappingType.TASK, FormMappingTarget.INTERNAL,
+                                "task2"));
     }
 
     @Test
     public void should_export_form_mapping_with_unexisting_page() throws Exception {
         //given
         BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor")
-                .addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
-        doReturn(Collections.singletonList(withFormMapping(null, PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2")))
-                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+        businessArchiveBuilder.setProcessDefinition(
+                new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor")
+                        .addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
+        doReturn(Collections.singletonList(withFormMapping(null, PROCESS_DEFINITION_ID, FormMappingType.TASK,
+                FormMappingTarget.INTERNAL, "task2")))
+                        .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
         //when
         formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
         //then
@@ -509,7 +568,8 @@ public class FormMappingAndPageArtifactManagerTest {
                         new FormMappingDefinition(null, FormMappingType.TASK, FormMappingTarget.INTERNAL, null));
     }
 
-    private SFormMapping withFormMapping(String pageName, long processDefinitionId, FormMappingType type, FormMappingTarget target, String task)
+    private SFormMapping withFormMapping(String pageName, long processDefinitionId, FormMappingType type,
+            FormMappingTarget target, String task)
             throws SBonitaReadException, SObjectNotFoundException {
         SFormMapping sFormMapping = new SFormMapping(processDefinitionId, type.getId(), task, target.name());
         SPageMapping pageMapping = new SPageMapping();

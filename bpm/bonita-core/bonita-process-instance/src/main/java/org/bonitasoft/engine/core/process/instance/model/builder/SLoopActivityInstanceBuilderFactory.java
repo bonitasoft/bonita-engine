@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
 public interface SLoopActivityInstanceBuilderFactory extends SActivityInstanceBuilderFactory {
 
-    SLoopActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+    SLoopActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
             long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
 
 }

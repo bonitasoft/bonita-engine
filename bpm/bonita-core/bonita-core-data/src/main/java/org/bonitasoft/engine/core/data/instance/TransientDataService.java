@@ -28,7 +28,8 @@ public interface TransientDataService {
      * @return
      * @throws SDataInstanceException
      */
-    List<SDataInstance> getDataInstances(List<String> dataNames, long containerId, String containerType) throws SDataInstanceException;
+    List<SDataInstance> getDataInstances(List<String> dataNames, long containerId, String containerType)
+            throws SDataInstanceException;
 
     /**
      * @param dataInstance
@@ -41,7 +42,8 @@ public interface TransientDataService {
      * @param descriptor
      * @throws SDataInstanceException
      */
-    void updateDataInstance(SDataInstance dataInstance, EntityUpdateDescriptor descriptor) throws SDataInstanceException;
+    void updateDataInstance(SDataInstance dataInstance, EntityUpdateDescriptor descriptor)
+            throws SDataInstanceException;
 
     /**
      * @param dataInstance
@@ -63,7 +65,8 @@ public interface TransientDataService {
      * @return
      * @throws SDataInstanceException
      */
-    SDataInstance getDataInstance(String dataName, long containerId, String containerType) throws SDataInstanceException;
+    SDataInstance getDataInstance(String dataName, long containerId, String containerType)
+            throws SDataInstanceException;
 
     /**
      * @param containerId
@@ -73,7 +76,8 @@ public interface TransientDataService {
      * @return
      * @throws SDataInstanceException
      */
-    List<SDataInstance> getDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceException;
+    List<SDataInstance> getDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults)
+            throws SDataInstanceException;
 
     /**
      * @param dataInstanceIds

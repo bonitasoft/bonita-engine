@@ -53,7 +53,8 @@ public class ImportActorMappingTest {
     private ImportActorMapping importActorMapping;
 
     @Test
-    public void execute_method_should_create_SActors_for_all_actors_and_correctly_add_users_roles_and_groups() throws SBonitaException {
+    public void execute_method_should_create_SActors_for_all_actors_and_correctly_add_users_roles_and_groups()
+            throws SBonitaException {
         //given
         ArrayList<String> mocklist = new ArrayList<>();
         mocklist.add("mock");

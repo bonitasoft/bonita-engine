@@ -19,6 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  * @author Baptiste Mesta
  */
 public class SInvalidPlatformCredentialsException extends SBonitaException {
+
     public SInvalidPlatformCredentialsException(Throwable e) {
         super(e);
     }

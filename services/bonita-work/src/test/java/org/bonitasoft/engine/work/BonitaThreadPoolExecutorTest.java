@@ -29,6 +29,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bonitasoft.engine.commons.time.FixedEngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -39,10 +42,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * @author Baptiste Mesta.
@@ -77,7 +76,7 @@ public class BonitaThreadPoolExecutorTest {
                 , new ArrayBlockingQueue<>(1_000) //
                 , new WorkerThreadFactory("test-worker", 1, threadNumber) //
                 , (r, executor) -> {
-        } //
+                } //
                 , workFactory, technicalLoggerService, engineClock, workExecutionCallback, workExecutionAuditor,
                 meterRegistry, TENANT_ID);
     }
@@ -166,9 +165,12 @@ public class BonitaThreadPoolExecutorTest {
 
     @Test
     public void should_have_tenant_id_in_all_meters() {
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_EXECUTED).tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_RUNNING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
-        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_PENDING).tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_EXECUTED)
+                .tag("tenant", String.valueOf(TENANT_ID)).counter()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_RUNNING)
+                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
+        assertThat(meterRegistry.find(BonitaThreadPoolExecutor.NUMBER_OF_WORKS_PENDING)
+                .tag("tenant", String.valueOf(TENANT_ID)).gauge()).isNotNull();
     }
 
     @Test
@@ -217,7 +219,7 @@ public class BonitaThreadPoolExecutorTest {
 
         @Override
         public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
-                              Throwable thrown) {
+                Throwable thrown) {
             this.thrown = thrown;
             onFailureCalled.set(true);
         }

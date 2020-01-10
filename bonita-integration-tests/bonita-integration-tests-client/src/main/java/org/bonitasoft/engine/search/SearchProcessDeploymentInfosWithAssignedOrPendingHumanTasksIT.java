@@ -63,39 +63,47 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksIT exten
 
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks() throws Exception {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5)
+                .sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI()
                 .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(searchOptionsBuilder.done());
         assertEquals(2, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
 
-        searchRes = getProcessAPI().searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(users.get(1).getId(), searchOptionsBuilder.done());
+        searchRes = getProcessAPI().searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
+                users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(0, searchRes.getCount());
     }
 
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksWithFilter() throws Exception {
         // test filter on process name
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5)
+                .sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.NAME, "My_Process1");
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(
-                searchOptionsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI()
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(
+                        searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(0).getId(), searchRes.getResult().get(0).getProcessId());
     }
 
     private void createProcessesDefinitions() throws Exception {
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true), ACTOR_NAME, true);
-        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, users.get(0));
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
+                        Arrays.asList("step1", "step2"), Arrays.asList(true, true), ACTOR_NAME, true);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1,
+                ACTOR_NAME, users.get(0));
         enabledProcessDefinitions.add(processDefinition1);
         startProcessAndWaitForTask(processDefinition1.getId(), "step1");
 
         // create process2
         final String actor2 = "Actor2";
-        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actor2, users.get(1));
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
+                        Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actor2,
+                users.get(1));
         enabledProcessDefinitions.add(processDefinition2);
         startProcessAndWaitForTask(processDefinition2.getId(), "step1");
     }

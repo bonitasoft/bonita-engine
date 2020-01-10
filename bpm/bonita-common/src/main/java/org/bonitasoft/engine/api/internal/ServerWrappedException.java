@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.api.internal;
 
-
 /**
- * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -25,10 +23,11 @@ public class ServerWrappedException extends Exception {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ServerWrappedException(final Throwable cause) {
         super(cause);
@@ -36,12 +35,13 @@ public class ServerWrappedException extends Exception {
 
     /**
      * Constructs a new exception with the specified detail message and cause.
-     * 
+     *
      * @param message
-     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ServerWrappedException(final String message, final Throwable cause) {
         super(message, cause);

@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,6 +30,7 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("fn_simple_ref")
 public class SFlowNodeSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
+
     @Column(name = "fn_inst_id")
     private long flowNodeInstanceId;
 

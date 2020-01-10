@@ -91,7 +91,8 @@ public class UserFilterIT extends TestWithTechnicalUser {
 
     @Test
     public void filterTask() throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilter", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilter", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
@@ -99,7 +100,8 @@ public class UserFilterIT extends TestWithTechnicalUser {
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilter");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -116,15 +118,18 @@ public class UserFilterIT extends TestWithTechnicalUser {
      */
     @Test
     public void filterTaskWithUserFilterNotFound() throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilter", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilter", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithClassNotFound", "1.0").addInput("userId",
-                new ExpressionBuilder().createConstantLongExpression(jack.getId()));
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithClassNotFound", "1.0")
+                .addInput("userId",
+                        new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithClassNotFound");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilterWithClassNotFound");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -138,37 +143,49 @@ public class UserFilterIT extends TestWithTechnicalUser {
      */
     @Test
     public void filterTaskWithUserFilterThatThrowException() throws Exception {
-        final ProcessDefinitionBuilder processWithRuntime = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterRuntimeException", "1.0");
+        final ProcessDefinitionBuilder processWithRuntime = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterRuntimeException", "1.0");
         processWithRuntime.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithRuntime.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = processWithRuntime.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
-                new ExpressionBuilder().createConstantStringExpression("runtime"));
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0")
+                .addInput("exception",
+                        new ExpressionBuilder().createConstantStringExpression("runtime"));
         processWithRuntime.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(processWithRuntime, ACTOR_NAME, john,
+        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(processWithRuntime,
+                ACTOR_NAME, john,
                 "TestFilterThatThrowException");
-        final ProcessDefinitionBuilder processWithException = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNormalException", "1.0");
+        final ProcessDefinitionBuilder processWithException = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterNormalException", "1.0");
         processWithException.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithException.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask2 = processWithException.addUserTask("step2", ACTOR_NAME);
-        addUserTask2.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
-                new ExpressionBuilder().createConstantStringExpression("normal"));
+        addUserTask2.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0")
+                .addInput("exception",
+                        new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithException.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(processWithException, ACTOR_NAME, john,
+        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(processWithException,
+                ACTOR_NAME, john,
                 "TestFilterThatThrowException");
-        final ProcessDefinitionBuilder processWithNoClassDef = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNoClassDef", "1.0");
+        final ProcessDefinitionBuilder processWithNoClassDef = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterNoClassDef", "1.0");
         processWithNoClassDef.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithNoClassDef.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask3 = processWithNoClassDef.addUserTask("step2", ACTOR_NAME);
-        addUserTask3.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef", "1.0").addInput("exception",
-                new ExpressionBuilder().createConstantStringExpression("normal"));
+        addUserTask3.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef", "1.0")
+                .addInput("exception",
+                        new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithNoClassDef.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(processWithNoClassDef, ACTOR_NAME, john,
+        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(processWithNoClassDef,
+                ACTOR_NAME, john,
                 "TestFilterThatThrowNoClassDef");
 
-        final ProcessInstance processInstanceException = getProcessAPI().startProcess(processDefinitionWithException.getId());
-        final ProcessInstance processInstanceRuntime = getProcessAPI().startProcess(processDefinitionWithRuntime.getId());
-        final ProcessInstance processInstanceNoClassDef = getProcessAPI().startProcess(processDefinitionNoClassDef.getId());
+        final ProcessInstance processInstanceException = getProcessAPI()
+                .startProcess(processDefinitionWithException.getId());
+        final ProcessInstance processInstanceRuntime = getProcessAPI()
+                .startProcess(processDefinitionWithRuntime.getId());
+        final ProcessInstance processInstanceNoClassDef = getProcessAPI()
+                .startProcess(processDefinitionNoClassDef.getId());
 
         waitForTaskToFail(processInstanceRuntime);
         waitForTaskToFail(processInstanceException);
@@ -181,16 +198,20 @@ public class UserFilterIT extends TestWithTechnicalUser {
 
     @Test
     public void filterTaskWithAutoAssign() throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithAutoAssign", "1.0").addInput("userId",
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithAutoAssign", "1.0").addInput(
+                "userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        addUserTask.addDisplayName(new ExpressionBuilder().createConstantStringExpression("A task to test user filter"));
+        addUserTask
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("A task to test user filter"));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithAutoAssign");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilterWithAutoAssign");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -200,36 +221,44 @@ public class UserFilterIT extends TestWithTechnicalUser {
         tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
         final SearchResult<Comment> commentSearchResult = getProcessAPI().searchComments(
-                new SearchOptionsBuilder(0, 10).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).done());
+                new SearchOptionsBuilder(0, 10)
+                        .filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).done());
         assertThat(commentSearchResult.getResult()).hasSize(1);
-        assertThat(commentSearchResult.getResult().get(0).getContent()).isEqualTo("The task \"A task to test user filter\" is now assigned to jack");
+        assertThat(commentSearchResult.getResult().get(0).getContent())
+                .isEqualTo("The task \"A task to test user filter\" is now assigned to jack");
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void filterTaskWithNullInput() throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterUsingActorName", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterUsingActorName", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0").addInput("userIds", null);
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0")
+                .addInput("userIds", null);
         designProcessDefinition.addTransition("step1", "step2");
         deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterUsingActorName");
     }
 
     @Test
     public void filterTaskUsingFilterName() throws Exception {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterUsingActorName", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterUsingActorName", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0").addInput(
                 "userIds",
-                new ExpressionBuilder().createGroovyScriptExpression("myScript", "['" + ACTOR_NAME + "':" + james.getId() + "l,'notACTOR_NAME':" + jack.getId()
-                        + "l]", Map.class.getName()));
+                new ExpressionBuilder().createGroovyScriptExpression("myScript",
+                        "['" + ACTOR_NAME + "':" + james.getId() + "l,'notACTOR_NAME':" + jack.getId()
+                                + "l]",
+                        Map.class.getName()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterUsingActorName");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME,
+                john, "TestFilterUsingActorName");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -249,15 +278,18 @@ public class UserFilterIT extends TestWithTechnicalUser {
         final Role role = createRole("role1");
         createUserMembership(jack.getUserName(), "role1", "group1");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput(
+                "groupId",
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john,
+                "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
@@ -280,14 +312,19 @@ public class UserFilterIT extends TestWithTechnicalUser {
 
     @Test(expected = UpdateException.class)
     public void unableToUpdateActorsOnAGateway() throws Exception {
-        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
+        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition",
+                "fzdfsdfsdfsdfsdf", Boolean.class.getName());
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE)
-                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", scriptExpression).addDefaultTransition("gateway1", "step3").getProcess();
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addGateway("gateway1", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", scriptExpression)
+                .addDefaultTransition("gateway1", "step3").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                john);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -302,17 +339,20 @@ public class UserFilterIT extends TestWithTechnicalUser {
 
     @Test
     public void doNotUpateAHumanTaskIfNoUserFilterIsDefined() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("doNotUpateAHumanTaskIfNoUserFilterIsDefined", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("doNotUpateAHumanTaskIfNoUserFilterIsDefined", "1.0");
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
         processBuilder.addUserTask("step2", ACTOR_NAME);
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME,
+                john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask("step2");
-        List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10,
+                ActivityInstanceCriterion.DEFAULT);
         assertEquals(1, tasks.size());
         final HumanTaskInstance taskBefore = tasks.get(0);
         getProcessAPI().updateActorsOfUserTask(tasks.get(0).getId());
@@ -329,15 +369,18 @@ public class UserFilterIT extends TestWithTechnicalUser {
         final Role role = createRole("role1");
         createUserMembership(jack.getUserName(), "role1", "group1");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("updateUserFilterAfterAUserAdd", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("updateUserFilterAfterAUserAdd", "1.0");
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
         final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", ACTOR_NAME);
-        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput(
+                "groupId",
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john,
+                "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());

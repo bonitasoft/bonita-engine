@@ -21,7 +21,8 @@ import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * Represents an archived instance of a process.
- * Gives access to the information of the instance, whereas the state, the definition, the archived date of the process instance...
+ * Gives access to the information of the instance, whereas the state, the definition, the archived date of the process
+ * instance...
  *
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
@@ -67,17 +68,21 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     long getStartedBy();
 
     /**
-     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process instance.
+     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process
+     * instance.
      *
-     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process instance.
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process
+     *         instance.
      * @since 6.3.0
      */
     long getStartedBySubstitute();
 
     /**
-     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process instance.
+     * Get the identifier of the substitute user (as Process manager or Administrator) who started this process
+     * instance.
      *
-     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process instance.
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started this process
+     *         instance.
      * @since 6.0.1
      * @deprecated As of version 6.3.0, replaced by {@link ArchivedProcessInstance#getStartedBySubstitute()}
      */

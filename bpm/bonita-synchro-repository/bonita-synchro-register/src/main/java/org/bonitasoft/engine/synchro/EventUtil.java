@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
 /**

@@ -25,7 +25,6 @@ public class BonitaEngineTest {
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
 
-
     @Test
     public void should_set_db_vendor_system_property_according_to_database_configuration() throws Exception {
         BonitaEngine bonitaEngine = newBonitaEngine();

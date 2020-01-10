@@ -18,13 +18,15 @@ import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ThrowErrorEventTriggerDefinitionImpl extends ErrorEventTriggerDefinitionImpl implements ThrowErrorEventTriggerDefinition {
+public class ThrowErrorEventTriggerDefinitionImpl extends ErrorEventTriggerDefinitionImpl
+        implements ThrowErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8087566164595708656L;
 
-    public  ThrowErrorEventTriggerDefinitionImpl(){
+    public ThrowErrorEventTriggerDefinitionImpl() {
         super();
     }
+
     public ThrowErrorEventTriggerDefinitionImpl(final String errorCode) {
         super(errorCode);
     }

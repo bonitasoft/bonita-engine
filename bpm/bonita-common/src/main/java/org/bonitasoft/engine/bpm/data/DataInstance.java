@@ -19,7 +19,8 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
- * This object represents this instance of {@link DataDefinition} generated when the associated {@link org.bonitasoft.engine.bpm.process.ProcessInstance} or
+ * This object represents this instance of {@link DataDefinition} generated when the associated
+ * {@link org.bonitasoft.engine.bpm.process.ProcessInstance} or
  * {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} is instantiated.
  *
  * @author Feng Hui
@@ -65,7 +66,8 @@ public interface DataInstance extends NamedElement, BaseElement {
     Serializable getValue();
 
     /**
-     * Get the identifier of the element where the data is defined. The element can be a {@link org.bonitasoft.engine.bpm.process.ProcessInstance} or a
+     * Get the identifier of the element where the data is defined. The element can be a
+     * {@link org.bonitasoft.engine.bpm.process.ProcessInstance} or a
      * {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance}.
      *
      * @return The identifier of the container of the data.

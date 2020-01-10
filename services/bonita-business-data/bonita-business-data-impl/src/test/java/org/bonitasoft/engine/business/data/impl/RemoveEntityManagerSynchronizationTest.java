@@ -39,7 +39,8 @@ public class RemoveEntityManagerSynchronizationTest {
         //given
         ThreadLocal<EntityManager> localManager = new ThreadLocal<>();
         localManager.set(entityManager);
-        RemoveEntityManagerSynchronization removeEntityManagerSynchronization = new RemoveEntityManagerSynchronization(localManager);
+        RemoveEntityManagerSynchronization removeEntityManagerSynchronization = new RemoveEntityManagerSynchronization(
+                localManager);
 
         //when
         removeEntityManagerSynchronization.beforeCommit();
@@ -55,7 +56,8 @@ public class RemoveEntityManagerSynchronizationTest {
         //given
         ThreadLocal<EntityManager> localManager = new ThreadLocal<>();
         localManager.set(entityManager);
-        RemoveEntityManagerSynchronization removeEntityManagerSynchronization = new RemoveEntityManagerSynchronization(localManager);
+        RemoveEntityManagerSynchronization removeEntityManagerSynchronization = new RemoveEntityManagerSynchronization(
+                localManager);
 
         //when
         removeEntityManagerSynchronization.afterCompletion(TransactionState.ACTIVE);

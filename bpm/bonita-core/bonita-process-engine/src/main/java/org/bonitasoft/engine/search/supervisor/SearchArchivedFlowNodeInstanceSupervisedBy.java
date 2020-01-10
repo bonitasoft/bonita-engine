@@ -29,7 +29,8 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Celine Souchet
  */
-public class SearchArchivedFlowNodeInstanceSupervisedBy extends AbstractSearchEntity<ArchivedFlowNodeInstance, SAFlowNodeInstance> {
+public class SearchArchivedFlowNodeInstanceSupervisedBy
+        extends AbstractSearchEntity<ArchivedFlowNodeInstance, SAFlowNodeInstance> {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
@@ -37,8 +38,10 @@ public class SearchArchivedFlowNodeInstanceSupervisedBy extends AbstractSearchEn
 
     private final Long supervisorId;
 
-    public SearchArchivedFlowNodeInstanceSupervisedBy(final Long supervisorId, final FlowNodeInstanceService flowNodeInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor, final SearchOptions searchOptions) {
+    public SearchArchivedFlowNodeInstanceSupervisedBy(final Long supervisorId,
+            final FlowNodeInstanceService flowNodeInstanceService,
+            final FlowNodeStateManager flowNodeStateManager, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.supervisorId = supervisorId;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -47,12 +50,14 @@ public class SearchArchivedFlowNodeInstanceSupervisedBy extends AbstractSearchEn
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return flowNodeInstanceService.getNumberOfArchivedFlowNodeInstancesSupervisedBy(supervisorId, SAFlowNodeInstance.class, searchOptions);
+        return flowNodeInstanceService.getNumberOfArchivedFlowNodeInstancesSupervisedBy(supervisorId,
+                SAFlowNodeInstance.class, searchOptions);
     }
 
     @Override
     public List<SAFlowNodeInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-        return flowNodeInstanceService.searchArchivedFlowNodeInstancesSupervisedBy(supervisorId, SAFlowNodeInstance.class, searchOptions);
+        return flowNodeInstanceService.searchArchivedFlowNodeInstancesSupervisedBy(supervisorId,
+                SAFlowNodeInstance.class, searchOptions);
     }
 
     @Override

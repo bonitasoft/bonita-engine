@@ -58,9 +58,11 @@ public class AutoLoginConfigurationHelperTest {
     public void enableAutoLogin_should_init_autoLogin_configuration() throws Exception {
         //given
         sProcessDefinition = new SProcessDefinitionImpl("first Pool", "1.0");
-        doReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, "[]".getBytes())).when(configurationService).getTenantPortalConfiguration(TENANT_ID,
-                AUTOLOGIN_V6_JSON);
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        doReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, "[]".getBytes())).when(configurationService)
+                .getTenantPortalConfiguration(TENANT_ID,
+                        AUTOLOGIN_V6_JSON);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
         Properties properties = getProperties();
 
         //when
@@ -78,13 +80,15 @@ public class AutoLoginConfigurationHelperTest {
         String existingConfig = "[{\"processname\":\"Pool\",\"processversion\":\"1.0\",\"username\":\"autologin-user\",\"password\":\"secret\"}]";
         when(configurationService.getTenantPortalConfiguration(TENANT_ID, AUTOLOGIN_V6_JSON))
                 .thenReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, existingConfig.getBytes()));
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
 
         //when
         autoLoginConfigurationHelper.enableAutoLogin(getProperties());
 
         //then
-        String expectedJson = "[{\"processname\":\"Pool\",\"processversion\":\"1.0\",\"username\":\"autologin-user\",\"password\":\"secret\"}," +
+        String expectedJson = "[{\"processname\":\"Pool\",\"processversion\":\"1.0\",\"username\":\"autologin-user\",\"password\":\"secret\"},"
+                +
                 "{\"processname\":\"new Pool\",\"processversion\":\"1.0\",\"username\":\"john\",\"password\":\"secret\"}]";
         verifyExpectedJsonConfigurationIsStored(expectedJson);
     }
@@ -96,7 +100,8 @@ public class AutoLoginConfigurationHelperTest {
         String existingConfig = "[{\"processname\":\"Pool\",\"processversion\":\"1.0\",\"username\":\"jack\",\"password\":\"bpm\"}]";
         when(configurationService.getTenantPortalConfiguration(TENANT_ID, AUTOLOGIN_V6_JSON))
                 .thenReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, existingConfig.getBytes()));
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
 
         //when
         autoLoginConfigurationHelper.enableAutoLogin(getProperties());
@@ -113,7 +118,8 @@ public class AutoLoginConfigurationHelperTest {
         sProcessDefinition = new SProcessDefinitionImpl("Pool", "1.0");
         when(configurationService.getTenantPortalConfiguration(TENANT_ID, AUTOLOGIN_V6_JSON))
                 .thenReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, "not json".getBytes()));
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
 
         //expect
         expectedException.expect(SProcessEnablementException.class);
@@ -131,7 +137,8 @@ public class AutoLoginConfigurationHelperTest {
         sProcessDefinition = new SProcessDefinitionImpl("Pool", "1.0");
         when(configurationService.getTenantPortalConfiguration(TENANT_ID, AUTOLOGIN_V6_JSON))
                 .thenReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, "not json".getBytes()));
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
 
         //expect
         expectedException.expect(SProcessDisablementException.class);
@@ -150,7 +157,8 @@ public class AutoLoginConfigurationHelperTest {
         String existingConfig = "[{\"processname\":\"Pool\",\"processversion\":\"1.0\",\"username\":\"jack\",\"password\":\"bpm\"}]";
         when(configurationService.getTenantPortalConfiguration(TENANT_ID, AUTOLOGIN_V6_JSON))
                 .thenReturn(new BonitaConfiguration(AUTOLOGIN_V6_JSON, existingConfig.getBytes()));
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, TENANT_ID, sProcessDefinition);
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, TENANT_ID, sProcessDefinition);
 
         //when
         autoLoginConfigurationHelper.disableAutoLogin();
@@ -169,7 +177,8 @@ public class AutoLoginConfigurationHelperTest {
 
     private Properties getProperties() {
         Properties properties = new Properties();
-        properties.put("security.password.validator", "org.bonitasoft.web.rest.server.api.organization.password.validator.DefaultPasswordValidator");
+        properties.put("security.password.validator",
+                "org.bonitasoft.web.rest.server.api.organization.password.validator.DefaultPasswordValidator");
         properties.put("forms.application.login.auto.password", "secret");
         properties.put("security.rest.api.authorizations.check.enabled", "true");
         properties.put("forms.application.login.auto", "true");

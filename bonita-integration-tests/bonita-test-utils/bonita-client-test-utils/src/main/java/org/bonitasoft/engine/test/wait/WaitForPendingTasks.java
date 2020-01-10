@@ -33,7 +33,8 @@ public final class WaitForPendingTasks extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
-    public WaitForPendingTasks(final int repeatEach, final int timeout, final int nbPendingTasks, final long userId, final ProcessAPI processAPI) {
+    public WaitForPendingTasks(final int repeatEach, final int timeout, final int nbPendingTasks, final long userId,
+            final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.nbPendingTasks = nbPendingTasks;
         this.userId = userId;

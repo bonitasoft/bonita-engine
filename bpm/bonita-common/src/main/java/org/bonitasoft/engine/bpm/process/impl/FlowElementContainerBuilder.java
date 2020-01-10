@@ -32,7 +32,8 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
 
     private final ProcessDefinitionBuilder processDefinitionBuilder;
 
-    public FlowElementContainerBuilder(final FlowElementContainerDefinitionImpl container, final ProcessDefinitionBuilder processDefinitionBuilder) {
+    public FlowElementContainerBuilder(final FlowElementContainerDefinitionImpl container,
+            final ProcessDefinitionBuilder processDefinitionBuilder) {
         super();
         this.container = container;
         this.processDefinitionBuilder = processDefinitionBuilder;
@@ -40,11 +41,11 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
 
     /**
      * Validates the process consistency and return it
-     * 
+     *
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return processDefinitionBuilder.done();
@@ -66,7 +67,8 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
-    public SendTaskDefinitionBuilder addSendTask(final String taskName, final String messageName, final Expression targetProcess) {
+    public SendTaskDefinitionBuilder addSendTask(final String taskName, final String messageName,
+            final Expression targetProcess) {
         return new SendTaskDefinitionBuilder(processDefinitionBuilder, container, taskName, messageName, targetProcess);
     }
 
@@ -81,7 +83,8 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
-    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression condition) {
+    public TransitionDefinitionBuilder addTransition(final String source, final String target,
+            final Expression condition) {
         return new TransitionDefinitionBuilder(processDefinitionBuilder, container, source, target, condition, false);
     }
 
@@ -116,8 +119,10 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
-    public CallActivityBuilder addCallActivity(final String name, final Expression callableElement, final Expression callableElementVersion) {
-        return new CallActivityBuilder(processDefinitionBuilder, container, name, callableElement, callableElementVersion);
+    public CallActivityBuilder addCallActivity(final String name, final Expression callableElement,
+            final Expression callableElementVersion) {
+        return new CallActivityBuilder(processDefinitionBuilder, container, name, callableElement,
+                callableElementVersion);
     }
 
     @Override
@@ -126,8 +131,10 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
-    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {
-        return new ConnectorDefinitionBuilder(processDefinitionBuilder, container, name, connectorId, version, activationEvent);
+    public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
+        return new ConnectorDefinitionBuilder(processDefinitionBuilder, container, name, connectorId, version,
+                activationEvent);
     }
 
     @Override
@@ -151,7 +158,8 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     @Override
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
-        return new TextDataDefinitionBuilder(processDefinitionBuilder, container, name, className, defaultValue).isLongText();
+        return new TextDataDefinitionBuilder(processDefinitionBuilder, container, name, className, defaultValue)
+                .isLongText();
     }
 
     @Override
@@ -194,7 +202,6 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     public DataDefinitionBuilder addData(final String name, final String className, final Expression defaultValue) {
         return new DataDefinitionBuilder(processDefinitionBuilder, container, name, className, defaultValue);
     }
-
 
     protected FlowElementContainerDefinitionImpl getContainer() {
         return container;

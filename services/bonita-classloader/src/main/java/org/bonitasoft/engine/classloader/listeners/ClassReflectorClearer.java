@@ -20,6 +20,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
  * @author Baptiste Mesta
  */
 public class ClassReflectorClearer implements ClassLoaderListener {
+
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
         ClassReflector.clearCache();

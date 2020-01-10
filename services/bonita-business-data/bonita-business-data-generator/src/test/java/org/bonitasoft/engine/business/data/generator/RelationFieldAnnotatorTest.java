@@ -29,7 +29,8 @@ public class RelationFieldAnnotatorTest {
 
     @Test
     public void getJoinTableName_should_truncate_names_longer_than_14_chars() {
-        String joinTableName = annotator.getJoinTableName("someLongNameLongerThanFourteen", "anotherLongNameLongerThanFourteen");
+        String joinTableName = annotator.getJoinTableName("someLongNameLongerThanFourteen",
+                "anotherLongNameLongerThanFourteen");
 
         assertThat(joinTableName).isEqualTo("SOMELONGNAMELO_ANOTHERLONGNAM");
     }

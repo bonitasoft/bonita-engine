@@ -16,16 +16,15 @@ package org.bonitasoft.engine.core.document.model.archive;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bonitasoft.engine.core.document.model.AbstractSMappedDocument;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
@@ -46,6 +45,5 @@ public class SAMappedDocument extends AbstractSMappedDocument implements Archive
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SMappedDocument.class;
     }
-
 
 }

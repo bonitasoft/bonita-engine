@@ -23,32 +23,32 @@ public interface PlatformSessionService {
 
     /**
      * Create a new session for the given user;
-     * 
+     *
      * @param username
-     *            user name
+     *        user name
      * @return a new session
      * @throws SSessionException
-     *             if some error arrives while creating the session
+     *         if some error arrives while creating the session
      * @@since 6.0
      */
     SPlatformSession createSession(String username) throws SSessionException;
 
     /**
      * Delete a session having the given id
-     * 
+     *
      * @param sessionId
-     *            the session's id
+     *        the session's id
      * @throws SSessionNotFoundException
-     *             if no session exists for the given id
+     *         if no session exists for the given id
      * @@since 6.0
      */
     void deleteSession(long sessionId) throws SSessionNotFoundException;
 
     /**
      * Verify if a session is valid
-     * 
+     *
      * @param sessionId
-     *            the session's id
+     *        the session's id
      * @return true if the session is valid, false otherwise
      * @since 6.0
      */
@@ -56,28 +56,28 @@ public interface PlatformSessionService {
 
     /**
      * Retrieve a session by its id
-     * 
+     *
      * @param sessionId
-     *            the session's id
+     *        the session's id
      * @return the session associated to the given id
      * @throws SSessionNotFoundException
-     *             if no session exists for the given id
+     *         if no session exists for the given id
      * @since 6.0
      */
     SPlatformSession getSession(long sessionId) throws SSessionNotFoundException;
 
     /**
      * Define how long new created sessions will be valid. This does not affect already created session
-     * 
+     *
      * @param duration
-     *            session's duration
+     *        session's duration
      * @since 6.0
      */
     void setSessionDuration(long duration);
 
     /**
      * Retrieve the default sessions's duration
-     * 
+     *
      * @return the default sessions's duration
      * @since 6.0
      */
@@ -85,7 +85,7 @@ public interface PlatformSessionService {
 
     /**
      * Retrieve the duration of new created sessions. If no duration was specified, the default duration will be used
-     * 
+     *
      * @return the duration of new created sessions
      * @since 6.0
      */
@@ -93,9 +93,9 @@ public interface PlatformSessionService {
 
     /**
      * Update the expiration and the last update dates of the session.
-     * 
+     *
      * @param sessionId
-     *            the session's id
+     *        the session's id
      * @throws SSessionException
      * @since 6.0
      */

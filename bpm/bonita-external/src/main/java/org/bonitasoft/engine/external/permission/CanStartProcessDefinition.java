@@ -26,7 +26,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * Specific Command to know if a user can start a specific process.
  * The mandatory keys to set as parameter are "USER_ID_KEY" and "PROCESS_INSTANCE_ID_KEY".
- * 
+ *
  * @author Celine Souchet
  */
 public class CanStartProcessDefinition extends CommandWithParameters {
@@ -51,7 +51,9 @@ public class CanStartProcessDefinition extends CommandWithParameters {
         try {
             return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
         } catch (final SBonitaException e) {
-            throw new SCommandExecutionException("Error executing command 'Boolean CanStartProcessDefinition(long userId, long processInstanceId)'", e);
+            throw new SCommandExecutionException(
+                    "Error executing command 'Boolean CanStartProcessDefinition(long userId, long processInstanceId)'",
+                    e);
         }
     }
 

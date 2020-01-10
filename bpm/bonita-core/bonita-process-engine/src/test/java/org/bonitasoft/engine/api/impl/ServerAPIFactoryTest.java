@@ -37,7 +37,8 @@ public class ServerAPIFactoryTest {
     @Test
     public void getServerAPIImplemShouldReturnTestImplemOfServerAPI() throws Exception {
         // given:
-        when(bonitaHomeServer.getServerAPIImplementation()).thenReturn("org.bonitasoft.engine.api.impl.TestImplemOfServerAPI");
+        when(bonitaHomeServer.getServerAPIImplementation())
+                .thenReturn("org.bonitasoft.engine.api.impl.TestImplemOfServerAPI");
         // when:
         ServerAPI serverAPIimplementation = serverAPIFactory.getServerAPIImplementation();
         // then:
@@ -49,7 +50,8 @@ public class ServerAPIFactoryTest {
     @Test
     public void should_cache_the_serverapi_class() throws Exception {
         //given
-        when(bonitaHomeServer.getServerAPIImplementation()).thenReturn("org.bonitasoft.engine.api.impl.TestImplemOfServerAPI");
+        when(bonitaHomeServer.getServerAPIImplementation())
+                .thenReturn("org.bonitasoft.engine.api.impl.TestImplemOfServerAPI");
         serverAPIFactory.getServerAPIImplementation();
         //when
         serverAPIFactory.getServerAPIImplementation();

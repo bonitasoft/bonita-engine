@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * represents a helper for updating a {@link Role}. Chaining is possible with this updator to ease the {@link Role} update.
+ * represents a helper for updating a {@link Role}. Chaining is possible with this updator to ease the {@link Role}
+ * update.
  * <br>
  * For instance, new RoleUpdater("member").setDisplayName("Member").setIconName("userIcon");
  *
@@ -36,7 +37,9 @@ public class RoleUpdater implements Serializable {
      * represent the available {@link Role} fields
      */
     public enum RoleField {
-        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, ICON_FILENAME, ICON_CONTENT
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated
+        ICON_NAME, @Deprecated
+        ICON_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<RoleField, Serializable> fields;

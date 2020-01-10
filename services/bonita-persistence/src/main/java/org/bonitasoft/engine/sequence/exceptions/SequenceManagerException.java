@@ -23,7 +23,7 @@ public class SequenceManagerException extends SBonitaException {
     private static final long serialVersionUID = 8661525835047162806L;
 
     /**
-     * 
+     *
      */
     public SequenceManagerException() {
         super();

@@ -63,7 +63,8 @@ public class ActivityCommandIT extends TestWithUser {
     private static final String COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE = "executeActionsAndTerminate";
 
     @Test
-    public void executeActionsAndTerminateAndUpdateDataTransientOnActivityInstanceWithConnectorOnFinish() throws Exception {
+    public void executeActionsAndTerminateAndUpdateDataTransientOnActivityInstanceWithConnectorOnFinish()
+            throws Exception {
         final String updatedValue = "afterUpdate";
 
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
@@ -74,12 +75,14 @@ public class ActivityCommandIT extends TestWithUser {
         // Execute it with operation using the command to update data instance
         final Map<String, Serializable> fieldValues = new HashMap<>();
         fieldValues.put("field_fieldId1", updatedValue);
-        final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
+        final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1",
+                String.class.getName());
         executeActionsAndTerminate("dataName", true, activityInstanceId, fieldValues, rightOperand);
 
         // Get value of updated data in connector
         waitForUserTask(processInstance, "step2");
-        assertEquals(updatedValue + "a", getProcessAPI().getProcessDataInstance("application", processInstance.getId()).getValue());
+        assertEquals(updatedValue + "a",
+                getProcessAPI().getProcessDataInstance("application", processInstance.getId()).getValue());
 
         // Clean
         disableAndDeleteProcess(processDefinition);
@@ -87,7 +90,8 @@ public class ActivityCommandIT extends TestWithUser {
 
     @Test
     public void executeActionsAndTerminateWithCustomJarInOperation() throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(
+                buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
@@ -106,7 +110,8 @@ public class ActivityCommandIT extends TestWithUser {
 
     @Test
     public void executeActionsAndTerminate() throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(
+                buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", user).getId();
@@ -114,12 +119,14 @@ public class ActivityCommandIT extends TestWithUser {
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<>();
         fieldValues.put("field_fieldId1", "Excel");
-        final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
+        final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1",
+                String.class.getName());
         executeActionsAndTerminate("application", false, activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
         waitForUserTask(processInstance, "step2");
-        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstance.getId());
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application",
+                processInstance.getId());
         Assert.assertEquals("Excel", dataInstance.getValue().toString());
 
         // Clean
@@ -129,7 +136,8 @@ public class ActivityCommandIT extends TestWithUser {
     @Test
     public void executeActionsAndTerminateFor() throws Exception {
         final User john = createUser("john", PASSWORD);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(
+                buildBusinessArchiveWithoutConnector(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", john).getId();
@@ -143,18 +151,21 @@ public class ActivityCommandIT extends TestWithUser {
 
             // check we have the other task ready and the operation was executed
             waitForUserTask(processInstance, "step2");
-            final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
+            final ArchivedActivityInstance archivedActivityInstance = getProcessAPI()
+                    .getArchivedActivityInstance(activityInstanceId);
             Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
             Assert.assertEquals(user.getId(), archivedActivityInstance.getExecutedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100)
+                    .filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                     .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains("The user " + USERNAME + " acting as delegate of the user john has done the task \"step1\".");
+                        || comment.getContent().contains("The user " + USERNAME
+                                + " acting as delegate of the user john has done the task \"step1\".");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
@@ -173,19 +184,25 @@ public class ActivityCommandIT extends TestWithUser {
     }
 
     private BusinessArchive buildBusinessArchiveWithDataTransientAndConnector() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(true).done();
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition);
-        businessArchiveBuilder.addConnectorImplementation(getResource("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
-                "TestConnectorWithOutput.impl"));
-        businessArchiveBuilder.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
+        final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(
+                true).done();
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(
+                        designProcessDefinition);
+        businessArchiveBuilder.addConnectorImplementation(
+                getResource("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
+                        "TestConnectorWithOutput.impl"));
+        businessArchiveBuilder.addClasspathResource(
+                new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
 
         return businessArchiveBuilder.done();
     }
 
     private BusinessArchive buildBusinessArchiveWithoutConnector() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(false).done();
-        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
+        final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(
+                false).done();
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(designProcessDefinition);
         final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
@@ -194,11 +211,14 @@ public class ActivityCommandIT extends TestWithUser {
         return builder.done();
     }
 
-    private ProcessDefinitionBuilder buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(final boolean withConnector)
+    private ProcessDefinitionBuilder buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(
+            final boolean withConnector)
             throws InvalidExpressionException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addLongTextData("application", new ExpressionBuilder().createConstantStringExpression("Word"));
+        processDefinitionBuilder.addLongTextData("application",
+                new ExpressionBuilder().createConstantStringExpression("Word"));
 
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         if (withConnector) {
@@ -207,8 +227,10 @@ public class ActivityCommandIT extends TestWithUser {
                     .addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
                     .addInput(
                             "input1",
-                            new ExpressionBuilder().createGroovyScriptExpression("concat", "dataName+\"a\"", String.class.getName(),
-                                    new ExpressionBuilder().createTransientDataExpression("dataName", String.class.getName())))
+                            new ExpressionBuilder().createGroovyScriptExpression("concat", "dataName+\"a\"",
+                                    String.class.getName(),
+                                    new ExpressionBuilder().createTransientDataExpression("dataName",
+                                            String.class.getName())))
                     .addOutput(
                             new OperationBuilder().createSetDataOperation("application",
                                     new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
@@ -219,10 +241,12 @@ public class ActivityCommandIT extends TestWithUser {
         return processDefinitionBuilder;
     }
 
-    private void executeActionsAndTerminate(final String dataName, final boolean isTransient, final long taskId, final Map<String, Serializable> fieldValues,
+    private void executeActionsAndTerminate(final String dataName, final boolean isTransient, final long taskId,
+            final Map<String, Serializable> fieldValues,
             final Expression rightOperand)
             throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
-        final Operation operation = BuildTestUtil.buildOperation(dataName, isTransient, OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Operation operation = BuildTestUtil.buildOperation(dataName, isTransient, OperatorType.ASSIGNMENT, "=",
+                rightOperand);
         final List<Operation> operations = new ArrayList<>();
         operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<>();

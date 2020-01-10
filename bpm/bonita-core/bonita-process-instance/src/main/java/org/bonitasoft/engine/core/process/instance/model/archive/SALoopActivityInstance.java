@@ -33,6 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("loop")
 public class SALoopActivityInstance extends SAActivityInstance {
+
     @Column(name = "loop_counter")
     private int loopCounter;
     @Column(name = "loop_max")
@@ -53,6 +54,5 @@ public class SALoopActivityInstance extends SAActivityInstance {
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SLoopActivityInstance.class;
     }
-
 
 }

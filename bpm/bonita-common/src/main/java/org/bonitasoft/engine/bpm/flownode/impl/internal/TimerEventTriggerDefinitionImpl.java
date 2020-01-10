@@ -63,8 +63,10 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TimerEventTriggerDefinitionImpl that = (TimerEventTriggerDefinitionImpl) o;
         return Objects.equals(timerType, that.timerType) &&
                 Objects.equals(timerValue, that.timerValue);

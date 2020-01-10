@@ -13,11 +13,12 @@
  **/
 package org.bonitasoft.engine.business.data.generator;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
 /**
  * @author Danila Mazour
@@ -42,7 +43,8 @@ public class DateAndTimeConverter implements AttributeConverter<LocalDateTime, S
             try {
                 return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             } catch (DateTimeParseException e) {
-                throw new RuntimeException("Database date & time format must be ISO-8601 compliant ( yyyy-mm-ddThh:mm:ss )", e);
+                throw new RuntimeException(
+                        "Database date & time format must be ISO-8601 compliant ( yyyy-mm-ddThh:mm:ss )", e);
             }
         } else {
             return null;

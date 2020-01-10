@@ -25,9 +25,11 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Celine Souchet
  */
-public abstract class AbstractGetProcessDeploymentInfo extends AbstractGetEntity<ProcessDeploymentInfo, SProcessDefinitionDeployInfo> {
+public abstract class AbstractGetProcessDeploymentInfo
+        extends AbstractGetEntity<ProcessDeploymentInfo, SProcessDefinitionDeployInfo> {
 
-    public AbstractGetProcessDeploymentInfo(final SearchEntityDescriptor searchDescriptor, final int fromIndex, final int numberOfResults,
+    public AbstractGetProcessDeploymentInfo(final SearchEntityDescriptor searchDescriptor, final int fromIndex,
+            final int numberOfResults,
             final ProcessDeploymentInfoCriterion criterion) {
         super(searchDescriptor, fromIndex, numberOfResults, criterion.getSort());
     }

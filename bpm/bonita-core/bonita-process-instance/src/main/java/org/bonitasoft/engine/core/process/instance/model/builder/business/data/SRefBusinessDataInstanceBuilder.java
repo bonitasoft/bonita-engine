@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.business.data;
 
-
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 
 /**

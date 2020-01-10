@@ -37,6 +37,7 @@ public class PlatformStateProvider {
 
     /**
      * Transition the Platform state to STARTED ( state put in STARTING )
+     *
      * @return true only if the state was changed
      */
     boolean initializeStart() {
@@ -53,6 +54,7 @@ public class PlatformStateProvider {
 
     /**
      * Transition the Platform state to STOPPED ( state put in STOPPING )
+     *
      * @return true only if the state was changed
      */
     boolean initializeStop() {
@@ -66,6 +68,5 @@ public class PlatformStateProvider {
     void setStopped() {
         state = PlatformState.STOPPED;
     }
-
 
 }

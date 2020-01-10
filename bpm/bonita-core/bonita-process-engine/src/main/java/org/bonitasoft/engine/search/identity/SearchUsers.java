@@ -31,7 +31,8 @@ public class SearchUsers extends AbstractUserSearchEntity {
 
     private final IdentityService identityService;
 
-    public SearchUsers(final IdentityService identityService, final SearchUserDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchUsers(final IdentityService identityService, final SearchUserDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.identityService = identityService;
     }

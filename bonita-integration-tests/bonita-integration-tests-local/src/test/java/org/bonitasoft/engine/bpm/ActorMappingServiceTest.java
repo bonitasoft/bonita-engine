@@ -26,7 +26,6 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -60,7 +59,8 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     public void tearDown() throws DeletionException {
         try {
             getTransactionService().begin();
-            new IdentityAPIImpl().deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
+            new IdentityAPIImpl()
+                    .deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
             getTransactionService().complete();
         } catch (STransactionException e) {
             throw new DeletionException(e);
@@ -202,7 +202,8 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         }
     }
 
-    private void checkActorMember(final SActorMember sActorMember, final long userId, final long groupId, final long roleId) {
+    private void checkActorMember(final SActorMember sActorMember, final long userId, final long groupId,
+            final long roleId) {
         assertEquals(userId, sActorMember.getUserId());
         assertEquals(groupId, sActorMember.getGroupId());
         assertEquals(roleId, sActorMember.getRoleId());

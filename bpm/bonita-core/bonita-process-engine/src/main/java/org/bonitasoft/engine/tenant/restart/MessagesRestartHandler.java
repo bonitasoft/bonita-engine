@@ -38,9 +38,10 @@ public class MessagesRestartHandler implements TenantRestartHandler {
     private UserTransactionService userTransactionService;
     private MessagesHandlingService messagesHandlingService;
 
-    public MessagesRestartHandler(@Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService technicalLoggerService,
-                                  EventInstanceRepository eventInstanceRepository, UserTransactionService userTransactionService,
-                                  MessagesHandlingService messagesHandlingService) {
+    public MessagesRestartHandler(
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService technicalLoggerService,
+            EventInstanceRepository eventInstanceRepository, UserTransactionService userTransactionService,
+            MessagesHandlingService messagesHandlingService) {
         this.technicalLoggerService = technicalLoggerService;
         this.eventInstanceRepository = eventInstanceRepository;
         this.userTransactionService = userTransactionService;
@@ -53,17 +54,21 @@ public class MessagesRestartHandler implements TenantRestartHandler {
 
         try {
             // Reset of all SMessageInstance:
-            logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by MessagesHandlingService");
+            logInfo(technicalLoggerService,
+                    "Reinitializing message instances in non-stable state to make them reworked by MessagesHandlingService");
             final int nbMessagesReset = eventInstanceRepository.resetProgressMessageInstances();
             logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
-            logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by MessagesHandlingService");
+            logInfo(technicalLoggerService,
+                    "Reinitializing waiting message events in non-stable state to make them reworked by MessagesHandlingService");
             final int nbWaitingEventsReset = eventInstanceRepository.resetInProgressWaitingEvents();
             logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
 
         } catch (final SBonitaException e) {
-            throw new RestartException("Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped", e);
+            throw new RestartException(
+                    "Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped",
+                    e);
         }
     }
 
@@ -80,7 +85,8 @@ public class MessagesRestartHandler implements TenantRestartHandler {
             });
         } catch (Exception e) {
             technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.ERROR,
-                    "Unable to register work to handle message events on startup, work will be triggered on next message event update", e);
+                    "Unable to register work to handle message events on startup, work will be triggered on next message event update",
+                    e);
         }
     }
 }

@@ -29,7 +29,6 @@ public class UniqueSimpleNameValidationRuleTest {
 
     private UniqueSimpleNameValidationRule uniqueSimpleNameValidationRule;
 
-
     private BusinessObject customerPackageA;
 
     private BusinessObject customerPackageB;

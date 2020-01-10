@@ -27,12 +27,13 @@ import org.bonitasoft.engine.session.SessionService;
 public class DeleteSessionCommand extends CommandWithParameters {
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor) throws SCommandParameterizationException, SCommandExecutionException {
-        Long sessionId = (Long)parameters.get("sessionId");
+    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+            throws SCommandParameterizationException, SCommandExecutionException {
+        Long sessionId = (Long) parameters.get("sessionId");
         SessionService sessionService = serviceAccessor.getSessionService();
         try {
             sessionService.deleteSession(sessionId.longValue());
-        } catch(SSessionNotFoundException e) {
+        } catch (SSessionNotFoundException e) {
             throw new SCommandExecutionException(e);
         }
         return null;

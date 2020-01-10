@@ -36,7 +36,8 @@ public class MenuIndexConverterTest {
     private MenuIndexConverter convertor;
 
     @Test
-    public void toMenuIndex_should_return_a_MenuIndex_based_on_ApplicationMenu_and_set_lastUsedIndex() throws Exception {
+    public void toMenuIndex_should_return_a_MenuIndex_based_on_ApplicationMenu_and_set_lastUsedIndex()
+            throws Exception {
         //given
         SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
@@ -53,7 +54,8 @@ public class MenuIndexConverterTest {
     }
 
     @Test
-    public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_parentId_when_parent_doesnt_change() throws Exception {
+    public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_parentId_when_parent_doesnt_change()
+            throws Exception {
         //given
         SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);
@@ -96,7 +98,8 @@ public class MenuIndexConverterTest {
     }
 
     @Test
-    public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_index_when_index_and_parent_dont_change() throws Exception {
+    public void toMenuIndex_with_updateDescriptor_should_reuse_app_menu_index_when_index_and_parent_dont_change()
+            throws Exception {
         //given
         SApplicationMenu appMenu = new SApplicationMenu("my menu", 1, null, 2);
         appMenu.setParentId(20L);

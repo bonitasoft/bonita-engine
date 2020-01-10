@@ -944,7 +944,8 @@ public class UserIT extends TestWithTechnicalUser {
         final User john = getIdentityAPI().createUser("john003", "bpm", "John", "Smith");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.differentFrom(UserSearchDescriptor.MANAGER_USER_ID, manager.getId()).differentFrom(UserSearchDescriptor.USER_NAME, manager.getUserName());
+        builder.differentFrom(UserSearchDescriptor.MANAGER_USER_ID, manager.getId())
+                .differentFrom(UserSearchDescriptor.USER_NAME, manager.getUserName());
         final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
         assertEquals(1, searchUsers.getCount());
@@ -1141,7 +1142,8 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void should_create_user_with_icon_create_the_icon() throws Exception {
         //given
-        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        User user = getIdentityAPI().createUser(
+                new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
         //when
         Icon icon = getIdentityAPI().getIcon(user.getIconId());
         //then
@@ -1153,7 +1155,8 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void should_delete_user_delete_the_icon() throws Exception {
         //given
-        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        User user = getIdentityAPI().createUser(
+                new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
         //when
         getIdentityAPI().deleteUser(user.getId());
         //then
@@ -1172,7 +1175,8 @@ public class UserIT extends TestWithTechnicalUser {
         //given
         User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword"));
         //when
-        User updatedUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon("myFile.png", "content".getBytes()));
+        User updatedUser = getIdentityAPI().updateUser(user.getId(),
+                new UserUpdater().setIcon("myFile.png", "content".getBytes()));
         //then
         Icon icon = getIdentityAPI().getIcon(updatedUser.getIconId());
         assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/png", "content".getBytes()));
@@ -1183,9 +1187,11 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void should_update_user_with_new_icon_create_a_new_icon() throws Exception {
         //given
-        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.png", "avatarContent".getBytes()));
+        User user = getIdentityAPI().createUser(
+                new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.png", "avatarContent".getBytes()));
         //when
-        User updatedUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon("myFile.jpg", "content".getBytes()));
+        User updatedUser = getIdentityAPI().updateUser(user.getId(),
+                new UserUpdater().setIcon("myFile.jpg", "content".getBytes()));
         //then
         Icon newIcon = getIdentityAPI().getIcon(updatedUser.getIconId());
         assertThat(newIcon.getId()).isNotEqualTo(user.getIconId());
@@ -1198,7 +1204,8 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void should_update_user_delete_the_icon() throws Exception {
         //given
-        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        User user = getIdentityAPI().createUser(
+                new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
         Icon icon = getIdentityAPI().getIcon(user.getIconId());
         //when
         User updateUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon(null, null));

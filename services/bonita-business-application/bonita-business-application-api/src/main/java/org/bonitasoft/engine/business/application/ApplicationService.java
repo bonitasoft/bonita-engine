@@ -37,11 +37,12 @@ public interface ApplicationService {
 
     String APPLICATION_MENU = "APPLICATION_MENU";
 
-    String DEFAULT_LAYOUT_NAME="custompage_layoutBonita";
+    String DEFAULT_LAYOUT_NAME = "custompage_layoutBonita";
 
-    String DEFAULT_THEME_NAME="custompage_bootstrapdefaulttheme";
+    String DEFAULT_THEME_NAME = "custompage_bootstrapdefaulttheme";
 
-    SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException;
+    SApplication createApplication(SApplication application)
+            throws SObjectCreationException, SObjectAlreadyExistsException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
@@ -49,25 +50,30 @@ public interface ApplicationService {
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
-    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException,
             SObjectAlreadyExistsException, SObjectNotFoundException;
 
-    SApplication updateApplication(SApplication application, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+    SApplication updateApplication(SApplication application, EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException,
             SObjectAlreadyExistsException;
 
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaReadException;
 
-    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException;
+    SApplicationPage createApplicationPage(SApplicationPage applicationPage)
+            throws SObjectCreationException, SObjectAlreadyExistsException;
 
-    SApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws SBonitaReadException, SObjectNotFoundException;
+    SApplicationPage getApplicationPage(String applicationName, String applicationPageToken)
+            throws SBonitaReadException, SObjectNotFoundException;
 
     SApplicationPage getApplicationPage(long applicationPageId) throws SBonitaReadException, SObjectNotFoundException;
 
     SApplicationPage getApplicationHomePage(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
-    SApplicationPage deleteApplicationPage(long applicationPageId) throws SObjectModificationException, SObjectNotFoundException;
+    SApplicationPage deleteApplicationPage(long applicationPageId)
+            throws SObjectModificationException, SObjectNotFoundException;
 
     void deleteApplicationPage(SApplicationPage applicationPage) throws SObjectModificationException;
 
@@ -77,15 +83,18 @@ public interface ApplicationService {
 
     SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException;
 
-    SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+    SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException,
             SObjectNotFoundException;
 
-    SApplicationMenu updateApplicationMenu(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes)
+    SApplicationMenu updateApplicationMenu(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor,
+            boolean organizeIndexes)
             throws SObjectModificationException;
 
     SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
 
-    SApplicationMenu deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
+    SApplicationMenu deleteApplicationMenu(long applicationMenuId)
+            throws SObjectModificationException, SObjectNotFoundException;
 
     void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException;
 

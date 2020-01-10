@@ -13,16 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling;
 
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
 
 /**
  * @author Zhao Na
@@ -55,8 +54,9 @@ public abstract class SWaitingEvent implements PersistentObject {
     private long flowNodeInstanceId = -1;
     private boolean active = true;
 
-    public SWaitingEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
-                             final String flowNodeName) {
+    public SWaitingEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
+            final String flowNodeName) {
         this.eventType = eventType;
         this.processName = processName;
         this.flowNodeDefinitionId = flowNodeDefinitionId;

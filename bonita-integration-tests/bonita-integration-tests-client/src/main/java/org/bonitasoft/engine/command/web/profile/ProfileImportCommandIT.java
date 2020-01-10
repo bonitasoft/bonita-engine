@@ -60,11 +60,13 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
 
         final Map<String, Serializable> importParameters1 = new HashMap<>();
         importParameters1.put("xmlContent", xmlContent1);
-        final List<String> warningMsgs1 = (List<String>) getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters1);
+        final List<String> warningMsgs1 = (List<String>) getCommandAPI().execute(IMPORT_PROFILES_CMD,
+                importParameters1);
         assertEquals(0, warningMsgs1.size());
 
         // check current status: profiles and its attributes
-        SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, Integer.MAX_VALUE).sort(ProfileSearchDescriptor.ID, Order.ASC);
+        SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                .sort(ProfileSearchDescriptor.ID, Order.ASC);
         final List<Profile> searchedProfiles = getProfileAPI().searchProfiles(searchBuilder.done()).getResult();
 
         final long olderid1 = searchedProfiles.get(0).getId();
@@ -84,9 +86,11 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
 
         // check profile entries and their attributes
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                    .filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
                     .sort(ProfileEntrySearchDescriptor.PROFILE_ID, Order.ASC).done();
-            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
+            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI()
+                    .searchProfileEntries(searchOptions);
             assertNotNull(searchedProfileEntries);
         }
 
@@ -113,14 +117,17 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
 
         // check profileEntries
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                    .filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
                     .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
-            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
+            final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI()
+                    .searchProfileEntries(searchOptions);
 
             assertTrue(searchedProfileEntries.getResult().size() == 0);
         }
 
-        SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1)
+        SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                .filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1)
                 .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
         final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
         final List<ProfileEntry> searchedProfileEntriesRes2 = searchedProfileEntries.getResult();
@@ -131,7 +138,8 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         assertEquals("CurrentUserTeamTasksDashboard", searchedProfileEntriesRes2.get(0).getType());
 
         // check profile mapping
-        searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileMemberSearchDescriptor.PROFILE_ID, newId1)
+        searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                .filter(ProfileMemberSearchDescriptor.PROFILE_ID, newId1)
                 .sort(ProfileMemberSearchDescriptor.ID, Order.ASC).done();
         final SearchResult<ProfileMember> searchpms = getProfileAPI().searchProfileMembers("user", searchOptions);
         assertEquals(2, searchpms.getCount());
@@ -141,7 +149,8 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         assertEquals(newId1, searchpms.getResult().get(1).getProfileId());
 
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i).done();
+            searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE)
+                    .filter(ProfileEntrySearchDescriptor.PROFILE_ID, i).done();
             final SearchResult<ProfileMember> searchpms1 = getProfileAPI().searchProfileMembers("user", searchOptions);
             assertEquals(0, searchpms1.getCount());
         }
@@ -177,7 +186,8 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
         builder2.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         builder2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, userProfileId);
-        final SearchResult<ProfileEntry> searchedProfileEntries2 = getProfileAPI().searchProfileEntries(builder2.done());
+        final SearchResult<ProfileEntry> searchedProfileEntries2 = getProfileAPI()
+                .searchProfileEntries(builder2.done());
         assertEquals(USER_PROFILE_ENTRY_COUNT, searchedProfileEntries2.getCount());
     }
 

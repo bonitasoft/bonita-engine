@@ -22,7 +22,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SAEndEventInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl implements SAEndEventInstanceBuilderFactory {
+public class SAEndEventInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl
+        implements SAEndEventInstanceBuilderFactory {
 
     @Override
     public SAEndEventInstanceBuilder createNewArchivedEndEventInstance(final SEndEventInstance endEvent) {

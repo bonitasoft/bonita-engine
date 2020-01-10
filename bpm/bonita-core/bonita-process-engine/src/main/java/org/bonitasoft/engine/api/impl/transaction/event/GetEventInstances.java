@@ -40,7 +40,8 @@ public final class GetEventInstances implements TransactionContentWithResult<Lis
 
     private List<SEventInstance> eventInstances;
 
-    public GetEventInstances(final EventInstanceService eventInstanceService, final long rootContainerId, final int fromIndex, final int maxResults,
+    public GetEventInstances(final EventInstanceService eventInstanceService, final long rootContainerId,
+            final int fromIndex, final int maxResults,
             final String fieldName, final OrderByType orderByType) {
         this.rootContainerId = rootContainerId;
         this.eventInstanceService = eventInstanceService;
@@ -52,7 +53,8 @@ public final class GetEventInstances implements TransactionContentWithResult<Lis
 
     @Override
     public void execute() throws SBonitaException {
-        this.eventInstances = this.eventInstanceService.getEventInstances(rootContainerId, fromIndex, maxResults, fieldName, orderByType);
+        this.eventInstances = this.eventInstanceService.getEventInstances(rootContainerId, fromIndex, maxResults,
+                fieldName, orderByType);
     }
 
     @Override

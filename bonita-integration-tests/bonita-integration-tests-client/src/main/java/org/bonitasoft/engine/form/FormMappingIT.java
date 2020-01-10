@@ -46,7 +46,8 @@ import org.junit.rules.ExpectedException;
  */
 public class FormMappingIT extends TestWithUser {
 
-    private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
+    private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN,
+            (Serializable) true);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -60,7 +61,8 @@ public class FormMappingIT extends TestWithUser {
                 .createNewBusinessArchive()
                 .setProcessDefinition(p1Builder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                        FormMappingModelBuilder.buildFormMappingModel()
+                                .addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
 
@@ -71,7 +73,8 @@ public class FormMappingIT extends TestWithUser {
                 .createNewBusinessArchive()
                 .setProcessDefinition(p2Builder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                        FormMappingModelBuilder.buildFormMappingModel()
+                                .addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task2Form", FormMappingTarget.URL, "step1")
                                 .addProcessOverviewForm(null, FormMappingTarget.LEGACY).build());
 
@@ -81,19 +84,23 @@ public class FormMappingIT extends TestWithUser {
 
         //get
         FormMapping processStartForm1 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
+                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START)
+                .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
                 .done()).getResult().get(0);
         FormMapping processOverviewForm1 = processConfigurationAPI
                 .searchFormMappings(
                         new SearchOptionsBuilder(0, 10)
                                 .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_OVERVIEW)
                                 .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
-                                .done()).getResult().get(0);
+                                .done())
+                .getResult().get(0);
         FormMapping step1Form1 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
+                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK)
+                .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
                 .filter(FormMappingSearchDescriptor.TASK, "step1").done()).getResult().get(0);
         FormMapping step2Form1 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
+                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK)
+                .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
                 .filter(FormMappingSearchDescriptor.TASK, "step2").done()).getResult().get(0);
 
         assertThat(processStartForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
@@ -111,17 +118,20 @@ public class FormMappingIT extends TestWithUser {
         assertThat(step2Form1.getTarget()).isEqualTo(FormMappingTarget.NONE);
 
         //search
-        SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
-                FormMappingSearchDescriptor.ID, Order.DESC).done());
+        SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI
+                .searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
+                        FormMappingSearchDescriptor.ID, Order.DESC).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(4);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(
                 p1.getId(), p1.getId(), p1.getId(), p1.getId());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(4);
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.TASK, "step1").done());
+        formMappingSearchResult = processConfigurationAPI
+                .searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
+                        .filter(FormMappingSearchDescriptor.TASK, "step1").done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).done());
+        formMappingSearchResult = processConfigurationAPI
+                .searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
+                        .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
 
         //resolve urls:
@@ -134,7 +144,9 @@ public class FormMappingIT extends TestWithUser {
 
         getProcessAPI().deleteProcessDefinition(p1.getId());
         assertThat(
-                processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
+                processConfigurationAPI
+                        .searchFormMappings(new SearchOptionsBuilder(0, 100)
+                                .sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();
 
     }
@@ -148,7 +160,8 @@ public class FormMappingIT extends TestWithUser {
                 .createNewBusinessArchive()
                 .setProcessDefinition(processBuilder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                        FormMappingModelBuilder.buildFormMappingModel()
+                                .addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task2Form", FormMappingTarget.URL, "step1")
                                 .addProcessOverviewForm(null, FormMappingTarget.LEGACY).build());
 
@@ -166,7 +179,8 @@ public class FormMappingIT extends TestWithUser {
         p1Builder.addActor("actor").addUserTask("step", "actor");
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive().setProcessDefinition(p1Builder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm(null, FormMappingTarget.UNDEFINED, "step").build());
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel()
+                        .addTaskForm(null, FormMappingTarget.UNDEFINED, "step").build());
 
         ProcessDefinition processDefinition = deployProcess(bar.done());
 
@@ -174,7 +188,8 @@ public class FormMappingIT extends TestWithUser {
 
         // try to resolve url:
         try {
-            getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable>emptyMap(), true);
+            getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step",
+                    Collections.<String, Serializable> emptyMap(), true);
         } finally {
             deleteProcess(processDefinition);
         }
@@ -186,10 +201,10 @@ public class FormMappingIT extends TestWithUser {
         p1Builder.addActor("actor").addUserTask("step", "actor");
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive().setProcessDefinition(p1Builder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm(null, FormMappingTarget.NONE, "step").build());
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel()
+                        .addTaskForm(null, FormMappingTarget.NONE, "step").build());
 
         ProcessDefinition processDefinition = deployProcess(bar.done());
-
 
         // try to resolve url:
         PageURL pageURL = getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", context, true);
@@ -197,36 +212,42 @@ public class FormMappingIT extends TestWithUser {
         assertThat(pageURL.getPageId()).isNull();
         assertThat(pageURL.getUrl()).isNull();
 
-
         deleteProcess(processDefinition);
     }
 
     @Test
     public void deployProcessWithInternalPagesIncludedShouldBeResolved() throws Exception {
-        Page custompage_globalpage = getPageAPI().createPage("globalPage.zip", createTestPageContent("custompage_globalpage", "Global page", "a global page"));
-        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.12");
+        Page custompage_globalpage = getPageAPI().createPage("globalPage.zip",
+                createTestPageContent("custompage_globalpage", "Global page", "a global page"));
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport",
+                "1.12");
         final String custompage_startProcessForm = "custompage_startProcessForm";
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(processBuilder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL)
+                        FormMappingModelBuilder.buildFormMappingModel()
+                                .addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL)
                                 .addProcessOverviewForm("custompage_globalpage", FormMappingTarget.INTERNAL).build())
                 .addExternalResource(
-                        new BarResource("customPages/custompage_startProcessForm.zip", createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
+                        new BarResource("customPages/custompage_startProcessForm.zip",
+                                createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
 
         final ProcessDefinition processDefinition = deployProcess(bar.done());
-        final Page page = getPageAPI().getPageByNameAndProcessDefinitionId(custompage_startProcessForm, processDefinition.getId());
+        final Page page = getPageAPI().getPageByNameAndProcessDefinitionId(custompage_startProcessForm,
+                processDefinition.getId());
         assertThat(page.getId()).isNotNull();
         assertThat(getProcessAPI().getProcessResolutionProblems(processDefinition.getId())).isEmpty();
         getProcessAPI().enableProcess(processDefinition.getId());
 
         // Should not throw Exception
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
         final PageURL pageURLStart = getPageAPI().resolvePageOrURL("process/CustomerSupport/1.12", context, true);
-        final PageURL pageURLOverview = getPageAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context, true);
+        final PageURL pageURLOverview = getPageAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context,
+                true);
         assertThat(pageURLStart.getPageId()).isNotNull();
         assertThat(page.getId()).isEqualTo(pageURLStart.getPageId());
         assertThat(pageURLOverview.getPageId()).isNotNull();
@@ -244,7 +265,8 @@ public class FormMappingIT extends TestWithUser {
         ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("P1", "1.0");
         p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p1Builder.addActor("actor");
-        final SubProcessDefinitionBuilder eventSubProc = p1Builder.addSubProcess("eventSubProc", true).getSubProcessBuilder();
+        final SubProcessDefinitionBuilder eventSubProc = p1Builder.addSubProcess("eventSubProc", true)
+                .getSubProcessBuilder();
         eventSubProc.addUserTask("subTask", "actor");
         eventSubProc.addStartEvent("start").addSignalEventTrigger("theSignal");
         eventSubProc.addTransition("start", "subTask");
@@ -253,16 +275,18 @@ public class FormMappingIT extends TestWithUser {
                 .createNewBusinessArchive()
                 .setProcessDefinition(p1Builder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                        FormMappingModelBuilder.buildFormMappingModel()
+                                .addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
                                 .addTaskForm("urlForThesubTask", FormMappingTarget.URL, "subTask")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
 
-
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
 
-        SearchResult<FormMapping> formMappingSearchResult = getProcessAPI().searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
-                FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TASK, "subTask").done());
+        SearchResult<FormMapping> formMappingSearchResult = getProcessAPI()
+                .searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
+                        FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TASK, "subTask")
+                        .done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
         assertThat(formMappingSearchResult.getResult().get(0).getURL()).isEqualTo("urlForThesubTask");
 

@@ -37,7 +37,8 @@ public class SContractViolationException extends SBonitaException {
      * @param explanations the explanations
      */
     public SContractViolationException(final String message, final List<String> explanations) {
-        super(message + ": " + ((explanations == null) || (explanations.isEmpty())? "no details": String.join(", ", explanations)));
+        super(message + ": " + ((explanations == null) || (explanations.isEmpty()) ? "no details"
+                : String.join(", ", explanations)));
         this.simpleMessage = message;
         if (explanations == null) {
             this.explanations = Collections.emptyList();

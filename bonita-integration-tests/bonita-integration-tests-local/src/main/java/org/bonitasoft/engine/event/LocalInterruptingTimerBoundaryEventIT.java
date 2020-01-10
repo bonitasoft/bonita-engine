@@ -83,7 +83,8 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     public void timerBoundaryEventNotTriggered() throws Exception {
         // given
         final long timerDuration = 20000;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true, "step1", "exceptionStep", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true,
+                "step1", "exceptionStep", "step2");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -115,10 +116,12 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final String simpleTaskName = "stepCA";
 
         // deploy a simple process p1
-        final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName,
+                simpleTaskName);
 
         // deploy a process, p2, with a call activity calling p1. The call activity has an interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(timerDuration, true, simpleProcessName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(
+                timerDuration, true, simpleProcessName);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -148,7 +151,8 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final long timerDuration = 20000;
         final int loopCardinality = 1;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration,
+                true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -179,7 +183,8 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final long timerDuration = 20000;
         final int loopCardinality = 2;
         final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration,
+                true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -208,7 +213,8 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         // given
         final long timerDuration = 20000;
         final int loopMax = 1;
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(timerDuration, true, loopMax, "step1", "step2",
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(
+                timerDuration, true, loopMax, "step1", "step2",
                 "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -235,20 +241,23 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         // deploy a simple process with BoundaryEvent P1
         List<ProcessDefinition> processDefinitions = new ArrayList<>();
         final String simpleStepName = "simpleStep";
-        final ProcessDefinition simpleProcess = deployAndEnableSimpleProcessWithBoundaryEvent("simpleProcess", simpleStepName);
+        final ProcessDefinition simpleProcess = deployAndEnableSimpleProcessWithBoundaryEvent("simpleProcess",
+                simpleStepName);
         processDefinitions.add(simpleProcess); // To clean in the end
 
         // deploy a process P2 containing a call activity calling P1
         final String intermediateStepName = "intermediateStep1";
         final String intermediateCallActivityName = "intermediateCall";
-        final ProcessDefinition intermediateProcess = deployAndEnableProcessWithCallActivity("intermediateProcess", simpleProcess.getName(),
+        final ProcessDefinition intermediateProcess = deployAndEnableProcessWithCallActivity("intermediateProcess",
+                simpleProcess.getName(),
                 intermediateStepName, intermediateCallActivityName);
         processDefinitions.add(intermediateProcess); // To clean in the end
 
         // deploy a process P3 containing a call activity calling P2
         final String rootStepName = "rootStep1";
         final String rootCallActivityName = "rootCall";
-        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess", intermediateProcess.getName(), rootStepName,
+        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess",
+                intermediateProcess.getName(), rootStepName,
                 rootCallActivityName);
         processDefinitions.add(rootProcess); // To clean in the end
 
@@ -270,11 +279,13 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         getProcessAPI().deleteProcessInstance(rootProcessInstance.getId());
 
         // check that the instances of p1 and p2 were deleted
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
         assertThat(processInstances.size()).isEqualTo(0);
 
         // check that archived flow nodes were deleted.
-        List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100,
+        List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                rootProcessInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertThat(taskInstances.size()).isEqualTo(0);
 
@@ -289,12 +300,15 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinitions);
     }
 
-    private ProcessDefinition deployAndEnableSimpleProcessWithBoundaryEvent(final String processName, final String userTaskName) throws BonitaException {
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+    private ProcessDefinition deployAndEnableSimpleProcessWithBoundaryEvent(final String processName,
+            final String userTaskName) throws BonitaException {
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("tStart");
-        processDefBuilder.addUserTask(userTaskName, ACTOR_NAME).addBoundaryEvent("TheBoundaryEvent").addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(6000L));
+        processDefBuilder.addUserTask(userTaskName, ACTOR_NAME).addBoundaryEvent("TheBoundaryEvent")
+                .addTimerEventTriggerDefinition(TimerType.DURATION,
+                        new ExpressionBuilder().createConstantLongExpression(6000L));
         processDefBuilder.addEndEvent("tEnd");
         processDefBuilder.addEndEvent("tBoundaryEnd");
         processDefBuilder.addTransition("TheBoundaryEvent", "tBoundaryEnd");
@@ -303,11 +317,14 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, user);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String userTaskName,
+    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName,
+            final String targetProcessName, final String userTaskName,
             final String callActivityName) throws BonitaException {
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcessName);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity(callActivityName, targetProcessNameExpr, null);

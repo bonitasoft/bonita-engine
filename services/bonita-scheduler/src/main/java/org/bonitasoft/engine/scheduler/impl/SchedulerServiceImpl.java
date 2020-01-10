@@ -78,9 +78,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     /**
      * Create a new instance of scheduler service.
      */
-    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
-                                final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-                                final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
+    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
+            final TechnicalLoggerService logger,
+            final EventService eventService, final TransactionService transactionService,
+            final SessionAccessor sessionAccessor,
+            final ServicesResolver servicesResolver, final PersistenceService persistenceService) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
@@ -102,7 +104,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void schedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException {
+    public void schedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters,
+            final Trigger trigger) throws SSchedulerException {
         if (trigger == null) {
             throw new SSchedulerException("The trigger is null");
         }
@@ -113,22 +116,26 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void executeAgain(final long jobDescriptorId, int delayInMillis) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, delayInMillis);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(),
+                false, delayInMillis);
     }
 
     @Override
     public void retryJobThatFailed(long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, 0);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(),
+                false, 0);
     }
 
     @Override
-    public void retryJobThatFailed(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
+    public void retryJobThatFailed(final long jobDescriptorId, final List<SJobParameter> parameters)
+            throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
         deleteFailedJobs(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), false, 0);
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(),
+                false, 0);
     }
 
     private void deleteFailedJobs(long jobDescriptorId) throws SSchedulerException {
@@ -139,7 +146,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    private SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {
+    private SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor,
+            final List<SJobParameter> parameters) throws SSchedulerException {
         final long tenantId = getTenantId();
         try {
             final SJobDescriptor createdJobDescriptor = jobService.createJobDescriptor(sJobDescriptor, tenantId);
@@ -150,10 +158,12 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
+    private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger)
+            throws SSchedulerException {
         final String tenantId = getTenantIdAsString();
         try {
-            schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, false);
+            schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger,
+                    false);
         } catch (final Throwable e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             try {
@@ -264,7 +274,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         public JobWrapper call() throws Exception {
             final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
             if (sJobDescriptor == null) {
-                throw new SObjectNotFoundException(String.format("The job %s does not exist anymore. It might be already executed", jobIdentifier));
+                throw new SObjectNotFoundException(String
+                        .format("The job %s does not exist anymore. It might be already executed", jobIdentifier));
             }
             final String jobClassName = sJobDescriptor.getJobClassName();
             final Class<?> jobClass = Class.forName(jobClassName);
@@ -299,7 +310,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
+    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime)
+            throws SSchedulerException {
         return schedulerExecutor.rescheduleJob(triggerName, groupName, triggerStartTime);
     }
 

@@ -53,7 +53,8 @@ public class ApplicationNodeContainerConverterTest {
         final ApplicationNodeContainerConverter converter = new ApplicationNodeContainerConverter();
 
         final ApplicationNodeContainer container = converter.unmarshallFromXML(
-                IOUtils.toByteArray(ApplicationNodeContainerConverterTest.class.getResourceAsStream("/application.xml")));
+                IOUtils.toByteArray(
+                        ApplicationNodeContainerConverterTest.class.getResourceAsStream("/application.xml")));
 
         assertThat(container).isNotNull();
         assertThat(container.getApplications()).extracting("token", "displayName", "version")
@@ -68,7 +69,8 @@ public class ApplicationNodeContainerConverterTest {
         expectedException.expect(UnmarshalException.class);
 
         converter.unmarshallFromXML(
-                IOUtils.toByteArray(ApplicationNodeContainerConverterTest.class.getResourceAsStream("/badApplication.xml")));
+                IOUtils.toByteArray(
+                        ApplicationNodeContainerConverterTest.class.getResourceAsStream("/badApplication.xml")));
     }
 
 }

@@ -56,8 +56,9 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private String uuid;
 
-    BonitaClassLoader(final Stream<BonitaResource> resources, final String type, final long id, final URI temporaryDirectoryUri, final ClassLoader parent) {
-        super(type + "__" + id, new URL[]{}, parent);
+    BonitaClassLoader(final Stream<BonitaResource> resources, final String type, final long id,
+            final URI temporaryDirectoryUri, final ClassLoader parent) {
+        super(type + "__" + id, new URL[] {}, parent);
         this.creationTime = System.currentTimeMillis();
         NullCheckingUtil.checkArgsNotNull(resources, type, id, temporaryDirectoryUri, parent);
         this.type = type;
@@ -98,7 +99,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         if (resources == null) {
             return;
         }
-        resources.forEach((resource)->{
+        resources.forEach((resource) -> {
             if (resource.getName().matches(".*\\.jar")) {
                 try {
                     final File file = writeResource(resource);
@@ -198,7 +199,8 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", uuid=" + uuid + ", creationTime=" + creationTime + ", type=" + type + ", id=" + id + ", isActive: " + isActive
+        return super.toString() + ", uuid=" + uuid + ", creationTime=" + creationTime + ", type=" + type + ", id=" + id
+                + ", isActive: " + isActive
                 + ", parent= " + getParent();
     }
 }

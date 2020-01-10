@@ -16,14 +16,8 @@ package org.bonitasoft.engine.business.data.impl.jackson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ClassUtils;
-import org.bonitasoft.engine.business.data.impl.jackson.utils.ExtraPropertyUtils;
-import org.bonitasoft.engine.business.data.impl.jackson.writer.ExtraBeanPropertyWriter;
-import org.bonitasoft.engine.business.data.impl.jackson.writer.IgnoredPropertyWriter;
-import org.hibernate.proxy.HibernateProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -31,9 +25,13 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-
-import javassist.util.proxy.MethodHandler;
-import javassist.util.proxy.Proxy;
+import org.apache.commons.lang3.ClassUtils;
+import org.bonitasoft.engine.business.data.impl.jackson.utils.ExtraPropertyUtils;
+import org.bonitasoft.engine.business.data.impl.jackson.writer.ExtraBeanPropertyWriter;
+import org.bonitasoft.engine.business.data.impl.jackson.writer.IgnoredPropertyWriter;
+import org.hibernate.proxy.HibernateProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntityBeanSerializerModifier extends BeanSerializerModifier {
 
@@ -59,8 +57,7 @@ public class EntityBeanSerializerModifier extends BeanSerializerModifier {
                 BeanPropertyWriter ignoredPropertyWriter = new IgnoredPropertyWriter(beanPropertyWriter);
                 LOG.trace("Adding only an ignored property writer {}", ignoredPropertyWriter);
                 newProperties.add(ignoredPropertyWriter);
-            }
-            else {
+            } else {
                 newProperties.add(beanPropertyWriter);
                 if (ExtraPropertyUtils.shouldAddExtraProperty(beanPropertyWriter)) {
                     LOG.trace("Will have an additional property");
@@ -85,7 +82,8 @@ public class EntityBeanSerializerModifier extends BeanSerializerModifier {
             LOG.trace("Interfaces: {}", getNames(ClassUtils.getAllInterfaces(rawClass)));
             LOG.trace("Superclasses: {}", getNames(ClassUtils.getAllSuperclasses(rawClass)));
         }
-        if (MethodHandler.class.isAssignableFrom(rawClass) || Proxy.class.isAssignableFrom(rawClass) || HibernateProxy.class.isAssignableFrom(rawClass)) {
+        if (MethodHandler.class.isAssignableFrom(rawClass) || Proxy.class.isAssignableFrom(rawClass)
+                || HibernateProxy.class.isAssignableFrom(rawClass)) {
             return true;
         }
         return false;

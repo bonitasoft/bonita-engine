@@ -66,12 +66,14 @@ public class LockProcessInstanceWorkTest {
 
     @Test
     public void testWork() throws Exception {
-        BonitaLock bonitaLock = new BonitaLock( PROCESS, processInstanceId);
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(
-                bonitaLock);
+        BonitaLock bonitaLock = new BonitaLock(PROCESS, processInstanceId);
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
+                .thenReturn(
+                        bonitaLock);
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
+        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS),
+                eq(TENANT_ID));
         verify(lockService, times(1)).unlock(bonitaLock, TENANT_ID);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
@@ -123,7 +125,8 @@ public class LockProcessInstanceWorkTest {
     public void should_thow_exception_when_unable_to_lock() throws Exception {
         // On first try to lock : exception to reschedule the work
         // On the second try : return a correct lock
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID)))
+                .thenReturn(null);
 
         lockProcessInstanceWork.work(Collections.singletonMap("tenantAccessor", tenantAccessor));
     }

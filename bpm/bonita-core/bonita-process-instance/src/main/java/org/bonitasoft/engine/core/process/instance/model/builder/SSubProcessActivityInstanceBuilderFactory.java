@@ -13,15 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
 public interface SSubProcessActivityInstanceBuilderFactory extends SActivityInstanceBuilderFactory {
 
-    SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId, boolean isTriggeredByEvent);
+    SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name,
+            final long flowNodeDefinitionId, final long rootContainerId,
+            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId,
+            boolean isTriggeredByEvent);
 
     String getTriggeredByEventKey();
 

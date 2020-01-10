@@ -46,7 +46,8 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         this(pageMappingService, new SPageContentHelper());
     }
 
-    public ApiExtensionPageServiceListenerImpl(final PageMappingService pageMappingService, final SPageContentHelper helper) {
+    public ApiExtensionPageServiceListenerImpl(final PageMappingService pageMappingService,
+            final SPageContentHelper helper) {
         super();
         this.pageMappingService = pageMappingService;
         this.helper = helper;
@@ -54,7 +55,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
 
     @Override
     public void pageInserted(final SPage sPage, final byte[] content) throws SObjectCreationException {
-        if (SContentType.API_EXTENSION.equals(sPage.getContentType())){
+        if (SContentType.API_EXTENSION.equals(sPage.getContentType())) {
             try {
                 addPageMapping(sPage, helper.loadPageProperties(content));
             } catch (final IOException | SInvalidPageZipMissingPropertiesException e) {
@@ -63,7 +64,8 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         }
     }
 
-    private void addPageMapping(final SPage page, final Properties apiProperties) throws SObjectCreationException, IOException,
+    private void addPageMapping(final SPage page, final Properties apiProperties)
+            throws SObjectCreationException, IOException,
             SInvalidPageZipMissingPropertiesException {
         final List<String> mappings = getKeysOfPageMappings(apiProperties);
         for (final String mapping : mappings) {
@@ -75,7 +77,8 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         return new StringBuilder().append("apiExtension|").append(method).append("|").append(pathTemplate).toString();
     }
 
-    private String getRequiredProperty(final Properties properties, final String propertyName) throws SObjectCreationException {
+    private String getRequiredProperty(final Properties properties, final String propertyName)
+            throws SObjectCreationException {
         final String property = (String) properties.get(propertyName);
         if (property == null || property.trim().length() == 0) {
             throw new SObjectCreationException("the property '" + propertyName + "' is missing or is empty");
@@ -101,13 +104,15 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         if (SContentType.API_EXTENSION.equals(page.getContentType())) {
             try {
                 updateMappings(page, helper.loadPageProperties(content));
-            } catch (SBonitaReadException | SDeletionException | SObjectCreationException | SInvalidPageZipMissingPropertiesException | IOException e) {
+            } catch (SBonitaReadException | SDeletionException | SObjectCreationException
+                    | SInvalidPageZipMissingPropertiesException | IOException e) {
                 throw new SObjectModificationException(e);
             }
         }
     }
 
-    private void updateMappings(final SPage page, final Properties apiProperties) throws SObjectCreationException, SBonitaReadException, SDeletionException {
+    private void updateMappings(final SPage page, final Properties apiProperties)
+            throws SObjectCreationException, SBonitaReadException, SDeletionException {
         final List<String> keys = getKeysOfPageMappings(apiProperties);
         final List<String> existingKeys = new ArrayList<>();
         List<SPageMapping> mappings;

@@ -12,10 +12,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 /**
- * 
- *     <p>
- * 
- *     </p>
- * 
+ * <p>
+ * </p>
  */
 package org.bonitasoft.engine.bpm.userfilter;

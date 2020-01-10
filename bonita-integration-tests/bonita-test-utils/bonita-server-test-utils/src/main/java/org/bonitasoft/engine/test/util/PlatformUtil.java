@@ -32,7 +32,8 @@ public class PlatformUtil {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created).status(status).defaultTenant(false).build();
+            final STenant tenant = STenant.builder().name(tenantName).createdBy(createdBy).created(created)
+                    .status(status).defaultTenant(false).build();
             platformService.createTenant(tenant);
             BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());

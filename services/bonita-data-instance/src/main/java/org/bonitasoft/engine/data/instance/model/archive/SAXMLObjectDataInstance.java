@@ -24,7 +24,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.hibernate.annotations.Type;
 
@@ -35,6 +34,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @DiscriminatorValue("SAXMLObjectDataInstanceImpl")
 public final class SAXMLObjectDataInstance extends SADataInstance {
+
     @Column(name = "clobValue")
     @Type(type = "materialized_clob")
     private String value;

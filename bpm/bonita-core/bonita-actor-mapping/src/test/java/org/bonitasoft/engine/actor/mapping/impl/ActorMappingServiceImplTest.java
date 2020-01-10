@@ -54,8 +54,8 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -77,7 +77,6 @@ public class ActorMappingServiceImplTest {
     private IdentityService identityService;
     @InjectMocks
     private ActorMappingServiceImpl actorMappingServiceImpl;
-
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(long)}.
@@ -101,7 +100,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfActorMembers(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfActorMembers(long)}.
      *
      * @throws SBonitaReadException
      */
@@ -109,93 +109,107 @@ public class ActorMappingServiceImplTest {
     public final void getNumberOfActorMembers() throws SBonitaReadException {
         final long actorId = 456L;
         final long numberOfActorMemebers = 1L;
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(numberOfActorMemebers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any()))
+                .thenReturn(numberOfActorMemebers);
 
         Assert.assertEquals(numberOfActorMemebers, actorMappingServiceImpl.getNumberOfActorMembers(actorId));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfUsersOfActor(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfUsersOfActor(long)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getNumberOfUsersOfActor() throws SBonitaReadException {
         final long numberOfUsersOfActor = 155L;
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfUsersOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any()))
+                .thenReturn(numberOfUsersOfActor);
 
         Assert.assertEquals(numberOfUsersOfActor, actorMappingServiceImpl.getNumberOfUsersOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfUsersOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfUsersOfActor(456L);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfRolesOfActor(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfRolesOfActor(long)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getNumberOfRolesOfActor() throws SBonitaReadException {
         final long numberOfRolesOfActor = 155L;
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfRolesOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any()))
+                .thenReturn(numberOfRolesOfActor);
 
         Assert.assertEquals(numberOfRolesOfActor, actorMappingServiceImpl.getNumberOfRolesOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfRolesOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfRolesOfActor(456L);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfGroupsOfActor(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfGroupsOfActor(long)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getNumberOfGroupsOfActor() throws SBonitaReadException {
         final long numberOfGroupsOfActor = 155L;
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any()))
+                .thenReturn(numberOfGroupsOfActor);
 
         Assert.assertEquals(numberOfGroupsOfActor, actorMappingServiceImpl.getNumberOfGroupsOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfGroupsOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfGroupsOfActor(456L);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfMembershipsOfActor(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfMembershipsOfActor(long)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getNumberOfMembershipsOfActor() throws SBonitaReadException {
         final long numberOfGroupsOfActor = 155L;
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfGroupsOfActor);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any()))
+                .thenReturn(numberOfGroupsOfActor);
 
         Assert.assertEquals(numberOfGroupsOfActor, actorMappingServiceImpl.getNumberOfMembershipsOfActor(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public final void getNumberOfMembershipsOfActorThrowException() throws SBonitaReadException {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfMembershipsOfActor(456L);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(java.lang.String, long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(java.lang.String, long)}.
      *
      * @throws SBonitaReadException
      * @throws SActorNotFoundException
@@ -217,52 +231,60 @@ public class ActorMappingServiceImplTest {
 
     @Test(expected = SActorNotFoundException.class)
     public final void getActorByNameAndScopeIdThrowException() throws SActorNotFoundException, SBonitaReadException {
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<SActor>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getActor("actorName", 69L);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembers(long, int, int)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembers(long, int, int)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getActorMembersByActorPaginated() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>();
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>>any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any()))
+                .thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembers(4115L, 0, 1));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long, int, int)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long, int, int)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getActorMembersOfGroup() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>(6);
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any()))
+                .thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembersOfGroup(41L, 0, 1));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long, int, int)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long, int, int)}.
      *
      * @throws SBonitaReadException
      */
     @Test
     public final void getActorMembersOfRole() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>(3);
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any()))
+                .thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembersOfRole(41L, 0, 1));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMember(long, long, long, long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMember(long, long, long, long)}.
      */
     @Test
     public final void getActorMember() throws SBonitaReadException {
@@ -272,7 +294,8 @@ public class ActorMappingServiceImplTest {
         final long userId = 2L;
         final long groupId = 3L;
         final long roleId = 4L;
-        when(persistenceService.selectOne(SelectDescriptorBuilder.getActorMember(actorId, userId, groupId, roleId))).thenReturn(actor);
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getActorMember(actorId, userId, groupId, roleId)))
+                .thenReturn(actor);
 
         // When
         final SActorMember sActorMember = actorMappingServiceImpl.getActorMember(actorId, userId, groupId, roleId);
@@ -296,7 +319,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.List)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.List)}.
      *
      * @throws SBonitaReadException
      */
@@ -321,7 +345,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(long, org.bonitasoft.engine.persistence.QueryOptions)}
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(long, org.bonitasoft.engine.persistence.QueryOptions)}
      * .
      *
      * @throws SBonitaReadException
@@ -336,7 +361,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#canUserStartProcessDefinition(long, long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#canUserStartProcessDefinition(long, long)}.
      *
      * @throws SBonitaReadException
      */
@@ -344,33 +370,39 @@ public class ActorMappingServiceImplTest {
     public final void shouldBeAllowedToStartProcessDefinition() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(1);
         actorMembers.add(123L);
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(3L);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .thenReturn(actorMembers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(3L);
 
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should be allowed to start Process").isTrue();
+        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L))
+                .as("Should be allowed to start Process").isTrue();
     }
 
     @Test
     public final void shouldNotBeAllowedToStartProcessDefinitionIfNoActorMembers() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(0);
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .thenReturn(actorMembers);
 
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
+        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L))
+                .as("Should NOT be allowed to start Process").isFalse();
     }
-
 
     @Test
     public final void shouldNotBeAllowedToStartProcessDefinitionIfNoUserMemberships() throws SBonitaReadException {
         final List<Long> actorMembers = new ArrayList<Long>(1);
         actorMembers.add(123L);
-        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>>any())).thenReturn(0L);
+        when(persistenceService.selectList(ArgumentMatchers.<SelectListDescriptor<Long>> any()))
+                .thenReturn(actorMembers);
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<Long>> any())).thenReturn(0L);
 
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
+        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L))
+                .as("Should NOT be allowed to start Process").isFalse();
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.Set, java.lang.Long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.Set, java.lang.Long)}.
      *
      * @throws SBonitaReadException
      */
@@ -383,7 +415,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActors(java.util.Set)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActors(java.util.Set)}.
      *
      * @throws SActorCreationException
      */
@@ -392,7 +425,8 @@ public class ActorMappingServiceImplTest {
         final Set<SActor> actors = new HashSet<SActor>();
         actors.add(mock(SActor.class));
 
-        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class, withSettings().spiedInstance(actorMappingServiceImpl));
+        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class,
+                withSettings().spiedInstance(actorMappingServiceImpl));
         final SActor sActor = mock(SActor.class);
         when(mockedActorMappingServiceImpl.addActor(any(SActor.class))).thenReturn(sActor);
 
@@ -421,7 +455,8 @@ public class ActorMappingServiceImplTest {
         final Set<SActor> actors = new HashSet<SActor>();
         actors.add(mock(SActor.class));
 
-        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class, withSettings().spiedInstance(actorMappingServiceImpl));
+        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class,
+                withSettings().spiedInstance(actorMappingServiceImpl));
         when(mockedActorMappingServiceImpl.addActor(any(SActor.class))).thenThrow(new SActorCreationException(""));
 
         // Let's call it for real:
@@ -430,7 +465,8 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActor(org.bonitasoft.engine.actor.mapping.model.SActor)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActor(org.bonitasoft.engine.actor.mapping.model.SActor)}.
      *
      * @throws Exception
      */
@@ -462,7 +498,8 @@ public class ActorMappingServiceImplTest {
     public final void updateActor() throws SActorNotFoundException, SActorUpdateException, SBonitaReadException {
         final SActor sActor = mock(SActor.class);
 
-        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class)
+                .createNewInstance();
         sActorUpdateBuilder.updateDescription("newDescription");
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
@@ -474,23 +511,28 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = SActorNotFoundException.class)
-    public final void updateActorNotExists() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
-        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
+    public final void updateActorNotExists()
+            throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class)
+                .createNewInstance();
         doReturn(null).when(persistenceService).selectById(ArgumentMatchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());
     }
 
     @Test(expected = SActorUpdateException.class)
-    public final void updateActorThrowException() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException, SRecorderException {
+    public final void updateActorThrowException()
+            throws SActorUpdateException, SActorNotFoundException, SBonitaReadException, SRecorderException {
         final SActor sActor = mock(SActor.class);
 
-        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class)
+                .createNewInstance();
         sActorUpdateBuilder.updateDescription("newDescription");
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
         doReturn(sActor).when(persistenceService).selectById(any());
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
     }
@@ -513,7 +555,8 @@ public class ActorMappingServiceImplTest {
 
         doReturn(Arrays.asList(sActor)).doReturn(new ArrayList<SActor>()).when(persistenceService)
                 .selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
-        doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
+        doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService)
+                .selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
 
         actorMappingServiceImpl.deleteActors(scopeId);
     }
@@ -537,7 +580,8 @@ public class ActorMappingServiceImplTest {
     public final void deleteNoActors() throws SBonitaReadException, SRecorderException, SActorDeletionException {
         final int scopeId = 9;
 
-        doReturn(new ArrayList<SActor>()).when(persistenceService).selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
+        doReturn(new ArrayList<SActor>()).when(persistenceService)
+                .selectList(ArgumentMatchers.<SelectListDescriptor<SActorMember>> any());
 
         actorMappingServiceImpl.deleteActors(scopeId);
     }

@@ -21,5 +21,5 @@ import java.util.Map;
 @FunctionalInterface
 public interface FailureCallback {
 
-    void onFailure(WorkDescriptor workDescriptor, BonitaWork bonitaWork, Map<String,Object> context, Exception thrown);
+    void onFailure(WorkDescriptor workDescriptor, BonitaWork bonitaWork, Map<String, Object> context, Exception thrown);
 }

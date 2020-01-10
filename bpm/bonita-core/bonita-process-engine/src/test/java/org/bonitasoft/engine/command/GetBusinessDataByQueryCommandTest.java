@@ -66,7 +66,8 @@ public class GetBusinessDataByQueryCommandTest {
         commandParameters.put(GetBusinessDataByQueryCommand.MAX_RESULTS, PARAMETER_MAX_RESULTS);
         commandParameters.put(GetBusinessDataByQueryCommand.START_INDEX, PARAMETER_START_INDEX);
         commandParameters.put(GetBusinessDataByQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
-        commandParameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
+        commandParameters.put(BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN,
+                PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
         when(tenantServiceAccessor.getBusinessDataService()).thenReturn(businessDataService);
     }
 
@@ -76,7 +77,8 @@ public class GetBusinessDataByQueryCommandTest {
         command.execute(commandParameters, tenantServiceAccessor);
 
         //then
-        verify(businessDataService).getJsonQueryEntities(PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME, queryParameters, PARAMETER_START_INDEX,
+        verify(businessDataService).getJsonQueryEntities(PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME, queryParameters,
+                PARAMETER_START_INDEX,
                 PARAMETER_MAX_RESULTS,
                 PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
     }
@@ -84,7 +86,8 @@ public class GetBusinessDataByQueryCommandTest {
     @Test(expected = SCommandExecutionException.class)
     public void executeCommand_should_throw_exception() throws Exception {
         //given
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonQueryEntities(PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME,
+        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonQueryEntities(
+                PARAMETER_RETURN_TYPE, PARAMETER_QUERY_NAME,
                 queryParameters, PARAMETER_START_INDEX, PARAMETER_MAX_RESULTS,
                 PARAMETER_BUSINESS_DATA_CLASS_URI_VALUE);
 
@@ -94,8 +97,10 @@ public class GetBusinessDataByQueryCommandTest {
 
     @Test
     public void executeCommand_should_check_return_type() throws Exception {
-        String[] mandatoryParameters = { GetBusinessDataByQueryCommand.START_INDEX, GetBusinessDataByQueryCommand.MAX_RESULTS,
-                GetBusinessDataByQueryCommand.QUERY_NAME, GetBusinessDataByQueryCommand.QUERY_PARAMETERS, GetBusinessDataByQueryCommand.ENTITY_CLASS_NAME };
+        String[] mandatoryParameters = { GetBusinessDataByQueryCommand.START_INDEX,
+                GetBusinessDataByQueryCommand.MAX_RESULTS,
+                GetBusinessDataByQueryCommand.QUERY_NAME, GetBusinessDataByQueryCommand.QUERY_PARAMETERS,
+                GetBusinessDataByQueryCommand.ENTITY_CLASS_NAME };
 
         for (String mandatoryParameter : mandatoryParameters) {
             try {

@@ -74,6 +74,6 @@ public class SProcessDefinitionDeployInfo implements PersistentObject {
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "content_tenantid", referencedColumnName = "tenantid"),
-            @JoinColumn(name = "content_id", referencedColumnName = "id")})
+            @JoinColumn(name = "content_id", referencedColumnName = "id") })
     private SProcessDefinitionDesignContent designContent;
 }

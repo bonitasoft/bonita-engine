@@ -55,7 +55,8 @@ public class LegacyURLAdapterTest {
     @Test
     public void should_generate_legacy_URL_for_process_start_when_mapping_on_legacy() throws Exception {
         String mappingKey = "process/processName/processVersion";
-        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_INTERNAL);
+        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         when(formMappingService.get(mappingKey)).thenReturn(formMapping);
         when(processDefinition.getName()).thenReturn("processName");
         when(processDefinition.getVersion()).thenReturn("processVersion");
@@ -77,7 +78,8 @@ public class LegacyURLAdapterTest {
     @Test
     public void should_generate_legacy_URL_for_instance_when_mapping_on_legacy() throws Exception {
         String mappingKey = "processInstance/processName/processVersion";
-        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_OVERVIEW.getId(), null, SFormMapping.TARGET_INTERNAL);
+        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_OVERVIEW.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         when(formMappingService.get(mappingKey)).thenReturn(formMapping);
         when(processDefinition.getName()).thenReturn("processName");
         when(processDefinition.getVersion()).thenReturn("processVersion");
@@ -99,7 +101,8 @@ public class LegacyURLAdapterTest {
     @Test
     public void should_generate_legacy_URL_for_task_when_mapping_on_legacy() throws Exception {
         String mappingKey = "process/processName/processVersion";
-        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.TASK.getId(), "taskName", SFormMapping.TARGET_INTERNAL);
+        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.TASK.getId(), "taskName",
+                SFormMapping.TARGET_INTERNAL);
         when(formMappingService.get(mappingKey)).thenReturn(formMapping);
         when(processDefinition.getName()).thenReturn("processName");
         when(processDefinition.getVersion()).thenReturn("processVersion");
@@ -120,11 +123,13 @@ public class LegacyURLAdapterTest {
                 .isEqualTo(
                         "/bonita/portal/homepage?ui=form&locale=en&theme=1#mode=form&form=processName--processVersion--taskName%24entry&task=42&assignTask=true&userId=2");
     }
-    
+
     @Test
-    public void should_generate_legacy_URL_for_process_start_when_mapping_on_legacy_with_autInstantiate_param() throws Exception {
+    public void should_generate_legacy_URL_for_process_start_when_mapping_on_legacy_with_autInstantiate_param()
+            throws Exception {
         String mappingKey = "process/processName/processVersion";
-        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_INTERNAL);
+        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         when(formMappingService.get(mappingKey)).thenReturn(formMapping);
         when(processDefinition.getName()).thenReturn("processName");
         when(processDefinition.getVersion()).thenReturn("processVersion");
@@ -143,11 +148,12 @@ public class LegacyURLAdapterTest {
         assertThat(legacyURL).isEqualTo(
                 "/bonita/portal/homepage?ui=form&locale=en&theme=1#mode=form&form=processName--processVersion%24entry&process=1&autoInstantiate=false");
     }
-    
+
     @Test
     public void should_generate_legacy_URL_when_mapping_on_legacy_with_specific_mode() throws Exception {
         String mappingKey = "process/processName/processVersion";
-        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_INTERNAL);
+        SFormMapping formMapping = new SFormMapping(1L, FormMappingType.PROCESS_START.getId(), null,
+                SFormMapping.TARGET_INTERNAL);
         when(formMappingService.get(mappingKey)).thenReturn(formMapping);
         when(processDefinition.getName()).thenReturn("processName");
         when(processDefinition.getVersion()).thenReturn("processVersion");

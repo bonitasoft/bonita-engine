@@ -38,14 +38,13 @@ public class ProfilesUpdaterRestartHandler implements TenantRestartHandler {
     private TransactionService transactionService;
 
     public ProfilesUpdaterRestartHandler(@Value("${tenantId}") Long tenantId,
-                                         @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
-                                         ProfilesImporter profileImporter, TransactionService transactionService) {
+            @Qualifier("tenantTechnicalLoggerService") TechnicalLoggerService logger,
+            ProfilesImporter profileImporter, TransactionService transactionService) {
         this.tenantId = tenantId;
         this.logger = logger;
         this.profileImporter = profileImporter;
         this.transactionService = transactionService;
     }
-
 
     @Override
     public void beforeServicesStart() {

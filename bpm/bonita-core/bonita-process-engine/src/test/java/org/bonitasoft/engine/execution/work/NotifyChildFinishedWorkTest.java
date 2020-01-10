@@ -69,8 +69,10 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_throw_precondition_exception_when_flownode_is_not_found() throws Exception {
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 4, false, false, false);
-        doThrow(SFlowNodeNotFoundException.class).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 4, false,
+                false, false);
+        doThrow(SFlowNodeNotFoundException.class).when(flowNodeInstanceService)
+                .getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
         expectedException.expect(SWorkPreconditionException.class);
         expectedException.expectMessage("Flow node " + FLOW_NODE_INSTANCE_ID + " is already completed ( not found )");
@@ -80,30 +82,33 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_throw_precondition_exception_when_flownode_is_completed() throws Exception {
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 1, false, false, false);
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 1, false,
+                false, false);
         SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(false);
         flowNodeInstance.setStateId(1);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-
 
         expectedException.expect(SWorkPreconditionException.class);
         expectedException.expectMessage("Flow node " + FLOW_NODE_INSTANCE_ID + " is not yet completed");
 
         notifyChildFinishedWork.work(context);
     }
+
     @Test
     public void should_throw_precondition_exception_when_flownode_changed() throws Exception {
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 3, false, false, false);
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 3, false,
+                false, false);
         SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(true);
         flowNodeInstance.setStateId(2);
         doReturn(flowNodeInstance).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
-
         expectedException.expect(SWorkPreconditionException.class);
-        expectedException.expectMessage("Unable to execute flow node "+FLOW_NODE_INSTANCE_ID+" because it is not in the expected state " +
-                "( expected state: 3, transitioning: false, aborting: false, canceling: false, but got  state: 2, transitioning: false, aborting: false, canceling: false)." +
+        expectedException.expectMessage("Unable to execute flow node " + FLOW_NODE_INSTANCE_ID
+                + " because it is not in the expected state " +
+                "( expected state: 3, transitioning: false, aborting: false, canceling: false, but got  state: 2, transitioning: false, aborting: false, canceling: false)."
+                +
                 " Someone probably already called execute on it.");
 
         notifyChildFinishedWork.work(context);
@@ -111,7 +116,8 @@ public class NotifyChildFinishedWorkTest {
 
     @Test
     public void should_notify_child_finished_if_flow_node_is_completed() throws Exception {
-        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 2, false, false, false);
+        notifyChildFinishedWork = new NotifyChildFinishedWork(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, 2, false,
+                false, false);
         doReturn(containerRegistry).when(tenantServiceAccessor).getContainerRegistry();
         SAutomaticTaskInstance flowNodeInstance = new SAutomaticTaskInstance();
         flowNodeInstance.setTerminal(true);

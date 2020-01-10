@@ -77,7 +77,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private final TechnicalLoggerService logger;
 
-    public FlowNodeInstancesServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final EventService eventService,
+    public FlowNodeInstancesServiceImpl(final Recorder recorder, final PersistenceService persistenceService,
+            final EventService eventService,
             final TechnicalLoggerService logger, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -91,9 +92,9 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return archiveService;
     }
 
-
     @Override
-    public void setState(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state) throws SFlowNodeModificationException {
+    public void setState(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state)
+            throws SFlowNodeModificationException {
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getPreviousStateIdKey(), flowNodeInstance.getStateId());
@@ -108,8 +109,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             logger.log(
                     getClass(),
                     TechnicalLogSeverity.DEBUG,
-                    MessageFormat.format("[{0} with id {1}] changed state {2}->{3}(new={4})", flowNodeInstance.getClass().getSimpleName(),
-                            flowNodeInstance.getId(), flowNodeInstance.getStateId(), state.getId(), state.getClass().getSimpleName()));
+                    MessageFormat.format("[{0} with id {1}] changed state {2}->{3}(new={4})",
+                            flowNodeInstance.getClass().getSimpleName(),
+                            flowNodeInstance.getId(), flowNodeInstance.getStateId(), state.getId(),
+                            state.getClass().getSimpleName()));
         }
 
         updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
@@ -125,7 +128,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             logger.log(
                     getClass(),
                     TechnicalLogSeverity.DEBUG,
-                    MessageFormat.format("[{0} with id {1}] have executing flag set to true", flowNodeInstance.getClass().getSimpleName(),
+                    MessageFormat.format("[{0} with id {1}] have executing flag set to true",
+                            flowNodeInstance.getClass().getSimpleName(),
                             flowNodeInstance.getId()));
         }
 
@@ -133,7 +137,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void updateDisplayName(final SFlowNodeInstance flowNodeInstance, final String displayName) throws SFlowNodeModificationException {
+    public void updateDisplayName(final SFlowNodeInstance flowNodeInstance, final String displayName)
+            throws SFlowNodeModificationException {
         if (displayName != null && !displayName.equals(flowNodeInstance.getDisplayName())) {
             final String key = activityInstanceKeyProvider.getDisplayNameKey();
             final String event = ACTIVITYINSTANCE_DISPLAY_NAME;
@@ -141,7 +146,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance, final String key) {
+    private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance,
+            final String key) {
         if (value.length() > maxLengh) {
             final String truncatedValue = value.substring(0, maxLengh);
             logTruncationWarning(value, truncatedValue, maxLengh, flowNodeInstance, key);
@@ -150,7 +156,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return value;
     }
 
-    private void logTruncationWarning(final String value, final String truncatedValue, final int maxLengh, final SFlowNodeInstance flowNodeInstance,
+    private void logTruncationWarning(final String value, final String truncatedValue, final int maxLengh,
+            final SFlowNodeInstance flowNodeInstance,
             final String key) {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
             final StringBuilder stb = new StringBuilder();
@@ -176,7 +183,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey, final String attributeValue, final int maxLength,
+    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey,
+            final String attributeValue, final int maxLength,
             final String event) throws SFlowNodeModificationException {
         final String truncatedValue = getTruncated(attributeValue, maxLength, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -185,14 +193,16 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         updateOneField(flowNodeInstance, event, descriptor);
     }
 
-    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey, final Long attributeValue, final String event)
+    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey,
+            final Long attributeValue, final String event)
             throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, attributeValue);
         updateOneField(flowNodeInstance, event, descriptor);
     }
 
-    private void updateOneField(SFlowNodeInstance flowNodeInstance, String event, EntityUpdateDescriptor descriptor) throws SFlowNodeModificationException {
+    private void updateOneField(SFlowNodeInstance flowNodeInstance, String event, EntityUpdateDescriptor descriptor)
+            throws SFlowNodeModificationException {
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), event);
         } catch (final SRecorderException e) {
@@ -201,7 +211,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void updateDisplayDescription(final SFlowNodeInstance flowNodeInstance, final String displayDescription) throws SFlowNodeModificationException {
+    public void updateDisplayDescription(final SFlowNodeInstance flowNodeInstance, final String displayDescription)
+            throws SFlowNodeModificationException {
         if (displayDescription != null && !displayDescription.equals(flowNodeInstance.getDisplayDescription())) {
             final String event = ACTIVITYINSTANCE_DISPLAY_DESCRIPTION;
             final String key = activityInstanceKeyProvider.getDisplayDescriptionKey();
@@ -210,17 +221,20 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority) throws SFlowNodeModificationException {
+    public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority)
+            throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
         updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override
-    public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException {
+    public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException {
         SFlowNodeInstance selectOne;
         try {
-            selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
+            selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class,
+                    "SFlowNodeInstance", flowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -231,30 +245,38 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(final long parentProcessInstanceId, final int fromIndex, final int maxResults) throws SBonitaReadException {
+    public List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(final long parentProcessInstanceId,
+            final int fromIndex, final int maxResults) throws SBonitaReadException {
         List<SFlowNodeInstance> selectList;
-        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", parentProcessInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId",
+                parentProcessInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfProcess", parameters, SFlowNodeInstance.class, queryOptions));
+        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfProcess",
+                parameters, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults) throws SBonitaReadException {
+    public List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex,
+            int maxResults) throws SBonitaReadException {
         List<SFlowNodeInstance> selectList;
-        final Map<String, Object> parameters = Collections.singletonMap("parentActivityInstanceId", parentActivityInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("parentActivityInstanceId",
+                parentActivityInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfActivity", parameters, SFlowNodeInstance.class, queryOptions));
+        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfActivity",
+                parameters, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 
     @Override
-    public List<SAFlowNodeInstance> getArchivedFlowNodeInstances(final long rootContainerId, final int fromIndex, final int maxResults)
+    public List<SAFlowNodeInstance> getArchivedFlowNodeInstances(final long rootContainerId, final int fromIndex,
+            final int maxResults)
             throws SFlowNodeReadException {
         List<SAFlowNodeInstance> selectList;
         try {
             selectList = getPersistenceService().selectList(
-                    SelectDescriptorBuilder.getArchivedFlowNodesFromProcessInstance(rootContainerId, fromIndex, maxResults));
+                    SelectDescriptorBuilder.getArchivedFlowNodesFromProcessInstance(rootContainerId, fromIndex,
+                            maxResults));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -262,23 +284,29 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds) throws SBonitaReadException {
-        return new HashSet<>(getPersistenceService().selectList(new SelectListDescriptor<>("getSourceObjectIdsOfArchivedFlowNodeInstances",
-                Collections.singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds), SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
+    public Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds)
+            throws SBonitaReadException {
+        return new HashSet<>(getPersistenceService()
+                .selectList(new SelectListDescriptor<>("getSourceObjectIdsOfArchivedFlowNodeInstances",
+                        Collections.singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds),
+                        SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
     }
 
     @Override
     public void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException {
-        archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances", Collections.singletonMap("sourceObjectIds", sourceObjectIds));
+        archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances",
+                Collections.singletonMap("sourceObjectIds", sourceObjectIds));
     }
 
     @Override
-    public SAFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId) throws SFlowNodeReadException, SFlowNodeNotFoundException {
+    public SAFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId)
+            throws SFlowNodeReadException, SFlowNodeNotFoundException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         SAFlowNodeInstance selectOne;
         try {
-            selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SAFlowNodeInstance.class, "SArchivedFlowNodeInstance",
-                    archivedFlowNodeInstanceId));
+            selectOne = persistenceService.selectById(
+                    SelectDescriptorBuilder.getElementById(SAFlowNodeInstance.class, "SArchivedFlowNodeInstance",
+                            archivedFlowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -289,14 +317,18 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
+    public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass,
+            final long sourceObjectFlowNodeInstanceId)
             throws SBonitaReadException {
-        final SAManualTaskInstanceBuilderFactory builderFactory = BuilderFactory.get(SAManualTaskInstanceBuilderFactory.class);
-        final FilterOption filterOption = new FilterOption(entityClass, builderFactory.getSourceObjectIdKey(), sourceObjectFlowNodeInstanceId);
+        final SAManualTaskInstanceBuilderFactory builderFactory = BuilderFactory
+                .get(SAManualTaskInstanceBuilderFactory.class);
+        final FilterOption filterOption = new FilterOption(entityClass, builderFactory.getSourceObjectIdKey(),
+                sourceObjectFlowNodeInstanceId);
         final List<OrderByOption> orderByOptions = new ArrayList<>();
         orderByOptions.add(new OrderByOption(entityClass, builderFactory.getArchivedDateKey(), OrderByType.DESC));
         orderByOptions.add(new OrderByOption(entityClass, builderFactory.getLastUpdateKey(), OrderByType.DESC));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, Collections.singletonList(filterOption), null);
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions,
+                Collections.singletonList(filterOption), null);
         final List<T> saFlowNodeInstances = searchArchivedFlowNodeInstances(entityClass, queryOptions);
         if (!saFlowNodeInstances.isEmpty()) {
             return saFlowNodeInstances.get(0);
@@ -305,7 +337,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void setStateCategory(final SFlowNodeInstance flowElementInstance, final SStateCategory stateCategory) throws SFlowNodeModificationException {
+    public void setStateCategory(final SFlowNodeInstance flowElementInstance, final SStateCategory stateCategory)
+            throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
 
@@ -318,27 +351,31 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void setExecutedBy(final SFlowNodeInstance flowNodeInstance, final long userId) throws SFlowNodeModificationException {
+    public void setExecutedBy(final SFlowNodeInstance flowNodeInstance, final long userId)
+            throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getExecutedBy(), userId);
         updateFlowNode(flowNodeInstance, EXECUTED_BY_MODIFIED, descriptor);
     }
 
     @Override
-    public void setExecutedBySubstitute(final SFlowNodeInstance flowNodeInstance, final long executerSubstituteId) throws SFlowNodeModificationException {
+    public void setExecutedBySubstitute(final SFlowNodeInstance flowNodeInstance, final long executerSubstituteId)
+            throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getExecutedBySubstitute(), executerSubstituteId);
         updateFlowNode(flowNodeInstance, EXECUTED_BY_SUBSTITUTE_MODIFIED, descriptor);
     }
 
     @Override
-    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long dueDate) throws SFlowNodeModificationException {
+    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long dueDate)
+            throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
         updateFlowNode(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);
     }
 
-    protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName, final EntityUpdateDescriptor descriptor)
+    protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName,
+            final EntityUpdateDescriptor descriptor)
             throws SFlowNodeModificationException {
         try {
             getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), eventName);
@@ -355,37 +392,43 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public long getNumberOfFlowNodeInstances(final Class<? extends SFlowNodeInstance> entityClass, final QueryOptions countOptions)
+    public long getNumberOfFlowNodeInstances(final Class<? extends SFlowNodeInstance> entityClass,
+            final QueryOptions countOptions)
             throws SBonitaReadException {
         return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
-    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstances(final Class<T> entityClass, final QueryOptions searchOptions)
+    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstances(final Class<T> entityClass,
+            final QueryOptions searchOptions)
             throws SBonitaReadException {
         return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
 
     @Override
-    public long getNumberOfFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<? extends SFlowNodeInstance> entityClass,
+    public long getNumberOfFlowNodeInstancesSupervisedBy(final Long supervisorId,
+            final Class<? extends SFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<T> entityClass,
+    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(final Long supervisorId,
+            final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long parentProcessInstanceId)
+            throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
         final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<>(
-                "getNumberOfFlowNodesInAllStates", parameters, SFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
+                "getNumberOfFlowNodesInAllStates", parameters, SFlowNodeInstance.class,
+                new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
             return result;
         }
@@ -393,11 +436,13 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(
+            final long parentProcessInstanceId) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
         final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<>(
-                "getNumberOfArchivedFlowNodesInAllStates", parameters, SAFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
+                "getNumberOfArchivedFlowNodesInAllStates", parameters, SAFlowNodeInstance.class,
+                new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
             return result;
         }
@@ -405,26 +450,30 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public long getNumberOfArchivedFlowNodeInstances(final Class<? extends SAFlowNodeInstance> entityClass, final QueryOptions countOptions)
+    public long getNumberOfArchivedFlowNodeInstances(final Class<? extends SAFlowNodeInstance> entityClass,
+            final QueryOptions countOptions)
             throws SBonitaReadException {
         return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
-    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(final Class<T> entityClass, final QueryOptions searchOptions)
+    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(final Class<T> entityClass,
+            final QueryOptions searchOptions)
             throws SBonitaReadException {
         return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
 
     @Override
-    public long getNumberOfArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final Class<? extends SAFlowNodeInstance> entityClass,
+    public long getNumberOfArchivedFlowNodeInstancesSupervisedBy(final long supervisorId,
+            final Class<? extends SAFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final Class<T> entityClass,
+    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId,
+            final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
@@ -458,12 +507,14 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SBonitaReadException {
         final List<Long> selectList = getPersistenceService().selectList(
-                new SelectListDescriptor<>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
+                new SelectListDescriptor<>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class,
+                        queryOptions));
         return getUnmodifiableList(selectList);
     }
 
     @Override
     public int getNumberOfFlowNodes(final long parentProcessInstanceId) throws SBonitaReadException {
-        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(parentProcessInstanceId)).intValue();
+        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(parentProcessInstanceId))
+                .intValue();
     }
 }

@@ -41,5 +41,4 @@ public class ApplicationArchive {
     @Singular
     private List<FileAndContent> applications;
 
-
 }

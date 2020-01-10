@@ -61,18 +61,23 @@ public class JavaMethodInvoker {
         return Thread.currentThread().getContextClassLoader().loadClass(type);
     }
 
-    public Object invokeJavaMethod(final String typeOfValueToSet, final Object valueToSetObjectWith, final Object objectToInvokeJavaMethodOn,
-            final String operator, final String operatorParameterClassName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
+    public Object invokeJavaMethod(final String typeOfValueToSet, final Object valueToSetObjectWith,
+            final Object objectToInvokeJavaMethodOn,
+            final String operator, final String operatorParameterClassName)
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final Class<?> expressionResultType = getClassOrPrimitiveClass(typeOfValueToSet);
-        final Class<?> dataType = Thread.currentThread().getContextClassLoader().loadClass(objectToInvokeJavaMethodOn.getClass().getName());
-        final Method method = MethodUtils.getMatchingAccessibleMethod(dataType, operator, new Class[]{getClassOrPrimitiveClass(operatorParameterClassName)});
+        final Class<?> dataType = Thread.currentThread().getContextClassLoader()
+                .loadClass(objectToInvokeJavaMethodOn.getClass().getName());
+        final Method method = MethodUtils.getMatchingAccessibleMethod(dataType, operator,
+                new Class[] { getClassOrPrimitiveClass(operatorParameterClassName) });
         if (method != null) {
             final Object o = dataType.cast(objectToInvokeJavaMethodOn);
             method.invoke(o, expressionResultType.cast(valueToSetObjectWith));
             return o;
         } else {
-            throw new NoSuchMethodException(dataType.toGenericString() + "." + operator + "(" + operatorParameterClassName + ").");
+            throw new NoSuchMethodException(
+                    dataType.toGenericString() + "." + operator + "(" + operatorParameterClassName + ").");
         }
     }
 }

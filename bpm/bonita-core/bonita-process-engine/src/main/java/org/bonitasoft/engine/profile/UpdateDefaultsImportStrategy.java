@@ -19,8 +19,8 @@ import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -43,8 +43,9 @@ public class UpdateDefaultsImportStrategy extends ProfileImportStrategy {
         // update profile
         if (profile.isDefault() || existingProfile.isDefault()) {
             // only update LastUpdatedBy and LastUpdateDate
-            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(profile, importerId, true));
-        }else{
+            return getProfileService().updateProfile(existingProfile,
+                    getProfileUpdateDescriptor(profile, importerId, true));
+        } else {
             return null;
         }
     }
@@ -59,8 +60,10 @@ public class UpdateDefaultsImportStrategy extends ProfileImportStrategy {
         return true;
     }
 
-    EntityUpdateDescriptor getProfileUpdateDescriptor(final ProfileNode profile, final long importerId, final boolean updateAllProfile) {
-        final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
+    EntityUpdateDescriptor getProfileUpdateDescriptor(final ProfileNode profile, final long importerId,
+            final boolean updateAllProfile) {
+        final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class)
+                .createNewInstance();
         updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(importerId);
         if (updateAllProfile) {
             updateBuilder.setDescription(profile.getDescription());

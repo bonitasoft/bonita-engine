@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBui
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.page.SPageMapping;
@@ -29,7 +30,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -46,16 +46,17 @@ public class FormMappingTest {
     public void should_be_able_to_add_form_mapping() {
         SPageMapping pageMapping = SPageMapping.builder().id(1).build();
         testRepository.add(pageMapping);
-        testRepository.add(SFormMapping.builder().pageMapping(pageMapping).type(3).task("task1").target("target1").lastUpdateDate(200L).lastUpdatedBy(100L).processDefinitionId(2L).build());
-        testRepository.add(SFormMapping.builder().pageMapping(pageMapping).type(4).task("task2").target("target2").processDefinitionId(3L).build());
+        testRepository.add(SFormMapping.builder().pageMapping(pageMapping).type(3).task("task1").target("target1")
+                .lastUpdateDate(200L).lastUpdatedBy(100L).processDefinitionId(2L).build());
+        testRepository.add(SFormMapping.builder().pageMapping(pageMapping).type(4).task("task2").target("target2")
+                .processDefinitionId(3L).build());
 
         testRepository.flush();
 
         List<Map<String, Object>> formMapping = jdbcTemplate.queryForList("SELECT * from form_mapping");
         assertThat(formMapping).hasSize(2);
 
-
-        assertThat(formMapping).anySatisfy(c->{
+        assertThat(formMapping).anySatisfy(c -> {
             assertThat(c.get("task")).isEqualTo("task1");
             assertThat(c.get("type")).isEqualTo(3);
             assertThat(c.get("page_mapping_id")).isEqualTo(1L);
@@ -65,7 +66,7 @@ public class FormMappingTest {
             assertThat(c.get("process")).isEqualTo(2L);
             assertThat(c.get("target")).isEqualTo("target1");
         });
-        assertThat(formMapping).anySatisfy(c->{
+        assertThat(formMapping).anySatisfy(c -> {
             assertThat(c.get("task")).isEqualTo("task2");
             assertThat(c.get("page_mapping_id")).isEqualTo(1L);
             assertThat(c.get("page_mapping_tenant_id")).isEqualTo(DEFAULT_TENANT_ID);

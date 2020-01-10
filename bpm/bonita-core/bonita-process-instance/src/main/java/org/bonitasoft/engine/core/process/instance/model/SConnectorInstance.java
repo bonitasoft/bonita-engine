@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.*;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-
-import javax.persistence.*;
 
 /**
  * @author Baptiste Mesta
@@ -30,8 +30,9 @@ import javax.persistence.*;
 @Table(name = "connector_instance")
 public class SConnectorInstance extends SAbstractConnectorInstance {
 
-    public SConnectorInstance(final String name, final long containerId, final String containerType, final String connectorId, final String version,
-                                  final ConnectorEvent activationEvent) {
+    public SConnectorInstance(final String name, final long containerId, final String containerType,
+            final String connectorId, final String version,
+            final ConnectorEvent activationEvent) {
         super(name, containerId, containerType, connectorId, version, activationEvent);
     }
 

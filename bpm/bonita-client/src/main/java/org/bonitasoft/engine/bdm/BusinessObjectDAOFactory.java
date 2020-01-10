@@ -20,7 +20,8 @@ import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.session.APISession;
 
 /**
- * A factory to create Data Access Objects (DAO). These DAOs interact with {@link org.bonitasoft.engine.bdm.model.BusinessObject}s.
+ * A factory to create Data Access Objects (DAO). These DAOs interact with
+ * {@link org.bonitasoft.engine.bdm.model.BusinessObject}s.
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
@@ -37,7 +38,8 @@ public class BusinessObjectDAOFactory {
      * @return the implementation of the DAO
      * @throws BusinessObjectDaoCreationException if the factory is not able to instantiate the DAO
      */
-    public <T extends BusinessObjectDAO> T createDAO(final APISession session, final Class<T> daoInterface) throws BusinessObjectDaoCreationException {
+    public <T extends BusinessObjectDAO> T createDAO(final APISession session, final Class<T> daoInterface)
+            throws BusinessObjectDaoCreationException {
         if (session == null) {
             throw new IllegalArgumentException("session is null");
         }
@@ -85,8 +87,10 @@ public class BusinessObjectDAOFactory {
      * @throws ClassNotFoundException if the daoClassName is unknown by the current Thread
      */
     @SuppressWarnings("unchecked")
-    protected <T extends BusinessObjectDAO> Class<T> loadClass(final String daoClassName) throws ClassNotFoundException {
-        return (Class<T>) Class.forName(toDaoImplClassName(daoClassName), true, Thread.currentThread().getContextClassLoader());
+    protected <T extends BusinessObjectDAO> Class<T> loadClass(final String daoClassName)
+            throws ClassNotFoundException {
+        return (Class<T>) Class.forName(toDaoImplClassName(daoClassName), true,
+                Thread.currentThread().getContextClassLoader());
     }
 
     private String toDaoImplClassName(final String daoClassName) {

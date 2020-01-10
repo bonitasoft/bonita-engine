@@ -39,7 +39,8 @@ public class UniqueSimpleNameValidationRule extends ValidationRule<BusinessObjec
         Set<String> businessObjectNames = new HashSet<>();
         for (BusinessObject businessObject : businessObjects) {
             if (!businessObjectNames.add(businessObject.getSimpleName().toLowerCase())) {
-                status.addError(DUPLICATE_BUSINESS_OBJECT_NAME, " There are at least 2 objects in the BDM that are called : " + businessObject.getSimpleName());
+                status.addError(DUPLICATE_BUSINESS_OBJECT_NAME,
+                        " There are at least 2 objects in the BDM that are called : " + businessObject.getSimpleName());
             }
         }
         return status;

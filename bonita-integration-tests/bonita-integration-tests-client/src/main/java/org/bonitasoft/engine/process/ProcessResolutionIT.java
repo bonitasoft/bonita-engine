@@ -52,7 +52,8 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addActor("Leader").addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
@@ -98,7 +99,8 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
 
         Thread.sleep(10);
         // remove actor member
-        final ActorInstance actorInstance = getProcessAPI().getActors(definition.getId(), 0, 10, ActorCriterion.NAME_ASC).get(0);
+        final ActorInstance actorInstance = getProcessAPI()
+                .getActors(definition.getId(), 0, 10, ActorCriterion.NAME_ASC).get(0);
         final ActorMember actorMember = getProcessAPI().getActorMembers(actorInstance.getId(), 0, 10).get(0);
         getProcessAPI().removeActorMember(actorMember.getId());
 
@@ -150,9 +152,11 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
-        builder.createNewInstance("update proc resolution", "1.0").addActor(actor, true).addUserTask("test_session", actor);
+        builder.createNewInstance("update proc resolution", "1.0").addActor(actor, true).addUserTask("test_session",
+                actor);
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
         getProcessAPI().addUserToActor(initiator.getId(), piouPiou.getId());
@@ -174,9 +178,11 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
-        builder.createNewInstance("update proc resolution", "1.1").addActor(actor, true).addUserTask("deleteUser", actor);
+        builder.createNewInstance("update proc resolution", "1.1").addActor(actor, true).addUserTask("deleteUser",
+                actor);
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
         getProcessAPI().addUserToActor(initiator.getId(), piouPiou.getId());
@@ -196,9 +202,11 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         final Role role = getIdentityAPI().createRole("Tester");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
-        builder.createNewInstance("update proc resolution", "1.2").addActor(actor, true).addUserTask("deleteRole", actor);
+        builder.createNewInstance("update proc resolution", "1.2").addActor(actor, true).addUserTask("deleteRole",
+                actor);
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
         getProcessAPI().addRoleToActor(initiator.getId(), role.getId());
@@ -218,9 +226,11 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         final Group group = getIdentityAPI().createGroup("Tester", null);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         final String actor = "Dev Leader";
-        builder.createNewInstance("update proc resolution", "1.2").addActor(actor, true).addUserTask("deleteGroup", actor);
+        builder.createNewInstance("update proc resolution", "1.2").addActor(actor, true).addUserTask("deleteGroup",
+                actor);
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
         getProcessAPI().addGroupToActor(initiator.getId(), group.getId());
@@ -238,9 +248,11 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
     @Test
     public void noConnectorImplementation() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("resolve", "1.0").addAutomaticTask("auto").addConnector("exec", "exec-1.0", "1.0", ConnectorEvent.ON_ENTER);
+        builder.createNewInstance("resolve", "1.0").addAutomaticTask("auto").addConnector("exec", "exec-1.0", "1.0",
+                ConnectorEvent.ON_ENTER);
         final DesignProcessDefinition processDefinition = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = deployProcess(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());

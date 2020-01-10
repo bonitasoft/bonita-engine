@@ -25,7 +25,6 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 /**
  * @author Hongwen Zang
- * 
  */
 public class SearchCommentsSupervisedByTransaction extends AbstractCommentSearchEntity {
 
@@ -33,7 +32,8 @@ public class SearchCommentsSupervisedByTransaction extends AbstractCommentSearch
 
     private final Long supervisorId;
 
-    public SearchCommentsSupervisedByTransaction(final Long supervisorId, final SCommentService commentService, final SearchEntityDescriptor searchDescriptor,
+    public SearchCommentsSupervisedByTransaction(final Long supervisorId, final SCommentService commentService,
+            final SearchEntityDescriptor searchDescriptor,
             final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.supervisorId = supervisorId;

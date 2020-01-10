@@ -22,7 +22,6 @@ public interface Trigger {
 
     /**
      * Specify what to do when some job were not triggered in time.
-     * 
      */
     public enum MisfireRestartPolicy {
         /**
@@ -43,7 +42,7 @@ public interface Trigger {
 
     /**
      * Gets the name of the trigger
-     * 
+     *
      * @return the name of the trigger
      * @since 6.0
      */
@@ -51,7 +50,7 @@ public interface Trigger {
 
     /**
      * Returns when the trigger must start
-     * 
+     *
      * @return a date when the trigger must start
      * @since 6.0
      */
@@ -59,16 +58,15 @@ public interface Trigger {
 
     /**
      * The trigger of the highest priority will be executed first.
-     * 
+     *
      * @return the trigger's priority
      * @since 6.0
      */
     int getPriority();
 
     /**
-     * 
      * Tell the scheduler how to handle jobs that were not executed in time.
-     * 
+     *
      * @return the MisfireHandlingPolicy for this trigger
      */
     MisfireRestartPolicy getMisfireHandlingPolicy();

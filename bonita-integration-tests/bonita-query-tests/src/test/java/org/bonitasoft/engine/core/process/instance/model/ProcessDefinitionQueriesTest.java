@@ -20,6 +20,7 @@ import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -32,23 +33,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class ProcessDefinitionQueriesTest {
-
 
     private static final long PROCESS_ID = 45354312L;
     private static final long ROLE_ID = 222222L;
     @Inject
     private ProcessInstanceRepository repository;
     /*
-        Tests for queries:
-        getNumberOfSUserWhoCanStartProcess
-        searchSUserWhoCanStartProcess
+     * Tests for queries:
+     * getNumberOfSUserWhoCanStartProcess
+     * searchSUserWhoCanStartProcess
      */
-
-    
-
 
     @Test
     public void searchSUserWhoCanStartProcess_should_return_users_having_the_right_user_membership() {
@@ -57,9 +54,9 @@ public class ProcessDefinitionQueriesTest {
         long G3 = 333333L;
         long G4 = 333334L;
 
-        long R2=222225L;
-        long R3=222226L;
-        long R4=222227L;
+        long R2 = 222225L;
+        long R3 = 222226L;
+        long R4 = 222227L;
 
         final SUser john = repository.add(aUser().withUserName("john").withId(1L).build());
         final SUser paul = repository.add(aUser().withUserName("paul").withId(2L).build());
@@ -80,7 +77,6 @@ public class ProcessDefinitionQueriesTest {
         repository.add(aUserMembership().forUser(walter).memberOf(G2, R3).build());
         repository.add(aUserMembership().forUser(marie).memberOf(G3, R2).build());
         repository.add(aUserMembership().forUser(jobs).memberOf(G4, R4).build());
-
         final List<SUser> users = repository.searchSUserWhoCanStartProcess(PROCESS_ID);
 
         assertThat(users).hasSize(5).containsOnly(john, paul, walter, marie, helen);

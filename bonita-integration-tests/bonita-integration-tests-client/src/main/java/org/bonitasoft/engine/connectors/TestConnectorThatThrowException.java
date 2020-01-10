@@ -39,7 +39,8 @@ public class TestConnectorThatThrowException extends AbstractConnector {
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
         final Object inputParameter = getInputParameter(KIND);
-        if (!NORMAL.equals(inputParameter) && !RUNTIME.equals(inputParameter) && !NONE.equals(inputParameter) && !CONNECT.equals(inputParameter)) {
+        if (!NORMAL.equals(inputParameter) && !RUNTIME.equals(inputParameter) && !NONE.equals(inputParameter)
+                && !CONNECT.equals(inputParameter)) {
             throw new ConnectorValidationException("bad kind of exception");
         }
     }

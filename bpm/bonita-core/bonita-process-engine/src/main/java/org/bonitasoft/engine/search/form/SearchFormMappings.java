@@ -35,7 +35,8 @@ public class SearchFormMappings extends AbstractSearchEntity<FormMapping, SFormM
     private final FormMappingService formMappingService;
     private final ProcessDefinitionService processDefinitionService;
 
-    public SearchFormMappings(final FormMappingService formMappingService, final ProcessDefinitionService processDefinitionService,
+    public SearchFormMappings(final FormMappingService formMappingService,
+            final ProcessDefinitionService processDefinitionService,
             final SearchFormMappingDescriptor searchProfileDescriptor, final SearchOptions options) {
         super(searchProfileDescriptor, options);
         this.formMappingService = formMappingService;

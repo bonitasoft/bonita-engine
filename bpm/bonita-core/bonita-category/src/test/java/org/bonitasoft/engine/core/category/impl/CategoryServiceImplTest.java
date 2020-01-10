@@ -104,7 +104,8 @@ public class CategoryServiceImplTest {
     public final void getCategoryByIdThrowException() throws SBonitaReadException, SCategoryNotFoundException {
         // Given
         final long id = 456L;
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(SelectDescriptorBuilder.getCategory(id));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectById(SelectDescriptorBuilder.getCategory(id));
 
         // When
         categoryServiceImpl.getCategory(id);
@@ -126,10 +127,12 @@ public class CategoryServiceImplTest {
         final OrderByType order = OrderByType.ASC;
         final int fromIndex = 0;
         final int numberOfCategories = 1;
-        doReturn(sCategories).when(persistenceService).selectList(SelectDescriptorBuilder.getCategories(field, order, fromIndex, numberOfCategories));
+        doReturn(sCategories).when(persistenceService)
+                .selectList(SelectDescriptorBuilder.getCategories(field, order, fromIndex, numberOfCategories));
 
         // When
-        final List<SCategory> categories = categoryServiceImpl.getCategories(fromIndex, numberOfCategories, field, order);
+        final List<SCategory> categories = categoryServiceImpl.getCategories(fromIndex, numberOfCategories, field,
+                order);
 
         // Then
         Assert.assertEquals(sCategories, categories);
@@ -166,10 +169,12 @@ public class CategoryServiceImplTest {
         final int numberOfCategories = 1;
         final OrderByType order = OrderByType.ASC;
         doReturn(sCategories).when(persistenceService).selectList(
-                SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories, order));
+                SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories,
+                        order));
 
         // When
-        final List<SCategory> categoriesOfProcessDefinition = categoryServiceImpl.getCategoriesOfProcessDefinition(processDefinitionId, fromIndex,
+        final List<SCategory> categoriesOfProcessDefinition = categoryServiceImpl.getCategoriesOfProcessDefinition(
+                processDefinitionId, fromIndex,
                 numberOfCategories, order);
 
         // Then
@@ -184,14 +189,16 @@ public class CategoryServiceImplTest {
         final int numberOfCategories = 1;
         final OrderByType order = OrderByType.ASC;
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(
-                SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories, order));
+                SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories,
+                        order));
 
         // When
         categoryServiceImpl.getCategoriesOfProcessDefinition(processDefinitionId, fromIndex, numberOfCategories, order);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoryByName(java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoryByName(java.lang.String)}.
      *
      * @throws SCategoryNotFoundException
      * @throws SBonitaReadException
@@ -224,7 +231,8 @@ public class CategoryServiceImplTest {
     public final void getCategoryByNameThrowException() throws SBonitaReadException, SCategoryNotFoundException {
         // Given
         final String name = "name";
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(SelectDescriptorBuilder.getCategory(name));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getCategory(name));
 
         // When
         categoryServiceImpl.getCategoryByName(name);
@@ -240,7 +248,8 @@ public class CategoryServiceImplTest {
     public final void getNumberOfCategories() throws SBonitaReadException, SCategoryException {
         // Given
         final long numberOfCategories = 3L;
-        doReturn(numberOfCategories).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
+        doReturn(numberOfCategories).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
 
         // When
         final long result = categoryServiceImpl.getNumberOfCategories();
@@ -252,14 +261,16 @@ public class CategoryServiceImplTest {
     @Test(expected = SCategoryException.class)
     public final void getNumberOfCategoriesThrowException() throws SCategoryException, SBonitaReadException {
         // Given
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfElement("Category", SCategory.class));
 
         // When
         categoryServiceImpl.getNumberOfCategories();
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesOfProcess(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesOfProcess(long)}.
      *
      * @throws SCategoryException
      * @throws SBonitaReadException
@@ -269,7 +280,8 @@ public class CategoryServiceImplTest {
         // Given
         final long numberOfCategories = 3L;
         final long processDefinitionId = 1589L;
-        doReturn(numberOfCategories).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfCategoriesOfProcess(processDefinitionId));
+        doReturn(numberOfCategories).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfCategoriesOfProcess(processDefinitionId));
 
         // When
         final long result = categoryServiceImpl.getNumberOfCategoriesOfProcess(processDefinitionId);
@@ -282,14 +294,16 @@ public class CategoryServiceImplTest {
     public final void getNumberOfCategoriesOfProcessThrowException() throws SCategoryException, SBonitaReadException {
         // Given
         final long processDefinitionId = 1589L;
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfCategoriesOfProcess(processDefinitionId));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfCategoriesOfProcess(processDefinitionId));
 
         // When
         categoryServiceImpl.getNumberOfCategoriesOfProcess(processDefinitionId);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesUnrelatedToProcess(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesUnrelatedToProcess(long)}.
      *
      * @throws SCategoryException
      * @throws SBonitaReadException
@@ -299,17 +313,20 @@ public class CategoryServiceImplTest {
         // Given
         final long numberOfCategories = 3L;
         final long processDefinitionId = 1589L;
-        doReturn(numberOfCategories).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfCategoriesUnrelatedToProcess(processDefinitionId));
+        doReturn(numberOfCategories).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfCategoriesUnrelatedToProcess(processDefinitionId));
 
         // When
-        final long numberOfCategoriesUnrelatedToProcess = categoryServiceImpl.getNumberOfCategoriesUnrelatedToProcess(processDefinitionId);
+        final long numberOfCategoriesUnrelatedToProcess = categoryServiceImpl
+                .getNumberOfCategoriesUnrelatedToProcess(processDefinitionId);
 
         // Then
         Assert.assertEquals(numberOfCategories, numberOfCategoriesUnrelatedToProcess);
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getNumberOfCategoriesUnrelatedToProcessThrowException() throws SCategoryException, SBonitaReadException {
+    public final void getNumberOfCategoriesUnrelatedToProcessThrowException()
+            throws SCategoryException, SBonitaReadException {
         // Given
         final long processDefinitionId = 1589L;
         doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(
@@ -320,7 +337,8 @@ public class CategoryServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategorizedProcessIds(java.util.List)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategorizedProcessIds(java.util.List)}.
      *
      * @throws SCategoryException
      * @throws SBonitaReadException
@@ -331,7 +349,8 @@ public class CategoryServiceImplTest {
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
         final long numberOfCategories = 3L;
-        doReturn(numberOfCategories).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfCategorizedProcessIds(processIds));
+        doReturn(numberOfCategories).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfCategorizedProcessIds(processIds));
 
         // When
         final long numberOfCategorizedProcessIds = categoryServiceImpl.getNumberOfCategorizedProcessIds(processIds);
@@ -352,7 +371,8 @@ public class CategoryServiceImplTest {
     @Test
     public final void getNumberOfCategorizedProcessIdsWithEmptyList() throws SCategoryException {
         // When
-        final long numberOfCategorizedProcessIds = categoryServiceImpl.getNumberOfCategorizedProcessIds(new ArrayList<Long>());
+        final long numberOfCategorizedProcessIds = categoryServiceImpl
+                .getNumberOfCategorizedProcessIds(new ArrayList<Long>());
 
         // Then
         Assert.assertEquals(0, numberOfCategorizedProcessIds);
@@ -363,7 +383,8 @@ public class CategoryServiceImplTest {
         // Given
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(SelectDescriptorBuilder.getNumberOfCategorizedProcessIds(processIds));
+        doThrow(new SBonitaReadException("")).when(persistenceService)
+                .selectOne(SelectDescriptorBuilder.getNumberOfCategorizedProcessIds(processIds));
 
         // When
         categoryServiceImpl.getNumberOfCategorizedProcessIds(processIds);
@@ -382,19 +403,22 @@ public class CategoryServiceImplTest {
         final int fromIndex = 0;
         final int numberOfCategories = 10;
         final OrderByType order = OrderByType.ASC;
-        doReturn(sCategories).when(persistenceService).selectList(SelectDescriptorBuilder.getCategoriesUnrelatedToProcess(processDefinitionId, fromIndex,
-                numberOfCategories, order));
+        doReturn(sCategories).when(persistenceService)
+                .selectList(SelectDescriptorBuilder.getCategoriesUnrelatedToProcess(processDefinitionId, fromIndex,
+                        numberOfCategories, order));
 
         // When
-        final List<SCategory> categoriesUnrelatedToProcessDefinition = categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(processDefinitionId,
-                fromIndex, numberOfCategories, order);
+        final List<SCategory> categoriesUnrelatedToProcessDefinition = categoryServiceImpl
+                .getCategoriesUnrelatedToProcessDefinition(processDefinitionId,
+                        fromIndex, numberOfCategories, order);
 
         // Then
         Assert.assertEquals(sCategories, categoriesUnrelatedToProcessDefinition);
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getCategoriesUnrelatedToProcessDefinitionThrowException() throws SBonitaReadException, SCategoryException {
+    public final void getCategoriesUnrelatedToProcessDefinitionThrowException()
+            throws SBonitaReadException, SCategoryException {
         // Given
         final long processDefinitionId = 54894L;
         final int fromIndex = 0;
@@ -405,7 +429,8 @@ public class CategoryServiceImplTest {
                         numberOfCategories, order));
 
         // When
-        categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, fromIndex, numberOfCategories, order);
+        categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, fromIndex,
+                numberOfCategories, order);
     }
 
 }

@@ -44,7 +44,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if ("".equals(expression.getContent().trim())) {
-            throw new SInvalidExpressionException("The expression content cannot be empty. Expression : " + expression, expression.getName());
+            throw new SInvalidExpressionException("The expression content cannot be empty. Expression : " + expression,
+                    expression.getName());
         }
     }
 
@@ -54,7 +55,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public Object evaluate(final SExpression expression, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         Serializable result;
@@ -82,18 +84,24 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
             } else if (OffsetDateTime.class.getName().equals(returnType)) {
                 result = OffsetDateTime.parse(expressionContent);
             } else {
-                throw new SExpressionEvaluationException("Unknown return type: " + returnType + " for expression " + expression.getName() + " : "
-                        + expressionContent, expression.getName());
+                throw new SExpressionEvaluationException(
+                        "Unknown return type: " + returnType + " for expression " + expression.getName() + " : "
+                                + expressionContent,
+                        expression.getName());
             }
         } catch (final NumberFormatException e) {
-            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent, e,
+            throw new SExpressionEvaluationException(
+                    "The content of the expression \"" + expression.getName() + "\" is not a number :"
+                            + expressionContent,
+                    e,
                     expression.getName());
         }
         return result;
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context,
+            final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {

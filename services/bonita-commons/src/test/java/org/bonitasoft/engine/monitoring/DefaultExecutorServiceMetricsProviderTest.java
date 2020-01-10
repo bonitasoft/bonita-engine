@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.monitoring;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -26,8 +25,8 @@ import org.junit.Test;
 
 public class DefaultExecutorServiceMetricsProviderTest {
 
-
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(10));
+    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 100, TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(10));
     private MeterRegistry meterRegistry = new SimpleMeterRegistry();
     private DefaultExecutorServiceMetricsProvider defaultExecutorServiceMetricsProvider = new DefaultExecutorServiceMetricsProvider();
 

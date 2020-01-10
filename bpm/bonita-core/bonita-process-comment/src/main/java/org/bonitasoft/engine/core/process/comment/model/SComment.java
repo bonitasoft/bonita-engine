@@ -20,7 +20,6 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -41,6 +40,7 @@ import org.hibernate.annotations.Filter;
 @DiscriminatorColumn(name = "kind")
 @Table(name = "process_comment")
 public class SComment implements PersistentObject {
+
     public static final String ID_KEY = "id";
     public static final String USERID_KEY = "userId";
     public static final String PROCESSINSTANCEID_KEY = "processInstanceId";

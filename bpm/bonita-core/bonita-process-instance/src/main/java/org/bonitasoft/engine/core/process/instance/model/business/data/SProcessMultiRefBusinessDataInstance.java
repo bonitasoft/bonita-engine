@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import java.util.List;
+
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
@@ -31,7 +32,8 @@ import java.util.List;
 public class SProcessMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
 
     @ElementCollection
-    @CollectionTable(name = "multi_biz_data", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id"), @JoinColumn(name = "tenantid", referencedColumnName = "tenantid")})
+    @CollectionTable(name = "multi_biz_data", joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id"),
+            @JoinColumn(name = "tenantid", referencedColumnName = "tenantid") })
     @OrderColumn(name = "idx")
     @Column(name = "data_id")
     private List<Long> dataIds;

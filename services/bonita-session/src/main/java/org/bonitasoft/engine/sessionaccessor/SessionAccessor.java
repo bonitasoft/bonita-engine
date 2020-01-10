@@ -19,11 +19,11 @@ package org.bonitasoft.engine.sessionaccessor;
 public interface SessionAccessor extends ReadSessionAccessor {
 
     void setSessionInfo(long sessionId, long tenantId);
-    
+
     void setTenantId(long tenantId);
 
     void deleteSessionId();
-    
+
     void deleteTenantId();
 
     boolean isTenantSession();

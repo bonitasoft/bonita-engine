@@ -17,7 +17,6 @@ import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.awaitility.Awaitility;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -42,13 +40,12 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.hamcrest.core.IsCollectionContaining;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-// because of waituntil but its the only class where we use failed jobs... so i don't want to add a handler and so on only for jobs
+// because of waituntil but its the only class where we use failed jobs... so i don't want to add a handler and so on
+// only for jobs
 @SuppressWarnings("deprecation")
 public class JobExecutionIT extends CommonAPILocalIT {
 
@@ -77,7 +74,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
     }
 
     @Test
-    public void retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrent() throws Exception {
+    public void retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrent()
+            throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
         final Map<String, Serializable> parameters = new HashMap<>();
@@ -98,7 +96,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
             }
 
             //when
-            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), Collections.singletonMap("throwException", Boolean.FALSE));
+            getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(),
+                    Collections.singletonMap("throwException", Boolean.FALSE));
 
             //then
             assertJobWasExecutedWithSucess("ThrowsExceptionJob");
@@ -143,7 +142,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
 
         final List<FilterOption> filters = Collections
-                .singletonList(new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
+                .singletonList(
+                        new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
         final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
 
         final Callable<List<SJobDescriptor>> searchJobLogs = new Callable<List<SJobDescriptor>>() {
@@ -175,7 +175,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
             failedJob = await().until(() -> getProcessAPI().getFailedJobs(0, 100), hasSize(1)).get(0);
             assertThat(failedJob.getJobName()).isEqualTo("ThrowsExceptionJob");
             assertThat(failedJob.getDescription()).isEqualTo("Throw an exception when 'throwException'=true");
-            assertThat(failedJob.getLastMessage()).contains("org.bonitasoft.engine.scheduler.exception.SJobExecutionException: This job throws an arbitrary exception");
+            assertThat(failedJob.getLastMessage()).contains(
+                    "org.bonitasoft.engine.scheduler.exception.SJobExecutionException: This job throws an arbitrary exception");
             assertThat(failedJob.getNumberOfFailures()).isEqualTo(1);
         } finally {
             getCommandAPI().unregister("except");

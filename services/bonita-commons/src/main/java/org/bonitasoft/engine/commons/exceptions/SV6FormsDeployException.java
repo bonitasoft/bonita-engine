@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.commons.exceptions;
 
-
 /**
  * Thrown when a process fails to deploy because of V6 form presence in the bar to deploy.
  *

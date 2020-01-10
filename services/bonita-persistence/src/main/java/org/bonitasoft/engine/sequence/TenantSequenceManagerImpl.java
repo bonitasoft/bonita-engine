@@ -116,7 +116,7 @@ public class TenantSequenceManagerImpl {
 
     /**
      * get the next available id of a sequence and update in database its value
-     * 
+     *
      * @return the next available id of the sequence
      */
     private long setNewRange(final long sequenceId) throws SObjectNotFoundException {

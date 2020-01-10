@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 public interface FlowNodeExecutor extends ContainerExecutor {
 
     /**
-     * 
      * @param flowNodeInstance
      * @param executerId
      * @param executerSubstituteId
@@ -42,54 +41,58 @@ public interface FlowNodeExecutor extends ContainerExecutor {
      * @throws SFlowNodeExecutionException
      */
     FlowNodeState stepForward(SFlowNodeInstance flowNodeInstance,
-                              Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
+            Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
 
     /**
-     *  force the state of a flow node toa particular state
+     * force the state of a flow node toa particular state
+     *
      * @param flowNodeInstanceId
      * @param stateId
      */
     void setStateByStateId(long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
 
     /**
-     * 
      * @param childProcInst
      * @param childState
      * @param hasActionsToExecute
      * @throws SBonitaException
      * @since 6.1
      */
-    void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute) throws SBonitaException;
+    void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute)
+            throws SBonitaException;
 
     /**
-     * Archive the flow node instance given as parameter. Also archive all related object that needs to be archived as well.
-     * 
+     * Archive the flow node instance given as parameter. Also archive all related object that needs to be archived as
+     * well.
+     *
      * @param flowNodeInstance
-     *            The flow node instance to be archived.
+     *        The flow node instance to be archived.
      * @param deleteAfterArchive
      * @param processDefinitionId
-     *            the identifier of process definition
+     *        the identifier of process definition
      * @throws SActivityExecutionException
-     *             in case an error occurs
+     *         in case an error occurs
      * @since 6.1
      */
-    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, long processDefinitionId) throws SArchivingException;
+    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive,
+            long processDefinitionId) throws SArchivingException;
 
     /**
      * @param processDefinition
-     *            the process definition of the SFlowNodeInstance on which to execute the state.
+     *        the process definition of the SFlowNodeInstance on which to execute the state.
      * @param flowNodeInstance
-     *            the <code>SFlowNodeInstance</code> whose state has to be executed
+     *        the <code>SFlowNodeInstance</code> whose state has to be executed
      * @param state
-     *            the <code>FlowNodeState</code> to execute
+     *        the <code>FlowNodeState</code> to execute
      * @return the next <code>FlowNodeState</code>, after executing current state
      * @throws SActivityStateExecutionException
-     *             if an exception occurs when executing current state
+     *         if an exception occurs when executing current state
      * @throws SActivityExecutionException
-     *             if an exception occurs when retrieving next state
+     *         if an exception occurs when retrieving next state
      * @since 6.0
      */
-    StateCode executeState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, FlowNodeState state)
+    StateCode executeState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
+            FlowNodeState state)
             throws SActivityStateExecutionException, SActivityExecutionException;
 
 }

@@ -22,7 +22,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 
 public class SequenceDAO {
 
-
     static final String NEXTID = "nextid";
     static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE tenantid = ? AND id = ?";
 
@@ -69,7 +68,8 @@ public class SequenceDAO {
         }
     }
 
-    private long getNextId(final long id, final long tenantId, final ResultSet resultSet) throws SQLException, SObjectNotFoundException {
+    private long getNextId(final long id, final long tenantId, final ResultSet resultSet)
+            throws SQLException, SObjectNotFoundException {
         try {
             if (resultSet.next()) {
                 final long nextId = resultSet.getLong(NEXTID);
@@ -79,7 +79,8 @@ public class SequenceDAO {
                 }
 
                 if (resultSet.next()) {
-                    throw new SQLException("Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
+                    throw new SQLException(
+                            "Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
                 }
 
                 return nextId;

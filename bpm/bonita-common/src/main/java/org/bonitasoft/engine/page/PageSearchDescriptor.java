@@ -38,6 +38,4 @@ public class PageSearchDescriptor {
 
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
-
-
 }

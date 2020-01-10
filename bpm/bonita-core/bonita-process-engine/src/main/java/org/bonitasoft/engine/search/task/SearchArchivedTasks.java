@@ -32,8 +32,10 @@ public class SearchArchivedTasks extends AbstractArchivedHumanTaskInstanceSearch
 
     private final ActivityInstanceService activityInstanceService;
 
-    public SearchArchivedTasks(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final SearchArchivedHumanTaskInstanceDescriptor searchArchivedTasksDescriptor, final SearchOptions options) {
+    public SearchArchivedTasks(final ActivityInstanceService activityInstanceService,
+            final FlowNodeStateManager flowNodeStateManager,
+            final SearchArchivedHumanTaskInstanceDescriptor searchArchivedTasksDescriptor,
+            final SearchOptions options) {
         super(searchArchivedTasksDescriptor, options, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;
     }

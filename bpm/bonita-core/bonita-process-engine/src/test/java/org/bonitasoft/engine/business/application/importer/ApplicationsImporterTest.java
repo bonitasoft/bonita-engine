@@ -42,7 +42,8 @@ public class ApplicationsImporterTest {
     private ApplicationsImporter applicationsImporter;
 
     @Test
-    public void importApplications_should_create_applications_contained_in_xml_file_and_return_status() throws Exception {
+    public void importApplications_should_create_applications_contained_in_xml_file_and_return_status()
+            throws Exception {
         //given
         long createdBy = 5L;
 
@@ -59,7 +60,8 @@ public class ApplicationsImporterTest {
         given(applicationImporter.importApplication(node2, createdBy)).willReturn(status2);
 
         //when
-        List<ImportStatus> importStatus = applicationsImporter.importApplications("<applications/>".getBytes(), createdBy);
+        List<ImportStatus> importStatus = applicationsImporter.importApplications("<applications/>".getBytes(),
+                createdBy);
 
         //then
         assertThat(importStatus).containsExactly(status1, status2);

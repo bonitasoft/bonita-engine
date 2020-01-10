@@ -30,7 +30,8 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
  */
 public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
-    public UserTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
+    public UserTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final FlowElementContainerDefinitionImpl container,
             final String name, final String actorName) {
         super(container, processDefinitionBuilder, getUserTaskActivity(name, actorName));
     }
@@ -41,14 +42,16 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds a user filter on this user task.
-     * 
+     *
      * @param name filter name in this task.
      * @param userFilterId user filter identifier.
      * @param version user filter version.
      * @return
      */
-    public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId, final String version) {
-        return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version, (HumanTaskDefinitionImpl) getActivity());
+    public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId,
+            final String version) {
+        return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version,
+                (HumanTaskDefinitionImpl) getActivity());
     }
 
     /**
@@ -57,7 +60,8 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
      *
      * @param time how long (in milliseconds) this task is expected to take.
      * @return
-     * @deprecated use {@link org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder#addExpectedDuration(org.bonitasoft.engine.expression.Expression)}
+     * @deprecated use
+     *             {@link org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder#addExpectedDuration(org.bonitasoft.engine.expression.Expression)}
      */
     @Deprecated
     public UserTaskDefinitionBuilder addExpectedDuration(final long time) {
@@ -82,7 +86,7 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the task priority.
-     * 
+     *
      * @param priority task priority.
      * @return
      */
@@ -92,7 +96,8 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
     }
 
     public ContractDefinitionBuilder addContract() {
-        return new ContractDefinitionBuilder(getProcessBuilder(), getContainer(), (UserTaskDefinitionImpl) getActivity());
+        return new ContractDefinitionBuilder(getProcessBuilder(), getContainer(),
+                (UserTaskDefinitionImpl) getActivity());
     }
 
     public UserTaskDefinitionBuilder addContextEntry(String key, Expression expression) {

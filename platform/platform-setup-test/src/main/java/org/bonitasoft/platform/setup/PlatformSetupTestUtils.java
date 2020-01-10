@@ -42,7 +42,8 @@ import org.apache.commons.lang3.text.StrSubstitutor;
  */
 public class PlatformSetupTestUtils {
 
-    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile)
+            throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         outputFile.getParentFile().mkdirs();
         try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
@@ -64,7 +65,8 @@ public class PlatformSetupTestUtils {
         return new PumpStreamHandler(System.out, System.err, new ByteArrayInputStream(answer.getBytes()));
     }
 
-    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws IOException {
+    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder)
+            throws IOException {
         ZipEntry zipEntry;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
@@ -125,7 +127,8 @@ public class PlatformSetupTestUtils {
 
     public static Connection getJdbcConnection(File distFolder, String dbUser) throws IOException, SQLException {
         Properties properties = getDatabaseProperties(distFolder);
-        properties.put("h2.database.dir", distFolder.toPath().resolve(properties.getProperty("h2.database.dir")).toString());
+        properties.put("h2.database.dir",
+                distFolder.toPath().resolve(properties.getProperty("h2.database.dir")).toString());
         StrSubstitutor strSubstitutor = new StrSubstitutor(new HashMap(properties));
         return DriverManager.getConnection(strSubstitutor.replace(properties.getProperty("h2.url")),
                 dbUser != null ? dbUser : properties.getProperty("db.user"), properties.getProperty("db.password"));

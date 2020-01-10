@@ -13,20 +13,18 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SCustomUserInfoValueNotFoundException extends SIdentityException {
 
     private static final long serialVersionUID = 2269304406690155075L;
 
     public SCustomUserInfoValueNotFoundException(long id) {
-        super("No custom user info value found with id '" + id  + "'");
+        super("No custom user info value found with id '" + id + "'");
     }
 
     public SCustomUserInfoValueNotFoundException(long definitionId, long userId) {
-        super("No custom user info value found with definition id '" + definitionId + "' and user id '" + userId +"'");
+        super("No custom user info value found with definition id '" + definitionId + "' and user id '" + userId + "'");
     }
 }

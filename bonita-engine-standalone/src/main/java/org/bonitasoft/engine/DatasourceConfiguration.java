@@ -31,5 +31,4 @@ public class DatasourceConfiguration {
      */
     private int maxPoolSize;
 
-
 }

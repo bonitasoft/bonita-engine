@@ -38,12 +38,18 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, SPage.NAME));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, SPage.PROVIDED));
         pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, SPage.HIDDEN));
-        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, SPage.INSTALLATION_DATE));
-        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, SPage.LAST_MODIFICATION_DATE));
-        pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, SPage.INSTALLED_BY));
-        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, SPage.DISPLAY_NAME));
-        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE, new FieldDescriptor(SPage.class, SPage.CONTENT_TYPE));
-        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SPage.class, SPage.PROCESS_DEFINITION_ID));
+        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE,
+                new FieldDescriptor(SPage.class, SPage.INSTALLATION_DATE));
+        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE,
+                new FieldDescriptor(SPage.class, SPage.LAST_MODIFICATION_DATE));
+        pageKeys.put(PageSearchDescriptor.INSTALLED_BY,
+                new FieldDescriptor(SPage.class, SPage.INSTALLED_BY));
+        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SPage.class, SPage.DISPLAY_NAME));
+        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE,
+                new FieldDescriptor(SPage.class, SPage.CONTENT_TYPE));
+        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SPage.class, SPage.PROCESS_DEFINITION_ID));
 
         pageAllFields = new HashMap<>();
 

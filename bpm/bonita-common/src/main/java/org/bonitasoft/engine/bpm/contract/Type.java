@@ -16,9 +16,7 @@ package org.bonitasoft.engine.bpm.contract;
 /**
  * @author Matthieu Chaffotte
  * @since 7.0
- *
- *  All the default types accepted by the contract
- *
+ *        All the default types accepted by the contract
  */
 public enum Type {
     TEXT, BOOLEAN,
@@ -26,22 +24,22 @@ public enum Type {
      * Old java Date format. Maintained for compatibility reasons.
      */
     @Deprecated
-    DATE,
-    INTEGER, DECIMAL, BYTE_ARRAY, FILE, LONG,
+    DATE, INTEGER, DECIMAL, BYTE_ARRAY, FILE, LONG,
     /**
      * Date format following the ISO-8601 norm. Timezone-independent, stores a date. Ex: 1993-02-24.
      * Uses the java 1.8 LocalDate.class.
      */
     LOCALDATE,
     /**
-     * Date format following the ISO-8601 norm. Timezone-independent, stores a date, and a time. Ex: 1993-02-24 17:25:00.
+     * Date format following the ISO-8601 norm. Timezone-independent, stores a date, and a time. Ex: 1993-02-24
+     * 17:25:00.
      * The time is precise up to the nanosecond. Uses the java 1.8 LocalDateTime.class.
-      */
+     */
     LOCALDATETIME,
     /**
-     * Date format following the ISO-8601 norm. Timezone-dependent, stores a date, a time, and an Offset. Systematically rebased to the UTC
+     * Date format following the ISO-8601 norm. Timezone-dependent, stores a date, a time, and an Offset. Systematically
+     * rebased to the UTC
      * timezone by the engine. Ex: 1993-02-24 17:25:00Z. Uses the java 1.8 OffsetDateTime.class.
-     *
      */
     OFFSETDATETIME
 }

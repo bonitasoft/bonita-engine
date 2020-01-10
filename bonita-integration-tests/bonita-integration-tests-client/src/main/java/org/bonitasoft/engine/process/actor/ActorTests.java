@@ -18,10 +18,10 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ 
-    ProcessActorIT.class,
-    ImportActorMappingIT.class,
-    ExportActorMappingIT.class
+@SuiteClasses({
+        ProcessActorIT.class,
+        ImportActorMappingIT.class,
+        ExportActorMappingIT.class
 })
 public class ActorTests {
 

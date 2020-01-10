@@ -21,16 +21,15 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Bonita Engine Spring configuration at platform-level
- * 
+ *
  * @author Danila Mazour
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  */
 @Configuration
-@Import({DataSourceConfiguration.class,
-        MonitoringConfiguration.class})
+@Import({ DataSourceConfiguration.class,
+        MonitoringConfiguration.class })
 @ComponentScan("org.bonitasoft.engine.platform")
 public class EnginePlatformConfiguration {
-
 
 }

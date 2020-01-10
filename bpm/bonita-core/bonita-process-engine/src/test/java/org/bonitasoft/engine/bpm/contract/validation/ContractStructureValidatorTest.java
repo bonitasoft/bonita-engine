@@ -118,7 +118,8 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(
                         aComplexInput().withName("complex").withMultiple(true)
-                                .withInput(aSimpleInput(TEXT).withName("name").build(), aSimpleInput(SType.INTEGER).withName("value").build()))
+                                .withInput(aSimpleInput(TEXT).withName("name").build(),
+                                        aSimpleInput(SType.INTEGER).withName("value").build()))
                 .build();
 
         final List<Map<String, Serializable>> complexList = new ArrayList<>();
@@ -141,7 +142,8 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(TEXT).withName("aText"))
                 .withInput(aSimpleInput(BOOLEAN).withName("aBoolean"))
-                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
+                .build();
         final Map<String, Serializable> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true)
@@ -169,7 +171,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
+                .build();
 
         try {
             validator.validate(contract, new HashMap<String, Serializable>());
@@ -183,7 +186,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_leaves_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
+                .build();
         final Map<String, Serializable> map = aMap().put("complex", aMap().build()).build();
         try {
             validator.validate(contract, map);
@@ -196,7 +200,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_not_check_children_when_complex_input_is_null() throws Exception {
         // Given
-        final SInputDefinition complex = aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")).build();
+        final SInputDefinition complex = aComplexInput().withName("complex")
+                .withInput(aSimpleInput(SType.TEXT).withName("embedded")).build();
         final SContractDefinition contract = aContract().withInput(complex).build();
         final Map<String, Serializable> inputs = Collections.singletonMap("complex", null);
         final ContractStructureValidator spy = spy(this.validator);
@@ -217,9 +222,12 @@ public class ContractStructureValidatorTest {
     public void should_call_type_validator_when_types_are_not_valid() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
-                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
-        doReturn(false).when(typeValidator).validate(any(SInputDefinition.class), any(Object.class), any(ErrorReporter.class));
-        final Map<String, Serializable> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
+                .build();
+        doReturn(false).when(typeValidator).validate(any(SInputDefinition.class), any(Object.class),
+                any(ErrorReporter.class));
+        final Map<String, Serializable> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger")
+                .put("complex", "thisIsNotAComplex").build();
 
         validator.validate(contract, taskInputs);
 
@@ -230,14 +238,16 @@ public class ContractStructureValidatorTest {
     public void validate_should_handle_null_inputs_map_argument_as_empty_map() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
-                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")))
+                .build();
         final ErrorReporter errorReporter = new ErrorReporter();
         errorReporter.addError("plop");
         try {
             validator.validate(contract, null);
             fail("expected exception has not been thrown");
         } catch (final SContractViolationException e) {
-            assertThat(e.getExplanations()).containsOnly("Expected input [anInteger] is missing", "Expected input [complex] is missing");
+            assertThat(e.getExplanations()).containsOnly("Expected input [anInteger] is missing",
+                    "Expected input [complex] is missing");
         }
     }
 
@@ -258,9 +268,12 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_not_throw_exception_for_present_multiple_complex_input_with_empty_list() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(aComplexInput().withName("complex").withMultiple(true).withInput(aSimpleInput(TEXT).withName("name").build())).build();
+                .withInput(aComplexInput().withName("complex").withMultiple(true)
+                        .withInput(aSimpleInput(TEXT).withName("name").build()))
+                .build();
 
-        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) Collections.emptyList()).build();
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) Collections.emptyList())
+                .build();
 
         validator.validate(contract, taskInputs);
     }

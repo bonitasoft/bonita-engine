@@ -18,14 +18,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
@@ -37,16 +35,24 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
         keys = new HashMap<>(13);
         keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, SApplication.ID));
         keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, SApplication.TOKEN));
-        keys.put(ApplicationSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplication.class, SApplication.DISPLAY_NAME));
+        keys.put(ApplicationSearchDescriptor.DISPLAY_NAME,
+                new FieldDescriptor(SApplication.class, SApplication.DISPLAY_NAME));
         keys.put(ApplicationSearchDescriptor.VERSION, new FieldDescriptor(SApplication.class, SApplication.VERSION));
-        keys.put(ApplicationSearchDescriptor.ICON_PATH, new FieldDescriptor(SApplication.class, SApplication.ICON_PATH));
-        keys.put(ApplicationSearchDescriptor.CREATION_DATE, new FieldDescriptor(SApplication.class, SApplication.CREATION_DATE));
-        keys.put(ApplicationSearchDescriptor.CREATED_BY, new FieldDescriptor(SApplication.class, SApplication.CREATED_BY));
-        keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE, new FieldDescriptor(SApplication.class, SApplication.LAST_UPDATE_DATE));
-        keys.put(ApplicationSearchDescriptor.UPDATED_BY, new FieldDescriptor(SApplication.class, SApplication.UPDATED_BY));
+        keys.put(ApplicationSearchDescriptor.ICON_PATH,
+                new FieldDescriptor(SApplication.class, SApplication.ICON_PATH));
+        keys.put(ApplicationSearchDescriptor.CREATION_DATE,
+                new FieldDescriptor(SApplication.class, SApplication.CREATION_DATE));
+        keys.put(ApplicationSearchDescriptor.CREATED_BY,
+                new FieldDescriptor(SApplication.class, SApplication.CREATED_BY));
+        keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE,
+                new FieldDescriptor(SApplication.class, SApplication.LAST_UPDATE_DATE));
+        keys.put(ApplicationSearchDescriptor.UPDATED_BY,
+                new FieldDescriptor(SApplication.class, SApplication.UPDATED_BY));
         keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, SApplication.STATE));
-        keys.put(ApplicationSearchDescriptor.PROFILE_ID, new FieldDescriptor(SApplication.class, SApplication.PROFILE_ID));
-        keys.put(ApplicationSearchDescriptor.LAYOUT_ID, new FieldDescriptor(SApplication.class, SApplication.LAYOUT_ID));
+        keys.put(ApplicationSearchDescriptor.PROFILE_ID,
+                new FieldDescriptor(SApplication.class, SApplication.PROFILE_ID));
+        keys.put(ApplicationSearchDescriptor.LAYOUT_ID,
+                new FieldDescriptor(SApplication.class, SApplication.LAYOUT_ID));
         keys.put(ApplicationSearchDescriptor.THEME_ID, new FieldDescriptor(SApplication.class, SApplication.THEME_ID));
 
         allFields = new HashMap<>(1);

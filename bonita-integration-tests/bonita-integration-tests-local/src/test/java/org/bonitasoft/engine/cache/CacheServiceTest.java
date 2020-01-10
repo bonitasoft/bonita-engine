@@ -39,11 +39,10 @@ public class CacheServiceTest {
     protected static final String ETERNAL_CACHE = "ETERNAL_CACHE";
     private static final String TEST1 = "test1";// with copy
     private static final String TEST2 = "test2";// without copy
-	private static final String ONE_ELEMENT_IN_MEMORY = "ONE_ELEMENT_IN_MEMORY";
-	private static final String ONE_ELEMENT_IN_MEMORY_ONLY = "ONE_ELEMENT_IN_MEMORY_ONLY";
+    private static final String ONE_ELEMENT_IN_MEMORY = "ONE_ELEMENT_IN_MEMORY";
+    private static final String ONE_ELEMENT_IN_MEMORY_ONLY = "ONE_ELEMENT_IN_MEMORY_ONLY";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheServiceTest.class);
-
 
     private CacheService cacheService;
 
@@ -102,12 +101,13 @@ public class CacheServiceTest {
 
         final CacheConfiguration cacheWithOneElementInMemory = createOneElementInMemoryCacheConfiguration();
         configurationsList.add(cacheWithOneElementInMemory);
-        
+
         final CacheConfiguration cacheWithOneElementInMemoryOnly = createOneElementInMemoryOnlyCacheConfiguration();
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
         return new EhCacheCacheService(mock(TechnicalLoggerService.class), configurationsList, new CacheConfiguration(),
-                "target", 1){
+                "target", 1) {
+
             @Override
             protected String getCacheManagerName() {
                 //override the default name so it works in integration tests
@@ -116,8 +116,8 @@ public class CacheServiceTest {
         };
     }
 
-	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {
-		final CacheConfiguration cacheWithOneElementInMemory = new CacheConfiguration();
+    private CacheConfiguration createOneElementInMemoryCacheConfiguration() {
+        final CacheConfiguration cacheWithOneElementInMemory = new CacheConfiguration();
         cacheWithOneElementInMemory.setName(ONE_ELEMENT_IN_MEMORY);
         cacheWithOneElementInMemory.setTimeToLiveSeconds(1);
         cacheWithOneElementInMemory.setMaxElementsInMemory(1);
@@ -125,11 +125,11 @@ public class CacheServiceTest {
         cacheWithOneElementInMemory.setEternal(false);
         cacheWithOneElementInMemory.setCopyOnRead(true);
         cacheWithOneElementInMemory.setCopyOnWrite(true);
-		return cacheWithOneElementInMemory;
-	}
+        return cacheWithOneElementInMemory;
+    }
 
-	private CacheConfiguration createOneElementInMemoryOnlyCacheConfiguration() {
-		final CacheConfiguration cacheWithOneElementInMemoryOnly = new CacheConfiguration();
+    private CacheConfiguration createOneElementInMemoryOnlyCacheConfiguration() {
+        final CacheConfiguration cacheWithOneElementInMemoryOnly = new CacheConfiguration();
         cacheWithOneElementInMemoryOnly.setName(ONE_ELEMENT_IN_MEMORY_ONLY);
         cacheWithOneElementInMemoryOnly.setTimeToLiveSeconds(1);
         cacheWithOneElementInMemoryOnly.setMaxElementsInMemory(1);
@@ -137,8 +137,8 @@ public class CacheServiceTest {
         cacheWithOneElementInMemoryOnly.setEternal(false);
         cacheWithOneElementInMemoryOnly.setCopyOnRead(true);
         cacheWithOneElementInMemoryOnly.setCopyOnWrite(true);
-		return cacheWithOneElementInMemoryOnly;
-	}
+        return cacheWithOneElementInMemoryOnly;
+    }
 
     @Test
     public void shortTimeoutConfig() throws Exception {
@@ -283,18 +283,20 @@ public class CacheServiceTest {
         for (int i = 0; i < j; i++) {
             cacheService.store(ONE_ELEMENT_IN_MEMORY, "testLotOfItems" + i, "value" + i);
         }
-       
-        assertEquals("Not all elements were added with the overflow", cacheSize + j, cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY));
+
+        assertEquals("Not all elements were added with the overflow", cacheSize + j,
+                cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY));
     }
-    
+
     @Test
     public void testPutLotOfItemsWithOverflowInMemoryOnly() throws SCacheException, InterruptedException {
         final int j = 2;
         for (int i = 0; i < j; i++) {
             cacheService.store(ONE_ELEMENT_IN_MEMORY_ONLY, "testLotOfItems" + i, "value" + i);
         }
-       
-        assertEquals("Too many elements added although limited memory.", 1, cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY_ONLY));
+
+        assertEquals("Too many elements added although limited memory.", 1,
+                cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY_ONLY));
     }
 
     @SuppressWarnings("unchecked")

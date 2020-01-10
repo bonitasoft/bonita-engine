@@ -32,7 +32,8 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
  */
 public class SelectDescriptorBuilder {
 
-    public static SelectListDescriptor<SMappedDocument> getDocumentMappingsForProcessInstance(final long processInstanceId, final int fromIndex,
+    public static SelectListDescriptor<SMappedDocument> getDocumentMappingsForProcessInstance(
+            final long processInstanceId, final int fromIndex,
             final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
         QueryOptions queryOptions;
         String queryName = "getSMappedDocumentOfProcess";
@@ -47,7 +48,8 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<>(queryName, parameters, SMappedDocument.class, queryOptions);
     }
 
-    public static SelectOneDescriptor<SMappedDocument> getSMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName) {
+    public static SelectOneDescriptor<SMappedDocument> getSMappedDocumentOfProcessWithName(final long processInstanceId,
+            final String documentName) {
         final Map<String, Object> parameters = new HashMap<>(2);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
@@ -60,7 +62,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<>("getNumberOfSMappedDocumentOfProcess", parameters, SDocument.class);
     }
 
-    public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName,
+    public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(
+            final long processInstanceId, final String documentName,
             final long time) {
         final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
@@ -80,7 +83,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<>("getArchivedVersionOfDocument", parameters, SAMappedDocument.class);
     }
 
-    public static SelectListDescriptor<SMappedDocument> getDocumentList(String name, long processInstanceId, QueryOptions queryOptions) {
+    public static SelectListDescriptor<SMappedDocument> getDocumentList(String name, long processInstanceId,
+            QueryOptions queryOptions) {
         final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);
@@ -88,7 +92,8 @@ public class SelectDescriptorBuilder {
                 queryOptions);
     }
 
-    public static SelectListDescriptor<SAMappedDocument> getArchivedDocumentList(String name, long processInstanceId, QueryOptions queryOptions, long time) {
+    public static SelectListDescriptor<SAMappedDocument> getArchivedDocumentList(String name, long processInstanceId,
+            QueryOptions queryOptions, long time) {
         final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);
@@ -97,7 +102,8 @@ public class SelectDescriptorBuilder {
                 queryOptions);
     }
 
-    public static SelectListDescriptor<SMappedDocument> getDocumentListCreatedBefore(String name, long processInstanceId, QueryOptions queryOptions, long time) {
+    public static SelectListDescriptor<SMappedDocument> getDocumentListCreatedBefore(String name,
+            long processInstanceId, QueryOptions queryOptions, long time) {
         final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);

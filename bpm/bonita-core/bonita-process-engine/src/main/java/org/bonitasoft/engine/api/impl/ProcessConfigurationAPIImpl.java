@@ -52,7 +52,8 @@ public class ProcessConfigurationAPIImpl {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService, getTenantAccessor().getProcessDefinitionService(),
+        final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService,
+                getTenantAccessor().getProcessDefinitionService(),
                 searchEntitiesDescriptor.getSearchFormMappingDescriptor(),
                 searchOptions);
         try {
@@ -66,8 +67,9 @@ public class ProcessConfigurationAPIImpl {
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
-            return ModelConvertor.toFormMapping(formMappingService.get(formMappingId), new FormRequiredAnalyzer(getTenantAccessor()
-                    .getProcessDefinitionService()));
+            return ModelConvertor.toFormMapping(formMappingService.get(formMappingId),
+                    new FormRequiredAnalyzer(getTenantAccessor()
+                            .getProcessDefinitionService()));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {

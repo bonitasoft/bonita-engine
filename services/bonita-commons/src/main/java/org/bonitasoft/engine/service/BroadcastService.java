@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Service allowing to broadcast a call made on services to the other nodes of a Cluster
- * 
+ *
  * @author Baptiste Mesta
  */
 public interface BroadcastService {
@@ -58,6 +58,7 @@ public interface BroadcastService {
      */
     <T> Future<Map<String, TaskResult<T>>> executeOnOthers(Callable<T> callable, Long tenantId);
 
-    <T> Map<String, TaskResult<T>> executeOnOthersAndWait(Callable<T> callable, Long tenantId) throws TimeoutException, InterruptedException, ExecutionException;
+    <T> Map<String, TaskResult<T>> executeOnOthersAndWait(Callable<T> callable, Long tenantId)
+            throws TimeoutException, InterruptedException, ExecutionException;
 
 }

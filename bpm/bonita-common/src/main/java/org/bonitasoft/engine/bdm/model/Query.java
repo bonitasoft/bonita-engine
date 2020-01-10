@@ -107,7 +107,7 @@ public class Query {
         return List.class.getName().equals(returnType);
     }
 
-    public boolean isCountQuery(){
+    public boolean isCountQuery() {
         return Long.class.getName().equals(returnType);
     }
 

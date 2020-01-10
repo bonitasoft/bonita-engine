@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.WeakHashMap;
+import javassist.util.proxy.ProxyFactory;
 
+import com.company.pojo.Employee;
 import org.bonitasoft.engine.bdm.Entity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.company.pojo.Employee;
-
-import javassist.util.proxy.ProxyFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProxyCacheManagerTest {

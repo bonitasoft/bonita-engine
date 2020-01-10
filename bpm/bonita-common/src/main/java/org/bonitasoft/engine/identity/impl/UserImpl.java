@@ -260,7 +260,8 @@ public class UserImpl implements User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, password, userName, iconId, title, jobTitle, creationDate, createdBy, lastUpdate, lastConnection,
+        return Objects.hash(id, firstName, lastName, password, userName, iconId, title, jobTitle, creationDate,
+                createdBy, lastUpdate, lastConnection,
                 managerUserName, managerUserId, enabled);
     }
 }

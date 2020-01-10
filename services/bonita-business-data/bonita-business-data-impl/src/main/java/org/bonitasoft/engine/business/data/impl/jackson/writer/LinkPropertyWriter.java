@@ -15,11 +15,6 @@ package org.bonitasoft.engine.business.data.impl.jackson.writer;
 
 import java.util.LinkedHashSet;
 
-import org.bonitasoft.engine.business.data.impl.jackson.utils.Link;
-import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -28,6 +23,10 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.ser.VirtualBeanPropertyWriter;
 import com.fasterxml.jackson.databind.util.Annotations;
+import org.bonitasoft.engine.business.data.impl.jackson.utils.Link;
+import org.bonitasoft.engine.business.data.impl.jackson.utils.LinkUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkPropertyWriter extends VirtualBeanPropertyWriter {
 
@@ -53,8 +52,8 @@ public class LinkPropertyWriter extends VirtualBeanPropertyWriter {
 
     @Override
     public VirtualBeanPropertyWriter withConfig(MapperConfig<?> config,
-                                                AnnotatedClass declaringClass, BeanPropertyDefinition propDef,
-                                                JavaType type) {
+            AnnotatedClass declaringClass, BeanPropertyDefinition propDef,
+            JavaType type) {
         return new LinkPropertyWriter(propDef, declaringClass.getAnnotations(), type);
     }
 

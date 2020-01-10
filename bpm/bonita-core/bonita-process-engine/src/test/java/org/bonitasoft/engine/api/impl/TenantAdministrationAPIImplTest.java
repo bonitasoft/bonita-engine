@@ -75,8 +75,8 @@ public class TenantAdministrationAPIImplTest {
         doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
         doReturn(userTransactionService).when(tenantServiceAccessor).getUserTransactionService();
 
-
-        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService).executeInTransaction(any());
+        doAnswer(invocation -> ((Callable) invocation.getArgument(0)).call()).when(userTransactionService)
+                .executeInTransaction(any());
         when(platformServiceAccessor.getTenantServiceAccessor(17)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
@@ -90,7 +90,8 @@ public class TenantAdministrationAPIImplTest {
         final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
                 || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
 
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt")
+        assertThat(present).as(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt")
                 .isTrue();
     }
 
@@ -101,7 +102,8 @@ public class TenantAdministrationAPIImplTest {
         final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
                 || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
 
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt")
+        assertThat(present).as(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt")
                 .isTrue();
     }
 
@@ -122,15 +124,14 @@ public class TenantAdministrationAPIImplTest {
         verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
     }
 
-
-
     @Test
     public void installBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
         final Method method = TenantAdministrationAPIImpl.class.getMethod("installBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
+        assertThat(present).as(
+                "Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
                 .isTrue();
     }
 
@@ -140,7 +141,9 @@ public class TenantAdministrationAPIImplTest {
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.onlyAvailableWhenPaused();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'").isTrue();
+        assertThat(present).as(
+                "Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'")
+                .isTrue();
     }
 
     @Test
@@ -184,7 +187,8 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void getTenantResource_should_return_NONE_if_exception() throws Exception {
         // Given
-        doThrow(SBonitaReadException.class).when(tenantResourcesService).getSingleLightResource(any(TenantResourceType.class));
+        doThrow(SBonitaReadException.class).when(tenantResourcesService)
+                .getSingleLightResource(any(TenantResourceType.class));
 
         // When
         final TenantResource tenantResource = tenantManagementAPI.getTenantResource(BDM);

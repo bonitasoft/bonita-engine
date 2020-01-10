@@ -23,7 +23,6 @@ import org.junit.Test;
 
 public class APICallContextTest {
 
-
     @Test
     public void getFilters() {
         final APICallContext apiCallContext = new APICallContext();
@@ -82,7 +81,7 @@ public class APICallContextTest {
 
         assertThat(filters).containsOnly(entry("state", "ready"));
     }
-    
+
     @Test
     public void getFilters_with_corrupt_filters_not_encoded() {
         final APICallContext apiCallContext = new APICallContext();
@@ -92,7 +91,7 @@ public class APICallContextTest {
 
         assertThat(filters).containsOnly(entry("state", "ready"));
     }
-    
+
     @Test
     public void getFilters_with_value_not_encoded() {
         final APICallContext apiCallContext = new APICallContext();
@@ -112,7 +111,7 @@ public class APICallContextTest {
 
         assertThat(searchTerm).isEqualTo("toto");
     }
-    
+
     @Test
     public void should_return_allparameters() {
         final APICallContext apiCallContext = new APICallContext();
@@ -120,12 +119,12 @@ public class APICallContextTest {
 
         final Map<String, String[]> parameters = apiCallContext.getParameters();
 
-        assertThat(parameters).contains(entry("p", new String[]{ "0" }));
-        assertThat(parameters).contains(entry("c", new String[]{ "10" }));
-        assertThat(parameters).contains(entry("o", new String[]{ "priority%20DESC" }));
-        assertThat(parameters).contains(entry("f", new String[]{ "state%3dready", "user_id%3d3" }));
-        assertThat(parameters).contains(entry("d", new String[]{ "processId" }));
-        assertThat(parameters).contains(entry("param", new String[]{ "1" }));
+        assertThat(parameters).contains(entry("p", new String[] { "0" }));
+        assertThat(parameters).contains(entry("c", new String[] { "10" }));
+        assertThat(parameters).contains(entry("o", new String[] { "priority%20DESC" }));
+        assertThat(parameters).contains(entry("f", new String[] { "state%3dready", "user_id%3d3" }));
+        assertThat(parameters).contains(entry("d", new String[] { "processId" }));
+        assertThat(parameters).contains(entry("param", new String[] { "1" }));
     }
 
     @Test
@@ -246,8 +245,10 @@ public class APICallContextTest {
         apiCallContext.setResourceId("125");
 
         assertThat(apiCallContext).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125"));
-        assertThat(apiCallContext.hashCode()).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").hashCode());
-        assertThat(apiCallContext.toString()).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").toString());
+        assertThat(apiCallContext.hashCode())
+                .isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").hashCode());
+        assertThat(apiCallContext.toString())
+                .isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").toString());
     }
 
 }

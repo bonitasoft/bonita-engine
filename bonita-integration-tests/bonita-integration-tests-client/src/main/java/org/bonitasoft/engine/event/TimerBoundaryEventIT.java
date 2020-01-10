@@ -32,7 +32,8 @@ public class TimerBoundaryEventIT extends AbstractEventIT {
         final String nonInterruptExceptionTaskName = "afterNonInterrupt";
         final String interruptTimerName = "interruptTimer";
         final String nonInterruptTimerName = "nonInterruptTimer";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(100, nonInterruptingTimer,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(100,
+                nonInterruptingTimer,
                 taskWithBoundaryName,
                 interruptExceptionTaskName, nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
 
@@ -58,7 +59,8 @@ public class TimerBoundaryEventIT extends AbstractEventIT {
         final String nonInterruptExceptionTaskName = "afterNonInterrupt";
         final String interruptTimerName = "interruptTimer";
         final String nonInterruptTimerName = "nonInterruptTimer";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(1000, 100, taskWithBoundaryName,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(1000,
+                100, taskWithBoundaryName,
                 interruptExceptionTaskName,
                 nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
 

@@ -30,12 +30,14 @@ public class ApplicationsImporter {
     private final ApplicationContainerImporter containerImporter;
     private final ApplicationImporter applicationImporter;
 
-    public ApplicationsImporter(ApplicationContainerImporter containerImporter, ApplicationImporter applicationImporter) {
+    public ApplicationsImporter(ApplicationContainerImporter containerImporter,
+            ApplicationImporter applicationImporter) {
         this.containerImporter = containerImporter;
         this.applicationImporter = applicationImporter;
     }
 
-    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy) throws ImportException, AlreadyExistsException {
+    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy)
+            throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = containerImporter.importXML(xmlContent);
         ArrayList<ImportStatus> importStatus = new ArrayList<>(applicationNodeContainer.getApplications().size());
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {

@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.compiler.CompilationProgress;
 /**
  * CompilationProgress which do nothing
  * Used by JdtCompiler
- * 
+ *
  * @author Colin PUY
  */
 public class DummyCompilationProgress extends CompilationProgress {

@@ -153,13 +153,14 @@ public interface FlowElementBuilder {
      * <p>
      * Must also add connector dependencies and connector implementation descriptor
      * <p>
-     * 
+     *
      * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
      * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
      * @param name
      *        The name the connector instance will use
      * @param connectorId
-     *        The id of the Connector definition (connector implementation added in {@link org.bonitasoft.engine.bpm.bar.BusinessArchive} must match this id in
+     *        The id of the Connector definition (connector implementation added in
+     *        {@link org.bonitasoft.engine.bpm.bar.BusinessArchive} must match this id in
      *        definitionId
      * @param version
      *        The version of the Connector definition
@@ -167,7 +168,8 @@ public interface FlowElementBuilder {
      *        {@link ConnectorEvent} on which the connector will be triggered
      * @return
      */
-    ConnectorDefinitionBuilder addConnector(String name, String connectorId, String version, ConnectorEvent activationEvent);
+    ConnectorDefinitionBuilder addConnector(String name, String connectorId, String version,
+            ConnectorEvent activationEvent);
 
     /**
      * Adds an {@link org.bonitasoft.engine.bpm.flownode.UserTaskDefinition} on this element
@@ -243,7 +245,8 @@ public interface FlowElementBuilder {
      * @param target
      *        The target element name
      * @param condition
-     *        The transition condition. The transition is taken if and only if the expression is evaluated to {@link Boolean#TRUE}.
+     *        The transition condition. The transition is taken if and only if the expression is evaluated to
+     *        {@link Boolean#TRUE}.
      * @return
      */
     TransitionDefinitionBuilder addTransition(String source, String target, Expression condition);

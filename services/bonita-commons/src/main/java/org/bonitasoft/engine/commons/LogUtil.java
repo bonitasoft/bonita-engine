@@ -14,8 +14,9 @@
 package org.bonitasoft.engine.commons;
 
 /**
- * This class is for Add call to techinalLoggerService.log with severity TRACE in all Service Implementation public method
- * 
+ * This class is for Add call to techinalLoggerService.log with severity TRACE in all Service Implementation public
+ * method
+ *
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  * @since 6.0
@@ -24,11 +25,11 @@ public class LogUtil {
 
     /**
      * Get the log message on enter of the method
-     * 
+     *
      * @param classes
-     *            class name
+     *        class name
      * @param methodName
-     *            method name
+     *        method name
      * @return log message with String type
      */
     public static String getLogBeforeMethod(final Object classes, final String methodName) {
@@ -38,11 +39,11 @@ public class LogUtil {
 
     /**
      * Get the log message before quitting the method
-     * 
+     *
      * @param classes
-     *            class name
+     *        class name
      * @param methodName
-     *            method name
+     *        method name
      * @return log message with String type
      */
     public static String getLogAfterMethod(final Object classes, final String methodName) {
@@ -52,13 +53,13 @@ public class LogUtil {
 
     /**
      * Get the log message in each catch block
-     * 
+     *
      * @param classes
-     *            class name
+     *        class name
      * @param methodName
-     *            method name
+     *        method name
      * @param e
-     *            Exception
+     *        Exception
      * @return log message with String type
      */
     public static String getLogOnExceptionMethod(final Object classes, final String methodName, final Exception e) {
@@ -68,13 +69,14 @@ public class LogUtil {
 
     /**
      * Get the log message in each catch block
-     * 
+     *
      * @param classes
      * @param methodName
      * @param exceptionMessage
      * @return log message with String type
      */
-    public static String getLogOnExceptionMethod(final Object classes, final String methodName, final String exceptionMessage) {
+    public static String getLogOnExceptionMethod(final Object classes, final String methodName,
+            final String exceptionMessage) {
         final String serviceName = classes.toString();
         return "Quitting method " + methodName + " on Service " + serviceName + " with exception" + exceptionMessage;
     }

@@ -51,9 +51,10 @@ public class DocumentInitialValueArtifactManagerTest {
     @Test
     public void deploy_should_call_resourceService_add_on_each_resource() throws Exception {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.addDocumentResource(new BarResource("myDoc.pdf",  new byte[] { 0 }));
+        businessArchiveBuilder.addDocumentResource(new BarResource("myDoc.pdf", new byte[] { 0 }));
         businessArchiveBuilder.addDocumentResource(new BarResource("myDoc2.pdf", new byte[] { 1 }));
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("tata", "toto").done());
+        businessArchiveBuilder
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("tata", "toto").done());
         final SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("tata", "toto");
         processDefinition.setId(PROCESS_ID);
 
@@ -66,10 +67,14 @@ public class DocumentInitialValueArtifactManagerTest {
     @Test
     public void exportBusinessArchive_should_export_only_initial_documents() throws Exception {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("tata", "toto").done());
+        businessArchiveBuilder
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("tata", "toto").done());
         doReturn(getBarResources()).when(processResourcesService).get(PROCESS_ID, BARResourceType.DOCUMENT, 0, 10);
-        doReturn(Collections.singletonList(new SBARResource("10.pdf", BARResourceType.DOCUMENT, PROCESS_ID, new byte[] { 10 }))).when(
-                processResourcesService).get(PROCESS_ID, BARResourceType.DOCUMENT, 10, 10);
+        doReturn(Collections
+                .singletonList(new SBARResource("10.pdf", BARResourceType.DOCUMENT, PROCESS_ID, new byte[] { 10 })))
+                        .when(
+                                processResourcesService)
+                        .get(PROCESS_ID, BARResourceType.DOCUMENT, 10, 10);
 
         documentInitialValueDependencyManager.exportToBusinessArchive(PROCESS_ID, businessArchiveBuilder);
 
@@ -86,7 +91,8 @@ public class DocumentInitialValueArtifactManagerTest {
     List<SBARResource> getBarResources() {
         final List<SBARResource> sbarResources = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            final SBARResource sbarResource = new SBARResource(i + ".pdf", BARResourceType.DOCUMENT, PROCESS_ID, new byte[] { (byte) i });
+            final SBARResource sbarResource = new SBARResource(i + ".pdf", BARResourceType.DOCUMENT, PROCESS_ID,
+                    new byte[] { (byte) i });
             sbarResources.add(sbarResource);
         }
         return sbarResources;

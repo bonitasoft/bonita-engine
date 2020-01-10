@@ -25,7 +25,8 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 public class InterruptedFlowNodeState implements FlowNodeState {
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
@@ -35,7 +36,8 @@ public class InterruptedFlowNodeState implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return false;
     }
 

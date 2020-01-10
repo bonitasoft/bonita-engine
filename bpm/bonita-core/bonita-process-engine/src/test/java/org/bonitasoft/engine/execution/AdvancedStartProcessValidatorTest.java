@@ -103,18 +103,21 @@ public class AdvancedStartProcessValidatorTest {
         SUserTaskDefinitionImpl userTask2 = new SUserTaskDefinitionImpl(23425L, "userTask2WithContract", "actor");
         userTask2.setContract(ContractBuilder.contract().input("u2Input", SType.TEXT).build());
         SUserTaskDefinitionImpl userTask3 = new SUserTaskDefinitionImpl(23425L, "userTask3WithNoContract", "actor");
-        SUserTaskDefinitionImpl userTask4 = new SUserTaskDefinitionImpl(23425L, "userTask4WithMultipleContract", "actor");
+        SUserTaskDefinitionImpl userTask4 = new SUserTaskDefinitionImpl(23425L, "userTask4WithMultipleContract",
+                "actor");
         userTask4.setContract(ContractBuilder.contract().input("u4Input1", SType.TEXT).build());
         userTask4.setContract(ContractBuilder.contract().input("u4Input2", SType.INTEGER).build());
         container.addActivity(userTask1);
         container.addActivity(userTask2);
         container.addActivity(userTask3);
         container.addActivity(userTask4);
-        doReturn(procDef).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_WITH_CONTRACT_INPUT_ID);
+        doReturn(procDef).when(processDefinitionService)
+                .getProcessDefinition(PROCESS_DEFINITION_WITH_CONTRACT_INPUT_ID);
     }
 
     private AdvancedStartProcessValidator createValidatorFor(long process_definition_id) {
-        return new AdvancedStartProcessValidator(processDefinitionService, process_definition_id, technicalLoggerService, expressionService);
+        return new AdvancedStartProcessValidator(processDefinitionService, process_definition_id,
+                technicalLoggerService, expressionService);
     }
 
     @Test
@@ -191,7 +194,8 @@ public class AdvancedStartProcessValidatorTest {
     }
 
     @Test
-    public void should_detect_problem_when_when_process_contract_input_are_required_and_not_all_given() throws Exception {
+    public void should_detect_problem_when_when_process_contract_input_are_required_and_not_all_given()
+            throws Exception {
         //given
         AdvancedStartProcessValidator starterValidator = createValidatorFor(PROCESS_DEFINITION_WITH_CONTRACT_INPUT_ID);
         //when

@@ -30,9 +30,10 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Roles: creation, deletion,
+ * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on
+ * Roles: creation, deletion,
  * search, etc...
- * 
+ *
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
@@ -44,7 +45,7 @@ public interface RoleAPI {
 
     /**
      * Creates a role.
-     * 
+     *
      * @param roleName
      *        the name of the role
      * @return the created role
@@ -63,7 +64,7 @@ public interface RoleAPI {
      * <p>
      * It takes the values of the creator in order to create the role.
      * </p>
-     * 
+     *
      * @param creator
      *        the role creator
      * @return the created role.
@@ -81,10 +82,11 @@ public interface RoleAPI {
      * Updates the group according to the updater values.
      * <p>
      * This method also allow to update the icon of the role.
-     * When you update it, the iconId will be set on the role and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * When you update it, the iconId will be set on the role and you can later get it using
+     * {@link IdentityAPI#getIcon(long)}.
      * Changing the content of the icon will create a new icon and change the iconId of the role.
      * </p>
-     * 
+     *
      * @param roleId
      *        the identifier of the role
      * @param updater
@@ -102,7 +104,7 @@ public interface RoleAPI {
 
     /**
      * Deletes the role.
-     * 
+     *
      * @param roleId
      *        the role identifier
      * @throws DeletionException
@@ -115,7 +117,7 @@ public interface RoleAPI {
 
     /**
      * Deletes the roles.
-     * 
+     *
      * @param roleIds
      *        the list of role identifiers
      * @throws DeletionException
@@ -128,7 +130,7 @@ public interface RoleAPI {
 
     /**
      * Retrieves the role.
-     * 
+     *
      * @param roleId
      *        the identifier of the role
      * @return the role
@@ -144,7 +146,7 @@ public interface RoleAPI {
 
     /**
      * Retrieves the role.
-     * 
+     *
      * @param roleName
      *        the name of the role.
      * @return the role.
@@ -160,7 +162,7 @@ public interface RoleAPI {
 
     /**
      * Returns the total number of roles.
-     * 
+     *
      * @return the total number of roles
      * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the count retrieving
@@ -175,7 +177,7 @@ public interface RoleAPI {
      * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * </p>
-     * 
+     *
      * @param startIndex
      *        the start index
      * @param maxResults
@@ -210,7 +212,7 @@ public interface RoleAPI {
 
     /**
      * Searches roles according to the criteria containing in the options.
-     * 
+     *
      * @param options
      *        the search criteria
      * @return the search result

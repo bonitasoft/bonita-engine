@@ -30,7 +30,8 @@ public class ConnectorDefinitionWithInputValuesImpl implements ConnectorDefiniti
 
     private final Map<String, Map<String, Serializable>> inputValues;
 
-    public ConnectorDefinitionWithInputValuesImpl(final ConnectorDefinition connectorDefinition, final Map<String, Map<String, Serializable>> inputValues) {
+    public ConnectorDefinitionWithInputValuesImpl(final ConnectorDefinition connectorDefinition,
+            final Map<String, Map<String, Serializable>> inputValues) {
         super();
         this.connectorDefinition = connectorDefinition;
         this.inputValues = inputValues;

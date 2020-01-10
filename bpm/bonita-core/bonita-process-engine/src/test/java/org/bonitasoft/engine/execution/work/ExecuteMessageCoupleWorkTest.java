@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,9 +65,12 @@ public class ExecuteMessageCoupleWorkTest {
     private ArgumentCaptor<Callable<?>> callableArgumentCaptor;
     private Map<String, Object> context = new HashMap<>();
 
-    private ExecuteMessageCoupleWork executeMessageCoupleWork = new ExecuteMessageCoupleWork(MESSAGE_INSTANCE_ID, WAITING_MESSAGE_ID);
-    private SWaitingMessageEvent waitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, 4243252L, "Process", 5435312, "flownode", "message");
-    private SMessageInstance messageInstance = new SMessageInstance("message", "Process", "flowNode", 4243252L, "flownode");
+    private ExecuteMessageCoupleWork executeMessageCoupleWork = new ExecuteMessageCoupleWork(MESSAGE_INSTANCE_ID,
+            WAITING_MESSAGE_ID);
+    private SWaitingMessageEvent waitingMessageEvent = new SWaitingMessageEvent(SBPMEventType.BOUNDARY_EVENT, 4243252L,
+            "Process", 5435312, "flownode", "message");
+    private SMessageInstance messageInstance = new SMessageInstance("message", "Process", "flowNode", 4243252L,
+            "flownode");
 
     @Before
     public void before() {
@@ -97,7 +99,8 @@ public class ExecuteMessageCoupleWorkTest {
 
         executeMessageCoupleWork.work(context);
 
-        verify(dataInstanceService).deleteLocalDataInstances(MESSAGE_INSTANCE_ID, DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
+        verify(dataInstanceService).deleteLocalDataInstances(MESSAGE_INSTANCE_ID,
+                DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
     }
 
     @Test
@@ -129,8 +132,8 @@ public class ExecuteMessageCoupleWorkTest {
         executeMessageCoupleWork.handleFailure(new Exception("something happened during the coupling"), context);
 
         callableArgumentCaptor.getValue().call();
-        verify(eventInstanceService, never()).updateWaitingMessage(eq(waitingMessageEvent), argThat(arg ->
-                arg.getFields().size() == 1 &&
+        verify(eventInstanceService, never()).updateWaitingMessage(eq(waitingMessageEvent),
+                argThat(arg -> arg.getFields().size() == 1 &&
                         arg.getFields().get("progress").equals(0)));
     }
 

@@ -25,8 +25,8 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
  * @author Zhao Na
  */
 public class SDataInstanceBuilder {
-    private final SDataInstance dataInstance;
 
+    private final SDataInstance dataInstance;
 
     public static SDataInstanceBuilder createNewInstance(final SDataDefinition dataDefinition) {
         final String className = dataDefinition.getClassName();
@@ -58,8 +58,11 @@ public class SDataInstanceBuilder {
         }
         return new SDataInstanceBuilder(dataInstance);
     }
-    public static SDataInstance createNewInstance(final SDataDefinition dataDefinition, long containerId, String containerType, Serializable value) throws SDataInstanceNotWellFormedException {
-        return createNewInstance(dataDefinition).setContainerId(containerId).setContainerType(containerType).setValue(value).done();
+
+    public static SDataInstance createNewInstance(final SDataDefinition dataDefinition, long containerId,
+            String containerType, Serializable value) throws SDataInstanceNotWellFormedException {
+        return createNewInstance(dataDefinition).setContainerId(containerId).setContainerType(containerType)
+                .setValue(value).done();
     }
 
     private static SDataInstance getTextDataInstance(final STextDataDefinition dataDefinition) {
@@ -72,7 +75,6 @@ public class SDataInstanceBuilder {
         dataInstance.setValue(null);
         return dataInstance;
     }
-
 
     private SDataInstanceBuilder(final SDataInstance dataInstance) {
         super();

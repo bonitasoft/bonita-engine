@@ -22,7 +22,7 @@ public interface BusinessDataModelRepository {
 
     /**
      * Deploys a Business Data Model / repository on the specified tenant.
-     * 
+     *
      * @param bdmArchive
      *        the Business Data Model, as a jar containing the Business Object classes to deploy.
      * @param tenantId
@@ -32,11 +32,12 @@ public interface BusinessDataModelRepository {
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
      */
-    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
+    String install(byte[] bdmArchive, long tenantId, long userId)
+            throws SBusinessDataRepositoryDeploymentException, InvalidBusinessDataModelException;
 
     /**
      * Undeploy Business Data Model from specified tenant
-     * 
+     *
      * @param tenantId
      *        the ID of the tenant to undeploy the Business Data Model from
      * @throws SBusinessDataRepositoryException
@@ -49,7 +50,7 @@ public interface BusinessDataModelRepository {
     /**
      * Retrieve the client side BDM generated zip.
      * This zip contains jars with BDM Pojos and DAOs
-     * 
+     *
      * @return the zip content
      * @throws SBusinessDataRepositoryException
      */
@@ -59,7 +60,7 @@ public interface BusinessDataModelRepository {
 
     /**
      * Returns the currently deployed BDM version, or null if no BDM is deployed.
-     * 
+     *
      * @return the currently deployed BDM version, or null if no BDM is deployed.
      * @throws SBusinessDataRepositoryException
      *         if the BDM cannot be retrieved.

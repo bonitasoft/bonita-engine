@@ -34,7 +34,8 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
 
     private static final String SEARCH_OPTIONS_KEY = "searchOptions";
 
-    protected void checkNumberOfWaitingEvents(final String errorMessage, final String flowNodeName, final long expectedNbOfWaitingEvents)
+    protected void checkNumberOfWaitingEvents(final String errorMessage, final String flowNodeName,
+            final long expectedNbOfWaitingEvents)
             throws BonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, flowNodeName);
@@ -43,11 +44,13 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
-        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(errorMessage, expectedNbOfWaitingEvents, searchResult.getCount());
     }
 
-    protected void checkNumberOfWaitingEvents(final String flowNodeName, final long expectedNbOfWaitingEvents) throws BonitaException {
+    protected void checkNumberOfWaitingEvents(final String flowNodeName, final long expectedNbOfWaitingEvents)
+            throws BonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, flowNodeName);
 
@@ -55,11 +58,13 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
-        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(expectedNbOfWaitingEvents, searchResult.getCount());
     }
 
-    protected void checkNumberOfWaitingEventsInProcess(final String processName, final long expectedNbOfWaitingEvents) throws BonitaException {
+    protected void checkNumberOfWaitingEventsInProcess(final String processName, final long expectedNbOfWaitingEvents)
+            throws BonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.PROCESS_NAME, processName);
 
@@ -67,7 +72,8 @@ public abstract class AbstractWaitingEventIT extends AbstractEventIT {
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         @SuppressWarnings("unchecked")
-        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI()
+                .execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(expectedNbOfWaitingEvents, searchResult.getCount());
     }
 

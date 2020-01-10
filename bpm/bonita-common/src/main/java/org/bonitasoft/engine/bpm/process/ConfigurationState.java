@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
- * Autoset by Bonita Engine. Determines if a process is resolved / unresolved, that is, if a process can be started or not.
+ * Autoset by Bonita Engine. Determines if a process is resolved / unresolved, that is, if a process can be started or
+ * not.
  * Reasons for unresolved processes are:
  * <ul>
  * <li>Not all actors of the process have mappings to users / groups / roles / memberships</li>
- * <li>Some business data used in the process are not available on the currently deployed Business Data Model version (Subscription editions only)</li>
+ * <li>Some business data used in the process are not available on the currently deployed Business Data Model version
+ * (Subscription editions only)</li>
  * <li>Not all connectors used in the process have an implementation defined</li>
  * <li>Not all user filters used in the process have an implementation defined</li>
  * <li>Not all parameters used in the process have a value defined (Subscription editions only)</li>

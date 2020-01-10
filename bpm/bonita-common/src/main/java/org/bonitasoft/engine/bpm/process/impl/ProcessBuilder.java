@@ -23,14 +23,15 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
 
     protected final DesignProcessDefinitionImpl process;
 
-    protected ProcessBuilder(final DesignProcessDefinitionImpl process, final ProcessDefinitionBuilder processDefinitionBuilder) {
+    protected ProcessBuilder(final DesignProcessDefinitionImpl process,
+            final ProcessDefinitionBuilder processDefinitionBuilder) {
         super((FlowElementContainerDefinitionImpl) process.getProcessContainer(), processDefinitionBuilder);
         this.process = process;
     }
 
     /**
      * Adds an actor on this element
-     * 
+     *
      * @param actorName actor name
      * @return
      */
@@ -40,7 +41,7 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
 
     /**
      * Adds an actor on this process
-     * 
+     *
      * @param name actor name
      * @param initiator defines whether it's the actor initiator (actor that's able to start the process)
      * @return
@@ -51,7 +52,7 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
 
     /**
      * Adds an actor initiator on this process. The actor initiator is the one that will start the process.
-     * 
+     *
      * @param actorName
      * @return
      */
@@ -61,13 +62,14 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.document.DocumentDefinition} on this process
-     * 
+     *
      * @param name document name
      * @param fileName document file name
      * @return
      */
     public DocumentDefinitionBuilder addDocumentDefinition(final String name, final String fileName) {
-        return new DocumentDefinitionBuilder(getProcessBuilder(), (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, fileName);
+        return new DocumentDefinitionBuilder(getProcessBuilder(),
+                (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, fileName);
     }
 
     /**
@@ -77,7 +79,8 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
      *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      * @param type
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
-     * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @return The {@link ParameterDefinitionBuilder} containing the new
+     *         {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(getProcessBuilder(), process, parameterName, type);

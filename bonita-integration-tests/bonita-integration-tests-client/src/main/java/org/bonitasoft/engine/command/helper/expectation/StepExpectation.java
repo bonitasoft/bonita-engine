@@ -75,15 +75,15 @@ public class StepExpectation {
         }
     }
 
-
-    private SearchResult<ArchivedFlowNodeInstance> getArchives(String step, boolean terminal, String state) throws SearchException {
+    private SearchResult<ArchivedFlowNodeInstance> getArchives(String step, boolean terminal, String state)
+            throws SearchException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 0);
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, step);
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, process.getId());
-        if(terminal) {
+        if (terminal) {
             builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
         }
-        if(state != null) {
+        if (state != null) {
             builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, state);
         }
         return testCase.getProcessAPI().searchArchivedFlowNodeInstances(builder.done());

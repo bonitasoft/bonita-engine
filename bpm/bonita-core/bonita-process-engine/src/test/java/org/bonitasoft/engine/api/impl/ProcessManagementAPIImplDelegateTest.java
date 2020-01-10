@@ -65,7 +65,8 @@ public class ProcessManagementAPIImplDelegateTest {
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
     public void purgeClassLoader_should_throw_an_exception_if_process_definition_does_not_exist() throws Exception {
-        when(processDefinitionService.getProcessDeploymentInfo(45L)).thenThrow(new SProcessDefinitionNotFoundException("proc"));
+        when(processDefinitionService.getProcessDeploymentInfo(45L))
+                .thenThrow(new SProcessDefinitionNotFoundException("proc"));
 
         delegate.purgeClassLoader(45L);
     }
@@ -88,7 +89,8 @@ public class ProcessManagementAPIImplDelegateTest {
     }
 
     @Test(expected = RetrieveException.class)
-    public void purgeClassLoader_should_throw_an_exception_if_a_read_exception_occurs_when_retrieving_process_info() throws Exception {
+    public void purgeClassLoader_should_throw_an_exception_if_a_read_exception_occurs_when_retrieving_process_info()
+            throws Exception {
         when(processDefinitionService.getProcessDeploymentInfo(45L)).thenThrow(new SBonitaReadException("error"));
 
         delegate.purgeClassLoader(45L);

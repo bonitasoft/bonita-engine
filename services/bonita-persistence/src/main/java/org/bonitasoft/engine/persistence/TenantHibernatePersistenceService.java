@@ -30,10 +30,10 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleStateException;
 import org.hibernate.exception.LockAcquisitionException;
+import org.hibernate.query.Query;
 
 /**
  * @author Baptiste Mesta
@@ -53,8 +53,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
             final char likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder) throws Exception {
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings, HibernateMetricsBinder hibernateMetricsBinder)
+            throws Exception {
         super(name, hbmConfigurationProvider, extraHibernateProperties, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
@@ -116,8 +118,9 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     public void delete(final PersistentObject entity) throws SPersistenceException {
         try {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName()
-                        + " with id=" + entity.getId());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                        "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName()
+                                + " with id=" + entity.getId());
             }
             final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
             final Session session = getSession(true);
@@ -151,7 +154,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     @SuppressWarnings("unchecked")
     @Override
-    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor)
+            throws SBonitaReadException {
         try {
             final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
             Class<? extends PersistentObject> mappedClass = null;
@@ -167,16 +171,19 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     }
 
     @Override
-    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
+    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters)
+            throws SPersistenceException {
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
             final boolean enableWordSearch = isWordSearchEnabled(entityClass);
 
             boolean hasFilters = filters != null && !filters.isEmpty();
-            String baseQuery = "DELETE FROM " + entityClassName + " " + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
+            String baseQuery = "DELETE FROM " + entityClassName + " "
+                    + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
                     + " WHERE tenantId= :tenantId";
-            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(), likeEscapeCharacter);
+            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(),
+                    likeEscapeCharacter);
             if (hasFilters) {
                 queryBuilder.appendFilters(filters, null, enableWordSearch);
             }
@@ -184,7 +191,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                        "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
             }
         } catch (final STenantIdNotSetException e) {
             throw new SPersistenceException(e);

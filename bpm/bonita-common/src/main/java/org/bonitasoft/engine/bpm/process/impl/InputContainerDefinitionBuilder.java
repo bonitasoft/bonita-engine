@@ -26,7 +26,8 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefi
  */
 public abstract class InputContainerDefinitionBuilder extends FlowElementContainerBuilder {
 
-    public InputContainerDefinitionBuilder(FlowElementContainerDefinitionImpl container, ProcessDefinitionBuilder processDefinitionBuilder) {
+    public InputContainerDefinitionBuilder(FlowElementContainerDefinitionImpl container,
+            ProcessDefinitionBuilder processDefinitionBuilder) {
         super(container, processDefinitionBuilder);
     }
 
@@ -34,7 +35,8 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
         return addInput(name, type, description, false);
     }
 
-    public InputContainerDefinitionBuilder addInput(final String name, final Type type, final String description, final boolean multiple) {
+    public InputContainerDefinitionBuilder addInput(final String name, final Type type, final String description,
+            final boolean multiple) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description, multiple);
         getInputContainerDefinition().addInput(input);
         return this;
@@ -44,7 +46,8 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
         return addComplexInput(name, description, false);
     }
 
-    public ContractInputDefinitionBuilder addComplexInput(final String name, final String description, final boolean multiple) {
+    public ContractInputDefinitionBuilder addComplexInput(final String name, final String description,
+            final boolean multiple) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple);
         getInputContainerDefinition().addInput(input);
         return new ContractInputDefinitionBuilder(getProcessBuilder(), getContainer(), input);
@@ -55,8 +58,10 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
     }
 
     public InputContainerDefinitionBuilder addFileInput(final String name, final String description, boolean multiple) {
-        final InputDefinitionImpl nameInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_FILENAME, Type.TEXT, "Name of the file");
-        final InputDefinitionImpl contentInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_CONTENT, Type.BYTE_ARRAY, "Content of the file");
+        final InputDefinitionImpl nameInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_FILENAME, Type.TEXT,
+                "Name of the file");
+        final InputDefinitionImpl contentInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_CONTENT,
+                Type.BYTE_ARRAY, "Content of the file");
         final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description, multiple, Type.FILE,
                 Arrays.<InputDefinition> asList(nameInput, contentInput));
         getInputContainerDefinition().addInput(fileInput);

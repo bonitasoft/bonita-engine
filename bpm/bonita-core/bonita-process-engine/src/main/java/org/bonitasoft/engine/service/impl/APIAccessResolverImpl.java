@@ -76,7 +76,8 @@ public class APIAccessResolverImpl implements APIAccessResolver {
     public <T> T getAPIImplementation(Class<T> apiInterface) throws APIImplementationNotFoundException {
         final Object api = getApiImplementation(apiInterface);
         if (api == null) {
-            throw new APIImplementationNotFoundException("No API implementation was found for: " + apiInterface.getName());
+            throw new APIImplementationNotFoundException(
+                    "No API implementation was found for: " + apiInterface.getName());
         }
         return apiInterface.cast(api);
     }

@@ -21,7 +21,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Baptiste Mesta
  */
-public class SContextEntryImpl  implements SContextEntry{
+public class SContextEntryImpl implements SContextEntry {
 
     private String key;
     private SExpression expression;
@@ -51,8 +51,10 @@ public class SContextEntryImpl  implements SContextEntry{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         SContextEntryImpl that = (SContextEntryImpl) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(expression, that.expression);

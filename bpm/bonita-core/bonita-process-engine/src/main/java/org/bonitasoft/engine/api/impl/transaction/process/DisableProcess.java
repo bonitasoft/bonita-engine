@@ -51,8 +51,10 @@ public final class DisableProcess implements TransactionContent {
     private final String username;
     private final long tenantId;
 
-    public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventInstanceService eventInstanceService,
-            ConfigurationService configurationService, final SchedulerService scheduler, final TechnicalLoggerService logger, final String username,
+    public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId,
+            final EventInstanceService eventInstanceService,
+            ConfigurationService configurationService, final SchedulerService scheduler,
+            final TechnicalLoggerService logger, final String username,
             long tenantId) {
         this.processDefinitionService = processDefinitionService;
         this.eventInstanceService = eventInstanceService;
@@ -71,13 +73,17 @@ public final class DisableProcess implements TransactionContent {
         handleAutoLoginConfiguration(processDefinition);
         disableStartEvents(processDefinition);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + username + "> has disabled process <" + processDefinition.getName()
-                    + "> in version <" + processDefinition.getVersion() + "> with id <" + processDefinition.getId() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "The user <" + username + "> has disabled process <" + processDefinition.getName()
+                            + "> in version <" + processDefinition.getVersion() + "> with id <"
+                            + processDefinition.getId() + ">");
         }
     }
 
-    private void handleAutoLoginConfiguration(SProcessDefinition sProcessDefinition) throws SProcessDisablementException {
-        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(configurationService, tenantId, sProcessDefinition);
+    private void handleAutoLoginConfiguration(SProcessDefinition sProcessDefinition)
+            throws SProcessDisablementException {
+        AutoLoginConfigurationHelper autoLoginConfigurationHelper = new AutoLoginConfigurationHelper(
+                configurationService, tenantId, sProcessDefinition);
         autoLoginConfigurationHelper.disableAutoLogin();
     }
 
@@ -97,7 +103,8 @@ public final class DisableProcess implements TransactionContent {
 
     private void deleteWaitingEvents() throws SWaitingEventModificationException, SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId, queryOptions);
+        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId,
+                queryOptions);
         while (!waitingEvents.isEmpty()) {
             for (final SWaitingEvent startEvent : waitingEvents) {
                 eventInstanceService.deleteWaitingEvent(startEvent);

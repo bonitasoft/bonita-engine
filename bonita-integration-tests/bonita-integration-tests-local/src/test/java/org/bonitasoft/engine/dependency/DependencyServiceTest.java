@@ -38,13 +38,14 @@ public class DependencyServiceTest extends CommonBPMServicesTest {
 
     private final String defaultFileName = "dfv.cu";
 
-    private final byte[] defaultValue = new byte[]{12, 33};
+    private final byte[] defaultValue = new byte[] { 12, 33 };
 
     @Test
     public void testLifeCycle() throws Exception {
         getTransactionService().begin();
 
-        AbstractSDependency mappedDependency = dependencyService.createMappedDependency(defaultName, defaultValue, defaultFileName, 2L, ScopeType.PROCESS);
+        AbstractSDependency mappedDependency = dependencyService.createMappedDependency(defaultName, defaultValue,
+                defaultFileName, 2L, ScopeType.PROCESS);
 
         List<Long> dependencyIds = dependencyService.getDependencyIds(2L, ScopeType.PROCESS, 0, 1);
 

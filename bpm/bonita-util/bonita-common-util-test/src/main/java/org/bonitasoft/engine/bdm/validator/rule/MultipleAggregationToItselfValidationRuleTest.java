@@ -41,8 +41,9 @@ public class MultipleAggregationToItselfValidationRuleTest {
     public void shouldDetectMultipleAggregationToItself() {
         BusinessObject daughter = aBO("daughter").build();
         daughter = aBO("daughter")
-                .withField(new FieldBuilder.RelationFieldBuilder().withName("daughter").aggregation().multiple().referencing(daughter).fetchType(
-                        EAGER))
+                .withField(new FieldBuilder.RelationFieldBuilder().withName("daughter").aggregation().multiple()
+                        .referencing(daughter).fetchType(
+                                EAGER))
                 .build();
 
         final BusinessObjectModel bom = aBOM().withBOs(daughter).build();
@@ -51,7 +52,8 @@ public class MultipleAggregationToItselfValidationRuleTest {
         assertThat(validationStatus.isOk()).isFalse();
         assertThat(validationStatus.getErrors()).hasSize(1);
         assertThat(validationStatus.getWarnings()).hasSize(0);
-        assertThat(validationStatus.getErrors().get(0)).isEqualTo("The object daughter is referencing itself in a multiple aggregation relation.");
+        assertThat(validationStatus.getErrors().get(0))
+                .isEqualTo("The object daughter is referencing itself in a multiple aggregation relation.");
 
     }
 }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl.business.data;
 
-
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilderFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderFactory;
@@ -21,7 +20,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
 /**
  * @author Matthieu Chaffotte
  */
-public class SRefBusinessDataInstanceLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SRefBusinessDataInstanceLogBuilderFactory {
+public class SRefBusinessDataInstanceLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SRefBusinessDataInstanceLogBuilderFactory {
 
     @Override
     public SRefBusinessDataInstanceLogBuilder createNewInstance() {

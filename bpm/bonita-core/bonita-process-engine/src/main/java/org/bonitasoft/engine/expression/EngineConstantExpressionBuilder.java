@@ -30,7 +30,8 @@ public final class EngineConstantExpressionBuilder {
 
     public static SExpression getConnectorAPIAccessorExpression() {
         final SExpressionBuilder builder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
-        builder.setContent("connectorApiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());
+        builder.setContent("connectorApiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name())
+                .setReturnType(APIAccessor.class.getName());
         try {
             return builder.done();
         } catch (final SInvalidExpressionException e) {

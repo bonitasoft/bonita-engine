@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl;
 
 /**
  * A Human task is a task having an actor and that can be assigned.
- * 
+ *
  * @author Baptiste Mesta
  * @deprecated since 6.2.3
  */

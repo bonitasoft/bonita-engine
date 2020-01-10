@@ -34,7 +34,8 @@ public class EvaluateExpression implements TransactionContentWithResult<Serializ
 
     private Serializable result;
 
-    public EvaluateExpression(final ExpressionResolverService expressionResolverService, final SExpressionContext expressionContext,
+    public EvaluateExpression(final ExpressionResolverService expressionResolverService,
+            final SExpressionContext expressionContext,
             final SExpression expression) {
         this.expressionResolverService = expressionResolverService;
         this.expressionContext = expressionContext;

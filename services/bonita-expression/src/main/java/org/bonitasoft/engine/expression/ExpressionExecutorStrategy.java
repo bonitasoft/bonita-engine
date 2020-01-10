@@ -25,7 +25,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * Allow to evaluate one kind of expression
- * the kind of expression that this evaluator is responsible for is define by the {@link #getExpressionKind()} Client implements this interface in order to add
+ * the kind of expression that this evaluator is responsible for is define by the {@link #getExpressionKind()} Client
+ * implements this interface in order to add
  * a new kind of expression
  *
  * @author Zhao Na
@@ -50,7 +51,7 @@ public interface ExpressionExecutorStrategy {
     String TYPE_INPUT = "TYPE_INPUT";
 
     String TYPE_READ_ONLY_SCRIPT = "TYPE_READ_ONLY_SCRIPT";
-    
+
     String TYPE_READ_ONLY_CONDITION_SCRIPT = "TYPE_READ_ONLY__CONDITION_SCRIPT";
 
     String TYPE_VARIABLE = "TYPE_VARIABLE";
@@ -86,8 +87,9 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
 
     ExpressionKind KIND_READ_ONLY_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_SCRIPT, INTERPRETER_GROOVY);
-    
-    ExpressionKind KIND_READ_ONLY_CONDITION_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_CONDITION_SCRIPT, INTERPRETER_GROOVY);
+
+    ExpressionKind KIND_READ_ONLY_CONDITION_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_CONDITION_SCRIPT,
+            INTERPRETER_GROOVY);
 
     ExpressionKind KIND_INPUT = new ExpressionKind(TYPE_INPUT);
 
@@ -124,40 +126,45 @@ public interface ExpressionExecutorStrategy {
     /**
      * This list must contain only types with no dependencies
      */
-    List<ExpressionKind> NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER = Arrays.asList(KIND_ENGINE_CONSTANT, KIND_VARIABLE, KIND_CONSTANT, KIND_INPUT,
-            KIND_PARAMETER, KIND_DOCUMENT, KIND_BUSINESS_DATA, KIND_BUSINESS_OBJECT_DAO, KIND_CONTRACT_INPUT /*
-             * , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY,
-             * KIND_LIST
-             */);
+    List<ExpressionKind> NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER = Arrays
+            .asList(KIND_ENGINE_CONSTANT, KIND_VARIABLE, KIND_CONSTANT, KIND_INPUT,
+                    KIND_PARAMETER, KIND_DOCUMENT, KIND_BUSINESS_DATA, KIND_BUSINESS_OBJECT_DAO,
+                    KIND_CONTRACT_INPUT /*
+                                         * , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY,
+                                         * KIND_LIST
+                                         */);
 
     /**
      * @param expression
-     *            the expression to evaluate
+     *        the expression to evaluate
      * @param context
-     *            map containing the result of the evaluation of dependencies
-     *            and also informations about the context of evaluation given by {@link #CONTAINER_ID_KEY} and {@link #CONTAINER_TYPE_KEY}
+     *        map containing the result of the evaluation of dependencies
+     *        and also informations about the context of evaluation given by {@link #CONTAINER_ID_KEY} and
+     *        {@link #CONTAINER_TYPE_KEY}
      * @return
      *         the result of the evaluation of the expression of appropriate type
      * @throws SExpressionEvaluationException
      * @throws SExpressionDependencyMissingException
      */
-    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
+    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions,
+            ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**
      * Validate the expression, an exception is thrown it is invalid
      *
      * @param expression
-     *            the expression to validate
+     *        the expression to validate
      * @throws SInvalidExpressionException
-     *             if the exception is invalid
+     *         if the exception is invalid
      * @since 6.0
      */
     void validate(SExpression expression) throws SInvalidExpressionException;
 
     ExpressionKind getExpressionKind();
 
-    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
+    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context,
+            Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**

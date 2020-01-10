@@ -38,7 +38,8 @@ public class SProcessDefinitionNotFoundException extends SProcessDefinitionExcep
         setProcessDefinitionIdOnContext(id);
     }
 
-    public SProcessDefinitionNotFoundException(final Throwable cause, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
+    public SProcessDefinitionNotFoundException(final Throwable cause,
+            final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
         this(cause, processDefinitionDeployInfo.getId());
         setProcessDefinitionNameOnContext(processDefinitionDeployInfo.getName());
         setProcessDefinitionVersionOnContext(processDefinitionDeployInfo.getVersion());

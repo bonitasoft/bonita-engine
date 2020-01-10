@@ -15,7 +15,6 @@
 package com.company.model.javassist;
 
 import java.lang.reflect.Method;
-
 import javassist.util.proxy.MethodHandler;
 
 public class MethodHandlerImpl implements MethodHandler {

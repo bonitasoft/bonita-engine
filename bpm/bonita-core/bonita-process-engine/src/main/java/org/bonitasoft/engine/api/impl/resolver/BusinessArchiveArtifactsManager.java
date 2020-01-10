@@ -41,7 +41,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Handles the resolution of Process Dependencies. A process can have a list of <code>ProcessDependencyResolver</code>s which validates different aspects of the
+ * Handles the resolution of Process Dependencies. A process can have a list of <code>ProcessDependencyResolver</code>s
+ * which validates different aspects of the
  * process to validate (or "resolve")
  *
  * @author Emmanuel Duchastenier
@@ -53,7 +54,8 @@ public class BusinessArchiveArtifactsManager {
     private final List<BusinessArchiveArtifactManager> dependencyResolvers;
     private final TechnicalLoggerService technicalLoggerService;
 
-    public BusinessArchiveArtifactsManager(final List<BusinessArchiveArtifactManager> dependencyResolvers, TechnicalLoggerService technicalLoggerService) {
+    public BusinessArchiveArtifactsManager(final List<BusinessArchiveArtifactManager> dependencyResolvers,
+            TechnicalLoggerService technicalLoggerService) {
         this.dependencyResolvers = dependencyResolvers;
         this.technicalLoggerService = technicalLoggerService;
     }
@@ -66,7 +68,8 @@ public class BusinessArchiveArtifactsManager {
                 resolved &= artifactManager.deploy(businessArchive, sDefinition);
                 if (!resolved) {
                     for (Problem problem : artifactManager.checkResolution(sDefinition)) {
-                        technicalLoggerService.log(BusinessArchiveArtifactsManager.class, INFO, problem.getDescription());
+                        technicalLoggerService.log(BusinessArchiveArtifactsManager.class, INFO,
+                                problem.getDescription());
                     }
                 }
             } catch (BonitaException | SBonitaException e) {
@@ -80,7 +83,8 @@ public class BusinessArchiveArtifactsManager {
 
     public void resolveDependenciesForAllProcesses(TenantServiceAccessor tenantAccessor) {
         try {
-            List<Long> processDefinitionIds = tenantAccessor.getProcessDefinitionService().getProcessDefinitionIds(0, Integer.MAX_VALUE);
+            List<Long> processDefinitionIds = tenantAccessor.getProcessDefinitionService().getProcessDefinitionIds(0,
+                    Integer.MAX_VALUE);
             resolveDependencies(processDefinitionIds, tenantAccessor);
         } catch (SBonitaReadException e) {
             technicalLoggerService.log(BusinessArchiveArtifactsManager.class, ERROR,
@@ -88,13 +92,15 @@ public class BusinessArchiveArtifactsManager {
         }
     }
 
-    private void resolveDependencies(final List<Long> processDefinitionIds, final TenantServiceAccessor tenantAccessor) {
+    private void resolveDependencies(final List<Long> processDefinitionIds,
+            final TenantServiceAccessor tenantAccessor) {
         for (Long id : processDefinitionIds) {
             resolveDependencies(id, tenantAccessor);
         }
     }
 
-    public void deleteDependencies(final SProcessDefinition processDefinition) throws SObjectModificationException, SBonitaReadException, SRecorderException {
+    public void deleteDependencies(final SProcessDefinition processDefinition)
+            throws SObjectModificationException, SBonitaReadException, SRecorderException {
         final List<BusinessArchiveArtifactManager> resolvers = getArtifactManagers();
         for (BusinessArchiveArtifactManager resolver : resolvers) {
             resolver.delete(processDefinition);
@@ -103,21 +109,24 @@ public class BusinessArchiveArtifactsManager {
 
     /*
      * Done in a separated transaction
-     * We try here to check if now the process is resolved so it must not be done in the same transaction that did the modification
+     * We try here to check if now the process is resolved so it must not be done in the same transaction that did the
+     * modification
      * this does not throw exception, it only log because it can be retried after.
      */
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) {
-        resolveDependencies(processDefinitionId, tenantAccessor, getArtifactManagers().toArray(new BusinessArchiveArtifactManager[getArtifactManagers().size()]));
+        resolveDependencies(processDefinitionId, tenantAccessor,
+                getArtifactManagers().toArray(new BusinessArchiveArtifactManager[getArtifactManagers().size()]));
     }
 
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
-                                    final BusinessArchiveArtifactManager... resolvers) {
+            final BusinessArchiveArtifactManager... resolvers) {
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             boolean resolved = true;
             for (final BusinessArchiveArtifactManager dependencyResolver : resolvers) {
-                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                final SProcessDefinition processDefinition = processDefinitionService
+                        .getProcessDefinition(processDefinitionId);
                 resolved &= dependencyResolver.checkResolution(processDefinition).isEmpty();
             }
             changeResolutionStatus(processDefinitionId, processDefinitionService, resolved);
@@ -127,22 +136,26 @@ public class BusinessArchiveArtifactsManager {
                 loggerService.log(clazz, TechnicalLogSeverity.DEBUG, e);
             }
             if (loggerService.isLoggable(clazz, TechnicalLogSeverity.WARNING)) {
-                loggerService.log(clazz, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of " + e.getMessage()
-                        + ". Please retry it manually");
+                loggerService.log(clazz, TechnicalLogSeverity.WARNING,
+                        "Unable to resolve dependencies after they were modified because of " + e.getMessage()
+                                + ". Please retry it manually");
             }
         }
     }
 
-    public void changeResolutionStatus(final long processDefinitionId, final ProcessDefinitionService processDefinitionService,
-                                        final boolean resolved) throws SBonitaException {
-        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+    public void changeResolutionStatus(final long processDefinitionId,
+            final ProcessDefinitionService processDefinitionService,
+            final boolean resolved) throws SBonitaException {
+        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService
+                .getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
                 processDefinitionService.resolveProcess(processDefinitionId);
             }
         } else {
             if (ConfigurationState.RESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-                final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
+                final EntityUpdateDescriptor updateDescriptor = BuilderFactory
+                        .get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
                         .updateConfigurationState(ConfigurationState.UNRESOLVED).done();
                 processDefinitionService.updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
             }
@@ -153,7 +166,8 @@ public class BusinessArchiveArtifactsManager {
         return dependencyResolvers;
     }
 
-    public BusinessArchive exportBusinessArchive(long processDefinitionId, DesignProcessDefinition designProcessDefinition)
+    public BusinessArchive exportBusinessArchive(long processDefinitionId,
+            DesignProcessDefinition designProcessDefinition)
             throws InvalidBusinessArchiveFormatException, SBonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition);

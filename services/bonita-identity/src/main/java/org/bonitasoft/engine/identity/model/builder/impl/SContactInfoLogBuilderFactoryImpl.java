@@ -35,7 +35,7 @@ public class SContactInfoLogBuilderFactoryImpl extends CRUDELogBuilderFactory im
     public SContactInfoLogBuilder createNewInstance() {
         return new SContactInfoLogBuilderImpl();
     }
-    
+
     @Override
     public String getObjectIdKey() {
         return USER_CONTACT_INFO_INDEX_NAME;

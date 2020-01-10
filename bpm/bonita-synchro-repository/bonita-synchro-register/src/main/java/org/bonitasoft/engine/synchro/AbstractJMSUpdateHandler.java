@@ -30,13 +30,13 @@ public abstract class AbstractJMSUpdateHandler extends AbstractUpdateHandler {
     private final Long messageTimeout;
 
     private String brokerURL;
-    
+
     public AbstractJMSUpdateHandler(final long tenantId, final long messageTimeout, String brokerURL) {
         super(tenantId);
         this.messageTimeout = messageTimeout;
         this.brokerURL = brokerURL;
     }
-    
+
     @Override
     protected BonitaTransactionSynchronization getSynchronization(final Map<String, Serializable> event, final Long id,
             final TenantServiceAccessor tenantServiceAccessor) {

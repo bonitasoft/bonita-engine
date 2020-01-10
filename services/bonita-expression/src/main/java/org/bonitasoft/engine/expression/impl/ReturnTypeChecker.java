@@ -39,8 +39,8 @@ public class ReturnTypeChecker {
 
     /**
      * Describes types that can be be converted later to other types.<br>
-     *     <li>key: the type which can be converted to
-     *     <li>values: the input types that can be converted to the <code>key</code> type
+     * <li>key: the type which can be converted to
+     * <li>values: the input types that can be converted to the <code>key</code> type
      */
     private static final Map<String, List<String>> CONVERTIBLE_TYPES = new HashMap<>();
     static {
@@ -61,7 +61,8 @@ public class ReturnTypeChecker {
      * @throws SExpressionEvaluationException
      *         if the condition is not fulfilled, does nothing otherwise
      */
-    public void checkReturnType(final SExpression expression, final Object result, final Map<String, Object> context) throws SExpressionEvaluationException {
+    public void checkReturnType(final SExpression expression, final Object result, final Map<String, Object> context)
+            throws SExpressionEvaluationException {
         if (result == null) {
             return;
         }

@@ -64,7 +64,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, userId, -1, -1));
+        final SProcessSupervisor expectedSProcessSupervisor = repository
+                .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, userId, -1, -1));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
@@ -85,7 +86,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId, 0));
+        final SProcessSupervisor expectedSProcessSupervisor = repository
+                .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId, 0));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
@@ -106,7 +108,8 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, 0, roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository
+                .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, 0, roleId));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
@@ -127,8 +130,9 @@ public class SupervisorQueriesTest {
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
-        final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId,
-                roleId));
+        final SProcessSupervisor expectedSProcessSupervisor = repository
+                .add(new SProcessSupervisor(supervisorId, tenantId, processDefId, 0, groupId,
+                        roleId));
         repository.add(new SProcessSupervisor(2, tenantId, processDefId, userId, groupId, roleId));
 
         final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);

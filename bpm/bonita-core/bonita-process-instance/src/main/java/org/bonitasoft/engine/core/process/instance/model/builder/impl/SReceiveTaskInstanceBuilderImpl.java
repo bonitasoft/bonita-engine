@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SReceiveTaskIns
 /**
  * @author Julien Molinaro
  */
-public class SReceiveTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SReceiveTaskInstanceBuilder {
+public class SReceiveTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl
+        implements SReceiveTaskInstanceBuilder {
 
     public SReceiveTaskInstanceBuilderImpl(final SReceiveTaskInstance activityInstanceImpl) {
         super(activityInstanceImpl);

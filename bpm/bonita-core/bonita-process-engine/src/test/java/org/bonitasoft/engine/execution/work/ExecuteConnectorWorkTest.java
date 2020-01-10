@@ -29,12 +29,10 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
-import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -43,7 +41,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -55,7 +52,6 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ExecuteConnectorWorkTest {
-
 
     private static final long PROCESS_DEFINITION_ID = 154323L;
     private static final long CONNECTOR_INSTANCE_ID = 95043L;
@@ -69,20 +65,26 @@ public class ExecuteConnectorWorkTest {
     private LockService lockService;
     @Mock
     private UserTransactionService userTransactionService;
-    private SExpressionContext expressionContext = new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS", PROCESS_DEFINITION_ID);
+    private SExpressionContext expressionContext = new SExpressionContext(PROCESS_INSTANCE_ID, "PROCESS",
+            PROCESS_DEFINITION_ID);
     private Map<String, Object> workContext = new HashMap<>();
-    private ExecuteConnectorWork executeConnectorWork = new ExecuteConnectorWork(PROCESS_DEFINITION_ID, CONNECTOR_INSTANCE_ID, CONNECTOR_NAME, expressionContext, PROCESS_INSTANCE_ID) {
+    private ExecuteConnectorWork executeConnectorWork = new ExecuteConnectorWork(PROCESS_DEFINITION_ID,
+            CONNECTOR_INSTANCE_ID, CONNECTOR_NAME, expressionContext, PROCESS_INSTANCE_ID) {
+
         @Override
-        protected void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Throwable Exception) throws SBonitaException {
+        protected void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition,
+                Throwable Exception) throws SBonitaException {
         }
 
         @Override
-        protected SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context, SEndEventDefinition eventDefinition) throws SBonitaException {
+        protected SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context,
+                SEndEventDefinition eventDefinition) throws SBonitaException {
             return null;
         }
 
         @Override
-        protected SConnectorDefinition getSConnectorDefinition(ProcessDefinitionService processDefinitionService) throws SBonitaException {
+        protected SConnectorDefinition getSConnectorDefinition(ProcessDefinitionService processDefinitionService)
+                throws SBonitaException {
             return null;
         }
 
@@ -95,7 +97,8 @@ public class ExecuteConnectorWorkTest {
         }
 
         @Override
-        protected void evaluateOutput(Map<String, Object> context, ConnectorResult result, SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+        protected void evaluateOutput(Map<String, Object> context, ConnectorResult result,
+                SConnectorDefinition sConnectorDefinition) throws SBonitaException {
         }
 
         @Override
@@ -109,7 +112,6 @@ public class ExecuteConnectorWorkTest {
     private TimeTracker timeTracker;
     @Mock
     private ConnectorService connectorService;
-
 
     @Before
     public void before() throws SClassLoaderException {
@@ -126,7 +128,8 @@ public class ExecuteConnectorWorkTest {
     @Test
     public void should_execute_do_operations_in_a_lock() throws Exception {
         //given
-        CompletableFuture<ConnectorResult> toBeReturned = completedFuture(new ConnectorResult(null, Collections.emptyMap()));
+        CompletableFuture<ConnectorResult> toBeReturned = completedFuture(
+                new ConnectorResult(null, Collections.emptyMap()));
         when(connectorService.executeConnector(anyLong(), any(), any(), any(), any())).thenReturn(toBeReturned);
 
         //when
@@ -134,7 +137,8 @@ public class ExecuteConnectorWorkTest {
 
         //then
         InOrder inOrder = inOrder(lockService, userTransactionService);
-        inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()), eq(TENANT_ID));
+        inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()),
+                eq(TENANT_ID));
         inOrder.verify(userTransactionService).executeInTransaction(any());
         inOrder.verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
     }

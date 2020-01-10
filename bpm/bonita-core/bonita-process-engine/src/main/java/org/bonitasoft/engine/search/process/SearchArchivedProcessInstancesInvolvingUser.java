@@ -35,8 +35,10 @@ public class SearchArchivedProcessInstancesInvolvingUser extends AbstractArchive
 
     private final long userId;
 
-    public SearchArchivedProcessInstancesInvolvingUser(final long userId, final ProcessInstanceService processInstanceService,
-            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor, final SearchOptions searchOptions) {
+    public SearchArchivedProcessInstancesInvolvingUser(final long userId,
+            final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor,
+            final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions, processDefinitionService);
         this.userId = userId;
         this.processInstanceService = processInstanceService;

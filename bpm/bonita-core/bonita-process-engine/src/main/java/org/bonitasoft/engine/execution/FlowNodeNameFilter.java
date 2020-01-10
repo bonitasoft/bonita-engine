@@ -17,13 +17,11 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class FlowNodeNameFilter implements Filter<SFlowNodeDefinition>{
-    
+public class FlowNodeNameFilter implements Filter<SFlowNodeDefinition> {
+
     private final List<String> flowNodeNames;
 
     public FlowNodeNameFilter(List<String> flowNodeNames) {

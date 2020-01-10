@@ -50,8 +50,8 @@ import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -83,7 +83,8 @@ public class ThemeServiceImplTest {
     private ThemeServiceImpl themeServiceImpl;
 
     /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#createTheme(org.bonitasoft.engine.theme.model.STheme)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#createTheme(org.bonitasoft.engine.theme.model.STheme)}.
      *
      * @throws SThemeCreationException
      * @throws SRecorderException
@@ -108,7 +109,8 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(1L).when(sTheme).getId();
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         themeServiceImpl.createTheme(sTheme);
     }
@@ -122,7 +124,8 @@ public class ThemeServiceImplTest {
      * @throws SBonitaReadException
      */
     @Test
-    public final void deleteThemeById() throws SThemeNotFoundException, SThemeDeletionException, SRecorderException, SBonitaReadException {
+    public final void deleteThemeById()
+            throws SThemeNotFoundException, SThemeDeletionException, SRecorderException, SBonitaReadException {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
 
@@ -132,7 +135,8 @@ public class ThemeServiceImplTest {
     }
 
     @Test(expected = SThemeNotFoundException.class)
-    public final void deleteNoThemeById() throws SBonitaReadException, SThemeDeletionException, SThemeNotFoundException {
+    public final void deleteNoThemeById()
+            throws SBonitaReadException, SThemeDeletionException, SThemeNotFoundException {
         when(persistenceService.selectById(any())).thenReturn(null);
 
         themeServiceImpl.deleteTheme(1);
@@ -144,13 +148,15 @@ public class ThemeServiceImplTest {
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(any());
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         themeServiceImpl.deleteTheme(1);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(org.bonitasoft.engine.theme.model.STheme)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(org.bonitasoft.engine.theme.model.STheme)}.
      *
      * @throws SRecorderException
      * @throws SThemeDeletionException
@@ -172,7 +178,8 @@ public class ThemeServiceImplTest {
     public void deleteThemeByObjectThrowException() throws Exception {
         final STheme sTheme = mock(STheme.class);
 
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         themeServiceImpl.deleteTheme(sTheme);
     }
@@ -270,13 +277,15 @@ public class ThemeServiceImplTest {
 
     @Test(expected = SThemeReadException.class)
     public void getThemeByIdThrowException() throws Exception {
-        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(ArgumentMatchers.<SelectByIdDescriptor<STheme>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getTheme(1);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getLastModifiedTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getLastModifiedTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
      *
      * @throws SBonitaReadException
      * @throws SThemeNotFoundException
@@ -305,18 +314,21 @@ public class ThemeServiceImplTest {
     public void getLastModifiedThemeThrowException() throws Exception {
         final SThemeType type = SThemeType.MOBILE;
 
-        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(ArgumentMatchers.<SelectOneDescriptor<STheme>> any()))
+                .thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getLastModifiedTheme(type);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getNumberOfThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getNumberOfThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
      */
     @Test
     public void getNumberOfThemesWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(STheme.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(STheme.class, options, Collections.<String, Object> emptyMap()))
+                .thenReturn(1L);
 
         assertEquals(1L, themeServiceImpl.getNumberOfThemes(options));
     }
@@ -324,18 +336,21 @@ public class ThemeServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfThemesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.getNumberOfEntities(STheme.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(STheme.class, options, Collections.<String, Object> emptyMap()))
+                .thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getNumberOfThemes(options);
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#searchThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#searchThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
      */
     @Test
     public void searchThemesWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(STheme.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<STheme>());
+        when(persistenceService.searchEntity(STheme.class, options, Collections.<String, Object> emptyMap()))
+                .thenReturn(new ArrayList<STheme>());
 
         assertNotNull(themeServiceImpl.searchThemes(options));
     }
@@ -343,7 +358,8 @@ public class ThemeServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void searchThemesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.searchEntity(STheme.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.searchEntity(STheme.class, options, Collections.<String, Object> emptyMap()))
+                .thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.searchThemes(options);
     }
@@ -360,7 +376,8 @@ public class ThemeServiceImplTest {
     public final void updateTheme() throws SThemeUpdateException {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
-        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class)
+                .createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
         final STheme result = themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
@@ -370,7 +387,8 @@ public class ThemeServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public final void updateNullTheme() throws SThemeUpdateException {
-        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class)
+                .createNewInstance();
 
         themeServiceImpl.updateTheme(null, sThemeUpdateBuilder.done());
     }
@@ -386,10 +404,12 @@ public class ThemeServiceImplTest {
     public final void updateThemeThrowException() throws SRecorderException, SThemeUpdateException {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
-        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+        final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class)
+                .createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
     }

@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
  */
 public interface BusinessArchiveService {
 
-
     SProcessDefinition deploy(BusinessArchive businessArchive) throws SObjectCreationException, SAlreadyExistsException;
 
     BusinessArchive export(long processDefinitionId) throws SBonitaException, InvalidBusinessArchiveFormatException;

@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
 
 /**
  * Check that a composite bo is referenced in only one composition
- * 
+ *
  * @author Colin PUY
  */
 public class UniquenessCompositionValidationRule extends ValidationRule<BusinessObjectModel, ValidationStatus> {
@@ -45,7 +45,8 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
                         String.format(
                                 "Business object %s is referenced by composition in two business objects, or is referenced several times in a single business object",
                                 compositeBO.getQualifiedName()),
-                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, compositeBO.getQualifiedName()));
+                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY,
+                                compositeBO.getQualifiedName()));
             } else {
                 alreadyComposedBOs.add(compositeBO);
             }

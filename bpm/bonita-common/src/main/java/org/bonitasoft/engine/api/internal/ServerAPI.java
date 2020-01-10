@@ -25,6 +25,7 @@ import java.util.Map;
 public interface ServerAPI extends Serializable, Remote {
 
     Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException;
+            final List<String> classNameParameters, final Object[] parametersValues)
+            throws ServerWrappedException, RemoteException;
 
 }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -22,6 +21,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
 public interface SManualTaskInstanceBuilderFactory extends SHumanTaskInstanceBuilderFactory {
 
     SManualTaskInstanceBuilder createNewManualTaskInstance(String name, long flowNodeDefinitionId, long rootContainerId,
-            long parentContainerId, long actorId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
+            long parentContainerId, long actorId, long processDefinitionId, long rootProcessInstanceId,
+            long parentProcessInstanceId);
 
 }

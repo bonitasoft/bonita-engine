@@ -40,8 +40,9 @@ public class SWaitingMessageEvent extends SWaitingEvent {
     private String correlation4;
     private String correlation5;
 
-    public SWaitingMessageEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
-                                    final String flowNodeName, final String messageName) {
+    public SWaitingMessageEvent(final SBPMEventType eventType, final long processdefinitionId, final String processName,
+            final long flowNodeDefinitionId,
+            final String flowNodeName, final String messageName) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
         this.messageName = messageName;
     }

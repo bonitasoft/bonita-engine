@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.services.Vendor;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.junit.Test;
@@ -99,7 +98,10 @@ public class SQLQueryBuilderTest {
         doReturn(baseQuery).when(mockedQuery).getQueryString();
         //when
         QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.POSTGRES);
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
+                null,
                 false);
         queryBuilder.buildQuery(session);
         //then
@@ -114,7 +116,10 @@ public class SQLQueryBuilderTest {
         doReturn(baseQuery).when(mockedQuery).getQueryString();
         //when
         QueryBuilder queryBuilder = createQueryBuilder(baseQuery, Vendor.ORACLE);
-        queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)), null,
+        queryBuilder.appendFilters(
+                Collections.singletonList(
+                        new FilterOption(TestObject.class, "enabled", true, FilterOperationType.EQUALS)),
+                null,
                 false);
         queryBuilder.buildQuery(session);
         //then

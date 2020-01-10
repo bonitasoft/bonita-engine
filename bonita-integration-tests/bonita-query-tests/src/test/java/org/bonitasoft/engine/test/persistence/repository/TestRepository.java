@@ -22,9 +22,9 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -79,28 +79,31 @@ public class TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id, long tenantId) {
-        return (T) getSession().get(clazz, new PersistentObjectId(id, tenantId));
+    public <T extends PersistentObject> T getById(final Class<? extends PersistentObject> clazz, long id,
+            long tenantId) {
+        return (T) getSession().get(clazz,
+                new PersistentObjectId(id, tenantId));
     }
 
     public PersistentObject selectOne(String queryName, Pair... parameters) {
         return selectOne(DEFAULT_TENANT_ID, queryName, parameters);
     }
-    public Long selectCount(String queryName, Pair...parameters){
+
+    public Long selectCount(String queryName, Pair... parameters) {
         Query namedQuery = getSessionWithTenantFilter(DEFAULT_TENANT_ID).getNamedQuery(queryName);
         for (Pair parameter : parameters) {
             namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
         }
         return ((Long) namedQuery.uniqueResult());
     }
-    public PersistentObject selectOne(long tenantId, String queryName, Pair...parameters){
+
+    public PersistentObject selectOne(long tenantId, String queryName, Pair... parameters) {
         Query namedQuery = getSessionWithTenantFilter(tenantId).getNamedQuery(queryName);
         for (Pair parameter : parameters) {
             namedQuery.setParameter(((String) parameter.getKey()), parameter.getValue());
         }
         return ((PersistentObject) namedQuery.uniqueResult());
     }
-
 
     public <T extends PersistentObject> T add(T entity) {
         if (!isTenantIdSet(entity)) {

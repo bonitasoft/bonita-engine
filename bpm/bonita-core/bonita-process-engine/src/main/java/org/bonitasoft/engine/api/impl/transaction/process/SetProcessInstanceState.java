@@ -32,7 +32,8 @@ public final class SetProcessInstanceState implements TransactionContentWithResu
 
     private SProcessInstance result;
 
-    public SetProcessInstanceState(final ProcessInstanceService processInstanceService, final long processInstanceId, final ProcessInstanceState state) {
+    public SetProcessInstanceState(final ProcessInstanceService processInstanceService, final long processInstanceId,
+            final ProcessInstanceState state) {
         this.processInstanceService = processInstanceService;
         this.processInstanceId = processInstanceId;
         this.state = state;

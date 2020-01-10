@@ -22,6 +22,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
  */
 public interface ApplicationImportStrategy {
 
-    void whenApplicationExists(SApplication existing, SApplication toBeImported) throws AlreadyExistsException, SBonitaException;
+    void whenApplicationExists(SApplication existing, SApplication toBeImported)
+            throws AlreadyExistsException, SBonitaException;
 
 }

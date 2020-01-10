@@ -203,7 +203,8 @@ public class DocumentValue implements Serializable {
     }
 
     /**
-     * If the document value updates an existing document, this getter tels us if the content is modified and should be updated
+     * If the document value updates an existing document, this getter tels us if the content is modified and should be
+     * updated
      *
      * @return true if the content of the original document has changed
      */
@@ -232,8 +233,10 @@ public class DocumentValue implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         DocumentValue that = (DocumentValue) o;
         return Objects.equals(hasContent, that.hasContent) &&
                 Objects.equals(hasChanged, that.hasChanged) &&

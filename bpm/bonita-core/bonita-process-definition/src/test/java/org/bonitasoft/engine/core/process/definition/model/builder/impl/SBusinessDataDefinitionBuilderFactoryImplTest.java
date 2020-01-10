@@ -24,7 +24,8 @@ public class SBusinessDataDefinitionBuilderFactoryImplTest {
     @Test
     public void getSBusinessDataDefinitionBuilderFactoryInterfaceShouldReturnsSBusinessDataDefinitionBuilderFactoryImpl() {
         // when:
-        final SBusinessDataDefinitionBuilderFactory factory = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
+        final SBusinessDataDefinitionBuilderFactory factory = BuilderFactory
+                .get(SBusinessDataDefinitionBuilderFactory.class);
         // then:
         assertThat(factory).isInstanceOf(SBusinessDataDefinitionBuilderFactoryImpl.class);
     }

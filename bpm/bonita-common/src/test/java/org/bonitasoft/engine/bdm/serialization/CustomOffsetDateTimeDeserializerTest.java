@@ -20,12 +20,11 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * @author Emmanuel Duchastenier
@@ -46,7 +45,8 @@ public class CustomOffsetDateTimeDeserializerTest {
         final OffsetDateTime deserialized = serializer.deserialize(jsonParser, null);
 
         // then:
-        assertThat(deserialized).isEqualTo(OffsetDateTime.of(LocalDateTime.of(2018, 9, 1, 2, 21, 8), ZoneOffset.ofHours(0)));
+        assertThat(deserialized)
+                .isEqualTo(OffsetDateTime.of(LocalDateTime.of(2018, 9, 1, 2, 21, 8), ZoneOffset.ofHours(0)));
     }
 
     @Test

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.connector;
 
 /**
  * Events type to activate a connector
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */

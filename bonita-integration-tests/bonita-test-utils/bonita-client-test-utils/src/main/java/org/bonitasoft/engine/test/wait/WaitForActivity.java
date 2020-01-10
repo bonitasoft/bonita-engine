@@ -34,7 +34,8 @@ public class WaitForActivity extends WaitUntil {
     private final ProcessAPI processAPI;
 
     @Deprecated
-    public WaitForActivity(final int repeatEach, final int timeout, final String activityName, final long processInstanceId, final ProcessAPI processAPI) {
+    public WaitForActivity(final int repeatEach, final int timeout, final String activityName,
+            final long processInstanceId, final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.activityName = activityName;
         this.processInstanceId = processInstanceId;
@@ -42,7 +43,8 @@ public class WaitForActivity extends WaitUntil {
     }
 
     @Deprecated
-    public WaitForActivity(final int repeatEach, final int timeout, final String activityName, final long processInstanceId, final String state,
+    public WaitForActivity(final int repeatEach, final int timeout, final String activityName,
+            final long processInstanceId, final String state,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.activityName = activityName;

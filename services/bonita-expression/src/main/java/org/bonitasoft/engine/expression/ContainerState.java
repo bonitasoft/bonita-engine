@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.expression;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
 public enum ContainerState {
     ARCHIVED, ACTIVE;

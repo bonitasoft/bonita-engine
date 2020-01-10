@@ -17,7 +17,8 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
 /**
- * Utilitary builder to creation <code>Operation</code> objects. <code>Operation</code>s are a way to 'assign', 'operate', 'set a new value', ... on something.
+ * Utilitary builder to creation <code>Operation</code> objects. <code>Operation</code>s are a way to 'assign',
+ * 'operate', 'set a new value', ... on something.
  * See {@link OperatorType} for the different types of operation.
  *
  * @see OperatorType
@@ -32,7 +33,8 @@ public class OperationBuilder {
     private OperationImpl operation;
 
     /**
-     * Initiate the building of a new <code>Operation</code>. The <code>Operation</code> building will be complete when calling the {@link #done()} method.
+     * Initiate the building of a new <code>Operation</code>. The <code>Operation</code> building will be complete when
+     * calling the {@link #done()} method.
      *
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
@@ -42,7 +44,8 @@ public class OperationBuilder {
     }
 
     /**
-     * Sets the <code>LeftOperand</code> of this operation. A <code>LeftOperand</code> can be obtained by using <code>LeftOperandBuilder</code>.
+     * Sets the <code>LeftOperand</code> of this operation. A <code>LeftOperand</code> can be obtained by using
+     * <code>LeftOperandBuilder</code>.
      *
      * @param leftOperand
      *        the <code>LeftOperand</code> to set.
@@ -56,7 +59,8 @@ public class OperationBuilder {
 
     /**
      * @deprecated use setLeftOperand(String,String)
-     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external
+     *             properties.
      * @param name
      *        the name of the left operand
      * @param external
@@ -71,7 +75,8 @@ public class OperationBuilder {
 
     /**
      * @deprecated use setLeftOperand(String,String)
-     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external
+     *             properties.
      * @param name
      *        the name of the left operand
      * @param type
@@ -142,11 +147,13 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDataOperation(final String dataName, final Expression expression) {
-        return createNewInstance().setLeftOperand(dataName, LeftOperand.TYPE_DATA).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
+        return createNewInstance().setLeftOperand(dataName, LeftOperand.TYPE_DATA).setRightOperand(expression)
+                .setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
-     * Creates a new operation of type {@link org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA} that allows to update a Business Data by calling a
+     * Creates a new operation of type {@link org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA} that
+     * allows to update a Business Data by calling a
      * Java setter on one of
      * its attributes.
      *
@@ -155,19 +162,24 @@ public class OperationBuilder {
      * @param methodName
      *        the Java setter method to call.
      * @param methodParamType
-     *        the type of the Java setter method parameter (to be able to differentiate 2 methods with the same name but with different parameter types)
+     *        the type of the Java setter method parameter (to be able to differentiate 2 methods with the same name but
+     *        with different parameter types)
      * @param expression
      *        the Expression to evaluate that represents the new value to set.
      * @return the newly created <code>Operation</code>.
      */
-    public Operation createBusinessDataSetAttributeOperation(final String businessDataName, final String methodName, final String methodParamType,
+    public Operation createBusinessDataSetAttributeOperation(final String businessDataName, final String methodName,
+            final String methodParamType,
             final Expression expression) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setRightOperand(expression)
+        return createNewInstance()
+                .setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
+                .setRightOperand(expression)
                 .setType(OperatorType.JAVA_METHOD).setOperator(methodName).setOperatorInputType(methodParamType).done();
     }
 
     /**
-     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that associates an existing Business Data to the current process.
+     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that associates an existing Business Data to the
+     * current process.
      *
      * @param businessDataName
      *        the name of the reference in the process.
@@ -176,13 +188,16 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      * @see org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA
      */
-    public Operation attachBusinessDataSetAttributeOperation(final String businessDataName, final Expression expressionReturningBusinessData) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
+    public Operation attachBusinessDataSetAttributeOperation(final String businessDataName,
+            final Expression expressionReturningBusinessData) {
+        return createNewInstance()
+                .setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
                 .setRightOperand(expressionReturningBusinessData).setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
-     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that remove the named Business Data of the current process.
+     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that remove the named Business Data of the
+     * current process.
      *
      * @param businessDataName
      *        the name of the reference in the process.
@@ -190,7 +205,9 @@ public class OperationBuilder {
      * @see OperatorType#DELETION
      */
     public Operation deleteBusinessDataOperation(final String businessDataName) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setType(OperatorType.DELETION)
+        return createNewInstance()
+                .setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
+                .setType(OperatorType.DELETION)
                 .done();
     }
 
@@ -204,7 +221,8 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocument(final String docName, final Expression expression) {
-        return createNewInstance().setLeftOperand(docName, LeftOperand.TYPE_DOCUMENT).setType(OperatorType.ASSIGNMENT).setRightOperand(expression).done();
+        return createNewInstance().setLeftOperand(docName, LeftOperand.TYPE_DOCUMENT).setType(OperatorType.ASSIGNMENT)
+                .setRightOperand(expression).done();
     }
 
     /**
@@ -217,7 +235,8 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocumentList(final String docName, final Expression expression) {
-        return createNewInstance().setLeftOperand(docName, LeftOperand.TYPE_DOCUMENT_LIST).setType(OperatorType.ASSIGNMENT).setRightOperand(expression).done();
+        return createNewInstance().setLeftOperand(docName, LeftOperand.TYPE_DOCUMENT_LIST)
+                .setType(OperatorType.ASSIGNMENT).setRightOperand(expression).done();
     }
 
     /**
@@ -232,7 +251,8 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createXPathOperation(final String xmlName, final String xPath, final Expression setValue) {
-        return createNewInstance().setLeftOperand(xmlName, LeftOperand.TYPE_DATA).setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath)
+        return createNewInstance().setLeftOperand(xmlName, LeftOperand.TYPE_DATA)
+                .setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath)
                 .setRightOperand(setValue).done();
     }
 
@@ -249,8 +269,10 @@ public class OperationBuilder {
      *        the value to call the method with
      * @return the newly created <code>Operation</code>.
      */
-    public Operation createJavaMethodOperation(final String objectName, final String methodName, final String methodParamType, final Expression methodParams) {
-        return createNewInstance().setLeftOperand(objectName, LeftOperand.TYPE_DATA).setType(OperatorType.JAVA_METHOD).setOperator(methodName)
+    public Operation createJavaMethodOperation(final String objectName, final String methodName,
+            final String methodParamType, final Expression methodParams) {
+        return createNewInstance().setLeftOperand(objectName, LeftOperand.TYPE_DATA).setType(OperatorType.JAVA_METHOD)
+                .setOperator(methodName)
                 .setOperatorInputType(methodParamType).setRightOperand(methodParams).done();
     }
 
@@ -264,7 +286,8 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetStringIndexOperation(final int index, final Expression setValue) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index)).setType(OperatorType.ASSIGNMENT)
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index))
+                .setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(setValue).done();
     }
 
@@ -279,8 +302,10 @@ public class OperationBuilder {
     }
 
     /**
-     * Get a copy of this operation, so that this operation can be added at several places without conflicting because of unique ID constraint.
-     * If <code>operation</code> is null, simply returns null. In particular, the right operand expression needs to be unique, because of its ID.
+     * Get a copy of this operation, so that this operation can be added at several places without conflicting because
+     * of unique ID constraint.
+     * If <code>operation</code> is null, simply returns null. In particular, the right operand expression needs to be
+     * unique, because of its ID.
      *
      * @param operation the operation to copy
      * @return a deep copy of this operation, or null.

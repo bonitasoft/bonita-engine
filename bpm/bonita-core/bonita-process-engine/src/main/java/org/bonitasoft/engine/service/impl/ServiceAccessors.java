@@ -17,7 +17,6 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- *
  * This is the main entry point to the engine services
  *
  * @author Baptiste Mesta.

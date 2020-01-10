@@ -17,7 +17,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
  * Thrown when a BPM flow node fails to execute.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
@@ -27,9 +27,10 @@ public class FlowNodeExecutionException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail message.
-     * 
+     *
      * @param message
-     *            The detail message why the flow node failed to execute(which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message why the flow node failed to execute(which is saved for later retrieval by the
+     *        {@link Throwable#getMessage()} method).
      */
     public FlowNodeExecutionException(final String message) {
         super(message);
@@ -37,10 +38,11 @@ public class FlowNodeExecutionException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *            The cause of the flow node failure (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is
-     *            permitted, and indicates that the cause is nonexistent or unknown.)
+     *        The cause of the flow node failure (which is saved for later retrieval by the {@link Throwable#getCause()}
+     *        method). (A null value is
+     *        permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public FlowNodeExecutionException(final Throwable cause) {
         super(cause);

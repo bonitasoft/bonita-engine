@@ -35,7 +35,8 @@ public class SearchEntityMemberRoleAndGroupDescriptor extends SearchEntityMember
         super();
         putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, SRole.NAME));
         putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, SGroup.NAME));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SGroup.class, SGroup.PARENT_PATH));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3,
+                new FieldDescriptor(SGroup.class, SGroup.PARENT_PATH));
 
         entityMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(2);
         final Set<String> roleFields = new HashSet<String>(1);

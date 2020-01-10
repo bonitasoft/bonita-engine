@@ -14,7 +14,8 @@
 package org.bonitasoft.engine.business.data;
 
 /**
- * A <code>SimpleBusinessDataReference</code> is a reference of a {@link org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition} which is not multiple.
+ * A <code>SimpleBusinessDataReference</code> is a reference of a
+ * {@link org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition} which is not multiple.
  *
  * @author Matthieu Chaffotte
  */

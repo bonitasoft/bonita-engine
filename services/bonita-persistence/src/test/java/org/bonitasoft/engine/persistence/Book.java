@@ -22,8 +22,7 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NamedQuery(name = "getAllBooks",
-        query = "SELECT book FROM org.bonitasoft.engine.persistence.Book AS book")
+@NamedQuery(name = "getAllBooks", query = "SELECT book FROM org.bonitasoft.engine.persistence.Book AS book")
 
 @Data
 @NoArgsConstructor

@@ -33,7 +33,8 @@ public class ClassDataUtil {
         byte[] data = null;
         try {
             if (inputStream == null) {
-                throw new IOException("Impossible to get stream from class: " + clazz.getName() + ", className= " + resource);
+                throw new IOException(
+                        "Impossible to get stream from class: " + clazz.getName() + ", className= " + resource);
             }
             data = IOUtil.getAllContentFrom(inputStream);
         } finally {

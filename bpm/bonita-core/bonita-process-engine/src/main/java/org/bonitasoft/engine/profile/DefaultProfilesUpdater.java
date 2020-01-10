@@ -36,13 +36,12 @@ import org.bonitasoft.engine.session.SessionService;
  */
 public class DefaultProfilesUpdater {
 
-
     private TechnicalLoggerService logger;
     private ProfilesImporter profilesImporter;
     private Long tenantId;
 
     public DefaultProfilesUpdater(Long tenantId, TechnicalLoggerService logger,
-                                  ProfilesImporter profilesImporter) {
+            ProfilesImporter profilesImporter) {
         this.logger = logger;
         this.profilesImporter = profilesImporter;
         this.tenantId = tenantId;
@@ -91,7 +90,8 @@ public class DefaultProfilesUpdater {
     Object doUpdateProfiles(final ProfilesNode defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
-            final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles, ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
+            final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles,
+                    ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
             logger.log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Updated default profiles " + importStatuses);
             if (md5File != null) {

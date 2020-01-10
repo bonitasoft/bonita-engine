@@ -22,11 +22,10 @@ public interface ContentType {
 
     String FORM = "form";
 
-    String API_EXTENSION= "apiExtension";
+    String API_EXTENSION = "apiExtension";
 
-    String LAYOUT= "layout";
+    String LAYOUT = "layout";
 
-    String THEME= "theme";
-
+    String THEME = "theme";
 
 }

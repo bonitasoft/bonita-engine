@@ -89,7 +89,9 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
 
         try {
             dependencyService.deleteDependency(name);
-            classLoaderService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
+            classLoaderService.refreshClassLoaderAfterUpdate(
+                    ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                    classLoaderService.getGlobalClassLoaderId());
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -98,7 +100,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     }
 
     @Override
-    public CommandDescriptor register(final String name, final String description, final String implementation) throws CreationException {
+    public CommandDescriptor register(final String name, final String description, final String implementation)
+            throws CreationException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
         try {
@@ -118,7 +121,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     }
 
     @Override
-    public Serializable execute(final String platformCommandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
+    public Serializable execute(final String platformCommandName, final Map<String, Serializable> parameters)
+            throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
 
@@ -126,7 +130,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         try {
             SPlatformCommand sPlatformCommand = platformCommandService.getPlatformCommand(platformCommandName);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            PlatformCommand command = (PlatformCommand) contextClassLoader.loadClass(sPlatformCommand.getImplementation()).newInstance();
+            PlatformCommand command = (PlatformCommand) contextClassLoader
+                    .loadClass(sPlatformCommand.getImplementation()).newInstance();
             return command.execute(parameters, platformAccessor);
         } catch (final SPlatformCommandNotFoundException e) {
             throw new CommandNotFoundException(e);
@@ -146,7 +151,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
             final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
             final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
-            final DeleteSPlatformCommand deletePlatformCommand = new DeleteSPlatformCommand(platformCommandService, platformCommandName);
+            final DeleteSPlatformCommand deletePlatformCommand = new DeleteSPlatformCommand(platformCommandService,
+                    platformCommandName);
             deletePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new CommandNotFoundException(scnfe);
@@ -168,12 +174,14 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     }
 
     @Override
-    public List<CommandDescriptor> getCommands(final int startIndex, final int maxResults, final CommandCriterion sort) {
+    public List<CommandDescriptor> getCommands(final int startIndex, final int maxResults,
+            final CommandCriterion sort) {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
         try {
-            final GetSPlatformCommands getPlatformCommands = new GetSPlatformCommands(platformCommandService, startIndex, maxResults, sort);
+            final GetSPlatformCommands getPlatformCommands = new GetSPlatformCommands(platformCommandService,
+                    startIndex, maxResults, sort);
             getPlatformCommands.execute();
             return ModelConvertor.toPlatformCommandDescriptors(getPlatformCommands.getResult());
         } catch (final SBonitaException e) {
@@ -190,7 +198,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
         try {
-            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService, platformCommandName, updater);
+            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService,
+                    platformCommandName, updater);
             updatePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);

@@ -26,17 +26,16 @@ import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SearchApplicationMenus extends AbstractSearchEntity<ApplicationMenu, SApplicationMenu> {
 
     private final ApplicationService applicationService;
     private final ApplicationMenuModelConverter convertor;
 
-    public SearchApplicationMenus(final ApplicationService applicationService, final ApplicationMenuModelConverter convertor,
+    public SearchApplicationMenus(final ApplicationService applicationService,
+            final ApplicationMenuModelConverter convertor,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.applicationService = applicationService;
@@ -54,7 +53,8 @@ public class SearchApplicationMenus extends AbstractSearchEntity<ApplicationMenu
     }
 
     @Override
-    public List<ApplicationMenu> convertToClientObjects(final List<SApplicationMenu> serverObjects) throws SBonitaException {
+    public List<ApplicationMenu> convertToClientObjects(final List<SApplicationMenu> serverObjects)
+            throws SBonitaException {
         return convertor.toApplicationMenu(serverObjects);
     }
 

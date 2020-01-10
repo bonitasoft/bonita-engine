@@ -55,7 +55,8 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
     private ProcessDefinition processDefinition;
 
     private ProcessDefinition deployEmptyProcess() throws BonitaException {
-        final DesignProcessDefinition done = new ProcessDefinitionBuilder().createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
+        final DesignProcessDefinition done = new ProcessDefinitionBuilder()
+                .createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()))
                 .done();
         return deployAndEnableProcess(done);
     }
@@ -72,13 +73,17 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         inputValues.put("emp2", emp2);
 
         final ProcessDefinition processDefinition = deployEmptyProcess();
-        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1, ComparisonOperator.GREATER_THAN,
+        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand1,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand2);
-        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2, ComparisonOperator.GREATER_THAN,
+        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("GreaterThan", exprOperand2,
+                ComparisonOperator.GREATER_THAN,
                 exprOperand1);
 
-        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression1, inputValues, processDefinition.getId()));
-        assertEquals(false, getProcessAPI().evaluateExpressionOnProcessDefinition(expression2, inputValues, processDefinition.getId()));
+        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression1, inputValues,
+                processDefinition.getId()));
+        assertEquals(false, getProcessAPI().evaluateExpressionOnProcessDefinition(expression2, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -97,11 +102,15 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         inputValues.put("emp3", emp3);
 
         final ProcessDefinition processDefinition = deployEmptyProcess();
-        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand2);
-        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("Equals2", exprOperand1, ComparisonOperator.EQUALS, exprOperand3);
+        final Expression expression1 = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand2);
+        final Expression expression2 = new ExpressionBuilder().createComparisonExpression("Equals2", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand3);
 
-        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression1, inputValues, processDefinition.getId()));
-        assertEquals(false, getProcessAPI().evaluateExpressionOnProcessDefinition(expression2, inputValues, processDefinition.getId()));
+        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression1, inputValues,
+                processDefinition.getId()));
+        assertEquals(false, getProcessAPI().evaluateExpressionOnProcessDefinition(expression2, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -117,19 +126,24 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         inputValues.put("emp2", secretary);
 
         final ProcessDefinition processDefinition = deployEmptyProcess();
-        final Expression expression = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1, ComparisonOperator.EQUALS, exprOperand2);
+        final Expression expression = new ExpressionBuilder().createComparisonExpression("Equals", exprOperand1,
+                ComparisonOperator.EQUALS, exprOperand2);
 
-        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues,
+                processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void should_operation_with_transient_data_reevaluate_the_definition_if_lost() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTransientData",
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(
+                "processWithTransientData",
                 String.valueOf(System.currentTimeMillis()));
         builder.addActor("actor");
         builder.addUserTask("step1", "actor")
-                .addData("tData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
+                .addData("tData", String.class.getName(),
+                        new ExpressionBuilder().createConstantStringExpression("The default value"))
+                .isTransient();
         processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance step1 = waitForUserTaskAndGetIt("step1");
@@ -158,18 +172,23 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         }
     }
 
-    private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name) throws InvalidExpressionException,
+    private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name)
+            throws InvalidExpressionException,
             UpdateException {
-        final Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
-                .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value)).setType(OperatorType.ASSIGNMENT).done();
+        final Operation operation = new OperationBuilder().createNewInstance()
+                .setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value))
+                .setType(OperatorType.ASSIGNMENT).done();
         getProcessAPI().updateActivityInstanceVariables(Arrays.asList(operation), step1.getId(), null);
     }
 
-    private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1) throws ExpressionEvaluationException,
+    private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1)
+            throws ExpressionEvaluationException,
             InvalidExpressionException {
         final Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<>();
         expressionMap
-                .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()), Collections.<String, Serializable> emptyMap());
+                .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()),
+                        Collections.<String, Serializable> emptyMap());
         return getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);
     }
 

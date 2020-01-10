@@ -44,7 +44,8 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
     protected final Set<String> processFields;
 
     public SearchProcessInstanceDescriptor() {
-        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory
+                .get(SUserTaskInstanceBuilderFactory.class);
 
         searchEntityKeys = new HashMap<>();
         searchEntityKeys.put(NAME, new FieldDescriptor(SProcessInstance.class, SProcessInstance.NAME_KEY));

@@ -25,7 +25,6 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
  */
 public class DeleteTenantConfigurationInTransaction extends TransactionCallbackWithoutResult {
 
-
     private final JdbcTemplate jdbcTemplate;
     private final String dbVendor;
     private final long tenantId;
@@ -41,7 +40,7 @@ public class DeleteTenantConfigurationInTransaction extends TransactionCallbackW
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
         LOGGER.info(
-                "delete existing configurations for tenant id:" + tenantId );
+                "delete existing configurations for tenant id:" + tenantId);
 
         jdbcTemplate.batchUpdate(BonitaConfigurationTenantCleaner.DELETE_TENANT_CONFIGURATION,
                 new BonitaConfigurationTenantCleaner(tenantId));

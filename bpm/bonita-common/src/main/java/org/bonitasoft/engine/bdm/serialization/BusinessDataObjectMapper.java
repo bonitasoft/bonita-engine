@@ -21,11 +21,10 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.bonitasoft.engine.bdm.Entity;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.bonitasoft.engine.bdm.Entity;
 
 public class BusinessDataObjectMapper {
 
@@ -55,7 +54,8 @@ public class BusinessDataObjectMapper {
     }
 
     public <T extends Serializable> List<T> readListValue(byte[] result, Class<T> loadClass) throws IOException {
-        return objectMapper.readValue(result, objectMapper.getTypeFactory().constructCollectionType(List.class, loadClass));
+        return objectMapper.readValue(result,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, loadClass));
     }
 
     public <T extends Serializable> T readValue(byte[] result, Class<T> loadClass) throws IOException {

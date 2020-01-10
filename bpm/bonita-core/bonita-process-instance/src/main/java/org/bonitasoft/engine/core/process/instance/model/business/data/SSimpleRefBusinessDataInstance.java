@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,6 +28,7 @@ import javax.persistence.Entity;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public abstract class SSimpleRefBusinessDataInstance extends SRefBusinessDataInstance {
+
     @Column(name = "data_id")
     private Long dataId;
 }

@@ -57,7 +57,8 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
 
     @Test
     public void timerJobsAreDeleteOnDisable() throws Exception {
-        final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("proc",
+                "1.0");
         final String timerEventName = "startTimer";
         definitionBuilder.addStartEvent(timerEventName).addTimerEventTriggerDefinition(TimerType.DURATION,
                 new ExpressionBuilder().createConstantLongExpression(2000));
@@ -106,17 +107,21 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
         return TIMER_EVENT_PREFIX + eventInstanceId;
     }
 
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String stepName)
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType,
+            final Expression timerValue, final String stepName)
             throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
-        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("My Process with start event", "1.0");
+        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent")
+                .addTimerEventTriggerDefinition(timerType, timerValue);
         processDefinitionBuilder.addAutomaticTask(stepName);
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("intermediateCatchEvent", stepName);
         processDefinitionBuilder.addTransition(stepName, "end");
 
         final ProcessDefinition definition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
     }
@@ -126,10 +131,12 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
         // given
         final int timerTrigger = 20000; // the timer intermediate catch event will wait 20 seconds
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerTrigger);
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION,
+                timerExpression, "step");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final FlowNodeInstance intermediateCatchEvent = waitForFlowNodeInWaitingState(processInstance, "intermediateCatchEvent", false);
+        final FlowNodeInstance intermediateCatchEvent = waitForFlowNodeInWaitingState(processInstance,
+                "intermediateCatchEvent", false);
         final Long floNodeInstanceId = intermediateCatchEvent.getId();
         final String jobName = getJobName(floNodeInstanceId);
         assertThat(containsTimerJob(jobName)).isTrue();

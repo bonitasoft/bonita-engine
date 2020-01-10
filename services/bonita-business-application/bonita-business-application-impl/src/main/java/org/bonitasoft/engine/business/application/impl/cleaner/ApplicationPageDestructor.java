@@ -38,12 +38,15 @@ public class ApplicationPageDestructor {
 
     public void onDeleteApplicationPage(SApplicationPage applicationPage) throws SBonitaException {
         verifyIfIsHomePage(applicationPage);
-        applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationPageRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationPage.getId()));
+        applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationPageRelatedMenusFilterBuilder(
+                new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS), applicationPage.getId()));
     }
 
-    private void verifyIfIsHomePage(SApplicationPage applicationPage) throws SBonitaReadException, SObjectNotFoundException, SObjectModificationException {
-        if(homePageChecker.isHomePage(applicationPage)) {
-            throw new SObjectModificationException("The application page with id '" + applicationPage.getId() + "' cannot be deleted because it is set as the application home page");
+    private void verifyIfIsHomePage(SApplicationPage applicationPage)
+            throws SBonitaReadException, SObjectNotFoundException, SObjectModificationException {
+        if (homePageChecker.isHomePage(applicationPage)) {
+            throw new SObjectModificationException("The application page with id '" + applicationPage.getId()
+                    + "' cannot be deleted because it is set as the application home page");
         }
     }
 

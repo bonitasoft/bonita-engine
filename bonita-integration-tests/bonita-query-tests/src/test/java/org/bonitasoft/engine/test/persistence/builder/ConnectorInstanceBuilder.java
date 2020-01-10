@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithF
 /**
  * @author Julien Reboul
  */
-public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SAbstractConnectorInstance, ConnectorInstanceBuilder> {
+public class ConnectorInstanceBuilder
+        extends PersistentObjectBuilder<SAbstractConnectorInstance, ConnectorInstanceBuilder> {
 
     private boolean withFailureInfo = false;
 
@@ -56,7 +57,6 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SAbstractC
         return this;
     }
 
-
     @Override
     SAbstractConnectorInstance _build() {
         SAbstractConnectorInstance connectorInstance;
@@ -64,8 +64,7 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SAbstractC
             connectorInstance = new SConnectorInstanceWithFailureInfo();
             ((SConnectorInstanceWithFailureInfo) connectorInstance).setExceptionMessage(exceptionMessage);
             ((SConnectorInstanceWithFailureInfo) connectorInstance).setStackTrace(stackTrace);
-        }
-        else {
+        } else {
             connectorInstance = new SConnectorInstance();
         }
         connectorInstance.setState(state);

@@ -32,8 +32,9 @@ public abstract class SActivityInstance extends SFlowNodeInstance {
 
     private long abortedByBoundary = 0;
 
-    public SActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                 final long logicalGroup1, final long logicalGroup2) {
+    public SActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
 }

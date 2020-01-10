@@ -40,7 +40,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 //keep order
 @SpringBootTest(classes = {
         PlatformSetupApplication.class })
-@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version" })
+@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration",
+        "org.bonitasoft.platform.version" })
 @PropertySource("classpath:/application.properties")
 @Component
 public class VersionServiceImplT {
@@ -79,7 +80,8 @@ public class VersionServiceImplT {
         final String platformVersion = versionService.getPlatformVersion();
 
         //then
-        Assertions.assertThat(platformVersion).as("should return same version").isEqualTo(versionService.getPlatformSetupVersion());
+        Assertions.assertThat(platformVersion).as("should return same version")
+                .isEqualTo(versionService.getPlatformSetupVersion());
     }
 
     @Test

@@ -44,7 +44,8 @@ public class BonitaBPMParentClassLoaderResolverTest {
         //given
         final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.TENANT.name(), 124);
         //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
+        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
+                .getParentClassLoaderIdentifier(childId);
         //then
         assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
@@ -54,7 +55,8 @@ public class BonitaBPMParentClassLoaderResolverTest {
         //given
         final ClassLoaderIdentifier childId = new ClassLoaderIdentifier("___datasource___", 124);
         //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
+        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
+                .getParentClassLoaderIdentifier(childId);
         //then
         assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
@@ -77,15 +79,17 @@ public class BonitaBPMParentClassLoaderResolverTest {
         bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then exception
     }
+
     @Test
     public void should_getParentClassLoaderIdentifier_return_tenant() throws Exception {
         //given
         doReturn(25l).when(sessionAccessor).getTenantId();
         final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.PROCESS.name(), 124);
         //when
-        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
+        final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver
+                .getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isEqualTo(new ClassLoaderIdentifier(ScopeType.TENANT.name(),25));
+        assertThat(parentClassLoaderIdentifier).isEqualTo(new ClassLoaderIdentifier(ScopeType.TENANT.name(), 25));
     }
 
 }

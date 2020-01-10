@@ -18,23 +18,16 @@ import static org.bonitasoft.engine.commons.Pair.pair;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
-import org.bonitasoft.engine.transaction.UserTransactionService;
-
 
 /**
  * @author Baptiste Mesta
@@ -49,13 +42,13 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
     private final Long tenantId;
 
     public RefreshClassloaderSynchronization(ClassLoaderServiceImpl classLoaderService,
-                                             BroadcastService broadcastService,
-                                             RefreshClassLoaderTask callable,
-                                             ClassLoaderUpdater classLoaderUpdater,
-                                             Long tenantId, ScopeType scopeType, Long scopeId) {
+            BroadcastService broadcastService,
+            RefreshClassLoaderTask callable,
+            ClassLoaderUpdater classLoaderUpdater,
+            Long tenantId, ScopeType scopeType, Long scopeId) {
         this.classLoaderService = classLoaderService;
         this.classLoaderUpdater = classLoaderUpdater;
-                this.broadcastService = broadcastService;
+        this.broadcastService = broadcastService;
         this.callable = callable;
         this.tenantId = tenantId;
         addClassloaderToRefresh(scopeType, scopeId);
@@ -86,7 +79,6 @@ class RefreshClassloaderSynchronization implements BonitaTransactionSynchronizat
             throw new SBonitaRuntimeException("Unable to refresh the classloaders on all nodes: " + ids, e);
         }
     }
-
 
     //Testing purpose only
     Set<Pair<ScopeType, Long>> getIds() {

@@ -39,7 +39,6 @@ public class SADateDataInstance extends SADataInstance {
     @Type(type = "org.bonitasoft.engine.persistence.DateStoredAsLongUserType")
     private Date value;
 
-
     public SADateDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);
         value = (Date) sDataInstance.getValue();

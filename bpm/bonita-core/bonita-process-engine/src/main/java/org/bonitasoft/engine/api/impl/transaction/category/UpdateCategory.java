@@ -30,7 +30,8 @@ public class UpdateCategory implements TransactionContent {
 
     private final EntityUpdateDescriptor updateDescriptor;
 
-    public UpdateCategory(final CategoryService categoryService, final long categoryId, final EntityUpdateDescriptor updateDescriptor) {
+    public UpdateCategory(final CategoryService categoryService, final long categoryId,
+            final EntityUpdateDescriptor updateDescriptor) {
         super();
         this.categoryService = categoryService;
         this.categoryId = categoryId;

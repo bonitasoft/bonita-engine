@@ -42,7 +42,8 @@ public class LogicalComplementExecutorTest {
     public void evaluate_should_return_true_when_the_resolution_of_first_dependency_is_false() throws Exception {
         //given
         SExpression sourceExpression = buildBooleanExpression(false);
-        Map<Integer, Object> resolvedExpressions = Collections.<Integer, Object> singletonMap(sourceExpression.getDiscriminant(), false);
+        Map<Integer, Object> resolvedExpressions = Collections
+                .<Integer, Object> singletonMap(sourceExpression.getDiscriminant(), false);
         SExpression logicalComplementExpression = buildLogicalComplementExpression(sourceExpression);
 
         //when
@@ -56,7 +57,8 @@ public class LogicalComplementExecutorTest {
     public void evaluate_should_return_false_when_the_resolution_of_first_dependency_is_true() throws Exception {
         //given
         SExpression sourceExpression = buildBooleanExpression(true);
-        Map<Integer, Object> resolvedExpressions = Collections.<Integer, Object> singletonMap(sourceExpression.getDiscriminant(), true);
+        Map<Integer, Object> resolvedExpressions = Collections
+                .<Integer, Object> singletonMap(sourceExpression.getDiscriminant(), true);
         SExpression logicalComplementExpression = buildLogicalComplementExpression(sourceExpression);
 
         //when
@@ -81,7 +83,8 @@ public class LogicalComplementExecutorTest {
     }
 
     @Test
-    public void evaluate_should_throws_SExpressionEvaluationException_when_dependencies_has_size_different_of_one() throws Exception {
+    public void evaluate_should_throws_SExpressionEvaluationException_when_dependencies_has_size_different_of_one()
+            throws Exception {
         //given
 
         List<SExpression> dependencies = Arrays.asList(mock(SExpression.class), mock(SExpression.class));
@@ -97,14 +100,16 @@ public class LogicalComplementExecutorTest {
         } catch (SExpressionEvaluationException e) {
             //then
             assertThat(e.getMessage()).isEqualTo(
-                    "The expression '" + ConditionExpressionExecutorStrategy.LOGICAL_COMPLEMENT_OPERATOR + "' must have exactly 1 dependency.");
+                    "The expression '" + ConditionExpressionExecutorStrategy.LOGICAL_COMPLEMENT_OPERATOR
+                            + "' must have exactly 1 dependency.");
             assertThat(e.getExpressionName()).isEqualTo("my expr");
         }
 
     }
 
     @Test
-    public void evaluate_should_throws_SExpressionEvaluationException_when_dependency_does_not_return_a_boolean() throws Exception {
+    public void evaluate_should_throws_SExpressionEvaluationException_when_dependency_does_not_return_a_boolean()
+            throws Exception {
         //given
         SExpression sourceExpression = mock(SExpression.class);
         given(sourceExpression.getReturnType()).willReturn(Integer.class.getName());

@@ -51,13 +51,13 @@ public abstract class AbstractConnector implements Connector {
 
     /**
      * get the input parameter or the default value if the parameter is not set
-     * 
+     *
      * @param parameterKey
-     *      name of the parameter
+     *        name of the parameter
      * @param defaultValue
-     *      value of the parameter if not set
+     *        value of the parameter if not set
      * @return
-     *      the value of the parameter
+     *         the value of the parameter
      */
     protected Object getInputParameter(final String parameterKey, final Serializable defaultValue) {
         final Object param = getInputParameter(parameterKey);

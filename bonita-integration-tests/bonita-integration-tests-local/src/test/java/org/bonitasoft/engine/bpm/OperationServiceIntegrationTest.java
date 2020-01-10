@@ -118,7 +118,8 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         final String containerType = "miniTask";
         final String defaultValueExpressionContent = "new ArrayList<String>();";
         final String newConstantValue = "stringAddedIntoTheList";
-        createListDataInstance(dataInstanceName, containerId, containerType, defaultValueExpressionContent, new ArrayList<String>());
+        createListDataInstance(dataInstanceName, containerId, containerType, defaultValueExpressionContent,
+                new ArrayList<String>());
         SDataInstance dataInstance = getDataInstance(dataInstanceName, containerId, containerType);
         assertTrue(dataInstance.getValue() instanceof ArrayList<?>);
 
@@ -138,27 +139,38 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         deleteDataInstance(dataInstance);
     }
 
-    private void createListDataInstance(final String dataInstanceName, final long containerId, final String containerType,
+    private void createListDataInstance(final String dataInstanceName, final long containerId,
+            final String containerType,
             final String defaultValueExpressionConstant, final Serializable defaultValue) throws Exception {
         final String description = null;
-        final SDataInstance dataInstance = buildDataInstance(dataInstanceName, ArrayList.class.getName(), description, defaultValueExpressionConstant,
+        final SDataInstance dataInstance = buildDataInstance(dataInstanceName, ArrayList.class.getName(), description,
+                defaultValueExpressionConstant,
                 containerId, containerType, false, SExpression.TYPE_READ_ONLY_SCRIPT, SExpression.GROOVY, defaultValue);
         insertDataInstance(dataInstance);
     }
 
-    private SOperation buildJavaMethodOperation(final String dataInstanceName, final String newConstantValue) throws SInvalidExpressionException {
-        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataInstanceName).done();
-        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setContent(newConstantValue)
+    private SOperation buildJavaMethodOperation(final String dataInstanceName, final String newConstantValue)
+            throws SInvalidExpressionException {
+        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                .setName(dataInstanceName).done();
+        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance()
+                .setContent(newConstantValue)
                 .setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance()
+                .setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
                 .setType(SOperatorType.JAVA_METHOD).setRightOperand(expression).done();
     }
 
-    private SOperation buildAssignmentOperation(final String dataInstanceName, final String newConstantValue) throws SInvalidExpressionException {
-        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataInstanceName).done();
-        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setContent(newConstantValue)
-                .setReturnType(String.class.getName()).setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+    private SOperation buildAssignmentOperation(final String dataInstanceName, final String newConstantValue)
+            throws SInvalidExpressionException {
+        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                .setName(dataInstanceName).done();
+        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance()
+                .setContent(newConstantValue)
+                .setReturnType(String.class.getName()).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+                .setReturnType(String.class.getName()).done();
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("=")
+                .setLeftOperand(leftOperand)
                 .setType(SOperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
     }
@@ -179,33 +191,41 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         });
     }
 
-    private SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws Exception {
+    private SDataInstance getDataInstance(final String dataInstanceName, final long containerId,
+            final String containerType) throws Exception {
         return transactionService.executeInTransaction(new Callable<SDataInstance>() {
 
             @Override
             public SDataInstance call() throws Exception {
-                return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
+                return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType,
+                        parentContainerResolver);
             }
         });
     }
 
     private void createStringDataInstance(final String instanceName, final long containerId, final String containerType,
             final String defaultValueExpressionContent, final Serializable currentDataInstanceValue) throws Exception {
-        final SDataInstance dataInstance = buildDataInstance(instanceName, String.class.getName(), "testUpdate", defaultValueExpressionContent, containerId,
+        final SDataInstance dataInstance = buildDataInstance(instanceName, String.class.getName(), "testUpdate",
+                defaultValueExpressionContent, containerId,
                 containerType, false, SExpression.TYPE_CONSTANT, null, currentDataInstanceValue);
         insertDataInstance(dataInstance);
     }
 
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description,
-            final String defaultValueExpressionContent, final long containerId, final String containerType, final boolean isTransient,
-            final String expressionType, final String expressionInterpreter, final Serializable currentDataInstanceValue) throws SBonitaException {
+            final String defaultValueExpressionContent, final long containerId, final String containerType,
+            final boolean isTransient,
+            final String expressionType, final String expressionInterpreter,
+            final Serializable currentDataInstanceValue) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
-        initializeBuilder(dataDefinitionBuilder, description, defaultValueExpressionContent, className, isTransient, expressionType, expressionInterpreter);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class)
+                .createNewInstance(instanceName, className);
+        initializeBuilder(dataDefinitionBuilder, description, defaultValueExpressionContent, className, isTransient,
+                expressionType, expressionInterpreter);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create data instance
         final SDataInstanceBuilder dataInstanceBuilder = SDataInstanceBuilder.createNewInstance(dataDefinition);
-        return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue).done();
+        return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType)
+                .setValue(currentDataInstanceValue).done();
     }
 
     private void insertDataInstance(final SDataInstance dataInstance) throws Exception {
@@ -219,15 +239,19 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         });
     }
 
-    private void initializeBuilder(final SDataDefinitionBuilder dataDefinitionBuilder, final String description, final String defaultValueExpressionContent,
-            final String defaultValueExprReturnType, final boolean isTransient, final String expressionType, final String interpreter)
+    private void initializeBuilder(final SDataDefinitionBuilder dataDefinitionBuilder, final String description,
+            final String defaultValueExpressionContent,
+            final String defaultValueExprReturnType, final boolean isTransient, final String expressionType,
+            final String interpreter)
             throws SInvalidExpressionException {
         SExpression expression = null;
         if (defaultValueExpressionContent != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class)
+                    .createNewInstance();
             // this discrimination'll be changed.
-            expreBuilder.setContent(defaultValueExpressionContent).setExpressionType(expressionType).setReturnType(defaultValueExprReturnType);
+            expreBuilder.setContent(defaultValueExpressionContent).setExpressionType(expressionType)
+                    .setReturnType(defaultValueExprReturnType);
             if (interpreter != null) {
                 expreBuilder.setInterpreter(interpreter);
             }

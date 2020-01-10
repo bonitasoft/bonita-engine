@@ -77,13 +77,17 @@ public class ProcessExecutionIT extends TestWithUser {
      */
     @Test
     public void ensureADeployWorksAfterAChangeInDependencies() throws Exception {
-        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process123", "1.0",
-                Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process123", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1,
+                ACTOR_NAME, user);
         getCommandAPI().addDependency("kikoo", new byte[] { 0, 2, 3 });
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
-                Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(processDefinition1);
         getCommandAPI().removeDependency("kikoo");
@@ -91,9 +95,11 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void startProcessWithCurrentUser() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
-                Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // Check that the current getSession() user name is the one used to start the process:
         LOGGER.debug("current getSession() user name used to start the process: " + processInstance.getStartedBy());
@@ -108,9 +114,11 @@ public class ProcessExecutionIT extends TestWithUser {
     public void startProcessFor() throws Exception {
         final User jack = createUser("jack", PASSWORD);
 
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
-                Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(jack.getId(), processDefinition.getId());
 
         try {
@@ -120,13 +128,15 @@ public class ProcessExecutionIT extends TestWithUser {
             assertEquals(user.getId(), processInstance.getStartedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100)
+                    .filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                     .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains("The user " + USERNAME + " acting as delegate of the user jack has started the case.");
+                        || comment.getContent().contains(
+                                "The user " + USERNAME + " acting as delegate of the user jack has started the case.");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
@@ -138,8 +148,9 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void createAndExecuteProcessWithAutomaticSteps() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.1",
-                Arrays.asList("step1", "step2"), Arrays.asList(false, false));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.1",
+                        Arrays.asList("step1", "step2"), Arrays.asList(false, false));
 
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
@@ -156,24 +167,28 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void executeProcessWithNoActivities() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.3",
-                Collections.<String> emptyList(), Collections.<Boolean> emptyList());
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.3",
+                        Collections.<String> emptyList(), Collections.<Boolean> emptyList());
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processDefinition.getId(), 0, 200);
         assertEquals(0, activities.size());
         assertTrue("Process instance should be completed",
-                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.NORMAL_FINAL));// FIXME
+                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10),
+                        TestStates.NORMAL_FINAL));// FIXME
 
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void checkStartAndEndDate() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
-                "1.0", Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                        "1.0", Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         long before = new Date().getTime();
         Thread.sleep(10);
@@ -181,7 +196,8 @@ public class ProcessExecutionIT extends TestWithUser {
         Thread.sleep(10);
         long after = new Date().getTime();
         final long startDate = processInstance.getStartDate().getTime();
-        assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
+        assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate,
+                after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
 
         final Long step1Id = waitForUserTask("step1");
@@ -189,17 +205,21 @@ public class ProcessExecutionIT extends TestWithUser {
         assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
         after = new Date().getTime();
-        final long endDate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getEndDate().getTime();
-        assertTrue("The process instance must finish between " + before + " and " + after + ", but was " + endDate, after >= endDate && endDate >= before);
+        final long endDate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getEndDate()
+                .getTime();
+        assertTrue("The process instance must finish between " + before + " and " + after + ", but was " + endDate,
+                after >= endDate && endDate >= before);
 
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void checkLastUpdateDateOfAnArchivedProcess() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
-                "1.0", Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                        "1.0", Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         long before = new Date().getTime();
         Thread.sleep(10);
@@ -207,7 +227,8 @@ public class ProcessExecutionIT extends TestWithUser {
         Thread.sleep(10);
         long after = new Date().getTime();
         final long processStartDate = processInstance.getStartDate().getTime();
-        assertTrue("The process instance " + processInstance.getName() + " must start between <" + before + "> and <" + after + ">, but was <"
+        assertTrue("The process instance " + processInstance.getName() + " must start between <" + before + "> and <"
+                + after + ">, but was <"
                 + processStartDate + ">", after >= processStartDate && processStartDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
 
@@ -216,8 +237,10 @@ public class ProcessExecutionIT extends TestWithUser {
         assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
         after = new Date().getTime();
-        final long lastUpdate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getLastUpdate().getTime();
-        assertTrue("The process instance " + processInstance.getName() + " must update in last between <" + before + "> and <" + after + ">, but was <"
+        final long lastUpdate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getLastUpdate()
+                .getTime();
+        assertTrue("The process instance " + processInstance.getName() + " must update in last between <" + before
+                + "> and <" + after + ">, but was <"
                 + lastUpdate + ">", after >= lastUpdate && lastUpdate >= before);
 
         disableAndDeleteProcess(processDefinition);
@@ -225,7 +248,8 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void checkProcessIsArchived() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addStartEvent("start");
         builder.addUserTask("step1", ACTOR_NAME);
@@ -236,7 +260,8 @@ public class ProcessExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final Long step1Id = waitForUserTask(processInstance, "step1");
 
-        final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
+        final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(),
+                0, 100);
         assertEquals(1, archs.size());
         assertEquals(TestStates.INITIALIZING.getStateName(), archs.get(0).getState());
 
@@ -244,7 +269,8 @@ public class ProcessExecutionIT extends TestWithUser {
         waitForProcessToFinish(processInstance);
 
         // Verify if the process instance is archived
-        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
+        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI()
+                .getFinalArchivedProcessInstance(processInstance.getId());
         assertNotNull(archivedProcessInstance);
         try {
             getProcessAPI().getProcessInstance(processInstance.getId());
@@ -257,7 +283,8 @@ public class ProcessExecutionIT extends TestWithUser {
         final SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 20);
         optionsBuilder.sort(ArchivedFlowNodeInstanceSearchDescriptor.NAME, Order.ASC);
         optionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
-        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(optionsBuilder.done()).getResult();
+        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI()
+                .searchArchivedFlowNodeInstances(optionsBuilder.done()).getResult();
         // To uncomment if need to fix BS-11970
         //        assertEquals(3, archivedFlowNodeInstances.size());
         //        assertEquals("end", archivedFlowNodeInstances.get(0).getName());
@@ -272,15 +299,19 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void getArchivedProcessInstanceById() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
-                Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
+                        Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition,
+                APITestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step1");
-        final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
+        final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(),
+                0, 100);
         assertEquals(1, archs.size());
         final ArchivedProcessInstance archivedProcessInstance = archs.get(0);
-        assertEquals(archivedProcessInstance, getProcessAPI().getArchivedProcessInstance(archivedProcessInstance.getId()));
+        assertEquals(archivedProcessInstance,
+                getProcessAPI().getArchivedProcessInstance(archivedProcessInstance.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -291,9 +322,11 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void checkArchiveDate() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
-                "1.0", Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                        "1.0", Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(processInstance, "step1");
@@ -301,11 +334,13 @@ public class ProcessExecutionIT extends TestWithUser {
         assignAndExecuteStep(step1Id, user.getId());
         waitForProcessToFinish(processInstance);
         final long after = new Date().getTime();
-        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
+        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI()
+                .getFinalArchivedProcessInstance(processInstance.getId());
         assertNotNull(archivedProcessInstance);
         long archiveDate = archivedProcessInstance.getArchiveDate().getTime();
-        assertTrue("The process must be archived between " + before + " and " + after + ", but was " + archiveDate, after >= archiveDate
-                && archiveDate >= before);
+        assertTrue("The process must be archived between " + before + " and " + after + ", but was " + archiveDate,
+                after >= archiveDate
+                        && archiveDate >= before);
 
         final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(step1Id);
         assertNotNull(archivedActivityInstance);
@@ -319,16 +354,19 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void checkArchiveStartedBy() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
-                "1.0", Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                        "1.0", Arrays.asList("step1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(user.getId(), processInstance.getStartedBy());
 
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
-        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
+        final ArchivedProcessInstance archivedProcessInstance = getProcessAPI()
+                .getFinalArchivedProcessInstance(processInstance.getId());
         assertNotNull(archivedProcessInstance);
         assertEquals(user.getId(), archivedProcessInstance.getStartedBy());
 
@@ -338,9 +376,11 @@ public class ProcessExecutionIT extends TestWithUser {
     @Test
     public void activityDisplayDescriptionUndefined() throws Exception {
         // create process definition;
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION)
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance(PROCESS_NAME, PROCESS_VERSION)
                 .addActor(ACTOR_NAME).addAutomaticTask("auto1").addUserTask("task1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME,
+                user);
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
 
         final ArchivedActivityInstance auto1 = waitForActivityInCompletedState(pi, "auto1", true);
@@ -355,16 +395,20 @@ public class ProcessExecutionIT extends TestWithUser {
     @Test
     public void should_update_and_sort_due_date_with_null_values() throws Exception {
         //given
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithNullDueDate", "7.4");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("processWithNullDueDate", "7.4");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addExpectedDuration(3600L);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
-        final UserTaskInstance todayTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance1, "step1", user);
-        final UserTaskInstance nextWeekTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance2, "step1", user);
-        final UserTaskInstance nullDueDate = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance3, "step1", user);
+        final UserTaskInstance todayTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance1, "step1",
+                user);
+        final UserTaskInstance nextWeekTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance2, "step1",
+                user);
+        final UserTaskInstance nullDueDate = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance3, "step1",
+                user);
 
         //when
         getProcessAPI().updateDueDateOfTask(nullDueDate.getId(), null);
@@ -393,8 +437,10 @@ public class ProcessExecutionIT extends TestWithUser {
                 .as("should have null as first value")
                 .containsExactly(nextWeekTask.getId(), todayTask.getId(), nullDueDate.getId());
 
-        assertThat(getProcessAPI().getHumanTaskInstance(nullDueDate.getId()).getExpectedEndDate()).as("should have updated expected date to null").isNull();
-        assertThat(getProcessAPI().getHumanTaskInstance(nextWeekTask.getId()).getExpectedEndDate()).as("should have updated expected date to next week")
+        assertThat(getProcessAPI().getHumanTaskInstance(nullDueDate.getId()).getExpectedEndDate())
+                .as("should have updated expected date to null").isNull();
+        assertThat(getProcessAPI().getHumanTaskInstance(nextWeekTask.getId()).getExpectedEndDate())
+                .as("should have updated expected date to next week")
                 .isEqualTo(nextWeekDueDate);
 
         disableAndDeleteProcess(processDefinition);
@@ -402,7 +448,8 @@ public class ProcessExecutionIT extends TestWithUser {
 
     public SearchResult<HumanTaskInstance> getHumanTaskInstanceSearchResult(Order order) throws SearchException {
         return getProcessAPI()
-                .searchHumanTaskInstances(new SearchOptionsBuilder(0, 100).sort(HumanTaskInstanceSearchDescriptor.DUE_DATE, order).done());
+                .searchHumanTaskInstances(new SearchOptionsBuilder(0, 100)
+                        .sort(HumanTaskInstanceSearchDescriptor.DUE_DATE, order).done());
     }
 
     @Test(expected = UpdateException.class)
@@ -410,24 +457,23 @@ public class ProcessExecutionIT extends TestWithUser {
         getProcessAPI().updateDueDateOfTask(123456789L, new Date());
     }
 
-
     @Test
     public void should_be_able_to_set_due_date_with_connector() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithDueDate", "1.0");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithDueDate",
+                "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME)
                 .addConnector("setDueDate", "dueDateConnector", "1.0", ConnectorEvent.ON_ENTER);
 
         BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(builder.done())
-                .addConnectorImplementation(generateConnectorImplementation("dueDateConnector", "1.0", SetDueDateConnector.class))
+                .addConnectorImplementation(
+                        generateConnectorImplementation("dueDateConnector", "1.0", SetDueDateConnector.class))
                 .addClasspathResource(generateJarAndBuildBarResource(SetDueDateConnector.class, "dueDate.jar")).done();
-
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance1,"step1");
-
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance1, "step1");
 
         assertThat(step1.getExpectedEndDate()).isEqualTo(SetDueDateConnector.dueDate);
 
@@ -436,10 +482,12 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void executeTaskFor() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil
+                .buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+                        Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final User jack = createUser("jack", PASSWORD);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition,
+                APITestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         try {
@@ -457,13 +505,15 @@ public class ProcessExecutionIT extends TestWithUser {
             assertEquals(user.getId(), step1Archived.getExecutedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100)
+                    .filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                     .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains("The user " + USERNAME + " acting as delegate of the user jack has done the task \"step1\".");
+                        || comment.getContent().contains("The user " + USERNAME
+                                + " acting as delegate of the user jack has done the task \"step1\".");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
@@ -475,17 +525,21 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void systemCommentsShouldBeAutoAddedAtTaskAssignment() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive",
+                "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("step1", ACTOR_NAME).addDisplayName(new ExpressionBuilder().createConstantStringExpression("Step1 display name"));
+        builder.addUserTask("step1", ACTOR_NAME)
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("Step1 display name"));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), APITestUtil.ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(),
+                APITestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForUserTask(processInstance, "step2");
 
-        final SearchResult<Comment> searchResult = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
+        final SearchResult<Comment> searchResult = getProcessAPI()
+                .searchComments(new SearchOptionsBuilder(0, 5).done());
         final List<Comment> commentList = searchResult.getResult();
         assertEquals(1, commentList.size());
         assertEquals("The task \"Step1 display name\" is now assigned to " + USERNAME, commentList.get(0).getContent());

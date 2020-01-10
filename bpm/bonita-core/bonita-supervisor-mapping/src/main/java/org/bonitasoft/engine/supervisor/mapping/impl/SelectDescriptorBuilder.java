@@ -38,7 +38,8 @@ public class SelectDescriptorBuilder {
 
     public static SelectOneDescriptor<Long> getNumberOfSupervisors(final long processDefId) {
         final Map<String, Object> parameters = Collections.singletonMap("processDefId", (Object) processDefId);
-        return new SelectOneDescriptor<Long>("getNumberOfSupervisorsOfProcessDef", parameters, SProcessSupervisor.class);
+        return new SelectOneDescriptor<Long>("getNumberOfSupervisorsOfProcessDef", parameters,
+                SProcessSupervisor.class);
     }
 
     public static SelectOneDescriptor<SProcessSupervisor> getSupervisor(final long processDefId, final long userId) {
@@ -48,15 +49,19 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SProcessSupervisor>("getSupervisor", parameters, SProcessSupervisor.class);
     }
 
-    public static SelectListDescriptor<Long> getProcessDefIdsOfUser(final long userId, final int fromIndex, final int maxResult, final OrderByType orderByType) {
+    public static SelectListDescriptor<Long> getProcessDefIdsOfUser(final long userId, final int fromIndex,
+            final int maxResult, final OrderByType orderByType) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
 
-        final OrderByOption orderByOption = new OrderByOption(SProcessSupervisor.class, SProcessSupervisor.PROCESS_DEF_ID_KEY,
+        final OrderByOption orderByOption = new OrderByOption(SProcessSupervisor.class,
+                SProcessSupervisor.PROCESS_DEF_ID_KEY,
                 orderByType);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResult, Collections.singletonList(orderByOption));
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResult,
+                Collections.singletonList(orderByOption));
 
-        return new SelectListDescriptor<Long>("getProcessDefIdsOfUser", parameters, SProcessSupervisor.class, queryOptions);
+        return new SelectListDescriptor<Long>("getProcessDefIdsOfUser", parameters, SProcessSupervisor.class,
+                queryOptions);
     }
 
 }

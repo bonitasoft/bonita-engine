@@ -33,7 +33,8 @@ public class IsProcessInitiatorRule extends AuthorizationRuleWithParameters impl
 
     private final ProcessInvolvementDelegate processInvolvementDelegate;
 
-    public IsProcessInitiatorRule(SessionService sessionService, SessionAccessor sessionAccessor, ProcessInvolvementDelegate processInvolvementDelegate) {
+    public IsProcessInitiatorRule(SessionService sessionService, SessionAccessor sessionAccessor,
+            ProcessInvolvementDelegate processInvolvementDelegate) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.processInvolvementDelegate = processInvolvementDelegate;

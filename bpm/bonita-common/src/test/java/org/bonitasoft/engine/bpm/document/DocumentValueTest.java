@@ -25,7 +25,8 @@ import org.junit.Test;
 public class DocumentValueTest {
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
     @Test(expected = IllegalArgumentException.class)
     public final void cant_construct_DocumentValue_with_content_and_mimeType_without_file_name() {
@@ -33,7 +34,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
     @Test(expected = IllegalArgumentException.class)
     public final void cant_construct_DocumentValue_with_content_and_mimeType_with_empty_file_name() {
@@ -41,7 +43,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void should_be_able_to_construct_DocumentValue_without_content_but_with_mimeType_and_file_name() {
@@ -49,7 +52,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void should_be_able_to_construct_DocumentValue_with_empty_content_with_mimeType_and_file_name() {
@@ -57,7 +61,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void can_construct_DocumentValue_with_content_and_mimeType_and_file_name() {
@@ -65,7 +70,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
     @Test(expected = IllegalArgumentException.class)
     public final void cant_construct_DocumentValue_with_documentId_and_content_and_mimeType_without_file_name() {
@@ -73,7 +79,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
     @Test(expected = IllegalArgumentException.class)
     public final void cant_construct_DocumentValue_with_documentId_and_content_and_mimeType_with_empty_file_name() {
@@ -81,7 +88,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void should_be_able_to_construct_DocumentValue_without_content_with_documentId_and_mimeType_and_file_name() {
@@ -89,7 +97,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void should_be_able_to_construct_DocumentValue_with_empty_content_with_documentId_and_mimeType_and_file_name() {
@@ -97,7 +106,8 @@ public class DocumentValueTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
     @Test
     public final void can_construct_DocumentValue_with_content_and_documentId_and_mimeType_and_file_name() {

@@ -44,8 +44,6 @@ public class EntityGetterTest {
         assertThat(sourceEntityName).isEqualTo(Employee.class.getSimpleName());
     }
 
-
-
     @Test
     public void should_be_able_to_retrieve_target_entity_class_even_if_method_return_a_list() throws Exception {
         //given
@@ -85,8 +83,6 @@ public class EntityGetterTest {
         assertThat(entityGetter.returnsList()).isFalse();
 
     }
-
-
 
     @Test
     public void should_be_able_to_get_associated_named_query() throws Exception {

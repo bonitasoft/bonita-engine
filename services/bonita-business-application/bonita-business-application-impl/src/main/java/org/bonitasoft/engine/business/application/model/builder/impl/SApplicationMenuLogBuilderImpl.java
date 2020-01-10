@@ -20,10 +20,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatoryFieldsException;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationMenuLogBuilderImpl extends CRUDELogBuilder implements SApplicationMenuLogBuilder {
 
@@ -40,10 +38,10 @@ public class SApplicationMenuLogBuilderImpl extends CRUDELogBuilder implements S
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SApplicationMenuLogBuilderFactoryImpl.APPLICATION_MENU_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
+                && log.getNumericIndex(SApplicationMenuLogBuilderFactoryImpl.APPLICATION_MENU_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: application menu identifier");
         }
     }
-
 
 }

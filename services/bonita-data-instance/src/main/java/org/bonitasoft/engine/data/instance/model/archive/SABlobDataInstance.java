@@ -42,11 +42,9 @@ import org.hibernate.annotations.Type;
 @DiscriminatorValue("SABlobDataInstanceImpl")
 public class SABlobDataInstance extends SADataInstance {
 
-
     @Column(name = "blobValue")
     @Type(type = "materialized_blob")
     private byte[] value;
-
 
     public SABlobDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

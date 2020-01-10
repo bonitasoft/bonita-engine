@@ -20,7 +20,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderF
 /**
  * @author Emmanuel Duchastenier
  */
-public class SExternalIdentityMappingLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SExternalIdentityMappingLogBuilderFactory {
+public class SExternalIdentityMappingLogBuilderFactoryImpl extends CRUDELogBuilderFactory
+        implements SExternalIdentityMappingLogBuilderFactory {
 
     @Override
     public SExternalIdentityMappingLogBuilder createNewInstance() {

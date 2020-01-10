@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.business.data;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,6 +30,7 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("proc_simple_ref")
 public class SProcessSimpleRefBusinessDataInstance extends SSimpleRefBusinessDataInstance {
+
     @Column(name = "proc_inst_id")
     private long processInstanceId;
 }

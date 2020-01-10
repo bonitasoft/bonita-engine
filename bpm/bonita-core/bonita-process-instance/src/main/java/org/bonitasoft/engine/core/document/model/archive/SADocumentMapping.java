@@ -16,16 +16,15 @@ package org.bonitasoft.engine.core.document.model.archive;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.bonitasoft.engine.core.document.model.AbstractSDocumentMapping;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bonitasoft.engine.core.document.model.AbstractSDocumentMapping;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 @Data
 @NoArgsConstructor
@@ -55,8 +54,9 @@ public class SADocumentMapping extends AbstractSDocumentMapping implements Archi
     private long archiveDate;
     private long sourceObjectId;
 
-    public SADocumentMapping(final long documentId, final long processInstanceId, final long archiveDate, final long sourceObjectId, final String name,
-                                 final String description, final String version) {
+    public SADocumentMapping(final long documentId, final long processInstanceId, final long archiveDate,
+            final long sourceObjectId, final String name,
+            final String description, final String version) {
         super(documentId, processInstanceId, name);
         setDescription(description);
         setVersion(version);

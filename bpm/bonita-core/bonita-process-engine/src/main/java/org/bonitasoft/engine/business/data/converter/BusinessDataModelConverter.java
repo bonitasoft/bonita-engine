@@ -25,12 +25,16 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRe
  */
 public class BusinessDataModelConverter {
 
-    public static SimpleBusinessDataReference toSimpleBusinessDataReference(final SSimpleRefBusinessDataInstance sReference) {
-        return new SimpleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataId());
+    public static SimpleBusinessDataReference toSimpleBusinessDataReference(
+            final SSimpleRefBusinessDataInstance sReference) {
+        return new SimpleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(),
+                sReference.getDataId());
     }
 
-    public static MultipleBusinessDataReference toMultipleBusinessDataReference(final SProcessMultiRefBusinessDataInstance sReference) {
-        return new MultipleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataIds());
+    public static MultipleBusinessDataReference toMultipleBusinessDataReference(
+            final SProcessMultiRefBusinessDataInstance sReference) {
+        return new MultipleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(),
+                sReference.getDataIds());
     }
 
 }

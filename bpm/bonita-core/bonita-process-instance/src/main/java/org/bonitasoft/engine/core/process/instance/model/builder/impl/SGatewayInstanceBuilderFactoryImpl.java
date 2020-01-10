@@ -22,7 +22,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanc
  * @author Feng Hui
  * @author Celine Souchet
  */
-public class SGatewayInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl implements SGatewayInstanceBuilderFactory {
+public class SGatewayInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl
+        implements SGatewayInstanceBuilderFactory {
 
     private static final String ID_KEY = "id";
 
@@ -35,10 +36,13 @@ public class SGatewayInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilder
     private static final String HITBYS = "hitBys";
 
     @Override
-    public SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final SGatewayType gatewayType, final long processDefinitionId, final long rootProcessInstanceId,
+    public SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId,
+            final long rootContainerId,
+            final long parentContainerId, final SGatewayType gatewayType, final long processDefinitionId,
+            final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SGatewayInstance entity = new SGatewayInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, gatewayType, processDefinitionId,
+        final SGatewayInstance entity = new SGatewayInstance(name, flowNodeDefinitionId, rootContainerId,
+                parentContainerId, gatewayType, processDefinitionId,
                 rootProcessInstanceId);
         entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SGatewayInstanceBuilderImpl(entity);

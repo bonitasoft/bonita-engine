@@ -27,14 +27,14 @@ public interface LoginService {
 
     /**
      * generic login approach to handle outer authentication service like CAS or OAuth or whatever...
-     * 
+     *
      * @param credentials
-     *            the parameters to use to login
+     *        the parameters to use to login
      * @return the session created if login succeeds
      * @throws SLoginException
-     *             if login fails
-     * @throws SUserNotFoundException 
-     *             if the user does not exist in the database
+     *         if login fails
+     * @throws SUserNotFoundException
+     *         if the user does not exist in the database
      */
     SSession login(Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException;
 

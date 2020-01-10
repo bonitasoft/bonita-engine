@@ -39,7 +39,8 @@ public class GetGroups implements TransactionContentWithResult<List<SGroup>> {
 
     private List<SGroup> groups;
 
-    public GetGroups(final IdentityService identityService, final int startIndex, final int maxResults, final OrderByType orderExecutor,
+    public GetGroups(final IdentityService identityService, final int startIndex, final int maxResults,
+            final OrderByType orderExecutor,
             final String fieldExecutor) {
         this.identityService = identityService;
         this.startIndex = startIndex;

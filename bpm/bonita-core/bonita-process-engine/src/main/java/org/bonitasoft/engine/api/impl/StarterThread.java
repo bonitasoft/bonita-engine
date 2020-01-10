@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.RestartException;
@@ -45,8 +44,8 @@ public class StarterThread extends Thread {
     private PlatformService platformService;
 
     public StarterThread(Long tenantId, SessionAccessor sessionAccessor, SessionService sessionService,
-                         UserTransactionService transactionService, PlatformService platformService,
-                         List<TenantRestartHandler> tenantRestartHandlers) {
+            UserTransactionService transactionService, PlatformService platformService,
+            List<TenantRestartHandler> tenantRestartHandlers) {
         super("Tenant " + tenantId + " starter Thread");
         this.tenantRestartHandlers = tenantRestartHandlers;
         this.tenantId = tenantId;
@@ -72,7 +71,8 @@ public class StarterThread extends Thread {
         }
     }
 
-    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor) throws SBonitaException, RestartException {
+    private void executeHandlers(long tenantId, SessionAccessor sessionAccessor)
+            throws SBonitaException, RestartException {
         long sessionId = createSessionAndMakeItActive(sessionAccessor, tenantId);
         try {
             for (final TenantRestartHandler restartHandler : tenantRestartHandlers) {

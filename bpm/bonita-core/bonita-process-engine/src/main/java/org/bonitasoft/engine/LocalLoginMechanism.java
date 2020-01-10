@@ -25,7 +25,7 @@ import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 
 /**
  * Use to login on the platform when inside the same JVM
- * 
+ *
  * @author Baptiste Mesta
  */
 //Do not remove
@@ -35,11 +35,13 @@ public class LocalLoginMechanism {
 
     public PlatformSession login() throws PlatformLoginException {
         try {
-            PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance()
+                    .createPlatformServiceAccessor();
             final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
             SPlatformSession platformSession = platformSessionService.createSession("local");
             final Date creationDate = platformSession.getCreationDate();
-            return new PlatformSessionImpl(platformSession.getId(), creationDate, platformSession.getDuration(), "local", platformSession.getUserId());
+            return new PlatformSessionImpl(platformSession.getId(), creationDate, platformSession.getDuration(),
+                    "local", platformSession.getUserId());
         } catch (final Exception e) {
             throw new PlatformLoginException(e);
         }

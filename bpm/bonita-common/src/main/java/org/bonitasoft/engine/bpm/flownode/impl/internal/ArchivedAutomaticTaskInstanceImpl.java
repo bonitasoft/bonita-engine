@@ -20,7 +20,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ArchivedAutomaticTaskInstanceImpl extends ArchivedActivityInstanceImpl implements ArchivedAutomaticTaskInstance {
+public class ArchivedAutomaticTaskInstanceImpl extends ArchivedActivityInstanceImpl
+        implements ArchivedAutomaticTaskInstance {
 
     private static final long serialVersionUID = 9035445836798276633L;
 

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.commons;
 /**
  * Represent an enum which enum values can be convertible to other types.
  * One method: fromEnum, returns an object value, result of the conversion of that enum
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -25,7 +25,7 @@ public interface EnumToObjectConvertible {
 
     /**
      * Convert this enum to an Object value
-     * 
+     *
      * @return The object corresponding to the Enum
      * @since 6.0
      */

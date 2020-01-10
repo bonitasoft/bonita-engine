@@ -52,7 +52,8 @@ public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
                 if (task == null || task.isEmpty()) {
                     throw new SObjectCreationException("The task name is not set");
                 }
-                return "taskInstance/" + processDefinition.getName() + "/" + processDefinition.getVersion() + "/" + task;
+                return "taskInstance/" + processDefinition.getName() + "/" + processDefinition.getVersion() + "/"
+                        + task;
         }
         throw new SObjectCreationException("Unable to generate the key for the unknown type " + type);
     }

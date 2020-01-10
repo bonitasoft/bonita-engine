@@ -21,7 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInst
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SManualTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl implements SManualTaskInstanceBuilder {
+public class SManualTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl
+        implements SManualTaskInstanceBuilder {
 
     public SManualTaskInstanceBuilderImpl(final SManualTaskInstance activityInst) {
         super(activityInst);

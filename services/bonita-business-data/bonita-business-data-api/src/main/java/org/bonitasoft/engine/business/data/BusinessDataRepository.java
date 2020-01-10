@@ -22,7 +22,8 @@ import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
- * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find / create
+ * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a
+ * Business Data Model, search / find / create
  * / update of Business Data entity objects.
  *
  * @author Matthieu Chaffotte
@@ -42,7 +43,8 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     <T extends Entity> T findById(Class<T> entityClass, Long primaryKey) throws SBusinessDataNotFoundException;
 
     /**
-     * Finds entities that is defined in a deployed Business Data Model. If a primary key does not match an existing entity no exception is thrown and nothing
+     * Finds entities that is defined in a deployed Business Data Model. If a primary key does not match an existing
+     * entity no exception is thrown and nothing
      * is added in the list.
      *
      * @param entityClass the class of the entity to search for.
@@ -52,7 +54,8 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     <T extends Entity> List<T> findByIds(Class<T> entityClass, List<Long> primaryKeys);
 
     /**
-     * Finds (well-loaded) entities that is defined in a deployed Business Data Model. If a primary key does not match an existing entity no exception is thrown
+     * Finds (well-loaded) entities that is defined in a deployed Business Data Model. If a primary key does not match
+     * an existing entity no exception is thrown
      * and nothing is added in the list.
      *
      * @param entityClass the class of the entity to search for.
@@ -71,14 +74,18 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @throws SBusinessDataNotFoundException if the Business Data could not be found with the provided primary key.
      * @throws NonUniqueResultException if more than one result was found.
      */
-    <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters) throws NonUniqueResultException;
+    <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters)
+            throws NonUniqueResultException;
 
-    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters, int startIndex, int maxResults);
+    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery,
+            Map<String, Serializable> parameters, int startIndex, int maxResults);
 
-    <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) throws NonUniqueResultException;
+    <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass,
+            Map<String, Serializable> parameters) throws NonUniqueResultException;
 
-    <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters, int startIndex,
-                                                          int maxResults);
+    <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass,
+            Map<String, Serializable> parameters, int startIndex,
+            int maxResults);
 
     /**
      * Saves or updates an entity in the Business Data Repository.

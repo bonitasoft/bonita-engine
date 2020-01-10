@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.ST
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SThrowSignalEventTriggerDefinitionBuilderFactoryImpl implements SThrowSignalEventTriggerDefinitionBuilderFactory {
+public class SThrowSignalEventTriggerDefinitionBuilderFactoryImpl
+        implements SThrowSignalEventTriggerDefinitionBuilderFactory {
 
     @Override
     public SThrowSignalEventTriggerDefinitionBuilder createNewInstance(final String signalName) {

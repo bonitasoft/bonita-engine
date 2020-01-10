@@ -70,7 +70,7 @@ public class MergeEntityActionTest {
         given(repository.merge(entity2)).willReturn(mergedEntity2);
 
         //when
-        final List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1,null, entity2), null);
+        final List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1, null, entity2), null);
 
         //then
         assertThat(actionResult).containsExactly(mergedEntity1, mergedEntity2);

@@ -60,9 +60,10 @@ public class AggregationAndCompositionValidationRule extends ValidationRule<Busi
                 validationStatus.addWarning(StatusCode.BUSINESS_OBJECT_USED_IN_COMPOSITION_AND_AGGREGATION,
                         String.format(
                                 "The object %s is referenced both in composition and in aggregation. This may lead to runtime errors and"
-                                + " may lead to unpredictable behaviour of the AccessControl configuration.",
-                        composedBo.getQualifiedName()),
-                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, composedBo.getQualifiedName()));
+                                        + " may lead to unpredictable behaviour of the AccessControl configuration.",
+                                composedBo.getQualifiedName()),
+                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY,
+                                composedBo.getQualifiedName()));
             }
         }
         return validationStatus;

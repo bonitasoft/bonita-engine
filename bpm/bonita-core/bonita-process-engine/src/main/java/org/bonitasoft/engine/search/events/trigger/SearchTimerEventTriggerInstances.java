@@ -30,14 +30,16 @@ import org.bonitasoft.engine.service.ModelConvertor;
  * @version 6.4.0
  * @since 6.4.0
  */
-public class SearchTimerEventTriggerInstances extends AbstractSearchEntity<TimerEventTriggerInstance, STimerEventTriggerInstance> {
+public class SearchTimerEventTriggerInstances
+        extends AbstractSearchEntity<TimerEventTriggerInstance, STimerEventTriggerInstance> {
 
     private final EventInstanceService eventInstanceService;
 
     private final long processInstanceId;
 
     public SearchTimerEventTriggerInstances(final EventInstanceService eventInstanceService,
-            final SearchEventTriggerInstanceDescriptor searchEventTriggerInstanceDescriptor, final long processInstanceId, final SearchOptions searchOptions) {
+            final SearchEventTriggerInstanceDescriptor searchEventTriggerInstanceDescriptor,
+            final long processInstanceId, final SearchOptions searchOptions) {
         super(searchEventTriggerInstanceDescriptor, searchOptions);
         this.eventInstanceService = eventInstanceService;
         this.processInstanceId = processInstanceId;
@@ -49,12 +51,14 @@ public class SearchTimerEventTriggerInstances extends AbstractSearchEntity<Timer
     }
 
     @Override
-    public List<STimerEventTriggerInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+    public List<STimerEventTriggerInstance> executeSearch(final QueryOptions searchOptions)
+            throws SBonitaReadException {
         return eventInstanceService.searchTimerEventTriggerInstances(processInstanceId, searchOptions);
     }
 
     @Override
-    public List<TimerEventTriggerInstance> convertToClientObjects(final List<STimerEventTriggerInstance> serverObjects) {
+    public List<TimerEventTriggerInstance> convertToClientObjects(
+            final List<STimerEventTriggerInstance> serverObjects) {
         return ModelConvertor.toTimerEventTriggerInstances(serverObjects);
     }
 

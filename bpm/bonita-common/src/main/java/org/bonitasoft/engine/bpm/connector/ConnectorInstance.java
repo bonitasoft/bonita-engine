@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * Represents a connector, once instanciated by the containinig activity or process at runtime.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -26,12 +26,12 @@ import org.bonitasoft.engine.bpm.NamedElement;
 public interface ConnectorInstance extends NamedElement, BaseElement {
 
     /**
-     * 
+     *
      */
     String FLOWNODE_TYPE = "flowNode";
 
     /**
-     * 
+     *
      */
     String PROCESS_TYPE = "process";
 

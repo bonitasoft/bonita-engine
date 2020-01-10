@@ -31,8 +31,9 @@ public class ApplicationDestructor {
     }
 
     public void onDeleteApplication(SApplication application) throws SBonitaException {
-        applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS),
-                application.getId()));
+        applicationMenuCleaner.deleteRelatedApplicationMenus(
+                new ApplicationRelatedMenusFilterBuilder(new SelectRange(0, ApplicationServiceImpl.MAX_RESULTS),
+                        application.getId()));
     }
 
 }

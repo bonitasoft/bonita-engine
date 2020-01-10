@@ -22,7 +22,7 @@ public class Parent implements Entity {
 
     private Child child;
     private List<Child> children;
-    
+
     public Child getChild() {
         return child;
     }

@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubPr
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SASubProcessActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SASubProcessActivityInstanceBuilder {
+public class SASubProcessActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl
+        implements SASubProcessActivityInstanceBuilder {
 
     public SASubProcessActivityInstanceBuilderImpl(final SASubProcessActivityInstance entity) {
         super(entity);

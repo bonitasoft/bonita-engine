@@ -37,6 +37,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkExecutorServiceImplTest {
+
     public static final int WORK_TERMINATION_TIMEOUT = 5000;
     @Mock
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
@@ -181,7 +182,8 @@ public class WorkExecutorServiceImplTest {
     public void should_pause_throw_exception_on_interrupted() throws InterruptedException, SBonitaException {
         // given
         workExecutorService.start();
-        doThrow(InterruptedException.class).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
+        doThrow(InterruptedException.class).when(bonitaExecutorService).awaitTermination(anyLong(),
+                any(TimeUnit.class));
 
         // when
         workExecutorService.pause();
@@ -193,7 +195,8 @@ public class WorkExecutorServiceImplTest {
     public void should_stop_do_not_throw_exception_on_interrupted() throws InterruptedException {
         // given
         workExecutorService.start();
-        doThrow(InterruptedException.class).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
+        doThrow(InterruptedException.class).when(bonitaExecutorService).awaitTermination(anyLong(),
+                any(TimeUnit.class));
 
         // when
         workExecutorService.stop();
@@ -249,7 +252,6 @@ public class WorkExecutorServiceImplTest {
         verify(logger).debug(eq("Completed work {}"), any(Object.class));
     }
 
-
     @Test
     public void should_await_specified_time_when_stopping_the_executor() throws Exception {
 
@@ -260,7 +262,8 @@ public class WorkExecutorServiceImplTest {
 
     @Test
     public void should_log_when_work_is_ignored_because_of_precondition() {
-        workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(), new SWorkPreconditionException("My precondition"));
+        workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
+                new SWorkPreconditionException("My precondition"));
 
         verifyZeroInteractions(bonitaExecutorService);
         verifyZeroInteractions(bonitaWork);

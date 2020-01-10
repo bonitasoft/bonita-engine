@@ -18,18 +18,16 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
-import static org.bonitasoft.engine.test.persistence.builder.RoleBuilder.aRole;
 
 import java.util.Map;
+
 import javax.inject.Inject;
 
-import org.assertj.core.groups.Tuple;
 import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
 import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.CommentRepository;
-import org.bonitasoft.engine.test.persistence.repository.RoleRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Danila Mazour
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class CommentsTest {
 
@@ -64,12 +62,12 @@ public class CommentsTest {
         repository.add(new SSystemComment(PROCESS1_ID, "comment4"));
         repository.add(new SHumanComment(PROCESS2_ID, "comment5", JACK_ID));
 
-        assertThat(repository.getCommentsOfProcessInstance(PROCESS1_ID)).extracting("content", "userId", "class").containsExactly(
-                tuple("comment1", JACK_ID, SHumanComment.class),
-                tuple("comment2", JOHN_ID, SHumanComment.class),
-                tuple("comment3", JACK_ID, SHumanComment.class),
-                tuple("comment4", null, SSystemComment.class)
-        );
+        assertThat(repository.getCommentsOfProcessInstance(PROCESS1_ID)).extracting("content", "userId", "class")
+                .containsExactly(
+                        tuple("comment1", JACK_ID, SHumanComment.class),
+                        tuple("comment2", JOHN_ID, SHumanComment.class),
+                        tuple("comment3", JACK_ID, SHumanComment.class),
+                        tuple("comment4", null, SSystemComment.class));
 
     }
 
@@ -79,8 +77,10 @@ public class CommentsTest {
         SSystemComment comment2 = repository.add(new SSystemComment(PROCESS2_ID, "comment2"));
         repository.flush();
 
-        Map<String, Object> comment1AsMap = jdbcTemplate.queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS1_ID);
-        Map<String, Object> comment2AsMap = jdbcTemplate.queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS2_ID);
+        Map<String, Object> comment1AsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS1_ID);
+        Map<String, Object> comment2AsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM process_comment WHERE processInstanceId = " + PROCESS2_ID);
 
         assertThat(comment1AsMap).containsOnly(
                 entry("ID", comment1.getId()),
@@ -106,12 +106,14 @@ public class CommentsTest {
         SAComment comment2 = repository.add(new SAComment(new SSystemComment(PROCESS2_ID, "comment2")));
         repository.flush();
 
-
-        PersistentObject comment1FromQuery = repository.selectOne("getArchivedCommentById", pair("id", comment1.getId()));
-        PersistentObject comment2FromQuery = repository.selectOne("getArchivedCommentById", pair("id", comment2.getId()));
-        Map<String, Object> comment1AsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS1_ID);
-        Map<String, Object> comment2AsMap = jdbcTemplate.queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS2_ID);
-
+        PersistentObject comment1FromQuery = repository.selectOne("getArchivedCommentById",
+                pair("id", comment1.getId()));
+        PersistentObject comment2FromQuery = repository.selectOne("getArchivedCommentById",
+                pair("id", comment2.getId()));
+        Map<String, Object> comment1AsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS1_ID);
+        Map<String, Object> comment2AsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM arch_process_comment WHERE processInstanceId = " + PROCESS2_ID);
 
         assertThat(comment1FromQuery).isEqualTo(comment1);
         assertThat(comment2FromQuery).isEqualTo(comment2);

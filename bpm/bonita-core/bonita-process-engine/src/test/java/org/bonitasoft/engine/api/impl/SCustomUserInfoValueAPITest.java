@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -54,7 +54,8 @@ public class SCustomUserInfoValueAPITest {
     @Test
     public void update_should_call_service_to_update_custom_user_info_when_exist() throws Exception {
         final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(1).build();
-        final SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(new EntityUpdateDescriptor());
+        final SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(
+                new EntityUpdateDescriptor());
         given(updateFactory.createNewInstance()).willReturn(builder);
 
         api.update(value, new CustomUserInfoValueUpdater("value"));

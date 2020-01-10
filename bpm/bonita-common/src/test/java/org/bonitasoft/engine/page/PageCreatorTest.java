@@ -36,7 +36,8 @@ public class PageCreatorTest {
     @Test
     public void should_create_page_with_default_content_type() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION);
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME)
+                .setDescription(DESCRIPTION);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
@@ -46,8 +47,7 @@ public class PageCreatorTest {
                 entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
                 entry(PageField.DESCRIPTION, DESCRIPTION),
                 entry(PageField.CONTENT_TYPE, ContentType.PAGE),
-                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME)
-                );
+                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME));
 
         assertThat(pageCreator.getName()).isEqualTo(NAME);
     }
@@ -55,7 +55,8 @@ public class PageCreatorTest {
     @Test
     public void should_create_page_with_process_definition() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME)
+                .setDescription(DESCRIPTION)
                 .setProcessDefinitionId(PROCESS_DEFINITION_ID).setContentType(ContentType.FORM);
 
         // when
@@ -68,8 +69,7 @@ public class PageCreatorTest {
                 entry(PageField.CONTENT_TYPE, ContentType.PAGE),
                 entry(PageField.CONTENT_NAME, ZIP_FILE_NAME),
                 entry(PageField.CONTENT_TYPE, ContentType.FORM),
-                entry(PageField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID)
-                );
+                entry(PageField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID));
 
         assertThat(pageCreator.getName()).isEqualTo(NAME);
     }
@@ -77,7 +77,8 @@ public class PageCreatorTest {
     @Test
     public void should_create_page_with_form_content_type() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L).setDisplayName(DISPLAY_NAME);
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L)
+                .setDisplayName(DISPLAY_NAME);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
@@ -88,22 +89,23 @@ public class PageCreatorTest {
                 entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
                 entry(PageField.CONTENT_TYPE, ContentType.FORM),
                 entry(PageField.PROCESS_DEFINITION_ID, 12345L),
-                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME)
-                );
+                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME));
 
     }
 
     @Test
     public void should_print_all_fields() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L).setDisplayName(DISPLAY_NAME).setDescription(
-                DESCRIPTION);
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L)
+                .setDisplayName(DISPLAY_NAME).setDescription(
+                        DESCRIPTION);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(pageCreator.toString()).as("should print human readable to string").isEqualTo("PageCreator [fields=" + fields + "]");
+        assertThat(pageCreator.toString()).as("should print human readable to string")
+                .isEqualTo("PageCreator [fields=" + fields + "]");
 
     }
 }

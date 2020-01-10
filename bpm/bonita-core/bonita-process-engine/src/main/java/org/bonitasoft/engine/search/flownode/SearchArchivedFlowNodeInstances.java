@@ -29,13 +29,15 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Emmanuel Duchastenier
  */
-public class SearchArchivedFlowNodeInstances extends AbstractSearchEntity<ArchivedFlowNodeInstance, SAFlowNodeInstance> {
+public class SearchArchivedFlowNodeInstances
+        extends AbstractSearchEntity<ArchivedFlowNodeInstance, SAFlowNodeInstance> {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
     private final FlowNodeStateManager flowNodeStateManager;
 
-    public SearchArchivedFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService, final FlowNodeStateManager flowNodeStateManager,
+    public SearchArchivedFlowNodeInstances(final FlowNodeInstanceService flowNodeInstanceService,
+            final FlowNodeStateManager flowNodeStateManager,
             final SearchArchivedFlowNodeInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions);
         this.flowNodeInstanceService = flowNodeInstanceService;

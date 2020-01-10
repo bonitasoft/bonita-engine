@@ -29,6 +29,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 @Entity
 @DiscriminatorValue("startEvent")
 public class SAStartEventInstance extends SACatchEventInstance {
+
     public SAStartEventInstance(final SStartEventInstance startEventInstance) {
         super(startEventInstance);
     }

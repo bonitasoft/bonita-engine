@@ -19,7 +19,8 @@ import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMapping
 /**
  * @author Yanyan Liu
  */
-public class SPlatformDependencyMappingLogBuilderFactoryImpl extends SDependencyMappingLogBuilderFactoryImpl implements SPlatformDependencyMappingLogBuilderFactory {
+public class SPlatformDependencyMappingLogBuilderFactoryImpl extends SDependencyMappingLogBuilderFactoryImpl
+        implements SPlatformDependencyMappingLogBuilderFactory {
 
     @Override
     public SDependencyMappingLogBuilder createNewInstance() {

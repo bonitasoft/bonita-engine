@@ -22,7 +22,8 @@ import javax.persistence.AttributeConverter;
 
 /**
  * @author Danila Mazour
- * @deprecated {@link org.bonitasoft.engine.business.data.generator.OffsetDateTimeConverter} is now used. Keep this class for backward runtime compatibility
+ * @deprecated {@link org.bonitasoft.engine.business.data.generator.OffsetDateTimeConverter} is now used. Keep this
+ *             class for backward runtime compatibility
  */
 @Deprecated
 public class OffsetDateTimeConverter implements AttributeConverter<OffsetDateTime, String> {

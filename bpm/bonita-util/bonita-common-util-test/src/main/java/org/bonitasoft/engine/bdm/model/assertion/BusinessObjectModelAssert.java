@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bdm.model.assertion;
 
 import org.assertj.core.api.AbstractAssert;
-
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 
 /**

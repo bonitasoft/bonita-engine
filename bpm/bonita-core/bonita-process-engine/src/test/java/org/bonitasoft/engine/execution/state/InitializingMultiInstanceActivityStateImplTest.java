@@ -71,29 +71,35 @@ public class InitializingMultiInstanceActivityStateImplTest {
     @Test
     public void should_not_create_instances_with_empty_list() throws Exception {
         //given
-        SMultiInstanceLoopCharacteristicsImpl miLoop = new SMultiInstanceLoopCharacteristicsImpl(new MultiInstanceLoopCharacteristicsImpl(false, "data"));
+        SMultiInstanceLoopCharacteristicsImpl miLoop = new SMultiInstanceLoopCharacteristicsImpl(
+                new MultiInstanceLoopCharacteristicsImpl(false, "data"));
         doReturn(miLoop).when(activityDefinition)
                 .getLoopCharacteristics();
-        doReturn(0).when(stateBehaviors).getNumberOfInstancesToCreateFromInputRef(processDefinition, flowNodeInstance, miLoop,
+        doReturn(0).when(stateBehaviors).getNumberOfInstancesToCreateFromInputRef(processDefinition, flowNodeInstance,
+                miLoop,
                 -1);
         //when
         state.execute(processDefinition, flowNodeInstance);
         //then
-        verify(stateBehaviors, never()).createInnerInstances(anyLong(), any(SActivityDefinition.class), any(SMultiInstanceActivityInstance.class), anyInt());
+        verify(stateBehaviors, never()).createInnerInstances(anyLong(), any(SActivityDefinition.class),
+                any(SMultiInstanceActivityInstance.class), anyInt());
     }
 
     @Test
     public void should_create_instances_when_list_not_empty() throws Exception {
         //given
-        SMultiInstanceLoopCharacteristicsImpl miLoop = new SMultiInstanceLoopCharacteristicsImpl(new MultiInstanceLoopCharacteristicsImpl(false, "data"));
+        SMultiInstanceLoopCharacteristicsImpl miLoop = new SMultiInstanceLoopCharacteristicsImpl(
+                new MultiInstanceLoopCharacteristicsImpl(false, "data"));
         doReturn(miLoop).when(activityDefinition)
                 .getLoopCharacteristics();
-        doReturn(1).when(stateBehaviors).getNumberOfInstancesToCreateFromInputRef(processDefinition, flowNodeInstance, miLoop,
+        doReturn(1).when(stateBehaviors).getNumberOfInstancesToCreateFromInputRef(processDefinition, flowNodeInstance,
+                miLoop,
                 -1);
         //when
         state.execute(processDefinition, flowNodeInstance);
         //then
-        verify(stateBehaviors).createInnerInstances(anyLong(), any(SActivityDefinition.class), any(SMultiInstanceActivityInstance.class), anyInt());
+        verify(stateBehaviors).createInnerInstances(anyLong(), any(SActivityDefinition.class),
+                any(SMultiInstanceActivityInstance.class), anyInt());
     }
 
 }

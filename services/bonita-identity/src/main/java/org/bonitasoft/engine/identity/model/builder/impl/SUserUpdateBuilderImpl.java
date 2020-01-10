@@ -31,6 +31,7 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
         super();
         this.descriptor = descriptor;
     }
+
     public static SUserUpdateBuilder updateBuilder() {
         return new SUserUpdateBuilderImpl(new EntityUpdateDescriptor());
     }

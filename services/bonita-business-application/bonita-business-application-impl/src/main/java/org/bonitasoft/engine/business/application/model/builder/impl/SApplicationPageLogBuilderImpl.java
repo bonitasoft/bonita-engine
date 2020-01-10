@@ -21,7 +21,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationPageLogBuilderImpl extends CRUDELogBuilder implements SApplicationPageLogBuilder {
 

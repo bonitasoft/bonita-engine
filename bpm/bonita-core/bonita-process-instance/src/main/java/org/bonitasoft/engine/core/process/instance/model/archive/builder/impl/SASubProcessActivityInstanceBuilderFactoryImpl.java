@@ -21,10 +21,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubPr
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SASubProcessActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl implements SASubProcessActivityInstanceBuilderFactory {
+public class SASubProcessActivityInstanceBuilderFactoryImpl extends SAActivityInstanceBuilderFactoryImpl
+        implements SASubProcessActivityInstanceBuilderFactory {
 
     @Override
-    public SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(final SSubProcessActivityInstance subProcActInst) {
+    public SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(
+            final SSubProcessActivityInstance subProcActInst) {
         final SASubProcessActivityInstance entity = new SASubProcessActivityInstance(subProcActInst);
         return new SASubProcessActivityInstanceBuilderImpl(entity);
     }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet

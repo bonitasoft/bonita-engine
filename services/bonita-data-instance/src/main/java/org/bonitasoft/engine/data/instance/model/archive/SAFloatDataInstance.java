@@ -33,7 +33,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @DiscriminatorValue("SAFloatDataInstanceImpl")
 public class SAFloatDataInstance extends SADataInstance {
 
-
     @Column(name = "floatValue")
     private Float value;
 

@@ -36,7 +36,8 @@ public class WaitForEvent extends WaitUntil {
     private final ProcessAPI processAPI;
 
     @Deprecated
-    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final ProcessAPI processAPI) {
+    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId,
+            final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.eventName = eventName;
         this.processInstanceId = processInstanceId;
@@ -44,7 +45,8 @@ public class WaitForEvent extends WaitUntil {
     }
 
     @Deprecated
-    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final TestStates state,
+    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId,
+            final TestStates state,
             final ProcessAPI processAPI) {
         this(repeatEach, timeout, eventName, processInstanceId, processAPI);
         this.state = state.getStateName();
@@ -52,7 +54,8 @@ public class WaitForEvent extends WaitUntil {
 
     @Override
     protected boolean check() {
-        final List<EventInstance> eventInstances = processAPI.getEventInstances(processInstanceId, 0, 10, EventCriterion.NAME_ASC);
+        final List<EventInstance> eventInstances = processAPI.getEventInstances(processInstanceId, 0, 10,
+                EventCriterion.NAME_ASC);
         boolean found = false;
         final Iterator<EventInstance> iterator = eventInstances.iterator();
         while (iterator.hasNext() && !found) {

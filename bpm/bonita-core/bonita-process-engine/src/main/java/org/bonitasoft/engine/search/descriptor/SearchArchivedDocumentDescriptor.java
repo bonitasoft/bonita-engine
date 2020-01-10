@@ -49,9 +49,12 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.HAS_CONTENT));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME,
                 new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.NAME));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.DESCRIPTION));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.VERSION));
-        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.INDEX));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_DESCRIPTION,
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.DESCRIPTION));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION,
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.VERSION));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.LIST_INDEX,
+                new FieldDescriptor(SAMappedDocument.class, SADocumentMapping.INDEX));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_URL,
                 new FieldDescriptor(SAMappedDocument.class, "document." + SADocumentMapping.URL));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID,

@@ -67,7 +67,8 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
         return Collections.unmodifiableList(messageEventTriggerDefinitions);
     }
 
-    public void addMessageEventTriggerDefinition(final ThrowMessageEventTriggerDefinition messageEventTriggerDefinition) {
+    public void addMessageEventTriggerDefinition(
+            final ThrowMessageEventTriggerDefinition messageEventTriggerDefinition) {
         messageEventTriggerDefinitions.add(messageEventTriggerDefinition);
         addEventTrigger(messageEventTriggerDefinition);
     }
@@ -84,9 +85,12 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ThrowEventDefinitionImpl that = (ThrowEventDefinitionImpl) o;
         return Objects.equals(messageEventTriggerDefinitions, that.messageEventTriggerDefinitions) &&
                 Objects.equals(signalEventTriggerDefinitions, that.signalEventTriggerDefinitions);

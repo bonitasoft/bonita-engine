@@ -26,10 +26,11 @@ public class ActivityInstanceNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message.
-     * 
+     *
      * @param activityInstanceId
-     *            The identifier of the searched activity displayed in the detail message (which is saved for later retrieval by the
-     *            {@link Throwable#getMessage()} method).
+     *        The identifier of the searched activity displayed in the detail message (which is saved for later
+     *        retrieval by the
+     *        {@link Throwable#getMessage()} method).
      */
     public ActivityInstanceNotFoundException(final long activityInstanceId) {
         super("activity with id " + activityInstanceId + " not found");
@@ -37,13 +38,15 @@ public class ActivityInstanceNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message and cause.
-     * 
+     *
      * @param activityInstanceId
-     *            The identifier of the searched activity displayed in the detail message (which is saved for later retrieval by the
-     *            {@link Throwable#getMessage()} method).
+     *        The identifier of the searched activity displayed in the detail message (which is saved for later
+     *        retrieval by the
+     *        {@link Throwable#getMessage()} method).
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ActivityInstanceNotFoundException(final long activityInstanceId, final Exception cause) {
         super("activity with id " + activityInstanceId + " not found", cause);
@@ -51,10 +54,11 @@ public class ActivityInstanceNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value
+     *        is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ActivityInstanceNotFoundException(final Throwable cause) {
         super(cause);

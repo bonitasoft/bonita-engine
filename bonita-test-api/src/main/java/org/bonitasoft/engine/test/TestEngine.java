@@ -19,6 +19,7 @@ import org.bonitasoft.engine.BonitaDatabaseConfiguration;
  * @author Baptiste Mesta
  */
 public interface TestEngine {
+
     String TECHNICAL_USER_NAME = "install";
     String TECHNICAL_USER_PASSWORD = "install";
 

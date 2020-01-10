@@ -75,7 +75,8 @@ public class TransitionConditionEvaluatorTest {
     }
 
     @Test
-    public void evaluateCondition_should_throw_SExpressionEvaluationException_when_expression_return_type_is_not_a_boolean() throws Exception {
+    public void evaluateCondition_should_throw_SExpressionEvaluationException_when_expression_return_type_is_not_a_boolean()
+            throws Exception {
         //given
         SExpression condition = mock(SExpression.class);
         given(condition.getReturnType()).willReturn(String.class.getName());
@@ -89,7 +90,8 @@ public class TransitionConditionEvaluatorTest {
             fail("Exception expected");
         } catch (SExpressionEvaluationException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("Condition expression must return a boolean, on transition: " + transition.getName());
+            assertThat(e.getMessage())
+                    .isEqualTo("Condition expression must return a boolean, on transition: " + transition.getName());
             assertThat(e.getExpressionName()).isEqualTo("isTrue");
 
             verifyZeroInteractions(expressionResolverService);

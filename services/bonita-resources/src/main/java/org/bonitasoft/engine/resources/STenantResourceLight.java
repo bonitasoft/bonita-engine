@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 public class STenantResourceLight extends AbstractSTenantResource {
 
     public STenantResourceLight(String name, TenantResourceType type, long lastUpdatedBy, long lastUpdateDate,
-                                STenantResourceState state) {
+            STenantResourceState state) {
         super(name, type, lastUpdatedBy, lastUpdateDate, state);
     }
 }

@@ -37,15 +37,18 @@ public class BusinessDataRetriever {
     }
 
     /**
-     * Retrieves the Business Data related to the given {@link SSimpleRefBusinessDataInstance}. If the {@code SSimpleRefBusinessDataInstance} does not
+     * Retrieves the Business Data related to the given {@link SSimpleRefBusinessDataInstance}. If the
+     * {@code SSimpleRefBusinessDataInstance} does not
      * references any Business Data the result will be null.
      *
      * @param dataRef the business data reference
      * @param bizClass the business data class
-     * @return the Business Data related to the given {@code SSimpleRefBusinessDataInstance} or null if no Business Data is referenced.
+     * @return the Business Data related to the given {@code SSimpleRefBusinessDataInstance} or null if no Business Data
+     *         is referenced.
      * @throws SBusinessDataNotFoundException when no Business Data is found for the given id
      */
-    public Entity getSimpleBusinessData(SSimpleRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass) throws SBusinessDataNotFoundException {
+    public Entity getSimpleBusinessData(SSimpleRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass)
+            throws SBusinessDataNotFoundException {
         if (dataRef.getDataId() == null) {
             return null;
         }
@@ -54,14 +57,17 @@ public class BusinessDataRetriever {
     }
 
     /**
-     * Retrieves the list of Business Data related to the given {@link SProcessMultiRefBusinessDataInstance}. If the {@code SMultiRefBusinessDataInstance} does not
+     * Retrieves the list of Business Data related to the given {@link SProcessMultiRefBusinessDataInstance}. If the
+     * {@code SMultiRefBusinessDataInstance} does not
      * references any Business Data the result will em empty list.
      *
      * @param dataRef the multi business data reference
      * @param bizClass the business data class
-     * @return the list of Business Data related to the given {@code SMultiRefBusinessDataInstance} or empty list if no Business Data is referenced.
+     * @return the list of Business Data related to the given {@code SMultiRefBusinessDataInstance} or empty list if no
+     *         Business Data is referenced.
      */
-    public List<Entity> getMultiBusinessData(SProcessMultiRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass) {
+    public List<Entity> getMultiBusinessData(SProcessMultiRefBusinessDataInstance dataRef,
+            Class<? extends Entity> bizClass) {
         if (dataRef.getDataIds() == null || dataRef.getDataIds().isEmpty()) {
             return new ArrayList<>();
         }
@@ -75,13 +81,16 @@ public class BusinessDataRetriever {
     }
 
     /**
-     * Retrieves a Business Data or a List of Business Data related to the given {@link SRefBusinessDataInstance} depending on its type (single {@link Entity}
-     * if it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a {@link SProcessMultiRefBusinessDataInstance}.
+     * Retrieves a Business Data or a List of Business Data related to the given {@link SRefBusinessDataInstance}
+     * depending on its type (single {@link Entity}
+     * if it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a
+     * {@link SProcessMultiRefBusinessDataInstance}.
      * This method will use {@link #getSimpleBusinessData(SSimpleRefBusinessDataInstance, Class)} or
      * {@link #getMultiBusinessData(SProcessMultiRefBusinessDataInstance, Class)} based on the data reference type
      *
      * @param refBusinessDataInstance the business data reference
-     * @return The {@code Entity} or {@code List<Entity>} if the business data reference is a {@code SSimpleRefBusinessDataInstance} or a
+     * @return The {@code Entity} or {@code List<Entity>} if the business data reference is a
+     *         {@code SSimpleRefBusinessDataInstance} or a
      *         {@code SMultiRefBusinessDataInstance} respectively
      * @throws SBusinessDataNotFoundException
      * @throws SExpressionEvaluationException
@@ -89,14 +98,17 @@ public class BusinessDataRetriever {
     public Object getBusinessData(final SRefBusinessDataInstance refBusinessDataInstance)
             throws SBusinessDataNotFoundException, SExpressionEvaluationException {
         try {
-            final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
+                    .loadClass(refBusinessDataInstance.getDataClassName());
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 return getSimpleBusinessData((SSimpleRefBusinessDataInstance) refBusinessDataInstance, bizClass);
             }
             final SProcessMultiRefBusinessDataInstance reference = (SProcessMultiRefBusinessDataInstance) refBusinessDataInstance;
             return getMultiBusinessData(reference, bizClass);
         } catch (final ClassNotFoundException e) {
-            throw new SExpressionEvaluationException("Unable to load class for the business data having reference '" + refBusinessDataInstance.getName() + "'",
+            throw new SExpressionEvaluationException(
+                    "Unable to load class for the business data having reference '" + refBusinessDataInstance.getName()
+                            + "'",
                     e, refBusinessDataInstance.getName());
         }
     }

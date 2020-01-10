@@ -27,7 +27,8 @@ public class SPlatformTest {
         platform.setInformation("info");
 
         //then
-        assertThat(platform).hasVersion("7.0").hasPreviousVersion("6.5").hasInitialVersion("6.4").hasCreatedBy("admin").hasCreated(created)
+        assertThat(platform).hasVersion("7.0").hasPreviousVersion("6.5").hasInitialVersion("6.4").hasCreatedBy("admin")
+                .hasCreated(created)
                 .hasInformation("info");
     }
 

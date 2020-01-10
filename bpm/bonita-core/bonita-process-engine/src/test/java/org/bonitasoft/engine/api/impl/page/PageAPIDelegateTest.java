@@ -15,11 +15,11 @@ package org.bonitasoft.engine.api.impl.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -168,7 +168,8 @@ public class PageAPIDelegateTest {
         final long pageId = 123;
         final SFormMapping formMapping = new SFormMapping();
         formMapping.setPageMapping(new SPageMapping());
-        doReturn(Collections.<SFormMapping> singletonList(formMapping)).when(formMappingService).searchFormMappings(any(QueryOptions.class));
+        doReturn(Collections.<SFormMapping> singletonList(formMapping)).when(formMappingService)
+                .searchFormMappings(any(QueryOptions.class));
 
         pageAPIDelegate.deletePage(pageId);
 
@@ -179,8 +180,9 @@ public class PageAPIDelegateTest {
 
     @Test
     public void updatePageMapping_return_affected_processes() throws Exception {
-        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1))).when(formMappingService).searchFormMappings(
-                any(QueryOptions.class));
+        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1)))
+                .when(formMappingService).searchFormMappings(
+                        any(QueryOptions.class));
 
         final Set<Long> processDefinitionIds = pageAPIDelegate.updatePageMappings(PAGE_ID);
 
@@ -189,8 +191,9 @@ public class PageAPIDelegateTest {
 
     @Test
     public void deletePage_update_resolution_of_related_processes() throws Exception {
-        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1))).when(formMappingService).searchFormMappings(
-                any(QueryOptions.class));
+        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1)))
+                .when(formMappingService).searchFormMappings(
+                        any(QueryOptions.class));
 
         pageAPIDelegate.deletePage(PAGE_ID);
 
@@ -274,7 +277,8 @@ public class PageAPIDelegateTest {
         // given
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+                pair("page.properties",
+                        "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         final long pageId = 1;
 
         // when

@@ -71,7 +71,8 @@ public class ProcessDeletionIT extends TestWithUser {
     }
 
     private ProcessDefinition deployProcessWithSeveralOutGoingTransitions() throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("process To Delete", "2.5");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         for (int i = 0; i < 10; i++) {
@@ -92,7 +93,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
         Thread.sleep(1500);
 
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT);
+        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 100,
+                ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
 
@@ -108,7 +110,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
         getProcessAPI().deleteProcessInstance(processInstance.getId());
 
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
@@ -120,7 +123,8 @@ public class ProcessDeletionIT extends TestWithUser {
         final ProcessInstance processInstance = startAndFinishProcess(processDefinition);
         getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 50);
 
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
@@ -135,15 +139,19 @@ public class ProcessDeletionIT extends TestWithUser {
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done())
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI()
+                .searchArchivedProcessInstances(searchOptionsBuilder.done())
                 .getResult();
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(
-                Arrays.asList(archivedProcessInstances.get(0).getSourceObjectId(), archivedProcessInstances.get(2).getSourceObjectId()));
+                Arrays.asList(archivedProcessInstances.get(0).getSourceObjectId(),
+                        archivedProcessInstances.get(2).getSourceObjectId()));
 
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance1.getId(), 0, 100,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                processInstance1.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
-        final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+        final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI()
+                .searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getCount();
         assertEquals(3, numberOfArchivedProcessInstancesAfterDelete);
     }
@@ -156,14 +164,17 @@ public class ProcessDeletionIT extends TestWithUser {
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI()
+                .searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getResult();
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(archivedProcessInstances.get(0).getSourceObjectId());
 
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
-        final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+        final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI()
+                .searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getCount();
         assertEquals(archivedProcessInstances.size() - 3, numberOfArchivedProcessInstancesAfterDelete);
     }
@@ -180,7 +191,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
     @Test
     public void deleteProcessDefinitionStopsCreatingNewActivities() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder()
+                .createNewInstance("process To Delete", "2.5");
         final String actorName = "delivery";
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addUserTask("step1", actorName);
@@ -190,7 +202,8 @@ public class ProcessDeletionIT extends TestWithUser {
             processDefinitionBuilder.addTransition("step1", activityName);
 
         }
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(),
+                actorName, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         disableAndDeleteProcess(processDefinition.getId()); // will fail in CommonAPITest.succeeded if activities are created after delete
@@ -207,14 +220,16 @@ public class ProcessDeletionIT extends TestWithUser {
         // deploy a process P2 containing a call activity calling P1
         final String intermediateStepName = "intermediateStep1";
         final String intermediateCallActivityName = "intermediateCall";
-        final ProcessDefinition intermediateProcess = deployAndEnableProcessWithCallActivity("intermediateProcess", simpleProcess.getName(),
+        final ProcessDefinition intermediateProcess = deployAndEnableProcessWithCallActivity("intermediateProcess",
+                simpleProcess.getName(),
                 intermediateStepName, intermediateCallActivityName);
         processDefinitions.add(intermediateProcess); // To clean in the end
 
         // deploy a process P3 containing a call activity calling P2
         final String rootStepName = "rootStep1";
         final String rootCallActivityName = "rootCall";
-        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess", intermediateProcess.getName(), rootStepName,
+        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess",
+                intermediateProcess.getName(), rootStepName,
                 rootCallActivityName);
         processDefinitions.add(rootProcess); // To clean in the end
 
@@ -223,11 +238,13 @@ public class ProcessDeletionIT extends TestWithUser {
         waitForUserTask(rootProcessInstance, simpleStepName);
 
         // check that the instances of p1, p2 and p3 were created
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
         assertEquals(3, processInstances.size());
 
         // check that archived flow nodes
-        List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100,
+        List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                rootProcessInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertTrue(taskInstances.size() > 0);
 
@@ -239,12 +256,15 @@ public class ProcessDeletionIT extends TestWithUser {
         assertEquals(0, processInstances.size());
 
         // check that archived flow nodes were not deleted.
-        taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT);
+        taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100,
+                ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
 
-    private ProcessDefinition deployAndEnableSimpleProcess(final String processName, final String userTaskName) throws BonitaException {
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+    private ProcessDefinition deployAndEnableSimpleProcess(final String processName, final String userTaskName)
+            throws BonitaException {
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("tStart");
         processDefBuilder.addUserTask(userTaskName, ACTOR_NAME);
@@ -254,11 +274,14 @@ public class ProcessDeletionIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, user);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String userTaskName,
+    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName,
+            final String targetProcessName, final String userTaskName,
             final String callActivityName) throws BonitaException {
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+        final Expression targetProcessNameExpr = new ExpressionBuilder()
+                .createConstantStringExpression(targetProcessName);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity(callActivityName, targetProcessNameExpr, null);
@@ -280,24 +303,28 @@ public class ProcessDeletionIT extends TestWithUser {
         // deploy a process P2 containing a call activity calling P1
         final String rootStepName = "rootStep1";
         final String rootCallActivityName = "rootCall";
-        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess", simpleProcess.getName(), rootStepName,
+        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess",
+                simpleProcess.getName(), rootStepName,
                 rootCallActivityName);
         processDefinitions.add(rootProcess); // To clean in the end
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
         final ActivityInstance simpleTask = waitForUserTaskAndGetIt(rootProcessInstance, simpleStepName);
-        final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
+        final ProcessInstance simpleProcessInstance = getProcessAPI()
+                .getProcessInstance(simpleTask.getParentProcessInstanceId());
         assignAndExecuteStep(simpleTask, user.getId());
         waitForProcessToFinish(simpleProcessInstance);
         waitForUserTask(rootProcessInstance, rootStepName);
 
         // check that only one instance (p2) is in the journal: p1 is supposed to be archived
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
         assertEquals(1, processInstances.size());
 
         // check that there are archived instances of p1
-        List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
+        List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                .getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
         assertTrue(archivedProcessInstanceList.size() > 0);
 
         // delete the root process instance
@@ -312,7 +339,8 @@ public class ProcessDeletionIT extends TestWithUser {
         assertEquals(0, archivedProcessInstanceList.size());
 
         // check that archived flow node were not deleted.
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 10,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                rootProcessInstance.getId(), 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
@@ -327,25 +355,29 @@ public class ProcessDeletionIT extends TestWithUser {
         // deploy a process P2 containing a call activity calling P1
         final String rootStepName = "rootStep1";
         final String rootCallActivityName = "rootCall";
-        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess", simpleProcess.getName(), rootStepName,
+        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess",
+                simpleProcess.getName(), rootStepName,
                 rootCallActivityName);
         processDefinitions.add(rootProcess); // To clean in the end
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
         final ActivityInstance simpleTask = waitForUserTaskAndAssignIt(rootProcessInstance, simpleStepName, user);
-        final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
+        final ProcessInstance simpleProcessInstance = getProcessAPI()
+                .getProcessInstance(simpleTask.getParentProcessInstanceId());
         getProcessAPI().executeFlowNode(simpleTask.getId());
 
         waitForUserTask(rootProcessInstance, rootStepName);
         waitForProcessToFinish(simpleProcessInstance);
 
         // check that only one instance (p2) is in the journal: p1 is supposed to be archived
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.NAME_ASC);
         assertEquals(1, processInstances.size());
 
         // check that there are archived instances of p1
-        List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
+        List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                .getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
         assertTrue(archivedProcessInstanceList.size() > 0);
 
         // delete archived root process instances
@@ -356,11 +388,13 @@ public class ProcessDeletionIT extends TestWithUser {
         assertEquals(1, processInstances.size());
 
         // check that the archived instances of p1 were deleted
-        archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 1000);
+        archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0,
+                1000);
         assertEquals(0, archivedProcessInstanceList.size());
 
         // check that archived flow node were deleted.
-        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 10,
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(
+                rootProcessInstance.getId(), 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
     }
@@ -371,7 +405,8 @@ public class ProcessDeletionIT extends TestWithUser {
         final String childTaskName = "subStep";
         final String signalName = "go";
         // deploy and create a instance of a process containing an event sub-process
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithSignalEventSubProcess(parentTaskName, childTaskName, signalName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithSignalEventSubProcess(parentTaskName,
+                childTaskName, signalName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -383,7 +418,8 @@ public class ProcessDeletionIT extends TestWithUser {
         waitForUserTask(rootProcessInstance, childTaskName);
 
         // check the number of process instances: 2 expected the root process instance and the event subprocess
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.DEFAULT);
         assertEquals(2, processInstances.size());
 
         // delete the root process instance: the event subprocess must be deleted at same time
@@ -394,16 +430,19 @@ public class ProcessDeletionIT extends TestWithUser {
         assertEquals(0, processInstances.size());
     }
 
-    private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final String parentTaskName, final String childTaskName, final String signalName)
+    private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final String parentTaskName,
+            final String childTaskName, final String signalName)
             throws BonitaException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+                .createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
         builder.addStartEvent("start");
         builder.addUserTask(parentTaskName, "mainActor");
         builder.addEndEvent("end");
         builder.addTransition("start", parentTaskName);
         builder.addTransition(parentTaskName, "end");
-        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("eventSubProcess", true).getSubProcessBuilder();
+        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("eventSubProcess", true)
+                .getSubProcessBuilder();
         subProcessBuilder.addStartEvent("startSub").addSignalEventTrigger(signalName);
         subProcessBuilder.addUserTask(childTaskName, "mainActor");
         subProcessBuilder.addEndEvent("endSubProcess");
@@ -430,8 +469,10 @@ public class ProcessDeletionIT extends TestWithUser {
         waitForUserTask(activeProcessInstance, userTaskName);
 
         // check number of process instances and archived process instances
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10,
+                ProcessInstanceCriterion.DEFAULT);
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0,
+                10, ProcessInstanceCriterion.DEFAULT);
         assertEquals(1, processInstances.size());
         assertEquals(1, archivedProcessInstances.size());
 
@@ -443,10 +484,12 @@ public class ProcessDeletionIT extends TestWithUser {
             processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
             assertFalse(processInstances.isEmpty());
 
-            List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstanceToArchive.getId(), 0, 10);
+            List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                    .getArchivedProcessInstances(processInstanceToArchive.getId(), 0, 10);
             assertFalse(archivedProcessInstanceList.isEmpty());
 
-            archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(activeProcessInstance.getId(), 0, 10);
+            archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(activeProcessInstance.getId(), 0,
+                    10);
             assertFalse(archivedProcessInstanceList.isEmpty());
         }
     }
@@ -462,7 +505,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
         final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
-        final SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI()
+                .searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(0, searchResult.getCount());
         assertTrue(searchResult.getResult().isEmpty());
     }
@@ -482,7 +526,8 @@ public class ProcessDeletionIT extends TestWithUser {
         getProcessAPI().deleteProcessInstance(processInstance.getId());
 
         // check that all archived process instance related to this process were deleted
-        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10);
+        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                .getArchivedProcessInstances(processInstance.getId(), 0, 10);
         assertEquals(0, archivedProcessInstanceList.size());
     }
 
@@ -501,7 +546,8 @@ public class ProcessDeletionIT extends TestWithUser {
         getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 1000);
 
         // check that all archived process instance related to this process were deleted
-        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10);
+        final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI()
+                .getArchivedProcessInstances(processInstance.getId(), 0, 10);
         assertEquals(0, archivedProcessInstanceList.size());
     }
 
@@ -510,13 +556,15 @@ public class ProcessDeletionIT extends TestWithUser {
         // deploy and instantiate a process containing data and documents
         final String userTaskName = "step1";
         final String url = "http://intranet.bonitasoft.com/private/docStorage/anyValue";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithDocument("myProcess", userTaskName, "Doc", url);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithDocument("myProcess", userTaskName, "Doc",
+                url);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, userTaskName);
 
         // check the number of data and documents
-        SearchResult<Document> documentsSearchResult = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 10).done());
+        SearchResult<Document> documentsSearchResult = getProcessAPI()
+                .searchDocuments(new SearchOptionsBuilder(0, 10).done());
         assertEquals(1, documentsSearchResult.getCount());
 
         // delete process instance
@@ -527,9 +575,11 @@ public class ProcessDeletionIT extends TestWithUser {
         assertEquals(0, documentsSearchResult.getCount());
     }
 
-    private ProcessDefinition deployAndEnableProcessWithDocument(final String processName, final String userTaskName, final String docName, final String url)
+    private ProcessDefinition deployAndEnableProcessWithDocument(final String processName, final String userTaskName,
+            final String docName, final String url)
             throws BonitaException {
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName,
+                "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         final DocumentDefinitionBuilder documentDefinitionBuilder = processDefBuilder.addDocumentDefinition(docName);
         documentDefinitionBuilder.addUrl(url);
@@ -568,7 +618,8 @@ public class ProcessDeletionIT extends TestWithUser {
     public void deleteProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";
-        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion",
+                userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long userTaskId = waitForUserTask(processInstance, userTaskName);
@@ -578,7 +629,8 @@ public class ProcessDeletionIT extends TestWithUser {
         assignAndExecuteStep(userTaskId, user);
         waitForProcessToFinish(processInstance);
 
-        SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
+        SearchResult<ArchivedComment> searchResult = getProcessAPI()
+                .searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
         assertTrue(searchResult.getCount() > 0);
 
         getProcessAPI().deleteProcessInstances(processDefinition.getId(), 0, 10);
@@ -592,7 +644,8 @@ public class ProcessDeletionIT extends TestWithUser {
     public void deleteArchivedProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";
-        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion",
+                userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long userTaskId = waitForUserTask(processInstance, userTaskName);
@@ -602,7 +655,8 @@ public class ProcessDeletionIT extends TestWithUser {
         assignAndExecuteStep(userTaskId, user);
         waitForProcessToFinish(processInstance);
 
-        SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
+        SearchResult<ArchivedComment> searchResult = getProcessAPI()
+                .searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
         assertTrue(searchResult.getCount() > 0);
 
         getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);

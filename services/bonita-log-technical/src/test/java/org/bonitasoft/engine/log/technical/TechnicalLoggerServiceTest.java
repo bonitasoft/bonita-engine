@@ -37,8 +37,8 @@ public class TechnicalLoggerServiceTest {
     private final class RunnableImplementation implements Runnable {
 
         /**
-     * 
-     */
+        *
+        */
         private final TechnicalLoggerSLF4JImpl techLogger;
 
         /**

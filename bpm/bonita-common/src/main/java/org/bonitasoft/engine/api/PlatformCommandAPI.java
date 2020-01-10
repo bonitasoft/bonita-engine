@@ -31,7 +31,8 @@ import org.bonitasoft.engine.exception.UpdateException;
 
 /**
  * Manipulates a platform command. A command can be registered, unregistered and executed with parameters.<br>
- * These commands are executed in a platform scope, see {@link CommandAPI} for an explanation of how to deploy, execute, ... a command. The only
+ * These commands are executed in a platform scope, see {@link CommandAPI} for an explanation of how to deploy, execute,
+ * ... a command. The only
  * difference between the {@link CommandAPI} and the {@link PlatformCommandAPI} is that a platform command must extend
  * {@code org.bonitasoft.engine.command.PlatformCommand}.
  *
@@ -88,7 +89,8 @@ public interface PlatformCommandAPI {
      * @throws CreationException
      *         if a problem occurs when registering the command
      */
-    CommandDescriptor register(String name, String description, String implementation) throws AlreadyExistsException, CreationException;
+    CommandDescriptor register(String name, String description, String implementation)
+            throws AlreadyExistsException, CreationException;
 
     /**
      * Executes a command according to its name and the list of parameters.
@@ -107,7 +109,8 @@ public interface PlatformCommandAPI {
      * @throws CommandExecutionException
      *         occurs when an exception is thrown during command execution
      */
-    Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    Serializable execute(String name, Map<String, Serializable> parameters)
+            throws CommandNotFoundException, CommandParameterizationException,
             CommandExecutionException;
 
     /**

@@ -47,7 +47,8 @@ public class PlatformRetrieverImplTest {
     @Test
     public final void getPlatform_should_return_result_of_persistence_service() throws SBonitaException {
         SPlatform platform = mock(SPlatform.class);
-        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class))).willReturn(platform);
+        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class)))
+                .willReturn(platform);
 
         //when
         SPlatform retrievedPlatform = platformRetriever.getPlatform();
@@ -55,8 +56,10 @@ public class PlatformRetrieverImplTest {
     }
 
     @Test
-    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_returns_null() throws SBonitaException {
-        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class))).willReturn(null);
+    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_returns_null()
+            throws SBonitaException {
+        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class)))
+                .willReturn(null);
 
         //then
         expectedException.expect(SPlatformNotFoundException.class);
@@ -67,9 +70,11 @@ public class PlatformRetrieverImplTest {
     }
 
     @Test
-    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_throws_Exception() throws SBonitaException {
+    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_throws_Exception()
+            throws SBonitaException {
         SBonitaReadException exception = new SBonitaReadException("Unable to access database");
-        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class))).willThrow(exception);
+        given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class)))
+                .willThrow(exception);
 
         //then
         expectedException.expect(SPlatformNotFoundException.class);

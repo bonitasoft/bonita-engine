@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command.model;
 
-
 /**
  * @author Matthieu Chaffotte
  */

@@ -26,11 +26,12 @@ public class BusinessDataQueryResultImpl implements BusinessDataQueryResult {
     private final Serializable jsonResults;
     private final BusinessDataQueryMetadataImpl businessDataQueryMetadata;
 
-    public BusinessDataQueryResultImpl(){
-        this(null,null);
+    public BusinessDataQueryResultImpl() {
+        this(null, null);
     };
 
-    public BusinessDataQueryResultImpl(Serializable jsonResults, BusinessDataQueryMetadataImpl businessDataQueryMetadata) {
+    public BusinessDataQueryResultImpl(Serializable jsonResults,
+            BusinessDataQueryMetadataImpl businessDataQueryMetadata) {
         this.jsonResults = jsonResults;
         this.businessDataQueryMetadata = businessDataQueryMetadata;
     }

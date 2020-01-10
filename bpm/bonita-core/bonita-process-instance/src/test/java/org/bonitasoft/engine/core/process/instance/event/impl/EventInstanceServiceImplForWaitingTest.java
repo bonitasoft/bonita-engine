@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceRepository;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
@@ -30,10 +31,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.micrometer.core.instrument.MeterRegistry;
-
 @RunWith(MockitoJUnitRunner.class)
 public class EventInstanceServiceImplForWaitingTest {
+
     @Mock
     private EventInstanceRepository instanceRepository;
 
@@ -43,12 +43,12 @@ public class EventInstanceServiceImplForWaitingTest {
     @Mock
     private DataInstanceService dataInstanceService;
 
-
     private EventInstanceServiceImpl eventInstanceServiceImpl;
 
     @Before
-    public void setUp(){
-        eventInstanceServiceImpl = spy( new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L));
+    public void setUp() {
+        eventInstanceServiceImpl = spy(
+                new EventInstanceServiceImpl(instanceRepository, dataInstanceService, meterRegistry, 1L));
     }
 
     @Test
@@ -56,7 +56,8 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         final SWaitingMessageEvent waitingMessageEventImpl = new SWaitingMessageEvent();
-        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList()).when(instanceRepository)
+        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList())
+                .when(instanceRepository)
                 .getWaitingEventsForFlowNodeId(anyLong());
         doNothing().when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
 
@@ -72,14 +73,14 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SIntermediateCatchEventInstance sIntermediateCatchEventInstance = new SIntermediateCatchEventInstance();
         final SWaitingSignalEvent waitingMessageEventImpl = new SWaitingSignalEvent();
-        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList()).when(instanceRepository)
+        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList())
+                .when(instanceRepository)
                 .getWaitingEventsForFlowNodeId(anyLong());
         doThrow(new SWaitingEventModificationException(new Exception(""))).when(instanceRepository)
                 .deleteWaitingEvent(waitingMessageEventImpl);
         // When
         eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstance);
     }
-
 
     @Test(expected = SEventTriggerInstanceReadException.class)
     public final void deleteWaitingEvents_should_throw_exception_when_cant_search_waiting_event() throws Exception {

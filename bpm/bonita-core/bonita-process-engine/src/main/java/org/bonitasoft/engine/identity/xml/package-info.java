@@ -19,7 +19,7 @@
  */
 
 @XmlSchema(namespace = "http://documentation.bonitasoft.com/organization-xml-schema/1.1", elementFormDefault = XmlNsForm.UNSET, xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://documentation.bonitasoft.com/organization-xml-schema/1.1", prefix = "organization")})
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://documentation.bonitasoft.com/organization-xml-schema/1.1", prefix = "organization") })
 package org.bonitasoft.engine.identity.xml;
 
 import javax.xml.bind.annotation.XmlNsForm;

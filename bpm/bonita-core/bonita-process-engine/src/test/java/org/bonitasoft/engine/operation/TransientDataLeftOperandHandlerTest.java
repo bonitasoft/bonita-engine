@@ -55,13 +55,15 @@ public class TransientDataLeftOperandHandlerTest {
         final SShortTextDataInstance data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
         // when
-        transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String,Object>emptyMap(), "new Value", 42, "ctype");
+        transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String, Object> emptyMap(),
+                "new Value", 42, "ctype");
 
         // then
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", "new Value");
         verify(transientDataService, times(1)).updateDataInstance(eq(data), eq(entityUpdateDescriptor));
-        verify(logger, times(1)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
+        verify(logger, times(1)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING),
+                anyString());
     }
 
     private SLeftOperandImpl createLeftOperand(final String name) {
@@ -77,10 +79,12 @@ public class TransientDataLeftOperandHandlerTest {
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
         SExpressionContext sExpressionContext = new SExpressionContext(42l, "ctype", 12l);
         // when
-        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"),sExpressionContext.getContainerId(),sExpressionContext.getContainerType(), sExpressionContext);
+        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"),
+                sExpressionContext.getContainerId(), sExpressionContext.getContainerType(), sExpressionContext);
 
         // then
-        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
+        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("myData", data.getValue()),
+                entry("%TRANSIENT_DATA%_myData", data));
     }
 
     private SShortTextDataInstance createData() {
@@ -90,7 +94,6 @@ public class TransientDataLeftOperandHandlerTest {
         data.setValue("The data value");
         return data;
     }
-
 
     @Test(expected = SOperationExecutionException.class)
     public void deleteThrowsAnExceptionNotYetSupported() throws Exception {

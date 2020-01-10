@@ -42,20 +42,26 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
                 new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getNameKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME,
                 new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getStateNameKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getProcessDefinitionKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getParentProcessInstanceKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getParentActivityInstanceKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getRootProcessInstanceKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getProcessDefinitionKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getParentProcessInstanceKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getParentActivityInstanceKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getRootProcessInstanceKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.DISPLAY_NAME,
                 new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getDisplayNameKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getKindKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                keyProvider.getSourceObjectIdKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getKindKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class,
+                        keyProvider.getSourceObjectIdKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL,
                 new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getTerminalKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.REACHED_STATE_DATE,

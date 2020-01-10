@@ -22,5 +22,5 @@ import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 public interface SAutomaticTaskInstanceBuilder extends SActivityInstanceBuilder {
 
     SAutomaticTaskInstance done();
-    
+
 }

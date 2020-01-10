@@ -15,8 +15,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.dependency.model.DependencyContent;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 /**

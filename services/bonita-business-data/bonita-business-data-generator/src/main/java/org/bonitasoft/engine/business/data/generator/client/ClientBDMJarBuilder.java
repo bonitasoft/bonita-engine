@@ -37,7 +37,7 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
         super.addSourceFilesToDirectory(bom, directory);
         addClientResources(directory);
     }
-    
+
     private void addClientResources(final File directory) throws CodeGenerationException {
         try {
             resourcesLoader.copyJavaFilesToDirectory("org.bonitasoft.engine.bdm.dao.client.resources", directory);

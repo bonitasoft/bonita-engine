@@ -76,13 +76,15 @@ public class GetBusinessDataByIdsCommandTest {
         command.execute(parameters, tenantServiceAccessor);
 
         //then
-        verify(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifers,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test(expected = SCommandExecutionException.class)
     public void executeCommandWithEntitiesShloudThrowException() throws Exception {
         //given
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME, identifers,
+        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonEntities(PARAMETER_CLASS_NAME,
+                identifers,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception

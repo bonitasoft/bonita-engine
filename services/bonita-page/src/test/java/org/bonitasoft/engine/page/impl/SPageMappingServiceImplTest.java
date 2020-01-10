@@ -139,7 +139,8 @@ public class SPageMappingServiceImplTest {
     public void should_create_return_external_mapping() throws Exception {
         //given
         //when
-        SPageMapping sPageMapping = pageMappingService.create("theKey", "http://www.mycompagny.com/aResource/page.html", "myAdapter",
+        SPageMapping sPageMapping = pageMappingService.create("theKey", "http://www.mycompagny.com/aResource/page.html",
+                "myAdapter",
                 Collections.<String> emptyList());
         //then
         assertThat(sPageMapping).isNotNull();
@@ -207,7 +208,8 @@ public class SPageMappingServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder).recordUpdate(updateRecord.capture(), eq("PAGE_MAPPING"));
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null),
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null),
+                entry("urlAdapter", null),
                 entry("lastUpdatedBy", 0L));
 
     }
@@ -236,7 +238,8 @@ public class SPageMappingServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder).recordUpdate(updateRecord.capture(), eq("PAGE_MAPPING"));
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"),
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"),
+                entry("urlAdapter", "urlAdapter"),
                 entry("lastUpdatedBy", 0L));
     }
 
@@ -245,7 +248,8 @@ public class SPageMappingServiceImplTest {
         SPageMapping pageMapping = new SPageMapping();
         pageMapping.setPageId(56l);
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping,
+                Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(56l);
         assertThat(sPageURL.getUrl()).isEqualTo(null);
@@ -256,7 +260,8 @@ public class SPageMappingServiceImplTest {
         SPageMapping pageMapping = new SPageMapping();
         pageMapping.setUrl("theUrl");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping,
+                Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl");
@@ -268,7 +273,8 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl(null);
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping,
+                Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("null_adapted_0");
@@ -280,7 +286,8 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"), true);
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping,
+                Collections.<String, Serializable> singletonMap("test", "test"), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl_adapted_1");/* 1 is the map size */
@@ -292,7 +299,8 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("unknown");
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"), true);
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"),
+                true);
     }
 
     class ValidRule implements AuthorizationRule {
@@ -348,7 +356,7 @@ public class SPageMappingServiceImplTest {
 
         verify(authorizationRule).isAllowed(nullable(String.class), anyMap());
     }
-    
+
     @Test
     public void resolvePageURL_shouldNotExecuteAuthorizationRule() throws Exception {
         SPageMapping pageMapping = new SPageMapping();

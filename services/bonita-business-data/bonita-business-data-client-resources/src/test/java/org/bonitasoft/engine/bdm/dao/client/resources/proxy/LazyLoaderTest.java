@@ -58,7 +58,8 @@ public class LazyLoaderTest {
         long persistenceId = 22L;
         Child luce = new Child("Luce", 2);
         Method getChild = Parent.class.getMethod("getChild");
-        when(commandAPI.execute("executeBDMQuery", parameters(getChild, persistenceId))).thenReturn(luce.toJson().getBytes());
+        when(commandAPI.execute("executeBDMQuery", parameters(getChild, persistenceId)))
+                .thenReturn(luce.toJson().getBytes());
 
         Object loadedChild = lazyLoader.load(getChild, persistenceId);
 

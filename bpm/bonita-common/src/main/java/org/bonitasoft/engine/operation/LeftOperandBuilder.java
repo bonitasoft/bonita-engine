@@ -31,7 +31,8 @@ public class LeftOperandBuilder {
     private LeftOperandImpl leftOperand;
 
     /**
-     * Initiate the building of a new <code>LeftOperand</code>. The <code>LeftOperand</code> building will be complete when calling the {@link #done()} method.
+     * Initiate the building of a new <code>LeftOperand</code>. The <code>LeftOperand</code> building will be complete
+     * when calling the {@link #done()} method.
      *
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
@@ -60,8 +61,10 @@ public class LeftOperandBuilder {
 
     /**
      * Set the type of the left operand
-     * It can be {@link LeftOperand#TYPE_DATA} {@link LeftOperand#TYPE_BUSINESS_DATA} {@link LeftOperand#TYPE_DOCUMENT} {@link LeftOperand#TYPE_EXTERNAL_DATA}
-     * {@link LeftOperand#TYPE_SEARCH_INDEX} {@link LeftOperand#TYPE_TRANSIENT_DATA} or an other type of org.bonitasoft.engine.core.operation.LeftOperandHandler
+     * It can be {@link LeftOperand#TYPE_DATA} {@link LeftOperand#TYPE_BUSINESS_DATA} {@link LeftOperand#TYPE_DOCUMENT}
+     * {@link LeftOperand#TYPE_EXTERNAL_DATA}
+     * {@link LeftOperand#TYPE_SEARCH_INDEX} {@link LeftOperand#TYPE_TRANSIENT_DATA} or an other type of
+     * org.bonitasoft.engine.core.operation.LeftOperandHandler
      * registered in the configuration
      *
      * @param type
@@ -104,7 +107,8 @@ public class LeftOperandBuilder {
     }
 
     public LeftOperand createSearchIndexLeftOperand(final int index) {
-        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.TYPE_SEARCH_INDEX).done();
+        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.TYPE_SEARCH_INDEX)
+                .done();
     }
 
     /**
@@ -122,7 +126,8 @@ public class LeftOperandBuilder {
     }
 
     /**
-     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be updated in Bonita system)
+     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be
+     * updated in Bonita system)
      *
      * @param dataName
      *        the name of the data to set
@@ -133,7 +138,8 @@ public class LeftOperandBuilder {
     }
 
     /**
-     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be updated in Bonita system)
+     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be
+     * updated in Bonita system)
      *
      * @param dataName
      *        the name of the data to set

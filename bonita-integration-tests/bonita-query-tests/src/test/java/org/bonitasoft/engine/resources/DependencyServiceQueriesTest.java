@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Map;
 import java.util.Random;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.dependency.model.DependencyContent;
@@ -30,7 +31,6 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.test.persistence.repository.DependencyRepository;
 import org.bonitasoft.engine.test.persistence.repository.PlatformRepository;
@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Danila Mazour
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class DependencyServiceQueriesTest {
 
@@ -138,7 +138,8 @@ public class DependencyServiceQueriesTest {
                 .description("description of the jar")
                 .value_("jarContent".getBytes()).build());
 
-        PersistentObject dependencyFromQuery = repository.selectOne("getDependencyByName", pair("name", "dependencyName"));
+        PersistentObject dependencyFromQuery = repository.selectOne("getDependencyByName",
+                pair("name", "dependencyName"));
         Map<String, Object> dependencyAsMap = jdbcTemplate.queryForMap("SELECT * FROM dependency");
 
         assertThat(dependencyFromQuery).isEqualTo(aDependency);
@@ -163,8 +164,10 @@ public class DependencyServiceQueriesTest {
                 .artifactType(PROCESS)
                 .dependencyId(aDependency.getId()).build());
 
-        PersistentObject dependencyMappingFromQuery = repository.selectOne("getDependencyMappingsByDependency", pair("dependencyId", aDependency.getId()));
-        Map<String, Object> dependencyMappingAsMap = jdbcTemplate.queryForMap("SELECT * FROM dependencymapping WHERE dependencyId=" + aDependency.getId());
+        PersistentObject dependencyMappingFromQuery = repository.selectOne("getDependencyMappingsByDependency",
+                pair("dependencyId", aDependency.getId()));
+        Map<String, Object> dependencyMappingAsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM dependencymapping WHERE dependencyId=" + aDependency.getId());
 
         assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
         assertThat(dependencyMappingAsMap).containsOnly(
@@ -183,7 +186,8 @@ public class DependencyServiceQueriesTest {
                 .description("description of the jar")
                 .value_("jarContent".getBytes()).build());
 
-        PersistentObject dependencyFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyByName", pair("name", "dependencyName"));
+        PersistentObject dependencyFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyByName",
+                pair("name", "dependencyName"));
         Map<String, Object> dependencyAsMap = jdbcTemplate.queryForMap("SELECT * FROM pdependency");
 
         assertThat(dependencyFromQuery).isEqualTo(aDependency);
@@ -207,8 +211,10 @@ public class DependencyServiceQueriesTest {
                 .artifactType(PROCESS)
                 .dependencyId(aDependency.getId()).build());
 
-        PersistentObject dependencyMappingFromQuery = platformRepository.selectOneOnPlatform("getPlatformDependencyMappingsByDependency", pair("dependencyId", aDependency.getId()));
-        Map<String, Object> dependencyMappingAsMap = jdbcTemplate.queryForMap("SELECT * FROM pdependencymapping WHERE dependencyId=" + aDependency.getId());
+        PersistentObject dependencyMappingFromQuery = platformRepository.selectOneOnPlatform(
+                "getPlatformDependencyMappingsByDependency", pair("dependencyId", aDependency.getId()));
+        Map<String, Object> dependencyMappingAsMap = jdbcTemplate
+                .queryForMap("SELECT * FROM pdependencymapping WHERE dependencyId=" + aDependency.getId());
 
         assertThat(dependencyMappingFromQuery).isEqualTo(dependencyMapping);
         assertThat(dependencyMappingAsMap).containsOnly(

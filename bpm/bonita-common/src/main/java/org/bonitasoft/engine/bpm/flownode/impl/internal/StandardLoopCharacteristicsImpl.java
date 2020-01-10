@@ -51,7 +51,8 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
         loopMax = null;
     }
 
-    public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore, final Expression loopMax) {
+    public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore,
+            final Expression loopMax) {
         super();
         this.loopCondition = getNonNullCopy(loopCondition);
         this.testBefore = testBefore;

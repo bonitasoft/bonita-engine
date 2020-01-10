@@ -35,7 +35,8 @@ public class GetConnectorImplementation implements TransactionContentWithResult<
 
     private SConnectorImplementationDescriptor connectorImplementation;
 
-    public GetConnectorImplementation(final ConnectorService connectorService, final long processDefinitionId, final String connectorId,
+    public GetConnectorImplementation(final ConnectorService connectorService, final long processDefinitionId,
+            final String connectorId,
             final String connectorVersion, final long tenantId) {
         this.connectorService = connectorService;
         this.processDefinitionId = processDefinitionId;
@@ -46,7 +47,8 @@ public class GetConnectorImplementation implements TransactionContentWithResult<
 
     @Override
     public void execute() throws SBonitaException {
-        connectorImplementation = connectorService.getConnectorImplementation(processDefinitionId, connectorId, connectorVersion);
+        connectorImplementation = connectorService.getConnectorImplementation(processDefinitionId, connectorId,
+                connectorVersion);
     }
 
     @Override

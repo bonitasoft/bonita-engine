@@ -79,7 +79,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void pause() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException().getTenantServiceAccessor(getTenantId());
+        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
+                .getTenantServiceAccessor(getTenantId());
         try {
             tenantServiceAccessor.getTenantStateManager().pause();
         } catch (Exception e) {
@@ -91,7 +92,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     @CustomTransactions
     public void resume() throws UpdateException {
-        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException().getTenantServiceAccessor(getTenantId());
+        TenantServiceAccessor tenantServiceAccessor = getPlatformAccessorNoException()
+                .getTenantServiceAccessor(getTenantId());
         try {
             tenantServiceAccessor.getTenantStateManager().resume();
             tenantServiceAccessor.getUserTransactionService().executeInTransaction(() -> {
@@ -140,7 +142,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     @Override
     @AvailableWhenTenantIsPaused(onlyAvailableWhenPaused = true)
-    public String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+    public String installBusinessDataModel(final byte[] zip)
+            throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final long userId;
         try {
@@ -199,7 +202,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    private SessionAccessor getSessionAccessor() throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException, BonitaHomeConfigurationException, BonitaHomeNotSetException {
+    private SessionAccessor getSessionAccessor() throws IllegalAccessException, InstantiationException, IOException,
+            ClassNotFoundException, BonitaHomeConfigurationException, BonitaHomeNotSetException {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 

@@ -113,7 +113,8 @@ public class RoleIT extends TestWithTechnicalUser {
     @Test
     public void roleNameAndDisplayNameShouldAccept255Chars() throws BonitaException {
         final String stringIndex_255_chars = "ईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईऑऑऑऑऑ";
-        final Role role = getIdentityAPI().createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
+        final Role role = getIdentityAPI()
+                .createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
 
         // Should be no exception:
 
@@ -321,7 +322,8 @@ public class RoleIT extends TestWithTechnicalUser {
         final Group group = getIdentityAPI().createGroup("R&D", null);
         getIdentityAPI().addUserMemberships(userIds, group.getId(), role.getId());
 
-        final List<User> users = getIdentityAPI().getActiveUsersInRole(role.getId(), 0, 10, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getActiveUsersInRole(role.getId(), 0, 10,
+                UserCriterion.USER_NAME_ASC);
         assertNotNull(users);
         assertEquals(2, users.size());
         assertEquals(user1, users.get(0));
@@ -353,7 +355,8 @@ public class RoleIT extends TestWithTechnicalUser {
         final Group group = getIdentityAPI().createGroup("R&D", null);
         getIdentityAPI().addUserMemberships(userIds, group.getId(), role.getId());
 
-        final List<User> users = getIdentityAPI().getInactiveUsersInRole(role.getId(), 0, 10, UserCriterion.USER_NAME_ASC);
+        final List<User> users = getIdentityAPI().getInactiveUsersInRole(role.getId(), 0, 10,
+                UserCriterion.USER_NAME_ASC);
         assertNotNull(users);
         assertEquals(1, users.size());
         assertEquals(user3, users.get(0));
@@ -591,7 +594,8 @@ public class RoleIT extends TestWithTechnicalUser {
         //given
         Role aRole = getIdentityAPI().createRole(new RoleCreator("aRole").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
-        Role role = getIdentityAPI().updateRole(aRole.getId(), new RoleUpdater().setIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
+        Role role = getIdentityAPI().updateRole(aRole.getId(),
+                new RoleUpdater().setIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
         //then
         Icon icon = getIdentityAPI().getIcon(role.getIconId());
         assertThat(icon.getId()).isNotEqualTo(aRole.getIconId());

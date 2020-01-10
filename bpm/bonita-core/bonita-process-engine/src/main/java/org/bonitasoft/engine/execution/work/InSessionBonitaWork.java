@@ -36,7 +36,8 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
     }
 
     protected void logIncident(final Throwable cause, final Exception exceptionWhenHandlingFailure) {
-        final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
+        final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause,
+                exceptionWhenHandlingFailure);
         final IncidentService incidentService = getTenantAccessor().getIncidentService();
         incidentService.report(getTenantId(), incident);
     }
@@ -98,13 +99,16 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
         }
     }
 
-    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Throwable e, final Map<String, Object> context) {
+    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Throwable e,
+            final Map<String, Object> context) {
         try {
             getWrappedWork().handleFailure(e, context);
             logException(loggerService, e);
         } catch (final Exception e1) {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work [" + getDescription() + "]"
-                    + ". You may consider restarting the system. This will restart all works.", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                    "Unexpected error while executing work [" + getDescription() + "]"
+                            + ". You may consider restarting the system. This will restart all works.",
+                    e);
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure. ", e1);
             logIncident(e, e1);
         }

@@ -38,8 +38,9 @@ public class CleanAndStoreConfigurationInTransaction extends TransactionCallback
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
-    public CleanAndStoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor, List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
-                                                   long tenantId) {
+    public CleanAndStoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
+            List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
+            long tenantId) {
 
         this.jdbcTemplate = jdbcTemplate;
         this.dbVendor = dbVendor;
@@ -51,7 +52,7 @@ public class CleanAndStoreConfigurationInTransaction extends TransactionCallback
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
         LOGGER.debug(
-                "delete existing configurations for type:" + type.name() + " and tenant id:" + tenantId );
+                "delete existing configurations for type:" + type.name() + " and tenant id:" + tenantId);
 
         jdbcTemplate.batchUpdate(BonitaConfigurationContentTypeCleaner.DELETE_CONFIGURATION,
                 new BonitaConfigurationContentTypeCleaner(type, tenantId));

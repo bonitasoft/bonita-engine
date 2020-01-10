@@ -38,7 +38,8 @@ public class MemoryJNDISetup implements DisposableBean, InitializingBean {
     public MemoryJNDISetup(final DataSource datasource) throws NamingException {
         super();
         this.datasource = datasource;
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.platform.setup.jndi.SimpleMemoryContextFactory");
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+                "org.bonitasoft.platform.setup.jndi.SimpleMemoryContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.platform.setup.jndi");
         jndiTemplate = new JndiTemplate();
     }

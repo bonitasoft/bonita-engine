@@ -100,7 +100,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void createWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingMessageEvent sWaitingEventImpl = new SWaitingMessageEvent();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.createWaitingEvent(sWaitingEventImpl);
@@ -128,16 +129,16 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void deleteWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingSignalEvent sWaitingEventImpl = new SWaitingSignalEvent();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.deleteWaitingEvent(sWaitingEventImpl);
     }
 
-
-
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#resetInProgressWaitingEvents()}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#resetInProgressWaitingEvents()}.
      */
     @Test
     public final void resetInProgressWaitingEvents_should_update_waiting_events() throws Exception {
@@ -182,7 +183,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void getNumberOfWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(SWaitingEvent.class, queryOptions, null);
+        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(SWaitingEvent.class,
+                queryOptions, null);
 
         // When
         eventInstanceRepository.getNumberOfWaitingEvents(SWaitingEvent.class, queryOptions);
@@ -199,11 +201,13 @@ public class EventInstanceRepositoryImplForWaitingTest {
         final long processDefinitionId = 9L;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
         final List<SWaitingSignalEvent> sWaitingSignalEvents = Arrays.asList(new SWaitingSignalEvent());
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId, queryOptions);
+        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder
+                .getStartWaitingEvents(processDefinitionId, queryOptions);
         doReturn(sWaitingSignalEvents).when(persistenceService).selectList(descriptor);
 
         // When
-        final List<SWaitingEvent> result = eventInstanceRepository.searchStartWaitingEvents(processDefinitionId, queryOptions);
+        final List<SWaitingEvent> result = eventInstanceRepository.searchStartWaitingEvents(processDefinitionId,
+                queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", sWaitingSignalEvents, result);
@@ -214,7 +218,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
         // Given
         final long processDefinitionId = 9L;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId, queryOptions);
+        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder
+                .getStartWaitingEvents(processDefinitionId, queryOptions);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(descriptor);
 
         // When
@@ -222,14 +227,16 @@ public class EventInstanceRepositoryImplForWaitingTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getWaitingMessage(long)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceRepositoryImpl#getWaitingMessage(long)}.
      */
     @Test
     public final void getWaitingMessage_should_return_waiting_message() throws Exception {
         // Given
         final long waitingMessageId = 63L;
         final SWaitingMessageEvent sWaitingMessageEvent = new SWaitingMessageEvent();
-        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SWaitingMessageEvent.class,
+        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SWaitingMessageEvent.class,
                 "WaitingMessageEvent", waitingMessageId);
         doReturn(sWaitingMessageEvent).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -244,7 +251,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void getWaitingMessage_should_return_null_if_doesnt_exist() throws Exception {
         // Given
         final long waitingMessageId = 63L;
-        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SWaitingMessageEvent.class,
+        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SWaitingMessageEvent.class,
                 "WaitingMessageEvent", waitingMessageId);
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -259,7 +267,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void getWaitingMessage_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final long waitingMessageId = 63L;
-        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SWaitingMessageEvent.class,
+        final SelectByIdDescriptor<SWaitingMessageEvent> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SWaitingMessageEvent.class,
                 "WaitingMessageEvent", waitingMessageId);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectById(selectByIdDescriptor);
 
@@ -276,7 +285,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
         // Given
         final String signalName = "name";
         final List<SWaitingSignalEvent> waitingSignalEventImpls = Arrays.asList(new SWaitingSignalEvent());
-        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder.getListeningSignals(signalName, 0, 100);
+        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder
+                .getListeningSignals(signalName, 0, 100);
         doReturn(waitingSignalEventImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -290,7 +300,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void getWaitingSignalEvents_should_return_empty_list_if_doesnt_exist() throws Exception {
         // Given
         final String signalName = "name";
-        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder.getListeningSignals(signalName, 0, 100);
+        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder
+                .getListeningSignals(signalName, 0, 100);
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -304,7 +315,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void getEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final String signalName = "name";
-        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder.getListeningSignals(signalName, 0, 100);
+        final SelectListDescriptor<SWaitingSignalEvent> selectDescriptor = SelectDescriptorBuilder
+                .getListeningSignals(signalName, 0, 100);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -324,7 +336,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
         doReturn(sWaitingSignalEvents).when(persistenceService).searchEntity(SWaitingEvent.class, queryOptions, null);
 
         // When
-        final List<SWaitingEvent> result = eventInstanceRepository.searchWaitingEvents(SWaitingEvent.class, queryOptions);
+        final List<SWaitingEvent> result = eventInstanceRepository.searchWaitingEvents(SWaitingEvent.class,
+                queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", sWaitingSignalEvents, result);
@@ -334,7 +347,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
     public final void searchWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(SWaitingEvent.class, queryOptions, null);
+        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(SWaitingEvent.class, queryOptions,
+                null);
 
         // When
         eventInstanceRepository.searchWaitingEvents(SWaitingEvent.class, queryOptions);
@@ -364,7 +378,8 @@ public class EventInstanceRepositoryImplForWaitingTest {
         // Given
         final SWaitingMessageEvent waitingMessageEventImpl = new SWaitingMessageEvent();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(String.class));
 
         // When
         eventInstanceRepository.updateWaitingMessage(waitingMessageEventImpl, descriptor);

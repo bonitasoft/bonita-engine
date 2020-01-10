@@ -31,14 +31,19 @@ import org.bonitasoft.engine.identity.xml.ExportedUser;
  */
 public interface ImportOrganizationStrategy {
 
-    void foundExistingMembership(final SUserMembership existingMembership) throws ImportDuplicateInOrganizationException;
+    void foundExistingMembership(final SUserMembership existingMembership)
+            throws ImportDuplicateInOrganizationException;
 
-    void foundExistingRole(final SRole existingRole, final ExportedRole newRole) throws ImportDuplicateInOrganizationException, SIdentityException;
+    void foundExistingRole(final SRole existingRole, final ExportedRole newRole)
+            throws ImportDuplicateInOrganizationException, SIdentityException;
 
     void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException;
 
-    void foundExistingGroup(final SGroup existingGroup, final ExportedGroup newGroup) throws ImportDuplicateInOrganizationException, SIdentityException;
+    void foundExistingGroup(final SGroup existingGroup, final ExportedGroup newGroup)
+            throws ImportDuplicateInOrganizationException, SIdentityException;
 
-    void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition, ExportedCustomUserInfoDefinition newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException;
+    void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
+            ExportedCustomUserInfoDefinition newUserInfoDefinition)
+            throws ImportDuplicateInOrganizationException, SIdentityException;
 
 }

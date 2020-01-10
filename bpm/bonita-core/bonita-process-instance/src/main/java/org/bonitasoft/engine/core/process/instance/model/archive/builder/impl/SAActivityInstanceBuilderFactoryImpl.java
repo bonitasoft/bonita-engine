@@ -19,7 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAActiv
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class SAActivityInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl implements SAActivityInstanceBuilderFactory {
+public abstract class SAActivityInstanceBuilderFactoryImpl extends SAFlowNodeInstanceBuilderFactoryImpl
+        implements SAActivityInstanceBuilderFactory {
 
     protected static final String PRIORITY_KEY = "priority";
 

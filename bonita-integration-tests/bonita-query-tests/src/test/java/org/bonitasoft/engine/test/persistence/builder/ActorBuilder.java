@@ -15,7 +15,6 @@ package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 
-
 public class ActorBuilder extends PersistentObjectBuilder<SActor, ActorBuilder> {
 
     private long scopeId;
@@ -40,7 +39,7 @@ public class ActorBuilder extends PersistentObjectBuilder<SActor, ActorBuilder> 
     public static ActorBuilder anActor() {
         return new ActorBuilder();
     }
-    
+
     @Override
     SActor _build() {
         SActor sActor = new SActor();

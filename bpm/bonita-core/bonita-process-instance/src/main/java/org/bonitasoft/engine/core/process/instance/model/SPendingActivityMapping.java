@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +22,6 @@ import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
-
 
 /**
  * Used to get pending activities of a user.

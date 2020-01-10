@@ -40,7 +40,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.operation.Operation;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -56,8 +55,10 @@ public class ServerModelConvertor {
             dependencies.add(convertExpression(expression));
         }
         try {
-            return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(value.getName()).setContent(value.getContent())
-                    .setExpressionType(value.getExpressionType()).setInterpreter(value.getInterpreter()).setReturnType(value.getReturnType())
+            return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(value.getName())
+                    .setContent(value.getContent())
+                    .setExpressionType(value.getExpressionType()).setInterpreter(value.getInterpreter())
+                    .setReturnType(value.getReturnType())
                     .setDependencies(dependencies).done();
         } catch (final SInvalidExpressionException e) {
             throw new IllegalArgumentException("Error building SExpression", e);
@@ -96,7 +97,8 @@ public class ServerModelConvertor {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
-            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement())
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName())
+                    .setElement(xmlDataDef.getElement())
                     .setNamespace(xmlDataDef.getNamespace());
             builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
             builder.setDescription(dataDefinition.getDescription());
@@ -117,19 +119,23 @@ public class ServerModelConvertor {
         return builder.done();
     }
 
-    public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+    public static SBusinessDataDefinition convertBusinessDataDefinition(
+            final BusinessDataDefinition businessDataDefinition) {
         if (businessDataDefinition == null) {
             return null;
         }
         final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
-        builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
+        builder.setDefaultValue(
+                ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());
         builder.setMultiple(businessDataDefinition.isMultiple());
         return builder.done();
     }
 
-    protected static SBusinessDataDefinitionBuilder getSBusinessDataDefinitionBuilder(final BusinessDataDefinition businessDataDefinition) {
-        final SBusinessDataDefinitionBuilderFactory fact = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
+    protected static SBusinessDataDefinitionBuilder getSBusinessDataDefinitionBuilder(
+            final BusinessDataDefinition businessDataDefinition) {
+        final SBusinessDataDefinitionBuilderFactory fact = BuilderFactory
+                .get(SBusinessDataDefinitionBuilderFactory.class);
         return fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
     }
 

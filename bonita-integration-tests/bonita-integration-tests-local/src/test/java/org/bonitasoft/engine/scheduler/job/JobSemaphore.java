@@ -18,7 +18,7 @@ import java.util.concurrent.Semaphore;
 class JobSemaphore extends Semaphore {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

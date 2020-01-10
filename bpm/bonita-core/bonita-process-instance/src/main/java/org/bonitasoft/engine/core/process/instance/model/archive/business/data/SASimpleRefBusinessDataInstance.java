@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public abstract class SASimpleRefBusinessDataInstance extends SARefBusinessDataInstance {
+
     @Column(name = "data_id")
     private Long dataId;
 

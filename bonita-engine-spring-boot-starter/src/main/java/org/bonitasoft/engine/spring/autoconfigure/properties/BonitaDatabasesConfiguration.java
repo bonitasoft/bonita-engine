@@ -23,7 +23,6 @@ public class BonitaDatabasesConfiguration {
     @NestedConfigurationProperty
     private BonitaDatabaseConfiguration businessData = new BonitaDatabaseConfiguration();
 
-
     public BonitaDatabaseConfiguration getBonita() {
         return bonita;
     }

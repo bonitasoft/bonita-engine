@@ -17,15 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl implements MultipleBusinessDataReference {
+public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
+        implements MultipleBusinessDataReference {
 
     private static final long serialVersionUID = -8221290488745270659L;
 
@@ -34,14 +33,13 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
     @JsonProperty("storageIds_string")
     private final List<String> storageIdsAsString;
 
-
     public MultipleBusinessDataReferenceImpl(final String name, final String type, final List<Long> storageIds) {
         super(name, type);
         this.storageIds = new ArrayList<>();
         this.storageIdsAsString = new ArrayList<>();
         for (final Long storageId : storageIds) {
             this.storageIds.add(storageId);
-            if (storageId == null){
+            if (storageId == null) {
                 this.storageIdsAsString.add(null);
             } else {
                 this.storageIdsAsString.add(storageId.toString());
@@ -61,15 +59,18 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         MultipleBusinessDataReferenceImpl that = (MultipleBusinessDataReferenceImpl) o;
         return Objects.equals(storageIds, that.storageIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), storageIds,storageIdsAsString);
+        return Objects.hash(super.hashCode(), storageIds, storageIdsAsString);
     }
 }

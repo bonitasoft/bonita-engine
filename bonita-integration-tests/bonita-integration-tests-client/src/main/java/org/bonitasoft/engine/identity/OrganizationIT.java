@@ -115,40 +115,48 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    private void checkDefaultCustomUserInfoValues(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws Exception {
+    private void checkDefaultCustomUserInfoValues(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap)
+            throws Exception {
         checkDefaultCustomUserInfoValueForFirstUser(userInfoDefinitonsMap);
         checkDefaultCustomUserInfoValueForSecondUser(userInfoDefinitonsMap);
     }
 
-    private void checkCustomUserInfoValuesAfterUpdate(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws Exception {
+    private void checkCustomUserInfoValuesAfterUpdate(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap)
+            throws Exception {
         // the first user is not present in the second file to import, so his information keep the same
         checkDefaultCustomUserInfoValueForFirstUser(userInfoDefinitonsMap);
         checkCustomUserInfoValueForSecondUserAfterUpdate(userInfoDefinitonsMap);
     }
 
-    private void checkDefaultCustomUserInfoValueForSecondUser(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws UserNotFoundException {
+    private void checkDefaultCustomUserInfoValueForSecondUser(
+            final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws UserNotFoundException {
         final User user = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         final SearchOptions searchOptions = getCustomUserInfoValueSearchOptions(user);
-        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
+        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI()
+                .searchCustomUserInfoValues(searchOptions);
         assertThat(searchResult.getCount()).isEqualTo(1);
         checkCustomUserInfo(searchResult.getResult().get(0), SKILLS_NAME, SKILLS_VALUE, userInfoDefinitonsMap);
     }
 
-    private void checkCustomUserInfoValueForSecondUserAfterUpdate(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap)
+    private void checkCustomUserInfoValueForSecondUserAfterUpdate(
+            final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap)
             throws UserNotFoundException {
         final User user = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         final SearchOptions searchOptions = getCustomUserInfoValueSearchOptions(user);
-        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
+        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI()
+                .searchCustomUserInfoValues(searchOptions);
         assertThat(searchResult.getCount()).isEqualTo(2);
         checkCustomUserInfo(searchResult.getResult().get(0), LOCATION_NAME, LOCATION_VALUE, userInfoDefinitonsMap);
         checkCustomUserInfo(searchResult.getResult().get(1), SKILLS_NAME, SKILLS_UPDATED_VALUE, userInfoDefinitonsMap);
     }
 
-    private void checkDefaultCustomUserInfoValueForFirstUser(final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws UserNotFoundException {
+    private void checkDefaultCustomUserInfoValueForFirstUser(
+            final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws UserNotFoundException {
         final User user = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
         final SearchOptions searchOptions = getCustomUserInfoValueSearchOptions(user);
 
-        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
+        final SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI()
+                .searchCustomUserInfoValues(searchOptions);
         assertThat(searchResult.getCount()).isEqualTo(2);
 
         checkCustomUserInfo(searchResult.getResult().get(0), LOCATION_NAME, LOCATION_VALUE, userInfoDefinitonsMap);
@@ -162,14 +170,16 @@ public class OrganizationIT extends TestWithTechnicalUser {
         return optionsBuilder.done();
     }
 
-    private void checkCustomUserInfo(final CustomUserInfoValue customUserInfoValue, final String expectedName, final String expectedValue,
+    private void checkCustomUserInfo(final CustomUserInfoValue customUserInfoValue, final String expectedName,
+            final String expectedValue,
             final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) {
         assertThat(customUserInfoValue.getDefinitionId()).isEqualTo(userInfoDefinitonsMap.get(expectedName).getId());
         assertThat(customUserInfoValue.getValue()).isEqualTo(expectedValue);
     }
 
     private Map<String, CustomUserInfoDefinition> checkDefaultCustomUserInfoDefinitons() {
-        final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
+        final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI()
+                .getCustomUserInfoDefinitions(0, 10);
         assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
 
         final CustomUserInfoDefinition firstDefinition = customUserInfoDefinitions.get(0);
@@ -185,7 +195,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     private Map<String, CustomUserInfoDefinition> checkCustomUserInfoDefinitonsAfterUpdate() {
-        final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
+        final List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI()
+                .getCustomUserInfoDefinitions(0, 10);
         assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
 
         final CustomUserInfoDefinition firstDefinition = customUserInfoDefinitions.get(0);
@@ -324,13 +335,15 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Group rd = getIdentityAPI().getGroupByPath("/RD");
         getIdentityAPI().getGroupByPath("/BonitaSoft/RD");
 
-        List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(john.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC);
+        List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(john.getId(), 0, 10,
+                UserMembershipCriterion.GROUP_NAME_ASC);
         assertEquals(1, userMemberships.size());
         UserMembership userMembership = userMemberships.get(0);
         assertEquals(bonitaRD.getId(), userMembership.getGroupId());
         assertEquals(jack.getId(), userMembership.getAssignedBy());
         assertEquals(new Date(1331142448365L), userMembership.getAssignedDate());
-        userMemberships = getIdentityAPI().getUserMemberships(jack.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC);
+        userMemberships = getIdentityAPI().getUserMemberships(jack.getId(), 0, 10,
+                UserMembershipCriterion.GROUP_NAME_ASC);
         assertEquals(1, userMemberships.size());
         userMembership = userMemberships.get(0);
         assertEquals(rd.getId(), userMembership.getGroupId());
@@ -340,14 +353,16 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void importOrganizationWithWarnings_return_no_warnings_on_good_XML() throws IOException, OrganizationImportException, DeletionException {
+    public void importOrganizationWithWarnings_return_no_warnings_on_good_XML()
+            throws IOException, OrganizationImportException, DeletionException {
         //given
         List<String> warnings;
         try (final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganization.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
 
             //when
-            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),ImportPolicy.IGNORE_DUPLICATES);
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
+                    ImportPolicy.IGNORE_DUPLICATES);
         }
 
         //then
@@ -358,34 +373,42 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Test(expected = GroupNotFoundException.class)
-    public void importOrganizationWithWarnings_return_warnings_on_faulty_group_names() throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
+    public void importOrganizationWithWarnings_return_warnings_on_faulty_group_names()
+            throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
         //given
         List<String> warnings;
-        try(final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
+        try (final InputStream xmlStream = OrganizationIT.class
+                .getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
 
             //when
-            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),ImportPolicy.IGNORE_DUPLICATES);
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
+                    ImportPolicy.IGNORE_DUPLICATES);
         }
         //then
         try {
             assertThat(warnings).hasSize(1);
-            assertThat(warnings).contains("The group name RD/Studio contains the character '/' which is not supported. The group has not been imported");
+            assertThat(warnings).contains(
+                    "The group name RD/Studio contains the character '/' which is not supported. The group has not been imported");
             getIdentityAPI().getGroupByPath("/RD/Studio");
         } finally {
             // clean-up
             getIdentityAPI().deleteOrganization();
         }
     }
+
     @Test
-    public void importOrganizationWithWarnings_imports_the_correct_groups_if_the_incorrect_one_is_present() throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
+    public void importOrganizationWithWarnings_imports_the_correct_groups_if_the_incorrect_one_is_present()
+            throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
         //given
         List<String> warnings;
-        try (final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
+        try (final InputStream xmlStream = OrganizationIT.class
+                .getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
 
             //when
-            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent), ImportPolicy.IGNORE_DUPLICATES);
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),
+                    ImportPolicy.IGNORE_DUPLICATES);
         }
         //then
         //Should not throw any exception
@@ -459,7 +482,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
             getIdentityAPI().importOrganization(xmlOrganization);
         } catch (final OrganizationImportException e) {
             // check john was not deleted:
-            assertNotNull("import organization with a bad file made the organization to be deleted!", getIdentityAPI().getUserByUserName("john"));
+            assertNotNull("import organization with a bad file made the organization to be deleted!",
+                    getIdentityAPI().getUserByUserName("john"));
             deleteUser(createUser);
             throw e;
         }
@@ -528,7 +552,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
 
         final List<User> users = getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
-        assertThat(users).extracting("userName", "managerUserId").containsExactly(tuple("user1", users.get(1).getId()), tuple("user2", users.get(2).getId()),
+        assertThat(users).extracting("userName", "managerUserId").containsExactly(tuple("user1", users.get(1).getId()),
+                tuple("user2", users.get(2).getId()),
                 tuple("user3", users.get(0).getId()));
         assertEquals(3, users.size());
 
@@ -569,8 +594,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         // Create process that is mapped to user of organization
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, persistedUser1);
-        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME,
+                persistedUser1);
+        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(),
+                "human");
         assignAndExecuteStep(startProcessUntilStep.getActivityInstance(), persistedUser1.getId());
         waitForProcessToFinish(startProcessUntilStep.getProcessInstance());
 
@@ -583,7 +610,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).isEmpty();
 
         // reload the process deploy info:
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI()
+                .getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
 
         // Clean up
@@ -622,8 +650,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         // Create process that is mapped to user of organization
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, persistedUser1);
-        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME,
+                persistedUser1);
+        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(),
+                "human");
 
         // delete organization and do check
         try {
@@ -696,8 +726,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
             final Group persistedGroup1 = getIdentityAPI().getGroupByPath(groupName1);
             assertNotNull(persistedGroup1);
             assertEquals(groupDisplayName1, persistedGroup1.getDisplayName());
-            final UserMembership persistedMembership1 = getIdentityAPI().getUserMemberships(persistedUser1.getId(), 0, 10,
-                    UserMembershipCriterion.GROUP_NAME_ASC).get(0);
+            final UserMembership persistedMembership1 = getIdentityAPI()
+                    .getUserMemberships(persistedUser1.getId(), 0, 10,
+                            UserMembershipCriterion.GROUP_NAME_ASC)
+                    .get(0);
             assertEquals(groupName1, persistedMembership1.getGroupName());
             assertEquals(roleName1, persistedMembership1.getRoleName());
             assertEquals(userName1, persistedMembership1.getUsername());
@@ -759,7 +791,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(roleDisplayName, persistedRole.getDisplayName());
         // check createdBy for role
         assertEquals(getSession().getUserId(), persistedRole.getCreatedBy());
-        final UserMembership persistedMembership = getIdentityAPI().getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership = getIdentityAPI()
+                .getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName, persistedMembership.getGroupName());
         assertEquals(roleName, persistedMembership.getRoleName());
@@ -775,7 +808,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(groupName1);
         assertNotNull(persistedGroup1);
         assertEquals(groupDisplayName1, persistedGroup1.getDisplayName());
-        final UserMembership persistedMembership1 = getIdentityAPI().getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership1 = getIdentityAPI()
+                .getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName1, persistedMembership1.getGroupName());
         assertEquals(roleName1, persistedMembership1.getRoleName());
@@ -789,7 +823,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertNotNull(persistedRole2);
         final Group persistedGroup2 = getIdentityAPI().getGroupByPath(groupName2);
         assertNotNull(persistedGroup2);
-        final UserMembership persistedMembership2 = getIdentityAPI().getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership2 = getIdentityAPI()
+                .getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName2, persistedMembership2.getGroupName());
         assertEquals(roleName2, persistedMembership2.getRoleName());
@@ -825,7 +860,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     private void checkMembershipAfterUpdate() throws UserNotFoundException {
         final User persistedUser = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
-        final UserMembership persistedMembership = getIdentityAPI().getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership = getIdentityAPI()
+                .getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(WEB_GROUP_NAME, persistedMembership.getGroupName());
         assertEquals(MANAGER, persistedMembership.getRoleName());
@@ -834,7 +870,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(getSession().getUserId(), persistedMembership.getAssignedBy());
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
-        final UserMembership persistedMembership1 = getIdentityAPI().getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership1 = getIdentityAPI()
+                .getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(ENGINE, persistedMembership1.getGroupName());
         assertEquals(DEVELOPER, persistedMembership1.getRoleName());
@@ -843,7 +880,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(getSession().getUserId(), persistedMembership1.getAssignedBy());
 
         final User persistedUser2 = getIdentityAPI().getUserByUserName(JOHNNYFOOTBALL);
-        final UserMembership persistedMembership2 = getIdentityAPI().getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership2 = getIdentityAPI()
+                .getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(QA, persistedMembership2.getGroupName());
         assertEquals("Tester", persistedMembership2.getRoleName());
@@ -969,7 +1007,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertEquals(roleDisplayName, persistedRole.getDisplayName());
         // check createdBy for role
         assertEquals(getSession().getUserId(), persistedRole.getCreatedBy());
-        final UserMembership persistedMembership = getIdentityAPI().getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership = getIdentityAPI()
+                .getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName, persistedMembership.getGroupName());
         assertEquals(roleName, persistedMembership.getRoleName());
@@ -985,7 +1024,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(groupName1);
         assertNotNull(persistedGroup1);
         assertEquals(groupDisplayName1, persistedGroup1.getDisplayName());
-        final UserMembership persistedMembership1 = getIdentityAPI().getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership1 = getIdentityAPI()
+                .getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName1, persistedMembership1.getGroupName());
         assertEquals(roleName1, persistedMembership1.getRoleName());
@@ -999,7 +1039,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertNotNull(persistedRole2);
         final Group persistedGroup2 = getIdentityAPI().getGroupByPath(groupName2);
         assertNotNull(persistedGroup2);
-        final UserMembership persistedMembership2 = getIdentityAPI().getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership2 = getIdentityAPI()
+                .getUserMemberships(persistedUser2.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(groupName2, persistedMembership2.getGroupName());
         assertEquals(roleName2, persistedMembership2.getRoleName());
@@ -1080,7 +1121,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     private void checkDefaultMembership() throws UserNotFoundException {
         final User persistedUser = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
-        final UserMembership persistedMembership = getIdentityAPI().getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
+        final UserMembership persistedMembership = getIdentityAPI()
+                .getUserMemberships(persistedUser.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
         assertEquals(WEB_GROUP_NAME, persistedMembership.getGroupName());
         assertEquals(MANAGER, persistedMembership.getRoleName());
@@ -1144,8 +1186,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
 
         // membership
-        final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
-        final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
+        final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(),
+                persistedGroup1.getId(), persistedRole1.getId());
+        final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(),
+                persistedGroup2.getId(), persistedRole2.getId());
 
         // custom user info definition
         final CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(
@@ -1165,8 +1209,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(organizationContent).doesNotContain("<iconName/>");
         assertThat(organizationContent).doesNotContain("<iconPath/>");
         assertThat(organizationContent).contains("engine team");
-        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
-        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
+        assertThat(organizationContent)
+                .contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
+        assertThat(organizationContent)
+                .contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
         assertThat(organizationContent).contains(SKILLS_NAME);
         assertThat(organizationContent).contains(SKILLS_DESCRIPTION);
         assertThat(organizationContent).contains(LOCATION_NAME);
@@ -1306,8 +1352,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         groupCreator2.setDisplayName(WEB_TEAM);
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
 
-        final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
-        final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
+        final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(),
+                persistedGroup1.getId(), persistedRole1.getId());
+        final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(),
+                persistedGroup2.getId(), persistedRole2.getId());
 
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
@@ -1316,8 +1364,10 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(organizationContent).contains("Bonita developer");
         assertThat(organizationContent).contains(ENGINE);
         assertThat(organizationContent).contains("engine team");
-        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
-        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
+        assertThat(organizationContent)
+                .contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
+        assertThat(organizationContent)
+                .contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser1.getId());
@@ -1428,7 +1478,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(getIdentityAPI().getUserByUserName("john").getManagerUserId())
                 .as("manager id of john").isEqualTo(0);
         assertThat(systemOutRule.getLog())
-                .contains("The user john has a manager with username johnManager, but this one does not exist. Please set it manually.");
+                .contains(
+                        "The user john has a manager with username johnManager, but this one does not exist. Please set it manually.");
         //clean
         getIdentityAPI().deleteOrganization();
     }

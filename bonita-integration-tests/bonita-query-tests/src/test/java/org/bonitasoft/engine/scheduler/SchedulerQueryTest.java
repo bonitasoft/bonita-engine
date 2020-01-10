@@ -20,9 +20,6 @@ import static org.bonitasoft.engine.test.persistence.builder.JobDescriptorBuilde
 import static org.bonitasoft.engine.test.persistence.builder.JobLogBuilder.aJobLog;
 import static org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder.DEFAULT_TENANT_ID;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -122,7 +119,8 @@ public class SchedulerQueryTest {
                 .build());
 
         Long numberOfSJobParameters = jobRepository.selectCount("getNumberOfSJobParameter");
-        PersistentObject jobParameterFromQuery = jobRepository.selectOne("getJobParameters", pair("jobDescriptorId", 1234L));
+        PersistentObject jobParameterFromQuery = jobRepository.selectOne("getJobParameters",
+                pair("jobDescriptorId", 1234L));
         Map<String, Object> jobParameterAsMap = jdbcTemplate.queryForMap("SELECT * FROM job_param");
 
         assertThat(numberOfSJobParameters).isEqualTo(1);

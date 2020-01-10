@@ -31,9 +31,10 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * Accessor for tenant level engine services.
  * <p>
- * All server side services of the platform can be accessed using this class. Using server side services instead of an API might cause unexpected behaviors and
+ * All server side services of the platform can be accessed using this class. Using server side services instead of an
+ * API might cause unexpected behaviors and
  * damage your data.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  * @author Zhao Na
@@ -67,6 +68,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     PlatformCacheService getPlatformCacheService();
 
     void destroy();
+
     BroadcastService getBroadcastService();
 
     PlatformAuthenticationService getPlatformAuthenticationService();

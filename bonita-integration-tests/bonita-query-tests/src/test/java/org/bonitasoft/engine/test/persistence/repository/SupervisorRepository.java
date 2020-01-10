@@ -15,8 +15,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository

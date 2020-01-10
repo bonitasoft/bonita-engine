@@ -20,7 +20,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
@@ -58,7 +57,8 @@ public class TaskInvolvementDelegate {
         final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
 
         QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(rootProcessInstanceId);
-        List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
+        List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService
+                .searchArchivedTasks(archivedQueryOptions);
         while (!sArchivedHumanTasks.isEmpty()) {
             for (final SAHumanTaskInstance sArchivedHumanTask : sArchivedHumanTasks) {
                 if (userId == sArchivedHumanTask.getExecutedBy()) {
@@ -72,21 +72,25 @@ public class TaskInvolvementDelegate {
     }
 
     private static QueryOptions buildArchivedTasksQueryOptions(final long rootProcessInstanceId) {
-        final SAUserTaskInstanceBuilderFactory archUserTaskKeyFactory = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
+        final SAUserTaskInstanceBuilderFactory archUserTaskKeyFactory = BuilderFactory
+                .get(SAUserTaskInstanceBuilderFactory.class);
         final String humanTaskIdKey = archUserTaskKeyFactory.getIdKey();
         final String parentProcessInstanceKey = archUserTaskKeyFactory.getRootProcessInstanceKey();
         final List<OrderByOption> archivedOrderByOptions = Collections
                 .singletonList(new OrderByOption(SAHumanTaskInstance.class, humanTaskIdKey, OrderByType.ASC));
         final List<FilterOption> archivedFilterOptions = Collections
-                .singletonList(new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, rootProcessInstanceId));
+                .singletonList(
+                        new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, rootProcessInstanceId));
         return new QueryOptions(0, BATCH_SIZE, archivedOrderByOptions, archivedFilterOptions, null);
     }
 
-    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException {
+    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId)
+            throws ActivityInstanceNotFoundException {
         final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
         try {
             long assigneeId;
-            final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(humanTaskInstanceId);
+            final SHumanTaskInstance humanTaskInstance = activityInstanceService
+                    .getHumanTaskInstance(humanTaskInstanceId);
             assigneeId = humanTaskInstance.getAssigneeId();
             if (assigneeId > 0) {
                 //check if the user is the assigned user
@@ -105,8 +109,10 @@ public class TaskInvolvementDelegate {
     public boolean hasUserPendingOrAssignedTasks(long userId, Long processInstanceId) throws SExecutionException {
         final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
         // is user assigned or has pending tasks on this process instance:
-        final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST, Arrays.asList(new FilterOption(SHumanTaskInstance.class,
-                "logicalGroup2", processInstanceId)), null);
+        final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST,
+                Arrays.asList(new FilterOption(SHumanTaskInstance.class,
+                        "logicalGroup2", processInstanceId)),
+                null);
         try {
             return activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0;
         } catch (SBonitaReadException e) {
@@ -114,16 +120,20 @@ public class TaskInvolvementDelegate {
         }
     }
 
-    public SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId, final SearchOptions searchOptions) throws SearchException {
+    public SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId,
+            final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantServiceAccessor.getSearchEntitiesDescriptor();
         final FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
-        return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
+        return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(
+                searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
                 searchOptions,
                 flowNodeStateManager,
-                (queryOptions) -> activityInstanceService.searchNumberOfPendingTasksManagedBy(managerUserId, queryOptions),
-                (queryOptions) -> activityInstanceService.searchPendingTasksManagedBy(managerUserId, queryOptions)).search();
+                (queryOptions) -> activityInstanceService.searchNumberOfPendingTasksManagedBy(managerUserId,
+                        queryOptions),
+                (queryOptions) -> activityInstanceService.searchPendingTasksManagedBy(managerUserId, queryOptions))
+                .search();
     }
 
 }

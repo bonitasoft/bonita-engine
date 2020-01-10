@@ -26,7 +26,7 @@ import org.hibernate.SessionFactory;
 public interface HibernateConfigurationProvider {
 
     Map<String, String> getClassAliasMappings();
-    
+
     List<String> getMappingExclusions();
 
     Map<String, String> getCacheQueries();

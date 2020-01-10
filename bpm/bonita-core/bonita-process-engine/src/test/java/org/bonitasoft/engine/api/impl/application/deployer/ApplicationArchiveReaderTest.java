@@ -48,8 +48,12 @@ public class ApplicationArchiveReaderTest {
     @Test
     public void should_read_application_archive_with_pages() throws IOException {
         byte[] zip = zip(
-                file("pages/myCustomPage1.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=page"), file("resources/index.html", "someContent"))),
-                file("pages/myCustomPage2.zip", zip(file("page.properties", "name=custompage_test2\ncontentType=page"), file("resources/Index.groovy", "someContent"))),
+                file("pages/myCustomPage1.zip",
+                        zip(file("page.properties", "name=custompage_test1\ncontentType=page"),
+                                file("resources/index.html", "someContent"))),
+                file("pages/myCustomPage2.zip",
+                        zip(file("page.properties", "name=custompage_test2\ncontentType=page"),
+                                file("resources/Index.groovy", "someContent"))),
                 file("pages/myCustomPage3.zip", zip(file("page.properties", "name=custompage_test3\ncontentType=page"))) //ignored, no index
         );
 
@@ -58,17 +62,20 @@ public class ApplicationArchiveReaderTest {
         assertThat(applicationArchive.getPages()).hasSize(2)
                 .extracting("fileName", "content")
                 .containsExactly(
-                        new Tuple("myCustomPage1.zip", zip(file("page.properties", "name=custompage_test1\ncontentType=page"), file("resources/index.html", "someContent"))),
-                        new Tuple("myCustomPage2.zip", zip(file("page.properties", "name=custompage_test2\ncontentType=page"), file("resources/Index.groovy", "someContent")))
-                );
+                        new Tuple("myCustomPage1.zip",
+                                zip(file("page.properties", "name=custompage_test1\ncontentType=page"),
+                                        file("resources/index.html", "someContent"))),
+                        new Tuple("myCustomPage2.zip",
+                                zip(file("page.properties", "name=custompage_test2\ncontentType=page"),
+                                        file("resources/Index.groovy", "someContent"))));
     }
 
     @Test
     public void should_read_application_archive_with_layout() throws IOException {
-        byte[] layout = zip(file("page.properties", "name=custompage_test1\ncontentType=layout"), file("resources/index.html", "someContent"));
+        byte[] layout = zip(file("page.properties", "name=custompage_test1\ncontentType=layout"),
+                file("resources/index.html", "someContent"));
         byte[] zip = zip(
-                file("layout.zip", layout)
-        );
+                file("layout.zip", layout));
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
@@ -78,10 +85,10 @@ public class ApplicationArchiveReaderTest {
 
     @Test
     public void should_read_application_archive_with_theme() throws IOException {
-        byte[] themeContent = zip(file("page.properties", "name=custompage_test1\ncontentType=theme"), file("resources/theme.css", "someContent"));
+        byte[] themeContent = zip(file("page.properties", "name=custompage_test1\ncontentType=theme"),
+                file("resources/theme.css", "someContent"));
         byte[] zip = zip(
-                file("theme.zip", themeContent)
-        );
+                file("theme.zip", themeContent));
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
@@ -93,8 +100,7 @@ public class ApplicationArchiveReaderTest {
     public void should_read_application_archive_with_apiExtension() throws IOException {
         byte[] apiExtensionContent = zip(file("page.properties", "name=custompage_test1\ncontentType=apiExtension"));
         byte[] zip = zip(
-                file("apiExtension.zip", apiExtensionContent)
-        );
+                file("apiExtension.zip", apiExtensionContent));
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 
@@ -104,10 +110,10 @@ public class ApplicationArchiveReaderTest {
 
     @Test
     public void should_read_application_archive_with_process() throws IOException {
-        byte[] barContent = zip(file("process-design.xml", "<process xmlns=\"http://www.bonitasoft.org/ns/process/client/\"></process>"));
+        byte[] barContent = zip(file("process-design.xml",
+                "<process xmlns=\"http://www.bonitasoft.org/ns/process/client/\"></process>"));
         byte[] zip = zip(
-                file("myprocess.bar", barContent)
-        );
+                file("myprocess.bar", barContent));
 
         ApplicationArchive applicationArchive = applicationArchiveReader.read(asInputStream(zip));
 

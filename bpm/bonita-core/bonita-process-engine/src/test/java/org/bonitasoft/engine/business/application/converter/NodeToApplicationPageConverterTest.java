@@ -62,7 +62,8 @@ public class NodeToApplicationPageConverterTest {
     }
 
     @Test
-    public void toSApplication_page_should_convert_all_fields_set_applicationId_and_return_no_errors_when_custom_page_is_found() throws Exception {
+    public void toSApplication_page_should_convert_all_fields_set_applicationId_and_return_no_errors_when_custom_page_is_found()
+            throws Exception {
         //given
         final ApplicationPageNode node = buildAppPageNode("home", "customPage");
 
@@ -85,7 +86,8 @@ public class NodeToApplicationPageConverterTest {
     }
 
     @Test
-    public void toSApplication_page_should_convert_available_fields_set_applicationId_and_return_errors_when_custom_page_is_not_found() throws Exception {
+    public void toSApplication_page_should_convert_available_fields_set_applicationId_and_return_errors_when_custom_page_is_not_found()
+            throws Exception {
         //given
         final ApplicationPageNode node = buildAppPageNode("home", "customPage");
 

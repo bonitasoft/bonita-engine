@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 
 import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -30,9 +31,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/testContext.xml"})
+@ContextConfiguration(locations = { "/testContext.xml" })
 @Transactional
 public class PlatformCommandTest {
+
     @Inject
     private PlatformRepository repository;
     @Inject
@@ -47,7 +49,8 @@ public class PlatformCommandTest {
                 .build());
         repository.flush();
 
-        PersistentObject platformCommandFromQuery = repository.selectOneOnPlatform("getPlatformCommandByName", pair("name", "myPlatformCommand"));
+        PersistentObject platformCommandFromQuery = repository.selectOneOnPlatform("getPlatformCommandByName",
+                pair("name", "myPlatformCommand"));
         Map<String, Object> platformCommandAsMap = jdbcTemplate.queryForMap("SELECT * FROM platformCommand");
 
         assertThat(platformCommandFromQuery).isEqualTo(platformCommand);

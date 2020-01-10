@@ -61,12 +61,14 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return parentInstance.getTokenCount() == 0;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
@@ -82,7 +84,8 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
 
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
-        return " User " + flowNodeInstance.getExecutedBy() + " has " + getName() + " task " + flowNodeInstance.getName();
+        return " User " + flowNodeInstance.getExecutedBy() + " has " + getName() + " task "
+                + flowNodeInstance.getName();
     }
 
 }

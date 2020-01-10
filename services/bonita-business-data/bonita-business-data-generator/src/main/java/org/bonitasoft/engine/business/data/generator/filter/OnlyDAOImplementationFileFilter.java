@@ -29,6 +29,7 @@ public class OnlyDAOImplementationFileFilter extends AbstractFileFilter {
     public boolean accept(final File file) {
         final String name = file.getName();
         return name.endsWith("DAOImpl.class")
-                || file.getAbsolutePath().contains(new StringBuilder().append(ORG).append(File.separator).append(BONITASOFT).toString());
+                || file.getAbsolutePath()
+                        .contains(new StringBuilder().append(ORG).append(File.separator).append(BONITASOFT).toString());
     }
 }

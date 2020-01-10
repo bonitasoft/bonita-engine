@@ -103,7 +103,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfile deletion
      * @since 6.0
      */
-    void deleteProfile(SProfile profile) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
+    void deleteProfile(SProfile profile)
+            throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
             SProfileMemberDeletionException;
 
     /**
@@ -116,7 +117,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfile deletion
      * @since 6.0
      */
-    void deleteProfile(long profileId) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
+    void deleteProfile(long profileId)
+            throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
             SProfileMemberDeletionException;
 
     /**
@@ -133,15 +135,15 @@ public interface ProfileService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
+    List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field,
+            OrderByType order) throws SBonitaReadException;
 
     List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException;
 
-    
     /**
      * Get all profiles with portal navigation for a user
      *
-     * @param userId 
+     * @param userId
      * @param fromIndex
      *        first result to be considered(>=0)
      * @param numberOfProfileEntry
@@ -152,7 +154,8 @@ public interface ProfileService {
      * @throws SBonitaReadException
      * @since 7.6.1
      */
-    List<SProfile> searchProfilesWithNavigationOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
+    List<SProfile> searchProfilesWithNavigationOfUser(long userId, int fromIndex, int numberOfElements, String field,
+            OrderByType order) throws SBonitaReadException;
 
     /**
      * Get profile entry by its id
@@ -194,7 +197,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfileEntry update
      * @since 6.0
      */
-    SProfileEntry updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException;
+    SProfileEntry updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor)
+            throws SProfileEntryUpdateException;
 
     /**
      * Delete a profileEntry by given profileEntry
@@ -249,7 +253,8 @@ public interface ProfileService {
      *         TODO
      * @since 6.0
      */
-    SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath) throws SProfileMemberCreationException;
+    SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath)
+            throws SProfileMemberCreationException;
 
     /**
      * Add a role to exist profile
@@ -264,7 +269,8 @@ public interface ProfileService {
      *         TODO
      * @since 6.0
      */
-    SProfileMember addRoleToProfile(long profileId, long roleId, String roleName) throws SProfileMemberCreationException;
+    SProfileMember addRoleToProfile(long profileId, long roleId, String roleName)
+            throws SProfileMemberCreationException;
 
     /**
      * Add a role and a group to exist profile
@@ -283,7 +289,8 @@ public interface ProfileService {
      *         TODO
      * @since 6.0
      */
-    SProfileMember addRoleAndGroupToProfile(long profileId, long roleId, long groupId, String roleName, String groupName, String groupParentPath)
+    SProfileMember addRoleAndGroupToProfile(long profileId, long roleId, long groupId, String roleName,
+            String groupName, String groupParentPath)
             throws SProfileMemberCreationException;
 
     /**
@@ -302,7 +309,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
-    List<SProfileMember> getProfileMembersOfUser(final long userId, int fromIndex, int numberOfElements, String field, OrderByType order)
+    List<SProfileMember> getProfileMembersOfUser(final long userId, int fromIndex, int numberOfElements, String field,
+            OrderByType order)
             throws SBonitaReadException;
 
     /**
@@ -321,7 +329,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
-    List<SProfileMember> getProfileMembersOfGroup(final long groupId, int fromIndex, int numberOfElements, String field, OrderByType order)
+    List<SProfileMember> getProfileMembersOfGroup(final long groupId, int fromIndex, int numberOfElements, String field,
+            OrderByType order)
             throws SBonitaReadException;
 
     /**
@@ -340,7 +349,8 @@ public interface ProfileService {
      *         occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
-    List<SProfileMember> getProfileMembersOfRole(final long roleId, int fromIndex, int numberOfElements, String field, OrderByType order)
+    List<SProfileMember> getProfileMembersOfRole(final long roleId, int fromIndex, int numberOfElements, String field,
+            OrderByType order)
             throws SBonitaReadException;
 
     /**
@@ -353,7 +363,8 @@ public interface ProfileService {
      *         occurs when the identifier does not refer to an existing sProfileMember
      * @since 6.0
      */
-    void deleteProfileMember(long profileMemberId) throws SProfileMemberDeletionException, SProfileMemberNotFoundException;
+    void deleteProfileMember(long profileMemberId)
+            throws SProfileMemberDeletionException, SProfileMemberNotFoundException;
 
     /**
      * Delete a profile member by given sProfile member
@@ -389,7 +400,8 @@ public interface ProfileService {
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfileMember> searchProfileMembers(String querySuffix, final QueryOptions searchOptions) throws SBonitaReadException;
+    List<SProfileMember> searchProfileMembers(String querySuffix, final QueryOptions searchOptions)
+            throws SBonitaReadException;
 
     /**
      * Get the total number of sProfileMember by a list contains profileIds
@@ -419,8 +431,8 @@ public interface ProfileService {
      * @return a list of profileMembers
      * @throws SProfileMemberNotFoundException
      */
-    List<SProfileMember> getProfileMembers(long profileId, QueryOptions queryOptions) throws SProfileMemberNotFoundException;
-
+    List<SProfileMember> getProfileMembers(long profileId, QueryOptions queryOptions)
+            throws SProfileMemberNotFoundException;
 
     /**
      * Delete all profile members for the connected tenant
@@ -476,7 +488,8 @@ public interface ProfileService {
      * @throws SProfileMemberNotFoundException
      * @since 6.3.1
      */
-    SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException;
+    SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId)
+            throws SProfileMemberNotFoundException;
 
     /**
      * updates profile metaData fields lastUpdateDate and lastUpdatedBy for a given profile

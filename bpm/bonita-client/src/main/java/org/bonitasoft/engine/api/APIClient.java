@@ -92,9 +92,11 @@ public class APIClient {
     protected <T> T getAPI(final Class<T> apiClass) {
         ensureSessionExists();
         try {
-            final ClientInterceptor clientInterceptor = new ClientInterceptor(apiClass.getName(), getServerAPI(), session);
+            final ClientInterceptor clientInterceptor = new ClientInterceptor(apiClass.getName(), getServerAPI(),
+                    session);
             @SuppressWarnings("unchecked")
-            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, clientInterceptor);
+            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass },
+                    clientInterceptor);
             return api;
         } catch (ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -112,7 +114,8 @@ public class APIClient {
     }
 
     /**
-     * This methods serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one, where no session is needed to access the
+     * This methods serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one,
+     * where no session is needed to access the
      * API class.
      *
      * @param apiClass the API to retrieve
@@ -124,7 +127,8 @@ public class APIClient {
         try {
             final ClientInterceptor interceptor = new ClientInterceptor(apiClass.getName(), getServerAPI());
             @SuppressWarnings("unchecked")
-            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, interceptor);
+            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass },
+                    interceptor);
             return api;
         } catch (ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -139,7 +143,8 @@ public class APIClient {
      * @param password
      *        the password
      * @throws LoginException
-     *         occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
+     *         occurs when an exception is thrown during the login (userName does not exist, or couple (userName,
+     *         password) is incorrect)
      * @since 7.2
      */
     public void login(String username, String password) throws LoginException {
@@ -170,7 +175,8 @@ public class APIClient {
      * @return the implementation of the DAO
      * @throws BusinessObjectDaoCreationException if the factory is not able to instantiate the DAO
      */
-    public <T extends BusinessObjectDAO> T getDAO(final Class<T> daoInterface) throws BusinessObjectDaoCreationException {
+    public <T extends BusinessObjectDAO> T getDAO(final Class<T> daoInterface)
+            throws BusinessObjectDaoCreationException {
         ensureSessionExists();
         if (daoInterface == null) {
             throw new IllegalArgumentException("daoInterface is null");
@@ -187,7 +193,8 @@ public class APIClient {
                 final Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
                 return constructor.newInstance(session);
             }
-        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException
+        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException
+                | InstantiationException
                 | IllegalAccessException | InvocationTargetException e) {
             throw new BusinessObjectDaoCreationException(e);
         }
@@ -204,7 +211,8 @@ public class APIClient {
      * @throws ClassNotFoundException if the implementation class name is unknown by the current Thread ClassLoader
      */
     @SuppressWarnings("unchecked")
-    protected <T extends BusinessObjectDAO> Class<T> loadClass(final Class<T> daoInterface) throws ClassNotFoundException {
+    protected <T extends BusinessObjectDAO> Class<T> loadClass(final Class<T> daoInterface)
+            throws ClassNotFoundException {
         final String implementationClassName = daoInterface.getName() + IMPL_SUFFIX;
         return (Class<T>) Class.forName(implementationClassName, true, Thread.currentThread().getContextClassLoader());
     }

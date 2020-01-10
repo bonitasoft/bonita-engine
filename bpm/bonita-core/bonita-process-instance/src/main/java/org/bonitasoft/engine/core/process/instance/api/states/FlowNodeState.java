@@ -26,14 +26,16 @@ public interface FlowNodeState extends State<SFlowNodeInstance> {
     /**
      * @param processDefinition
      * @param flowNodeInstance
-     * @return true the state must be executed, false if the execution must skip this state and go directly to the next one
+     * @return true the state must be executed, false if the execution must skip this state and go directly to the next
+     *         one
      * @throws SActivityExecutionException
      */
-    boolean shouldExecuteState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException;
+    boolean shouldExecuteState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance)
+            throws SActivityExecutionException;
 
     /**
      * Return true if flowNodeInstance instance of SHumanTaskInstance
-     * 
+     *
      * @param flowNodeInstance
      * @return true or false
      * @since 6.0
@@ -42,7 +44,7 @@ public interface FlowNodeState extends State<SFlowNodeInstance> {
 
     /**
      * Add a system comment "User XYZ has XYZ(state change) task XYZ(task name)"
-     * 
+     *
      * @param flowNodeInstance
      * @return system comment "User XYZ has XYZ(state change) task XYZ(task name)"
      * @since 6.0

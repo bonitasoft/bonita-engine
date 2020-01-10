@@ -25,6 +25,7 @@ import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
 import org.bonitasoft.engine.data.instance.model.SBooleanDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.SDateDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDoubleDataInstance;
 import org.bonitasoft.engine.data.instance.model.SFloatDataInstance;
@@ -34,7 +35,6 @@ import org.bonitasoft.engine.data.instance.model.SLongTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.SShortTextDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance;
-import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.junit.Test;
 
@@ -97,7 +97,8 @@ public class SDataInstanceBuilderFactoryImplTest {
 
     @Test
     public void createNewInstanceHandlesXMLType() throws Exception {
-        assertThat(SDataInstanceBuilder.createNewInstance(mock(SXMLDataDefinition.class)).done()).isInstanceOf(SXMLDataInstance.class);
+        assertThat(SDataInstanceBuilder.createNewInstance(mock(SXMLDataDefinition.class)).done())
+                .isInstanceOf(SXMLDataInstance.class);
     }
 
     @Test

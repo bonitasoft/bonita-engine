@@ -20,11 +20,13 @@ import java.util.Map;
  */
 public final class SelectOneDescriptor<T> extends AbstractSelectWithParametersDescriptor<T> {
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType) {
+    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters,
+            final Class<? extends PersistentObject> entityType) {
         super(queryName, inputParameters, entityType, (Class<T>) entityType);
     }
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
+    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters,
+            final Class<? extends PersistentObject> entityType,
             final Class<T> returnType) {
         super(queryName, inputParameters, entityType, returnType);
     }

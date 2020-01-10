@@ -40,7 +40,7 @@ public class SInvalidExpressionException extends SExpressionException {
 
     /**
      * Return null or empty string, if the context of evaluation is wrong.
-     * 
+     *
      * @return The expression's name that failed on the evaluation.
      */
     public String getExpressionName() {

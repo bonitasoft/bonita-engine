@@ -51,13 +51,12 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
     private final QueriableLogUpdater logUpdater;
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<>();
 
-
     public QueriableLoggerImpl(PersistenceService persistenceService,
-                               TransactionService transactionService,
-                               QueriableLoggerStrategy loggerStrategy,
-                               QueriableLogSessionProvider sessionProvider,
-                               PlatformService platformService,
-                               TechnicalLoggerService logger) {
+            TransactionService transactionService,
+            QueriableLoggerStrategy loggerStrategy,
+            QueriableLogSessionProvider sessionProvider,
+            PlatformService platformService,
+            TechnicalLoggerService logger) {
         this.transactionService = transactionService;
         this.logger = logger;
         this.persistenceService = persistenceService;
@@ -68,11 +67,13 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
     @Override
     public long getNumberOfLogs() throws SBonitaReadException {
         final Map<String, Object> emptyMap = Collections.emptyMap();
-        return persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfLogs", emptyMap, SQueriableLog.class, Long.class));
+        return persistenceService
+                .selectOne(new SelectOneDescriptor<>("getNumberOfLogs", emptyMap, SQueriableLog.class, Long.class));
     }
 
     @Override
-    public List<SQueriableLog> getLogs(final int startIndex, final int maxResults, final String field, final OrderByType order) throws SBonitaReadException {
+    public List<SQueriableLog> getLogs(final int startIndex, final int maxResults, final String field,
+            final OrderByType order) throws SBonitaReadException {
         return persistenceService.selectList(
                 new SelectListDescriptor<SQueriableLog>("getLogs", null, SQueriableLog.class,
                         new QueryOptions(startIndex, maxResults, SQueriableLog.class, field, order)));
@@ -131,7 +132,8 @@ public class QueriableLoggerImpl implements QueriableLoggerService {
 
     @Override
     public SQueriableLog getLog(final long logId) throws SQueriableLogNotFoundException, SBonitaReadException {
-        final SQueriableLog selectOne = persistenceService.selectById(new SelectByIdDescriptor<>(SQueriableLog.class, logId));
+        final SQueriableLog selectOne = persistenceService
+                .selectById(new SelectByIdDescriptor<>(SQueriableLog.class, logId));
         if (selectOne == null) {
             throw new SQueriableLogNotFoundException(logId);
         }

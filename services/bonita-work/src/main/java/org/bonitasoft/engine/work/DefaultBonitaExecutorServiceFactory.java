@@ -20,13 +20,12 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.work.audit.WorkExecutionAuditor;
-
-import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * Use ThreadPoolExecutor as ExecutorService
@@ -37,11 +36,10 @@ import io.micrometer.core.instrument.MeterRegistry;
  * - If the queue is full, and the number of threads is less than the maxPoolSize, create a new thread to run tasks in.
  * - If the queue is full, and the number of threads is greater than or equal to maxPoolSize, reject the task.
  * When the current number of threads are > than corePoolSize, they are kept idle during keepAliveTimeSeconds
- * 
+ *
  * @author Baptiste Mesta
  */
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
-
 
     private final int corePoolSize;
     private final int queueCapacity;
@@ -82,7 +80,8 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
                 maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                 workQueue, threadFactory, handler, workFactory, logger, engineClock, workExecutionCallback,
                 workExecutionAuditor, meterRegistry, tenantId);
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Creating a new Thread pool to handle works: " + bonitaThreadPoolExecutor);
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                "Creating a new Thread pool to handle works: " + bonitaThreadPoolExecutor);
 
         //TODO this returns the timed executor service, this should be used instead of the BonitaExecutorService but we should change it everywhere
         executorServiceMetricsProvider

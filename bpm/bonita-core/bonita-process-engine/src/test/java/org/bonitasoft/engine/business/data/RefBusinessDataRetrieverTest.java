@@ -67,7 +67,8 @@ public class RefBusinessDataRetrieverTest {
 
     @Before
     public void before() throws Exception {
-        flowNodeInstance = new SAutomaticTaskInstance("auto1", 312490L, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, 0L, 0L);
+        flowNodeInstance = new SAutomaticTaskInstance("auto1", 312490L, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, 0L,
+                0L);
         flowNodeInstance.setLogicalGroup(1, PROCESS_INSTANCE_ID);
         flowNodeInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         archivedFlowNodeInstance = new SAAutomaticTaskInstance((SAutomaticTaskInstance) flowNodeInstance);
@@ -78,73 +79,88 @@ public class RefBusinessDataRetrieverTest {
         eventSubProcessInstance.setId(EVENT_SUBPROCESS_ID);
         eventSubProcessInstance.setCallerType(SFlowNodeType.SUB_PROCESS);
         eventSubProcessInstance.setCallerId(FLOW_NODE_INSTANCE_ID);
-        eventSubProcessFlowNode = new SAutomaticTaskInstance("flownodeInEventSubProcess", 352523L, PROCESS_INSTANCE_ID, EVENT_SUBPROCESS_ID,
+        eventSubProcessFlowNode = new SAutomaticTaskInstance("flownodeInEventSubProcess", 352523L, PROCESS_INSTANCE_ID,
+                EVENT_SUBPROCESS_ID,
                 0L, PROCESS_INSTANCE_ID);
         eventSubProcessFlowNode.setLogicalGroup(1, PROCESS_INSTANCE_ID);
         eventSubProcessFlowNode.setLogicalGroup(3, EVENT_SUBPROCESS_ID);
 
-        given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS)).willReturn(eventSubProcessFlowNode);
+        given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS))
+                .willReturn(eventSubProcessFlowNode);
         given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
         given(processInstanceService.getProcessInstance(PROCESS_INSTANCE_ID)).willReturn(processInstance);
         given(processInstanceService.getProcessInstance(EVENT_SUBPROCESS_ID)).willReturn(eventSubProcessInstance);
-        given(flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, FLOW_NODE_INSTANCE_ID)).willReturn(archivedFlowNodeInstance);
+        given(flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, FLOW_NODE_INSTANCE_ID))
+                .willReturn(archivedFlowNodeInstance);
     }
 
     @Test
-    public void getRefBusinessData_should_retrieve_data_using_process_context_when_container_is_a_process() throws Exception {
+    public void getRefBusinessData_should_retrieve_data_using_process_context_when_container_is_a_process()
+            throws Exception {
         //given
         SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever
-                .getRefBusinessDataInstance(new BusinessDataContext("data", new Container(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
+                .getRefBusinessDataInstance(new BusinessDataContext("data",
+                        new Container(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
     }
 
     @Test
-    public void getRefBusinessData_should_retrieve_archived_data_when_container_is_a_process_and_data_not_found_in_journal() throws Exception {
+    public void getRefBusinessData_should_retrieve_archived_data_when_container_is_a_process_and_data_not_found_in_journal()
+            throws Exception {
         //given
         final SASimpleRefBusinessDataInstance refBusinessDataInstance = buildArchivedSimpleRefBusinessData(30L);
         given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
                 .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
-        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever
-                .getRefBusinessDataInstance(new BusinessDataContext("data", new Container(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
+                .getRefBusinessDataInstance(new BusinessDataContext("data",
+                        new Container(PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualToComparingFieldByField(refBusinessDataInstance);
     }
 
     @Test
-    public void getRefBusinessData_should_retrieve_data_using_flow_node_context_when_container_is_a_flow_node() throws Exception {
+    public void getRefBusinessData_should_retrieve_data_using_flow_node_context_when_container_is_a_flow_node()
+            throws Exception {
         //given
         SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
-        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data",
+                        new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
     }
 
     @Test
-    public void getRefBusinessData_should_retry_to_retrieve_data_using_process_context_when_retrieving_data_using_flow_node_fails() throws Exception {
+    public void getRefBusinessData_should_retry_to_retrieve_data_using_process_context_when_retrieving_data_using_flow_node_fails()
+            throws Exception {
         //given
         SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
                 .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data",
+                        new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
@@ -156,29 +172,38 @@ public class RefBusinessDataRetrieverTest {
         final SASimpleRefBusinessDataInstance archRefBusinessDataInstance = buildArchivedSimpleRefBusinessData(531L);
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
                 .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
-        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willReturn(archRefBusinessDataInstance);
+        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willReturn(archRefBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data",
+                        new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
     }
 
     @Test
-    public void getRefBusinessData_should_retry_up_to_archived_process_scope_when_not_found_in_journal_on_flow_node() throws Exception {
+    public void getRefBusinessData_should_retry_up_to_archived_process_scope_when_not_found_in_journal_on_flow_node()
+            throws Exception {
         //given
         final SASimpleRefBusinessDataInstance archRefBusinessDataInstance = buildArchivedSimpleRefBusinessData(531L);
-        final SRefBusinessDataInstanceNotFoundException notFoundException = new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data");
-        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(notFoundException);
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willThrow(notFoundException);
-        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(notFoundException);
-        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(archRefBusinessDataInstance);
+        final SRefBusinessDataInstanceNotFoundException notFoundException = new SRefBusinessDataInstanceNotFoundException(
+                PROCESS_INSTANCE_ID, "data");
+        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(archRefBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data",
+                        new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
@@ -189,16 +214,23 @@ public class RefBusinessDataRetrieverTest {
             throws Exception {
         //given
         final SASimpleRefBusinessDataInstance archRefBusinessDataInstance = buildArchivedSimpleRefBusinessData(531L);
-        final SRefBusinessDataInstanceNotFoundException notFoundException = new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data");
-        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(notFoundException);
-        given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willThrow(notFoundException);
-        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(notFoundException);
-        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(archRefBusinessDataInstance);
+        final SRefBusinessDataInstanceNotFoundException notFoundException = new SRefBusinessDataInstanceNotFoundException(
+                PROCESS_INSTANCE_ID, "data");
+        given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
+                .willThrow(notFoundException);
+        given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(archRefBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data",
+                        new Container(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualToComparingFieldByField(archRefBusinessDataInstance);
@@ -208,11 +240,13 @@ public class RefBusinessDataRetrieverTest {
     public void getRefBusinessData_should_get_from_root_process_for_event_subprocess() throws Exception {
         //given
         SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever
-                .getRefBusinessDataInstance(new BusinessDataContext("data", new Container(EVENT_SUBPROCESS_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
+                .getRefBusinessDataInstance(new BusinessDataContext("data",
+                        new Container(EVENT_SUBPROCESS_ID, DataInstanceContainer.PROCESS_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
@@ -225,11 +259,13 @@ public class RefBusinessDataRetrieverTest {
 
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS))
                 .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
+        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
+                .willReturn(refBusinessDataInstance);
 
         //when
         SRefBusinessDataInstance retrievedData = retriever.getRefBusinessDataInstance(
-                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS, DataInstanceContainer.ACTIVITY_INSTANCE.name())));
+                new BusinessDataContext("data", new Container(FLOW_NODE_INSTANCE_OF_EVENT_SUBPROCESS,
+                        DataInstanceContainer.ACTIVITY_INSTANCE.name())));
 
         //then
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);

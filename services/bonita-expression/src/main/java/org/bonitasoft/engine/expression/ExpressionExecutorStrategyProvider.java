@@ -15,12 +15,11 @@ package org.bonitasoft.engine.expression;
 
 import java.util.List;
 
-
 public class ExpressionExecutorStrategyProvider {
 
-    public ExpressionExecutorStrategyProvider(ExpressionService expressionService, List<ExpressionExecutorStrategy> expressionStrategies) {
-		expressionService.setExpressionExecutorStrategy(expressionStrategies);
-	}
-
+    public ExpressionExecutorStrategyProvider(ExpressionService expressionService,
+            List<ExpressionExecutorStrategy> expressionStrategies) {
+        expressionService.setExpressionExecutorStrategy(expressionStrategies);
+    }
 
 }

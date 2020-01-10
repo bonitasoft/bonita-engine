@@ -19,14 +19,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessEnablementException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Laurent Leseigneur
@@ -41,7 +40,8 @@ public class AutoLoginConfigurationHelper {
     private final ConfigurationService configurationService;
     private ObjectMapper mapper;
 
-    public AutoLoginConfigurationHelper(ConfigurationService configurationService, long tenantId, SProcessDefinition sProcessDefinition) {
+    public AutoLoginConfigurationHelper(ConfigurationService configurationService, long tenantId,
+            SProcessDefinition sProcessDefinition) {
         this.configurationService = configurationService;
         this.tenantId = tenantId;
         this.sProcessDefinition = sProcessDefinition;
@@ -55,7 +55,8 @@ public class AutoLoginConfigurationHelper {
             final List<AutoLoginConfiguration> tenantConfigurations = getTenantConfiguration();
             final AutoLoginConfiguration autoLoginConfiguration = getProcessConfiguration(tenantConfigurations);
             if (autoLoginConfiguration == null) {
-                tenantConfigurations.add(new AutoLoginConfiguration(sProcessDefinition.getName(), sProcessDefinition.getVersion(), userName, password));
+                tenantConfigurations.add(new AutoLoginConfiguration(sProcessDefinition.getName(),
+                        sProcessDefinition.getVersion(), userName, password));
             } else {
                 autoLoginConfiguration.setUserName(userName);
                 autoLoginConfiguration.setPassword(password);
@@ -63,7 +64,8 @@ public class AutoLoginConfigurationHelper {
             storeAutoLoginConfiguration(tenantConfigurations);
         } catch (IOException e) {
             throw new SProcessEnablementException(
-                    "unable to activate auto login for process with name:" + sProcessDefinition.getName() + " and version:" + sProcessDefinition.getVersion(),
+                    "unable to activate auto login for process with name:" + sProcessDefinition.getName()
+                            + " and version:" + sProcessDefinition.getVersion(),
                     e);
         }
 
@@ -80,7 +82,8 @@ public class AutoLoginConfigurationHelper {
             storeAutoLoginConfiguration(tenantConfigurations);
         } catch (IOException e) {
             throw new SProcessDisablementException(
-                    "unable to disable auto login for process with name:" + sProcessDefinition.getName() + " and version:" + sProcessDefinition.getVersion(),
+                    "unable to disable auto login for process with name:" + sProcessDefinition.getName()
+                            + " and version:" + sProcessDefinition.getVersion(),
                     e);
         }
     }
@@ -103,12 +106,14 @@ public class AutoLoginConfigurationHelper {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             mapper.writeValue(byteArrayOutputStream, autoLoginConfigurations);
             final byte[] bytes = byteArrayOutputStream.toByteArray();
-            configurationService.storeTenantPortalConf(Collections.singletonList(new BonitaConfiguration(AUTOLOGIN_V6_JSON, bytes)), tenantId);
+            configurationService.storeTenantPortalConf(
+                    Collections.singletonList(new BonitaConfiguration(AUTOLOGIN_V6_JSON, bytes)), tenantId);
         }
     }
 
     private List<AutoLoginConfiguration> getTenantConfiguration() throws IOException {
-        final BonitaConfiguration configuration = configurationService.getTenantPortalConfiguration(tenantId, AUTOLOGIN_V6_JSON);
+        final BonitaConfiguration configuration = configurationService.getTenantPortalConfiguration(tenantId,
+                AUTOLOGIN_V6_JSON);
         List<AutoLoginConfiguration> autoLoginConfigurations = mapper.readValue(configuration.getResourceContent(),
                 new TypeReference<List<AutoLoginConfiguration>>() {
                 });

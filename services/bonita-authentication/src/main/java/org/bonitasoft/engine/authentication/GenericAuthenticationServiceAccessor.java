@@ -25,7 +25,6 @@ public class GenericAuthenticationServiceAccessor {
         this.genericAuthenticationService = genericAuthenticationService;
     }
 
-
     public GenericAuthenticationService getAuthenticationService() {
         return this.genericAuthenticationService;
     }

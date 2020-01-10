@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
-
 import org.bonitasoft.engine.io.IOUtils;
 
 /**
@@ -41,7 +40,8 @@ public class ClassloaderRefresher {
      * @throws java.io.IOException
      * @throws java.net.MalformedURLException
      */
-    public ClassLoader loadClientModelInClassloader(final byte[] clientZipContent, final ClassLoader contextClassLoader, final String modelClass,
+    public ClassLoader loadClientModelInClassloader(final byte[] clientZipContent, final ClassLoader contextClassLoader,
+            final String modelClass,
             final File fsFolderToPutJars) throws IOException, MalformedURLException {
         final Map<String, byte[]> ressources = IOUtils.unzip(clientZipContent);
         final List<URL> urls = new ArrayList<URL>();

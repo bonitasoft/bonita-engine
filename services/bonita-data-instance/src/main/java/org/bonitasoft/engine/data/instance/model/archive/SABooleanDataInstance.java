@@ -32,9 +32,9 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 @Entity
 @DiscriminatorValue("SABooleanDataInstanceImpl")
 public class SABooleanDataInstance extends SADataInstance {
+
     @Column(name = "booleanValue")
     private Boolean value;
-
 
     public SABooleanDataInstance(final SDataInstance sDataInstance) {
         super(sDataInstance);

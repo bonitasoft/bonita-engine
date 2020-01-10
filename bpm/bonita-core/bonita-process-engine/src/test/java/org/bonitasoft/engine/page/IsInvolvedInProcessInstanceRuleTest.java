@@ -90,7 +90,8 @@ public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
     @Test(expected = SExecutionException.class)
     public void shouldThrowExecutionExceptionIfReadException() throws Exception {
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, LOGGED_USER_ID);
-        doThrow(SExecutionException.class).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
+        doThrow(SExecutionException.class).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
         rule.isAllowed("someKey", context);
     }

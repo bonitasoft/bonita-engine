@@ -145,7 +145,8 @@ public class ModelConvertorTest {
 
     private DocumentService createdMockedDocumentService() {
         final DocumentService documentService = mock(DocumentService.class);
-        doReturn("url?fileName=document&contentStorageId=123").when(documentService).generateDocumentURL("document", "123");
+        doReturn("url?fileName=document&contentStorageId=123").when(documentService).generateDocumentURL("document",
+                "123");
         return documentService;
     }
 
@@ -173,7 +174,8 @@ public class ModelConvertorTest {
 
         when(manager.getState(5)).thenReturn(new CompletedActivityStateImpl());
 
-        final ArchivedUserTaskInstance archivedUserTaskInstance = ModelConvertor.toArchivedUserTaskInstance(sInstance, manager);
+        final ArchivedUserTaskInstance archivedUserTaskInstance = ModelConvertor.toArchivedUserTaskInstance(sInstance,
+                manager);
         assertThat(archivedUserTaskInstance.getProcessDefinitionId()).isEqualTo(456789456798L);
         assertThat(archivedUserTaskInstance.getRootContainerId()).isEqualTo(1L);
         assertThat(archivedUserTaskInstance.getParentContainerId()).isEqualTo(2L);
@@ -236,10 +238,12 @@ public class ModelConvertorTest {
     @Test
     public void toEventTriggerInstance_can_convert_TIMER_Type() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2,
+                "eventInstanceName", 69, "jobTriggerName");
 
         // Then
-        final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);
+        final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor
+                .toTimerEventTriggerInstance(sTimerEventTriggerInstance);
 
         // When
         assertNotNull(eventTriggerInstance);
@@ -252,11 +256,13 @@ public class ModelConvertorTest {
     @Test
     public void toTimerEventTriggerInstance_can_convert() {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2, "eventInstanceName", 69, "jobTriggerName");
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstance(2,
+                "eventInstanceName", 69, "jobTriggerName");
         sTimerEventTriggerInstance.setId(9);
 
         // Then
-        final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);
+        final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor
+                .toTimerEventTriggerInstance(sTimerEventTriggerInstance);
 
         // When
         assertNotNull(eventTriggerInstance);
@@ -298,7 +304,8 @@ public class ModelConvertorTest {
         sProcessDefinition.setStringIndex(5, "label5", null);
 
         // Then
-        final ArchivedProcessInstance archivedProcessInstance = ModelConvertor.toArchivedProcessInstance(saProcessInstance, sProcessDefinition);
+        final ArchivedProcessInstance archivedProcessInstance = ModelConvertor
+                .toArchivedProcessInstance(saProcessInstance, sProcessDefinition);
 
         // When
         assertNotNull(archivedProcessInstance);
@@ -364,7 +371,8 @@ public class ModelConvertorTest {
         sFormMapping.setPageMapping(new SPageMapping());
 
         // Then
-        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping), formRequiredAnalyzer);
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping),
+                formRequiredAnalyzer);
 
         // When
         assertThat(formMapping).hasSize(1);
@@ -413,7 +421,8 @@ public class ModelConvertorTest {
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput, expectedComplexInput);
+        assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput,
+                expectedComplexInput);
     }
 
     @Test
@@ -429,9 +438,11 @@ public class ModelConvertorTest {
     public void convertMultipleSContractDefinition() {
         //given
         final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description", true);
-        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description", true,
+        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description",
+                true,
                 Collections.singletonList(expectedSimpleInput));
-        final InputDefinition expectedComplexWithComplexInput = new InputDefinitionImpl("complex in complex", "complex description", true,
+        final InputDefinition expectedComplexWithComplexInput = new InputDefinitionImpl("complex in complex",
+                "complex description", true,
                 null, Collections.singletonList(expectedComplexInput));
 
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
@@ -452,10 +463,12 @@ public class ModelConvertorTest {
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput, expectedComplexWithComplexInput);
+        assertThat(contract.getInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput,
+                expectedComplexWithComplexInput);
     }
 
-    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {
+    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId,
+            String type, long businessDataId) {
         SProcessSimpleRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
@@ -464,7 +477,8 @@ public class ModelConvertorTest {
         return sProcessSimpleRefBusinessDataInstance;
     }
 
-    SProcessMultiRefBusinessDataInstance createProcessMultipleDataReference(String name, long processInstanceId, String type, List<Long> dataIds) {
+    SProcessMultiRefBusinessDataInstance createProcessMultipleDataReference(String name, long processInstanceId,
+            String type, List<Long> dataIds) {
         SProcessMultiRefBusinessDataInstance sProcessSimpleRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstance();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
@@ -483,10 +497,12 @@ public class ModelConvertorTest {
 
     @Test
     public void convert_simple_business_data() {
-        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType",
-                Arrays.asList(5555l, 5556l, 5557l)));
+        BusinessDataReference businessDataReference = ModelConvertor
+                .toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType",
+                        Arrays.asList(5555l, 5556l, 5557l)));
 
-        assertThat(businessDataReference).isEqualTo(new MultipleBusinessDataReferenceImpl("myBData", "theType", Arrays.asList(5555l, 5556l, 5557l)));
+        assertThat(businessDataReference).isEqualTo(
+                new MultipleBusinessDataReferenceImpl("myBData", "theType", Arrays.asList(5555l, 5556l, 5557l)));
     }
 
     @Test
@@ -504,7 +520,8 @@ public class ModelConvertorTest {
         final SAGatewayInstance saFlowNode = new SAGatewayInstance();
         final long reachedStateDate = 4534311114L;
         saFlowNode.setReachedStateDate(reachedStateDate);
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isEqualTo(new Date(reachedStateDate));
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate())
+                .isEqualTo(new Date(reachedStateDate));
     }
 
     @Test
@@ -513,7 +530,8 @@ public class ModelConvertorTest {
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
         final SAReceiveTaskInstance receiveTaskInstance = new SAReceiveTaskInstance();
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(receiveTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(receiveTaskInstance, flowNodeStateManager)
+                .getReachedStateDate()).isNotNull();
     }
 
     @Test
@@ -522,7 +540,9 @@ public class ModelConvertorTest {
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
         final SASendTaskInstance sendTaskInstance = new SASendTaskInstance();
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
+        assertThat(
+                ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate())
+                        .isNotNull();
     }
 
     @Test
@@ -532,7 +552,8 @@ public class ModelConvertorTest {
 
         final SAUserTaskInstance saFlowNode = new SAUserTaskInstance();
         saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate())
+                .isNotNull();
     }
 
     @Test
@@ -542,7 +563,8 @@ public class ModelConvertorTest {
 
         final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
-        assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
+        assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getReachedStateDate())
+                .isNotNull();
     }
 
     @Test
@@ -554,7 +576,8 @@ public class ModelConvertorTest {
         saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         final long lastUpdateDate = 5746354125555L;
         saFlowNode.setLastUpdateDate(lastUpdateDate);
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getLastUpdateDate()).isEqualTo(new Date(lastUpdateDate));
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getLastUpdateDate())
+                .isEqualTo(new Date(lastUpdateDate));
     }
 
     @Test
@@ -565,7 +588,8 @@ public class ModelConvertorTest {
         final SUserTaskInstance sFlowNode = new SUserTaskInstance();
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
-        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstance(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
+        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstance(), flowNodeStateManager).getLastUpdateDate())
+                .isNotNull();
     }
 
     @Test
@@ -583,7 +607,8 @@ public class ModelConvertorTest {
 
         //when
         final UserTaskInstance urgentTask = ModelConvertor.toUserTaskInstance(urgentSTask, flowNodeStateManager);
-        final UserTaskInstance takeYourTimeTask = ModelConvertor.toUserTaskInstance(takeYourTimeSTask, flowNodeStateManager);
+        final UserTaskInstance takeYourTimeTask = ModelConvertor.toUserTaskInstance(takeYourTimeSTask,
+                flowNodeStateManager);
 
         //then
         assertThat(urgentTask.getExpectedEndDate()).isEqualTo(new Date(15L));
@@ -604,22 +629,25 @@ public class ModelConvertorTest {
         takeYourTimeASTask.setPriority(STaskPriority.UNDER_NORMAL);
 
         //when
-        final ArchivedUserTaskInstance urgentATask = ModelConvertor.toArchivedUserTaskInstance(urgentASTask, flowNodeStateManager);
-        final ArchivedUserTaskInstance takeYourTimeATask = ModelConvertor.toArchivedUserTaskInstance(takeYourTimeASTask, flowNodeStateManager);
+        final ArchivedUserTaskInstance urgentATask = ModelConvertor.toArchivedUserTaskInstance(urgentASTask,
+                flowNodeStateManager);
+        final ArchivedUserTaskInstance takeYourTimeATask = ModelConvertor.toArchivedUserTaskInstance(takeYourTimeASTask,
+                flowNodeStateManager);
 
         //then
         assertThat(urgentATask.getExpectedEndDate()).isEqualTo(new Date(15L));
         assertThat(takeYourTimeATask.getExpectedEndDate()).isNull();
     }
-    
+
     @Test
     public void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
-        SUserMembership sUserMembership = new SUserMembership(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
-        
+        SUserMembership sUserMembership = new SUserMembership(257L, 157L, 357L, 457L, 557L, 190119993L,
+                "dummy rolename", "dummy groupname", "dummy username", "Bonita/dummy");
+
         //when
         UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);
-        
+
         //then
         assertThat(userMembership.getGroupParentPath()).isNotNull();
         assertThat(userMembership.getGroupParentPath()).isEqualToIgnoringCase("Bonita/dummy");

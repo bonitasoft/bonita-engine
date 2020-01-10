@@ -18,6 +18,7 @@ import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 public class DoNothingConnector extends AbstractConnector {
+
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
 

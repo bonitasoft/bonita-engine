@@ -31,7 +31,8 @@ public interface UserFilterService {
 
     String IMPLEMENTATION_EXT = ".impl";
 
-    FilterResult executeFilter(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition, Map<String, SExpression> inputs, ClassLoader classLoader,
+    FilterResult executeFilter(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition,
+            Map<String, SExpression> inputs, ClassLoader classLoader,
             SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException;
 
     void removeUserFilters(long processDefinitionId) throws SBonitaReadException, SRecorderException;

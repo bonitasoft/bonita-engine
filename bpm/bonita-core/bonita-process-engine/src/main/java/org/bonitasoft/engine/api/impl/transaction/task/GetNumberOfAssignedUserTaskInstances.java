@@ -28,7 +28,8 @@ public class GetNumberOfAssignedUserTaskInstances implements TransactionContentW
 
     private final long userId;
 
-    public GetNumberOfAssignedUserTaskInstances(final long userId, final ActivityInstanceService activityInstanceService) {
+    public GetNumberOfAssignedUserTaskInstances(final long userId,
+            final ActivityInstanceService activityInstanceService) {
         this.userId = userId;
         this.activityInstanceService = activityInstanceService;
     }

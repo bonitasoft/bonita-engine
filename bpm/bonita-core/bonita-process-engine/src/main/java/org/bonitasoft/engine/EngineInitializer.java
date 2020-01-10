@@ -81,7 +81,8 @@ public class EngineInitializer {
         }
     }
 
-    SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+    SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return getServiceAccessorFactory().createSessionAccessor();
     }
 
@@ -108,13 +109,15 @@ public class EngineInitializer {
         return new PlatformAPIImpl();
     }
 
-    private void deletePlatformSession(final PlatformSessionService platformSessionService, final SessionAccessor sessionAccessor, final long sessionId)
+    private void deletePlatformSession(final PlatformSessionService platformSessionService,
+            final SessionAccessor sessionAccessor, final long sessionId)
             throws SSessionNotFoundException {
         platformSessionService.deleteSession(sessionId);
         sessionAccessor.deleteSessionId();
     }
 
-    private long createPlatformSession(final PlatformSessionService platformSessionService, final SessionAccessor sessionAccessor) throws SSessionException {
+    private long createPlatformSession(final PlatformSessionService platformSessionService,
+            final SessionAccessor sessionAccessor) throws SSessionException {
         final SPlatformSession createSession = platformSessionService.createSession("SYSTEM");
         final long sessionId = createSession.getId();
         sessionAccessor.setSessionInfo(sessionId, -1);

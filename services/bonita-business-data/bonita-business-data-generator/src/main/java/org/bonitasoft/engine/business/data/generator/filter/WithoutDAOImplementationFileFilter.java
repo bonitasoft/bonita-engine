@@ -28,7 +28,7 @@ public class WithoutDAOImplementationFileFilter extends AbstractFileFilter {
     }
 
     private boolean acceptFile(File file, String fileExtension) {
-        return file.getName().endsWith(fileExtension) && !file.getName().endsWith("DAOImpl"+fileExtension);
+        return file.getName().endsWith(fileExtension) && !file.getName().endsWith("DAOImpl" + fileExtension);
     }
 
 }

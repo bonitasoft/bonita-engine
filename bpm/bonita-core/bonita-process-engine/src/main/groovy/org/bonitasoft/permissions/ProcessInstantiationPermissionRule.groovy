@@ -60,7 +60,7 @@ class ProcessInstantiationPermissionRule implements PermissionRule {
             SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 1)
 
             if(apiCallContext.getParameters().get("user") != null
-                    && apiCallContext.getParameters().get("user").length > 0) {
+            && apiCallContext.getParameters().get("user").length > 0) {
                 if (!processAPI.isUserProcessSupervisor(processDefinitionId, currentUserId)) {
                     return false
                 }

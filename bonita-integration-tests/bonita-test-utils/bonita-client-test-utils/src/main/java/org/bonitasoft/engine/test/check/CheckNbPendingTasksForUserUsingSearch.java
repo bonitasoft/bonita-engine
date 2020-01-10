@@ -37,7 +37,8 @@ public final class CheckNbPendingTasksForUserUsingSearch extends WaitUntil {
 
     private final SearchOptions searchOptions;
 
-    public CheckNbPendingTasksForUserUsingSearch(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
+    public CheckNbPendingTasksForUserUsingSearch(final ProcessAPI processAPI, final int repeatEach, final int timeout,
+            final boolean throwExceptions,
             final int nbTasks, final long userId, final SearchOptions searchOptions) {
         super(repeatEach, timeout, throwExceptions);
         this.nbTasks = nbTasks;
@@ -48,7 +49,8 @@ public final class CheckNbPendingTasksForUserUsingSearch extends WaitUntil {
 
     @Override
     protected boolean check() throws Exception {
-        final SearchResult<HumanTaskInstance> searchResult = processAPI.searchPendingTasksForUser(userId, searchOptions);
+        final SearchResult<HumanTaskInstance> searchResult = processAPI.searchPendingTasksForUser(userId,
+                searchOptions);
         pendingHumanTasks = searchResult.getResult();
         return searchResult.getCount() == nbTasks;
     }

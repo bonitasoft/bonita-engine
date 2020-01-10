@@ -23,9 +23,10 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Delete all entity members related to the provided external ID.
- * Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different
+ * Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, DISCRIMINATOR_ID_KEY: the
+ * discriminator to isolate the different
  * functional notions.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 public class DeleteEntityMembersCommand extends EntityMemberCommand {

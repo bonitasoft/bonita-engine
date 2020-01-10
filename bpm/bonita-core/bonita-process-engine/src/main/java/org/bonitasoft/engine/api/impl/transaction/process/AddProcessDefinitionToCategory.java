@@ -31,7 +31,8 @@ public class AddProcessDefinitionToCategory implements TransactionContent {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public AddProcessDefinitionToCategory(final long categoryId, final long processDefinitionId, final CategoryService categoryService,
+    public AddProcessDefinitionToCategory(final long categoryId, final long processDefinitionId,
+            final CategoryService categoryService,
             final ProcessDefinitionService processDefinitionService) {
         this.categoryId = categoryId;
         this.processDefinitionId = processDefinitionId;

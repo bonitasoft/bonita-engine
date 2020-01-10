@@ -18,7 +18,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatew
 
 /**
  * @author Hongwen Zang
- * 
  */
 public class SAGatewayInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl implements SAGatewayInstanceBuilder {
 

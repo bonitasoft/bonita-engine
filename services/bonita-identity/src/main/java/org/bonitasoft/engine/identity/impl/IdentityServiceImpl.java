@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.activation.MimetypesFileTypeMap;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -121,8 +122,10 @@ public class IdentityServiceImpl implements IdentityService {
         MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
     }
 
-    public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final CredentialsEncrypter encrypter) {
+    public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService,
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final CredentialsEncrypter encrypter) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
@@ -132,10 +135,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createGroup(final SGroup group, String iconFileName, byte[] iconContent) throws SGroupCreationException {
+    public void createGroup(final SGroup group, String iconFileName, byte[] iconContent)
+            throws SGroupCreationException {
         final String methodName = "createGroup";
         final long objectId = group.getId();
-        final SGroupLogBuilder logBuilder = getGroupLog(ActionType.CREATED, "Adding a new group with name " + group.getName());
+        final SGroupLogBuilder logBuilder = getGroupLog(ActionType.CREATED,
+                "Adding a new group with name " + group.getName());
         try {
             if (iconFileName != null && iconContent != null) {
                 SIcon icon = createIcon(iconFileName, iconContent);
@@ -156,8 +161,9 @@ public class IdentityServiceImpl implements IdentityService {
     public SCustomUserInfoDefinition createCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo)
             throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException {
         final String methodName = "createCustomUserInfoDefinition";
-        final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.CREATED, "Adding a custom user info with name "
-                + customUserInfo.getName());
+        final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.CREATED,
+                "Adding a custom user info with name "
+                        + customUserInfo.getName());
         try {
             throwExceptionIfAlreadyExists(customUserInfo);
             recorder.recordInsert(new InsertRecord(customUserInfo), CUSTOM_USER_INFO_DEFINITION);
@@ -168,7 +174,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo) throws SBonitaReadException,
+    private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo)
+            throws SBonitaReadException,
             SCustomUserInfoDefinitionAlreadyExistsException {
         final SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
         if (storedDef != null) {
@@ -176,14 +183,17 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
-            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) {
+    private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(
+            final SCustomUserInfoDefinition customUserInfo,
+            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder,
+            final SBonitaException exception) {
         log(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
     }
 
     @Override
-    public SCustomUserInfoValue createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
+    public SCustomUserInfoValue createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo)
+            throws SIdentityException {
         try {
             recorder.recordInsert(new InsertRecord(customUserInfo), CUSTOM_USER_INFO_VALUE);
             return customUserInfo;
@@ -195,7 +205,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void createRole(final SRole role, String iconFilename, byte[] iconContent) throws SIdentityException {
         final String methodName = "createRole";
-        final SRoleLogBuilder logBuilder = getRoleLog(ActionType.CREATED, "Adding a new role with name " + role.getName());
+        final SRoleLogBuilder logBuilder = getRoleLog(ActionType.CREATED,
+                "Adding a new role with name " + role.getName());
         try {
             if (iconFilename != null && iconContent != null) {
                 SIcon icon = createIcon(iconFilename, iconContent);
@@ -225,8 +236,10 @@ public class IdentityServiceImpl implements IdentityService {
         return createUser(user, methodName, hashedUser);
     }
 
-    private SUser createUser(final SUser user, final String methodName, final SUser hashedUser) throws SUserCreationException {
-        final String message = "Adding a new user with user name " + user.getUserName() + ", first name " + user.getFirstName() + ", last name "
+    private SUser createUser(final SUser user, final String methodName, final SUser hashedUser)
+            throws SUserCreationException {
+        final String message = "Adding a new user with user name " + user.getUserName() + ", first name "
+                + user.getFirstName() + ", last name "
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
         try {
@@ -239,7 +252,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private void insertUserLogin(String methodName, SUser hashedUser, SUserLogBuilder logBuilder) throws SRecorderException {
+    private void insertUserLogin(String methodName, SUser hashedUser, SUserLogBuilder logBuilder)
+            throws SRecorderException {
         SUserLogin sUserLogin = new SUserLogin();
         hashedUser.setSUserLogin(sUserLogin);
         sUserLogin.setSUser(hashedUser);
@@ -272,7 +286,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void createUserMembership(final SUserMembership userMembership) throws SUserMembershipCreationException {
         final String methodName = "createUserMembership";
-        final String message = "Adding a new user membership for user " + userMembership.getUsername() + " with role " + userMembership.getRoleName()
+        final String message = "Adding a new user membership for user " + userMembership.getUsername() + " with role "
+                + userMembership.getRoleName()
                 + " in group " + userMembership.getGroupName();
 
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.CREATED, message, userMembership);
@@ -359,8 +374,10 @@ public class IdentityServiceImpl implements IdentityService {
         return logBuilder;
     }
 
-    private SCustomUserInfoDefinitionLogBuilder getSCustomUserInfoDefinitionLog(final ActionType actionType, final String message) {
-        final SCustomUserInfoDefinitionLogBuilder logBuilder = BuilderFactory.get(SCustomUserInfoDefinitionLogBuilderFactory.class).createNewInstance();
+    private SCustomUserInfoDefinitionLogBuilder getSCustomUserInfoDefinitionLog(final ActionType actionType,
+            final String message) {
+        final SCustomUserInfoDefinitionLogBuilder logBuilder = BuilderFactory
+                .get(SCustomUserInfoDefinitionLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
@@ -373,16 +390,20 @@ public class IdentityServiceImpl implements IdentityService {
         return logBuilder;
     }
 
-    private SContactInfoLogBuilder getUserContactInfoLog(final ActionType actionType, final String message, final SContactInfo contactInfo) {
-        final SContactInfoLogBuilder logBuilder = BuilderFactory.get(SContactInfoLogBuilderFactory.class).createNewInstance();
+    private SContactInfoLogBuilder getUserContactInfoLog(final ActionType actionType, final String message,
+            final SContactInfo contactInfo) {
+        final SContactInfoLogBuilder logBuilder = BuilderFactory.get(SContactInfoLogBuilderFactory.class)
+                .createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.setContactInfoUserId(contactInfo.getUserId());
         return logBuilder;
     }
 
-    private SUserMembershipLogBuilder getUserMembershipLog(final ActionType actionType, final String message, final SUserMembership userMemberShip) {
-        final SUserMembershipLogBuilder logBuilder = BuilderFactory.get(SUserMembershipLogBuilderFactory.class).createNewInstance();
+    private SUserMembershipLogBuilder getUserMembershipLog(final ActionType actionType, final String message,
+            final SUserMembership userMemberShip) {
+        final SUserMembershipLogBuilder logBuilder = BuilderFactory.get(SUserMembershipLogBuilderFactory.class)
+                .createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.identityUserId(userMemberShip.getUserId());
@@ -483,7 +504,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void deleteUser(final SUser user) throws SUserDeletionException {
         final String methodName = "deleteUser";
-        final SUserLogBuilder logBuilder = getUserLog(ActionType.DELETED, "Deleting user with username " + user.getUserName());
+        final SUserLogBuilder logBuilder = getUserLog(ActionType.DELETED,
+                "Deleting user with username " + user.getUserName());
         try {
             recorder.recordDelete(new DeleteRecord(user), USER);
             log(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -508,8 +530,9 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public SUserMembership getLightUserMembership(final long userMembershipId) throws SIdentityException {
         try {
-            final SUserMembership selectOne = persistenceService.selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class,
-                    "SUserMembership", userMembershipId));
+            final SUserMembership selectOne = persistenceService
+                    .selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class,
+                            "SUserMembership", userMembershipId));
             if (selectOne == null) {
                 throw new SIdentityException("Can't get the userMembership with id " + userMembershipId, null);
             }
@@ -523,7 +546,8 @@ public class IdentityServiceImpl implements IdentityService {
     public void deleteUserMembership(SUserMembership userMembership) throws SMembershipDeletionException {
         try {
             // fat object, hibernate won't delete id
-            if (userMembership.getGroupName() != null || userMembership.getUsername() != null || userMembership.getRoleName() != null) {
+            if (userMembership.getGroupName() != null || userMembership.getUsername() != null
+                    || userMembership.getRoleName() != null) {
                 userMembership = getLightUserMembership(userMembership.getId());
             }
             deleteLightUserMembership(userMembership);
@@ -545,7 +569,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void deleteLightUserMembership(final SUserMembership userMembership) throws SMembershipDeletionException {
         final String methodName = "deleteLightUserMembership";
-        final String message = "Deleting user membership for user " + userMembership.getUsername() + " with role " + userMembership.getRoleName()
+        final String message = "Deleting user membership for user " + userMembership.getUsername() + " with role "
+                + userMembership.getRoleName()
                 + " in group " + userMembership.getGroupName();
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.DELETED, message, userMembership);
         try {
@@ -570,7 +595,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public SGroup getGroup(final long groupId) throws SGroupNotFoundException {
         try {
-            final SGroup group = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SGroup.class, "Group", groupId));
+            final SGroup group = persistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SGroup.class, "Group", groupId));
             if (group == null) {
                 throw new SGroupNotFoundException("No group exists with id: " + groupId);
             }
@@ -581,22 +607,26 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups) throws SIdentityException {
+    public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups)
+            throws SIdentityException {
         try {
             final SGroup group = getGroup(groupId);
-            return persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, fromIndex, numberOfGroups));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, fromIndex, numberOfGroups));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the children of the group", e);
         }
     }
 
     @Override
-    public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups, final String field, final OrderByType order)
+    public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             final SGroup group = getGroup(groupId);
-            return persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, field, order, fromIndex,
-                    numberOfGroups));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, field, order, fromIndex,
+                            numberOfGroups));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the children of the group", e);
         }
@@ -613,10 +643,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SGroup> getGroups(final int fromIndex, final int numberOfGroups, final String field, final OrderByType order) throws SIdentityException {
+    public List<SGroup> getGroups(final int fromIndex, final int numberOfGroups, final String field,
+            final OrderByType order) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", field, order, fromIndex,
-                    numberOfGroups));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", field, order, fromIndex,
+                            numberOfGroups));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the groups", e);
         }
@@ -628,26 +660,31 @@ public class IdentityServiceImpl implements IdentityService {
             return Collections.emptyList();
         }
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SGroup.class, "Group", groupIds));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElementsByIds(SGroup.class, "Group", groupIds));
         } catch (final SBonitaReadException e) {
             throw new SGroupNotFoundException(e);
         }
     }
 
     @Override
-    public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfResult, final OrderByOption orderByOption)
+    public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfResult,
+            final OrderByOption orderByOption)
             throws SIdentityException {
         try {
             List<SUserMembership> listSUserMembership;
             if (orderByOption.getClazz() == SRole.class) {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(fromIndex,
-                        numberOfResult, Collections.singletonList(orderByOption))));
+                listSUserMembership = persistenceService
+                        .selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(fromIndex,
+                                numberOfResult, Collections.singletonList(orderByOption))));
             } else if (orderByOption.getClazz() == SGroup.class) {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(fromIndex,
-                        numberOfResult, Collections.singletonList(orderByOption))));
+                listSUserMembership = persistenceService
+                        .selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(fromIndex,
+                                numberOfResult, Collections.singletonList(orderByOption))));
             } else {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
-                        new QueryOptions(fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
+                listSUserMembership = persistenceService
+                        .selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
+                                new QueryOptions(fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
             }
             return listSUserMembership;
         } catch (final SBonitaReadException e) {
@@ -656,7 +693,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfGroup(final long groupId, final int startIndex, final int maxResults) throws SIdentityException {
+    public List<SUserMembership> getUserMembershipsOfGroup(final long groupId, final int startIndex,
+            final int maxResults) throws SIdentityException {
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(groupId, startIndex,
                     maxResults));
@@ -666,7 +704,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfRole(final long roleId, final int startIndex, final int maxResults) throws SIdentityException {
+    public List<SUserMembership> getUserMembershipsOfRole(final long roleId, final int startIndex, final int maxResults)
+            throws SIdentityException {
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(roleId, startIndex,
                     maxResults));
@@ -679,7 +718,8 @@ public class IdentityServiceImpl implements IdentityService {
     public long getNumberOfGroupChildren(final long parentGroupId) throws SIdentityException {
         try {
             final SGroup parentGroup = getGroup(parentGroupId);
-            return persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfGroupChildren(parentGroup.getPath()));
+            return persistenceService
+                    .selectOne(SelectDescriptorBuilder.getNumberOfGroupChildren(parentGroup.getPath()));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the number children of group", e);
         }
@@ -763,12 +803,15 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             return persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId));
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get the number of users having the membership with group:" + groupId + " and role:" + roleId, e);
+            throw new SIdentityException(
+                    "Can't get the number of users having the membership with group:" + groupId + " and role:" + roleId,
+                    e);
         }
     }
 
     @Override
-    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SCustomUserInfoDefinitionNotFoundException,
+    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name)
+            throws SCustomUserInfoDefinitionNotFoundException,
             SCustomUserInfoDefinitionReadException {
         SCustomUserInfoDefinition definition;
         try {
@@ -793,12 +836,14 @@ public class IdentityServiceImpl implements IdentityService {
         return definition != null;
     }
 
-    private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name) throws SBonitaReadException {
+    private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name)
+            throws SBonitaReadException {
         return persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(name));
     }
 
     @Override
-    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(final int fromIndex, final int maxResults) throws SIdentityException {
+    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(final int fromIndex, final int maxResults)
+            throws SIdentityException {
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getElements(
                     SCustomUserInfoDefinition.class, "CustomUserInfoDefinition", fromIndex, maxResults));
@@ -808,7 +853,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex,
+    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue,
+            final boolean usePartialMatch, final int fromIndex,
             final int maxResults) throws SIdentityException {
         try {
             String queryName;
@@ -821,7 +867,8 @@ public class IdentityServiceImpl implements IdentityService {
             final Map<String, Object> parameters = new HashMap<>(2);
             parameters.put("userInfoName", userInfoName);
             parameters.put("userInfoValue", userInfoValue);
-            final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<>(queryName, parameters, SUser.class, Long.class,
+            final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<>(queryName, parameters, SUser.class,
+                    Long.class,
                     new QueryOptions(fromIndex, maxResults));
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
@@ -830,21 +877,26 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition getCustomUserInfoDefinition(final long customUserInfoDefinitionId) throws SIdentityException {
+    public SCustomUserInfoDefinition getCustomUserInfoDefinition(final long customUserInfoDefinitionId)
+            throws SIdentityException {
         try {
-            final SCustomUserInfoDefinition selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoDefinition.class,
-                    "CustomUserInfoDefinition", customUserInfoDefinitionId));
+            final SCustomUserInfoDefinition selectOne = persistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoDefinition.class,
+                            "CustomUserInfoDefinition", customUserInfoDefinitionId));
             if (selectOne == null) {
-                throw new SIdentityException("Can't get the custom user info definition with id " + customUserInfoDefinitionId, null);
+                throw new SIdentityException(
+                        "Can't get the custom user info definition with id " + customUserInfoDefinitionId, null);
             }
             return selectOne;
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get the custom user info definition with id " + customUserInfoDefinitionId, e);
+            throw new SIdentityException(
+                    "Can't get the custom user info definition with id " + customUserInfoDefinitionId, e);
         }
     }
 
     @Override
-    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(final List<Long> customUserInfoDefinitionIds) throws SIdentityException {
+    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(final List<Long> customUserInfoDefinitionIds)
+            throws SIdentityException {
         if (customUserInfoDefinitionIds == null || customUserInfoDefinitionIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -852,16 +904,19 @@ public class IdentityServiceImpl implements IdentityService {
             return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(
                     SCustomUserInfoDefinition.class, "SCustomUserInfoDefinition", customUserInfoDefinitionIds));
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get custom user info definitions with ids " + Arrays.toString(customUserInfoDefinitionIds.toArray()), e);
+            throw new SIdentityException("Can't get custom user info definitions with ids "
+                    + Arrays.toString(customUserInfoDefinitionIds.toArray()), e);
         }
     }
 
     @Override
-    public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException,
+    public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId)
+            throws SCustomUserInfoValueNotFoundException,
             SCustomUserInfoValueReadException {
         try {
-            final SCustomUserInfoValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class,
-                    "SCustomUserInfoValue", customUserInfoValueId));
+            final SCustomUserInfoValue selectOne = persistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class,
+                            "SCustomUserInfoValue", customUserInfoValueId));
             if (selectOne == null) {
                 throw new SCustomUserInfoValueNotFoundException(customUserInfoValueId);
             }
@@ -872,22 +927,27 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SCustomUserInfoValue> getCustomUserInfoValues(final List<Long> customUserInfoValueIds) throws SIdentityException {
+    public List<SCustomUserInfoValue> getCustomUserInfoValues(final List<Long> customUserInfoValueIds)
+            throws SIdentityException {
         if (customUserInfoValueIds == null || customUserInfoValueIds.isEmpty()) {
             return Collections.emptyList();
         }
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SCustomUserInfoValue.class, "SCustomUserInfoValue",
-                    customUserInfoValueIds));
+            return persistenceService.selectList(
+                    SelectDescriptorBuilder.getElementsByIds(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+                            customUserInfoValueIds));
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get custom user info values with ids " + Arrays.toString(customUserInfoValueIds.toArray()), e);
+            throw new SIdentityException(
+                    "Can't get custom user info values with ids " + Arrays.toString(customUserInfoValueIds.toArray()),
+                    e);
         }
     }
 
     @Override
     public SRole getRole(final long roleId) throws SRoleNotFoundException {
         try {
-            final SRole selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SRole.class, "Role", roleId));
+            final SRole selectOne = persistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SRole.class, "Role", roleId));
             if (selectOne == null) {
                 throw new SRoleNotFoundException("The role with id= " + roleId + " does not exist");
             }
@@ -938,17 +998,20 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SRole> getRoles(final int fromIndex, final int numberOfRoles) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", fromIndex, numberOfRoles));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", fromIndex, numberOfRoles));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the roles", e);
         }
     }
 
     @Override
-    public List<SRole> getRoles(final int fromIndex, final int numberOfRoles, final String field, final OrderByType order) throws SIdentityException {
+    public List<SRole> getRoles(final int fromIndex, final int numberOfRoles, final String field,
+            final OrderByType order) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", field, order, fromIndex,
-                    numberOfRoles));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", field, order, fromIndex,
+                            numberOfRoles));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the roles", e);
         }
@@ -960,7 +1023,8 @@ public class IdentityServiceImpl implements IdentityService {
             return Collections.emptyList();
         }
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SRole.class, "Role", roleIds));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElementsByIds(SRole.class, "Role", roleIds));
         } catch (final SBonitaReadException e) {
             throw new SRoleNotFoundException(e);
         }
@@ -969,7 +1033,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public SUser getUser(final long userId) throws SUserNotFoundException {
         try {
-            final SUser user = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+            final SUser user = persistenceService
+                    .selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
 
             if (user == null) {
                 throw new SUserNotFoundException(userId);
@@ -1006,7 +1071,8 @@ public class IdentityServiceImpl implements IdentityService {
     public SUserMembership getUserMembership(final long userMembershipId) throws SIdentityException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) userMembershipId);
-            final SelectOneDescriptor<SUserMembership> desc = new SelectOneDescriptor<>("getSUserMembershipById", parameters,
+            final SelectOneDescriptor<SUserMembership> desc = new SelectOneDescriptor<>("getSUserMembershipById",
+                    parameters,
                     SUserMembership.class);
             final SUserMembership selectOne = persistenceService.selectOne(desc);
             if (selectOne == null) {
@@ -1028,24 +1094,28 @@ public class IdentityServiceImpl implements IdentityService {
             return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUserMembership.class,
                     "SUserMembership", localUserMembershipIds));
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get users memberships with ids " + Arrays.toString(localUserMembershipIds.toArray()), e);
+            throw new SIdentityException(
+                    "Can't get users memberships with ids " + Arrays.toString(localUserMembershipIds.toArray()), e);
         }
     }
 
     @Override
     public List<SUser> getUsers(final int fromIndex, final int numberOfUsers) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", fromIndex, numberOfUsers));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", fromIndex, numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users", e);
         }
     }
 
     @Override
-    public List<SUser> getUsers(final int fromIndex, final int numberOfUsers, final String field, final OrderByType order) throws SIdentityException {
+    public List<SUser> getUsers(final int fromIndex, final int numberOfUsers, final String field,
+            final OrderByType order) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", field, order, fromIndex,
-                    numberOfUsers));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", field, order, fromIndex,
+                            numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users", e);
         }
@@ -1057,7 +1127,8 @@ public class IdentityServiceImpl implements IdentityService {
             return Collections.emptyList();
         }
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", userIds));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", userIds));
         } catch (final SBonitaReadException e) {
             throw new SUserNotFoundException(e);
         }
@@ -1069,23 +1140,28 @@ public class IdentityServiceImpl implements IdentityService {
             return Collections.emptyList();
         }
         try {
-            final QueryOptions queryOptions = new QueryOptions(0, userNames.size(), SUser.class, "userName", OrderByType.ASC);
+            final QueryOptions queryOptions = new QueryOptions(0, userNames.size(), SUser.class, "userName",
+                    OrderByType.ASC);
             final Map<String, Object> parameters = Collections.singletonMap("userNames", (Object) userNames);
-            return persistenceService.selectList(new SelectListDescriptor<SUser>("getUsersByName", parameters, SUser.class, queryOptions));
+            return persistenceService.selectList(
+                    new SelectListDescriptor<SUser>("getUsersByName", parameters, SUser.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SUserNotFoundException(e);
         }
     }
 
     @Override
-    public List<SUser> getUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             if (order != null) {
-                return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
-                        numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
-                return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, fromIndex, numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, fromIndex, numberOfUsers));
             }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the group " + groupId, e);
@@ -1093,14 +1169,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getActiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getActiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             if (order != null) {
-                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, field, order, fromIndex,
-                        numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
-                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, fromIndex, numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, fromIndex, numberOfUsers));
             }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the active users having the group " + groupId, e);
@@ -1108,15 +1187,18 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getInactiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getInactiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
 
         try {
             if (order != null) {
-                return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, field, order, fromIndex,
-                        numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
-                return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, fromIndex, numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, fromIndex, numberOfUsers));
             }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the inactive users having the group " + groupId, e);
@@ -1124,7 +1206,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order) throws SIdentityException {
+    public List<SUser> getUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field,
+            OrderByType order) throws SIdentityException {
         try {
             final QueryOptions queryOptions;
             if (order != null) {
@@ -1139,7 +1222,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getActiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order)
+    public List<SUser> getActiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field,
+            OrderByType order)
             throws SIdentityException {
         try {
             final QueryOptions queryOptions;
@@ -1148,14 +1232,16 @@ public class IdentityServiceImpl implements IdentityService {
             } else {
                 queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
             }
-            return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithManager(managerId, queryOptions));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getActiveUsersWithManager(managerId, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the active users having the manager " + managerId, e);
         }
     }
 
     @Override
-    public List<SUser> getInactiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order)
+    public List<SUser> getInactiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field,
+            OrderByType order)
             throws SIdentityException {
         try {
             final QueryOptions queryOptions;
@@ -1164,16 +1250,19 @@ public class IdentityServiceImpl implements IdentityService {
             } else {
                 queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
             }
-            return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersWithManager(managerId, queryOptions));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getInactiveUsersWithManager(managerId, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the inactive users having the manager " + managerId, e);
         }
     }
 
     @Override
-    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
+    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers)
+            throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, fromIndex, numberOfUsers));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, fromIndex, numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
@@ -1182,28 +1271,33 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SUser> getActiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the active users having the role " + roleId, e);
         }
     }
 
     @Override
-    public List<SUser> getInactiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) throws SIdentityException {
+    public List<SUser> getInactiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers)
+            throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+            return persistenceService
+                    .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, fromIndex, numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the inactive users having the role " + roleId, e);
         }
     }
 
     @Override
-    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             if (order != null) {
                 return persistenceService
-                        .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+                        .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
                 return persistenceService
                         .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, fromIndex, numberOfUsers));
@@ -1214,14 +1308,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getActiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getActiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             if (order != null) {
                 return persistenceService
-                        .selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+                        .selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
-                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
             }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the active users having the role " + roleId, e);
@@ -1229,12 +1326,14 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getInactiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getInactiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers,
+            final String field, final OrderByType order)
             throws SIdentityException {
         try {
             if (order != null) {
                 return persistenceService
-                        .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+                        .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, field, order, fromIndex,
+                                numberOfUsers));
             } else {
                 return persistenceService
                         .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, fromIndex, numberOfUsers));
@@ -1245,7 +1344,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateGroup(final SGroup group, final EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
+    public void updateGroup(final SGroup group, final EntityUpdateDescriptor descriptor,
+            EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.UPDATED, "Updating the group");
         try {
             if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
@@ -1260,7 +1360,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo, final EntityUpdateDescriptor descriptor)
+    public void updateCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo,
+            final EntityUpdateDescriptor descriptor)
             throws SIdentityException {
         final String methodName = "updateCustomUserInfoDefinition";
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.UPDATED,
@@ -1275,7 +1376,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateCustomUserInfoValue(final SCustomUserInfoValue customUserInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateCustomUserInfoValue(final SCustomUserInfoValue customUserInfo,
+            final EntityUpdateDescriptor descriptor) throws SIdentityException {
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(customUserInfo, descriptor), CUSTOM_USER_INFO_VALUE);
         } catch (final SRecorderException e) {
@@ -1284,9 +1386,11 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SRole updateRole(final SRole role, final EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
+    public SRole updateRole(final SRole role, final EntityUpdateDescriptor descriptor,
+            EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         final String methodName = "updateRole";
-        final SRoleLogBuilder logBuilder = getRoleLog(ActionType.UPDATED, "Updating the role with name " + role.getName());
+        final SRoleLogBuilder logBuilder = getRoleLog(ActionType.UPDATED,
+                "Updating the role with name " + role.getName());
         try {
             if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
                 updateIcon(descriptor, iconUpdater, role);
@@ -1307,7 +1411,8 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Deprecated
     @Override
-    public void updateUser(final SUser user, final EntityUpdateDescriptor descriptor, final boolean isPasswordEncrypted) throws SUserUpdateException {
+    public void updateUser(final SUser user, final EntityUpdateDescriptor descriptor, final boolean isPasswordEncrypted)
+            throws SUserUpdateException {
         final String methodName = "updateUser";
         if (!isPasswordEncrypted) {
             final String password = (String) descriptor.getFields().get("password");
@@ -1332,10 +1437,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateUserContactInfo(final SContactInfo contactInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateUserContactInfo(final SContactInfo contactInfo, final EntityUpdateDescriptor descriptor)
+            throws SIdentityException {
         final String methodName = "updateUserContactInfo";
         final SContactInfoLogBuilder logBuilder = getUserContactInfoLog(ActionType.UPDATED,
-                "Updating " + (contactInfo.isPersonal() ? "personal" : "professional") + " user contact Info for user with Id " +
+                "Updating " + (contactInfo.isPersonal() ? "personal" : "professional")
+                        + " user contact Info for user with Id " +
                         contactInfo.getUserId(),
                 contactInfo);
         try {
@@ -1348,14 +1455,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateUserMembership(final SUserMembership userMembership, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateUserMembership(final SUserMembership userMembership, final EntityUpdateDescriptor descriptor)
+            throws SIdentityException {
         final String methodName = "updateUserMembership";
-        final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.UPDATED, "Updating user membership for user " +
-                userMembership.getUsername() +
-                " with role " +
-                userMembership.getRoleName() +
-                " in group " +
-                userMembership.getGroupName(), userMembership);
+        final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.UPDATED,
+                "Updating user membership for user " +
+                        userMembership.getUsername() +
+                        " with role " +
+                        userMembership.getRoleName() +
+                        " in group " +
+                        userMembership.getGroupName(),
+                userMembership);
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(userMembership, descriptor), USERMEMBERSHIP);
             log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -1366,8 +1476,10 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfUserMemberships) throws SIdentityException {
-        final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership", fromIndex,
+    public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfUserMemberships)
+            throws SIdentityException {
+        final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(
+                SUserMembership.class, "UserMembership", fromIndex,
                 numberOfUserMemberships);
         try {
             return persistenceService.selectList(descriptor);
@@ -1377,9 +1489,11 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
+    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex,
+            final int numberOfUsers) throws SIdentityException {
         try {
-            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, fromIndex, numberOfUsers);
+            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder
+                    .getUserMembershipsOfUser(userId, fromIndex, numberOfUsers);
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the memberships having the user " + userId, e);
@@ -1387,10 +1501,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberOfMemberships, final String field,
+    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex,
+            final int numberOfMemberships, final String field,
             final OrderByType order) throws SIdentityException {
         try {
-            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, field, order, fromIndex,
+            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(
+                    userId, field, order, fromIndex,
                     numberOfMemberships);
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
@@ -1399,11 +1515,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberPerPage, final OrderByOption orderByOption)
+    public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex,
+            final int numberPerPage, final OrderByOption orderByOption)
             throws SIdentityException {
         try {
-            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, new QueryOptions(fromIndex,
-                    numberPerPage, Collections.singletonList(orderByOption)));
+            final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder
+                    .getUserMembershipsOfUser(userId, new QueryOptions(fromIndex,
+                            numberPerPage, Collections.singletonList(orderByOption)));
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the memberships having the user" + userId, e);
@@ -1411,30 +1529,38 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SUserMembership getUserMembership(final long userId, final long groupId, final long roleId) throws SIdentityException {
-        final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembership(userId, groupId, roleId);
+    public SUserMembership getUserMembership(final long userId, final long groupId, final long roleId)
+            throws SIdentityException {
+        final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembership(userId,
+                groupId, roleId);
         try {
             return getUserMembership(userId, groupId, roleId, descriptor);
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId, e);
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = "
+                    + groupId + ", roleId = " + roleId, e);
         }
     }
 
     @Override
-    public SUserMembership getLightUserMembership(final long userId, final long groupId, final long roleId) throws SIdentityException {
-        final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getLightUserMembership(userId, groupId, roleId);
+    public SUserMembership getLightUserMembership(final long userId, final long groupId, final long roleId)
+            throws SIdentityException {
+        final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getLightUserMembership(userId,
+                groupId, roleId);
         try {
             return getUserMembership(userId, groupId, roleId, descriptor);
         } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId, e);
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = "
+                    + groupId + ", roleId = " + roleId, e);
         }
     }
 
-    private SUserMembership getUserMembership(final long userId, final long groupId, final long roleId, final SelectOneDescriptor<SUserMembership> descriptor)
+    private SUserMembership getUserMembership(final long userId, final long groupId, final long roleId,
+            final SelectOneDescriptor<SUserMembership> descriptor)
             throws SBonitaReadException, SIdentityException {
         final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
         if (sUserMembership == null) {
-            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = "
+                    + groupId + ", roleId = " + roleId);
         }
         return sUserMembership;
     }
@@ -1442,15 +1568,18 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public long getNumberOfUserMemberships() throws SIdentityException {
         try {
-            return persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("UserMembership", SUserMembership.class));
+            return persistenceService
+                    .selectOne(SelectDescriptorBuilder.getNumberOfElement("UserMembership", SUserMembership.class));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the number of user membership", e);
         }
     }
 
     @Override
-    public List<SUserMembership> getLightUserMemberships(final int startIndex, final int numberOfElements) throws SIdentityException {
-        final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(SUserMembership.class, "LightUserMembership", startIndex,
+    public List<SUserMembership> getLightUserMemberships(final int startIndex, final int numberOfElements)
+            throws SIdentityException {
+        final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(
+                SUserMembership.class, "LightUserMembership", startIndex,
                 numberOfElements);
         try {
             return persistenceService.selectList(descriptor);
@@ -1489,7 +1618,8 @@ public class IdentityServiceImpl implements IdentityService {
         return persistenceService.searchEntity(SGroup.class, options, null);
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -1506,13 +1636,16 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
+    public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options)
+            throws SBonitaReadException {
         return persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
     }
 
     @Override
-    public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
-            EntityUpdateDescriptor professionalDataUpdateDescriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
+    public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor,
+            EntityUpdateDescriptor personalDataUpdateDescriptor,
+            EntityUpdateDescriptor professionalDataUpdateDescriptor, EntityUpdateDescriptor iconUpdater)
+            throws SIdentityException {
         // User change
         SUser sUser = getUser(userId);
         if (iconUpdater.getFields().containsKey("content")) {
@@ -1548,7 +1681,8 @@ public class IdentityServiceImpl implements IdentityService {
         return sUser;
     }
 
-    private void updateIcon(EntityUpdateDescriptor updateDescriptor, EntityUpdateDescriptor iconUpdater, SHavingIcon element)
+    private void updateIcon(EntityUpdateDescriptor updateDescriptor, EntityUpdateDescriptor iconUpdater,
+            SHavingIcon element)
             throws SBonitaReadException, SRecorderException {
         byte[] content = (byte[]) iconUpdater.getFields().get("content");
         String filename = (String) iconUpdater.getFields().get("filename");
@@ -1568,7 +1702,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private void replaceIcon(EntityUpdateDescriptor updateDescriptor, byte[] content, String filename, SHavingIcon element)
+    private void replaceIcon(EntityUpdateDescriptor updateDescriptor, byte[] content, String filename,
+            SHavingIcon element)
             throws SRecorderException, SBonitaReadException {
         SIcon newIcon = createIcon(filename, content);
         updateDescriptor.addField("iconId", newIcon.getId());
@@ -1579,7 +1714,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo, String iconFilename, byte[] iconContent)
+    public SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo,
+            String iconFilename, byte[] iconContent)
             throws SUserCreationException {
         if (iconFilename != null && iconContent != null) {
             try {

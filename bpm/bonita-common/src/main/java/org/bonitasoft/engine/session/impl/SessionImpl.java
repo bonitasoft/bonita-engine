@@ -16,7 +16,6 @@ package org.bonitasoft.engine.session.impl;
 import java.util.Date;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.bonitasoft.engine.session.Session;
 
 /**
@@ -33,7 +32,8 @@ public abstract class SessionImpl implements Session {
     private long userId;
     private boolean technicalUser;
 
-    public SessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId) {
+    public SessionImpl(final long id, final Date creationDate, final long duration, final String userName,
+            final long userId) {
         super();
         this.id = id;
         this.creationDate = creationDate;

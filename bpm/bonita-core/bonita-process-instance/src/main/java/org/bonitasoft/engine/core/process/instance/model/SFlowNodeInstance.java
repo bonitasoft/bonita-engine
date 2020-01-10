@@ -15,14 +15,14 @@ package org.bonitasoft.engine.core.process.instance.model;
 
 import java.util.Date;
 
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.annotations.Filter;
-
-import javax.persistence.*;
 
 /**
  * @author Feng Hui
@@ -85,8 +85,9 @@ public abstract class SFlowNodeInstance implements PersistentObject {
     @Column(name = "state_executing")
     private boolean stateExecuting;
 
-    public SFlowNodeInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
-                                 final long logicalGroup1, final long logicalGroup2) {
+    public SFlowNodeInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
+            final long parentContainerId,
+            final long logicalGroup1, final long logicalGroup2) {
         this.name = name;
         this.rootContainerId = rootContainerId;
         this.parentContainerId = parentContainerId;
@@ -97,7 +98,6 @@ public abstract class SFlowNodeInstance implements PersistentObject {
         lastUpdateDate = now;
         reachedStateDate = now;
     }
-
 
     public long getProcessDefinitionId() {
         return logicalGroup1;
@@ -112,7 +112,8 @@ public abstract class SFlowNodeInstance implements PersistentObject {
 
     /**
      * @return
-     *         the id of the activity instance containing this element or 0 if this element is not contained in an activity
+     *         the id of the activity instance containing this element or 0 if this element is not contained in an
+     *         activity
      */
     public long getParentActivityInstanceId() {
         return logicalGroup3;
@@ -131,7 +132,8 @@ public abstract class SFlowNodeInstance implements PersistentObject {
      *         the type of the element that contains this element
      */
     public SFlowElementsContainerType getParentContainerType() {
-        return getParentActivityInstanceId() <= 0 ? SFlowElementsContainerType.PROCESS : SFlowElementsContainerType.FLOWNODE;
+        return getParentActivityInstanceId() <= 0 ? SFlowElementsContainerType.PROCESS
+                : SFlowElementsContainerType.FLOWNODE;
     }
 
     public long getLogicalGroup(final int index) {

@@ -194,8 +194,10 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         connectors = Collections.unmodifiableList(mConnectors);
 
         sStartEvents = initializeStartEvents(container.getStartEvents(), transitionsMap);
-        sIntermediateCatchEvents = initializeIntermediateCatchEvents(container.getIntermediateCatchEvents(), transitionsMap);
-        sIntermediateThrowEvents = initializeIntermediateThrowEvents(container.getIntermediateThrowEvents(), transitionsMap);
+        sIntermediateCatchEvents = initializeIntermediateCatchEvents(container.getIntermediateCatchEvents(),
+                transitionsMap);
+        sIntermediateThrowEvents = initializeIntermediateThrowEvents(container.getIntermediateThrowEvents(),
+                transitionsMap);
         sEndEvents = initializeEndEvents(container.getEndEvents(), transitionsMap);
 
         final List<BusinessDataDefinition> businessDataDefinitions = container.getBusinessDataDefinitions();
@@ -218,7 +220,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         }
         sDocumentDefinitions = Collections.unmodifiableList(mDocumentDefinitions);
         final List<DocumentListDefinition> documentListDefinitions2 = container.getDocumentListDefinitions();
-        final ArrayList<SDocumentListDefinition> mDocumentListDefinitions = new ArrayList<>(documentListDefinitions2.size());
+        final ArrayList<SDocumentListDefinition> mDocumentListDefinitions = new ArrayList<>(
+                documentListDefinitions2.size());
         for (final DocumentListDefinition documentListDefinition : documentListDefinitions2) {
             mDocumentListDefinitions.add(new SDocumentListDefinitionImpl(documentListDefinition));
         }
@@ -237,7 +240,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
                 if (activityDefinition instanceof UserTaskDefinitionImpl) {
                     activity = new SUserTaskDefinitionImpl((UserTaskDefinition) activityDefinition, transitionsMap);
                 } else {
-                    activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition, transitionsMap);
+                    activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition,
+                            transitionsMap);
                 }
                 final HumanTaskDefinitionImpl humanTaskDefinitionImpl = (HumanTaskDefinitionImpl) activityDefinition;
                 final UserFilterDefinition userFilter = humanTaskDefinitionImpl.getUserFilter();
@@ -246,9 +250,11 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
                     sHumanTaskDefinitionImpl.setUserFilter(new SUserFilterDefinitionImpl(userFilter));
                 }
                 sHumanTaskDefinitionImpl.setPriority(humanTaskDefinitionImpl.getPriority());
-                sHumanTaskDefinitionImpl.setExpectedDuration(ServerModelConvertor.convertExpression(humanTaskDefinitionImpl.getExpectedDuration()));
+                sHumanTaskDefinitionImpl.setExpectedDuration(
+                        ServerModelConvertor.convertExpression(humanTaskDefinitionImpl.getExpectedDuration()));
             } else if (activityDefinition instanceof ReceiveTaskDefinitionImpl) {
-                activity = new SReceiveTaskDefinitionImpl((ReceiveTaskDefinitionImpl) activityDefinition, transitionsMap);
+                activity = new SReceiveTaskDefinitionImpl((ReceiveTaskDefinitionImpl) activityDefinition,
+                        transitionsMap);
             } else if (activityDefinition instanceof SendTaskDefinitionImpl) {
                 activity = new SSendTaskDefinitionImpl((SendTaskDefinitionImpl) activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof CallActivityDefinition) {
@@ -256,13 +262,15 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             } else if (activityDefinition instanceof SubProcessDefinition) {
                 activity = new SSubProcessDefinitionImpl((SubProcessDefinition) activityDefinition);
             } else {
-                throw new BonitaRuntimeException("Can't find the client type for " + activityDefinition.getClass().getName());
+                throw new BonitaRuntimeException(
+                        "Can't find the client type for " + activityDefinition.getClass().getName());
             }
             addActivity(activity);
         }
     }
 
-    private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents, final Map<String, STransitionDefinition> transitionsMap) {
+    private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents,
+            final Map<String, STransitionDefinition> transitionsMap) {
         final List<SEndEventDefinition> sEndEvents = new ArrayList<>(endEvents.size());
         for (final EndEventDefinition endEventDefinition : endEvents) {
             final SEndEventDefinitionImpl sEndEvent = new SEndEventDefinitionImpl(endEventDefinition, transitionsMap);
@@ -276,19 +284,22 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             final Map<String, STransitionDefinition> transitionsMap) {
         final List<SStartEventDefinition> sStartEvents = new ArrayList<>(startEvents.size());
         for (final StartEventDefinition startEventDefinition : startEvents) {
-            final SStartEventDefinitionImpl sStartEventDefinitionImpl = new SStartEventDefinitionImpl(startEventDefinition, transitionsMap);
+            final SStartEventDefinitionImpl sStartEventDefinitionImpl = new SStartEventDefinitionImpl(
+                    startEventDefinition, transitionsMap);
             sStartEvents.add(sStartEventDefinitionImpl);
             addFlowNode(sStartEventDefinitionImpl);
         }
         return sStartEvents;
     }
 
-    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(final List<IntermediateCatchEventDefinition> intermediateCatchEvents,
+    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(
+            final List<IntermediateCatchEventDefinition> intermediateCatchEvents,
             final Map<String, STransitionDefinition> transitionsMap) {
         final List<SIntermediateCatchEventDefinition> sIntermediateCatchEvents = new ArrayList<>(
                 intermediateCatchEvents.size());
         for (final IntermediateCatchEventDefinition intermediateCatchEventDefinition : intermediateCatchEvents) {
-            final SIntermediateCatchEventDefinitionImpl sIntermediateCatchEvent = new SIntermediateCatchEventDefinitionImpl(intermediateCatchEventDefinition,
+            final SIntermediateCatchEventDefinitionImpl sIntermediateCatchEvent = new SIntermediateCatchEventDefinitionImpl(
+                    intermediateCatchEventDefinition,
                     transitionsMap);
             sIntermediateCatchEvents.add(sIntermediateCatchEvent);
             addFlowNode(sIntermediateCatchEvent);
@@ -296,12 +307,14 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sIntermediateCatchEvents;
     }
 
-    private List<SIntermediateThrowEventDefinition> initializeIntermediateThrowEvents(final List<IntermediateThrowEventDefinition> intermediateThrowEvents,
+    private List<SIntermediateThrowEventDefinition> initializeIntermediateThrowEvents(
+            final List<IntermediateThrowEventDefinition> intermediateThrowEvents,
             final Map<String, STransitionDefinition> transitionsMap) {
         final List<SIntermediateThrowEventDefinition> sIntermediateThrowEvents = new ArrayList<>(
                 intermediateThrowEvents.size());
         for (final IntermediateThrowEventDefinition intermediateThrowEventDefinition : intermediateThrowEvents) {
-            final SIntermediateThrowEventDefinitionImpl sIntermediateThrowEvent = new SIntermediateThrowEventDefinitionImpl(intermediateThrowEventDefinition,
+            final SIntermediateThrowEventDefinitionImpl sIntermediateThrowEvent = new SIntermediateThrowEventDefinitionImpl(
+                    intermediateThrowEventDefinition,
                     transitionsMap);
             sIntermediateThrowEvents.add(sIntermediateThrowEvent);
             addFlowNode(sIntermediateThrowEvent);
@@ -431,7 +444,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         while (iterator.hasNext() && !found) {
             final SActivityDefinition activityDefinition = iterator.next();
             if (SFlowNodeType.SUB_PROCESS.equals(activityDefinition.getType())) {
-                flowNode = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer().getFlowNode(targetFlowNode);
+                flowNode = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer()
+                        .getFlowNode(targetFlowNode);
                 if (flowNode != null) {
                     found = true;
                 }
@@ -456,7 +470,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         while (iterator.hasNext() && !found) {
             final SActivityDefinition activityDefinition = iterator.next();
             if (SFlowNodeType.SUB_PROCESS.equals(activityDefinition.getType())) {
-                transition = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer().getTransition(transitionId);
+                transition = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer()
+                        .getTransition(transitionId);
                 if (transition != null) {
                     found = true;
                 }
@@ -583,12 +598,14 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sDocumentListDefinitions;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SFlowElementContainerDefinitionImpl that = (SFlowElementContainerDefinitionImpl) o;
         return containsInclusiveGateway == that.containsInclusiveGateway &&
                 Objects.equals(connectorsMap, that.connectorsMap) &&
@@ -616,6 +633,10 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), connectorsMap, allElementsMapString, gatewaysMap, allElementsMap, allConnectorsMap, transitionsMap, activities, subProcessDefinitions, transitions, gateways, allElements, connectors, sStartEvents, sIntermediateCatchEvents, sBoundaryEvents, sEndEvents, sIntermediateThrowEvents, sDataDefinitions, sBusinessDataDefinitions, sDocumentDefinitions, sDocumentListDefinitions, containsInclusiveGateway);
+        return Objects.hash(super.hashCode(), connectorsMap, allElementsMapString, gatewaysMap, allElementsMap,
+                allConnectorsMap, transitionsMap, activities, subProcessDefinitions, transitions, gateways, allElements,
+                connectors, sStartEvents, sIntermediateCatchEvents, sBoundaryEvents, sEndEvents,
+                sIntermediateThrowEvents, sDataDefinitions, sBusinessDataDefinitions, sDocumentDefinitions,
+                sDocumentListDefinitions, containsInclusiveGateway);
     }
 }

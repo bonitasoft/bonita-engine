@@ -36,7 +36,8 @@ public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskIn
 
     @Override
     SUserTaskInstance _build() {
-        final SUserTaskInstance userTaskInstanceImpl = new SUserTaskInstance(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
+        final SUserTaskInstance userTaskInstanceImpl = new SUserTaskInstance(name, flowNodeDefinitionId,
+                rootContainerId, parentContainerId, actorId,
                 STaskPriority.NORMAL, logicalGroup1, logicalGroup2);
         userTaskInstanceImpl.setAssigneeId(assigneeId);
         return userTaskInstanceImpl;

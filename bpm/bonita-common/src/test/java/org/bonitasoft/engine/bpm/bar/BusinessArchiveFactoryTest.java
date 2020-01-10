@@ -81,9 +81,11 @@ public class BusinessArchiveFactoryTest {
         assertThat(deserializeBAR.getProcessDefinition().getName()).isEqualTo("说话_éé");
     }
 
-    private BusinessArchive createBusinessArchive() throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException {
+    private BusinessArchive createBusinessArchive()
+            throws InvalidBusinessArchiveFormatException, InvalidProcessDefinitionException {
         return new BusinessArchiveBuilder().createNewBusinessArchive()
-                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("说话_éé", "1.0").addAutomaticTask("说话_éé_task").getProcess())
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("说话_éé", "1.0")
+                        .addAutomaticTask("说话_éé_task").getProcess())
                 .done();
     }
 

@@ -39,7 +39,6 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class PlatformLoginServiceImplTest {
 
@@ -58,7 +57,8 @@ public class PlatformLoginServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.platform.login.impl.PlatformLoginServiceImpl#login(java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.bonitasoft.engine.core.platform.login.impl.PlatformLoginServiceImpl#login(java.lang.String, java.lang.String)}.
      */
     @Test
     public final void login() throws Exception {
@@ -70,7 +70,6 @@ public class PlatformLoginServiceImplTest {
 
         assertEquals(sPlatformSession, platformLoginServiceImpl.login(userName, password));
     }
-
 
     @Test(expected = SInvalidPlatformCredentialsException.class)
     public final void loginThrowSInvalidUserException() throws Exception {

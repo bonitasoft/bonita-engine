@@ -57,6 +57,7 @@ public class ThreadLocalSessionAccessorTest {
 
         assertThat(threadLocalSessionAccessor.getTenantId()).isEqualTo(1);
     }
+
     @Test(expected = STenantIdNotSetException.class)
     public void should_throw_tenant_id_not_set_when_it_is_not_set() throws Exception {
         threadLocalSessionAccessor.getTenantId();

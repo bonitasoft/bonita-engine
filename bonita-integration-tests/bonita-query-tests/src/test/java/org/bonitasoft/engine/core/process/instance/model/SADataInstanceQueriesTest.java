@@ -23,11 +23,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.data.instance.model.SBlobDataInstance;
 import org.bonitasoft.engine.data.instance.model.SBooleanDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.SDateDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDoubleDataInstance;
 import org.bonitasoft.engine.data.instance.model.SFloatDataInstance;
@@ -68,7 +66,8 @@ public class SADataInstanceQueriesTest {
     @Inject
     private JdbcTemplate jdbcTemplate;
 
-    private void addSADataInstance(final int id, final String name, final int containerId, final String value, final long archiveDate, final long sourceObjectId) {
+    private void addSADataInstance(final int id, final String name, final int containerId, final String value,
+            final long archiveDate, final long sourceObjectId) {
         repository.add(SAShortTextDataInstance.builder()
                 .id(id)
                 .name(name)
@@ -80,15 +79,16 @@ public class SADataInstanceQueriesTest {
                 .sourceObjectId(sourceObjectId).build());
     }
 
-
-    private SDataInstance.SDataInstanceBuilder<?, ?> fillCommonValues(SDataInstance.SDataInstanceBuilder<?, ?> builder) {
+    private SDataInstance.SDataInstanceBuilder<?, ?> fillCommonValues(
+            SDataInstance.SDataInstanceBuilder<?, ?> builder) {
         return builder.className("theClassName")
                 .containerId(CONTAINER_ID)
                 .containerType("ContainerType")
                 .description("My data");
     }
 
-    private SADataInstance.SADataInstanceBuilder<?, ?> fillCommonValues(SADataInstance.SADataInstanceBuilder<?, ?> builder) {
+    private SADataInstance.SADataInstanceBuilder<?, ?> fillCommonValues(
+            SADataInstance.SADataInstanceBuilder<?, ?> builder) {
         return builder.className("theClassName")
                 .containerId(CONTAINER_ID)
                 .containerType("ContainerType")
@@ -104,11 +104,13 @@ public class SADataInstanceQueriesTest {
     }
 
     protected PersistentObject getDataInstance(String dataName) {
-        return repository.selectOne("getDataInstancesByNameAndContainer", pair("name", dataName), pair("containerId", CONTAINER_ID), pair("containerType", "ContainerType"));
+        return repository.selectOne("getDataInstancesByNameAndContainer", pair("name", dataName),
+                pair("containerId", CONTAINER_ID), pair("containerType", "ContainerType"));
     }
 
     protected PersistentObject getSADataInstance(String dataName) {
-        return repository.selectOne("getLastSADataInstanceByContainer", pair("dataName", dataName), pair("containerId", CONTAINER_ID), pair("containerType", "ContainerType"));
+        return repository.selectOne("getLastSADataInstanceByContainer", pair("dataName", dataName),
+                pair("containerId", CONTAINER_ID), pair("containerType", "ContainerType"));
     }
 
     @Test
@@ -117,8 +119,7 @@ public class SADataInstanceQueriesTest {
                 .name("myXmlData")
                 .element("theElement")
                 .namespace("theNameSpace")
-                .value("<xml></xml>")
-        ).build());
+                .value("<xml></xml>")).build());
 
         PersistentObject persistentObject = getDataInstance("myXmlData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -133,8 +134,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SShortTextDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SShortTextDataInstance.builder()
                 .name("myTextData")
-                .value("shortText")
-        ).build());
+                .value("shortText")).build());
 
         PersistentObject persistentObject = getDataInstance("myTextData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -149,8 +149,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SSShortTextDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SAShortTextDataInstance.builder()
                 .name("myTextData")
-                .value("shortText")
-        ).build());
+                .value("shortText")).build());
 
         PersistentObject persistentObject = getSADataInstance("myTextData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -165,8 +164,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SLongDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SLongDataInstance.builder()
                 .name("myLongData")
-                .value(1234567890L)
-        ).build());
+                .value(1234567890L)).build());
 
         PersistentObject persistentObject = getDataInstance("myLongData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -181,8 +179,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SDoubleDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SDoubleDataInstance.builder()
                 .name("myDoubleData")
-                .value(1234567890.0)
-        ).build());
+                .value(1234567890.0)).build());
 
         PersistentObject persistentObject = getDataInstance("myDoubleData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -197,8 +194,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SXMLObjectDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SXMLObjectDataInstance.builder()
                 .name("myXmlData")
-                .value("<string>MyString<string>")
-        ).build());
+                .value("<string>MyString<string>")).build());
 
         PersistentObject persistentObject = getDataInstance("myXmlData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -214,8 +210,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SIntegerDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SIntegerDataInstance.builder()
                 .name("myIntData")
-                .value(1234567890)
-        ).build());
+                .value(1234567890)).build());
 
         PersistentObject persistentObject = getDataInstance("myIntData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -231,8 +226,7 @@ public class SADataInstanceQueriesTest {
         Date date = new Date();
         SDataInstance dataInstance = repository.add(fillCommonValues(SDateDataInstance.builder()
                 .name("myDateData")
-                .value(date)
-        ).build());
+                .value(date)).build());
 
         PersistentObject persistentObject = getDataInstance("myDateData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -248,8 +242,7 @@ public class SADataInstanceQueriesTest {
         Date date = new Date();
         SDataInstance dataInstance = repository.add(fillCommonValues(SLongTextDataInstance.builder()
                 .name("myTextData")
-                .value("lonnnnnnnnng text")
-        ).build());
+                .value("lonnnnnnnnng text")).build());
 
         PersistentObject persistentObject = getDataInstance("myTextData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -264,8 +257,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SFloatDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SFloatDataInstance.builder()
                 .name("myFloatData")
-                .value(1f)
-        ).build());
+                .value(1f)).build());
 
         PersistentObject persistentObject = getDataInstance("myFloatData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -280,15 +272,14 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SBlobDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SBlobDataInstance.builder()
                 .name("myBlob")
-                .value(new byte[]{1, 2, 3})
-        ).build());
+                .value(new byte[] { 1, 2, 3 })).build());
 
         PersistentObject persistentObject = getDataInstance("myBlob");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
 
         assertThat(persistentObject).isEqualTo(dataInstance);
         assertThat(persistentObject).isInstanceOf(SBlobDataInstance.class);
-        assertThat(dataAsMap.get("BLOBVALUE")).isEqualTo(new byte[]{1, 2, 3});
+        assertThat(dataAsMap.get("BLOBVALUE")).isEqualTo(new byte[] { 1, 2, 3 });
         assertThat(dataAsMap).containsEntry("DISCRIMINANT", "SBlobDataInstanceImpl");
     }
 
@@ -296,8 +287,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SBooleanDataInstance() {
         SDataInstance dataInstance = repository.add(fillCommonValues(SBooleanDataInstance.builder()
                 .name("myBoolean")
-                .value(true)
-        ).build());
+                .value(true)).build());
 
         PersistentObject persistentObject = getDataInstance("myBoolean");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -308,13 +298,11 @@ public class SADataInstanceQueriesTest {
         assertThat(dataAsMap).containsEntry("DISCRIMINANT", "SBooleanDataInstanceImpl");
     }
 
-
     @Test
     public void should_save_and_get_SALongDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SALongDataInstance.builder()
                 .name("myLongData")
-                .value(1234567890L)
-        ).build());
+                .value(1234567890L)).build());
 
         PersistentObject persistentObject = getSADataInstance("myLongData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -329,8 +317,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SADoubleDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SADoubleDataInstance.builder()
                 .name("myDoubleData")
-                .value(1234567890.0)
-        ).build());
+                .value(1234567890.0)).build());
 
         PersistentObject persistentObject = getSADataInstance("myDoubleData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -345,8 +332,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SAXMLObjectDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SAXMLObjectDataInstance.builder()
                 .name("myXmlData")
-                .value("<string>MyString<string>")
-        ).build());
+                .value("<string>MyString<string>")).build());
 
         PersistentObject persistentObject = getSADataInstance("myXmlData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -362,8 +348,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SAIntegerDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SAIntegerDataInstance.builder()
                 .name("myIntData")
-                .value(1234567890)
-        ).build());
+                .value(1234567890)).build());
 
         PersistentObject persistentObject = getSADataInstance("myIntData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -379,8 +364,7 @@ public class SADataInstanceQueriesTest {
         Date date = new Date();
         SADataInstance dataInstance = repository.add(fillCommonValues(SADateDataInstance.builder()
                 .name("myDateData")
-                .value(date)
-        ).build());
+                .value(date)).build());
 
         PersistentObject persistentObject = getSADataInstance("myDateData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -395,8 +379,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SALongTextDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SALongTextDataInstance.builder()
                 .name("myTextData")
-                .value("lonnnnnnnnng text")
-        ).build());
+                .value("lonnnnnnnnng text")).build());
 
         PersistentObject persistentObject = getSADataInstance("myTextData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -411,8 +394,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SAFloatDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SAFloatDataInstance.builder()
                 .name("myFloatData")
-                .value(1f)
-        ).build());
+                .value(1f)).build());
 
         PersistentObject persistentObject = getSADataInstance("myFloatData");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -427,15 +409,14 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SABlobDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SABlobDataInstance.builder()
                 .name("myBlob")
-                .value(new byte[]{1, 2, 3})
-        ).build());
+                .value(new byte[] { 1, 2, 3 })).build());
 
         PersistentObject persistentObject = getSADataInstance("myBlob");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
 
         assertThat(persistentObject).isEqualTo(dataInstance);
         assertThat(persistentObject).isInstanceOf(SABlobDataInstance.class);
-        assertThat(dataAsMap.get("BLOBVALUE")).isEqualTo(new byte[]{1, 2, 3});
+        assertThat(dataAsMap.get("BLOBVALUE")).isEqualTo(new byte[] { 1, 2, 3 });
         assertThat(dataAsMap).containsEntry("DISCRIMINANT", "SABlobDataInstanceImpl");
     }
 
@@ -443,8 +424,7 @@ public class SADataInstanceQueriesTest {
     public void should_save_and_get_SABooleanDataInstance() {
         SADataInstance dataInstance = repository.add(fillCommonValues(SABooleanDataInstance.builder()
                 .name("myBoolean")
-                .value(true)
-        ).build());
+                .value(true)).build());
 
         PersistentObject persistentObject = getSADataInstance("myBoolean");
         Map<String, Object> dataAsMap = getDataUsingJDBC(dataInstance);
@@ -455,14 +435,14 @@ public class SADataInstanceQueriesTest {
         assertThat(dataAsMap).containsEntry("DISCRIMINANT", "SABooleanDataInstanceImpl");
     }
 
-
     @Test
     public void getSADataInstancesByDataInstanceIdAndArchiveDate_should_return_an_empty_list_if_not_data_defined() {
         final List<Long> dataInstanceIds = new ArrayList<>();
         dataInstanceIds.add(4L);
         final long time = System.currentTimeMillis();
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -473,7 +453,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<>();
         dataInstanceIds.add(4L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, 1411051738348L, 1);
 
         assertThat(dataInstances).isEmpty();
     }
@@ -488,7 +469,8 @@ public class SADataInstanceQueriesTest {
         dataInstanceIds.add(205093L);
 
         final long time = 0L;
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, time, 1);
         assertThat(dataInstances).isEmpty();
     }
 
@@ -502,7 +484,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<>();
         dataInstanceIds.add(205093L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 5000, 1);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025356);
     }
@@ -517,7 +500,8 @@ public class SADataInstanceQueriesTest {
         final List<Long> dataInstanceIds = new ArrayList<>();
         dataInstanceIds.add(205093L);
 
-        final List<SADataInstance> dataInstances = repository.getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000, 1);
+        final List<SADataInstance> dataInstances = repository
+                .getSADataInstancesByDataInstanceIdAndArchiveDate(dataInstanceIds, archiveDate + 2000, 1);
         assertThat(dataInstances).hasSize(1);
         assertThat(dataInstances.get(0).getId()).isEqualTo(1025259);
     }

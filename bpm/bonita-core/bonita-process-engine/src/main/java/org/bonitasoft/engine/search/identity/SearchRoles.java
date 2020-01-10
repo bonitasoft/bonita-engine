@@ -30,7 +30,8 @@ public class SearchRoles extends AbstractRoleSearchEntity {
 
     private final IdentityService identityService;
 
-    public SearchRoles(final IdentityService identityService, final SearchRoleDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchRoles(final IdentityService identityService, final SearchRoleDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options);
         this.identityService = identityService;
     }

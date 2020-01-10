@@ -55,8 +55,7 @@ public class ParentProfileEntryTest {
     }
 
     private void shouldNotBeEquals(final ParentProfileEntryNode entryA, final ParentProfileEntryNode entryB) {
-        if (null != entryA && null != entryB)
-        {
+        if (null != entryA && null != entryB) {
             assertThat(entryA).as("should not be equals").isNotEqualTo(entryB);
             assertThat(entryA.hashCode()).as("hash code should not be equals").isNotEqualTo(entryB.hashCode());
         }

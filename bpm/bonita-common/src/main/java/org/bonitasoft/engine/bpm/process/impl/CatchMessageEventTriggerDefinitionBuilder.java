@@ -28,17 +28,19 @@ public class CatchMessageEventTriggerDefinitionBuilder extends FlowElementContai
     protected final CatchMessageEventTriggerDefinitionImpl messageTrigger;
 
     public CatchMessageEventTriggerDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final FlowElementContainerDefinitionImpl container, final CatchEventDefinitionImpl event, final String messageName) {
+            final FlowElementContainerDefinitionImpl container, final CatchEventDefinitionImpl event,
+            final String messageName) {
         super(container, processDefinitionBuilder);
         messageTrigger = new CatchMessageEventTriggerDefinitionImpl(messageName);
         event.addMessageEventTrigger(messageTrigger);
     }
 
     /**
-     * Adds the given operation on this message event. Operations added here can be used to initialize process data from message content.
-     * 
+     * Adds the given operation on this message event. Operations added here can be used to initialize process data from
+     * message content.
+     *
      * @param operation
-     *            operation to be added
+     *        operation to be added
      * @return
      */
     public CatchMessageEventTriggerDefinitionBuilder addOperation(final Operation operation) {
@@ -48,17 +50,19 @@ public class CatchMessageEventTriggerDefinitionBuilder extends FlowElementContai
 
     /**
      * Adds a correlation on this message event.
-     * <p> 
+     * <p>
      * It's possible to define up to five correlations. If more then five correlations are defined, the
      * process becomes invalid.
      * <p>
-     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization 
-     * 
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node
+     * initialization
+     *
      * @param correlationKey expression representing the correlation key
      * @param value expression representing the correlation value
      * @return
      */
-    public CatchMessageEventTriggerDefinitionBuilder addCorrelation(final Expression correlationKey, final Expression value) {
+    public CatchMessageEventTriggerDefinitionBuilder addCorrelation(final Expression correlationKey,
+            final Expression value) {
         messageTrigger.addCorrelation(correlationKey, value);
         if (messageTrigger.getCorrelations().size() > 5) {
             getProcessBuilder().addError("Too much correlation on catch message: " + messageTrigger.getMessageName());

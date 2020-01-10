@@ -16,9 +16,9 @@ package org.bonitasoft.engine.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_RE_EXECUTE;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -115,10 +115,12 @@ public class StateBehaviorsTest {
                 return true;
             }
         };
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(3)).addPendingActivityMappings(argumentCaptor.capture());
@@ -143,10 +145,12 @@ public class StateBehaviorsTest {
                 return true;
             }
         };
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
@@ -159,10 +163,12 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_do_not_assign_if_only_one_and_auto_assign_is_false() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(1L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
@@ -175,48 +181,56 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_throw_exception_when_empty_return() throws Exception {
         //given
         final FilterResult result = getFilterResult(Collections.<Long> emptyList());
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
     }
 
     @Test
     public void should_mapUsingUserFilters_throw_exception_when_null_return() throws Exception {
         //given
         final FilterResult result = getFilterResult(null);
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
     }
 
     @Test
     public void should_mapUsingUserFilters_throw_exception_when_return_contains_minus_1() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(-1L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
     }
 
     @Test
     public void should_mapUsingUserFilters_throw_exception_when_return_contains_0() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(0L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition),
+                anyMap(),
                 nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+        stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId,
+                userFilterDefinition);
     }
 
     FilterResult getFilterResult(final List<Long> theResult) {
@@ -246,7 +260,8 @@ public class StateBehaviorsTest {
 
         final SExpressionContext context = mock(SExpressionContext.class);
         final StateBehaviors behave = spy(stateBehaviors);
-        doReturn(mock(Serializable.class)).when(behave).getExpressionResultWithDiscriminant(eq(expression.getDiscriminant()), eq(sExpressions), anyList());
+        doReturn(mock(Serializable.class)).when(behave)
+                .getExpressionResultWithDiscriminant(eq(expression.getDiscriminant()), eq(sExpressions), anyList());
 
         behave.getEvaluatedInputExpressions(contractInputs, context);
 
@@ -263,7 +278,8 @@ public class StateBehaviorsTest {
         final long callerProcessDefinitionId = 555L;
         doReturn(callerProcessDefinitionId).when(callerProcessDefinition).getId();
         final StateBehaviors spy = spy(stateBehaviors);
-        final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
+        final SExpressionContext context = new SExpressionContext(callerId,
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
 
         final SCallActivityDefinition callActivityDefinition = mock(SCallActivityDefinition.class);
         final List operations = mock(List.class);
@@ -281,48 +297,59 @@ public class StateBehaviorsTest {
     }
 
     @Test
-    public void should_noConnectorHasStartedInCurrentList_return_true_when_first_connector_must_be_executed() throws Exception {
+    public void should_noConnectorHasStartedInCurrentList_return_true_when_first_connector_must_be_executed()
+            throws Exception {
         //given
-        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
+        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(
+                new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
         SConnectorInstance sConnectorInstance = new SConnectorInstance("connector1", 12, null, null, null, null);
         sConnectorInstance.setState(TO_BE_EXECUTED.name());
         //when
-        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);
+        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions,
+                sConnectorInstance);
         //then
         assertThat(noConnectorStarted).isTrue();
     }
 
     @Test
-    public void should_noConnectorHasStartedInCurrentList_return_false_when_first_connector_must_be_RE_executed() throws Exception {
+    public void should_noConnectorHasStartedInCurrentList_return_false_when_first_connector_must_be_RE_executed()
+            throws Exception {
         //given
-        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
+        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(
+                new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
         SConnectorInstance sConnectorInstance = new SConnectorInstance("connector1", 12, null, null, null, null);
         sConnectorInstance.setState(TO_RE_EXECUTE.name());
         //when
-        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);
+        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions,
+                sConnectorInstance);
         //then
         assertThat(noConnectorStarted).isFalse();
     }
 
     @Test
-    public void should_noConnectorHasStartedInCurrentList_return_false_when_connector_must_be_executed_but_is_not_the_first() throws Exception {
+    public void should_noConnectorHasStartedInCurrentList_return_false_when_connector_must_be_executed_but_is_not_the_first()
+            throws Exception {
         //given
-        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
+        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(
+                new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
         SConnectorInstance sConnectorInstance = new SConnectorInstance("connector2", 12, null, null, null, null);
         sConnectorInstance.setState(TO_BE_EXECUTED.name());
         //when
-        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, sConnectorInstance);
+        boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions,
+                sConnectorInstance);
         //then
         assertThat(noConnectorStarted).isFalse();
     }
 
     @Test
-    public void should_noConnectorHasStartedInCurrentList_return_false_when_no_connector_must_be_executed_but_some_were_executed() throws Exception {
+    public void should_noConnectorHasStartedInCurrentList_return_false_when_no_connector_must_be_executed_but_some_were_executed()
+            throws Exception {
         //given
-        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(new SConnectorDefinitionImpl("connector1", null, null, null),
+        List<SConnectorDefinition> sConnectorDefinitions = Arrays.<SConnectorDefinition> asList(
+                new SConnectorDefinitionImpl("connector1", null, null, null),
                 new SConnectorDefinitionImpl("connector2", null, null, null));
         //when
         boolean noConnectorStarted = stateBehaviors.noConnectorHasStartedInCurrentList(sConnectorDefinitions, null);
@@ -331,7 +358,8 @@ public class StateBehaviorsTest {
     }
 
     @Test
-    public void should_noConnectorHasStartedInCurrentList_return_true_when_no_connector_must_be_executed() throws Exception {
+    public void should_noConnectorHasStartedInCurrentList_return_true_when_no_connector_must_be_executed()
+            throws Exception {
         //given
         List<SConnectorDefinition> sConnectorDefinitions = Collections.emptyList();
         //when

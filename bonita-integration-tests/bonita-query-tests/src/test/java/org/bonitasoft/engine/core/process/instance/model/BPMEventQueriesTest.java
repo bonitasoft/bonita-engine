@@ -13,6 +13,17 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_THROW_EVENT;
+import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
+import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
@@ -22,15 +33,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType.INTERMEDIATE_THROW_EVENT;
-import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
-import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -46,7 +48,6 @@ public class BPMEventQueriesTest {
 
     @Inject
     private JdbcTemplate jdbcTemplate;
-
 
     @Test
     public void getInProgressMessageInstancesShouldOnlyConsiderHandledMessages() {
@@ -169,10 +170,11 @@ public class BPMEventQueriesTest {
         assertThat(messageInstanceIds).containsExactly(messageInstance2.getId());
     }
 
-     @Test
+    @Test
     public void should_get_waitingEvents_by_eventType() {
         // Given
-        final SWaitingEvent sWaitingEvent = bPMEventRepository.add(aWaitingEvent().withEventType(INTERMEDIATE_THROW_EVENT).build());
+        final SWaitingEvent sWaitingEvent = bPMEventRepository
+                .add(aWaitingEvent().withEventType(INTERMEDIATE_THROW_EVENT).build());
         bPMEventRepository.flush();
         final String eventType = jdbcTemplate.queryForObject("select eventType from waiting_event", String.class);
         assertThat(eventType).isEqualTo("INTERMEDIATE_THROW_EVENT");

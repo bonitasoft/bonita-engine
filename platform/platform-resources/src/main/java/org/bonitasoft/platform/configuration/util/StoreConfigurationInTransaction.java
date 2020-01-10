@@ -37,7 +37,8 @@ public class StoreConfigurationInTransaction extends TransactionCallbackWithoutR
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StoreConfigurationInTransaction.class);
 
-    public StoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor, List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
+    public StoreConfigurationInTransaction(JdbcTemplate jdbcTemplate, String dbVendor,
+            List<BonitaConfiguration> bonitaConfigurations, ConfigurationType type,
             long tenantId) {
 
         this.jdbcTemplate = jdbcTemplate;
@@ -50,13 +51,15 @@ public class StoreConfigurationInTransaction extends TransactionCallbackWithoutR
     @Override
     protected void doInTransactionWithoutResult(TransactionStatus status) {
         LOGGER.debug(
-                "delete configurations for type:" + type.name() + " and tenant id:" + tenantId + " bonitaConfigurations:" + bonitaConfigurations.toString());
+                "delete configurations for type:" + type.name() + " and tenant id:" + tenantId
+                        + " bonitaConfigurations:" + bonitaConfigurations.toString());
 
         jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementCleaner.DELETE_CONFIGURATION,
                 new BonitaConfigurationPreparedStatementCleaner(bonitaConfigurations, type, tenantId));
 
         LOGGER.debug(
-                "store configurations for type:" + type.name() + " and tenant id:" + tenantId + " bonitaConfigurations:" + bonitaConfigurations.toString());
+                "store configurations for type:" + type.name() + " and tenant id:" + tenantId + " bonitaConfigurations:"
+                        + bonitaConfigurations.toString());
         jdbcTemplate.batchUpdate(BonitaConfigurationPreparedStatementSetter.INSERT_CONFIGURATION,
                 new BonitaConfigurationPreparedStatementSetter(bonitaConfigurations, dbVendor, type, tenantId));
 

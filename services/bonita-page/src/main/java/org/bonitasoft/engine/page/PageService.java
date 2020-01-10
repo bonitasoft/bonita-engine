@@ -55,7 +55,8 @@ public interface PageService extends TenantLifecycleService {
      * @throws SInvalidPageZipException
      * @throws SInvalidPageTokenException
      */
-    SPage addPage(SPage page, byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipException,
+    SPage addPage(SPage page, byte[] content)
+            throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipException,
             SInvalidPageTokenException;
 
     SPage getPage(long pageId) throws SBonitaReadException, SObjectNotFoundException;
@@ -77,7 +78,8 @@ public interface PageService extends TenantLifecycleService {
      *         if the zip is not a valid zip file or unreadable
      * @throws SInvalidPageZipMissingPropertiesException
      */
-    Properties readPageZip(final byte[] content) throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
+    Properties readPageZip(final byte[] content)
+            throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException,
             SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException;
 
     long getNumberOfPages(QueryOptions options) throws SBonitaReadException;
@@ -97,7 +99,8 @@ public interface PageService extends TenantLifecycleService {
     void start() throws SBonitaException;
 
     /**
-     * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the zip
+     * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the
+     * zip
      *
      * @param content
      * @param userId
@@ -107,12 +110,14 @@ public interface PageService extends TenantLifecycleService {
      * @throws SInvalidPageZipException
      * @throws SInvalidPageTokenException
      */
-    SPage addPage(final byte[] content, final String contentName, long userId) throws SObjectCreationException, SObjectAlreadyExistsException,
+    SPage addPage(final byte[] content, final String contentName, long userId)
+            throws SObjectCreationException, SObjectAlreadyExistsException,
             SInvalidPageZipException,
             SInvalidPageTokenException;
 
     /**
      * get a page attached to a process
+     *
      * @param name
      * @param processDefinitionId
      * @return
@@ -122,11 +127,13 @@ public interface PageService extends TenantLifecycleService {
 
     /**
      * get a list of page attached to a process
+     *
      * @param processDefinitionId
      * @param fromIndex
      * @param numberOfResults
      * @return
      * @throws SBonitaReadException
      */
-    List<SPage> getPageByProcessDefinitionId(long processDefinitionId,int fromIndex, int numberOfResults) throws SBonitaReadException;
+    List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults)
+            throws SBonitaReadException;
 }

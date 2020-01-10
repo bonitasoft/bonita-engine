@@ -18,7 +18,6 @@ import org.bonitasoft.engine.business.application.ApplicationPage;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationPageImpl extends BaseElementImpl implements ApplicationPage {
 
@@ -88,7 +87,8 @@ public class ApplicationPageImpl extends BaseElementImpl implements ApplicationP
 
     @Override
     public String toString() {
-        return "ApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", token=" + token + ", getId()=" + getId() + "]";
+        return "ApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", token=" + token
+                + ", getId()=" + getId() + "]";
     }
 
 }

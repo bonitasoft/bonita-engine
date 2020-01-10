@@ -33,5 +33,4 @@ public abstract class SACatchEventInstance extends SAEventInstance {
         interrupting = sCatchEventInstance.isInterrupting();
     }
 
-
 }

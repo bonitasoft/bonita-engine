@@ -21,7 +21,8 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventInstance;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class IntermediateThrowEventInstanceImpl extends ThrowEventInstanceImpl implements IntermediateThrowEventInstance {
+public class IntermediateThrowEventInstanceImpl extends ThrowEventInstanceImpl
+        implements IntermediateThrowEventInstance {
 
     private static final long serialVersionUID = -3256549925414354772L;
 

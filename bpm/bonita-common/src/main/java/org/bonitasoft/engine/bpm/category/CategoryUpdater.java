@@ -51,9 +51,9 @@ public class CategoryUpdater implements Serializable {
 
     /**
      * Set the new name
-     * 
+     *
      * @param name
-     *            The new name
+     *        The new name
      * @return The CategoryUpdater containing the new name
      */
     public CategoryUpdater setName(final String name) {
@@ -63,9 +63,9 @@ public class CategoryUpdater implements Serializable {
 
     /**
      * Set the new description
-     * 
+     *
      * @param description
-     *            The new description
+     *        The new description
      * @return The CategoryUpdater containing the new description
      */
     public CategoryUpdater setDescription(final String description) {
@@ -75,7 +75,7 @@ public class CategoryUpdater implements Serializable {
 
     /**
      * Get the fields to update, and the new value
-     * 
+     *
      * @return The map containing the pairs (field, new value) to update.
      */
     public Map<CategoryField, Serializable> getFields() {

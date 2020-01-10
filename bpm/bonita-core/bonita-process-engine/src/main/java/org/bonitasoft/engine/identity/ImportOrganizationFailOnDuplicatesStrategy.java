@@ -34,31 +34,41 @@ public class ImportOrganizationFailOnDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingGroup(final SGroup existingGroup, final ExportedGroup newGroup) throws ImportDuplicateInOrganizationException {
-        throw new ImportDuplicateInOrganizationException("There's already a group with the path : " + existingGroup.getPath());
+    public void foundExistingGroup(final SGroup existingGroup, final ExportedGroup newGroup)
+            throws ImportDuplicateInOrganizationException {
+        throw new ImportDuplicateInOrganizationException(
+                "There's already a group with the path : " + existingGroup.getPath());
     }
 
     @Override
     public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException {
-        throw new ImportDuplicateInOrganizationException("There's already a user with the name : " + existingUser.getUserName());
+        throw new ImportDuplicateInOrganizationException(
+                "There's already a user with the name : " + existingUser.getUserName());
     }
 
     @Override
-    public void foundExistingRole(final SRole existingRole, final ExportedRole newRole) throws ImportDuplicateInOrganizationException {
-        throw new ImportDuplicateInOrganizationException("There's already a role with the name : " + existingRole.getName());
+    public void foundExistingRole(final SRole existingRole, final ExportedRole newRole)
+            throws ImportDuplicateInOrganizationException {
+        throw new ImportDuplicateInOrganizationException(
+                "There's already a role with the name : " + existingRole.getName());
 
     }
 
     @Override
-    public void foundExistingMembership(final SUserMembership existingMembership) throws ImportDuplicateInOrganizationException {
-        throw new ImportDuplicateInOrganizationException("There's already a user membership with the name : " + existingMembership.getUsername()
-                + ", the role : " + existingMembership.getRoleName() + "and the group : " + existingMembership.getGroupName());
+    public void foundExistingMembership(final SUserMembership existingMembership)
+            throws ImportDuplicateInOrganizationException {
+        throw new ImportDuplicateInOrganizationException(
+                "There's already a user membership with the name : " + existingMembership.getUsername()
+                        + ", the role : " + existingMembership.getRoleName() + "and the group : "
+                        + existingMembership.getGroupName());
     }
 
     @Override
     public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
-                                                      ExportedCustomUserInfoDefinition newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
-        throw new ImportDuplicateInOrganizationException("There's already a custom user info definition with the name : '" + newUserInfoDefinition.getName() + "'");
+            ExportedCustomUserInfoDefinition newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
+        throw new ImportDuplicateInOrganizationException(
+                "There's already a custom user info definition with the name : '" + newUserInfoDefinition.getName()
+                        + "'");
     }
 
 }

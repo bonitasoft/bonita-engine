@@ -39,7 +39,8 @@ public class AddActorMember implements TransactionContent {
 
     private final MemberType memberType;
 
-    public AddActorMember(final ActorMappingService actorMappingService, final long actorId, final long userId, final long groupId, final long roleId,
+    public AddActorMember(final ActorMappingService actorMappingService, final long actorId, final long userId,
+            final long groupId, final long roleId,
             final MemberType memberType) {
         super();
         this.actorMappingService = actorMappingService;

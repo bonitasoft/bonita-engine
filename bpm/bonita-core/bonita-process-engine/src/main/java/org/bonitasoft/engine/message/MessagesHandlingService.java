@@ -20,6 +20,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import org.bonitasoft.engine.api.utils.VisibleForTesting;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
@@ -49,10 +52,6 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
-
 /**
  * @author Baptiste Mesta
  */
@@ -73,9 +72,10 @@ public class MessagesHandlingService implements TenantLifecycleService {
 
     private final Counter executedMessagesCounter;
 
-    public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
-                                   LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-                                   SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
+    public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService,
+            TechnicalLoggerService loggerService,
+            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
+            SessionAccessor sessionAccessor, BPMWorkFactory workFactory, MeterRegistry meterRegistry) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;
@@ -132,7 +132,8 @@ public class MessagesHandlingService implements TenantLifecycleService {
 
     public void triggerMatchingOfMessages() throws STransactionNotFoundException {
         if (threadPoolExecutor == null) {
-            log(TechnicalLogSeverity.WARNING, "Cannot match events when service is stopped. Maybe the engine is not yet started.");
+            log(TechnicalLogSeverity.WARNING,
+                    "Cannot match events when service is stopped. Maybe the engine is not yet started.");
             return;
         }
         userTransactionService.registerBonitaSynchronization(new RegisterMatchingOfEventSynchronization());
@@ -164,14 +165,16 @@ public class MessagesHandlingService implements TenantLifecycleService {
         loggerService.log(MessagesHandlingService.class, severity, message);
     }
 
-    private void executeUniqueMessageCouplesWork(final List<SMessageEventCouple> uniqueCouples) throws SBonitaException {
+    private void executeUniqueMessageCouplesWork(final List<SMessageEventCouple> uniqueCouples)
+            throws SBonitaException {
         for (final SMessageEventCouple couple : uniqueCouples) {
             executeMessageCouple(couple.getMessageInstanceId(), couple.getWaitingMessageId());
         }
     }
 
     @VisibleForTesting
-    void executeMessageCouple(long messageInstanceId, long waitingMessageId) throws SWaitingEventReadException, SMessageInstanceReadException,
+    void executeMessageCouple(long messageInstanceId, long waitingMessageId)
+            throws SWaitingEventReadException, SMessageInstanceReadException,
             SMessageModificationException, SWaitingEventModificationException, SWorkRegisterException {
 
         // Mark messages that will be treated as "treatment in progress":
@@ -188,13 +191,16 @@ public class MessagesHandlingService implements TenantLifecycleService {
     }
 
     /**
-     * From a list of couples that may contain duplicate waiting message candidates, select only one waiting message for each message instance: the first
+     * From a list of couples that may contain duplicate waiting message candidates, select only one waiting message for
+     * each message instance: the first
      * matching waiting message is arbitrary chosen.
-     * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
+     * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or
+     * {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
      * selected several times to trigger multiple instances.
      *
      * @param potentialMessageCouples all the possible couples that match the potential correlation.
-     * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
+     * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique
+     *         waiting message.
      */
     List<SMessageEventCouple> getMessageUniqueCouples(List<SMessageEventCouple> potentialMessageCouples) {
         final List<Long> takenMessages = new ArrayList<>();
@@ -223,7 +229,8 @@ public class MessagesHandlingService implements TenantLifecycleService {
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
-    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMsg) throws SWaitingEventModificationException {
+    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMsg)
+            throws SWaitingEventModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
@@ -231,15 +238,18 @@ public class MessagesHandlingService implements TenantLifecycleService {
     }
 
     public void resetMessageCouple(long messageInstanceId, long waitingMessageId)
-            throws SWaitingEventReadException, SWaitingEventModificationException, SMessageModificationException, SMessageInstanceReadException {
+            throws SWaitingEventReadException, SWaitingEventModificationException, SMessageModificationException,
+            SMessageInstanceReadException {
         resetWaitingMessage(waitingMessageId);
         resetMessageInstance(messageInstanceId);
     }
 
-    private void resetMessageInstance(final long messageInstanceId) throws SMessageModificationException, SMessageInstanceReadException {
+    private void resetMessageInstance(final long messageInstanceId)
+            throws SMessageModificationException, SMessageInstanceReadException {
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         if (messageInstance == null) {
-            log(TechnicalLogSeverity.WARNING, "Unable to reset message instance " + messageInstanceId + " because it is not found.");
+            log(TechnicalLogSeverity.WARNING,
+                    "Unable to reset message instance " + messageInstanceId + " because it is not found.");
             return;
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -247,10 +257,12 @@ public class MessagesHandlingService implements TenantLifecycleService {
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
-    private void resetWaitingMessage(final long waitingMessageId) throws SWaitingEventModificationException, SWaitingEventReadException {
+    private void resetWaitingMessage(final long waitingMessageId)
+            throws SWaitingEventModificationException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMsg == null) {
-            log(TechnicalLogSeverity.WARNING, "Unable to reset waiting message " + waitingMessageId + " because it is not found.");
+            log(TechnicalLogSeverity.WARNING,
+                    "Unable to reset waiting message " + waitingMessageId + " because it is not found.");
             return;
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -269,7 +281,8 @@ public class MessagesHandlingService implements TenantLifecycleService {
                 BonitaLock eventLock = lockService.tryLock(1L, LOCK_TYPE, 1L, TimeUnit.MILLISECONDS, tenantId);
                 if (eventLock == null) {
                     //It could happen that some messaged where still not triggered because the work that is currently executing was started after the last message execution
-                    log(TechnicalLogSeverity.DEBUG, "triggered the message event handling work but was already running");
+                    log(TechnicalLogSeverity.DEBUG,
+                            "triggered the message event handling work but was already running");
                     return null;
                 }
                 try {
@@ -279,7 +292,8 @@ public class MessagesHandlingService implements TenantLifecycleService {
                     lockService.unlock(eventLock, tenantId);
                 }
             } catch (Exception e) {
-                loggerService.log(MessagesHandlingService.class, TechnicalLogSeverity.ERROR, "error while matching events", e);
+                loggerService.log(MessagesHandlingService.class, TechnicalLogSeverity.ERROR,
+                        "error while matching events", e);
                 throw e;
             }
             return null;

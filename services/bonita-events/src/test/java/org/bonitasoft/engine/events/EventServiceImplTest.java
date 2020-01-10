@@ -30,9 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
  * @author Laurent Vaills
- *
  */
 public class EventServiceImplTest {
 
@@ -46,6 +44,7 @@ public class EventServiceImplTest {
         when(logger.isLoggable(any(Class.class), any(TechnicalLogSeverity.class))).thenReturn(false);
         return logger;
     }
+
     private EventService eventSvc;
 
     // Test events
@@ -112,7 +111,8 @@ public class EventServiceImplTest {
     }
 
     @Test
-    public void isEventFiltered() throws HandlerRegistrationException, SFireEventException, HandlerUnregistrationException {
+    public void isEventFiltered()
+            throws HandlerRegistrationException, SFireEventException, HandlerUnregistrationException {
         // Register handler on a given event type.
         final TestHandlerCallback h = new TestHandlerCallback();
         eventSvc.addHandler(EVT_INTERESTING, h);
@@ -131,7 +131,8 @@ public class EventServiceImplTest {
     }
 
     @Test
-    public void isEventReceivedByHandler() throws SFireEventException, HandlerRegistrationException, HandlerUnregistrationException {
+    public void isEventReceivedByHandler()
+            throws SFireEventException, HandlerRegistrationException, HandlerUnregistrationException {
         final TestHandlerCallback h = new TestHandlerCallback();
         final TestEvent interesting = new TestEvent(EVT_INTERESTING);
 

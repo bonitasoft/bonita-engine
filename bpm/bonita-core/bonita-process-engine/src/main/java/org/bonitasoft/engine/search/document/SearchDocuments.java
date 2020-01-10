@@ -30,7 +30,8 @@ public class SearchDocuments extends AbstractDocumentSearchEntity {
 
     private final DocumentService documentService;
 
-    public SearchDocuments(final DocumentService documentService, final SearchDocumentDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchDocuments(final DocumentService documentService, final SearchDocumentDescriptor searchDescriptor,
+            final SearchOptions options) {
         super(searchDescriptor, options, documentService);
         this.documentService = documentService;
     }

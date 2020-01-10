@@ -26,7 +26,6 @@ import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuild
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.Id;
 
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.test.persistence.repository.ProfileRepository;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;

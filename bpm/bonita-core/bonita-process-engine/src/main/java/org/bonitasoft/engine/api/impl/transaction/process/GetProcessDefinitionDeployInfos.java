@@ -30,7 +30,8 @@ public final class GetProcessDefinitionDeployInfos extends AbstractGetProcessDep
 
     private final ProcessDefinitionService processDefinitionService;
 
-    public GetProcessDefinitionDeployInfos(final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor,
+    public GetProcessDefinitionDeployInfos(final ProcessDefinitionService processDefinitionService,
+            final SearchEntityDescriptor searchDescriptor,
             final int fromIndex, final int numberOfResults, final ProcessDeploymentInfoCriterion criterion) {
         super(searchDescriptor, fromIndex, numberOfResults, criterion);
         this.processDefinitionService = processDefinitionService;

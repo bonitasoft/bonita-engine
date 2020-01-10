@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.theme.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -71,7 +71,7 @@ public class ThemeActionCalculatorTest {
     @Test
     public void calculateAction_should_return_none_when_new_content_is_empty() throws Exception {
         //given
-        byte[] newContent = { };
+        byte[] newContent = {};
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(null, newContent);
@@ -81,7 +81,8 @@ public class ThemeActionCalculatorTest {
     }
 
     @Test
-    public void calculate_should_return_update_when_current_theme_is_not_null_and_content_has_changed() throws Exception {
+    public void calculate_should_return_update_when_current_theme_is_not_null_and_content_has_changed()
+            throws Exception {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = { 2 };
@@ -109,7 +110,8 @@ public class ThemeActionCalculatorTest {
     }
 
     @Test
-    public void calculate_should_return_none_when_current_theme_is_not_null_and_content_has_not_changed() throws Exception {
+    public void calculate_should_return_none_when_current_theme_is_not_null_and_content_has_not_changed()
+            throws Exception {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = { 1 };

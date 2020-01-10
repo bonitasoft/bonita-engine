@@ -19,14 +19,14 @@ package org.bonitasoft.engine.bpm.document;
 public final class ArchivedDocumentsSearchDescriptor {
 
     public static final String PROCESSINSTANCE_ID = "processinstanceid";
-    
+
     public static final String SOURCEOBJECT_ID = "sourceObjectId";
-    
+
     public static final String ARCHIVE_DATE = "archiveDate";
-    
+
     public static final String DOCUMENT_NAME = "documentName";
 
-    public static final String DOCUMENT_DESCRIPTION  = "documentDescription";
+    public static final String DOCUMENT_DESCRIPTION = "documentDescription";
 
     public static final String DOCUMENT_VERSION = "version";
 

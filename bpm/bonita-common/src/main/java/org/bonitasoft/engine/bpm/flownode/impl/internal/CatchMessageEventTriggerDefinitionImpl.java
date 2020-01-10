@@ -34,7 +34,8 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl implements CatchMessageEventTriggerDefinition {
+public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl
+        implements CatchMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -8667216649689173514L;
     @XmlElement(name = "operation", type = OperationImpl.class)
@@ -50,7 +51,8 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         operations = new ArrayList<>(1);
     }
 
-    public CatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
+    public CatchMessageEventTriggerDefinitionImpl(
+            final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(catchMessageEventTriggerDefinition);
         operations = catchMessageEventTriggerDefinition.getOperations();
     }
@@ -66,9 +68,12 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         CatchMessageEventTriggerDefinitionImpl that = (CatchMessageEventTriggerDefinitionImpl) o;
         return Objects.equals(operations, that.operations);
     }

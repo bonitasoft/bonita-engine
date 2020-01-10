@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.category.exception.SCategoryException;
 
 /**
  * Transaction content to remove a list of categories from a Process definition.
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 public class RemoveCategoriesFromProcessDefinition implements TransactionContent {
@@ -33,7 +33,8 @@ public class RemoveCategoriesFromProcessDefinition implements TransactionContent
 
     private final List<Long> categoryIds;
 
-    public RemoveCategoriesFromProcessDefinition(final long processDefinitionId, final List<Long> categoryIds, final CategoryService categoryService) {
+    public RemoveCategoriesFromProcessDefinition(final long processDefinitionId, final List<Long> categoryIds,
+            final CategoryService categoryService) {
         this.processDefinitionId = processDefinitionId;
         this.categoryIds = categoryIds;
         this.categoryService = categoryService;

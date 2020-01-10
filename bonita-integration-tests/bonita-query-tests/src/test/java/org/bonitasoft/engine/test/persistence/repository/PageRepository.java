@@ -18,10 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageWithContent;
-import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public class PageRepository extends TestRepository {
@@ -42,7 +41,7 @@ public class PageRepository extends TestRepository {
         return (SPage) namedQuery.uniqueResult();
     }
 
-    public SPage getPageByNameAndProcessDefinitionId(final String name,long processDefinitionId ) {
+    public SPage getPageByNameAndProcessDefinitionId(final String name, long processDefinitionId) {
         final Query namedQuery = getNamedQuery("getPageByNameAndProcessDefinitionId");
         namedQuery.setParameter("pageName", name);
         namedQuery.setParameter("processDefinitionId", processDefinitionId);

@@ -62,7 +62,8 @@ public class IOUtils {
         return baos.toByteArray();
     }
 
-    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL) throws JAXBException, IOException, SAXException {
+    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL)
+            throws JAXBException, IOException, SAXException {
         if (jaxbModel == null) {
             return null;
         }
@@ -82,7 +83,8 @@ public class IOUtils {
         }
     }
 
-    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
+    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL)
+            throws JAXBException, IOException,
             SAXException {
         if (xmlObject == null) {
             return null;
@@ -150,7 +152,8 @@ public class IOUtils {
         return dir;
     }
 
-    public static void saveDocument(final Document document, final File destination) throws IOException, TransformerException {
+    public static void saveDocument(final Document document, final File destination)
+            throws IOException, TransformerException {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }

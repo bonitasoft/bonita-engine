@@ -27,7 +27,6 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
 
     private static final long serialVersionUID = 6929368716340973445L;
 
-
     private String name;
 
     private String description;
@@ -82,8 +81,10 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         CustomUserInfoDefinitionCreator that = (CustomUserInfoDefinitionCreator) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description);

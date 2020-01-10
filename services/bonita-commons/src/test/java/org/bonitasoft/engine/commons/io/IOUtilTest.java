@@ -125,14 +125,12 @@ public class IOUtilTest {
         properties.put("key2", "value2");
         properties.put("key3", "value3");
 
-
         final File file = tempFolderRule.newFile("testPropertiesFile");
         PropertiesManager.saveProperties(properties, file);
         final String updatedValue2 = "@\\[||sfgf23465";
         final Map<String, String> pairs = new HashMap<>();
         pairs.put("key2", updatedValue2);
         IOUtil.updatePropertyValue(file, pairs);
-
 
         final Properties updatedProperties = PropertiesManager.getProperties(file);
         Assert.assertEquals(updatedValue2, updatedProperties.get("key2"));

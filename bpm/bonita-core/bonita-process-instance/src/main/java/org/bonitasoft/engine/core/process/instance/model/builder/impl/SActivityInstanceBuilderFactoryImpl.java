@@ -20,7 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SActivityInstan
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public abstract class SActivityInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl implements SActivityInstanceBuilderFactory {
+public abstract class SActivityInstanceBuilderFactoryImpl extends SFlowNodeInstanceBuilderFactoryImpl
+        implements SActivityInstanceBuilderFactory {
 
     private static final String ID_KEY = "id";
 

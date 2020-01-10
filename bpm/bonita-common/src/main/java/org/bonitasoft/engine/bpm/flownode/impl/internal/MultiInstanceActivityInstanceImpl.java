@@ -41,8 +41,10 @@ public class MultiInstanceActivityInstanceImpl extends ActivityInstanceImpl impl
 
     private final int loopCardinality;
 
-    public MultiInstanceActivityInstanceImpl(final String name, final long flownodeDefinitionId, final boolean sequential, final String loopDataInputRef,
-            final String loopDataOutputRef, final String dataInputItemRef, final String dataOutputItemRef, final int numberOfActiveInstances,
+    public MultiInstanceActivityInstanceImpl(final String name, final long flownodeDefinitionId,
+            final boolean sequential, final String loopDataInputRef,
+            final String loopDataOutputRef, final String dataInputItemRef, final String dataOutputItemRef,
+            final int numberOfActiveInstances,
             final int numberOfCompletedInstances, final int numberOfTerminatedInstances, final int loopCardinality) {
         super(name, flownodeDefinitionId);
         this.sequential = sequential;

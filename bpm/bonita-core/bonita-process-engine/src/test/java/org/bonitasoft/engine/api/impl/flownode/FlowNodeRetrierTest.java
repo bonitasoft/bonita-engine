@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.flownode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.connector.ConnectorResetStrategy;
@@ -73,7 +72,8 @@ public class FlowNodeRetrierTest {
 
     @Before
     public void setUp() throws Exception {
-        retrier = new FlowNodeRetrier(registry, flowNodeExecutor, activityInstanceService, flowNodeStateManager, strategy);
+        retrier = new FlowNodeRetrier(registry, flowNodeExecutor, activityInstanceService, flowNodeStateManager,
+                strategy);
 
         given(flowNodeInstance.getId()).willReturn(FLOW_NODE_INSTANCE_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
@@ -117,9 +117,11 @@ public class FlowNodeRetrierTest {
     }
 
     @Test(expected = ActivityExecutionException.class)
-    public void retryTask_should_throw_ActivityExecutionException_when_activityInstanceService_throws_exception() throws Exception {
+    public void retryTask_should_throw_ActivityExecutionException_when_activityInstanceService_throws_exception()
+            throws Exception {
         //given
-        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willThrow(new SFlowNodeReadException(""));
+        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .willThrow(new SFlowNodeReadException(""));
 
         //when
         retrier.retry(FLOW_NODE_INSTANCE_ID);
@@ -128,9 +130,11 @@ public class FlowNodeRetrierTest {
     }
 
     @Test(expected = ActivityInstanceNotFoundException.class)
-    public void retryTask_should_throw_ActivityInstanceNotFoundException_when_activityInstanceService_throws_SFlowNodeNotFoundException() throws Exception {
+    public void retryTask_should_throw_ActivityInstanceNotFoundException_when_activityInstanceService_throws_SFlowNodeNotFoundException()
+            throws Exception {
         //given
-        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
+        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID))
+                .willThrow(new SFlowNodeNotFoundException(FLOW_NODE_INSTANCE_ID));
 
         //when
         retrier.retry(FLOW_NODE_INSTANCE_ID);
@@ -142,7 +146,8 @@ public class FlowNodeRetrierTest {
     public void retry_should_throw_exception_when_flowNode_is_not_in_failed_state() throws Exception {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
-        given(flowNodeStateManager.getState(STATE_ID)).willReturn(new ReadyActivityStateImpl(mock(StateBehaviors.class)));
+        given(flowNodeStateManager.getState(STATE_ID))
+                .willReturn(new ReadyActivityStateImpl(mock(StateBehaviors.class)));
 
         try {
             //when
@@ -152,7 +157,8 @@ public class FlowNodeRetrierTest {
             //then
             assertThat(e.getMessage()).isEqualTo(
                     "Unable to retry the flow node instance [name=" + FLOW_NODE_NAME + ", id="
-                            + FLOW_NODE_INSTANCE_ID + "] because it is not in failed state. The current state for this flow node instance is '"
+                            + FLOW_NODE_INSTANCE_ID
+                            + "] because it is not in failed state. The current state for this flow node instance is '"
                             + ActivityStates.READY_STATE + "'");
         }
 

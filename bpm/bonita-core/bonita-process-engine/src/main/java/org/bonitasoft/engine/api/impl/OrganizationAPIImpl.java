@@ -34,7 +34,6 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 public class OrganizationAPIImpl {
 
@@ -61,19 +60,22 @@ public class OrganizationAPIImpl {
                 deleteOrganizationElements(activityInstanceService);
                 updateActorProcessDependenciesForAllActors(tenantAccessor);
             } else {
-                throw new DeletionException("Can't delete a organization when a process, a human tasks, or a comment is active !!.");
+                throw new DeletionException(
+                        "Can't delete a organization when a process, a human tasks, or a comment is active !!.");
             }
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
     }
 
-    private void deleteOrganizationElements(final ActivityInstanceService activityInstanceService) throws SBonitaException {
+    private void deleteOrganizationElements(final ActivityInstanceService activityInstanceService)
+            throws SBonitaException {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
-        final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor.getExternalIdentityMappingService();
+        final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor
+                .getExternalIdentityMappingService();
 
         deleteCustomUserInfo(identityService);
         actorMappingService.deleteAllActorMembers();
@@ -97,7 +99,8 @@ public class OrganizationAPIImpl {
         } while (customUserInfoDefinitions.size() == pageSize);
     }
 
-    private void deleteCustomUserInfo(List<SCustomUserInfoDefinition> customUserInfoDefinitions, IdentityService identityService) throws SIdentityException {
+    private void deleteCustomUserInfo(List<SCustomUserInfoDefinition> customUserInfoDefinitions,
+            IdentityService identityService) throws SIdentityException {
         for (SCustomUserInfoDefinition definition : customUserInfoDefinitions) {
             identityService.deleteCustomUserInfoDefinition(definition.getId());
         }
@@ -107,14 +110,18 @@ public class OrganizationAPIImpl {
     /**
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
-    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
+    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor)
+            throws SBonitaException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
-        final ActorBusinessArchiveArtifactManager dependencyResolver = new ActorBusinessArchiveArtifactManager(tenantAccessor.getActorMappingService(),tenantAccessor.getIdentityService(), tenantAccessor.getTechnicalLoggerService());
+        final ActorBusinessArchiveArtifactManager dependencyResolver = new ActorBusinessArchiveArtifactManager(
+                tenantAccessor.getActorMappingService(), tenantAccessor.getIdentityService(),
+                tenantAccessor.getTechnicalLoggerService());
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {
-                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
+                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId,
+                        tenantAccessor, dependencyResolver);
             }
         } while (processDefinitionIds.size() == 100);
     }

@@ -39,29 +39,36 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     public final DocumentHelper documentHelper;
     private final DocumentService documentService;
 
-    public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
+    public DocumentListLeftOperandHandler(final DocumentService documentService,
+            final ActivityInstanceService activityInstanceService,
+            final SessionAccessor sessionAccessor, final SessionService sessionService,
+            final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
-        this(activityInstanceService, sessionAccessor, sessionService, documentService, new DocumentHelper(documentService, processDefinitionService,
-                processInstanceService));
+        this(activityInstanceService, sessionAccessor, sessionService, documentService,
+                new DocumentHelper(documentService, processDefinitionService,
+                        processInstanceService));
     }
 
-    public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
+    public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService,
+            final SessionAccessor sessionAccessor,
+            final SessionService sessionService, final DocumentService documentService,
+            final DocumentHelper documentHelper) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentHelper = documentHelper;
         this.documentService = documentService;
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId,
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue,
+            final long containerId,
             final String containerType)
             throws SOperationExecutionException {
         final List<DocumentValue> documentList = documentHelper.toCheckedList(newValue);
         final String documentName = sLeftOperand.getName();
         try {
             final long processInstanceId = getProcessInstanceId(containerId, containerType);
-            documentHelper.setDocumentList(documentList, documentName, processInstanceId, getAuthorId(containerId, containerType));
+            documentHelper.setDocumentList(documentList, documentName, processInstanceId,
+                    getAuthorId(containerId, containerType));
             return documentList;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e.getMessage(), e);
@@ -75,7 +82,8 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     @Override
-    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting a document is not supported");
     }
 

@@ -17,9 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import io.micrometer.jmx.JmxMeterRegistry;
 import org.bonitasoft.engine.monitoring.DefaultExecutorServiceMetricsProvider;
-import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.monitoring.ExecutorServiceMetricsProvider;
+import org.bonitasoft.engine.monitoring.NoOpExecutorServiceMetricsProvider;
 import org.bonitasoft.engine.persistence.HibernateMetricsBinder;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
@@ -34,10 +37,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
-import io.micrometer.jmx.JmxMeterRegistry;
 
 public class MonitoringConfigTest {
 

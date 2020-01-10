@@ -15,7 +15,7 @@ package org.bonitasoft.engine.scheduler.recorder;
 
 /**
  * List all possible change of elements of the scheduler service
- * 
+ *
  * @author Baptiste Mesta
  */
 public enum JobDescriptorRecordType {

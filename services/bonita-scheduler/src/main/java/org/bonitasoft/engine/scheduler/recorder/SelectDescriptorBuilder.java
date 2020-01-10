@@ -29,7 +29,8 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 public class SelectDescriptorBuilder {
 
     // FIXME put in a common model
-    public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
+    public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz,
+            final String elementName, final long id) {
         return new SelectByIdDescriptor<T>(clazz, id);
     }
 

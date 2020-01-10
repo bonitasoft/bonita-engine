@@ -173,7 +173,8 @@ public class ProfileEntryImpl extends NamedElementImpl implements ProfileEntry {
 
     @Override
     public String toString() {
-        return "ProfileEntryImpl [name=" + getName() + ", profileId=" + profileId + ", parentId=" + parentId + ", description=" + description + ", index="
+        return "ProfileEntryImpl [name=" + getName() + ", profileId=" + profileId + ", parentId=" + parentId
+                + ", description=" + description + ", index="
                 + index + ", type=" + type
                 + ", page=" + page + ", custom=" + custom + "]";
     }

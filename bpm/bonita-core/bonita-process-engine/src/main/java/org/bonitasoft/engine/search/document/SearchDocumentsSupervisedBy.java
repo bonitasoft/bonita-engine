@@ -32,7 +32,8 @@ public class SearchDocumentsSupervisedBy extends AbstractDocumentSearchEntity {
 
     private final long userId;
 
-    public SearchDocumentsSupervisedBy(final DocumentService documentService, final SearchDocumentDescriptor searchDescriptor,
+    public SearchDocumentsSupervisedBy(final DocumentService documentService,
+            final SearchDocumentDescriptor searchDescriptor,
             final SearchOptions options, final long userId) {
         super(searchDescriptor, options, documentService);
         this.documentService = documentService;

@@ -20,6 +20,7 @@ public interface TechnicalLoggerService {
 
     /**
      * Provides a <code>TechnicalLogger</code> backed to this <code>TechnicalLoggerService</code>.
+     *
      * @since 7.8.0
      */
     TechnicalLogger asLogger(Class<?> clazz);
@@ -33,7 +34,7 @@ public interface TechnicalLoggerService {
      * <code>
      * log(getClass(), INFO, "Ready to update process {} with {}", processId, complexObjectWithSlowToStringMethod);
      * </code>
-     * 
+     *
      * @since 7.8.0
      */
     void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Object... arguments);

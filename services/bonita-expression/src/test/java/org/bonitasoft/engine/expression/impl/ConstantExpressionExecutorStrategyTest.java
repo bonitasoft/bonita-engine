@@ -47,12 +47,13 @@ public class ConstantExpressionExecutorStrategyTest {
      * Test method for
      * {@link org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy#evaluate(org.bonitasoft.engine.expression.model.SExpression, java.util.Map, java.util.Map)}
      * .
-     * 
+     *
      * @throws SExpressionEvaluationException
      */
     @Test
     public final void evaluateDate() throws SExpressionEvaluationException {
-        final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
+        final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86+02:00", SExpression.TYPE_CONSTANT,
+                Date.class.getName(), null, null);
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
@@ -60,7 +61,8 @@ public class ConstantExpressionExecutorStrategyTest {
 
     @Test
     public final void evaluateDateWithoutTimeZone() throws SExpressionEvaluationException {
-        final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
+        final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86", SExpression.TYPE_CONSTANT,
+                Date.class.getName(), null, null);
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
@@ -68,7 +70,8 @@ public class ConstantExpressionExecutorStrategyTest {
 
     @Test
     public final void evaluateDateWithoutMilliseconds() throws SExpressionEvaluationException {
-        final SExpression sExpression = buildExpression("2013-07-18T14:49:26+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
+        final SExpression sExpression = buildExpression("2013-07-18T14:49:26+02:00", SExpression.TYPE_CONSTANT,
+                Date.class.getName(), null, null);
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
@@ -115,7 +118,8 @@ public class ConstantExpressionExecutorStrategyTest {
         assertThat(result.getOffset()).isEqualTo(ZoneOffset.ofHours(1));
     }
 
-    private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
+    private SExpression buildExpression(final String content, final String expressionType, final String returnType,
+            final String interpreter,
             final List<SExpression> dependencies) {
         final SExpressionImpl eb = new SExpressionImpl();
         eb.setName(content);

@@ -21,15 +21,17 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
 /**
  * This API allows to list the {@link org.bonitasoft.engine.business.data.BusinessDataReference} related to specific
  * {@link org.bonitasoft.engine.bpm.process.ProcessInstance}
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Laurent Leseigneur
  * @since 7.0.0
  * @see org.bonitasoft.engine.business.data.BusinessDataReference
  * @see org.bonitasoft.engine.bpm.process.ProcessInstance
- * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
+ * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)}
+ *             ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
  *             archived process instances). In
- *             the map return by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get {@link BusinessDataReference} by using
+ *             the map return by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get
+ *             {@link BusinessDataReference} by using
  *             "yourBusinessDataName_ref" key (business data name as declared in
  *             the process definition followed by "_ref" suffix).
  */
@@ -68,6 +70,7 @@ public interface BusinessDataAPI {
      * @deprecated See deprecated comment of {@link BusinessDataAPI}
      */
     @Deprecated
-    List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex, int maxResults);
+    List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex,
+            int maxResults);
 
 }

@@ -19,12 +19,11 @@ import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aCompositionField;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Colin PUY
@@ -75,24 +74,27 @@ public class UniquenessCompositionValidationRuleTest {
     public void should_validate_that_a_bom_with_a_bo_composed_in_two_bos_is_invalid() {
         final BusinessObject composite = aBO("composite").build();
         final BusinessObject firstBO = aBO("firstBO").withField(aCompositionField("boOneComposite", composite)).build();
-        final BusinessObject secondBO = aBO("secondBO").withField(aCompositionField("boTwoComposite", composite)).build();
+        final BusinessObject secondBO = aBO("secondBO").withField(aCompositionField("boTwoComposite", composite))
+                .build();
         final BusinessObjectModel bom = aBOM().withBOs(firstBO, secondBO, composite).build();
 
         final ValidationStatus validationStatus = rule.validate(bom);
 
         assertThat(validationStatus).isNotOk();
     }
-    
+
     @Test
-    public void should_validate_that_a_bom_with_the_same_bo_composed_two_times_is_invalid(){
+    public void should_validate_that_a_bom_with_the_same_bo_composed_two_times_is_invalid() {
         //given
         final BusinessObject wheel = aBO("wheel").build();
-        final BusinessObject bycicle = aBO("bicycle").withField(aCompositionField("frontwheel",wheel)).withField(aCompositionField("backwheel",wheel)).build();
-        final BusinessObjectModel bom = aBOM().withBOs(wheel,bycicle).build();
+        final BusinessObject bycicle = aBO("bicycle").withField(aCompositionField("frontwheel", wheel))
+                .withField(aCompositionField("backwheel", wheel)).build();
+        final BusinessObjectModel bom = aBOM().withBOs(wheel, bycicle).build();
         //when
         ValidationStatus validationStatus = rule.validate(bom);
         //then
         assertThat(validationStatus).isNotOk();
-        assertThat(validationStatus).hasError("Business object " + "wheel" + " is referenced by composition in two business objects, or is referenced several times in a single business object");
+        assertThat(validationStatus).hasError("Business object " + "wheel"
+                + " is referenced by composition in two business objects, or is referenced several times in a single business object");
     }
 }

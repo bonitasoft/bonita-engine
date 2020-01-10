@@ -16,6 +16,7 @@ package org.bonitasoft.engine.page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,15 +24,14 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObjectId;
-import org.hibernate.annotations.Filter;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.hibernate.annotations.Filter;
 
 /**
  * @author Baptiste Mesta
@@ -75,7 +75,8 @@ public class SPageMapping implements PersistentObject {
     private void parseRules() {
         if (pageAuthorizRules != null) {
             authorizationRules.clear();
-            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIMITER, false); stringTk.hasMoreTokens();) {
+            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIMITER, false); stringTk
+                    .hasMoreTokens();) {
                 String rule = stringTk.nextToken();
                 authorizationRules.add(rule);
             }

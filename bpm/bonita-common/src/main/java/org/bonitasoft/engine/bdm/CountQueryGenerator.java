@@ -82,7 +82,8 @@ public class CountQueryGenerator extends AbstractQueryGenerator {
 
     private boolean hasUniqueConstraintOnField(BusinessObject businessObject, Field field) {
         for (UniqueConstraint uniqueConstraint : businessObject.getUniqueConstraints()) {
-            if (uniqueConstraint.getFieldNames().size() == 1 && uniqueConstraint.getFieldNames().contains(field.getName())) {
+            if (uniqueConstraint.getFieldNames().size() == 1
+                    && uniqueConstraint.getFieldNames().contains(field.getName())) {
                 return true;
             }
         }

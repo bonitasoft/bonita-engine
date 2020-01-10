@@ -28,7 +28,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 
 /**
  * Strategy to handle one kind of event: TIMER, ERROR, SIGNAL or MESSAGE
- * 
+ *
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
@@ -39,23 +39,29 @@ public abstract class EventHandlerStrategy {
         super();
     }
 
-    public abstract void handleThrowEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition, SThrowEventInstance eventInstance,
+    public abstract void handleThrowEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition,
+            SThrowEventInstance eventInstance,
             SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 
-    public abstract boolean handlePostThrowEvent(SProcessDefinition processDefinition, SEndEventDefinition sEventDefinition,
-            SThrowEventInstance sThrowEventInstance, SEventTriggerDefinition sEventTriggerDefinition, SFlowNodeInstance sFlowNodeInstance)
+    public abstract boolean handlePostThrowEvent(SProcessDefinition processDefinition,
+            SEndEventDefinition sEventDefinition,
+            SThrowEventInstance sThrowEventInstance, SEventTriggerDefinition sEventTriggerDefinition,
+            SFlowNodeInstance sFlowNodeInstance)
             throws SBonitaException;
 
     public abstract void handleThrowEvent(SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 
-    public abstract void handleCatchEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition, SCatchEventInstance eventInstance,
+    public abstract void handleCatchEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition,
+            SCatchEventInstance eventInstance,
             SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 
     public abstract void handleEventSubProcess(SProcessDefinition processDefinition, SEventDefinition eventDefinition,
-            SEventTriggerDefinition sEventTriggerDefinition, long subProcessId, SProcessInstance parentProcessInstance) throws SBonitaException;
+            SEventTriggerDefinition sEventTriggerDefinition, long subProcessId, SProcessInstance parentProcessInstance)
+            throws SBonitaException;
 
     public abstract void unregisterCatchEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition,
-            SEventTriggerDefinition sEventTriggerDefinition, long subProcessId, SProcessInstance parentProcessIsnstance) throws SBonitaException;
+            SEventTriggerDefinition sEventTriggerDefinition, long subProcessId, SProcessInstance parentProcessIsnstance)
+            throws SBonitaException;
 
     protected DataInstanceContainer getParentContainerType(final SFlowNodeInstance flowNodeInstance) {
         DataInstanceContainer parentContainerType;
@@ -67,6 +73,7 @@ public abstract class EventHandlerStrategy {
         return parentContainerType;
     }
 
-    public abstract OperationsWithContext getOperations(SWaitingEvent waitingEvent, Long triggeringElementID) throws SBonitaException;
+    public abstract OperationsWithContext getOperations(SWaitingEvent waitingEvent, Long triggeringElementID)
+            throws SBonitaException;
 
 }

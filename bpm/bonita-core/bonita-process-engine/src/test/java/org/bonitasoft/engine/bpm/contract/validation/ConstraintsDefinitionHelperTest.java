@@ -40,7 +40,8 @@ public class ConstraintsDefinitionHelperTest {
         final SContractDefinition contract = buildContract();
 
         //when
-        final String[] inputNames = { "user", "firstName", "lastName", "userId", "nature", "simple", "expenseLine", "date" };
+        final String[] inputNames = { "user", "firstName", "lastName", "userId", "nature", "simple", "expenseLine",
+                "date" };
         for (final String inputName : inputNames) {
             //then
             checkDefinitionIsFound(contract, inputName);
@@ -59,7 +60,8 @@ public class ConstraintsDefinitionHelperTest {
     private SContractDefinition buildContract() {
         final SContractDefinition contract = aContract()
                 .withInput(
-                        aComplexInput().withName("user").withInput(aSimpleInput(SType.TEXT).withName("firstName").build())
+                        aComplexInput().withName("user")
+                                .withInput(aSimpleInput(SType.TEXT).withName("firstName").build())
                                 .withInput(aSimpleInput(SType.TEXT).withName("lastName").build())
                                 .withInput(aSimpleInput(SType.LONG).withName("userId").build()))
                 .withInput(
@@ -70,7 +72,9 @@ public class ConstraintsDefinitionHelperTest {
                                                 .withInput(aSimpleInput(SType.TEXT).withName("nature").build())
                                                 .withInput(aSimpleInput(SType.DECIMAL).withName("amount").build())
                                                 .withInput(aSimpleInput(SType.DATE).withName("date").build())
-                                                .withInput(aSimpleInput(SType.TEXT).withName("comment").build()).build()).build())
+                                                .withInput(aSimpleInput(SType.TEXT).withName("comment").build())
+                                                .build())
+                                .build())
                 .withInput(aSimpleInput(SType.TEXT).withMultiple(true).withName("simple").build())
                 .build();
         return contract;

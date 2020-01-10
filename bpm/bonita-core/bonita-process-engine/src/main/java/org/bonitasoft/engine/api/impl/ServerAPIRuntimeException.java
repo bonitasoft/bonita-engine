@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api.impl;
 
 /**
-* @author Baptiste Mesta
-*/
+ * @author Baptiste Mesta
+ */
 public class ServerAPIRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = -5675131531953146131L;

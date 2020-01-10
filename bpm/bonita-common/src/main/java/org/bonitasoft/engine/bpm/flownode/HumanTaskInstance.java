@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.Date;
 
-
 /**
  * @author Baptiste Mesta
  */

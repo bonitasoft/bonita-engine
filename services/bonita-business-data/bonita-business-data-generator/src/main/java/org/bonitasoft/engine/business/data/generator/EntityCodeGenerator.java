@@ -31,6 +31,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.sun.codemodel.JAnnotationArrayMember;
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JClassAlreadyExistsException;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
 import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -42,13 +48,6 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
 
 /**
  * @author Colin PUY,
@@ -132,7 +131,8 @@ public class EntityCodeGenerator {
                 final JAnnotationUse uniqueConstraintAnnotation = uniqueConstraintsArray
                         .annotate(javax.persistence.UniqueConstraint.class);
                 uniqueConstraintAnnotation.param("name", uniqueConstraint.getName().toUpperCase());
-                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotation.paramArray("columnNames");
+                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotation
+                        .paramArray("columnNames");
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
                     columnNamesParamArray.param(getFieldRealColumnName(businessObject, fieldName));
                 }
@@ -160,7 +160,7 @@ public class EntityCodeGenerator {
 
     /**
      * get real column name used in database
-     * 
+     *
      * @param businessObject
      * @param fieldName
      * @return fieldName for simple fields or reduced name suffix by "_PID" when we have an entity relationship
@@ -175,7 +175,8 @@ public class EntityCodeGenerator {
         return columnName;
     }
 
-    private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name,
+    private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray,
+            final String name,
             final String content) {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
         nameQueryAnnotation.param("name", entityClass.name() + "." + name);
@@ -191,7 +192,8 @@ public class EntityCodeGenerator {
             alreadyInRuntime = false;
         }
         if (alreadyInRuntime) {
-            throw new IllegalArgumentException("Class " + qualifiedName + " already exists in target runtime environment.");
+            throw new IllegalArgumentException(
+                    "Class " + qualifiedName + " already exists in target runtime environment.");
         }
     }
 

@@ -33,13 +33,20 @@ public class SearchProfileEntryDescriptor extends SearchEntityDescriptor {
 
     public SearchProfileEntryDescriptor() {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(7);
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.ID, new FieldDescriptor(SProfileEntry.class, SProfileEntry.ID));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.NAME, new FieldDescriptor(SProfileEntry.class, SProfileEntry.NAME));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileEntry.class, SProfileEntry.PROFILE_ID));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.PARENT_ID, new FieldDescriptor(SProfileEntry.class, SProfileEntry.PARENT_ID));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.INDEX, new FieldDescriptor(SProfileEntry.class, SProfileEntry.INDEX));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.PAGE, new FieldDescriptor(SProfileEntry.class, SProfileEntry.PAGE));
-        searchEntityKeys.put(ProfileEntrySearchDescriptor.CUSTOM, new FieldDescriptor(SProfileEntry.class, SProfileEntry.CUSTOM));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.ID,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.ID));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.NAME,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.NAME));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.PROFILE_ID,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.PROFILE_ID));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.PARENT_ID,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.PARENT_ID));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.INDEX,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.INDEX));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.PAGE,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.PAGE));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.CUSTOM,
+                new FieldDescriptor(SProfileEntry.class, SProfileEntry.CUSTOM));
 
         profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(3);

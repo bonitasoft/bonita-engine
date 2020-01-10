@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.PageRepository;

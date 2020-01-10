@@ -20,7 +20,8 @@ public enum FilterOperationType {
     IN, BETWEEN, EQUALS, LIKE, GREATER, LESS, GREATER_OR_EQUALS, LESS_OR_EQUALS, DIFFERENT, L_PARENTHESIS, R_PARENTHESIS, AND, OR;
 
     public static boolean isNormalOperator(final FilterOperationType type) {
-        return type == IN || type == BETWEEN || type == EQUALS || type == LIKE || type == GREATER || type == LESS || type == GREATER_OR_EQUALS
+        return type == IN || type == BETWEEN || type == EQUALS || type == LIKE || type == GREATER || type == LESS
+                || type == GREATER_OR_EQUALS
                 || type == LESS_OR_EQUALS || type == DIFFERENT;
     }
 

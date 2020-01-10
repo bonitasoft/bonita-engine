@@ -51,8 +51,7 @@ public class ProfileEntryTest {
     }
 
     private void shouldNotBeEquals(final ProfileEntryNode entryA, final ProfileEntryNode entryB) {
-        if (null != entryA && null != entryB)
-        {
+        if (null != entryA && null != entryB) {
             assertThat(entryA).as("should not be equals").isNotEqualTo(entryB);
             assertThat(entryA.hashCode()).as("hash code should not be equals").isNotEqualTo(entryB.hashCode());
         }
@@ -98,8 +97,7 @@ public class ProfileEntryTest {
     }
 
     @Test
-    public void should_has_error_when_page_is_null
-            () {
+    public void should_has_error_when_page_is_null() {
         // given
         final ProfileEntryNode entry = new ProfileEntryNode("name");
         entry.setPage(null);

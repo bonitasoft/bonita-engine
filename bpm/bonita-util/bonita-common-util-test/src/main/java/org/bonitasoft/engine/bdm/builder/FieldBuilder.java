@@ -116,7 +116,6 @@ public abstract class FieldBuilder {
         return this;
     }
 
-
     public Field build() {
         return field;
     }

@@ -46,16 +46,22 @@ public abstract class SThrowEventDefinitionImpl extends SEventDefinitionImpl imp
             final Map<String, STransitionDefinition> transitionsMap) {
         super(eventDefinition, transitionsMap);
 
-        final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions = eventDefinition.getMessageEventTriggerDefinitions();
-        sMessageEventTriggerDefinitions = new ArrayList<SThrowMessageEventTriggerDefinition>(messageEventTriggerDefinitions.size());
+        final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions = eventDefinition
+                .getMessageEventTriggerDefinitions();
+        sMessageEventTriggerDefinitions = new ArrayList<SThrowMessageEventTriggerDefinition>(
+                messageEventTriggerDefinitions.size());
         for (final ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition : messageEventTriggerDefinitions) {
-            addMessageEventTriggerDefinition(new SThrowMessageEventTriggerDefinitionImpl(throwMessageEventTriggerDefinition));
+            addMessageEventTriggerDefinition(
+                    new SThrowMessageEventTriggerDefinitionImpl(throwMessageEventTriggerDefinition));
         }
 
-        final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions = eventDefinition.getSignalEventTriggerDefinitions();
-        sSignalEventTriggerDefinitions = new ArrayList<SThrowSignalEventTriggerDefinition>(signalEventTriggerDefinitions.size());
+        final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions = eventDefinition
+                .getSignalEventTriggerDefinitions();
+        sSignalEventTriggerDefinitions = new ArrayList<SThrowSignalEventTriggerDefinition>(
+                signalEventTriggerDefinitions.size());
         for (final ThrowSignalEventTriggerDefinition throwSignalEventTriggerDefinition : signalEventTriggerDefinitions) {
-            addSignalEventTriggerDefinition(new SThrowSignalEventTriggerDefinitionImpl(throwSignalEventTriggerDefinition.getSignalName()));
+            addSignalEventTriggerDefinition(
+                    new SThrowSignalEventTriggerDefinitionImpl(throwSignalEventTriggerDefinition.getSignalName()));
         }
     }
 
@@ -70,7 +76,8 @@ public abstract class SThrowEventDefinitionImpl extends SEventDefinitionImpl imp
         return Collections.unmodifiableList(sMessageEventTriggerDefinitions);
     }
 
-    public void addMessageEventTriggerDefinition(final SThrowMessageEventTriggerDefinition messageEventTriggerDefinition) {
+    public void addMessageEventTriggerDefinition(
+            final SThrowMessageEventTriggerDefinition messageEventTriggerDefinition) {
         addEventTriggerDefinition(messageEventTriggerDefinition);
         sMessageEventTriggerDefinitions.add(messageEventTriggerDefinition);
     }

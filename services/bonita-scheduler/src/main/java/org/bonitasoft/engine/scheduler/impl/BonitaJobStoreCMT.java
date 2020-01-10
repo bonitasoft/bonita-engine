@@ -36,7 +36,8 @@ public class BonitaJobStoreCMT extends JobStoreCMT {
             if (!getLog().isInfoEnabled()) {
                 getLog().error("All triggers of Job " + trigger.getKey() + " set to ERROR state.");
             }
-            getLog().error("In order to restart the triggers, you can either restart your node or call the platformAPI.rescheduleErroneousTriggers method.");
+            getLog().error(
+                    "In order to restart the triggers, you can either restart your node or call the platformAPI.rescheduleErroneousTriggers method.");
         }
     }
 

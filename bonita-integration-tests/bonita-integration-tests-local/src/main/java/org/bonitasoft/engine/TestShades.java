@@ -82,7 +82,8 @@ public class TestShades {
             String part1 = mavenOutput.substring(indexOf - 50, indexOf - 1);
             String part2 = mavenOutput.substring(indexOf - 1, indexOf + str.length());
             String part3 = mavenOutput.substring(indexOf + str.length(), indexOf + str.length() + 50);
-            fail("the dependency tree contains other modules than server/client/common: \"" + part1 + " =====>>>>>" + part2 + " <<<<<=====" + part3);
+            fail("the dependency tree contains other modules than server/client/common: \"" + part1 + " =====>>>>>"
+                    + part2 + " <<<<<=====" + part3);
         }
     }
 

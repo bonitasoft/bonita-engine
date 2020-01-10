@@ -26,13 +26,12 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 public class DeletePlatformSessionCommand extends PlatformCommand {
 
     public Serializable execute(Map parameters, PlatformServiceAccessor serviceAccessor)
-            throws SCommandParameterizationException, SCommandExecutionException
-    {
-        Long sessionId = (Long)parameters.get("sessionId");
+            throws SCommandParameterizationException, SCommandExecutionException {
+        Long sessionId = (Long) parameters.get("sessionId");
         PlatformSessionService sessionService = serviceAccessor.getPlatformSessionService();
         try {
             sessionService.deleteSession(sessionId.longValue());
-        } catch(SSessionNotFoundException e) {
+        } catch (SSessionNotFoundException e) {
             throw new SCommandExecutionException(e);
         }
         return null;

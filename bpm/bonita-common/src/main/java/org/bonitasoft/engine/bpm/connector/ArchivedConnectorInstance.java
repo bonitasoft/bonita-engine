@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * The archived connector
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet

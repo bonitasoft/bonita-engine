@@ -122,9 +122,12 @@ public class SDocumentDefinitionImpl extends SNamedElementImpl implements SDocum
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SDocumentDefinitionImpl that = (SDocumentDefinitionImpl) o;
         return Objects.equals(url, that.url) &&
                 Objects.equals(file, that.file) &&

@@ -102,10 +102,14 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
 
     private void initializeClassLoaderService() throws Exception {
         inTx(() -> {
-            createPlatformDependency("globalResource", "globalResource.jar", IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
-            createDependency(ID1, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-            createDependency(ID2, TYPE1, "LocalResource1", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-            createDependency(ID1, TYPE1, "LocalResource2", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
+            createPlatformDependency("globalResource", "globalResource.jar",
+                    IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
+            createDependency(ID1, TYPE1, "LocalResource1", "LocalResource1.jar",
+                    IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
+            createDependency(ID2, TYPE1, "LocalResource1", "LocalResource1.jar",
+                    IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
+            createDependency(ID1, TYPE1, "LocalResource2", "LocalResource2.jar",
+                    IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
         });
     }
 
@@ -120,25 +124,30 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
         });
     }
 
-    private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
-                                  final byte[] value) throws SDependencyException, SClassLoaderException {
+    private long createDependency(final long artifactId, final ScopeType artifactType, final String name,
+            final String fileName,
+            final byte[] value) throws SDependencyException, SClassLoaderException {
         long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
         classLoaderService.refreshClassLoaderImmediately(artifactType, artifactId);
         return id;
     }
 
-    private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException, SClassLoaderException {
+    private long createPlatformDependency(final String name, final String fileName, final byte[] value)
+            throws SDependencyException, SClassLoaderException {
         final SPlatformDependency dependency = new SPlatformDependency(name, fileName, value);
-        platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(),
+        platformDependencyService.createMappedDependency(name, value, fileName,
+                classLoaderService.getGlobalClassLoaderId(),
                 ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        classLoaderService.refreshClassLoaderImmediately(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+        classLoaderService.refreshClassLoaderImmediately(
+                ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                 classLoaderService.getGlobalClassLoaderId());
         return dependency.getId();
     }
 
     private void initializeClassLoaderServiceWithTwoApplications() throws Exception {
         getTransactionService().begin();
-        createPlatformDependency("globalResource", "globalResource.jar", IOUtil.generateJar(GlobalClass1.class, SharedClass1.class));
+        createPlatformDependency("globalResource", "globalResource.jar",
+                IOUtil.generateJar(GlobalClass1.class, SharedClass1.class));
         createDependency(ID1, TYPE1, "LocalResource111", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
         createDependency(ID2, TYPE1, "LocalResource211", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
         createDependency(ID1, TYPE1, "LocalResource123", "LocalResource3.jar", IOUtil.generateJar(LocalClass3.class));
@@ -341,7 +350,8 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
                     .getClassLoader());
 
             // check the refresh has been done using the old reference
-            checkLocalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
+            checkLocalClassLoader(
+                    localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
             assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
         });
@@ -350,7 +360,6 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     @Test
     public void testResetGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
-
 
         inTx(() -> {
             createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
@@ -364,7 +373,8 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
             assertSameClassloader(globalClassLoader, classLoader);
             platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
                     ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-            classLoaderService.refreshClassLoaderImmediately(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+            classLoaderService.refreshClassLoaderImmediately(
+                    ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                     classLoaderService.getGlobalClassLoaderId());
 
         });
@@ -524,16 +534,20 @@ public class ClassLoaderServiceIT extends CommonBPMServicesTest {
     private void assertSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) {
         assertNotNull(classLoader1);
         assertNotNull(classLoader2);
-        final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;
-        final ClassLoader c2 = classLoader2 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader2).getClassLoader() : classLoader2;
+        final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader
+                ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;
+        final ClassLoader c2 = classLoader2 instanceof VirtualClassLoader
+                ? ((VirtualClassLoader) classLoader2).getClassLoader() : classLoader2;
         assertEquals(c1, c2);
     }
 
     private void assertNotSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) {
         assertNotNull(classLoader1);
         assertNotNull(classLoader2);
-        final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;
-        final ClassLoader c2 = classLoader2 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader2).getClassLoader() : classLoader2;
+        final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader
+                ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;
+        final ClassLoader c2 = classLoader2 instanceof VirtualClassLoader
+                ? ((VirtualClassLoader) classLoader2).getClassLoader() : classLoader2;
         assertNotSame(c1, c2);
     }
 

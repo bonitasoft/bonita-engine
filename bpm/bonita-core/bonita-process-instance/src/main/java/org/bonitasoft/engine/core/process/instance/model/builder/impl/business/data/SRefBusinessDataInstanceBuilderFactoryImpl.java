@@ -21,14 +21,14 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNode
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 
-
 /**
  * @author Matthieu Chaffotte
  */
 public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessDataInstanceBuilderFactory {
 
     @Override
-    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final Long dataId, final String dataClassName) {
+    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId,
+            final Long dataId, final String dataClassName) {
         final SProcessSimpleRefBusinessDataInstance entity = new SProcessSimpleRefBusinessDataInstance();
         entity.setProcessInstanceId(processInstanceId);
         entity.setName(name);
@@ -38,7 +38,8 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
     }
 
     @Override
-    public SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(final String name, final long flowNodeInstanceId, final Long dataId,
+    public SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(final String name,
+            final long flowNodeInstanceId, final Long dataId,
             final String dataClassName) {
         final SFlowNodeSimpleRefBusinessDataInstance entity = new SFlowNodeSimpleRefBusinessDataInstance();
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
@@ -49,7 +50,8 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
     }
 
     @Override
-    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final List<Long> dataIds,
+    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId,
+            final List<Long> dataIds,
             final String dataClassName) {
         final SProcessMultiRefBusinessDataInstance entity = new SProcessMultiRefBusinessDataInstance();
         entity.setProcessInstanceId(processInstanceId);

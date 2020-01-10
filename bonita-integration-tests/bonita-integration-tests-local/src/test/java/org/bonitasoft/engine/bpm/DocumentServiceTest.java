@@ -58,7 +58,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     public void attachDocumentToProcessInstanceWithContentTest() throws SBonitaException {
         transactionService.begin();
         final SDocument document = buildProcessDocumentWithContent(1, "theContent".getBytes());
-        final SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+        final SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                "documentName", "the description");
         transactionService.complete();
 
         assertEquals(document.getAuthor(), result.getAuthor());
@@ -79,7 +80,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     public void attachDocumentToProcessInstanceWithUrlTest() throws SBonitaException {
         transactionService.begin();
         final SDocument document = buildProcessDocumentWithUrl(1);
-        final SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+        final SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                "documentName", "the description");
         transactionService.complete();
 
         assertEquals(document.getAuthor(), result.getAuthor());
@@ -100,8 +102,10 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         transactionService.begin();
         final SDocument document0 = buildProcessDocumentWithUrl(1);
         final SDocument document1 = buildProcessDocumentWithUrl(1);
-        final SMappedDocument result0 = documentService.attachDocumentToProcessInstance(document0, processInstanceId, "documentName", "the description", 0);
-        final SMappedDocument result1 = documentService.attachDocumentToProcessInstance(document1, processInstanceId, "documentName", "the description", 1);
+        final SMappedDocument result0 = documentService.attachDocumentToProcessInstance(document0, processInstanceId,
+                "documentName", "the description", 0);
+        final SMappedDocument result1 = documentService.attachDocumentToProcessInstance(document1, processInstanceId,
+                "documentName", "the description", 1);
         transactionService.complete();
 
         assertEquals(document0.getAuthor(), result0.getAuthor());
@@ -134,7 +138,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         final SMappedDocument sDocument = createDocumentMapping();
 
         transactionService.begin();
-        final SMappedDocument result = documentService.getMappedDocument(sDocument.getProcessInstanceId(), sDocument.getName());
+        final SMappedDocument result = documentService.getMappedDocument(sDocument.getProcessInstanceId(),
+                sDocument.getName());
         transactionService.complete();
 
         assertEquals(sDocument.getId(), result.getId());
@@ -164,7 +169,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         final List<SMappedDocument> list = createDocumentMappings();
 
         transactionService.begin();
-        final List<SMappedDocument> result = documentService.getDocumentsOfProcessInstance(list.get(0).getProcessInstanceId(), 0,
+        final List<SMappedDocument> result = documentService.getDocumentsOfProcessInstance(
+                list.get(0).getProcessInstanceId(), 0,
                 NUMBER_OF_DOCUMENT + 1, "name", OrderByType.ASC);
         transactionService.complete();
 
@@ -195,14 +201,16 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     }
 
     private SDocument buildProcessDocumentWithContent(final int i, final byte[] documentContent) {
-        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt", "text/plain", i);
+        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt",
+                "text/plain", i);
         builder.setHasContent(true);
         builder.setContent(documentContent);
         return builder.done();
     }
 
     private SDocument buildProcessDocumentWithUrl(final int i) {
-        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt", "text/plain", i);
+        final SDocumentBuilder builder = new SDocumentBuilderFactory().createNewInstance("getContentTest.txt",
+                "text/plain", i);
         builder.setHasContent(false);
         builder.setURL("theUrl");
         return builder.done();
@@ -211,7 +219,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     private SMappedDocument createDocumentMapping() throws SBonitaException {
         transactionService.begin();
         final SDocument document = buildProcessDocumentWithContent(1, "content".getBytes());
-        final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+        final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                "documentName", "the description");
         transactionService.complete();
         return doc;
     }
@@ -221,7 +230,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithContent(i, "content".getBytes());
-            list.add(documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description"));
+            list.add(documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName",
+                    "the description"));
         }
         transactionService.complete();
         return list;
@@ -280,7 +290,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         final List<SMappedDocument> list = createAndAttachDocumentToProcessInstances();
 
         transactionService.begin();
-        final List<SMappedDocument> result = documentService.getDocumentsOfProcessInstance(list.get(0).getProcessInstanceId(), 0,
+        final List<SMappedDocument> result = documentService.getDocumentsOfProcessInstance(
+                list.get(0).getProcessInstanceId(), 0,
                 NUMBER_OF_DOCUMENT + 1, documentNameKey, OrderByType.ASC);
         transactionService.complete();
 
@@ -331,20 +342,24 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         }
     }
 
-    private SMappedDocument createAndAttachDocumentToProcessInstanceWithContent(final byte[] documentContent) throws SBonitaException {
+    private SMappedDocument createAndAttachDocumentToProcessInstanceWithContent(final byte[] documentContent)
+            throws SBonitaException {
         transactionService.begin();
         final SDocument document = buildProcessDocumentWithContent(1, documentContent);
-        final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+        final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                "documentName", "the description");
         transactionService.complete();
         return doc;
     }
 
-    private List<SMappedDocument> createAndAttachDocumentToProcessInstancesWithContent(final byte[] documentContent) throws SBonitaException {
+    private List<SMappedDocument> createAndAttachDocumentToProcessInstancesWithContent(final byte[] documentContent)
+            throws SBonitaException {
         transactionService.begin();
         final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithContent(i, documentContent);
-            final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+            final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                    "documentName", "the description");
             list.add(doc);
         }
         transactionService.complete();
@@ -356,7 +371,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithUrl(i);
-            final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+            final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId,
+                    "documentName", "the description");
             list.add(doc);
         }
         transactionService.complete();
@@ -365,7 +381,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private byte[] getDocumentContent(final SMappedDocument sProcessDocument) throws SBonitaException {
         transactionService.begin();
-        final byte[] storedContents = documentService.getDocumentContent(String.valueOf(sProcessDocument.getDocumentId()));
+        final byte[] storedContents = documentService
+                .getDocumentContent(String.valueOf(sProcessDocument.getDocumentId()));
         transactionService.complete();
         return storedContents;
     }

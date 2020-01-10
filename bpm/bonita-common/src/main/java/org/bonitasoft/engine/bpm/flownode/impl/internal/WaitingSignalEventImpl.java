@@ -31,7 +31,8 @@ public class WaitingSignalEventImpl extends WaitingEventImpl implements WaitingS
         super();
     }
 
-    public WaitingSignalEventImpl(final BPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
+    public WaitingSignalEventImpl(final BPMEventType eventType, final long processdefinitionId,
+            final String processName, final long flowNodeDefinitionId,
             final String signalName) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId);
         this.signalName = signalName;

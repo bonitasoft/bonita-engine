@@ -15,7 +15,6 @@ package org.bonitasoft.engine.identity;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
-
 /**
  * @author Elias Ricken de Medeiros
  */
